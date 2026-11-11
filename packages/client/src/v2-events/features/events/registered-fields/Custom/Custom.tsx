@@ -144,7 +144,7 @@ export function findCustomFieldSources(eventConfigs: VersionedEventConfig[]) {
     eventConfigs
       .flatMap((config) =>
         config.versions.map((version) =>
-          getEventConfigOfVersion(config, version)
+          getEventConfigOfVersion(config, version.id)
         )
       )
       .flatMap(findAllFields)

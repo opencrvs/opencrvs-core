@@ -124,3 +124,53 @@ describe('by-id lookup of a record the server has not indexed', () => {
     unsubscribe()
   })
 })
+
+describe('a by-id refetch when the last observer unmounts during the fetch', () => {
+  const eventId = '55555555-5555-5555-5555-555555555555'
+  const before = {
+    results: [{ id: eventId, status: 'DECLARED' } as EventIndex],
+    total: 1
+  }
+  const after = {
+    results: [{ id: eventId, status: 'REGISTERED' } as EventIndex],
+    total: 1
+  }
+
+  it('keeps the server result, not the data from before the fetch', async () => {
+    let requestArrived = false
+    let releaseResponse: () => void = () => undefined
+    const responseReleased = new Promise<void>((resolve) => {
+      releaseResponse = resolve
+    })
+    server.use(
+      http.get('/api/events/:proc', async () => {
+        requestArrived = true
+        await responseReleased
+        return HttpResponse.json({
+          result: { data: serialize(after), type: 'data' }
+        })
+      })
+    )
+
+    // The overview shows the record.
+    queryClient.setQueryData(byIdSearchKey(eventId), before)
+    const observer = new QueryObserver(queryClient, {
+      ...byIdSearchOptions(eventId, () => EMPTY_RESULT),
+      staleTime: Infinity
+    })
+    const unsubscribe = observer.subscribe(() => undefined)
+
+    // An action succeeds, and deleteLocalEvent refetches the record.
+    const refetch = queryClient.refetchQueries({
+      queryKey: byIdSearchKey(eventId)
+    })
+    await vi.waitFor(() => expect(requestArrived).toBe(true))
+
+    // The user leaves the overview before the server answers.
+    unsubscribe()
+    releaseResponse()
+    await refetch
+
+    expect(queryClient.getQueryData(byIdSearchKey(eventId))).toEqual(after)
+  })
+})

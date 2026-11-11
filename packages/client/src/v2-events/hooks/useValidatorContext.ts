@@ -19,7 +19,7 @@ import {
   ValidatorContext
 } from '@opencrvs/commons/client'
 import { useAuthentication } from '../../utils/userUtils'
-import { useEventConfigurations } from '../features/events/useEventConfiguration'
+import { useEventConfigurationResolver } from '../features/events/useEventConfiguration'
 import { useSuspenseGetLeafAdministrativeAreaIds } from './useAdministrativeAreas'
 
 /**
@@ -36,11 +36,15 @@ function useUser() {
   )
 }
 
+/**
+ * @param findEventConfiguration gives the configuration of the version `event` was
+ * created under.
+ */
 export function resolveEventValidatorContext(
-  configs: EventConfig[],
+  findEventConfiguration: (record: EventDocument) => EventConfig | undefined,
   event?: EventDocument
 ): EventValidatorContext | undefined {
-  const eventConfig = configs.find((c) => c.id === event?.type)
+  const eventConfig = event && findEventConfiguration(event)
 
   if (!event || !eventConfig) {
     return undefined
@@ -53,15 +57,15 @@ export function useValidatorContext(event?: EventDocument): ValidatorContext {
   const leafAdminStructureLocationIds =
     useSuspenseGetLeafAdministrativeAreaIds()
   const user = useUser()
-  const configs = useEventConfigurations()
+  const findEventConfiguration = useEventConfigurationResolver()
 
   /**
    * Aggregating the action history is expensive and conditionals are evaluated
    * per field, per conditional type — so compute it once per (event, config).
    */
   const eventContext = useMemo(
-    () => resolveEventValidatorContext(configs, event),
-    [event, configs]
+    () => resolveEventValidatorContext(findEventConfiguration, event),
+    [event, findEventConfiguration]
   )
 
   return {

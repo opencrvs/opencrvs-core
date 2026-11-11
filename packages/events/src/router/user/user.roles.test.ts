@@ -11,7 +11,7 @@
 
 import { TRPCError } from '@trpc/server'
 import { http, HttpResponse, HttpResponseInit } from 'msw'
-import { getUUID } from '@opencrvs/commons'
+import { encodeScope, getUUID } from '@opencrvs/commons'
 import {
   createSystemTestClient,
   createTestClient,
@@ -21,10 +21,16 @@ import { env } from '@events/environment'
 import { mswServer } from '../../tests/msw'
 
 const mockRoles = [
-  { id: 'REGISTRATION_AGENT', scopes: ['record.declare-birth'] },
+  {
+    id: 'REGISTRATION_AGENT',
+    scopes: [encodeScope({ type: 'record.declare' })]
+  },
   {
     id: 'LOCAL_REGISTRAR',
-    scopes: ['record.declare-birth', 'record.register-birth']
+    scopes: [
+      encodeScope({ type: 'record.declare' }),
+      encodeScope({ type: 'record.register' })
+    ]
   }
 ]
 
@@ -67,6 +73,25 @@ describe('user.roles.list', () => {
 
     await expect(client.user.roles.list()).rejects.toThrow(
       'Failed to fetch roles config'
+    )
+  })
+
+  test('throws naming the role when country config serves invalid roles', async () => {
+    const { user } = await setupTestCase()
+    const client = createTestClient(user)
+
+    mockGetRoles([
+      {
+        id: 'COMMUNITY_LEADER',
+        scopes: [
+          encodeScope({ type: 'record.notify' }),
+          encodeScope({ type: 'record.declare' })
+        ]
+      }
+    ])
+
+    await expect(client.user.roles.list()).rejects.toThrow(
+      "Role 'COMMUNITY_LEADER': record.notify and record.declare are both granted for all events"
     )
   })
 
