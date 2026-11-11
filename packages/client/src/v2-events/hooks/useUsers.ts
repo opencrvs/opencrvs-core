@@ -66,7 +66,7 @@ setQueryDefaults<
       (file): file is DocumentPath => !!file
     )
 
-    await precacheFiles(files, { userId: user.id as UUID })
+    await precacheFiles(files, { userId: UUID.parse(user.id) })
 
     return deepDropNulls({
       ...user,
@@ -117,7 +117,7 @@ setQueryDefaults(trpcOptionsProxy.user.list, {
       await precacheUserAvatars(
         freshUsers.flatMap((user) =>
           user.type === TokenUserType.enum.user && user.avatar
-            ? [user.id as UUID]
+            ? [UUID.parse(user.id)]
             : []
         )
       )
