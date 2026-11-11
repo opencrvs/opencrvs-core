@@ -20,6 +20,9 @@
       "@opencrvs/commons/authentication": [
         "../commons/src/users/authentication.ts"
       ],
+      "@opencrvs/commons/request-signing": [
+        "../commons/src/request-signing/index.ts"
+      ],
       "@opencrvs/commons/events": ["../commons/src/events/index.ts"],
       "@opencrvs/commons/events/deduplication": [
         "../commons/src/events/deduplication.ts"
