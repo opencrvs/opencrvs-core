@@ -10,7 +10,7 @@
  */
 import { DocumentPath, logger, User, UUID } from '@opencrvs/commons'
 import { TrpcContext } from '@events/context'
-import { assertCanReadOtherUser } from '@events/router/middleware'
+import { assertCanReadOtherUser } from '@events/service/users/access'
 import { isSignableKey } from '@events/service/files/authorize'
 import { getUsersById, isOwnUserFile, isUser } from '@events/service/users/api'
 

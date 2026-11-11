@@ -17,7 +17,6 @@ import { findLast } from 'lodash'
 import {
   Action,
   ActionDocument,
-  User,
   ActionInputWithType,
   ActionStatus,
   ActionType,
@@ -51,6 +50,7 @@ import { ServiceTrpcContext, TrpcContext } from '@events/context'
 import { getUserById } from '@events/storage/postgres/events/users'
 import { getSystemInitialisation } from '@events/service/auth'
 import { getLocationHierarchy } from '@events/service/locations/locations'
+import { assertCanReadOtherUser } from '@events/service/users/access'
 import { findUserOrSystem, getUser } from '../../../service/users/api'
 import { getInMemoryEventConfigurations } from '../../../service/config/config'
 import { getEventIndexWithAdministrativeHierarchy } from '../../../service/indexing/utils'
@@ -581,59 +581,6 @@ export function canCreateUserWithScopes(scopes: UserScopeType[]) {
   }
 
   return fn
-}
-
-/**
- * Throws unless the caller may read the user: their own user, or one within
- * reach of their user.read scope. Pass `loadedUser` when the user is already
- * loaded, so it isn't loaded again.
- */
-export async function assertCanReadOtherUser(
-  ctx: TrpcContext,
-  userId: UUID,
-  loadedUser?: Pick<User, 'role' | 'primaryOfficeId'>
-) {
-  const { token, user: userReading } = ctx
-
-  const acceptedScopes = getAcceptedScopesFromToken(token, ['user.read'])
-
-  const isRequestingOwnUser = userReading.id === userId
-
-  if (acceptedScopes.length === 0 && !isRequestingOwnUser) {
-    throw new TRPCError({ code: 'FORBIDDEN' })
-  }
-
-  const otherUser = loadedUser ?? (await getUser(userId))
-
-  if (isRequestingOwnUser) {
-    return
-  }
-
-  if (acceptedScopes.length === 0) {
-    throw new TRPCError({ code: 'NOT_FOUND' })
-  }
-
-  if (!otherUser.primaryOfficeId) {
-    throw new TRPCError({ code: 'NOT_FOUND' })
-  }
-
-  const userLocationHierarchy = await getLocationHierarchy(
-    otherUser.primaryOfficeId
-  )
-
-  const hasAccess = canAccessOtherUserWithScopes({
-    scopes: acceptedScopes,
-    userToAccess: {
-      role: otherUser.role,
-      administrativeHierarchy: userLocationHierarchy,
-      primaryOfficeId: otherUser.primaryOfficeId
-    },
-    user: userReading
-  })
-
-  if (!hasAccess) {
-    throw new TRPCError({ code: 'NOT_FOUND' })
-  }
 }
 
 export const userCanReadOtherUser: MiddlewareFunction<
