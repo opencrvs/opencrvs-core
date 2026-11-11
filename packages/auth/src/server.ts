@@ -62,6 +62,7 @@ import { tokenHandler } from '@auth/features/oauthToken/handler'
 import { logger } from '@opencrvs/commons'
 import { getPublicKey } from '@auth/features/authenticate/service'
 import serviceTokenHandler from './features/serviceToken/handler'
+import { jwksHandler } from '@auth/features/wellKnown/handler'
 import reindexingTokenHandler, {
   responseSchema as reindexResponseSchema
 } from './features/reindexToken/handler'
@@ -140,6 +141,18 @@ export async function createServer() {
         'Returns a token to be used for endpoints that allow unauthorized access such as certificate verification endpoints. Token contains no scopes.'
     }
   })
+  server.route({
+    method: 'GET',
+    path: '/.well-known/jwks.json',
+    handler: jwksHandler,
+    options: {
+      auth: false,
+      tags: ['api'],
+      description:
+        'Public keys of core: the JWT key and the keys that sign requests to country config'
+    }
+  })
+
   // curl -H 'Content-Type: application/json' http://localhost:4040/reindexing-token
   server.route({
     method: 'GET',
