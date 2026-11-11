@@ -25,7 +25,7 @@ Related documents:
 8. Fail loudly. Do not skip bad data or hide an error.
 9. Reuse the helpers that exist. Delete the code that nothing uses.
 10. A comment says why. Delete comments that repeat the code or are no longer true.
-11. Do not edit a migration that can already have run. Write queries and migrations that work for the data of a whole country.
+11. Do not edit a migration that may have already run. Write migrations assuming it will run against a live environment with real data. Write queries assuming there can be millions of rows. 
 12. Read all the code, comments and text that an agent wrote before you ask a person to review it.
 
 ## What the tooling already checks
