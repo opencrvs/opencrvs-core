@@ -14,7 +14,9 @@ import createFetchMock from 'vitest-fetch-mock'
 import { ContentSvg } from 'pdfmake/interfaces'
 import {
   ActionDocument,
+  ActionType,
   AddressType,
+  DocumentPath,
   eventQueryDataGenerator,
   tennisClubMembershipEvent,
   UUID,
@@ -24,6 +26,7 @@ import {
 } from '@opencrvs/commons/client'
 import { testDataGenerator } from '@client/tests/test-data-generators'
 import { toFileUrl } from '@client/v2-events/cache'
+import { FileWithOption } from '@client/v2-events/components/forms/inputs/FileInput/DocumentUploaderWithOption'
 import {
   tennisClubMembershipEventDocument,
   tennisClubMembershipEventIndex
@@ -241,7 +244,14 @@ describe('svgToPdfTemplate', () => {
   })
 })
 
-function expectRenderOutput(template: string, output: string) {
+function expectRenderOutput(
+  template: string,
+  output: string,
+  overrides: {
+    $actions?: ActionDocument[]
+    $declaration?: Record<string, unknown>
+  } = {}
+) {
   const generator = testDataGenerator(2323)
   const registrar = generator.user.localRegistrar()
   const { declaration, ...metadata } = tennisClubMembershipEventIndex
@@ -254,12 +264,15 @@ function expectRenderOutput(template: string, output: string) {
       modifiedAt: new Date().toISOString(),
       copiesPrintedForTemplate: 2
     },
-    $actions: tennisClubMembershipEventDocument.actions as ActionDocument[],
+    $actions:
+      overrides.$actions ??
+      (tennisClubMembershipEventDocument.actions as ActionDocument[]),
     $declaration: {
       'applicant.name': {
         firstname: 'John',
         surname: 'Doe'
-      }
+      },
+      ...overrides.$declaration
     },
     review: false,
     locations: new Map(),
@@ -574,5 +587,74 @@ describe('SVG compiler', () => {
         '<svg><text>/aa13a268-ae48-4a30-9450-554aebaab203/signature.png</text></svg>'
       )
     })
+  })
+
+  /*
+   * The certificate is rendered inline on the print review page. A relative
+   * href ("events/<id>/x.png") resolves against the page URL, which misses the
+   * service worker cache and gives a broken image.
+   * @see https://github.com/opencrvs/opencrvs-core/issues/14187
+   */
+  describe('Images', () => {
+    const eventId = tennisClubMembershipEventDocument.id
+
+    it('renders a file from the declaration as an absolute path', () => {
+      expectRenderOutput(
+        '<svg><image href="{{ $lookup $declaration "applicant.image" }}"/></svg>',
+        `<svg><image href="/events/${eventId}/applicant-photo.png"/></svg>`,
+        {
+          $declaration: {
+            'applicant.image': {
+              path: `events/${eventId}/applicant-photo.png`,
+              originalFilename: 'applicant-photo.png',
+              type: 'image/png'
+            }
+          }
+        }
+      )
+    })
+
+    it('renders a file from the print annotation as an absolute path', () => {
+      const printAction = {
+        ...tennisClubMembershipEventDocument.actions.at(-1),
+        id: '6f1c2e0a-3b7d-4c55-9a1e-2d4f8b9c0e11' as UUID,
+        type: ActionType.PRINT_CERTIFICATE,
+        declaration: {},
+        annotation: {
+          'collector.requesterId': 'OTHER',
+          'collector.OTHER.signedAffidavit': {
+            path: `events/${eventId}/affidavit.png`,
+            originalFilename: 'affidavit.png',
+            type: 'image/png'
+          }
+        }
+      } as ActionDocument
+
+      expectRenderOutput(
+        `<svg><image href="{{ $lookup ($action 'PRINT_CERTIFICATE') 'annotation.collector.OTHER.signedAffidavit' }}"/></svg>`,
+        `<svg><image href="/events/${eventId}/affidavit.png"/></svg>`,
+        {
+          $actions: [
+            ...(tennisClubMembershipEventDocument.actions as ActionDocument[]),
+            printAction
+          ]
+        }
+      )
+    })
+  })
+})
+
+describe('Certificate variables of file fields', () => {
+  it('gives absolute paths for files with options', () => {
+    expect(
+      FileWithOption.toCertificateVariables([
+        {
+          path: 'events/abc/id-front.png' as DocumentPath,
+          originalFilename: 'id-front.png',
+          type: 'image/png',
+          option: 'ID_FRONT'
+        }
+      ])
+    ).toEqual({ ID_FRONT: '/events/abc/id-front.png' })
   })
 })
