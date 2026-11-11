@@ -91,7 +91,7 @@ Bad data or bad config always gives a signal. A reindex fails if it cannot index
 
 ### Tell the person who can fix it
 
-A log line is not enough when a user or an operator must act. People who deploy OpenCRVS do not watch the logs.
+Some problems on the server need a user or an operator to act. For example, the country config is not valid, or a service cannot fetch it. A log line on the server is not enough for these problems, because the people who deploy OpenCRVS do not watch the server logs. Make the problem visible. For example, stop the service from starting, or return an error that the user sees.
 
 ### Let errors propagate
 
@@ -107,7 +107,7 @@ Use a feature of the platform, or of a library that the repository already has, 
 
 ### Enforce a rule in the types, not at each call site
 
-If every call site must remember to pass a value or call a helper, make the compiler reject the call site that forgets. For example, make the parameter required, or accept only the type that the helper returns. If the types cannot enforce the rule, move it into one helper in commons or into a wrapper component.
+If every call site must remember to pass a value or call a helper, make the compiler reject the call site that forgets. For example, make the parameter required, or accept only the type that the helper returns. If the types cannot enforce the rule, move it into one helper or into a wrapper component. Put the helper in the package that owns the rule. It goes in commons only when more than one package uses it.
 
 ### Add a layer only when it does a job
 

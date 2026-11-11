@@ -29,8 +29,8 @@ By contributing to the OpenCRVS code, you are conforming to the terms of the [li
 - Keep each PR to one concern. Open a separate PR or an issue for other findings.
 - Fix the root cause, and reproduce the bug first. If a workaround is necessary, give the reason in the description and open an issue for the cause.
 - Write the description that the [PR template](.github/PULL_REQUEST_TEMPLATE.md) asks for.
-- Give the PR a title that describes the change. The title becomes the squash commit.
+- Give the PR a title that describes the change.
 - Open the PR for a bug fix on the earliest release where the bug was found.
 - Send a hotfix for a released version to the hotfix branch of its minor version, such as `release/2.1.x`.
-- A risky refactor with no user benefit waits until `develop` is on the next release line.
+- Merge a risky refactor at the start of the work on a release, not near the end. Then there is time to find its problems before the release. This applies mainly to a refactor that gives no benefit to users.
 - Read all the code, comments, tests and text that an agent wrote before you ask a person to review them. A finding from a bot review is a suggestion. Check it before you act on it.

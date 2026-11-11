@@ -22,7 +22,7 @@ useMutation({ ..., onError: () => dispatch(showError()) })
 
 ## Keep data logic out of views
 
-Sort, filter and refetch in the query or the procedure, not in the component that shows the data.
+When a list can grow large, sort, filter and page it in the query or the procedure, not in the component that shows it. A view can sort or filter a small list that it already has. Configure a refetch in the query, not in the component.
 
 ## Pass behaviour in
 
@@ -47,7 +47,6 @@ When a user must act, show an error in the UI. A view that renders nothing hides
 - Write the `id` and the `defaultMessage` of each message in the code as fixed strings. The `extract:translations` check cannot read a message that is created at runtime, so it cannot make sure that the country config has the key.
 - Use [ICU message](https://unicode-org.github.io/icu/userguide/format_parse/messages/) placeholders and `select` in one message instead of strings or punctuation that are joined to a translated message.
 - When you add, change or remove a message, update `client.csv` in `countryconfig-template` and in `testland`.
-- Use `APPLICATION_NAME` for the application name, and read the locale from the user.
 
 ```ts
 // Rejected: joins text to a translated message
