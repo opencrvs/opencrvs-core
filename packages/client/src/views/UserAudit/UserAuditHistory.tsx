@@ -67,7 +67,10 @@ const OPERATIONS_TO_HIDE = [
   'locations.withdrawVersion',
   'administrativeAreas.create',
   'administrativeAreas.update',
-  'administrativeAreas.withdrawVersion'
+  'administrativeAreas.withdrawVersion',
+  // Written each time a record's documents load; kept for investigations only
+  'event.files.presign',
+  'event.file.getPresignedUrl'
 ]
 
 const TableDiv = styled.div`

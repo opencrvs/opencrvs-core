@@ -20,6 +20,7 @@ import {
 } from '@opencrvs/commons'
 import { createTestClient, setupTestCase } from '@events/tests/utils'
 import { updateUserById } from '@events/storage/postgres/events/users'
+import { getClient } from '@events/storage/postgres/events'
 
 const readTennisClub = encodeScope({
   type: 'record.read',
@@ -194,5 +195,23 @@ describe('event.file.getPresignedUrl (deprecated)', () => {
         filePath: filePath as DocumentPath
       })
     ).rejects.toMatchObject({ code: 'BAD_REQUEST' })
+  })
+
+  test('records the presigned file in the audit log', async () => {
+    const { otherUser, event, filePath } = await setupDeclaredRecord()
+
+    await createTestClient(otherUser, [
+      readTennisClub
+    ]).event.file.getPresignedUrl({ filePath })
+
+    const logs = await getClient()
+      .selectFrom('auditLog')
+      .selectAll()
+      .where('clientId', '=', otherUser.id)
+      .where('operation', '=', 'event.file.getPresignedUrl')
+      .execute()
+
+    expect(logs).toHaveLength(1)
+    expect(logs[0].requestData).toEqual({ eventId: event.id, filePath })
   })
 })

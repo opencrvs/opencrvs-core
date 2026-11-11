@@ -19,6 +19,7 @@ import { router, userAndSystemProcedure } from '@events/router/trpc'
 import { getEventById } from '@events/service/events/events'
 import { presignFiles } from '@events/service/files'
 import { getReadableEventFiles } from '@events/service/files/authorize'
+import { writeAuditLog } from '@events/storage/postgres/events/auditLog'
 
 const PresignFileInput = z.object({
   filePath: DocumentPath,
@@ -80,6 +81,14 @@ export const fileRouter = router({
 
       const urls = await presignFiles([input.filePath], ctx.token)
 
+      await writeAuditLog({
+        clientId: ctx.user.id,
+        clientType: ctx.user.type,
+        operation: 'event.file.getPresignedUrl',
+        requestData: { eventId: ctx.eventId, filePath: input.filePath },
+        responseSummary: null
+      })
+
       return { presignedURL: urls[input.filePath] }
     })
 })
@@ -96,7 +105,16 @@ export const filesRouter = router({
     .query(async ({ ctx }) => {
       const event = await getEventById(ctx.eventId)
       const paths = await getReadableEventFiles(ctx, event)
+      const urls = await presignFiles(paths, ctx.token)
 
-      return presignFiles(paths, ctx.token)
+      await writeAuditLog({
+        clientId: ctx.user.id,
+        clientType: ctx.user.type,
+        operation: 'event.files.presign',
+        requestData: { eventId: ctx.eventId },
+        responseSummary: { files: paths }
+      })
+
+      return urls
     })
 })
