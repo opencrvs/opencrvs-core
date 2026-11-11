@@ -127,11 +127,18 @@ Remove the dependency, the environment variables, the endpoints, the Docker Comp
 
 Every permission check happens in the service that owns the data. When the client hides a button, that is a UX choice. It does not give security. Deny by default. If a PR finds a check that exists only in the client, fix it or open an issue.
 
-Use the existing middleware in the events service, for example `middleware.canAccessEventWithScopes` and `middleware.allowedWithAnyOfScopes`.
+For each route, access check is run as middleware, separate from the service logic. In the events package, utilise the existing ones from `packages/events/src/router/middleware`.
 
 ### 3.2 Read the identity from the token
 
-Get the acting user or client from the token or the tRPC context, not from the request payload. If the payload must name a user, check that user against the scopes of the token. Use the procedure type that matches the caller.
+Never trust the payload. Always read the identifiers from the token.
+
+Avoid defining APIs which require multiple identifiers as payload.
+- `/:eventId/files` access can be validated based on scopes in a token.
+- `/:eventId/:fileId` access cannot be validated based on scopes alone but requires additional check that file belongs to an event.
+- Get the acting user or client from the token or the tRPC context, not from the request payload.
+- If the payload must name a user, check that user against the scopes of the token. Use the procedure type that matches the caller. Do not expose endpoint to a system user if it is only used through client.
+
 
 ### 3.3 Do not show that a resource exists
 
@@ -275,7 +282,7 @@ Use a feature of a library that we already have, or of the platform, before you 
 
 ### 6.6 Follow the patterns of the other services
 
-Do a common task in the same way as the rest of the repository. For example, read environment variables with envalid `cleanEnv`, and use `devDefault` for defaults that apply only in development. Use `nx` in CI. Keep tool configuration in one place, for example in `pnpm-workspace.yaml`.
+Do a common task in the same way as the rest of the repository. For example, read environment variables with envalid `cleanEnv`, and use `devDefault` for defaults that apply only in development. Use `nx` in CI. Keep tool configuration in one place, for example in `pnpm-workspace.yaml`. If there are multiple conventions, always prefer one from events service.
 
 ### 6.7 Respect the package boundaries
 
@@ -329,7 +336,7 @@ A cache or another optimization must give a gain that is larger than the complex
 
 ### 8.1 A name says what the code does
 
-Rename a function, a variable, an error message or a test title when its behaviour changes. A function with a query name, such as `getX` or `isX`, has no side effects. Use a named constant for a number that is not obvious.
+Rename a function, a variable, an error message or a test title when its behaviour changes. A function with a query name, such as `getX` or `isX`, has no side effects. `getX` throws when not found. `findX` may return undefined. Use a named constant for a number that is not obvious.
 
 ### 8.2 Use the domain terms, and do not reuse them
 
@@ -366,7 +373,7 @@ A comment that is long or that sounds generated will not be read. When the code 
 ### 10.1 Every change of behaviour has a test
 
 - A bug fix comes with a test that reproduces the bug. The test fails without the fix.
-- Test at the layer where the bug is.
+- Test at the layer where the bug is. Prefer integration tests at endpoint level. Avoid unit tests that make the behaviour hard to follow or change later.
 - Cover the negative cases and each acceptance criterion of the issue.
 - A new tRPC procedure has access tests (allowed and forbidden, for each caller type) and functional tests. If endpoint can return multiple values, ensure it works with 0, 1 and more items.
 - Code that is about to be removed can go without new tests. Say so in the PR.
