@@ -8,15 +8,15 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { DocumentPath, logger, UUID } from '@opencrvs/commons'
+import { DocumentPath, logger, User, UUID } from '@opencrvs/commons'
 import { TrpcContext } from '@events/context'
 import { assertCanReadOtherUser } from '@events/router/middleware'
 import { isSignableKey } from '@events/service/files/authorize'
 import { getUsersById, isOwnUserFile, isUser } from '@events/service/users/api'
 
-async function canReadOtherUser(ctx: TrpcContext, userId: UUID) {
+async function canReadOtherUser(ctx: TrpcContext, user: User) {
   try {
-    await assertCanReadOtherUser(ctx, userId)
+    await assertCanReadOtherUser(ctx, UUID.parse(user.id), user)
     return true
   } catch {
     return false
@@ -53,7 +53,7 @@ export async function getReadableUserFiles(
 
   const files = await Promise.all(
     users.map(async (user) => {
-      const userId = user.id as UUID
+      const userId = UUID.parse(user.id)
       const avatar =
         user.avatar && isOwnFile(user.avatar, userId) ? [user.avatar] : []
 
@@ -66,7 +66,7 @@ export async function getReadableUserFiles(
         return avatar
       }
 
-      if (!(await canReadOtherUser(ctx, userId))) {
+      if (!(await canReadOtherUser(ctx, user))) {
         logger.info(
           `Not presigning the signature of user ${user.id}: user ${ctx.user.id} may not read that user`
         )

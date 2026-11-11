@@ -17,6 +17,7 @@ import { findLast } from 'lodash'
 import {
   Action,
   ActionDocument,
+  User,
   ActionInputWithType,
   ActionStatus,
   ActionType,
@@ -584,9 +585,14 @@ export function canCreateUserWithScopes(scopes: UserScopeType[]) {
 
 /**
  * Throws unless the caller may read the user: their own user, or one within
- * reach of their user.read scope.
+ * reach of their user.read scope. Pass `loadedUser` when the user is already
+ * loaded, so it isn't loaded again.
  */
-export async function assertCanReadOtherUser(ctx: TrpcContext, userId: UUID) {
+export async function assertCanReadOtherUser(
+  ctx: TrpcContext,
+  userId: UUID,
+  loadedUser?: Pick<User, 'role' | 'primaryOfficeId'>
+) {
   const { token, user: userReading } = ctx
 
   const acceptedScopes = getAcceptedScopesFromToken(token, ['user.read'])
@@ -597,7 +603,7 @@ export async function assertCanReadOtherUser(ctx: TrpcContext, userId: UUID) {
     throw new TRPCError({ code: 'FORBIDDEN' })
   }
 
-  const otherUser = await getUser(userId)
+  const otherUser = loadedUser ?? (await getUser(userId))
 
   if (isRequestingOwnUser) {
     return
