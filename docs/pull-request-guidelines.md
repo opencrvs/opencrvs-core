@@ -25,7 +25,7 @@ Related documents:
 8. Fail loudly. Do not skip bad data or hide an error.
 9. Reuse the helpers that exist. Delete the code that nothing uses.
 10. A comment says why. Delete comments that repeat the code or are no longer true.
-11. Do not edit a migration that may have already run. Write migrations assuming it will run against a live environment with real data. Write queries assuming there can be millions of rows. 
+11. Do not edit a migration that may have already run. Write migrations assuming it will run against a live environment with real data. Write queries assuming there can be millions of rows.
 12. Read all the code, comments and text that an agent wrote before you ask a person to review it.
 
 ## What the tooling already checks
@@ -55,24 +55,20 @@ Find out why the bug happens before you change core behaviour. Reproduce it firs
 
 ### 1.3 Write a short description that a reviewer can check
 
-- Describe which problem the PR solves. For a bug fix, give the root cause. If you are working on an issue, link it to the pull request. 
+- Describe which problem the PR solves. For a bug fix, give the root cause. If you are working on an issue, link it to the pull request.
 - Say why the solution is correct. Reviewers read the code, so do not describe each change in it.
 - Explain every changed default, limit or constant. Reviewers will ask "is this intentional?".
 - Add before and after screenshots, or a recording, for a UI change.
 - Check the acceptance criteria in the issue. If the PR does not meet one of them, say so.
 - Give the PR a title that describes the change. The title becomes the squash commit.
 
-### 1.4 Show a passing e2e run before merge
+### 1.4 Use the correct base branch
 
-Post a link to a passing e2e run in the PR. For a UI change, a Chromatic link helps too. If the fix needs a new e2e case, add it in `packages/testland/e2e` in the same PR.
-
-### 1.5 Use the correct base branch
-
-- A fix for a released version goes to the next patch branch of that line, not to a branch that is already released.
+- A hotfix for a released version goes to the hotfix branch of its minor version: `release/1.9.x`, `release/2.0.x`, `release/2.1.x` and so on. These branches stay open for all the patch releases of that minor version. Do not target a patch branch that is already released, such as `release/2.1.3`.
 - A fix that the live release lines need is backported to them.
 - A risky refactor with no user benefit waits until `develop` is on the next release line.
 
-### 1.6 Review the output of agents yourself first
+### 1.5 Review the output of agents yourself first
 
 Read all the code, comments, tests and descriptions that an agent wrote before you ask a person to review them. Remove the comments that are not true or not useful. A bot review finding is a suggestion. Check it before you act on it, and say so if it is wrong.
 
@@ -134,11 +130,11 @@ For each route, access check is run as middleware, separate from the service log
 Never trust the payload. Always read the identifiers from the token.
 
 Avoid defining APIs which require multiple identifiers as payload.
+
 - `/:eventId/files` access can be validated based on scopes in a token.
 - `/:eventId/:fileId` access cannot be validated based on scopes alone but requires additional check that file belongs to an event.
 - Get the acting user or client from the token or the tRPC context, not from the request payload.
 - If the payload must name a user, check that user against the scopes of the token. Use the procedure type that matches the caller. Do not expose endpoint to a system user if it is only used through client.
-
 
 ### 3.3 Do not show that a resource exists
 
@@ -232,13 +228,17 @@ Prefer `type` and string literal unions. Do not add an enum-like `as const` obje
 
 `null` means that the user cleared a field. For a value that is not there, send `undefined`, not an empty string. Remove `null` values before a payload leaves the API.
 
-### 4.6 Validate country config early, and keep server validation strict
+### 4.6 Validate country config at build time
 
-- Validate country config in `defineConfig` and `defineRoles`, so that the country sees the error at build time.
-- Use one schema from commons for this. The events service, the toolkit and the seeder then reject the same input.
-- The server still validates every request.
-- Do not make core validation weaker to work around a client bug. Fix the client.
-- Invalid input returns `BAD_REQUEST`, with a message that names the problem and where it is (for example the event id and the version).
+- Validate country config in `defineConfig` and `defineRoles`. Then the country sees an error when it builds its config, not after it deploys.
+- Use one schema from commons for this. Then the events service, the toolkit and the seeder accept and reject the same config.
+- The error message says what is wrong and where. For example, it names the event id and the version of the event config.
+
+### 4.7 Validate every request on the server
+
+- The server validates every request, also when the client validated the input before.
+- Do not make the validation in core weaker to work around a bug in the client. Fix the client.
+- For input that is not valid, return `BAD_REQUEST` with a message that says what is wrong.
 
 ---
 
@@ -264,9 +264,9 @@ Do not catch an error and then drop it. Throw the original error. Return the pro
 
 Search for an existing helper, hook, schema or component before you add one. Extend the existing function instead of adding a parallel one next to it. Define each enum and each list of statuses once.
 
-### 6.2 Put a rule that every caller must remember into one place
+### 6.2 Do not depend on every caller to remember a rule
 
-If every call site must remember to pass a value or call a helper, move the rule into one helper in commons or into a wrapper component. Then a call site cannot forget it.
+If every call site must remember to pass a value or call a helper, enforce the rule in the types. In most cases this is possible. For example, make the parameter required, or accept only the type that the helper returns. Then the compiler rejects a call site that forgets the rule. If the types cannot enforce it, move the rule into one helper in commons or into a wrapper component.
 
 ### 6.3 Write small functions, and do not add empty layers
 
@@ -308,7 +308,11 @@ A deployed database does not run a migration again after it has run. Add a new m
 
 ### 7.2 Write data migrations for the data of a whole country
 
-Do not load all rows into memory. Work in batches. Put the schema change and the data copy in separate steps. Join on indexed columns. Plain SQL is often shorter and faster than code. Check the order in which the migrations of different services run.
+- Do not load all rows into memory. Work in batches.
+- Put the schema change and the data copy in separate steps.
+- Join on indexed columns.
+- Plain SQL is often shorter and faster than code.
+- Do not assume that migrations run in the order of their timestamps. A migration that ships in a patch release can run before migrations on `develop` that have earlier timestamps. The comment in `packages/migration/run-migrations.sh` explains this. If your migration depends on the result of another migration, make sure that it works in either order. For example, use `IF NOT EXISTS` when you create a table or an index.
 
 ### 7.3 Let Postgres do the work
 
@@ -316,12 +320,13 @@ Do not load all rows into memory. Work in batches. Put the schema change and the
 - Use one query for many items. Do not run `Promise.all` over a list of queries.
 - Add indexes and foreign keys.
 - Do not query the inside of `jsonb` columns. Keep them as blobs of data.
-- Do not store data that is already stored somewhere else.
+- Do not write a field that gives no new information. For example, an audit log entry does not repeat values that are already in its `requestData`. Some copies are part of the design: each action keeps the data as it was when the action happened, and the search index is built from the events. Do not add a new copy of data without a reason, and give the reason in the PR.
 - Put writes that belong together in one transaction.
 
 ### 7.4 Keep I/O bounded and batched
 
-- Run independent calls in parallel with `Promise.all`. Move calls out of loops, and send one call for many items when the API allows it.
+- Move calls out of loops. Send one call for many items when the API allows it.
+- Do not use `Promise.all` for writes or for other calls that have side effects, mainly on the backend. When one call fails, `Promise.all` rejects at once, but the other calls do not stop. Then some writes are done and some are not. Use `Promise.all` only for independent reads, or for calls that are safe to retry.
 - Put a limit on an operation that can grow without limit (a list of keys, a prefix scan, an error message).
 - Do not hold a database lock while you wait for an external system.
 - Use the `waitFor` option, which waits for indexing, only when the client needs the new index at once. In tests that do not check indexing, set `waitFor: false`.
@@ -376,7 +381,6 @@ A comment that is long or that sounds generated will not be read. When the code 
 - Test at the layer where the bug is. Prefer integration tests at endpoint level. Avoid unit tests that make the behaviour hard to follow or change later.
 - Cover the negative cases and each acceptance criterion of the issue.
 - A new tRPC procedure has access tests (allowed and forbidden, for each caller type) and functional tests. If endpoint can return multiple values, ensure it works with 0, 1 and more items.
-- Code that is about to be removed can go without new tests. Say so in the PR.
 
 ### 10.2 Assert the result, not the call
 
@@ -474,13 +478,17 @@ When you change the data flow of the client, check that offline mode and the per
 ### 11.6 Copy and translations
 
 - Give each text its own translation key. Do not use one key for two different texts.
-- Use ICU placeholders and `select` in one message. Do not join strings or punctuation to a translated message.
+- Write the `id` and the `defaultMessage` of each message in the code as fixed strings. Do not create a message at runtime, for example with an id such as `` `event.${type}.label` ``. The `extract:translations` check cannot read such a message, so it cannot make sure that the country config has the key.
+- Use [ICU message](https://unicode-org.github.io/icu/userguide/format_parse/messages/) placeholders and `select` in one message. Do not join strings or punctuation to a translated message.
 - When you add or change a message, update `client.csv` in `countryconfig-template` and in `testland`. Remove the keys that are no longer used.
 - Do not hardcode the locale or the application name. Use `APPLICATION_NAME`.
 
 ```ts
 // Rejected: joins text to a translated message
 formatMessage(messages.title) + '?'
+
+// Rejected: the message id is created at runtime
+const label = { id: `event.${type}.label`, defaultMessage: type }
 
 // Preferred: one message, with a placeholder
 const integrationType = {
