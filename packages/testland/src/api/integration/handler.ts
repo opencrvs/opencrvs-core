@@ -13,6 +13,8 @@ import fetch from 'node-fetch'
 import { encodeScope, Scope } from '@opencrvs/toolkit/scopes'
 import { logger } from '@countryconfig/logger'
 import {
+  COUNTRY_CONFIG_CLIENT_ID,
+  COUNTRY_CONFIG_CLIENT_SECRET,
   MOSIP_INTEGRATION_CLIENT_ID,
   MOSIP_INTEGRATION_CLIENT_SECRET,
   EVENTS_URL
@@ -55,7 +57,19 @@ const INTEGRATIONS: IntegrationConfig[] = [
     ],
     clientId: MOSIP_INTEGRATION_CLIENT_ID,
     clientSecret: MOSIP_INTEGRATION_CLIENT_SECRET
-  }
+  },
+  // Country config's own client, for its calls to core: core's requests to
+  // country config are signed and carry no token it could reuse.
+  ...(COUNTRY_CONFIG_CLIENT_ID && COUNTRY_CONFIG_CLIENT_SECRET
+    ? [
+        {
+          name: 'Country config',
+          scopes: [{ type: 'organisation.read-locations' } as const],
+          clientId: COUNTRY_CONFIG_CLIENT_ID,
+          clientSecret: COUNTRY_CONFIG_CLIENT_SECRET
+        }
+      ]
+    : [])
 ]
 
 const INTEGRATIONS_URL = new URL('/integrations', EVENTS_URL).toString()

@@ -17,14 +17,6 @@ import {
   completeSystemInitialisation as completeSystemInitialisationQuery
 } from '@events/storage/postgres/system-initialisation'
 
-export async function getServiceToken() {
-  const res = await fetch(
-    new URL('/internal/service-token', env.AUTH_URL).toString()
-  )
-  const { token } = await res.json()
-  return token as string
-}
-
 /**
  * Callers retry on failure, so this must fail rather than stall. Auth and
  * events start concurrently, and without a timeout a peer that accepts the
