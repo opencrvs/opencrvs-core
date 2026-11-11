@@ -32,6 +32,8 @@ spec:
               value: "http://auth.{{ .Release.Namespace }}.svc.cluster.local:4040"
             - name: CERT_PUBLIC_KEY_PATH
               value: /secrets/public-key.pem
+            - name: CORE_REQUEST_SIGNING_KEY_PATH
+              value: /secrets/core-request-signing-key.pem
             - name: COUNTRY_CONFIG_URL
               value: "http://countryconfig.{{ .Release.Namespace }}.svc.cluster.local:3040"
             - name: DOCUMENTS_URL
@@ -63,6 +65,9 @@ spec:
             - mountPath: /secrets/public-key.pem
               name: public-key
               subPath: public-key.pem
+            - mountPath: /secrets/core-request-signing-key.pem
+              name: core-request-signing-key
+              subPath: core-request-signing-key.pem
       restartPolicy: Always
       volumes:
         - name: public-key
@@ -71,6 +76,9 @@ spec:
             items:
               - key: public-key.pem
                 path: public-key.pem
+        - name: core-request-signing-key
+          secret:
+            secretName: opencrvs-core-request-signing-key
 
 {{- include "service-account-helper" (dict "service_name" "events" "Values" .Values) }}
 

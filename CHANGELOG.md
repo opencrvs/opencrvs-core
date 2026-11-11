@@ -74,6 +74,14 @@ Users will see two kinds of revoked record: ones revoked before the move show as
 
 [#14052](https://github.com/opencrvs/opencrvs-core/issues/14052)
 
+#### Core signs its requests to country config: migrate your country config
+
+Core gets a key to sign its requests to country config with ([RFC 9421](https://www.rfc-editor.org/rfc/rfc9421)), so that country config can check that a request comes from core. Nothing signs with it yet.
+
+1. **Signing key.** Core signs with an Ed25519 key that auth, events and the data-seed job read from `CORE_REQUEST_SIGNING_KEY_PATH`. The Helm chart creates it as the secret `opencrvs-core-request-signing-key`, on install and on the upgrade, and keeps it across upgrades. To provide your own key, set `certs.request_signing_key_file`; do so if you render the chart with `helm template` or a GitOps tool, which cannot keep the generated key and make a new one on every render. To change the key, set the new key in `certs.request_signing_key_file` and the old one in `certs.previous_request_signing_key_file`, deploy, and remove the old key once every service runs with the new one. Locally, `pnpm dev` creates `.secrets/core-request-signing-key.pem`. Auth publishes the public key at `GET /.well-known/jwks.json`.
+
+[#14240](https://github.com/opencrvs/opencrvs-core/issues/14240)
+
 ### Breaking changes
 
 #### `POST /auth/token` no longer accepts parameters in the query string

@@ -81,6 +81,11 @@ if [ ! -d "$PROJECT_ROOT/.secrets" ]; then
   pnpm dev:secrets:gen
 fi
 
+# Added after the JWT keys, so existing checkouts get it without new JWT keys.
+if [ ! -f "$PROJECT_ROOT/.secrets/core-request-signing-key.pem" ]; then
+  pnpm dev:secrets:gen:request-signing
+fi
+
 if $dependencies; then
   concurrently "pnpm run compose:deps"
   exit 0
