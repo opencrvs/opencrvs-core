@@ -187,15 +187,16 @@ export function assertFilesBelongToEvent(
 ) {
   const namedByRecord = getFilePathsFromEvent(event)
 
-  for (const path of getFilePathsFromValues(values)) {
-    const file = parseDocumentPath(path)
-    // Stored under this record, or already named by it (e.g. a pre-2.0 key a
-    // correction carries over); anything else is rejected
-    const allowed =
-      (file?.kind === 'event' && file.eventId === event.id) ||
-      namedByRecord.includes(path)
+  // Files the record already names are carried over as they are (e.g. a
+  // pre-2.0 key in a correction), so only new ones are checked
+  const newFiles = getFilePathsFromValues(values).filter(
+    (path) => !namedByRecord.includes(path)
+  )
 
-    if (!allowed) {
+  for (const path of newFiles) {
+    const file = parseDocumentPath(path)
+
+    if (file?.kind !== 'event' || file.eventId !== event.id) {
       throw new TRPCError({
         code: 'BAD_REQUEST',
         message: `File does not belong to this record: ${path}`
