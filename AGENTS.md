@@ -34,7 +34,7 @@ Write everything a person reads (chat replies, PRs, issues, commits, code commen
 
 ## Coding standards
 
-`docs/coding-standards/README.md`: read it before you write or review code. It names the area page for each type of change: public interfaces, services, database, tests, client, infrastructure.
+`docs/coding-standards/README.md`: read it before you write or review code. It names the area page for each type of change: services, countries, database, tests, client, infrastructure.
 
 ## Agent skills
 

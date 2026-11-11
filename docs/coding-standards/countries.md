@@ -1,29 +1,13 @@
-# Public interfaces
+# Countries and compatibility
 
-Read this page when a change touches something that a country or an external system uses. [Coding standards](README.md) has the rules for all code.
+Read this page when a change touches something that a country depends on. [Coding standards](README.md) has the rules for all code.
 
-## Public or internal
-
-A **public interface** is one that core cannot change together with its users, because the users are in other repositories:
+Core cannot change these together with their users, because the users are in other repositories:
 
 - The format of the country config: what `defineConfig`, `defineRoles` and the toolkit accept.
 - The exports of `@opencrvs/toolkit`.
-- The REST API: each procedure with an OpenAPI `.meta({ openapi })` block.
 - Scopes, translation keys, and defaults that a country can see.
-
-All other interfaces are **internal**: tRPC procedures that only the client calls, the routes in `internalRouter`, and functions that only core imports.
-
-| Rule                         | Public interface                                      | Internal interface                                |
-| ---------------------------- | ----------------------------------------------------- | ------------------------------------------------- |
-| A change of format           | Deprecate first. Keep the old format for one release. | Change it, and update all callers in the same PR. |
-| CHANGELOG entry              | Always                                                | Only when a country can see the effect            |
-| Codemod in the toolkit       | When the config format changes                        | Never                                             |
-| OpenAPI `.meta` block        | Always                                                | Never                                             |
-| Validation and authorization | Always. See [services.md](services.md).               | Always. See [services.md](services.md).           |
-
-An internal interface stays internal. Keep internal routes out of the gateway, and give a procedure only the caller type that uses it.
-
-The rules below apply to public interfaces.
+- The public APIs. [services.md](services.md#public-and-internal-apis) defines them.
 
 ## Keep core generic
 
@@ -40,7 +24,7 @@ Core and the toolkit are independent of any one vendor or product. Countries can
 
 ## Deprecate before you remove
 
-When the format of a public interface changes, keep the old format working for one release:
+When the format of the country config or of a public API changes, keep the old format working for one release:
 
 - Read the old format next to the new one, and log a deprecation warning.
 - Add a toolkit codemod that rewrites the old format. The codemod logs a warning for every case that it cannot rewrite.
@@ -63,7 +47,3 @@ When core changes something that a country config uses, update `packages/country
 - Validate country config in `defineConfig` and `defineRoles`. Then the country sees an error when it builds its config, not after it deploys.
 - Use one schema from commons. Then the events service, the toolkit and the seeder accept and reject the same config.
 - The error message says what is wrong and where. For example, it names the event id and the version of the event config.
-
-## Add a REST endpoint as a tRPC procedure
-
-The OpenAPI `.meta({ openapi })` block makes the procedure a REST endpoint. A new endpoint needs no URL rewrite, no gateway code and no change to the tRPC context.

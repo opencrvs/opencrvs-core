@@ -11,14 +11,14 @@ The rules come from requests that reviewers repeated in the 2026 pull requests. 
 
 This page holds the rules for all code. Each area page holds the rules for one type of change.
 
-| The change touches                                                                                                    | Read                                         |
-| --------------------------------------------------------------------------------------------------------------------- | -------------------------------------------- |
-| Something that a country or an external system uses: country config, the REST API, scopes, translation keys, defaults | [public-interfaces.md](public-interfaces.md) |
-| A backend service: authorization, routers, calls to other systems                                                     | [services.md](services.md)                   |
-| A migration or a database query                                                                                       | [database.md](database.md)                   |
-| A test                                                                                                                | [tests.md](tests.md)                         |
-| `packages/client`, `packages/components` or `packages/login`                                                          | [client.md](client.md)                       |
-| `charts/`, `.github/workflows/` or a dependency                                                                       | [infrastructure.md](infrastructure.md)       |
+| The change touches                                                                          | Read                                   |
+| ------------------------------------------------------------------------------------------- | -------------------------------------- |
+| A backend service: authorization, public and internal APIs, routers, calls to other systems | [services.md](services.md)             |
+| The format of the country config, `@opencrvs/toolkit`, scopes, translation keys or defaults | [countries.md](countries.md)           |
+| A migration or a database query                                                             | [database.md](database.md)             |
+| A test                                                                                      | [tests.md](tests.md)                   |
+| `packages/client`, `packages/components` or `packages/login`                                | [client.md](client.md)                 |
+| `charts/`, `.github/workflows/` or a dependency                                             | [infrastructure.md](infrastructure.md) |
 
 Other sources:
 
@@ -79,7 +79,9 @@ Use the domain types in commons, such as `UUID`, `FieldValue`, `ActionType`, `To
 
 ### Use `null` only to clear a value
 
-`null` means that the user cleared a field. Send `undefined` for a value that is not there. Remove `null` values before a payload leaves the API.
+`null` is for requests only. An action is a partial update, so a request sends `null` to clear an optional value. A request leaves out a value that does not change.
+
+A stored value is never `null`. `deepDropNulls` removes the cleared values when it builds the state of a record, so a response has no `null`.
 
 ## Errors
 

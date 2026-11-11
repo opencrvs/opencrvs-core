@@ -2,6 +2,20 @@
 
 Read this page when a change touches a backend service. [Coding standards](README.md) has the rules for all code.
 
+## Public and internal APIs
+
+A **public API** is a procedure with an OpenAPI `.meta({ openapi })` block. The block makes the procedure a REST endpoint, and external systems use it. All other procedures are **internal APIs**: the tRPC procedures that only the client calls, and the routes in `internalRouter`.
+
+| Rule                         | Public API                                                                     | Internal API                                      |
+| ---------------------------- | ------------------------------------------------------------------------------ | ------------------------------------------------- |
+| A change of format           | Deprecate first. See [countries.md](countries.md#deprecate-before-you-remove). | Change it, and update all callers in the same PR. |
+| CHANGELOG entry              | Always                                                                         | Only when a country can see the effect            |
+| Caller type                  | The procedure type that matches the external caller                            | `userOnlyProcedure` when only the client calls it |
+| Validation and authorization | Always                                                                         | Always                                            |
+
+- Add a REST endpoint as a tRPC procedure with the `.meta` block. A new endpoint needs no URL rewrite, no gateway code and no change to the tRPC context.
+- An internal API stays internal. Keep internal routes out of the gateway.
+
 ## Authorization
 
 ### Check authorization in the service that owns the data
@@ -16,7 +30,6 @@ Get the acting user or system client from the token or the tRPC context. The pay
 
 - If the payload must name a user, check that user against the scopes of the token.
 - Design a route so that the scopes of the token can decide the access. `/:eventId/files` works like this. `/:eventId/:fileId` needs a second check that the file belongs to the event.
-- Use the procedure type that matches the caller. A procedure that only the client uses is `userOnlyProcedure`.
 
 ### Give "not found" and "forbidden" the same response
 

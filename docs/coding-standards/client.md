@@ -4,7 +4,7 @@ Read this page when a change touches `packages/client`, `packages/components` or
 
 ## Write new code on the v2 stack
 
-New client code uses tRPC and the v2 components. Redux, GraphQL and the v1 `FormFieldGenerator` are for existing code only. Import commons from `@opencrvs/commons/client`.
+New client code uses tRPC and the v2 components. Redux and GraphQL are for existing code only. Import commons from `@opencrvs/commons/client`.
 
 ## Derive state during render
 
