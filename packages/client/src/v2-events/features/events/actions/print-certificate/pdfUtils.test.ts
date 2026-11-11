@@ -15,9 +15,9 @@ import createFetchMock from 'vitest-fetch-mock'
 import { ContentSvg } from 'pdfmake/interfaces'
 import {
   ActionDocument,
-  ActionType,
   AddressType,
   DocumentPath,
+  EventDocument,
   eventQueryDataGenerator,
   tennisClubMembershipEvent,
   UUID,
@@ -30,7 +30,8 @@ import { toFileUrl } from '@client/v2-events/cache'
 import { FileWithOption } from '@client/v2-events/components/forms/inputs/FileInput/DocumentUploaderWithOption'
 import {
   tennisClubMembershipEventDocument,
-  tennisClubMembershipEventIndex
+  tennisClubMembershipEventIndex,
+  tennisClubMembershipEventWithPrintCertificate
 } from '../../fixtures'
 
 import {
@@ -245,11 +246,18 @@ describe('svgToPdfTemplate', () => {
   })
 })
 
+/**
+ * @param options.fixture gives the actions. The declaration does not come from
+ * it, so `options.$declaration` adds values to the default declaration.
+ */
 function expectRenderOutput(
   template: string,
   output: string,
-  overrides: {
-    $actions?: ActionDocument[]
+  {
+    fixture = tennisClubMembershipEventDocument,
+    $declaration = {}
+  }: {
+    fixture?: EventDocument
     $declaration?: Record<string, unknown>
   } = {}
 ) {
@@ -265,15 +273,13 @@ function expectRenderOutput(
       modifiedAt: new Date().toISOString(),
       copiesPrintedForTemplate: 2
     },
-    $actions:
-      overrides.$actions ??
-      (tennisClubMembershipEventDocument.actions as ActionDocument[]),
+    $actions: fixture.actions as ActionDocument[],
     $declaration: {
       'applicant.name': {
         firstname: 'John',
         surname: 'Doe'
       },
-      ...overrides.$declaration
+      ...$declaration
     },
     review: false,
     locations: new Map(),
@@ -616,30 +622,12 @@ describe('SVG compiler', () => {
     })
 
     it('renders a file from the print annotation as an absolute path', () => {
-      const printAction = {
-        ...tennisClubMembershipEventDocument.actions.at(-1),
-        id: '6f1c2e0a-3b7d-4c55-9a1e-2d4f8b9c0e11' as UUID,
-        type: ActionType.PRINT_CERTIFICATE,
-        declaration: {},
-        annotation: {
-          'collector.requesterId': 'OTHER',
-          'collector.OTHER.signedAffidavit': {
-            path: `events/${eventId}/affidavit.png`,
-            originalFilename: 'affidavit.png',
-            type: 'image/png'
-          }
-        }
-      } as ActionDocument
+      const fixture = tennisClubMembershipEventWithPrintCertificate
 
       expectRenderOutput(
         `<svg><image href="{{ $lookup ($action 'PRINT_CERTIFICATE') 'annotation.collector.OTHER.signedAffidavit' }}"/></svg>`,
-        `<svg><image href="/events/${eventId}/affidavit.png"/></svg>`,
-        {
-          $actions: [
-            ...(tennisClubMembershipEventDocument.actions as ActionDocument[]),
-            printAction
-          ]
-        }
+        `<svg><image href="/events/${fixture.id}/affidavit.png"/></svg>`,
+        { fixture }
       )
     })
   })
