@@ -57,7 +57,7 @@ export function declareActionProcedures() {
         }
 
         const event = ctx.event
-        const config = await getEventConfigurationForRecord({ event, token })
+        const config = await getEventConfigurationForRecord({ event })
 
         const declaredEvent = await defaultRequestHandler(
           input,

@@ -285,8 +285,7 @@ export async function assertCanReviewDuplicatesOf(
     duplicateEventIds.map(async (duplicateEventId) => {
       const duplicate = await getEventById(duplicateEventId)
       const eventConfig = await getEventConfigurationForRecord({
-        event: duplicate,
-        token: ctx.token
+        event: duplicate
       })
 
       const eventIndexWithLocationHierarchy =

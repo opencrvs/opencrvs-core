@@ -312,6 +312,13 @@ export function createSystemTestClient(
   return caller
 }
 
+export async function createUnauthenticatedTestClient() {
+  const ctx = await createContext({
+    req: { headers: {} } as unknown as IncomingMessage
+  })
+  return createCallerFactory(appRouter)(ctx)
+}
+
 export async function createServiceTokenTestClient() {
   const token = createTestToken({
     userId: SERVICE_USER_ID as UUID,
