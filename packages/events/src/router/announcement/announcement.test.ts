@@ -25,6 +25,7 @@ import {
 } from '@events/workers/announcementWorker'
 import { env } from '@events/environment'
 import { mswServer } from '@events/tests/msw'
+import { verifySignedByCore } from '@events/tests/request-signing'
 
 const scope = encodeScope({ type: 'config.update-all' })
 
@@ -471,12 +472,12 @@ describe('processNextAnnouncement', () => {
       .execute()
 
     const capturedBcc: string[] = []
-    const capturedAuth: (string | null)[] = []
+    const signatures: unknown[] = []
     mswServer.use(
       http.post(ALL_USER_NOTIFICATION_URL, async ({ request }) => {
+        signatures.push(await verifySignedByCore(request))
         const body = (await request.json()) as { recipient: { bcc: string[] } }
         capturedBcc.push(...body.recipient.bcc)
-        capturedAuth.push(request.headers.get('authorization'))
         return HttpResponse.json({ ok: true })
       })
     )
@@ -491,11 +492,10 @@ describe('processNextAnnouncement', () => {
     expect(announcement.status).toBe('SENT')
     expect(capturedBcc).toEqual(expect.arrayContaining(recipients))
     /*
-     * A broadcast has no acting user, so the worker fetches an anonymous token
-     * of its own. Asserted explicitly: if it stops doing so, country config
-     * rejects the dispatch with a 401 and no announcement is ever delivered.
+     * Asserted explicitly: if the worker stops signing, country config rejects
+     * the dispatch with a 403 and no announcement is ever delivered.
      */
-    expect(capturedAuth).toEqual([`Bearer service-token`])
+    expect(signatures).toEqual([expect.objectContaining({ valid: true })])
   })
 
   test('sends recipients in chunks of BCC_CHUNK_SIZE and updates progress after each', async () => {

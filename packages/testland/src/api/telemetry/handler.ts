@@ -11,7 +11,6 @@
 
 import { Request, ResponseToolkit } from '@hapi/hapi'
 import * as Joi from 'joi'
-import { isServiceToken } from '@opencrvs/toolkit/authentication'
 import { sendTelemetry, TelemetryReport } from '@opencrvs/toolkit/telemetry'
 import { env } from '@countryconfig/environment'
 import { logger } from '@countryconfig/logger'
@@ -73,25 +72,14 @@ export function logTelemetryStartupStatus() {
 }
 
 /**
- * Receives a usage report from the events service and, when telemetry is
+ * Receives a usage report from the events service (the route accepts only
+ * requests core signed) and, when telemetry is
  * enabled for this instance, stamps the instance identity onto it and forwards
  * it to the status service via the toolkit's `sendTelemetry` (which owns the
  * endpoint and payload schema). The events service is unaware of whether
  * telemetry is enabled or of the country code / domain / environment reported.
  */
 export async function telemetryHandler(request: Request, h: ResponseToolkit) {
-  // Only accept core's service token (the events service authenticates its
-  // unattended telemetry POST with it; identified by its fixed `sub`). A
-  // logged-in user's token has a different subject, so a user cannot submit
-  // telemetry with their own credentials — and the service-token endpoint is
-  // not reachable through the public gateway.
-  if (!isServiceToken(request.auth.credentials)) {
-    logger.warn(
-      'Telemetry: rejected a request that is not from the service token'
-    )
-    return h.response({ error: 'forbidden' }).code(403)
-  }
-
   if (!env.TELEMETRY_ENABLED) {
     // The encouraging notice is logged once at startup (see index.ts); keep the
     // per-report path quiet.
