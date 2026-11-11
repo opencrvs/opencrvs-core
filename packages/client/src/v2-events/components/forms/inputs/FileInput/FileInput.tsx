@@ -20,6 +20,7 @@ import {
   AttachmentPath
 } from '@opencrvs/commons/client'
 import { useFileUpload } from '@client/v2-events/features/files/useFileUpload'
+import { toFileUrl } from '@client/v2-events/cache'
 import { buttonMessages } from '@client/i18n/messages'
 import { useImageEditorModal } from '@client/v2-events/components/ImageEditorModal'
 import { useImageProcessing } from '@client/utils/imageUtils'
@@ -174,7 +175,7 @@ function FileOutput({
 }
 
 function stringify(value: FileFieldValue | undefined) {
-  return FileFieldValue.validate(value) ? value.path : ''
+  return FileFieldValue.validate(value) ? toFileUrl(value.path) : ''
 }
 
 export const File = {

@@ -1,3 +1,4 @@
+/* eslint-disable max-lines */
 /*
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -15,6 +16,8 @@ import { ContentSvg } from 'pdfmake/interfaces'
 import {
   ActionDocument,
   AddressType,
+  DocumentPath,
+  EventDocument,
   eventQueryDataGenerator,
   tennisClubMembershipEvent,
   UUID,
@@ -24,9 +27,11 @@ import {
 } from '@opencrvs/commons/client'
 import { testDataGenerator } from '@client/tests/test-data-generators'
 import { toFileUrl } from '@client/v2-events/cache'
+import { FileWithOption } from '@client/v2-events/components/forms/inputs/FileInput/DocumentUploaderWithOption'
 import {
   tennisClubMembershipEventDocument,
-  tennisClubMembershipEventIndex
+  tennisClubMembershipEventIndex,
+  tennisClubMembershipEventWithPrintCertificate
 } from '../../fixtures'
 
 import {
@@ -241,7 +246,21 @@ describe('svgToPdfTemplate', () => {
   })
 })
 
-function expectRenderOutput(template: string, output: string) {
+/**
+ * @param options.fixture gives the actions. The declaration does not come from
+ * it, so `options.$declaration` adds values to the default declaration.
+ */
+function expectRenderOutput(
+  template: string,
+  output: string,
+  {
+    fixture = tennisClubMembershipEventDocument,
+    $declaration = {}
+  }: {
+    fixture?: EventDocument
+    $declaration?: Record<string, unknown>
+  } = {}
+) {
   const generator = testDataGenerator(2323)
   const registrar = generator.user.localRegistrar()
   const { declaration, ...metadata } = tennisClubMembershipEventIndex
@@ -254,12 +273,13 @@ function expectRenderOutput(template: string, output: string) {
       modifiedAt: new Date().toISOString(),
       copiesPrintedForTemplate: 2
     },
-    $actions: tennisClubMembershipEventDocument.actions as ActionDocument[],
+    $actions: fixture.actions as ActionDocument[],
     $declaration: {
       'applicant.name': {
         firstname: 'John',
         surname: 'Doe'
-      }
+      },
+      ...$declaration
     },
     review: false,
     locations: new Map(),
@@ -574,5 +594,56 @@ describe('SVG compiler', () => {
         '<svg><text>/aa13a268-ae48-4a30-9450-554aebaab203/signature.png</text></svg>'
       )
     })
+  })
+
+  /*
+   * The certificate is rendered inline on the print review page. A relative
+   * href ("events/<id>/x.png") resolves against the page URL, which misses the
+   * service worker cache and gives a broken image.
+   * @see https://github.com/opencrvs/opencrvs-core/issues/14187
+   */
+  describe('Images', () => {
+    const eventId = tennisClubMembershipEventDocument.id
+
+    it('renders a file from the declaration as an absolute path', () => {
+      expectRenderOutput(
+        '<svg><image href="{{ $lookup $declaration "applicant.image" }}"/></svg>',
+        `<svg><image href="/events/${eventId}/applicant-photo.png"/></svg>`,
+        {
+          $declaration: {
+            'applicant.image': {
+              path: `events/${eventId}/applicant-photo.png`,
+              originalFilename: 'applicant-photo.png',
+              type: 'image/png'
+            }
+          }
+        }
+      )
+    })
+
+    it('renders a file from the print annotation as an absolute path', () => {
+      const fixture = tennisClubMembershipEventWithPrintCertificate
+
+      expectRenderOutput(
+        `<svg><image href="{{ $lookup ($action 'PRINT_CERTIFICATE') 'annotation.collector.OTHER.signedAffidavit' }}"/></svg>`,
+        `<svg><image href="/events/${fixture.id}/affidavit.png"/></svg>`,
+        { fixture }
+      )
+    })
+  })
+})
+
+describe('Certificate variables of file fields', () => {
+  it('gives absolute paths for files with options', () => {
+    expect(
+      FileWithOption.toCertificateVariables([
+        {
+          path: 'events/abc/id-front.png' as DocumentPath,
+          originalFilename: 'id-front.png',
+          type: 'image/png',
+          option: 'ID_FRONT'
+        }
+      ])
+    ).toEqual({ ID_FRONT: '/events/abc/id-front.png' })
   })
 })

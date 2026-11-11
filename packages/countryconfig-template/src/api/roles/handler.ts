@@ -8,4 +8,9 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-declare module 'country-data'
+import roles from './roles'
+import { Request, ResponseToolkit } from '@hapi/hapi'
+
+export async function rolesHandler(_: Request, h: ResponseToolkit) {
+  return h.response(roles)
+}

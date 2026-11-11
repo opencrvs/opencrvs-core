@@ -10,11 +10,11 @@
  */
 import { Meta, StoryObj } from '@storybook/react-vite'
 import * as React from 'react'
+import { expect, within } from 'storybook/test'
 import {
   eventQueryDataGenerator,
   EventStatus,
   mandatoryColumns,
-  tennisClubMembershipEvent,
   WorkqueueActionType
 } from '@opencrvs/commons/client'
 import { TRPCProvider } from '@client/v2-events/trpc'
@@ -48,7 +48,6 @@ export const DefaultSearchResult: Story = {
   name: 'Default Search Result',
   args: {
     action: { type: WorkqueueActionType.enum.READ },
-    eventConfigs: [tennisClubMembershipEvent],
     queryData: [
       eventQueryDataGenerator({
         declaration: {
@@ -72,7 +71,6 @@ export const SearchResultWithMultipleItems: Story = {
     chromatic: { disableSnapshot: true }
   },
   args: {
-    eventConfigs: [tennisClubMembershipEvent],
     queryData: queryData.map((e) => ({
       ...e,
       status: EventStatus.enum.REGISTERED
@@ -83,8 +81,45 @@ export const SearchResultWithMultipleItems: Story = {
 export const NoSearchResult: Story = {
   name: 'No Search Result',
   args: {
-    eventConfigs: [tennisClubMembershipEvent],
     queryData: [],
     columns: mandatoryColumns
+  }
+}
+
+export const RecordOfUnknownConfigVersion: Story = {
+  name: 'Record Of An Unknown Configuration Version',
+  args: {
+    action: { type: WorkqueueActionType.enum.READ },
+    queryData: [
+      {
+        ...queryData[0],
+        status: EventStatus.enum.REGISTERED
+      },
+      {
+        ...queryData[1],
+        status: EventStatus.enum.REGISTERED,
+        configVersionId: 'removed-version'
+      },
+      {
+        ...queryData[2],
+        status: EventStatus.enum.REGISTERED
+      }
+    ],
+    columns: mandatoryColumns
+  },
+  play: async ({ canvasElement, step }) => {
+    const canvas = within(canvasElement)
+
+    await step('The record of an unknown version shows a message', async () => {
+      await expect(
+        await canvas.findByText(`${queryData[1].trackingId} cannot be shown`)
+      ).toBeVisible()
+    })
+
+    await step('Only that record shows the message', async () => {
+      await expect(
+        canvas.getAllByTestId(/^unknown-config-version-/)
+      ).toHaveLength(1)
+    })
   }
 }

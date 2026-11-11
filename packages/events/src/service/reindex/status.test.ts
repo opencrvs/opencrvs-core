@@ -84,7 +84,8 @@ beforeEach(async () => {
       transactionId: getUUID(),
       trackingId: event.trackingId,
       createdAt: event.createdAt,
-      updatedAt: event.updatedAt
+      updatedAt: event.updatedAt,
+      configVersionId: event.configVersionId
     })
     .returning('id')
     .executeTakeFirst()

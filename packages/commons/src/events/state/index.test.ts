@@ -9,6 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
+import { INITIAL_EVENT_CONFIG_VERSION_ID } from '../EventConfig'
 import { deepDropNulls, getCurrentEventState } from '.'
 import { tennisClubMembershipEvent } from '../../fixtures'
 import { getUUID, UUID } from '../../uuid'
@@ -27,7 +28,7 @@ import {
 } from '../test.utils'
 import { EventIndex } from '../EventIndex'
 import { TENNIS_CLUB_MEMBERSHIP } from '../Constants'
-import { TokenUserType } from '../../authentication'
+import { TokenUserType } from '../../users/authentication'
 import { EventDocument } from '../EventDocument'
 
 /* eslint-disable max-lines */
@@ -92,6 +93,7 @@ describe('getCurrentEventState()', () => {
 
     const event = {
       trackingId: getUUID(),
+      configVersionId: INITIAL_EVENT_CONFIG_VERSION_ID,
       type: tennisClubMembershipEvent.id,
       actions,
       createdAt: new Date(Date.now()).toISOString(),
@@ -193,6 +195,7 @@ describe('getCurrentEventState()', () => {
 
     const event = {
       trackingId: getUUID(),
+      configVersionId: INITIAL_EVENT_CONFIG_VERSION_ID,
       type: tennisClubMembershipEvent.id,
       actions,
       createdAt: new Date(Date.now()).toISOString(),
@@ -212,6 +215,7 @@ describe('getCurrentEventState()', () => {
       id: event.id,
       type: event.type,
       trackingId: event.trackingId,
+      configVersionId: INITIAL_EVENT_CONFIG_VERSION_ID,
       status: EventStatus.enum.REGISTERED,
       updatedByUserRole: registerRequestAction.createdByRole,
       updatedAtLocation: registerRequestAction.createdAtLocation,
@@ -295,6 +299,7 @@ describe('getCurrentEventState()', () => {
 
     const event = {
       trackingId: getUUID(),
+      configVersionId: INITIAL_EVENT_CONFIG_VERSION_ID,
       type: tennisClubMembershipEvent.id,
       actions,
       createdAt: new Date(Date.now()).toISOString(),
@@ -313,6 +318,7 @@ describe('getCurrentEventState()', () => {
       id: event.id,
       type: event.type,
       trackingId: event.trackingId,
+      configVersionId: INITIAL_EVENT_CONFIG_VERSION_ID,
       status: EventStatus.enum.REGISTERED,
       updatedByUserRole: registerAcceptAction.createdByRole,
       updatedAtLocation: registerAcceptAction.createdAtLocation,
@@ -401,6 +407,7 @@ describe('getCurrentEventState()', () => {
     const event = {
       id: generateUuid(),
       trackingId: 'VM5Y53',
+      configVersionId: INITIAL_EVENT_CONFIG_VERSION_ID,
       type: tennisClubMembershipEvent.id,
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
@@ -494,6 +501,7 @@ describe('getCurrentEventState()', () => {
   test('should correctly merge the declaration from actions even when originalActionId is not available', () => {
     const fullEvent = {
       trackingId: getUUID(),
+      configVersionId: INITIAL_EVENT_CONFIG_VERSION_ID,
       type: tennisClubMembershipEvent.id,
       createdAt: new Date(Date.now()).toISOString(),
       id: getUUID(),
@@ -647,6 +655,7 @@ describe('getCurrentEventState()', () => {
 
     const event = {
       trackingId: getUUID(),
+      configVersionId: INITIAL_EVENT_CONFIG_VERSION_ID,
       type: tennisClubMembershipEvent.id,
       actions: [createAction, declareAction, editAction],
       createdAt: new Date(Date.now()).toISOString(),
@@ -704,6 +713,7 @@ describe('getCurrentEventState()', () => {
 
     const event = {
       trackingId: getUUID(),
+      configVersionId: INITIAL_EVENT_CONFIG_VERSION_ID,
       type: tennisClubMembershipEvent.id,
       actions: [createAction, declareAction, editAction],
       createdAt: new Date(Date.now()).toISOString(),
@@ -750,6 +760,7 @@ describe('correction requests', () => {
         type: TENNIS_CLUB_MEMBERSHIP,
         id: 'f743a5d5-19d4-44eb-9b0f-301a2d823bcf' as UUID,
         trackingId: 'TEST12',
+        configVersionId: INITIAL_EVENT_CONFIG_VERSION_ID,
         createdAt: '2025-01-23T02:21:38.343Z',
         updatedAt: '2025-01-23T02:21:42.230Z',
         actions: [
@@ -834,6 +845,7 @@ describe('correction requests', () => {
         type: TENNIS_CLUB_MEMBERSHIP,
         id: 'f743a5d5-19d4-44eb-9b0f-301a2d823bcf' as UUID,
         trackingId: 'TEST12',
+        configVersionId: INITIAL_EVENT_CONFIG_VERSION_ID,
         createdAt: '2025-01-23T02:21:38.343Z',
         updatedAt: '2025-01-23T02:21:42.230Z',
         actions: [
@@ -970,6 +982,7 @@ describe('correction requests', () => {
 
     const event = {
       trackingId: getUUID(),
+      configVersionId: INITIAL_EVENT_CONFIG_VERSION_ID,
       type: tennisClubMembershipEvent.id,
       id: getUUID(),
       createdAt: '2023-01-01T00:00:00.000Z',
@@ -1054,6 +1067,7 @@ describe('correction requests', () => {
 
     const event = {
       trackingId: getUUID(),
+      configVersionId: INITIAL_EVENT_CONFIG_VERSION_ID,
       type: tennisClubMembershipEvent.id,
       id: getUUID(),
       createdAt: '2023-01-01T00:00:00.000Z',
@@ -1124,6 +1138,7 @@ describe('correction requests', () => {
       type: TENNIS_CLUB_MEMBERSHIP,
       id: generateUuid(),
       trackingId: 'TEST12',
+      configVersionId: INITIAL_EVENT_CONFIG_VERSION_ID,
       createdAt: '2025-01-23T02:21:38.343Z',
       updatedAt: '2025-01-23T02:21:42.230Z',
       actions: [
@@ -1218,6 +1233,7 @@ describe('correction requests', () => {
       type: TENNIS_CLUB_MEMBERSHIP,
       id: generateUuid(),
       trackingId: 'TEST12',
+      configVersionId: INITIAL_EVENT_CONFIG_VERSION_ID,
       createdAt: '2025-01-23T02:21:38.343Z',
       updatedAt: '2025-01-23T02:21:42.230Z',
       actions: [
@@ -1295,6 +1311,7 @@ describe('correction requests', () => {
       type: TENNIS_CLUB_MEMBERSHIP,
       id: generateUuid(),
       trackingId: 'TEST12',
+      configVersionId: INITIAL_EVENT_CONFIG_VERSION_ID,
       createdAt: '2025-01-23T02:21:38.343Z',
       updatedAt: '2025-01-23T02:21:42.230Z',
       actions: [
@@ -1383,6 +1400,7 @@ describe('address state transitions', () => {
     const state = getCurrentEventState(
       {
         trackingId: getUUID(),
+        configVersionId: INITIAL_EVENT_CONFIG_VERSION_ID,
         type: tennisClubMembershipEvent.id,
         createdAt: new Date().toISOString(),
         actions,
@@ -1417,6 +1435,7 @@ describe('address state transitions', () => {
     const state = getCurrentEventState(
       {
         trackingId: getUUID(),
+        configVersionId: INITIAL_EVENT_CONFIG_VERSION_ID,
         type: tennisClubMembershipEvent.id,
         createdAt: new Date().toISOString(),
         actions,
@@ -1739,6 +1758,7 @@ describe('current state is the data of the act behind the status, plus later edi
   function eventWith(actions: EventDocument['actions']): EventDocument {
     return {
       trackingId: getUUID(),
+      configVersionId: INITIAL_EVENT_CONFIG_VERSION_ID,
       type: tennisClubMembershipEvent.id,
       id: getUUID(),
       createdAt: '2025-01-01T00:00:00.000Z',

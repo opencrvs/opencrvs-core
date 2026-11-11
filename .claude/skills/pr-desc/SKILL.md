@@ -7,7 +7,7 @@ description: Use when writing or updating a GitHub PR description, including whe
 
 1. Get the PR from the given URL or find the one created for the current branch. Keep any existing body or template; replace only its placeholder text.
 2. Draft from what this session knows. Read the diff only when the session lacks the facts.
-3. Write as few bullets as the diff needs: a small PR gets 1–2. For a bug fix, the first bullet states the root cause.
+3. Write what the comment in `.github/PULL_REQUEST_TEMPLATE.md` asks for, in as few bullets as the diff needs: a small PR gets 1–2.
 4. Show the draft and wait for approval.
 5. Post it, then reply with the PR URL only.
 

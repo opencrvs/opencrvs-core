@@ -22,7 +22,8 @@ import {
   TENNIS_CLUB_MEMBERSHIP,
   tennisClubMembershipEvent,
   TestUserRole,
-  UUID
+  UUID,
+  INITIAL_EVENT_CONFIG_VERSION_ID
 } from '@opencrvs/commons/client'
 import { testDataGenerator } from '@client/tests/test-data-generators'
 import { tennisClubMembershipEventWithCorrectionRequest } from '@client/v2-events/features/events/fixtures'
@@ -198,6 +199,7 @@ const tennisClubMembershipEventWithCorrectionRequestThenCustomAction: EventDocum
     type: TENNIS_CLUB_MEMBERSHIP,
     id: correctionEventId,
     trackingId: generateTrackingId(() => 0.1),
+    configVersionId: INITIAL_EVENT_CONFIG_VERSION_ID,
     createdAt: '2025-01-23T05:30:00.000Z',
     updatedAt: '2025-01-24T05:35:27.689Z',
     actions: [
@@ -362,6 +364,7 @@ const tennisClubMembershipEventWithRepeatedCorrectionRequests: EventDocument = {
   type: TENNIS_CLUB_MEMBERSHIP,
   id: repeatedCorrectionEventId,
   trackingId: generateTrackingId(() => 0.1),
+  configVersionId: INITIAL_EVENT_CONFIG_VERSION_ID,
   createdAt: '2025-01-23T05:30:00.000Z',
   updatedAt: '2025-01-25T05:35:00.000Z',
   actions: [

@@ -13,8 +13,8 @@ import {
   ScopeType,
   ScopeOptionKey,
   getScopeOptionValue
-} from '../scopes'
-import { getAcceptedScopesFromToken } from '../authentication'
+} from './scopes'
+import { getAcceptedScopesFromToken } from './authentication'
 import z from 'zod/v4'
 
 const ScopeOptionReference = z.object({

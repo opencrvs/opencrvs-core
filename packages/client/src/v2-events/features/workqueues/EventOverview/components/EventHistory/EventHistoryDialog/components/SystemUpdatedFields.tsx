@@ -20,7 +20,7 @@ import {
   ValidatorContext
 } from '@opencrvs/commons/client'
 import { ColumnContentAlignment, Table, Text } from '@opencrvs/components'
-import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
+import { useEventConfigurationForRecord } from '@client/v2-events/features/events/useEventConfiguration'
 import { Output } from '@client/v2-events/features/events/components/Output'
 import { recordAnchorDate } from '@client/v2-events/utils'
 
@@ -61,7 +61,7 @@ export function SystemUpdatedFields({
   validatorContext: ValidatorContext
 }) {
   const intl = useIntl()
-  const { eventConfiguration } = useEventConfiguration(fullEvent.type)
+  const { eventConfiguration } = useEventConfigurationForRecord(fullEvent)
   const fields = getDeclarationFields(eventConfiguration)
   const currentState = getCurrentEventState(fullEvent, eventConfiguration)
   const anchor = recordAnchorDate(currentState)

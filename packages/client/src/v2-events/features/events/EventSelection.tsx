@@ -24,17 +24,21 @@ import {
   Icon,
   RadioGroup,
   RadioSize,
-  Stack
+  Stack,
+  Text
 } from '@opencrvs/components'
 import {
   canUserCreateEvent,
-  canUserNotifyEvent
+  canUserNotifyEvent,
+  getOrThrow,
+  getVersionsInEffect
 } from '@opencrvs/commons/client'
 import { SuspenseLoadingFallback } from '@client/v2-events/components/SuspenseLoadingFallback'
 import { ROUTES } from '@client/v2-events/routes'
 import { createTemporaryId } from '@client/v2-events/utils'
 import { getScope, getUserDetails } from '@client/profile/profileSelectors'
-import { useEventConfigurations } from './useEventConfiguration'
+import { useCountryTimeZone } from '@client/v2-events/hooks/useCountryToday'
+import { useVersionedEventConfigurations } from './useEventConfiguration'
 import { useEventFormData } from './useEventFormData'
 import { useEventFormNavigation } from './useEventFormNavigation'
 import { useEvents } from './useEvents/useEvents'
@@ -61,6 +65,12 @@ const messages = defineMessages({
     defaultMessage: 'Please select the type of event',
     description: 'Error Message to show when no event is being selected'
   },
+  configVersionHeading: {
+    id: 'register.selectVitalEvent.configVersion',
+    defaultMessage: 'Form version',
+    description:
+      'Heading of the choice of the configuration version of a new record, shown when the country allows legacy records'
+  },
   exitButton: {
     defaultMessage: 'EXIT',
     description: 'Label for Exit button on EventTopBar',
@@ -81,8 +91,10 @@ function EventSelector() {
   const intl = useIntl()
   const navigate = useNavigate()
   const [eventType, setEventType] = useState('')
+  const [versionId, setVersionId] = useState<string>()
   const [noEventSelectedError, setNoEventSelectedError] = useState(false)
-  const eventConfigurations = useEventConfigurations()
+  const versionedEventConfigurations = useVersionedEventConfigurations()
+  const timeZone = useCountryTimeZone()
   const events = useEvents()
   const scopes = useSelector(getScope) ?? []
   const clearForm = useEventFormData((state) => state.clear)
@@ -90,29 +102,42 @@ function EventSelector() {
   const createEvent = events.useCreateEvent()
   const user = useSelector(getUserDetails)
 
-  const allowedEventConfigurations = eventConfigurations.filter(({ id }) =>
-    canUserCreateEvent(scopes, id)
+  const allowedEventConfigurations = versionedEventConfigurations.filter(
+    ({ id }) => canUserCreateEvent(scopes, id)
   )
+
+  const selectedEventConfiguration = allowedEventConfigurations.find(
+    ({ id }) => id === eventType
+  )
+  const versionsInEffect = selectedEventConfiguration
+    ? getVersionsInEffect(selectedEventConfiguration, new Date(), timeZone)
+    : []
+  const currentVersion = versionsInEffect.at(-1)
+  // A country that allows legacy records lets the user create a record under a past version
+  const canPickVersion =
+    window.config.FEATURES._EXPERIMENTAL_LEGACY_RECORDS &&
+    versionsInEffect.length > 1
+  const selectedVersionId = canPickVersion
+    ? (versionId ?? currentVersion?.id)
+    : currentVersion?.id
 
   function handleContinue() {
     if (eventType === '') {
       return setNoEventSelectedError(true)
     }
 
-    const eventConfig = allowedEventConfigurations.find(
-      ({ id }) => id === eventType
+    const version = getOrThrow(
+      versionsInEffect.find(({ id }) => id === selectedVersionId),
+      `Event '${eventType}' has no version '${selectedVersionId}' in effect today`
     )
-
-    if (!eventConfig) {
-      throw new Error(`Configuration for event '${eventType}' not found`)
-    }
 
     const eventId = createTemporaryId()
 
     createEvent.mutate({
       type: eventType,
       transactionId: eventId,
-      createdAtLocation: user?.primaryOfficeId
+      createdAtLocation: user?.primaryOfficeId,
+      configVersionId: version.id
     })
 
     clearForm()
@@ -146,9 +171,28 @@ function EventSelector() {
           value={eventType}
           onChange={(val) => {
             setEventType(val)
+            setVersionId(undefined)
             setNoEventSelectedError(false)
           }}
         />
+
+        {canPickVersion && (
+          <>
+            <Text element="h2" variant="h3">
+              {intl.formatMessage(messages.configVersionHeading)}
+            </Text>
+            <RadioGroup
+              name="configVersionId"
+              options={versionsInEffect.map((version) => ({
+                value: version.id,
+                label: intl.formatMessage(version.label)
+              }))}
+              size={RadioSize.LARGE}
+              value={selectedVersionId ?? ''}
+              onChange={setVersionId}
+            />
+          </>
+        )}
 
         <Button
           key="select-vital-event-continue"

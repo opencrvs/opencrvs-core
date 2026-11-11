@@ -570,6 +570,7 @@ duplicates.content.registeredAt,Registered at label for duplicates comparison,Re
 duplicates.content.registeredBy,Registered by label for duplicates comparison,Registered by,Enregistré par
 duplicates.content.subtitle,Duplicates content subtitle message,"This record was flagged as a potential duplicate of: {trackingIds}. Please review these by clicking on each tracking ID in the tab section to view a side-by-side comparison below, and confirm if this record is a duplicate",Cet enregistrement a été signalé comme un doublon potentiel de : {trackingIds}. Veuillez les examiner en cliquant sur chaque identifiant de suivi dans la section des onglets pour afficher une comparaison côte à côte ci-dessous et confirmer si cet enregistrement est un doublon
 duplicates.content.title,Duplicates content title message,Is {name} ({trackingId}) a duplicate?,Est-ce que {name} ({trackingId}) est un doublon?
+duplicates.content.unknownConfigVersion,Shown under the tabs of the duplicate review when a potential duplicate was created under a configuration version that is not available,"{trackingId} cannot be compared: its configuration version ""{version}"" is not available.","{trackingId} ne peut pas être comparé : sa version de configuration ""{version}"" n'est pas disponible."
 duplicates.review.header,Review page header for duplicates declarations,Potential {event} duplicate review,Potentiel {event} examen de doublon
 duplicates.reviewUnavailable.description,Body of the banner shown when the user cannot access every record matched as a potential duplicate,"It is flagged against a record registered outside your jurisdiction, which you are not permitted to view. The review must be completed by someone with access to both records.","Il est signalé par rapport à un enregistrement enregistré en dehors de votre juridiction, que vous n'êtes pas autorisé à consulter. L'examen doit être effectué par une personne ayant accès aux deux enregistrements."
 duplicates.reviewUnavailable.title,Title of the banner shown when the user cannot access every record matched as a potential duplicate,You cannot review this record for duplicates,Vous ne pouvez pas examiner cet enregistrement pour les doublons
@@ -589,6 +590,8 @@ error.search,The error message shown when a search query fails,An error occurred
 error.somethingWentWrong,Error description,Something went wrong.,Quelque chose s'est mal passé.
 error.title,Error title,Oops!,Oups !
 error.title.unauthorized,Error title unauthorized,Unauthorized!,Non autorisé !
+error.unknownConfigVersion,Title shown when a record was created under a configuration version that is no longer configured,This record cannot be opened,Cet enregistrement ne peut pas être ouvert
+error.unknownConfigVersionDescription,Description shown when a record was created under a configuration version that is no longer configured,"Record {trackingId} was created under version {version} of the {event} configuration, which is not available. Refresh the page; if this continues, please contact your system administrator.","L'enregistrement {trackingId} a été créé avec la version {version} de la configuration {event}, qui n'est pas disponible. Actualisez la page ; si le problème persiste, veuillez contacter votre administrateur système."
 error.weAreTryingToFixThisError,Error description,This page could not be found,"Ce n'est pas vous, c'est nous. C'est notre faute."
 errors.notAssigned,User not assigned error toast message,You've been unassigned from the event,Vous avez été désassigné de l'événement
 errors.somethingWentWrong,Error toast message for general errors,Something went wrong. Please try again,Une erreur s'est produite. Veuillez réessayer
@@ -974,6 +977,7 @@ register.selectInformant.marriageInformantTitle,Who is applying for marriage reg
 register.selectInformant.newBirthRegistration,The title that appears for new birth registrations,New birth declaration,Nouvelle déclaration de naissance
 register.selectInformant.newDeathRegistration,The title that appears for new death registrations,New death declaration,Nouvelle déclaration de décès
 register.selectInformant.parents,The description that appears when selecting the parent as informant,Mother & Father,Mère et père
+register.selectVitalEvent.configVersion,"Heading of the choice of the configuration version of a new record, shown when the country allows legacy records",Form version,Version du formulaire
 register.selectVitalEvent.errorMessage,Error Message to show when no event is being selected,Please select the type of event,Veuillez sélectionner le type d'événement
 register.selectVitalEvent.goToReviewButton,,Go to review,Aller à la révision
 register.selectVitalEvent.registerNewEventHeader,The section heading on the page,What type of event do you want to declare?,What type of event do you want to declare?
@@ -1007,6 +1011,9 @@ search.noResultFor,The no result text,No results for ”{param}”,Aucun résult
 search.noResultForSearchTerm,The no result text,No results for “{searchTerm}”,Pas de résultats pour “{searchTerm}”
 search.placeholder,Placeholder text of search input,Name of query,Nom de la requête
 search.quickSearch.result.title,Quick search result title,Search result for “{searchTerm}”,résultat de la recherche pour “{searchTerm}”
+search.result.unknownConfigVersion.description,Second line of a workqueue or search row whose record was created under a configuration version that is not available,Unknown configuration version,Version de configuration inconnue
+search.result.unknownConfigVersion.details,Shown on hover over a workqueue or search row whose record was created under a configuration version that is not available,"Record {trackingId} was created under version: ""{version}"" of the {event} configuration, which is not available. Please contact your system administrator.","L'enregistrement {trackingId} a été créé avec la version : « {version} » de la configuration {event}, qui n'est pas disponible. Veuillez contacter votre administrateur système."
+search.result.unknownConfigVersion.title,Shown in place of a workqueue or search row when the record was created under a configuration version that is not available,{trackingId} cannot be shown,{trackingId} ne peut pas être affiché
 searchField.indicators.clearButton,Clear button text,Clear,Effacer
 searchField.indicators.clearModal.cancel,Cancel button for clear confirmation modal,Cancel,Annuler
 searchField.indicators.clearModal.confirm,Confirm button for clear confirmation modal,Confirm,Confirmer
