@@ -91,6 +91,7 @@ export function Review() {
   return (
     <FormLayout route={ROUTES.V2.EVENTS.REQUEST_CORRECTION}>
       <ReviewComponent.Body
+        attachmentPath={`events/${eventId}/`}
         form={form}
         formConfig={formConfig}
         isCorrection={true}

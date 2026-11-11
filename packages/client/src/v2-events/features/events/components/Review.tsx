@@ -426,6 +426,7 @@ function FormReview({
  * User can review the declaration and take actions like declare, reject or edit.
  */
 function ReviewComponent({
+  attachmentPath,
   formConfig,
   previousFormValues,
   form,
@@ -442,6 +443,8 @@ function ReviewComponent({
   treatMissingValuesAsCleared = false,
   banner
 }: {
+  /** Where files uploaded in the review fields are stored */
+  attachmentPath: string
   children?: React.ReactNode
   formConfig: FormConfig
   form: EventState
@@ -526,6 +529,7 @@ function ReviewComponent({
                     name="annotation"
                   >
                     <FormFieldGenerator
+                      attachmentPath={attachmentPath}
                       fields={reviewFields}
                       formTouched={touched}
                       formValues={annotation}

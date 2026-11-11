@@ -223,6 +223,7 @@ function ReviewDuplicate() {
         >
           <ReviewComponent.Body
             readonlyMode
+            attachmentPath={`events/${eventId}/`}
             banner={<DuplicateForm eventIndex={eventState} />}
             form={eventState.declaration}
             formConfig={formConfig}

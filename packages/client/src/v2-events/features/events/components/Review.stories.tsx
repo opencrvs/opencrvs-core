@@ -528,6 +528,7 @@ export const ReviewDuringCreateNoAnnotationFields: Story = {
         element: (
           <Review.Body
             annotation={{}}
+            attachmentPath={`events/${tennisClubMembershipEventDocument.id}/`}
             form={mockDeclaration}
             formConfig={TENNIS_CLUB_DECLARATION_FORM}
             readonlyMode={false}
