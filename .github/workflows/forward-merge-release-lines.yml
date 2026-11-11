@@ -1,0 +1,216 @@
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at https://mozilla.org/MPL/2.0/.
+#
+# OpenCRVS is also distributed under the terms of the Civil Registration
+# & Healthcare Disclaimer located at http://opencrvs.org/license.
+#
+# Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
+
+# Opens a pull request that carries every change on a release line up into
+# the next newer one.
+#
+# The chain is every release/<major>.<minor>.x branch in version order, then
+# develop: release/1.9.x -> release/2.0.x -> release/2.1.x -> develop. The PR
+# for one step is opened from forward-merge/<from>-into-<to> (dots stripped,
+# e.g. forward-merge/19x-into-20x), a copy of the older line. The workflow
+# merges and edits nothing: conflicts, the version and the changelog are
+# resolved on that branch by whoever picks up the PR.
+#
+# Each run opens or updates one PR, from the given line into the next one:
+#   push to release/*.x   from the line that was pushed to
+#   workflow_dispatch     from the line typed in, e.g. 1.9.x
+# Merging that PR pushes to the next line, which opens the PR after it, so a
+# change climbs one line at a time.
+#
+# An open PR whose branch nobody has pushed to is fast-forwarded to the new
+# source commits. Once someone has pushed to it, new source commits are left
+# for them to merge in, or for the next PR after this one is merged.
+#
+# PRs are opened with GITHUB_TOKEN, so pull_request workflows (lint-and-test)
+# do not start on them until someone pushes to the branch.
+name: Release - Forward-merge release lines
+
+on:
+  push:
+    branches:
+      - 'release/*.x'
+  workflow_dispatch:
+    inputs:
+      from:
+        type: string
+        required: true
+        description: 'Release line to start from, e.g. 1.9.x'
+      dry_run:
+        type: boolean
+        default: false
+        description: 'Only report what would be pushed and opened'
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  plan:
+    runs-on: ubuntu-24.04
+    outputs:
+      source: ${{ steps.plan.outputs.source }}
+      target: ${{ steps.plan.outputs.target }}
+    steps:
+      - name: Work out the source and target branches
+        id: plan
+        env:
+          GH_TOKEN: ${{ github.token }}
+          # the line typed into a manual run, or the line that was pushed to
+          REQUESTED_LINE: ${{ inputs.from || github.ref_name }}
+        run: |
+          # Release lines in version order: release/1.9.x release/2.0.x ...
+          release_lines=$(gh api "repos/$GITHUB_REPOSITORY/git/matching-refs/heads/release/" --paginate \
+            --jq '.[].ref | ltrimstr("refs/heads/")' \
+            | grep -E '^release/[0-9]+\.[0-9]+\.x$' | sort -V)
+
+          # develop comes after the newest release line
+          mapfile -t chain < <(echo "$release_lines"; echo develop)
+          echo "Chain: ${chain[*]}"
+
+          source="release/${REQUESTED_LINE#release/}"
+          if ! grep -qx "$source" <<< "$release_lines"; then
+            echo "::error::'$REQUESTED_LINE' is not a release line. Release lines: $(paste -sd, <<< "$release_lines")"
+            exit 1
+          fi
+
+          # the target is the next branch in the chain
+          for i in "${!chain[@]}"; do
+            if [ "${chain[i]}" = "$source" ]; then target=${chain[i + 1]}; break; fi
+          done
+
+          echo "$source -> $target"
+          echo "source=$source" >> "$GITHUB_OUTPUT"
+          echo "target=$target" >> "$GITHUB_OUTPUT"
+
+  open-pr:
+    needs: plan
+    runs-on: ubuntu-24.04
+    # one run per source line at a time, so two pushes in a row update the PR in order
+    concurrency:
+      group: forward-merge-${{ needs.plan.outputs.source }}
+    env:
+      SOURCE_BRANCH: ${{ needs.plan.outputs.source }}
+      TARGET_BRANCH: ${{ needs.plan.outputs.target }}
+      DRY_RUN: ${{ inputs.dry_run == true }}
+      # gh needs a token and, with no checkout, the repository to work on
+      GH_TOKEN: ${{ github.token }}
+      GH_REPO: ${{ github.repository }}
+    steps:
+      - name: Open or update the PR from ${{ needs.plan.outputs.source }} into ${{ needs.plan.outputs.target }}
+        run: |
+          set -euo pipefail
+
+          # release/1.9.x -> 19x. Dots are stripped to pass the branch-name check.
+          short_name() { local name="${1#release/}"; echo "${name//./}"; }
+          PR_BRANCH="forward-merge/$(short_name "$SOURCE_BRANCH")-into-$(short_name "$TARGET_BRANCH")"
+          REPO_API="repos/$GH_REPO"
+
+          # Latest commit on a branch, or nothing if the branch doesn't exist.
+          # (On a 404, gh still prints the error to stdout, so it is dropped.)
+          latest_commit() {
+            local commit
+            if commit=$(gh api "$REPO_API/git/ref/heads/$1" --jq .object.sha 2>/dev/null); then
+              echo "$commit"
+            fi
+          }
+
+          # Succeeds when branch or commit $1 already contains commit $2.
+          contains() {
+            local status
+            status=$(gh api "$REPO_API/compare/$1...$2?per_page=1" --jq .status)
+            [ "$status" = "behind" ] || [ "$status" = "identical" ]
+          }
+
+          # Number of commits on $2 that $1 doesn't have.
+          count_missing() {
+            gh api "$REPO_API/compare/$1...$2?per_page=1" --jq .ahead_by
+          }
+
+          # Runs a command that changes something on GitHub. A dry run only prints it.
+          change() {
+            if [ "$DRY_RUN" = "true" ]; then echo "[dry run] $*" >&2; else "$@" > /dev/null; fi
+          }
+
+          # Points the PR branch at a commit. force=false only allows moving it forward.
+          move_pr_branch() { # commit, force
+            change gh api -X PATCH "$REPO_API/git/refs/heads/$PR_BRANCH" -f sha="$1" -F force="$2"
+          }
+
+          source_commit=$(latest_commit "$SOURCE_BRANCH")
+          open_pr=$(gh pr list --head "$PR_BRANCH" --base "$TARGET_BRANCH" --state open \
+            --json number --jq '.[0].number // ""')
+
+          # 1. A PR is already open: bring in the new commits, unless someone
+          #    has already pushed their own work to its branch.
+          if [ -n "$open_pr" ]; then
+            pr_commit=$(latest_commit "$PR_BRANCH")
+            if contains "$pr_commit" "$source_commit"; then
+              echo "#$open_pr already has everything from $SOURCE_BRANCH."
+            elif contains "$source_commit" "$pr_commit"; then
+              move_pr_branch "$source_commit" false
+              echo "Moved #$open_pr forward to the latest $SOURCE_BRANCH."
+            else
+              echo "::warning::$SOURCE_BRANCH has new commits that #$open_pr doesn't have, and someone has pushed to $PR_BRANCH. Merge them in there, or they go in the next PR."
+            fi
+            exit 0
+          fi
+
+          # 2. No PR open: stop if the target already has everything.
+          missing=$(count_missing "$TARGET_BRANCH" "$source_commit")
+          if [ "$missing" = "0" ]; then
+            echo "Nothing to merge from \`$SOURCE_BRANCH\` into \`$TARGET_BRANCH\`." | tee -a "$GITHUB_STEP_SUMMARY"
+            exit 0
+          fi
+
+          # 3. Point the PR branch at the source. A branch left over from an
+          #    earlier PR is only reused if nothing on it would be lost: that PR
+          #    was merged, or the source already contains the branch.
+          old_commit=$(latest_commit "$PR_BRANCH")
+          if [ -z "$old_commit" ]; then
+            change gh api "$REPO_API/git/refs" -f ref="refs/heads/$PR_BRANCH" -f sha="$source_commit"
+          elif contains "$TARGET_BRANCH" "$old_commit" || contains "$source_commit" "$old_commit"; then
+            move_pr_branch "$source_commit" true
+          else
+            echo "::warning::$PR_BRANCH has commits that are in neither $TARGET_BRANCH nor $SOURCE_BRANCH, probably from a PR closed without merging. Delete or merge it, then re-run."
+            exit 0
+          fi
+
+          # 4. Open the PR.
+          PR_BODY="Carries $missing commits from \`$SOURCE_BRANCH\` that \`$TARGET_BRANCH\` doesn't have yet. This branch is a copy of \`$SOURCE_BRANCH\`; nothing has been merged or edited.
+
+          Before merging:
+
+          - [ ] Resolve the conflicts on this branch, never on \`$SOURCE_BRANCH\`:
+            \`\`\`sh
+            git fetch origin
+            git checkout -B $PR_BRANCH origin/$PR_BRANCH
+            git merge origin/$TARGET_BRANCH
+            # resolve, commit
+            git push origin $PR_BRANCH
+            \`\`\`
+          - [ ] package.json files keep \`$TARGET_BRANCH\`'s version. On a release line, that is its next unreleased patch: bump it if the last release on \`$TARGET_BRANCH\` didn't.
+          - [ ] CHANGELOG.md: add the \`$SOURCE_BRANCH\` entries that apply to \`$TARGET_BRANCH\` under its own version.
+          - [ ] Merge with **Create a merge commit**. Squash or rebase drops the link to \`$SOURCE_BRANCH\`, so the next run offers the same commits again.
+
+          If \`$SOURCE_BRANCH\` gets new commits after you start resolving, merge \`origin/$SOURCE_BRANCH\` in here too, or leave them: the next push to \`$SOURCE_BRANCH\` or a manual run opens a new PR for them once this one is merged.
+
+          Opened by the forward-merge workflow ([run]($GITHUB_SERVER_URL/$GH_REPO/actions/runs/$GITHUB_RUN_ID)). CI starts once someone pushes to this branch."
+
+          if [ "$DRY_RUN" = "true" ]; then
+            printf '[dry run] PR %s -> %s\n\n%s\n' "$PR_BRANCH" "$TARGET_BRANCH" "$PR_BODY"
+            exit 0
+          fi
+          pr_url=$(gh pr create --base "$TARGET_BRANCH" --head "$PR_BRANCH" \
+            --title "chore: merge $SOURCE_BRANCH into $TARGET_BRANCH" --body "$PR_BODY")
+          echo "Opened $pr_url" | tee -a "$GITHUB_STEP_SUMMARY"
+
+          # Assign whoever triggered the run, unless it was a bot.
+          if [[ "$GITHUB_ACTOR" != *"[bot]" ]]; then
+            gh pr edit "$pr_url" --add-assignee "$GITHUB_ACTOR" || true
+          fi
