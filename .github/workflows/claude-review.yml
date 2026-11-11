@@ -63,6 +63,13 @@ jobs:
             PR NUMBER: ${{ env.PR_NUMBER }}
 
             Review this pull request. The PR head is checked out.
+
+            Review against the coding standards. Read docs/coding-standards/README.md
+            and each area page that matches the changed files. Check every rule on
+            those pages against the diff. When a comment reports a broken rule, name
+            the page and the heading of the rule instead of writing the reason again.
+            Also report bugs that the standards do not cover.
+
             Use mcp__github_inline_comment__create_inline_comment with confirmed: true
             for issues tied to specific lines. Use `gh pr comment` for one short
             top-level summary, and start that summary with the line <!-- claude-review -->.
