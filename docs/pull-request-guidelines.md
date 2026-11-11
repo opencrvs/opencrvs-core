@@ -368,7 +368,7 @@ A comment that is long or that sounds generated will not be read. When the code 
 - A bug fix comes with a test that reproduces the bug. The test fails without the fix.
 - Test at the layer where the bug is.
 - Cover the negative cases and each acceptance criterion of the issue.
-- A new tRPC procedure has access tests (allowed and forbidden, for each caller type) and functional tests.
+- A new tRPC procedure has access tests (allowed and forbidden, for each caller type) and functional tests. If endpoint can return multiple values, ensure it works with 0, 1 and more items.
 - Code that is about to be removed can go without new tests. Say so in the PR.
 
 ### 10.2 Assert the result, not the call
