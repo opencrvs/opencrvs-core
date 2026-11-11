@@ -10,17 +10,13 @@
  */
 
 import { DocumentPath } from '../documents'
-import { Action, ActionBase, ActionDocument } from './ActionDocument'
+import { ActionBase } from './ActionDocument'
 import { FileFieldValue, FileFieldWithOptionValue } from './CompositeFieldValue'
 import { EventDocument } from './EventDocument'
 import { uniq } from 'lodash'
 
 /** The field values an action, a draft or an action input carries. */
 export type ActionValues = Pick<ActionBase, 'declaration' | 'annotation'>
-
-function carriesFieldValues(action: Action): action is ActionDocument {
-  return 'declaration' in action
-}
 
 /**
  * Paths of every file in an action's declaration and annotation, from single-
@@ -60,7 +56,11 @@ export function getFilePathsFromValues({
 export function getFilePathsFromEvent(event: EventDocument): DocumentPath[] {
   return uniq(
     event.actions.flatMap((action) => [
-      ...(carriesFieldValues(action) ? getFilePathsFromValues(action) : []),
+      // Each field is read on its own, so neither depends on the other being there
+      ...getFilePathsFromValues({
+        declaration: 'declaration' in action ? action.declaration : {},
+        annotation: 'annotation' in action ? action.annotation : undefined
+      }),
       ...('createdBySignature' in action && action.createdBySignature
         ? [action.createdBySignature]
         : [])

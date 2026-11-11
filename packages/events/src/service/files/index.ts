@@ -222,9 +222,10 @@ export function assertImportedFilesBelongToEvent(event: EventDocument) {
   }
 
   for (const action of event.actions) {
-    if ('declaration' in action) {
-      getFilePathsFromValues(action).forEach((path) => assertPath(path))
-    }
+    getFilePathsFromValues({
+      declaration: 'declaration' in action ? action.declaration : {},
+      annotation: 'annotation' in action ? action.annotation : undefined
+    }).forEach((path) => assertPath(path))
 
     if ('createdBySignature' in action && action.createdBySignature) {
       assertPath(action.createdBySignature, action.createdBy)
