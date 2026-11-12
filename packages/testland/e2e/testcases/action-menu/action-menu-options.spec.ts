@@ -61,8 +61,7 @@ test.describe('Action menu options', () => {
         'Validate',
         'Escalate',
         'Reject',
-        'Archive',
-        'v2 only action'
+        'Archive'
       ])
     })
 
@@ -75,8 +74,7 @@ test.describe('Action menu options', () => {
         'Edit',
         'Escalate',
         'Reject',
-        'Archive',
-        'v2 only action'
+        'Archive'
       ])
     })
   })
@@ -99,8 +97,7 @@ test.describe('Action menu options', () => {
         'Edit',
         'Escalate',
         'Reject',
-        'Archive',
-        'v2 only action'
+        'Archive'
       ])
     })
   })
@@ -122,8 +119,7 @@ test.describe('Action menu options', () => {
         'Escalate',
         'Print',
         'Correct',
-        'Issue a verifiable credential',
-        'v2 only action'
+        'Issue a verifiable credential'
       ])
     })
 
@@ -142,8 +138,7 @@ test.describe('Action menu options', () => {
         'Print',
         'Correct',
         'Issue a verifiable credential',
-        'Unassign',
-        'v2 only action'
+        'Unassign'
       ])
     })
   })
@@ -165,8 +160,7 @@ test.describe('Action menu options', () => {
       await expectActionMenuOptions(page, declaration, [
         'Assign',
         'Escalate',
-        'Unarchive',
-        'v2 only action'
+        'Unarchive'
       ])
     })
 
@@ -175,8 +169,7 @@ test.describe('Action menu options', () => {
       await expectActionMenuOptions(page, declaration, [
         'Assign',
         'Escalate',
-        'Unarchive',
-        'v2 only action'
+        'Unarchive'
       ])
     })
   })

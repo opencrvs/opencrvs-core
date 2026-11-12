@@ -45,7 +45,7 @@ const GenderTypes = {
   UNKNOWN: 'unknown'
 } as const
 
-const TypeOfBirth = {
+export const TypeOfBirth = {
   SINGLE: 'SINGLE',
   TWIN: 'TWIN',
   TRIPLET: 'TRIPLET',

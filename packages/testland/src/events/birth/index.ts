@@ -35,7 +35,7 @@ import {
 import { advancedSearchBirth } from './advancedSearch'
 
 import { BIRTH_CERTIFICATE_COLLECTOR_FORM } from './forms/printForm'
-import { PlaceOfBirth } from './forms/pages/child'
+import { PlaceOfBirth, TypeOfBirth } from './forms/pages/child'
 import { birthCorrectionForm } from './forms/correctionForm'
 import { birthNotificationForm } from './forms/notificationForm'
 import { dedupConfig } from './dedupConfig'
@@ -53,7 +53,7 @@ type CustomActionInput = Extract<
 
 /*
  * Custom actions that only one version has, so that we can check that a record
- * offers the actions of its own version only. They have no form and no conditionals.
+ * offers the actions of its own version only. They have no form.
  */
 const INITIAL_ONLY_ACTION: CustomActionInput = {
   type: ActionType.CUSTOM,
@@ -88,7 +88,19 @@ const V2_ONLY_ACTION: CustomActionInput = {
       "Audit history label of a custom action that only version 'v2' of the birth event has",
     id: 'event.birth.custom.action.v2-only-action.audit-history-label'
   },
-  form: []
+  form: [],
+  // The action shows only for a multiple birth. 'child.birthType' is a field
+  // that only version 'v2' has, so QA can check that an action can depend on
+  // a field of its own version.
+  conditionals: [
+    {
+      type: ConditionalType.SHOW,
+      conditional: and(
+        not(field('child.birthType').isFalsy()),
+        not(field('child.birthType').isEqualTo(TypeOfBirth.SINGLE))
+      )
+    }
+  ]
 }
 
 interface BirthVersionInput {
