@@ -355,9 +355,8 @@ export const handlers = {
     })
   ],
   files: [
-    tRPCMsw.event.file.getPresignedUrl.query(() => ({
-      presignedURL: `http://localhost:3535/ocrvs/tree.svg`
-    })),
+    // No file is presigned unless a story mocks the record's files
+    tRPCMsw.event.files.presign.query(() => ({})),
     http.post('/api/upload', async (req) => {
       const formData = await req.request.formData()
 

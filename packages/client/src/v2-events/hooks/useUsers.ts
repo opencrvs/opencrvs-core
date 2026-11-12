@@ -14,11 +14,13 @@ import { inferInput, inferOutput } from '@trpc/tanstack-react-query'
 import { useSelector } from 'react-redux'
 import {
   deepDropNulls,
+  DocumentPath,
   System,
   TokenUserType,
   UserOrSystem,
   UserOrSystemSummary,
-  UserSummary
+  UserSummary,
+  UUID
 } from '@opencrvs/commons/client'
 import { getUserDetails } from '@client/profile/profileSelectors'
 import {
@@ -32,7 +34,10 @@ import {
   setMutationDefaults,
   setQueryDefaults
 } from '../features/events/useEvents/procedures/utils'
-import { precacheFile } from '../features/files/useFileUpload'
+import {
+  precacheFiles,
+  precacheUserAvatars
+} from '../features/files/useFileUpload'
 
 type UserWithResolvedFiles = Omit<UserOrSystem, 'signature' | 'avatar'> & {
   signature?: string
@@ -60,12 +65,11 @@ setQueryDefaults<
       return user
     }
 
-    if (user.signature) {
-      await precacheFile(user.signature)
-    }
-    if (user.avatar) {
-      await precacheFile(user.avatar)
-    }
+    const files = [user.avatar, user.signature].filter(
+      (file): file is DocumentPath => !!file
+    )
+
+    await precacheFiles(files, { userId: UUID.parse(user.id) })
 
     return deepDropNulls({
       ...user,
@@ -111,16 +115,14 @@ setQueryDefaults(trpcOptionsProxy.user.list, {
         ] as (typeof params)[0]['queryKey']
       })
 
-      await Promise.allSettled(
-        freshUsers.map(async (user) => {
-          if (user.type === TokenUserType.enum.system) {
-            return user
-          }
-          if (user.avatar) {
-            await precacheFile(user.avatar)
-          }
-          return user
-        })
+      // One call for every avatar; a failure is logged, not thrown, so the
+      // users still load
+      await precacheUserAvatars(
+        freshUsers.flatMap((user) =>
+          user.type === TokenUserType.enum.user && user.avatar
+            ? [UUID.parse(user.id)]
+            : []
+        )
       )
 
       for (const user of freshUsers) {

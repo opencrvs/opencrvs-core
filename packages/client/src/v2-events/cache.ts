@@ -30,6 +30,25 @@ export function toFileUrl(path: DocumentPath): string {
 }
 
 /**
+ * @returns the global file cache, or null when the service worker hasn't
+ * created it.
+ */
+export async function findFileCache() {
+  const cacheKeys = await caches.keys()
+  const cacheKey = cacheKeys.find((key) => key.startsWith(CACHE_NAME))
+
+  if (!cacheKey) {
+    // eslint-disable-next-line no-console
+    console.error(
+      `Cache ${CACHE_NAME} not found. Is service worker running properly?`
+    )
+    return null
+  }
+
+  return caches.open(cacheKey)
+}
+
+/**
  * Sets file to **BROWSER** cache with given filename.
  * Normalizes url to an absolute path (prepends / if missing).
  * @see CACHE_NAME

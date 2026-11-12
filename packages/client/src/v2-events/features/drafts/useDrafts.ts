@@ -30,7 +30,7 @@ import {
 import { queryClient, trpcOptionsProxy, useTRPC } from '@client/v2-events/trpc'
 import { createTemporaryId, isTemporaryId } from '@client/v2-events/utils'
 import { getFilepathsFromActionDocument } from '../files/cache'
-import { precacheFile } from '../files/useFileUpload'
+import { precacheFiles } from '../files/useFileUpload'
 
 /*
  * Overrides the default behaviour of "api.event.draft.list"
@@ -49,18 +49,12 @@ setQueryDefaults(trpcOptionsProxy.event.draft.list, {
     const response = await queryOptions.queryFn(...params)
     const drafts = response.map((draft) => Draft.parse(draft))
 
-    // Each draft's files are fetched with the id of the record it belongs to
-    const files = drafts.flatMap((draft) =>
-      getFilepathsFromActionDocument([draft.action]).map((filename) => ({
-        filename,
-        eventId: draft.eventId
-      }))
-    )
-
-    // precacheFile catches its own errors, so one failed file doesn't stop the rest
+    // One presign call per record; precacheFiles catches its own errors
     await Promise.all(
-      files.map(async ({ filename, eventId }) =>
-        precacheFile(filename, { eventId })
+      drafts.map(async (draft) =>
+        precacheFiles(getFilepathsFromActionDocument([draft.action]), {
+          eventId: draft.eventId
+        })
       )
     )
 

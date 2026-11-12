@@ -37,6 +37,7 @@ import { ROUTES } from '@client/v2-events/routes'
 import { withSuspense } from '@client/v2-events/components/withSuspense'
 import { storage } from '@client/storage'
 import { useDrafts } from '../../drafts/useDrafts'
+import { getFilepathsFromActionDocument } from '../../files/cache'
 import { useEvents } from './useEvents'
 
 const meta: Meta<unknown> = {
@@ -93,6 +94,11 @@ const trpcMsw = createTRPCMsw<AppRouter>({
   transformer: { input: superjson, output: superjson }
 })
 
+const draft = generateEventDraftDocument({
+  eventId: createdEvent.id,
+  actionType: ActionType.DECLARE
+})
+
 const spies = {
   draftList: 0,
   eventGet: 0,
@@ -105,12 +111,7 @@ const handlers = {
   drafts: [
     trpcMsw.event.draft.list.query(() => {
       spies.draftList++
-      return [
-        generateEventDraftDocument({
-          eventId: createdEvent.id,
-          actionType: ActionType.DECLARE
-        })
-      ]
+      return [draft]
     })
   ],
   event: [
@@ -120,11 +121,14 @@ const handlers = {
     })
   ],
   files: [
-    trpcMsw.event.file.getPresignedUrl.query((input) => {
+    trpcMsw.event.files.presign.query(() => {
       spies.presignFile++
-      return {
-        presignedURL: `http://localhost:3535/ocrvs/${input.filePath}`
-      }
+      return Object.fromEntries(
+        getFilepathsFromActionDocument([draft.action]).map((path) => [
+          path,
+          `http://localhost:3535/ocrvs/${path}`
+        ])
+      )
     }),
     http.get('http://localhost:3535/ocrvs/:id', () => {
       spies.fetchFile++
