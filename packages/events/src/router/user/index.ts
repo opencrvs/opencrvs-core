@@ -752,7 +752,7 @@ export const userRouter = router({
     presign: userOnlyProcedure
       .input(
         z.object({
-          // Same limit as user.list
+          // Limit to prevent user enumeration with arbitrarily large IN (...) queries
           userIds: z.array(UUID).min(1).max(100),
           avatarsOnly: z.boolean().optional()
         })
