@@ -34,6 +34,8 @@ jobs:
       # Runs before the checkout, so it cannot read the repository.
       - name: Work out the release line
         id: line
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           if [[ ! $VERSION =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
             echo "::error::'$VERSION' is not a semver version, e.g. 1.9.24"
@@ -41,13 +43,18 @@ jobs:
           fi
 
           IFS='.' read -r x y _ <<< "$VERSION"
-          echo "branch=release/$x.$y.x" >> "$GITHUB_OUTPUT"
+          branch="release/$x.$y.x"
+          if ! gh api "repos/$GITHUB_REPOSITORY/git/ref/heads/$branch" > /dev/null 2>&1; then
+            echo "::error::$branch does not exist. Create it before starting $VERSION."
+            exit 1
+          fi
+          echo "branch=$branch" >> "$GITHUB_OUTPUT"
 
       # Full history is required so lerna can traverse the commit graph.
-      - name: Checkout develop
+      - name: Checkout ${{ steps.line.outputs.branch }}
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
-          ref: develop
+          ref: ${{ steps.line.outputs.branch }}
           fetch-depth: 0
           token: ${{ secrets.GITHUB_TOKEN }}
 
@@ -55,20 +62,6 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-
-      - name: Check out ${{ steps.line.outputs.branch }}
-        env:
-          LINE_BRANCH: ${{ steps.line.outputs.branch }}
-        run: |
-          if git ls-remote --exit-code --heads origin "$LINE_BRANCH" > /dev/null 2>&1; then
-            git checkout -B "$LINE_BRANCH" "origin/$LINE_BRANCH"
-          elif [[ $VERSION == *.0 ]]; then
-            echo "$LINE_BRANCH doesn't exist yet; cutting it from develop."
-            git checkout -b "$LINE_BRANCH"
-          else
-            echo "::error::$LINE_BRANCH does not exist. Start $LINE_BRANCH with its .0 release first."
-            exit 1
-          fi
 
       # Each commit is skipped when it is already there, so a re-run is safe.
       - name: Bump the version and add a CHANGELOG section
