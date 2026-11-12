@@ -72,6 +72,12 @@ test.describe("Birth form version 'initial'", () => {
       await goToSection(page, 'father')
       await expect(page.locator('#father____maritalStatus')).toBeVisible()
     })
+
+    await test.step('Review page does not ask for the signature of the informant', async () => {
+      await goToSection(page, 'review')
+      await expect(page.getByText('Comment', { exact: true })).toBeVisible()
+      await expect(page.getByText('Signature of informant')).toHaveCount(0)
+    })
   })
 
   test('A record of version initial can be registered', async ({ page }) => {

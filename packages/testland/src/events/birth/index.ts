@@ -30,7 +30,7 @@ import {
 } from '@opencrvs/toolkit/events'
 import {
   birthDeclarationForm,
-  BIRTH_DECLARATION_REVIEW
+  birthDeclarationReview
 } from './forms/declaration'
 import { advancedSearchBirth } from './advancedSearch'
 
@@ -452,7 +452,7 @@ const birthVersion = ({
           'This is shown as the action name anywhere the user can trigger the action from',
         id: 'event.birth.action.Read.label'
       },
-      review: BIRTH_DECLARATION_REVIEW
+      review: birthDeclarationReview(id)
     },
     {
       type: ActionType.NOTIFY,
@@ -507,7 +507,7 @@ const birthVersion = ({
           }
         }
       ],
-      review: BIRTH_DECLARATION_REVIEW,
+      review: birthDeclarationReview(id),
       deduplication: {
         id: 'birth-deduplication',
         label: {

@@ -26,6 +26,7 @@ import {
 } from '@opencrvs/toolkit/events'
 import { getSignatureFile, uploadFile } from './utils'
 import { dateToIsoDateString, randomPastDate } from '@e2e/support/helpers'
+import { BirthVersion } from '@countryconfig/events/birth/versions'
 
 type InformantRelation = 'MOTHER' | 'LEGAL_GUARDIAN'
 
@@ -265,11 +266,12 @@ export async function createDeclaration(
     }
   }
 
-  const filename = await uploadFile(getSignatureFile(), token)
-
   const annotation = {
     'review.comment': 'My comment',
-    'review.signature': filename
+    // Version 'initial' of the birth form does not ask for the signature of the informant.
+    ...(configVersionId === BirthVersion.INITIAL
+      ? {}
+      : { 'review.signature': await uploadFile(getSignatureFile(), token) })
   }
 
   const declareRes = await client.event.actions.declare.request.mutate({

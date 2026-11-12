@@ -29,71 +29,79 @@ import { fatherPage } from './pages/father'
 import { documents } from './pages/documents'
 import { BirthVersion } from '../versions'
 
-export const BIRTH_DECLARATION_REVIEW = {
-  title: {
-    id: 'event.birth.action.declare.form.review.title',
-    defaultMessage:
-      '{child.name.firstname, select, __EMPTY__ {Birth declaration} other {{child.name.surname, select, __EMPTY__ {Birth declaration for {child.name.firstname}} other {Birth declaration for {child.name.firstname} {child.name.surname}}}}}',
-    description: 'Title of the form to show in review page'
-  },
-  fields: [
-    {
-      id: 'review.print',
-      type: FieldType.ALPHA_PRINT_BUTTON,
-      label: {
-        defaultMessage: 'Print certificate in advance of registration',
-        id: 'event.birth.action.declare.form.review.print.label',
-        description: 'Label for the print button in the review section'
-      },
-      configuration: {
-        template: 'v2.birth-certified-certificate',
-        buttonLabel: {
+/** The review page of the birth declaration. Only version `v2` asks for the signature of the informant. */
+export function birthDeclarationReview(version: BirthVersion) {
+  return {
+    title: {
+      id: 'event.birth.action.declare.form.review.title',
+      defaultMessage:
+        '{child.name.firstname, select, __EMPTY__ {Birth declaration} other {{child.name.surname, select, __EMPTY__ {Birth declaration for {child.name.firstname}} other {Birth declaration for {child.name.firstname} {child.name.surname}}}}}',
+      description: 'Title of the form to show in review page'
+    },
+    fields: [
+      {
+        id: 'review.print',
+        type: FieldType.ALPHA_PRINT_BUTTON,
+        label: {
           defaultMessage: 'Print certificate in advance of registration',
-          description: "Print button's label",
-          id: 'event.birth.action.declare.form.review.print.label'
-        }
+          id: 'event.birth.action.declare.form.review.print.label',
+          description: 'Label for the print button in the review section'
+        },
+        configuration: {
+          template: 'v2.birth-certified-certificate',
+          buttonLabel: {
+            defaultMessage: 'Print certificate in advance of registration',
+            description: "Print button's label",
+            id: 'event.birth.action.declare.form.review.print.label'
+          }
+        },
+        conditionals: [
+          {
+            type: ConditionalType.SHOW,
+            conditional: and(
+              or(
+                user.hasRole('LOCAL_REGISTRAR'),
+                user.hasRole('PROVINCIAL_REGISTRAR'),
+                user.hasRole('NATIONAL_REGISTRAR')
+              ),
+              not(event.hasAction(ActionType.DECLARE)),
+              not(event.hasAction(ActionType.NOTIFY))
+            )
+          }
+        ]
       },
-      conditionals: [
-        {
-          type: ConditionalType.SHOW,
-          conditional: and(
-            or(
-              user.hasRole('LOCAL_REGISTRAR'),
-              user.hasRole('PROVINCIAL_REGISTRAR'),
-              user.hasRole('NATIONAL_REGISTRAR')
-            ),
-            not(event.hasAction(ActionType.DECLARE)),
-            not(event.hasAction(ActionType.NOTIFY))
-          )
-        }
-      ]
-    },
-    {
-      id: 'review.comment',
-      type: FieldType.TEXTAREA,
-      label: {
-        defaultMessage: 'Comment',
-        id: 'event.birth.action.declare.form.review.comment.label',
-        description: 'Label for the comment field in the review section'
+      {
+        id: 'review.comment',
+        type: FieldType.TEXTAREA,
+        label: {
+          defaultMessage: 'Comment',
+          id: 'event.birth.action.declare.form.review.comment.label',
+          description: 'Label for the comment field in the review section'
+        },
+        required: true
       },
-      required: true
-    },
-    {
-      type: FieldType.SIGNATURE,
-      id: 'review.signature',
-      required: true,
-      label: {
-        defaultMessage: 'Signature of informant',
-        id: 'event.birth.action.declare.form.review.signature.label',
-        description: 'Label for the signature field in the review section'
-      },
-      signaturePromptLabel: {
-        id: 'signature.upload.modal.title',
-        defaultMessage: 'Draw signature',
-        description: 'Title for the modal to draw signature'
-      }
-    }
-  ]
+      ...(version === BirthVersion.V2
+        ? [
+            {
+              type: FieldType.SIGNATURE,
+              id: 'review.signature',
+              required: true,
+              label: {
+                defaultMessage: 'Signature of informant',
+                id: 'event.birth.action.declare.form.review.signature.label',
+                description:
+                  'Label for the signature field in the review section'
+              },
+              signaturePromptLabel: {
+                id: 'signature.upload.modal.title',
+                defaultMessage: 'Draw signature',
+                description: 'Title for the modal to draw signature'
+              }
+            }
+          ]
+        : [])
+    ]
+  }
 }
 
 export function birthDeclarationForm(version: BirthVersion) {

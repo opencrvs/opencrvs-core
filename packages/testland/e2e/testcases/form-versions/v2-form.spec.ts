@@ -82,6 +82,11 @@ test.describe("Birth form version 'v2'", () => {
       await goToSection(page, 'father')
       await expect(page.locator('#father____maritalStatus')).toHaveCount(0)
     })
+
+    await test.step('Review page asks for the signature of the informant', async () => {
+      await goToSection(page, 'review')
+      await expect(page.getByText('Signature of informant')).toBeVisible()
+    })
   })
 
   test('A notification of version v2 requires the type of birth', async () => {
