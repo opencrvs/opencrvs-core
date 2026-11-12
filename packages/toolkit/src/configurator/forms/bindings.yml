@@ -1,0 +1,263 @@
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at https://mozilla.org/MPL/2.0/.
+#
+# OpenCRVS is also distributed under the terms of the Civil Registration
+# & Healthcare Disclaimer located at http://opencrvs.org/license.
+#
+# Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
+# Which stored values feed which form question.
+#
+# github: a GitHub environment/repository variable or secret. The name defaults to the
+#         question name (the form uses the real variable names). Secrets can only be read
+#         by name, never by value, so a secret only marks a question as "defined".
+# file:   a variable of a template under templates/. scripts/check-bindings.ts finds where
+#         the template puts that variable in the rendered file; nothing here is a path.
+#
+# A question may list several targets. `precedence` decides which source wins when more
+# than one has a value (first listed wins); a binding can override it with its own.
+# `parse` names a conversion from src/bindings/parsers.ts.
+
+precedence: [github, file]
+
+# Template -> file inside environments/<name>/ (as written by `yarn environment:init`).
+files:
+  inventory/inventory.template.yml: inventory.yml
+  charts-values/dependencies/values.yaml: dependencies/values.yaml
+  charts-values/traefik/values.yaml: traefik/values.yaml
+  charts-values/opencrvs-services/values.yaml: opencrvs-services/values.yaml
+
+# In the flat layout (environments/<name>.yaml) an environment is a single file. This is the
+# rendered file that file holds, both when it is read and when it is written; the other files
+# have no place there and are not written.
+flat: inventory.yml
+
+# Template variables that no question feeds. When a template is rendered every variable needs
+# a source: a question (below), a default from here, or a derived value (src/plan/templateValues.ts).
+# Defaults are the CLI's; the form does not ask about them yet. `npm run check` fails if a
+# variable of a template has none of the three.
+#
+# A host or endpoint question is not listed here even when it is hidden (a built-in component): a question that
+# has an address in DEFAULT_HOSTS (src/plan/dependencyHosts.ts) gives it to every template variable it feeds
+# below, whenever it has no answer.
+templates:
+  inventory/inventory.template.yml:
+    derived: [single_node]
+  charts-values/dependencies/values.yaml:
+    defaults:
+      monitoring_enabled: true
+      s3_migrate_from_minio_to_rustfs: false
+      # The "Use built-in component" checkboxes; a dependency is deployed unless the form says it is not.
+      rustfs_enabled: true
+      elasticsearch_enabled: true
+      postgres_enabled: true
+      redis_enabled: true
+    derived: [env, backup_enabled, restore_enabled]
+  charts-values/traefik/values.yaml:
+    # `env` is in the tracing block, which is only there while monitoring is on. That block cannot be read
+    # back, so the monitoring question reaches this file as a derived value.
+    derived: [env, monitoring_enabled, lets_encrypt, static_ssl]
+  charts-values/opencrvs-services/values.yaml:
+    derived: [env, opencrvs_environment, restore_enabled]
+
+# Questions that hold no stored value of their own.
+ignore:
+  ENVIRONMENT_NAME: the environment being edited, chosen on the first page
+  CONFIGURE_EMAIL: page switch, inferred from the SMTP secrets that exist
+  CONFIGURE_INFRASTRUCTURE: page switch, inferred from the infrastructure values that exist
+  USE_SENTRY: checkbox, inferred from the SENTRY_DSN secret
+  USE_BUILTIN_OTEL_COLLECTOR: checkbox, inferred from OTEL_COLLECTOR_ENDPOINT (the opentelemetry chart is not written yet)
+  ENABLE_ENCRYPTION: inferred from ENCRYPTION_KEY and DISK_SPACE, which only exist for an encrypted disk
+  BACKUP_OR_RESTORE: inferred from BACKUP_HOST and RESTORE_HOST
+  GENERATE_BACKUP_SSH_KEYS: asks for a new SSH key pair; the backup secrets (BACKUP_HOST_PRIVATE_KEY, BACKUP_HOST_PUBLIC_KEY, BACKUP_ENCRYPTION_PASSPHRASE) have no question (src/plan/backupSecrets.ts)
+  USERS_WITHOUT_KEYS_WARNING: warning text
+  USERS_HELP: help text on the SSH users page
+
+bindings:
+  # Environment
+  DOMAIN:
+    targets:
+      - { source: github, kind: variable, scope: environment }
+  ACTIVATE_USERS:
+    targets:
+      - { source: github, kind: variable, scope: environment, parse: boolean }
+  ENVIRONMENT_TYPE:
+    targets:
+      - { source: file, template: charts-values/opencrvs-services/values.yaml, var: environment_type }
+  TWO_FA_ENABLED:
+    targets:
+      - { source: github, kind: variable, scope: environment, parse: boolean }
+      - { source: file, template: charts-values/opencrvs-services/values.yaml, var: two_fa_enabled, parse: boolean }
+  APPROVAL_REQUIRED:
+    targets:
+      - { source: github, kind: variable, scope: environment, parse: boolean }
+  APPROVERS:
+    targets:
+      - { source: github, kind: variable, scope: repository }
+
+  # Container registry (repository level; the old DOCKER* names still count)
+  REGISTRY_HOST:
+    targets:
+      - { source: github, kind: variable, scope: repository }
+  REGISTRY_ORGANISATION:
+    targets:
+      - { source: github, kind: secret, scope: repository, legacy: [DOCKERHUB_ACCOUNT] }
+  REGISTRY_REPOSITORY:
+    targets:
+      - { source: github, kind: secret, scope: repository, legacy: [DOCKERHUB_REPO] }
+  REGISTRY_USERNAME:
+    targets:
+      - { source: github, kind: secret, scope: repository, legacy: [DOCKER_USERNAME] }
+  REGISTRY_TOKEN:
+    targets:
+      - { source: github, kind: secret, scope: repository, legacy: [DOCKER_TOKEN] }
+
+  # Email (all secrets)
+  SMTP_HOST:
+    targets: [{ source: github, kind: secret, scope: environment }]
+  SMTP_PORT:
+    targets: [{ source: github, kind: secret, scope: environment }]
+  SMTP_USERNAME:
+    targets: [{ source: github, kind: secret, scope: environment }]
+  SMTP_PASSWORD:
+    targets: [{ source: github, kind: secret, scope: environment }]
+  SMTP_SECURE:
+    targets: [{ source: github, kind: secret, scope: environment }]
+  SENDER_EMAIL_ADDRESS:
+    targets: [{ source: github, kind: secret, scope: environment }]
+  ALERT_EMAIL:
+    targets: [{ source: github, kind: secret, scope: environment }]
+
+  # Kubernetes
+  KUBE_MASTER_NODE:
+    targets:
+      - { source: github, kind: variable, scope: environment }
+  KUBE_API_HOST:
+    targets:
+      - { source: github, kind: variable, scope: environment }
+      - { source: file, template: inventory/inventory.template.yml, var: kube_api_host }
+  KUBE_API_ALLOWED_CIDRS:
+    targets:
+      - { source: github, kind: variable, scope: environment }
+  WORKER_NODES:
+    targets:
+      - { source: github, kind: variable, scope: environment, name: KUBE_WORKER_NODES, parse: csv-to-ip-rows }
+      - { source: file, template: inventory/inventory.template.yml, var: kube_worker_nodes, parse: ip-rows }
+
+  # SSH users live in the inventory only
+  USERS:
+    targets:
+      - { source: file, template: inventory/inventory.template.yml, var: users.name, collect: container, parse: users }
+
+  # Backup: one value, up to three places
+  BACKUP_HOST:
+    targets:
+      - { source: github, kind: variable, scope: environment }
+      - { source: file, template: inventory/inventory.template.yml, var: backup_host }
+      - { source: file, template: charts-values/dependencies/values.yaml, var: backup_host }
+  BACKUP_SERVER_USER:
+    targets: [{ source: github, kind: secret, scope: environment }]
+  BACKUP_ENVIRONMENT_MODE:
+    targets:
+      - { source: github, kind: variable, scope: environment }
+      - { source: file, template: charts-values/dependencies/values.yaml, var: backup_type }
+
+  # Restore
+  RESTORE_ENVIRONMENT_NAME:
+    targets:
+      - { source: github, kind: variable, scope: environment }
+      - { source: file, template: charts-values/dependencies/values.yaml, var: restore_environment_name }
+  RESTORE_ENVIRONMENT_MODE:
+    targets:
+      - { source: github, kind: variable, scope: environment }
+      - { source: file, template: charts-values/dependencies/values.yaml, var: restore_type }
+  RESTORE_HOST:
+    targets:
+      - { source: github, kind: variable, scope: environment }
+      - { source: file, template: charts-values/dependencies/values.yaml, var: restore_host }
+
+  # Traefik. The mode is a new variable; the old script only kept the certificate, so an environment
+  # made by it is read as static_ssl when SSL_CRT exists (see applySnapshot).
+  TRAEFIK_MODE:
+    targets:
+      - { source: github, kind: variable, scope: environment }
+  SSL_CRT:
+    targets: [{ source: github, kind: secret, scope: environment }]
+  SSL_KEY:
+    targets: [{ source: github, kind: secret, scope: environment }]
+
+  # Dependencies. "Use built-in component" is `<component>.enabled` of the dependencies chart: the chart
+  # deploys the component, or leaves it to the host that is entered.
+  USE_BUILTIN_ELASTICSEARCH:
+    targets:
+      - { source: file, template: charts-values/dependencies/values.yaml, var: elasticsearch_enabled, parse: boolean }
+  USE_BUILTIN_RUSTFS:
+    targets:
+      - { source: file, template: charts-values/dependencies/values.yaml, var: rustfs_enabled, parse: boolean }
+  USE_BUILTIN_POSTGRES:
+    targets:
+      - { source: file, template: charts-values/dependencies/values.yaml, var: postgres_enabled, parse: boolean }
+  USE_BUILTIN_REDIS:
+    targets:
+      - { source: file, template: charts-values/dependencies/values.yaml, var: redis_enabled, parse: boolean }
+  ELASTICSEARCH_HOST:
+    targets:
+      - { source: github, kind: variable, scope: environment }
+      - { source: file, template: charts-values/dependencies/values.yaml, var: elasticsearch_host }
+      - { source: file, template: charts-values/opencrvs-services/values.yaml, var: elasticsearch_host }
+  ELASTICSEARCH_SUPERUSER:
+    targets: [{ source: github, kind: secret, scope: environment }]
+  ELASTICSEARCH_SUPERUSER_PASSWORD:
+    targets: [{ source: github, kind: secret, scope: environment }]
+  S3_HOST:
+    targets:
+      - { source: github, kind: variable, scope: environment }
+      - { source: file, template: charts-values/opencrvs-services/values.yaml, var: s3_host }
+  S3_ADMIN_ACCESS_KEY:
+    targets: [{ source: github, kind: secret, scope: environment, legacy: [MINIO_ROOT_USER] }]
+  S3_ADMIN_SECRET_KEY:
+    targets:
+      - { source: github, kind: secret, scope: environment, legacy: [MINIO_ROOT_PASSWORD] }
+  POSTGRES_HOST:
+    targets:
+      - { source: github, kind: variable, scope: environment }
+      - { source: file, template: charts-values/opencrvs-services/values.yaml, var: postgres_host }
+  POSTGRES_USER:
+    targets: [{ source: github, kind: secret, scope: environment }]
+  REDIS_HOST:
+    targets:
+      - { source: github, kind: variable, scope: environment }
+      - { source: file, template: charts-values/opencrvs-services/values.yaml, var: redis_host }
+
+  # Monitoring. The stack is also switched on by the workflows, which read MONITORING_ENABLED.
+  MONITORING_ENABLED:
+    targets:
+      - { source: github, kind: variable, scope: environment, parse: boolean }
+      - { source: file, template: charts-values/dependencies/values.yaml, var: monitoring_enabled, parse: boolean }
+  KIBANA_USERNAME:
+    targets: [{ source: github, kind: secret, scope: environment }]
+  OTEL_ENABLED:
+    targets:
+      - { source: github, kind: variable, scope: environment, parse: boolean }
+      - { source: file, template: charts-values/opencrvs-services/values.yaml, var: otel_enabled, parse: boolean }
+  OTEL_COLLECTOR_ENDPOINT:
+    targets:
+      - { source: github, kind: variable, scope: environment }
+      - { source: file, template: charts-values/opencrvs-services/values.yaml, var: exporter_otlp_endpoint }
+      - { source: file, template: charts-values/traefik/values.yaml, var: otel_collector_endpoint }
+  SENTRY_DSN:
+    targets: [{ source: github, kind: secret, scope: environment }]
+
+  # Disk encryption (the key is generated; the size is a variable)
+  DISK_SPACE:
+    targets: [{ source: github, kind: variable, scope: environment }]
+
+  # Other secrets (names only)
+  ENCRYPTION_KEY:
+    targets: [{ source: github, kind: secret, scope: environment }]
+  POSTGRES_PASSWORD:
+    targets: [{ source: github, kind: secret, scope: environment }]
+  KIBANA_PASSWORD:
+    targets: [{ source: github, kind: secret, scope: environment }]
+  OPENCRVS_METABASE_ADMIN_PASSWORD:
+    targets: [{ source: github, kind: secret, scope: environment }]

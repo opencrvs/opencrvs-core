@@ -65,6 +65,8 @@
     "packages/toolkit/tsconfig.build.tsbuildinfo",
     "packages/toolkit/create-countryconfig/index.js",
     "packages/toolkit/src/environment/templates/**",
+    "packages/toolkit/src/configurator/templates/**",
+    "packages/toolkit/src/configurator/ui/assets/**",
     "packages/commons/src/events/EventConfig.mermaid",
     "packages/commons/src/events/EventUpdateFlow.mermaid",
     "packages/events/src/storage/postgres/events/schema/**/*.ts",

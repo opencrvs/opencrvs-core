@@ -1,0 +1,711 @@
+/*
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at https://mozilla.org/MPL/2.0/.
+ *
+ * OpenCRVS is also distributed under the terms of the Civil Registration
+ * & Healthcare Disclaimer located at http://opencrvs.org/license.
+ *
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
+ */
+/* Brand: colours, fonts and logo follow https://www.opencrvs.org/. The fonts are bundled (offline). */
+@font-face {
+  font-family: 'Poppins';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('./assets/fonts/poppins-400.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329,
+    U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+@font-face {
+  font-family: 'Poppins';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url('./assets/fonts/poppins-500.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329,
+    U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+@font-face {
+  font-family: 'Poppins';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url('./assets/fonts/poppins-600.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329,
+    U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+@font-face {
+  font-family: 'Poppins';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url('./assets/fonts/poppins-700.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329,
+    U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+:root {
+  --brand-font: 'Poppins', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --brand-ink: #373050;
+  --brand-ink-soft: #6b6580;
+  --brand-blue: #2563eb;
+  --brand-blue-dim: #1d4fc2;
+  --brand-teal: #093944;
+  --brand-stone: #faf7f5;
+  --brand-line: #e6e0ea;
+  --brand-lilac: #efecf9;
+  --brand-yellow: #fcf5ca;
+  --brand-error: #d81b60;
+  --brand-error-bg: #fde8ef;
+  --brand-ok: #1b7f5c;
+  --brand-ok-bg: #dff3ea;
+  --status-on: #22a06b;
+  --status-off: #e5484d;
+  --brand-radius: 12px;
+  --brand-shadow: 0 2px 12px rgba(55, 48, 80, 0.08);
+  /* The content width of the Review and Apply card. Its padding comes on top of it (it is content-box), and the
+     Connect cards add the same padding to be as wide as it. */
+  --content-width: 960px;
+  --card-padding: 1.75rem;
+}
+
+/* SurveyJS form: its brand colour, font and page background. It sets these again on the form's root. */
+:root,
+.sd-root-modern {
+  --sjs2-color-project-brand-600: var(--brand-blue);
+  --sjs2-color-utility-surface-survey: var(--brand-stone);
+  --sjs2-typography-font-family-text: var(--brand-font);
+}
+
+body {
+  margin: 0;
+  font-family: var(--brand-font);
+  background: var(--brand-stone);
+  color: var(--brand-ink);
+}
+
+button,
+input,
+select,
+textarea {
+  font-family: inherit;
+}
+
+.app__header {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 0.5rem 1rem;
+  padding: 0.75rem 1.5rem;
+  background: #fff;
+  box-shadow: var(--brand-shadow);
+}
+
+.green {
+  color: var(--brand-ok);
+}
+
+.app__header h1 {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin: 0;
+  font-size: 1.25rem;
+  font-weight: 500;
+  color: var(--brand-ink);
+}
+
+.app__brand {
+  margin-right: auto;
+}
+
+.app__tagline {
+  display: none;
+  margin: 0;
+  font-size: 0.6875rem;
+  line-height: 1.2;
+  color: var(--brand-ink-soft);
+}
+
+/* The dot and the short label are for phones. */
+.app__dot,
+.app__connect-mobile {
+  display: none;
+}
+
+.app__dot {
+  width: 0.625rem;
+  height: 0.625rem;
+  border-radius: 50%;
+}
+
+.app__dot--on {
+  background: var(--status-on);
+}
+
+.app__dot--off {
+  background: var(--status-off);
+}
+
+.app__logo {
+  display: block;
+  height: 28px;
+  width: auto;
+}
+
+.app__header label {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.875rem;
+}
+
+.app__main {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 1.5rem;
+  padding: 1.5rem;
+  align-items: start;
+}
+
+.app__answers {
+  padding: 1rem;
+  background: #fff;
+  border-radius: var(--brand-radius);
+  box-shadow: var(--brand-shadow);
+}
+
+/* The heading is the toggle: collapse the answers to give the form the room. */
+.app__answers summary {
+  cursor: pointer;
+}
+
+.app__answers h2 {
+  display: inline;
+  margin: 0 0 0.25rem;
+  font-size: 1rem;
+}
+
+.app__answers details[open] > summary {
+  margin-bottom: 0.25rem;
+}
+
+.app__hint {
+  margin: 0 0 0.5rem;
+  font-size: 0.8125rem;
+  color: var(--brand-ink-soft);
+}
+
+.app__answers pre {
+  margin: 0;
+  max-height: 40vh;
+  overflow: auto;
+  font-size: 0.75rem;
+}
+
+.secret-question {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.secret-question {
+  align-items: center;
+}
+
+/* Edit and Cancel sit inside the field, at its right edge. */
+.secret-question__box {
+  display: flex;
+  flex: 1;
+  align-items: center;
+  gap: 0.5rem;
+  min-width: 0;
+  padding-right: 0.5rem;
+}
+
+.secret-question__input {
+  flex: 1;
+  width: auto;
+  min-width: 0;
+  font-family: ui-monospace, monospace;
+}
+
+.secret-question .secret-question__box button {
+  flex: none;
+  padding: 0.15rem 0.85rem;
+  font-size: 0.8125rem;
+}
+
+/* The text area of a multi-line secret: dots until revealed (browsers without this property show the text). */
+.secret-question__box--multiline {
+  align-items: flex-start;
+  padding-top: 0.25rem;
+}
+
+.secret-question__textarea {
+  resize: vertical;
+  white-space: pre;
+}
+
+.secret-question__textarea--masked {
+  -webkit-text-security: disc;
+}
+
+.secret-question__box--locked .secret-question__input {
+  opacity: 0.7;
+}
+
+.secret-question button {
+  padding: 0 0.75rem;
+  border: 1px solid var(--brand-line);
+  border-radius: 999px;
+  background: #fff;
+  color: var(--brand-ink);
+  cursor: pointer;
+}
+
+.secret-question button:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+/* Narrower icon columns (expand / remove) in dynamic tables, so the users table fits the form column. */
+.sd-table__cell--actions {
+  width: 40px;
+  min-width: 40px;
+  padding-left: 4px;
+  padding-right: 4px;
+}
+
+/* Left menu groups (see src/form/menu.ts): bold header, indented pages. The Review item closes the
+   menu like a header of its own. */
+.env-menu__group .sv-list__item-body,
+.env-menu__review .sv-list__item-body {
+  font-weight: 600;
+}
+
+.env-menu__child .sv-list__item-body {
+  padding-left: 32px;
+}
+
+/* Connect step */
+.connect-page {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+/* The Welcome card and the Connect card, one above the other and centred. */
+.connect {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1.5rem;
+  padding: 1.5rem;
+}
+
+.connect__card {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  box-sizing: border-box;
+  width: min(calc(var(--content-width) + 2 * var(--card-padding)), 100%);
+  padding: var(--card-padding);
+  background: #fff;
+  border-radius: var(--brand-radius);
+  box-shadow: var(--brand-shadow);
+}
+
+.connect__card h2 {
+  margin: 0;
+  font-size: 1.25rem;
+  font-weight: 600;
+}
+
+.connect__welcome p,
+.connect__welcome ul {
+  margin: 0;
+  font-size: 0.875rem;
+  line-height: 1.5;
+}
+
+.connect__welcome h3 {
+  margin: 0.5rem 0 0;
+  font-size: 0.9375rem;
+  font-weight: 600;
+}
+
+.connect__welcome ul {
+  padding-left: 1.25rem;
+}
+
+.connect__welcome li + li {
+  margin-top: 0.25rem;
+}
+
+.connect__card label {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+
+.connect__card input {
+  box-sizing: border-box;
+  width: 100%;
+  min-width: 0;
+  padding: 0.55rem 0.75rem;
+  border: 1px solid var(--brand-line);
+  border-radius: 8px;
+  background: #fff;
+  color: var(--brand-ink);
+  font: inherit;
+  font-weight: 400;
+}
+
+.connect__card input:focus-visible {
+  border-color: var(--brand-blue);
+  outline: 2px solid rgba(37, 99, 235, 0.25);
+}
+
+.connect__row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.75rem;
+}
+
+.connect__hint,
+.connect__note {
+  margin: 0;
+  font-size: 0.8125rem;
+  color: var(--brand-ink-soft);
+}
+
+.connect__error {
+  margin: 0;
+  color: var(--brand-error);
+  font-size: 0.875rem;
+}
+
+.connect__actions {
+  display: flex;
+  gap: 0.75rem;
+}
+
+/* Pill buttons: filled blue is the main action, outlined is the secondary one. */
+.connect__actions button,
+.app__header button,
+.review button {
+  padding: 0.5rem 1.25rem;
+  border: 1px solid var(--brand-blue);
+  border-radius: 999px;
+  background: var(--brand-blue);
+  color: #fff;
+  font: inherit;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.connect__actions button:hover:not(:disabled),
+.app__header button:hover,
+.review button:hover:not(:disabled) {
+  border-color: var(--brand-blue-dim);
+  background: var(--brand-blue-dim);
+}
+
+.connect__actions button:disabled,
+.review button:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+.connect__actions .connect__skip,
+.app__header button,
+.review button.secondary {
+  background: #fff;
+  color: var(--brand-blue);
+}
+
+.connect__actions .connect__skip:hover:not(:disabled),
+.app__header button:hover,
+.review button.secondary:hover:not(:disabled) {
+  background: var(--brand-lilac);
+  color: var(--brand-blue-dim);
+}
+
+/* Header and banners */
+/* The connection chip and the button are laid out by the header itself: on a wide screen they sit at
+   the right, and on a narrow one the button stays at the right of the first row and the chip wraps below. */
+.app__header-right {
+  display: contents;
+}
+
+.app__header-right > * {
+  order: 2;
+  white-space: nowrap;
+}
+
+.app__header-right > button {
+  order: 3;
+  padding: 0.3rem 1rem;
+  font-size: 0.875rem;
+}
+
+.app__connection {
+  padding: 0.25rem 0.75rem;
+  text-align: center;
+  border-radius: 999px;
+  background: var(--brand-lilac);
+  font-size: 0.8125rem;
+}
+
+.banner {
+  margin: 0.75rem 1.5rem 0;
+  padding: 0.75rem 1rem;
+  border-radius: var(--brand-radius);
+  background: var(--brand-lilac);
+  font-size: 0.875rem;
+}
+
+.banner--warn {
+  background: var(--brand-yellow);
+}
+
+.banner--error {
+  background: var(--brand-error-bg);
+}
+
+.banner__conflicts {
+  margin: 0.5rem 0 0;
+  padding-left: 1.25rem;
+}
+
+/* Review and apply */
+.review {
+  max-width: var(--content-width);
+  margin: 1.5rem auto;
+  padding: var(--card-padding);
+  background: #fff;
+  border-radius: var(--brand-radius);
+  box-shadow: var(--brand-shadow);
+}
+
+.review h2,
+.review h3 {
+  margin: 0 0 0.5rem;
+  font-weight: 600;
+}
+
+.review h3 {
+  margin-top: 1.5rem;
+  font-size: 1rem;
+}
+
+.review__table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.875rem;
+}
+
+.review__table th,
+.review__table td {
+  padding: 0.4rem 0.6rem;
+  border-bottom: 1px solid var(--brand-line);
+  text-align: left;
+  vertical-align: top;
+}
+
+.review__row--unchanged,
+.review__row--keep {
+  color: var(--brand-ink-soft);
+}
+
+.review__note {
+  font-size: 0.75rem;
+  color: var(--brand-ink-soft);
+}
+
+.badge {
+  display: inline-block;
+  padding: 0.05rem 0.6rem;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  background: var(--brand-lilac);
+}
+
+.badge--new {
+  background: var(--brand-ok-bg);
+}
+
+.badge--update {
+  background: var(--brand-yellow);
+}
+
+.review__file {
+  margin: 0.5rem 0;
+}
+
+.review__diff {
+  max-height: 320px;
+  margin: 0.5rem 0 0;
+  padding: 0.5rem;
+  overflow: auto;
+  border-radius: 8px;
+  background: var(--brand-stone);
+  font-size: 0.75rem;
+}
+
+.diff--add {
+  background: var(--brand-ok-bg);
+}
+
+.diff--remove {
+  background: var(--brand-error-bg);
+}
+
+.review__actions,
+.review__downloads {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin-top: 1.5rem;
+}
+
+.review__downloads {
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.review progress {
+  width: 100%;
+  accent-color: var(--brand-blue);
+}
+
+.apply__steps {
+  padding-left: 1.25rem;
+  font-size: 0.875rem;
+}
+
+.apply__step--done {
+  color: var(--brand-ok);
+}
+
+.apply__step--failed {
+  color: var(--brand-error);
+}
+
+.apply__step--pending {
+  color: var(--brand-ink-soft);
+}
+
+/* `hidden` must win over the display set above, or the form shows under the review. */
+.app__main[hidden] {
+  display: none;
+}
+
+/* Narrow windows: SurveyJS folds the left menu into a small, faint round button. Put it in the header,
+   at the top left, and keep the header in view so the button is always there. */
+.app__header {
+  position: sticky;
+  top: 0;
+  z-index: 30;
+}
+
+.sv_progress-toc--mobile {
+  position: fixed;
+  top: 6px;
+  left: 24px;
+  right: auto;
+  display: flex;
+  align-items: center;
+  padding: 8px;
+  border-radius: 999px;
+  background: var(--brand-blue);
+  cursor: pointer;
+  z-index: 40;
+}
+
+/* Make room for the button in front of the logo. */
+.app:has(.sv_progress-toc--mobile) .app__brand {
+  margin-left: 3.25rem;
+}
+
+.sv_progress-toc--mobile:hover {
+  background: var(--brand-blue-dim);
+}
+
+.sv_progress-toc--mobile use {
+  fill: #fff;
+}
+
+.secret-question__input:disabled {
+  cursor: not-allowed;
+  background: transparent;
+}
+
+/* Hints under a question title are smaller than the title. */
+.sd-question__description {
+  font-size: 0.8125rem;
+  line-height: 1.4;
+}
+
+/* Phones: the header has three columns. The menu button (placed by SurveyJS's own breakpoint, see above),
+   the logo with a small line under it, and a GitHub button whose dot shows if there is a connection. */
+@media (max-width: 640px) {
+  .app__header {
+    flex-wrap: nowrap;
+    padding: 0.75rem 1rem;
+  }
+
+  .app__header-right > .app__connection,
+  .app__header-right > label {
+    display: none;
+  }
+
+  .app__setup {
+    display: none;
+  }
+
+  .app__tagline {
+    display: block;
+  }
+
+  .app__logo {
+    height: 22px;
+  }
+
+  .app__header-right > button {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    order: 2;
+    margin-left: auto;
+    padding: 0.3rem 0.75rem;
+  }
+
+  .app__dot,
+  .app__connect-mobile {
+    display: inline;
+  }
+
+  .app__connect-desktop {
+    display: none;
+  }
+
+  .sv_progress-toc--mobile {
+    left: 16px;
+  }
+
+  .app:has(.sv_progress-toc--mobile) .app__brand {
+    margin-left: 3rem;
+  }
+}

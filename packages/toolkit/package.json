@@ -24,7 +24,9 @@
     "build:all": "pnpm -w exec lerna run build --include-dependencies --scope @opencrvs/toolkit",
     "test": "vitest run",
     "test:watch": "vitest",
-    "test:compilation": "tsc --noEmit"
+    "test:compilation": "tsc --noEmit && tsc --noEmit -p src/configurator/tsconfig.json",
+    "configurator:bindings": "node --experimental-strip-types --disable-warning=ExperimentalWarning --disable-warning=MODULE_TYPELESS_PACKAGE_JSON src/configurator/scripts/check-bindings.ts --write",
+    "configurator:bindings:check": "node --experimental-strip-types --disable-warning=ExperimentalWarning --disable-warning=MODULE_TYPELESS_PACKAGE_JSON src/configurator/scripts/check-bindings.ts"
   },
   "repository": {
     "type": "git",
@@ -54,6 +56,7 @@
     "superjson": "1.9.0-0",
     "ts-morph": "^27.0.2",
     "uuid": "^9.0.0",
+    "yaml": "^2.7.1",
     "zod": "^4.6.5",
     "zod-openapi": "^5.4.6"
   },
@@ -64,9 +67,17 @@
     "@types/libsodium-wrappers": "^0.7.10",
     "@types/object-hash": "^3.0.6",
     "@types/prompts": "^2.4.9",
+    "@types/react": "18.3.1",
+    "@types/react-dom": "18.3.0",
     "@types/ssh2": "^1.15.5",
     "@types/uuid": "^9.0.3",
+    "@vitejs/plugin-react": "^6.0.4",
     "esbuild": "^0.24.0",
+    "react": "18.3.1",
+    "react-dom": "18.3.1",
+    "survey-core": "^3.2.3",
+    "survey-react-ui": "^3.2.3",
+    "vite": "^8.1.5",
     "vitest": "^4.1.10"
   },
   "moduleNameMapper": {
