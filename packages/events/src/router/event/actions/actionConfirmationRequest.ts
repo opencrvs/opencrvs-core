@@ -10,7 +10,9 @@
  */
 import fetch from 'node-fetch'
 import { EventDocument, logger, ActionType } from '@opencrvs/commons'
+import { withCoreSignature } from '@opencrvs/commons/request-signing'
 import { env } from '@events/environment'
+import { getCoreSigningKey } from '@events/request-signing'
 
 export const ActionConfirmationResponse = {
   UnexpectedFailure: 'UnexpectedFailure', // Endpoint fails in an uncontrolled manner
@@ -30,8 +32,7 @@ const ActionConfirmationResponseCodes = {
 export async function requestActionConfirmation(
   actionType: ActionType,
   transactionId: string,
-  event: EventDocument,
-  token: string
+  event: EventDocument
 ): Promise<{
   responseStatus: ActionConfirmationResponse
   responseBody: Record<string, unknown> | undefined
@@ -53,14 +54,14 @@ export async function requestActionConfirmation(
   )
 
   try {
-    const res = await fetch(actionConfirmationUrl, {
-      method: 'POST',
-      body: JSON.stringify(event),
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: token
-      }
-    })
+    const res = await fetch(
+      actionConfirmationUrl,
+      withCoreSignature(getCoreSigningKey(), actionConfirmationUrl, {
+        method: 'POST',
+        body: JSON.stringify(event),
+        headers: { 'Content-Type': 'application/json' }
+      })
+    )
 
     const statusCode = res.status
     const responseStatus =

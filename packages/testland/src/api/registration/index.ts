@@ -31,6 +31,7 @@ import {
 import { InformantType as DeathInformantType } from '@countryconfig/events/death/forms/pages/informant'
 import { Event } from '@countryconfig/events/utils'
 import { getAdoptionSealingToken } from '@countryconfig/events/adoption/sealing-service'
+import { getCoreApiToken } from '@countryconfig/api/core-api-token'
 
 export type ActionConfirmationRefs = { Payload: EventDocument }
 export type ActionConfirmationRequest = Hapi.Request<ActionConfirmationRefs>
@@ -63,7 +64,7 @@ export async function onRegisterHandler(
   request: ActionConfirmationRequest,
   h: Hapi.ResponseToolkit<ActionConfirmationRefs>
 ) {
-  const token = request.auth.artifacts.token as string
+  const token = await getCoreApiToken()
   const event = request.payload
   const eventId = event.id
   const action = getPendingAction(event.actions)
@@ -156,7 +157,7 @@ export async function onMosipBirthRegisterHandler(
   request: ActionConfirmationRequest,
   h: Hapi.ResponseToolkit<ActionConfirmationRefs>
 ) {
-  const token = request.auth.artifacts.token as string
+  const token = await getCoreApiToken()
   const event = request.payload
   const declaration = aggregateActionDeclarations(event)
 
@@ -224,7 +225,7 @@ export async function onMosipDeathRegisterHandler(
   request: ActionConfirmationRequest,
   h: Hapi.ResponseToolkit<ActionConfirmationRefs>
 ) {
-  const token = request.auth.artifacts.token as string
+  const token = await getCoreApiToken()
   const event = request.payload
   const declaration = aggregateActionDeclarations(event)
 
@@ -310,7 +311,7 @@ export async function onAdoptionRegisterHandler(
   request: ActionConfirmationRequest,
   h: Hapi.ResponseToolkit<ActionConfirmationRefs>
 ) {
-  const token = request.auth.artifacts.token as string
+  const token = await getCoreApiToken()
   const event = request.payload
   const declaration = aggregateActionDeclarations(event)
 

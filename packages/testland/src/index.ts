@@ -84,8 +84,8 @@ import {
   onMosipDeathRegisterHandler,
   onRegisterHandler
 } from './api/registration'
-import { isServiceToken } from '@opencrvs/toolkit/authentication'
 import { coreRequestAuth } from '@opencrvs/toolkit/request-signing'
+import { getCoreApiToken } from '@countryconfig/api/core-api-token'
 import { env } from './environment'
 
 import { workqueueconfigHandler } from './api/workqueue/handler'
@@ -604,6 +604,7 @@ export async function createServer() {
     path: `/trigger/events/{event}/actions/${ActionType.CUSTOM}`,
     handler: onCustomActionHandler,
     options: {
+      auth: 'core',
       tags: ['api', 'events'],
       description: 'Receives notifications on event custom action'
     }
@@ -614,6 +615,7 @@ export async function createServer() {
     path: '/trigger/events/{event}/actions/{action}',
     handler: onAnyActionHandler,
     options: {
+      auth: 'core',
       tags: ['api', 'events'],
       description: 'Receives notifications on event actions'
     }
@@ -624,6 +626,7 @@ export async function createServer() {
     path: `/trigger/events/birth/actions/${ActionType.APPROVE_CORRECTION}`,
     handler: onBirthCorrectionActionHandler,
     options: {
+      auth: 'core',
       tags: ['api', 'events'],
       description: 'Receives notifications on birth correction approval actions'
     }
@@ -634,6 +637,7 @@ export async function createServer() {
     path: '/trigger/events/birth/actions/{action}',
     handler: onBirthActionHandler,
     options: {
+      auth: 'core',
       tags: ['api', 'events'],
       description: 'Receives notifications on event actions'
     }
@@ -644,6 +648,7 @@ export async function createServer() {
     path: '/trigger/events/death/actions/{action}',
     handler: onDeathActionHandler,
     options: {
+      auth: 'core',
       tags: ['api', 'events'],
       description: 'Receives notifications on event actions'
     }
@@ -654,6 +659,7 @@ export async function createServer() {
     path: `/trigger/events/${Event.TENNIS_CLUB_MEMBERSHIP}/actions/${ActionType.REGISTER}`,
     handler: onRegisterHandler,
     options: {
+      auth: 'core',
       tags: ['api', 'events'],
       description: 'Receives notifications on event actions'
     }
@@ -664,6 +670,7 @@ export async function createServer() {
     path: `/trigger/events/${Event.Birth}/actions/${ActionType.REGISTER}`,
     handler: onMosipBirthRegisterHandler,
     options: {
+      auth: 'core',
       tags: ['api', 'events'],
       description: 'Receives notifications on event actions'
     }
@@ -674,6 +681,7 @@ export async function createServer() {
     path: `/trigger/events/${Event.Death}/actions/${ActionType.REGISTER}`,
     handler: onMosipDeathRegisterHandler,
     options: {
+      auth: 'core',
       tags: ['api', 'events'],
       description: 'Receives notifications on event actions'
     }
@@ -684,6 +692,7 @@ export async function createServer() {
     path: `/trigger/events/${Event.Adoption}/actions/${ActionType.REGISTER}`,
     handler: onAdoptionRegisterHandler,
     options: {
+      auth: 'core',
       tags: ['api', 'events'],
       description:
         'Seals the original birth record matching the adopted child once the adoption is registered'
@@ -718,30 +727,6 @@ export async function createServer() {
       description:
         'Called by events on startup. Registers integrations in the events service using the provided bootstrap token.'
     }
-  })
-
-  /*
-   * Core uses a special 'service token' to prove the request originated from core.
-   * The token is only a proof of origin and carries no scopes.
-   *
-   * Action confirmation requests check here that the token is present.
-   */
-  server.ext('onPostAuth', (request, h) => {
-    const isActionConfirmationRequest =
-      request.method === 'post' &&
-      /^\/trigger\/events\/[^/]+\/actions\/[^/]+$/.test(request.route.path)
-
-    if (
-      isActionConfirmationRequest &&
-      !isServiceToken(request.auth.credentials)
-    ) {
-      logger.warn(
-        'Action confirmation: rejected a request that is not from the core service token'
-      )
-      return h.response({ error: 'forbidden' }).code(403).takeover()
-    }
-
-    return h.continue
   })
 
   server.ext('onPostHandler', async (request, h) => {
@@ -856,11 +841,13 @@ export async function createServer() {
     const now = Date.now()
     // Sync locations at most once per hour rather than every call
     if (now - lastLocationSyncAt > ONE_HOUR_MS) {
+      const token = await getCoreApiToken()
+      if (!token) {
+        logger.warn('Reindex: no token for core, locations not synced.')
+        return
+      }
       const url = new URL('events', GATEWAY_URL).toString()
-      const apiClient = createClient(
-        url,
-        getBearerToken(req.headers.authorization)
-      )
+      const apiClient = createClient(url, `Bearer ${token}`)
       const locations = await apiClient.locations.list.query()
       const administrativeAreas =
         await apiClient.administrativeAreas.list.query()

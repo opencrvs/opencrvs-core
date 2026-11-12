@@ -59,15 +59,6 @@ import {
 import { getEventIndexWithAdministrativeHierarchy } from '../../../service/indexing/utils'
 
 /**
- * Depending on how the API is called, there might or might not be Bearer keyword in the header.
- * To allow for usage with both direct HTTP calls and TRPC, ensure it's present to be able to use shared scope auth functions.
- */
-export function setBearerForToken(token: string) {
-  const bearer = 'Bearer'
-  return token.startsWith(bearer) ? token : `${bearer} ${token}`
-}
-
-/**
  * Middleware to check if the user has any of the specified allowed scopes.
  *
  * Checks the given list of scope types against the scopes in the user's JWT token.
