@@ -65,10 +65,6 @@ s3:
   # cluster, so it renders the secret only with them. An existing users_secret is left as it is.
   # admin_username: rustfsadmin
   # admin_password: rustfsadmin
-  # Image used as client to run OpenCRVS configuration scripts. It needs the `mc` command line client.
-  image:
-    repository: ghcr.io/opencrvs/minio-mc
-    tag: 'release.2025-05-21t01-59-54z'
 
 redis:
   host: redis-0.redis.opencrvs-deps-dev.svc.cluster.local
