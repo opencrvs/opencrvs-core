@@ -8,24 +8,15 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-export {
-  contentDigest,
-  MAX_SIGNATURE_AGE_SECONDS,
-  signCoreRequest,
-  verifyCoreRequest,
-  verifyCoreSignature,
-  withCoreSignature
-} from './signature'
+export { verifyCoreRequest, withCoreSignature } from './signature'
 export type {
   CoreRequest,
-  CoreSigningKey,
-  CoreRequestSignatureHeaders,
   CoreRequestVerification,
-  FindPublicKey,
-  SignCoreRequestInput
+  CoreSigningKey,
+  FindPublicKey
 } from './signature'
-export { createCoreKeyList } from './key-list'
-export { loadCoreSigningKey, loadCoreSigningKeyFile, toPublicJwk } from './keys'
+export { loadCoreSigningKeyFile, toPublicJwk } from './keys'
 export type { PublicJwk } from './keys'
 export { coreRequestAuth } from './hapi'
 export type { CoreCredentials, CoreRequestAuthOptions } from './hapi'
+export { createTestCoreKey } from './testing'

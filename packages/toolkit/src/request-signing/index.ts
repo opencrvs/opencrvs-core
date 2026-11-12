@@ -9,4 +9,12 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-export * from '@opencrvs/commons/request-signing'
+export {
+  coreRequestAuth,
+  createTestCoreKey
+} from '@opencrvs/commons/request-signing'
+export type {
+  CoreCredentials,
+  CoreRequestAuthOptions,
+  FindPublicKey
+} from '@opencrvs/commons/request-signing'

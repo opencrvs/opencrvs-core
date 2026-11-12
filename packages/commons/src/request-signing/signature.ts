@@ -9,23 +9,17 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-/**
- * Core signs every request it sends to country config with one fixed profile
- * of RFC 9421 (HTTP Message Signatures). The verifier accepts only that
- * profile: anything else is rejected, not negotiated.
- *
- * The signature covers the method, the path, the query and the
- * `Content-Digest` header (RFC 9530), so a captured request cannot be sent to
- * another route or with another body. It can be replayed unchanged within
- * `MAX_SIGNATURE_AGE_SECONDS`; the verifier keeps no record of seen
- * signatures.
- */
 import { createHash, KeyObject, sign, verify } from 'node:crypto'
 
 const LABEL = 'core'
 const COMPONENTS = '("@method" "@path" "@query" "content-digest")'
 const TAG = 'opencrvs-core-request'
-export const MAX_SIGNATURE_AGE_SECONDS = 300
+
+/**
+ * A signed request can be sent again unchanged until it is this old. The
+ * verifier does not record the signatures that it has seen.
+ */
+const MAX_SIGNATURE_AGE_SECONDS = 300
 
 /** Only `created` and `keyid` vary; the rest must equal `signatureParams`. */
 const SIGNATURE_PARAMS_VALUES = /;created=(\d+);keyid="([^"]+)";/
@@ -85,7 +79,13 @@ export interface CoreRequestSignatureHeaders {
   Signature: string
 }
 
-/** Headers that prove a request comes from core. Send them with the exact `body`. */
+/**
+ * Headers that prove a request comes from core: a signature in the
+ * [RFC 9421](https://www.rfc-editor.org/rfc/rfc9421) format over the method,
+ * the path, the query and the `Content-Digest`
+ * ([RFC 9530](https://www.rfc-editor.org/rfc/rfc9530)) of `body`. Send the
+ * headers with exactly this `body`.
+ */
 export function signCoreRequest({
   method,
   path,
