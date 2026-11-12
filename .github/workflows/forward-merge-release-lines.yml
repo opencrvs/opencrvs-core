@@ -7,28 +7,29 @@
 #
 # Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
 
-# Opens a pull request that carries every change on a release line up into
-# the next newer one.
+# Opens pull requests that carry every change on a release line up into each
+# newer line.
 #
-# The chain is every release/<major>.<minor>.x branch in version order, then
-# develop: release/1.9.x -> release/2.0.x -> release/2.1.x -> develop. The PR
-# for one step is opened from forward-merge/<from>-into-<to> (dots stripped,
-# e.g. forward-merge/19x-into-20x), a copy of the older line. The workflow
-# merges and edits nothing: conflicts, the version and the changelog are
-# resolved on that branch by whoever picks up the PR.
-#
-# Each run opens or updates one PR, from the given line into the next one:
+# The lines are every release/<major>.<minor>.x branch, then develop:
+# release/1.9.x, release/2.0.x, release/2.1.x, develop. A run starts from one
+# line and opens or updates one PR into every newer line, in parallel:
 #   push to release/*.x   from the line that was pushed to
 #   workflow_dispatch     from the line typed in, e.g. 1.9.x
-# Merging that PR pushes to the next line, which opens the PR after it, so a
-# change climbs one line at a time.
 #
-# An open PR whose branch nobody has pushed to is fast-forwarded to the new
-# source commits. Once someone has pushed to it, new source commits are left
-# for them to merge in, or for the next PR after this one is merged.
+# Each PR comes from forward-merge/<from>-into-<to> (dots stripped, e.g.
+# forward-merge/19x-into-21x). The workflow merges the target into a copy of
+# the older line, or new commits of the older line into an open PR's branch.
+# When that merge conflicts, Claude Code resolves it and the result is pushed
+# for review. If Claude leaves anything unresolved, the PR is opened from a
+# plain copy of the older line with instructions to resolve it by hand.
 #
-# PRs are opened with GITHUB_TOKEN, so pull_request workflows (lint-and-test)
-# do not start on them until someone pushes to the branch.
+# Review is requested from whoever started a manual run, or on a push from the
+# authors of the PRs that the push merged (for a merged forward-merge PR, the
+# authors of the feature PRs it carried).
+#
+# Needs the ANTHROPIC_API_KEY secret. Everything is pushed with GITHUB_TOKEN,
+# so pull_request workflows (lint-and-test) do not start on these PRs until a
+# person pushes to the branch.
 name: Release - Forward-merge release lines
 
 on:
@@ -44,7 +45,7 @@ on:
       dry_run:
         type: boolean
         default: false
-        description: 'Only report what would be pushed and opened'
+        description: 'Only report what would be pushed and opened (Claude does not run)'
 
 permissions:
   contents: write
@@ -54,11 +55,12 @@ jobs:
   plan:
     runs-on: ubuntu-24.04
     outputs:
-      source: ${{ steps.plan.outputs.source }}
-      target: ${{ steps.plan.outputs.target }}
+      source: ${{ steps.lines.outputs.source }}
+      targets: ${{ steps.lines.outputs.targets }}
+      reviewers: ${{ steps.reviewers.outputs.reviewers }}
     steps:
-      - name: Work out the source and target branches
-        id: plan
+      - name: Work out the source line and the newer lines
+        id: lines
         env:
           GH_TOKEN: ${{ github.token }}
           # the line typed into a manual run, or the line that was pushed to
@@ -69,148 +71,263 @@ jobs:
             --jq '.[].ref | ltrimstr("refs/heads/")' \
             | grep -E '^release/[0-9]+\.[0-9]+\.x$' | sort -V)
 
-          # develop comes after the newest release line
-          mapfile -t chain < <(echo "$release_lines"; echo develop)
-          echo "Chain: ${chain[*]}"
-
           source="release/${REQUESTED_LINE#release/}"
           if ! grep -qx "$source" <<< "$release_lines"; then
             echo "::error::'$REQUESTED_LINE' is not a release line. Release lines: $(paste -sd, <<< "$release_lines")"
             exit 1
           fi
 
-          # the target is the next branch in the chain
-          for i in "${!chain[@]}"; do
-            if [ "${chain[i]}" = "$source" ]; then target=${chain[i + 1]}; break; fi
-          done
+          # every line after the source, then develop
+          targets=$( (awk -v s="$source" 'found { print } $0 == s { found = 1 }' <<< "$release_lines"; echo develop) \
+            | jq -R . | jq -sc .)
 
-          echo "$source -> $target"
+          echo "$source -> $targets"
           echo "source=$source" >> "$GITHUB_OUTPUT"
-          echo "target=$target" >> "$GITHUB_OUTPUT"
+          echo "targets=$targets" >> "$GITHUB_OUTPUT"
 
-  open-pr:
+      - name: Work out who to ask for review
+        id: reviewers
+        env:
+          GH_TOKEN: ${{ github.token }}
+          BEFORE: ${{ github.event.before }}
+        run: |
+          if [ "$GITHUB_EVENT_NAME" = "workflow_dispatch" ]; then
+            reviewers="$GITHUB_ACTOR"
+          else
+            # The commits this push added (or just its head, for a new branch).
+            if [[ "$BEFORE" =~ ^0+$ ]]; then
+              commits="$GITHUB_SHA"
+            else
+              commits=$(gh api "repos/$GITHUB_REPOSITORY/compare/$BEFORE...$GITHUB_SHA" --jq '.commits[].sha')
+            fi
+
+            # Authors of the merged PRs those commits came from. Forward-merge
+            # PRs are skipped, so their feature PRs' authors are asked instead.
+            reviewers=$(for commit in $commits; do
+              gh api "repos/$GITHUB_REPOSITORY/commits/$commit/pulls" \
+                --jq '.[] | select(.merged_at != null and (.head.ref | startswith("forward-merge/") | not)) | .user.login'
+            done | grep -v '\[bot\]$' | sort -u | paste -sd, || true)
+          fi
+
+          echo "Reviewers: ${reviewers:-none}"
+          echo "reviewers=$reviewers" >> "$GITHUB_OUTPUT"
+
+  forward-merge:
     needs: plan
     runs-on: ubuntu-24.04
-    # one run per source line at a time, so two pushes in a row update the PR in order
+    strategy:
+      fail-fast: false
+      matrix:
+        target: ${{ fromJSON(needs.plan.outputs.targets) }}
+    # one run per PR at a time, so two pushes in a row update it in order
     concurrency:
-      group: forward-merge-${{ needs.plan.outputs.source }}
+      group: forward-merge-${{ needs.plan.outputs.source }}-${{ matrix.target }}
     env:
       SOURCE_BRANCH: ${{ needs.plan.outputs.source }}
-      TARGET_BRANCH: ${{ needs.plan.outputs.target }}
+      TARGET_BRANCH: ${{ matrix.target }}
+      REVIEWERS: ${{ needs.plan.outputs.reviewers }}
       DRY_RUN: ${{ inputs.dry_run == true }}
-      # gh needs a token and, with no checkout, the repository to work on
       GH_TOKEN: ${{ github.token }}
-      GH_REPO: ${{ github.repository }}
     steps:
-      - name: Open or update the PR from ${{ needs.plan.outputs.source }} into ${{ needs.plan.outputs.target }}
+      # Full commit history for the merge, file contents only as needed.
+      - name: Checkout
+        uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+          filter: blob:none
+
+      - name: Start the merge from ${{ needs.plan.outputs.source }} into ${{ matrix.target }}
+        id: merge
         run: |
           set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
 
           # release/1.9.x -> 19x. Dots are stripped to pass the branch-name check.
           short_name() { local name="${1#release/}"; echo "${name//./}"; }
           PR_BRANCH="forward-merge/$(short_name "$SOURCE_BRANCH")-into-$(short_name "$TARGET_BRANCH")"
-          REPO_API="repos/$GH_REPO"
+          echo "pr_branch=$PR_BRANCH" >> "$GITHUB_OUTPUT"
 
-          # Latest commit on a branch, or nothing if the branch doesn't exist.
-          # (On a 404, gh still prints the error to stdout, so it is dropped.)
-          latest_commit() {
-            local commit
-            if commit=$(gh api "$REPO_API/git/ref/heads/$1" --jq .object.sha 2>/dev/null); then
-              echo "$commit"
+          # Succeeds when $1 already contains $2.
+          contains() { git merge-base --is-ancestor "$2" "$1"; }
+
+          open_pr=$(gh pr list --head "$PR_BRANCH" --base "$TARGET_BRANCH" --state open \
+            --json number --jq '.[0].number // ""')
+          echo "open_pr=$open_pr" >> "$GITHUB_OUTPUT"
+
+          if [ -n "$open_pr" ]; then
+            # An open PR: merge the source's new commits into its branch.
+            git checkout -B "$PR_BRANCH" "origin/$PR_BRANCH"
+            if contains HEAD "origin/$SOURCE_BRANCH"; then
+              echo "#$open_pr already has everything from $SOURCE_BRANCH."
+              echo "action=none" >> "$GITHUB_OUTPUT"
+              exit 0
             fi
-          }
+            merging="$SOURCE_BRANCH"
+          else
+            if contains "origin/$TARGET_BRANCH" "origin/$SOURCE_BRANCH"; then
+              echo "Nothing to merge from \`$SOURCE_BRANCH\` into \`$TARGET_BRANCH\`." | tee -a "$GITHUB_STEP_SUMMARY"
+              echo "action=none" >> "$GITHUB_OUTPUT"
+              exit 0
+            fi
+            # A branch left over from an earlier PR is only replaced if nothing
+            # on it would be lost: that PR was merged, or the source has it all.
+            if git rev-parse -q --verify "origin/$PR_BRANCH" > /dev/null \
+              && ! contains "origin/$TARGET_BRANCH" "origin/$PR_BRANCH" \
+              && ! contains "origin/$SOURCE_BRANCH" "origin/$PR_BRANCH"; then
+              echo "::warning::$PR_BRANCH has commits that are in neither $TARGET_BRANCH nor $SOURCE_BRANCH, probably from a PR closed without merging. Delete or merge it, then re-run."
+              echo "action=none" >> "$GITHUB_OUTPUT"
+              exit 0
+            fi
+            # A new PR: a copy of the source with the target merged in.
+            git checkout -B "$PR_BRANCH" "origin/$SOURCE_BRANCH"
+            merging="$TARGET_BRANCH"
+          fi
 
-          # Succeeds when branch or commit $1 already contains commit $2.
-          contains() {
-            local status
-            status=$(gh api "$REPO_API/compare/$1...$2?per_page=1" --jq .status)
-            [ "$status" = "behind" ] || [ "$status" = "identical" ]
-          }
+          {
+            echo "merging=$merging"
+            echo "missing=$(git rev-list --count "origin/$TARGET_BRANCH..origin/$SOURCE_BRANCH")"
+            echo "action=merge"
+          } >> "$GITHUB_OUTPUT"
 
-          # Number of commits on $2 that $1 doesn't have.
-          count_missing() {
-            gh api "$REPO_API/compare/$1...$2?per_page=1" --jq .ahead_by
-          }
+          if git merge --no-ff --no-edit -m "Merge $merging into $PR_BRANCH" "origin/$merging"; then
+            echo "conflicts=" >> "$GITHUB_OUTPUT"
+          else
+            conflicts=$(git diff --name-only --diff-filter=U | paste -sd' ')
+            echo "Conflicts: $conflicts"
+            echo "conflicts=$conflicts" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Resolve the conflicts with Claude
+        if: steps.merge.outputs.conflicts != '' && inputs.dry_run != true
+        # if Claude fails, the next step falls back to a merge by hand
+        continue-on-error: true
+        uses: anthropics/claude-code-action@v1
+        with:
+          anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
+          github_token: ${{ github.token }}
+          claude_args: >-
+            --max-turns 200
+            --allowedTools "Read,Edit,Write,Glob,Grep,Bash(git status:*),Bash(git diff:*),Bash(git log:*),Bash(git show:*),Bash(git ls-files:*),Bash(git add:*),Bash(git rm:*),Bash(git checkout --ours:*),Bash(git checkout --theirs:*)"
+          prompt: |
+            A git merge is in progress in this repository, OpenCRVS core: `${{ steps.merge.outputs.merging }}` is being merged into `${{ steps.merge.outputs.pr_branch }}`. That branch carries the release line `${{ needs.plan.outputs.source }}` into the newer line `${{ matrix.target }}`, and will be merged into `${{ matrix.target }}` after review.
+
+            These files have conflicts: ${{ steps.merge.outputs.conflicts }}
+
+            Resolve every conflict. The result must keep `${{ matrix.target }}`'s code and behaviour and add the changes `${{ needs.plan.outputs.source }}` made since the two lines split:
+            - Use `git log` and `git show` on both sides to understand what each change is for before choosing.
+            - When a change from `${{ needs.plan.outputs.source }}` touches code that is different on `${{ matrix.target }}`, apply the same fix to `${{ matrix.target }}`'s code. If it doesn't apply there at all, leave it out.
+            - package.json files: keep `${{ matrix.target }}`'s "version" values; merge the other fields.
+            - CHANGELOG.md: keep `${{ matrix.target }}`'s sections and headings. Add the entries `${{ needs.plan.outputs.source }}` added under `${{ matrix.target }}`'s topmost section, leaving out entries for changes that were left out.
+            - A file that one side deleted: keep it deleted unless the other side's change is still needed.
+
+            Remove every conflict marker and `git add` (or `git rm`) each resolved file. Do not commit, push, or abort the merge.
+
+            Finally, write a short Markdown summary to `${{ runner.temp }}/resolution.md`: one bullet per file saying what you kept and why, and a separate list of anything a reviewer should check closely.
+
+      - name: Commit, push and open or update the PR
+        if: steps.merge.outputs.action == 'merge'
+        env:
+          PR_BRANCH: ${{ steps.merge.outputs.pr_branch }}
+          OPEN_PR: ${{ steps.merge.outputs.open_pr }}
+          MERGING: ${{ steps.merge.outputs.merging }}
+          MISSING: ${{ steps.merge.outputs.missing }}
+          CONFLICTS: ${{ steps.merge.outputs.conflicts }}
+          RESOLUTION_FILE: ${{ runner.temp }}/resolution.md
+        run: |
+          set -euo pipefail
 
           # Runs a command that changes something on GitHub. A dry run only prints it.
           change() {
-            if [ "$DRY_RUN" = "true" ]; then echo "[dry run] $*" >&2; else "$@" > /dev/null; fi
+            if [ "$DRY_RUN" = "true" ]; then echo "[dry run] $*" >&2; else "$@"; fi
           }
 
-          # Points the PR branch at a commit. force=false only allows moving it forward.
-          move_pr_branch() { # commit, force
-            change gh api -X PATCH "$REPO_API/git/refs/heads/$PR_BRANCH" -f sha="$1" -F force="$2"
-          }
-
-          source_commit=$(latest_commit "$SOURCE_BRANCH")
-          open_pr=$(gh pr list --head "$PR_BRANCH" --base "$TARGET_BRANCH" --state open \
-            --json number --jq '.[0].number // ""')
-
-          # 1. A PR is already open: bring in the new commits, unless someone
-          #    has already pushed their own work to its branch.
-          if [ -n "$open_pr" ]; then
-            pr_commit=$(latest_commit "$PR_BRANCH")
-            if contains "$pr_commit" "$source_commit"; then
-              echo "#$open_pr already has everything from $SOURCE_BRANCH."
-            elif contains "$source_commit" "$pr_commit"; then
-              move_pr_branch "$source_commit" false
-              echo "Moved #$open_pr forward to the latest $SOURCE_BRANCH."
+          # Claude must have staged every file and left no conflict markers.
+          resolved_by_claude=false
+          if [ -n "$CONFLICTS" ]; then
+            # shellcheck disable=SC2086 # CONFLICTS is a space-separated file list
+            if [ -z "$(git diff --name-only --diff-filter=U)" ] \
+              && ! git grep -qE '^(<<<<<<<|>>>>>>>)( |$)' -- $CONFLICTS 2>/dev/null; then
+              git commit --no-edit
+              resolved_by_claude=true
             else
-              echo "::warning::$SOURCE_BRANCH has new commits that #$open_pr doesn't have, and someone has pushed to $PR_BRANCH. Merge them in there, or they go in the next PR."
+              git merge --abort
+              echo "::warning::The conflicts in $CONFLICTS were not resolved; they need resolving by hand."
+            fi
+          fi
+          merged=true
+          if [ -n "$CONFLICTS" ] && [ "$resolved_by_claude" = false ]; then merged=false; fi
+
+          # shellcheck disable=SC2016,SC2086 # literal backticks; one bullet per file
+          conflict_list=$(printf -- '- `%s`\n' $CONFLICTS)
+
+          if [ "$resolved_by_claude" = true ]; then
+            notes=$(cat "$RESOLUTION_FILE" 2>/dev/null || echo "Claude left no notes.")
+            STATUS="Merging \`$MERGING\` conflicted in these files. **Claude Code resolved them**; check its resolution before merging.
+
+          $conflict_list
+
+          <details><summary>Claude's notes</summary>
+
+          $notes
+          </details>"
+          elif [ "$merged" = true ]; then
+            STATUS="\`$MERGING\` merged in without conflicts."
+          else
+            STATUS="**Merging \`$MERGING\` needs a human.** It conflicts in these files, and they were not resolved automatically:
+
+          $conflict_list
+
+          To resolve:
+          \`\`\`sh
+          git fetch origin
+          git checkout -B $PR_BRANCH origin/$PR_BRANCH
+          git merge origin/$MERGING
+          # resolve, commit
+          git push origin $PR_BRANCH
+          \`\`\`"
+          fi
+
+          # Open PR: push a finished merge, and say what happened in a comment.
+          if [ -n "$OPEN_PR" ]; then
+            if [ "$merged" = true ]; then
+              change git push origin "$PR_BRANCH"
+            fi
+            change gh pr comment "$OPEN_PR" --body "\`$SOURCE_BRANCH\` has new commits. $STATUS"
+            if [ -n "$REVIEWERS" ]; then
+              change gh pr edit "$OPEN_PR" --add-reviewer "$REVIEWERS" || true
             fi
             exit 0
           fi
 
-          # 2. No PR open: stop if the target already has everything.
-          missing=$(count_missing "$TARGET_BRANCH" "$source_commit")
-          if [ "$missing" = "0" ]; then
-            echo "Nothing to merge from \`$SOURCE_BRANCH\` into \`$TARGET_BRANCH\`." | tee -a "$GITHUB_STEP_SUMMARY"
-            exit 0
+          # New PR. Without a finished merge, the branch is a plain copy of the source.
+          if [ "$merged" = false ]; then
+            git checkout -B "$PR_BRANCH" "origin/$SOURCE_BRANCH"
           fi
+          change git push --force origin "$PR_BRANCH"
 
-          # 3. Point the PR branch at the source. A branch left over from an
-          #    earlier PR is only reused if nothing on it would be lost: that PR
-          #    was merged, or the source already contains the branch.
-          old_commit=$(latest_commit "$PR_BRANCH")
-          if [ -z "$old_commit" ]; then
-            change gh api "$REPO_API/git/refs" -f ref="refs/heads/$PR_BRANCH" -f sha="$source_commit"
-          elif contains "$TARGET_BRANCH" "$old_commit" || contains "$source_commit" "$old_commit"; then
-            move_pr_branch "$source_commit" true
-          else
-            echo "::warning::$PR_BRANCH has commits that are in neither $TARGET_BRANCH nor $SOURCE_BRANCH, probably from a PR closed without merging. Delete or merge it, then re-run."
-            exit 0
-          fi
+          PR_BODY="Carries $MISSING commits from \`$SOURCE_BRANCH\` that \`$TARGET_BRANCH\` doesn't have yet.
 
-          # 4. Open the PR.
-          PR_BODY="Carries $missing commits from \`$SOURCE_BRANCH\` that \`$TARGET_BRANCH\` doesn't have yet. This branch is a copy of \`$SOURCE_BRANCH\`; nothing has been merged or edited.
+          $STATUS
 
           Before merging:
 
-          - [ ] Resolve the conflicts on this branch, never on \`$SOURCE_BRANCH\`:
-            \`\`\`sh
-            git fetch origin
-            git checkout -B $PR_BRANCH origin/$PR_BRANCH
-            git merge origin/$TARGET_BRANCH
-            # resolve, commit
-            git push origin $PR_BRANCH
-            \`\`\`
-          - [ ] package.json files keep \`$TARGET_BRANCH\`'s version. On a release line, that is its next unreleased patch: bump it if the last release on \`$TARGET_BRANCH\` didn't.
-          - [ ] CHANGELOG.md: add the \`$SOURCE_BRANCH\` entries that apply to \`$TARGET_BRANCH\` under its own version.
+          - [ ] The merge keeps \`$TARGET_BRANCH\`'s behaviour and applies each \`$SOURCE_BRANCH\` change where it belongs.
+          - [ ] package.json files keep \`$TARGET_BRANCH\`'s version.
+          - [ ] CHANGELOG.md: the \`$SOURCE_BRANCH\` entries that apply to \`$TARGET_BRANCH\` are under its own version.
           - [ ] Merge with **Create a merge commit**. Squash or rebase drops the link to \`$SOURCE_BRANCH\`, so the next run offers the same commits again.
 
-          If \`$SOURCE_BRANCH\` gets new commits after you start resolving, merge \`origin/$SOURCE_BRANCH\` in here too, or leave them: the next push to \`$SOURCE_BRANCH\` or a manual run opens a new PR for them once this one is merged.
+          New commits on \`$SOURCE_BRANCH\` are merged into this branch while the PR is open.
 
-          Opened by the forward-merge workflow ([run]($GITHUB_SERVER_URL/$GH_REPO/actions/runs/$GITHUB_RUN_ID)). CI starts once someone pushes to this branch."
+          Opened by the forward-merge workflow ([run]($GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID)). CI starts once someone pushes to this branch."
 
           if [ "$DRY_RUN" = "true" ]; then
-            printf '[dry run] PR %s -> %s\n\n%s\n' "$PR_BRANCH" "$TARGET_BRANCH" "$PR_BODY"
+            printf '[dry run] PR %s -> %s, reviewers: %s\n\n%s\n' "$PR_BRANCH" "$TARGET_BRANCH" "${REVIEWERS:-none}" "$PR_BODY"
             exit 0
           fi
           pr_url=$(gh pr create --base "$TARGET_BRANCH" --head "$PR_BRANCH" \
             --title "chore: merge $SOURCE_BRANCH into $TARGET_BRANCH" --body "$PR_BODY")
           echo "Opened $pr_url" | tee -a "$GITHUB_STEP_SUMMARY"
-
-          # Assign whoever triggered the run, unless it was a bot.
-          if [[ "$GITHUB_ACTOR" != *"[bot]" ]]; then
-            gh pr edit "$pr_url" --add-assignee "$GITHUB_ACTOR" || true
+          if [ -n "$REVIEWERS" ]; then
+            gh pr edit "$pr_url" --add-reviewer "$REVIEWERS" || true
           fi
