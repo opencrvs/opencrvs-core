@@ -10,7 +10,7 @@
  */
 import { createPublicKey, generateKeyPairSync } from 'node:crypto'
 import { toPublicJwk } from './keys'
-import { signCoreRequest } from './signature'
+import { withCoreSignature } from './signature'
 
 /**
  * A new signing key that stands in for core's key in tests of routes with
@@ -32,23 +32,17 @@ export function createTestCoreKey() {
       keyid === jwk.kid ? publicKey : undefined,
     request(method: string, url: string, payload?: unknown) {
       const body = payload === undefined ? undefined : JSON.stringify(payload)
-      const { pathname, search } = new URL(url, 'http://countryconfig')
-      return {
-        method,
-        url,
-        payload: body,
-        headers: {
-          ...(body === undefined ? {} : { 'Content-Type': 'application/json' }),
-          ...signCoreRequest({
-            method,
-            path: pathname,
-            query: search,
-            body,
-            privateKey,
-            keyid: jwk.kid
-          })
+      const { headers } = withCoreSignature(
+        { privateKey, keyid: jwk.kid },
+        new URL(url, 'http://countryconfig'),
+        {
+          method,
+          body,
+          headers:
+            body === undefined ? {} : { 'Content-Type': 'application/json' }
         }
-      }
+      )
+      return { method, url, payload: body, headers }
     }
   }
 }

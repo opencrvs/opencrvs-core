@@ -14,6 +14,7 @@ import { coreRequestAuth } from './hapi'
 import { signCoreRequest } from './signature'
 
 const KEYID = 'core-request-test'
+const JWKS_URL = 'http://auth:4040/.well-known/jwks.json'
 const { privateKey, publicKey } = generateKeyPairSync('ed25519')
 
 async function createServer() {
@@ -59,8 +60,7 @@ function signed(
         path: pathname,
         query: search,
         body: payload,
-        privateKey: key,
-        keyid: KEYID
+        key: { privateKey: key, keyid: KEYID }
       })
     }
   }
@@ -78,12 +78,10 @@ describe('core auth plugin', () => {
 
     await Hapi.server().register({
       plugin: coreRequestAuth,
-      options: { jwksUrl: 'http://auth:4040/.well-known/jwks.json' }
+      options: { jwksUrl: JWKS_URL }
     })
 
-    expect(fetchKeys).toHaveBeenCalledWith(
-      'http://auth:4040/.well-known/jwks.json'
-    )
+    expect(fetchKeys).toHaveBeenCalledWith(JWKS_URL)
   })
 
   it('starts when auth cannot be reached', async () => {
@@ -92,7 +90,7 @@ describe('core auth plugin', () => {
     await expect(
       Hapi.server().register({
         plugin: coreRequestAuth,
-        options: { jwksUrl: 'http://auth:4040/.well-known/jwks.json' }
+        options: { jwksUrl: JWKS_URL }
       })
     ).resolves.not.toThrow()
   })
@@ -202,8 +200,7 @@ describe('core auth strategy', () => {
           method: 'GET',
           path: '/config/events',
           body,
-          privateKey,
-          keyid: KEYID
+          key: { privateKey, keyid: KEYID }
         }),
         'Content-Type': 'application/json'
       }
