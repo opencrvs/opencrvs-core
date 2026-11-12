@@ -63,8 +63,7 @@ const OPERATIONS_TO_HIDE = [
   'event.actions.assign.request',
   'event.actions.unassign.request',
   // Written each time a record's documents load; kept for investigations only
-  'event.files.presign',
-  'event.file.getPresignedUrl'
+  'event.files.presign'
 ]
 
 const TableDiv = styled.div`
