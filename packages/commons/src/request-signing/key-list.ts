@@ -41,12 +41,11 @@ function toRequestSigningKey(jwk: JsonWebKey): Array<[string, KeyObject]> {
 }
 
 /**
- * Auth's request-signing public keys, by kid. A lookup of a kid that is not
- * in the list fetches the list again, so a new key is picked up without a
- * restart. Fetches happen at most once a minute, so requests with made-up
- * kids cannot flood auth; a failed fetch keeps the known keys. Until the
- * first list arrives the wait is 5 seconds instead, so a country config that
- * starts before auth does not reject core for a minute.
+ * Returns `findPublicKey`, which finds core's public key for a kid in the
+ * JWKS at `jwksUrl`. For an unknown kid, it fetches the JWKS again: at most
+ * once a minute, or every 5 seconds until the first fetch succeeds. A failed
+ * fetch calls `onFetchError` and keeps the keys that it already has.
+ * `refresh()` fetches the JWKS now and rejects when the fetch fails.
  */
 export function createCoreKeyList({
   jwksUrl,
