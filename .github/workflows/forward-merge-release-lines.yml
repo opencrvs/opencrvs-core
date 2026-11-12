@@ -47,13 +47,15 @@ on:
         default: false
         description: 'Only report what would be pushed and opened (Claude does not run)'
 
-permissions:
-  contents: write
-  pull-requests: write
+# Each job asks for what it needs.
+permissions: {}
 
 jobs:
   plan:
     runs-on: ubuntu-24.04
+    permissions:
+      contents: read
+      pull-requests: read
     outputs:
       source: ${{ steps.lines.outputs.source }}
       targets: ${{ steps.lines.outputs.targets }}
@@ -115,6 +117,9 @@ jobs:
   forward-merge:
     needs: plan
     runs-on: ubuntu-24.04
+    permissions:
+      contents: write
+      pull-requests: write
     strategy:
       fail-fast: false
       matrix:
@@ -129,12 +134,15 @@ jobs:
       DRY_RUN: ${{ inputs.dry_run == true }}
       GH_TOKEN: ${{ github.token }}
     steps:
-      # Full commit history for the merge, file contents only as needed.
+      # Full commit history for the merge, file contents only as needed. The
+      # token is not left in .git/config; the last step authenticates git just
+      # before it pushes.
       - name: Checkout
-        uses: actions/checkout@v7
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           fetch-depth: 0
           filter: blob:none
+          persist-credentials: false
 
       - name: Start the merge from ${{ needs.plan.outputs.source }} into ${{ matrix.target }}
         id: merge
@@ -202,9 +210,12 @@ jobs:
         if: steps.merge.outputs.conflicts != '' && inputs.dry_run != true
         # if Claude fails, the next step falls back to a merge by hand
         continue-on-error: true
-        uses: anthropics/claude-code-action@v1
+        uses: anthropics/claude-code-action@4fa93a88de49bbef68b10eb15aabedf28ca0e1ed # v1.0.271
         with:
           anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
+          # The action needs a token. Claude can't push or call GitHub with it:
+          # its tools are limited to editing files and local, read-only or
+          # staging git commands.
           github_token: ${{ github.token }}
           claude_args: >-
             --max-turns 200
@@ -236,6 +247,9 @@ jobs:
           RESOLUTION_FILE: ${{ runner.temp }}/resolution.md
         run: |
           set -euo pipefail
+
+          git config http.https://github.com/.extraheader \
+            "AUTHORIZATION: basic $(printf 'x-access-token:%s' "$GH_TOKEN" | base64 -w0)"
 
           # Runs a command that changes something on GitHub. A dry run only prints it.
           change() {
