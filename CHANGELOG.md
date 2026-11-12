@@ -4,7 +4,13 @@
 
 ### Security
 
-- Fixes a security vulnerability. Details will be published in a security advisory.
+- Fixes two security vulnerabilities. Details will be published in security advisories.
+
+### Breaking changes
+
+- `event.file.getPresignedUrl` is deprecated in favour of `event.files.presign({ eventId })` and `user.files.presign({ userIds })`, which return presigned URLs keyed by the stored path. `getPresignedUrl` takes an `eventId` for files stored outside `events/{eventId}/`.
+- The gateway's `GET /presigned-url/{filePath*}` route is removed. Use `event.files.presign` or `user.files.presign` instead.
+- Upload record attachments with `path: events/{eventId}/`.
 
 ## 2.0.6
 
