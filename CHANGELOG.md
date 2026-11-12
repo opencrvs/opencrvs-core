@@ -4,7 +4,7 @@
 
 ### Security
 
-- Fixes two security vulnerabilities. Details will be published in security advisories.
+- Fixes a security vulnerability. Details will be published in a security advisory.
 
 ### Breaking changes
 
