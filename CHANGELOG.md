@@ -31,7 +31,7 @@
 A country configuration for 2.1 keeps its Metabase, Postgres and Elasticsearch scripts under `assets/`, and carries its own Tilt library in `tilt/`, checking the Helm charts out from opencrvs-core instead of cloning opencrvs-helm-charts. `npx @opencrvs/toolkit upgrade` brings an existing one to the same layout, and keeps it on yarn:
 
 - moves `infrastructure/metabase`, `infrastructure/postgres` and `infrastructure/deployment` to `assets/`, 3-way merging your changes with the template's, and replaces `Dockerfile.assets` with the template's. `infrastructure/postgres/on-deploy.sh` is not moved: the chart runs its own. Files with conflicts are left unstaged, with conflict markers;
-- replaces `Tiltfile` and `tilt/` with the template's, keeping your `countryconfig_image_name`. Your own Helm values go in `tilt/helm/`, which later upgrades leave alone.
+- replaces `Tiltfile` and `tilt/` with the template's, keeping your `countryconfig_image_name`. Your own Helm values go in `tilt/helm/` and your own Tilt customisation in `tilt/custom.tilt`, which later upgrades leave alone.
 
 With `--docker-swarm`, `infrastructure/` stays put and `assets/` gets a copy. Afterwards review `git diff` for local changes to the replaced files, and delete whatever is left in `infrastructure/` once you no longer need it.
 

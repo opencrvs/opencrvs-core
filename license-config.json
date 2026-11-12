@@ -11,6 +11,7 @@
     "packages/countryconfig-template/Tiltfile",
     "packages/countryconfig-template/.husky",
     "packages/countryconfig-template/tilt/examples/traefik/values-minikube.yaml",
+    "packages/countryconfig-template/tilt/custom.tilt",
     ".husky",
     "**/*.ipynb",
     "**/.wireit",
