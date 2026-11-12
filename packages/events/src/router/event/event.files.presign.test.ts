@@ -28,6 +28,7 @@ import {
 import { buildAction } from '@events/service/events/events'
 import * as eventsRepo from '@events/storage/postgres/events/events'
 import { updateUserById } from '@events/storage/postgres/events/users'
+import { getClient } from '@events/storage/postgres/events'
 
 const readTennisClub = encodeScope({
   type: 'record.read',
@@ -248,5 +249,26 @@ describe('event.files.presign', () => {
         eventId: event.id
       })
     ).rejects.toMatchObject(new TRPCError({ code: 'FORBIDDEN' }))
+  })
+
+  test('records which files were presigned in the audit log', async () => {
+    const { otherUser, event, filePath } = await setupDeclaredRecord()
+
+    await createTestClient(otherUser, [readTennisClub]).event.files.presign({
+      eventId: event.id
+    })
+
+    const logs = await getClient()
+      .selectFrom('auditLog')
+      .selectAll()
+      .where('clientId', '=', otherUser.id)
+      .where('operation', '=', 'event.files.presign')
+      .execute()
+
+    expect(logs).toHaveLength(1)
+    expect(logs[0].requestData).toEqual({ eventId: event.id })
+    expect(logs[0].responseSummary).toMatchObject({
+      files: expect.arrayContaining([filePath])
+    })
   })
 })
