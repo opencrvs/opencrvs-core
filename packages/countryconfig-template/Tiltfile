@@ -109,4 +109,7 @@ setup_opencrvs(
     countryconfig_image_tag=countryconfig_image_tag,
 )
 
+# Country specific customisation (e.g. uploader/mosip app), see ./tilt/custom.tilt
+include('./tilt/custom.tilt')
+
 print("✅ Tiltfile configuration loaded successfully.")

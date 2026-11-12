@@ -143,3 +143,11 @@ for workload in opensrvs_services:
   k8s_resource(workload, labels=[tilt_label], resource_deps=dependencies + opensrvs_predeploy_jobs)
 for job in opensrvs_postdeploy_jobs:
   k8s_resource(job, labels=[job_label], resource_deps=opensrvs_services)
+
+# Add dashboards resource if enabled in values.yaml (either examples or helm)
+for f in ["./examples/opencrvs-services/values.yaml", "./helm/opencrvs-services/values.yaml"]:
+  if os.path.exists(f):
+    values = decode_yaml(read_file(f)) or {}
+    dashboards = values.get("dashboards") or {}
+    if "enabled" in dashboards:
+      k8s_resource("dashboards", labels=["1.OpenCRVS"], resource_deps=["postgres"])
