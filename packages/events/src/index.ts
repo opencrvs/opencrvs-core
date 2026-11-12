@@ -9,11 +9,10 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { logger, TokenWithBearer } from '@opencrvs/commons'
+import { logger } from '@opencrvs/commons'
 import '@opencrvs/commons/monitoring'
 import { env } from './environment'
 import { server } from './server'
-import { getServiceToken } from './service/auth'
 import {
   getInMemoryRoles,
   getInMemoryVersionedEventConfigurations
@@ -23,6 +22,7 @@ import { ensureIndexExists } from './service/indexing/indexing'
 import { ensureConnection } from './storage/postgres/events'
 import { startAnnouncementWorker } from './workers/announcementWorker'
 import { startTelemetryWorker } from './workers/telemetryWorker'
+import { getCoreSigningKey } from './request-signing'
 
 // eslint-disable-next-line @typescript-eslint/no-require-imports
 const path = require('path')
@@ -32,14 +32,14 @@ const appModulePath = require('app-module-path')
 appModulePath.addPath(path.join(__dirname, '../'))
 
 export async function main() {
+  // Fail at startup rather than on the first request to country config.
+  getCoreSigningKey()
   try {
     await ensureConnection()
-    const serviceToken = await getServiceToken()
-    const token: TokenWithBearer = `Bearer ${serviceToken}`
-    const configurations = await getInMemoryVersionedEventConfigurations(token)
+    const configurations = await getInMemoryVersionedEventConfigurations()
 
     // Fetch roles here to validate them early on
-    await getInMemoryRoles(token)
+    await getInMemoryRoles()
 
     for (const configuration of configurations) {
       logger.info(`Loaded event configuration: ${configuration.id}`)

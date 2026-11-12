@@ -598,8 +598,7 @@ export const validateRequestAction: MiddlewareFunction<
 > = async ({ input, next, ctx }) => {
   const event = await getEventById(input.eventId)
   const eventConfig = await getEventConfigurationForRecord({
-    event: event,
-    token: ctx.token
+    event: event
   })
 
   const eventState = getCurrentEventState(event, eventConfig)
@@ -630,11 +629,10 @@ export const validateAcceptAction: MiddlewareFunction<
   unknown,
   unknown,
   ActionInputWithType
-> = async ({ input, next, ctx }) => {
+> = async ({ input, next }) => {
   const event = await getEventById(input.eventId)
   const eventConfig = await getEventConfigurationForRecord({
-    event: event,
-    token: ctx.token
+    event: event
   })
 
   validateActionPayloadStructure({

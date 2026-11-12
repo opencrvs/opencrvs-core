@@ -26,8 +26,7 @@ import {
   eventAttachmentPath,
   isUUID,
   logger,
-  triggerUserEventNotification,
-  TokenWithBearer
+  triggerUserEventNotification
 } from '@opencrvs/commons'
 import { EventStatus, getStatusFromActions } from '@opencrvs/commons/events'
 import { env } from '@events/environment'
@@ -604,10 +603,7 @@ export async function verifyPasswordById(
   }
 }
 
-export async function verifyUser(
-  input: { mobile?: string; email?: string },
-  token: TokenWithBearer
-) {
+export async function verifyUser(input: { mobile?: string; email?: string }) {
   const user = await getUserByMobileOrEmail(
     input.mobile ? { mobile: input.mobile } : { email: input.email ?? '' }
   )
@@ -623,7 +619,7 @@ export async function verifyUser(
   const securityQuestionKey =
     questions[Math.floor(Math.random() * questions.length)].questionKey
 
-  const roles = await getInMemoryRoles(token)
+  const roles = await getInMemoryRoles()
   const scope = roles.find((r) => r.id === user.role)?.scopes ?? []
 
   return {

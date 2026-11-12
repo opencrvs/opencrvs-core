@@ -8,7 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import fetch from 'node-fetch'
+import { fetchCountryConfig } from './country-config'
 import { z } from 'zod'
 import { fromZodError } from 'zod-validation-error'
 import { joinUrl } from '@opencrvs/commons'
@@ -72,9 +72,7 @@ export function parseApplicationConfig(
 
 export async function readApplicationConfig(): Promise<ApplicationConfigRead> {
   const url = joinUrl(env.COUNTRY_CONFIG_HOST, 'config/application')
-  const res = await fetch(url, {
-    headers: { 'Content-Type': 'application/json' }
-  })
+  const res = await fetchCountryConfig(url)
 
   if (!res.ok) {
     raise(

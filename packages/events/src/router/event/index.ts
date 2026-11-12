@@ -156,9 +156,7 @@ export const eventRouter = router({
       .input(z.void())
       .use(middleware.reuseEventConfigResponse)
       .output(z.array(VersionedEventConfig))
-      .query(async (options) =>
-        getInMemoryVersionedEventConfigurations(options.ctx.token)
-      )
+      .query(async () => getInMemoryVersionedEventConfigurations())
   }),
   create: userAndSystemProcedure
     .meta({
@@ -177,8 +175,7 @@ export const eventRouter = router({
     .output(EventDocument)
     .mutation(async ({ input, ctx }) => {
       const config = await getVersionedEventConfigurationById({
-        eventType: input.type,
-        token: ctx.token
+        eventType: input.type
       })
 
       const result = await createEvent({
@@ -187,7 +184,7 @@ export const eventRouter = router({
         user: ctx.user,
         createdAtLocation: input.createdAtLocation,
         config,
-        timeZone: await getCountryTimeZone(ctx.token)
+        timeZone: await getCountryTimeZone()
       })
 
       await writeAuditLog({
@@ -223,8 +220,7 @@ export const eventRouter = router({
     .query(async ({ ctx }) => {
       const { eventId, eventType, configVersionId } = ctx
       const configuration = await getEventConfigurationForRecord({
-        event: { type: eventType, configVersionId },
-        token: ctx.token
+        event: { type: eventType, configVersionId }
       })
 
       const updatedEvent = await processAction(
@@ -488,7 +484,7 @@ export const eventRouter = router({
             options.input,
             user,
             token,
-            await getEventConfigurationForRecord({ event, token })
+            await getEventConfigurationForRecord({ event })
           )
           await writeAuditLog({
             clientId: user.id,
@@ -520,7 +516,7 @@ export const eventRouter = router({
             options.input,
             user,
             token,
-            await getEventConfigurationForRecord({ event, token })
+            await getEventConfigurationForRecord({ event })
           )
           await writeAuditLog({
             clientId: user.id,
@@ -557,8 +553,8 @@ export const eventRouter = router({
     )
     .query(async ({ input, ctx }) => {
       const [eventConfigs, versionedEventConfigs] = await Promise.all([
-        getInMemoryEventConfigurations(ctx.token),
-        getInMemoryVersionedEventConfigurations(ctx.token)
+        getInMemoryEventConfigurations(),
+        getInMemoryVersionedEventConfigurations()
       ])
 
       const result = await findRecordsByQuery({
@@ -593,5 +589,5 @@ export const eventRouter = router({
     .use(middleware.allowedWithAnyOfScopes(['record.import']))
     .input(z.array(EventDocument))
     .output(z.any())
-    .mutation(async ({ input, ctx }) => bulkImportEvents(input, ctx.token))
+    .mutation(async ({ input }) => bulkImportEvents(input))
 })

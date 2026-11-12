@@ -13,7 +13,6 @@ import {
   configHandler,
   publicConfigHandler
 } from '@gateway/features/config/configHandler'
-import { formsHandler } from '@gateway/features/config/formsHandler'
 import healthCheckHandler from '@gateway/features/healthCheck/handler'
 import { trpcProxy } from '@gateway/v2-events/event-config/routes'
 import { ServerRoute } from '@hapi/hapi'
@@ -74,15 +73,6 @@ export const getRoutes = () => {
         auth: false,
         tags: ['api'],
         description: 'Retrieve application configuration'
-      }
-    },
-    {
-      method: 'GET',
-      path: '/forms',
-      handler: formsHandler,
-      options: {
-        tags: ['api'],
-        description: 'Retrieve forms'
       }
     },
     authProxy.token,

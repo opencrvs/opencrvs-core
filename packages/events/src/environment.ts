@@ -17,6 +17,10 @@ import { cleanEnv, str, url, bool, num } from 'envalid'
  */
 export const env = cleanEnv(process.env, {
   CERT_PUBLIC_KEY_PATH: str({ devDefault: '../../.secrets/public-key.pem' }),
+  CORE_REQUEST_SIGNING_KEY_PATH: str({
+    devDefault: '../../.secrets/core-request-signing-key.pem',
+    desc: 'Ed25519 private key that core signs its requests to country config with'
+  }),
   EVENTS_POSTGRES_URL: url({
     devDefault: 'postgres://events_app:app_password@localhost:5432/events'
   }),
