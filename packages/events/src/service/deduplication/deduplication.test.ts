@@ -381,7 +381,7 @@ describe('deduplication tests', () => {
     )
     expect(matchResultForEventWithSameId).toHaveLength(0)
   })
-  it('finds a duplicate that has a field the config of the new record does not have', async () => {
+  it('finds a duplicate that has a field that the config of the new record does not have', async () => {
     // e.g. a record of another version, with a field that the new version removed
     const esClient = getOrCreateClient()
 

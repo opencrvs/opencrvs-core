@@ -19,8 +19,8 @@ import {
 import { ActionType } from '@opencrvs/toolkit/events'
 
 /* The labels come from the CSV translations, which write them in lowercase. */
-const INITIAL_ONLY_ACTION = 'initial only action'
-const V2_ONLY_ACTION = 'v2 only action'
+const INITIAL_ONLY_ACTION = 'Initial only action'
+const V2_ONLY_ACTION = 'V2 only action'
 
 test.describe('Custom actions of a birth version', () => {
   test.beforeEach(async ({ page }) => {
