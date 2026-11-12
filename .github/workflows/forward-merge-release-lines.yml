@@ -7,29 +7,10 @@
 #
 # Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
 
-# Opens pull requests that carry every change on a release line up into each
-# newer line.
-#
-# The lines are every release/<major>.<minor>.x branch, then develop:
-# release/1.9.x, release/2.0.x, release/2.1.x, develop. A run starts from one
-# line and opens or updates one PR into every newer line, in parallel:
-#   push to release/*.x   from the line that was pushed to
-#   workflow_dispatch     from the line typed in, e.g. 1.9.x
-#
-# Each PR comes from forward-merge/<from>-into-<to> (dots stripped, e.g.
-# forward-merge/19x-into-21x). The workflow merges the target into a copy of
-# the older line, or new commits of the older line into an open PR's branch.
-# When that merge conflicts, Claude Code resolves it and the result is pushed
-# for review. If Claude leaves anything unresolved, the PR is opened from a
-# plain copy of the older line with instructions to resolve it by hand.
-#
-# Review is requested from whoever started a manual run, or on a push from the
-# authors of the PRs that the push merged (for a merged forward-merge PR, the
-# authors of the feature PRs it carried).
-#
-# Needs the ANTHROPIC_API_KEY secret. Everything is pushed with GITHUB_TOKEN,
-# so pull_request workflows (lint-and-test) do not start on these PRs until a
-# person pushes to the branch.
+# Carries each release line's changes into every newer line and develop, so a
+# fix made on an older line also reaches the newer ones. Merge conflicts are
+# resolved by Claude Code and pushed for human review. Pushes use GITHUB_TOKEN,
+# so CI starts on these PRs only once a person pushes to them.
 name: Release - Forward-merge release lines
 
 on:
@@ -198,6 +179,11 @@ jobs:
             echo "action=merge"
           } >> "$GITHUB_OUTPUT"
 
+          # Claude gets the target's project settings: during the merge, the copy
+          # in the working tree can hold conflict markers and fail to parse.
+          git show "origin/$TARGET_BRANCH:.claude/settings.json" > "$RUNNER_TEMP/claude-settings.json" 2>/dev/null \
+            || echo '{}' > "$RUNNER_TEMP/claude-settings.json"
+
           if git merge --no-ff --no-edit -m "Merge $merging into $PR_BRANCH" "origin/$merging"; then
             echo "conflicts=" >> "$GITHUB_OUTPUT"
           else
@@ -212,12 +198,15 @@ jobs:
         continue-on-error: true
         uses: anthropics/claude-code-action@4fa93a88de49bbef68b10eb15aabedf28ca0e1ed # v1.0.271
         with:
-          anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
+          claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
           # The action needs a token. Claude can't push or call GitHub with it:
           # its tools are limited to editing files and local, read-only or
           # staging git commands.
           github_token: ${{ github.token }}
+          settings: ${{ runner.temp }}/claude-settings.json
+          # --setting-sources user: skip the working tree's settings, see above
           claude_args: >-
+            --setting-sources user
             --max-turns 200
             --allowedTools "Read,Edit,Write,Glob,Grep,Bash(git status:*),Bash(git diff:*),Bash(git log:*),Bash(git show:*),Bash(git ls-files:*),Bash(git add:*),Bash(git rm:*),Bash(git checkout --ours:*),Bash(git checkout --theirs:*)"
           prompt: |
@@ -309,7 +298,8 @@ jobs:
             fi
             change gh pr comment "$OPEN_PR" --body "\`$SOURCE_BRANCH\` has new commits. $STATUS"
             if [ -n "$REVIEWERS" ]; then
-              change gh pr edit "$OPEN_PR" --add-reviewer "$REVIEWERS" || true
+              change gh pr edit "$OPEN_PR" --add-reviewer "$REVIEWERS" \
+                || echo "::warning::Could not request review from $REVIEWERS on #$OPEN_PR."
             fi
             exit 0
           fi
@@ -343,5 +333,6 @@ jobs:
             --title "chore: merge $SOURCE_BRANCH into $TARGET_BRANCH" --body "$PR_BODY")
           echo "Opened $pr_url" | tee -a "$GITHUB_STEP_SUMMARY"
           if [ -n "$REVIEWERS" ]; then
-            gh pr edit "$pr_url" --add-reviewer "$REVIEWERS" || true
+            gh pr edit "$pr_url" --add-reviewer "$REVIEWERS" \
+              || echo "::warning::Could not request review from $REVIEWERS on $pr_url."
           fi
