@@ -9,33 +9,30 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { DocumentPath, UUID } from '@opencrvs/commons'
-import { presignFile } from '@events/service/files'
+import { presignFiles } from '@events/service/files'
 
 const eventId = '105b69b3-415f-4e53-b912-ef71484cb6c0' as UUID
 
-describe('presignFile', () => {
+describe('presignFiles', () => {
   const token = 'Bearer test-token'
 
-  test.each([
-    `events/${eventId}/proof.png`,
-    `users/${eventId}/signature.png`,
-    `${eventId}.png`
-  ])('presigns the canonical path %s', async (path) => {
-    await expect(
-      presignFile(path as DocumentPath, token)
-    ).resolves.toMatchObject({ presignedURL: expect.any(String) })
+  test('keys each URL by the path it signs', async () => {
+    const paths = [
+      `events/${eventId}/proof.png`,
+      `users/${eventId}/signature.png`,
+      `${eventId}.png`
+    ] as DocumentPath[]
+
+    const urls = await presignFiles(paths, token)
+
+    expect(Object.keys(urls)).toEqual(paths)
+    // The documents mock (tests/msw.ts) signs each path under the `ocrvs` bucket
+    for (const path of paths) {
+      expect(urls[path]).toContain(`/ocrvs/${path}?`)
+    }
   })
 
-  test.each([
-    `users/../events/${eventId}/proof.png`,
-    `users/%2e%2e/events/${eventId}/proof.png`,
-    `events/${eventId}/./proof.png`
-  ])(
-    'refuses %s, which the URL would resolve to a different key',
-    async (path) => {
-      await expect(presignFile(path as DocumentPath, token)).rejects.toThrow(
-        `Refusing to presign a non-canonical path: ${path}`
-      )
-    }
-  )
+  test('returns nothing without asking documents-service for no paths', async () => {
+    await expect(presignFiles([], token)).resolves.toEqual({})
+  })
 })

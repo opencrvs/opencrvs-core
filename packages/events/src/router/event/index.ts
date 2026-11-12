@@ -10,13 +10,7 @@
  */
 
 import * as z from 'zod/v4'
-import { TRPCError } from '@trpc/server'
-import {
-  DocumentPath,
-  getUUID,
-  parseDocumentPath,
-  UUID
-} from '@opencrvs/commons'
+import { getUUID } from '@opencrvs/commons'
 import { logger } from '@opencrvs/commons'
 import {
   ActionStatus,
@@ -73,16 +67,15 @@ import { markAsDuplicate } from '@events/service/events/actions/mark-as-duplicat
 import { markNotDuplicate } from '@events/service/events/actions/mark-not-duplicate'
 import {
   assertFilesBelongToEvent,
-  cleanupUnreferencedFiles,
-  presignFile
+  cleanupUnreferencedFiles
 } from '@events/service/files'
-import { authorizeFileRead } from '@events/service/files/authorize'
 import { writeAuditLog } from '@events/storage/postgres/events/auditLog'
 import { getDuplicateEvents } from '../../service/deduplication/deduplication'
 import { declareActionProcedures } from './actions/declare'
 import { getDefaultActionProcedures } from './actions'
 import { customActionProcedures } from './actions/custom'
 import { createAndNotifyProcedure } from './actions/createAndNotify'
+import { fileRouter, filesRouter } from './files'
 
 export const eventRouter = router({
   /*
@@ -336,31 +329,8 @@ export const eventRouter = router({
         return currentDraft
       })
   }),
-  file: router({
-    getPresignedUrl: userAndSystemProcedure
-      .input(
-        z.object({
-          filePath: DocumentPath,
-          // The record a file outside events/{eventId}/ belongs to, e.g. a
-          // signature on one of its actions or a pre-2.0 attachment
-          eventId: UUID.optional()
-        })
-      )
-      .output(z.object({ presignedURL: z.string() }))
-      .query(async ({ input, ctx }) => {
-        const file = parseDocumentPath(input.filePath)
-
-        if (!file) {
-          throw new TRPCError({
-            code: 'BAD_REQUEST',
-            message: `Unrecognized file path: ${input.filePath}`
-          })
-        }
-
-        await authorizeFileRead({ file, eventId: input.eventId, ctx })
-        return presignFile(file.path, ctx.token)
-      })
-  }),
+  file: fileRouter,
+  files: filesRouter,
   actions: router({
     notify: router(getDefaultActionProcedures(ActionType.NOTIFY)),
     createAndNotify: router(createAndNotifyProcedure()),
