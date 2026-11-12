@@ -42,10 +42,11 @@ function toRequestSigningKey(jwk: JsonWebKey): Array<[string, KeyObject]> {
 
 /**
  * Returns `findPublicKey`, which finds core's public key for a kid in the
- * JWKS at `jwksUrl`. For an unknown kid, it fetches the JWKS again: at most
- * once a minute, or every 5 seconds until the first fetch succeeds. A failed
- * fetch calls `onFetchError` and keeps the keys that it already has.
- * `refresh()` fetches the JWKS now and rejects when the fetch fails.
+ * JWKS at `jwksUrl`. A lookup of an unknown kid fetches the JWKS again,
+ * but only when the last fetch was at least a minute ago, or 5 seconds ago
+ * until a fetch succeeds. Otherwise the lookup uses the keys that it has.
+ * A failed fetch calls `onFetchError` and keeps the keys that it already
+ * has. `refresh()` fetches the JWKS now and rejects when the fetch fails.
  */
 export function createCoreKeyList({
   jwksUrl,
