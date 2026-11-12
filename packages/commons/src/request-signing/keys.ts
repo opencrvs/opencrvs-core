@@ -65,7 +65,6 @@ export function loadCoreSigningKey(pem: string | Buffer): CoreSigningKey {
   return { privateKey, keyid: toPublicJwk(privateKey).kid }
 }
 
-/** Reads the signing key from a PEM file. */
 export function loadCoreSigningKeyFile(path: string): CoreSigningKey {
   return loadCoreSigningKey(readFileSync(path))
 }
