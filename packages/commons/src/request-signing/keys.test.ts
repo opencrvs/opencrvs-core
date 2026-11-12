@@ -47,8 +47,7 @@ describe('loadCoreSigningKey', () => {
     const headers = signCoreRequest({
       method: 'GET',
       path: '/config/events',
-      privateKey,
-      keyid
+      key: { privateKey, keyid }
     })
 
     const result = await verifyCoreRequest(

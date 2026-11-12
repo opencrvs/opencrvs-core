@@ -31,7 +31,7 @@ export interface CoreCredentials {
 
 const bodyChunksByRequest = new WeakMap<Hapi.Request, Buffer[]>()
 
-/** The reason is logged, not sent: a caller learns only that it was rejected. */
+/** Logs the reason and does not send it, so a caller learns only that core auth failed. */
 function reject(request: Hapi.Request, reason: string) {
   request.log(['auth', 'core', 'error'], reason)
   return Boom.forbidden()
@@ -90,8 +90,8 @@ function coreScheme(findPublicKey: FindPublicKey): Hapi.ServerAuthScheme {
         return h.unauthenticated(reject(request, REJECTION.WRONG_BODY))
       }
 
-      // Raw bytes as they arrive, before Hapi parses them; `payload` compares
-      // them with the signed digest.
+      // Keep the raw bytes as they arrive, before Hapi parses them. `payload`
+      // compares them with the signed digest.
       const chunks: Buffer[] = []
       bodyChunksByRequest.set(request, chunks)
       request.events.on('peek', (chunk: Buffer | string) => {

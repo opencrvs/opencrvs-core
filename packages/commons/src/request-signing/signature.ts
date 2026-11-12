@@ -60,6 +60,12 @@ function signatureBase(
   )
 }
 
+/** The private key core signs with, and the kid that names its public key. */
+export interface CoreSigningKey {
+  privateKey: KeyObject
+  keyid: string
+}
+
 export interface SignCoreRequestInput {
   method: string
   /** Absolute path, as sent on the request line, e.g. `/config/events`. */
@@ -68,8 +74,7 @@ export interface SignCoreRequestInput {
   query?: string
   /** The exact body that is sent; empty for requests without a body. */
   body?: Buffer | string
-  privateKey: KeyObject
-  keyid: string
+  key: CoreSigningKey
   now?: number
 }
 
@@ -91,16 +96,15 @@ export function signCoreRequest({
   path,
   query = '',
   body = '',
-  privateKey,
-  keyid,
+  key,
   now = Date.now()
 }: SignCoreRequestInput): CoreRequestSignatureHeaders {
-  const params = signatureParams(Math.floor(now / 1000), keyid)
+  const params = signatureParams(Math.floor(now / 1000), key.keyid)
   const digest = contentDigest(body)
   const signature = sign(
     null,
     signatureBase(method, path, query, digest, params),
-    privateKey
+    key.privateKey
   )
 
   return {
@@ -134,10 +138,10 @@ function header(headers: CoreRequest['headers'], name: string) {
 
 /**
  * Checks everything except the body: the profile, the age, the key and the
- * signature over the request's `Content-Digest` header. The caller must still
- * compare that header with the digest of the received body
- * (`verifyCoreRequest` does both); this split lets a server check the
- * signature before it reads the body.
+ * signature over the request's `Content-Digest` header. The caller must then
+ * compare that header with the digest of the received body. Use this function
+ * to check the signature before the server reads the body. `verifyCoreRequest`
+ * does both checks.
  */
 export async function verifyCoreSignature(
   request: Omit<CoreRequest, 'rawBody'>,
@@ -190,7 +194,7 @@ export function matchesContentDigest(
   return header(headers, 'content-digest') === contentDigest(rawBody)
 }
 
-/** Checks that a request was signed by core, for exactly this method, path, query and body. */
+/** Checks that core signed the request, for exactly this method, path, query and body. */
 export async function verifyCoreRequest(
   request: CoreRequest,
   findPublicKey: FindPublicKey,
@@ -201,12 +205,6 @@ export async function verifyCoreRequest(
     return { valid: false, reason: REJECTION.WRONG_BODY }
   }
   return result
-}
-
-/** The private key core signs with, and the kid that names its public key. */
-export interface CoreSigningKey {
-  privateKey: KeyObject
-  keyid: string
 }
 
 /**
@@ -232,7 +230,7 @@ export function withCoreSignature(
         path: pathname,
         query: search,
         body: init.body,
-        ...key
+        key
       })
     }
   }

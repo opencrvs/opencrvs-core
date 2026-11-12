@@ -199,8 +199,7 @@ describe('verifyCoreRequest', () => {
         signCoreRequest({
           method: 'GET',
           path: '/config/events',
-          privateKey,
-          keyid: EXAMPLE_KEYID,
+          key: { privateKey, keyid: EXAMPLE_KEYID },
           now: EXAMPLE_CREATED_MS
         })
       )
@@ -247,8 +246,7 @@ describe('signCoreRequest', () => {
     const headers = signCoreRequest({
       method: 'get',
       path: '/config/events',
-      privateKey,
-      keyid: EXAMPLE_KEYID,
+      key: { privateKey, keyid: EXAMPLE_KEYID },
       now: EXAMPLE_CREATED_MS
     })
 
@@ -264,8 +262,7 @@ describe('signCoreRequest', () => {
       path: '/trigger/user/user-created',
       query: '?lang=yo',
       body,
-      privateKey,
-      keyid: 'test-key',
+      key: { privateKey, keyid: 'test-key' },
       now
     })
 
