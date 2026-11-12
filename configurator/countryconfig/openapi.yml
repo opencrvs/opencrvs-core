@@ -2364,6 +2364,11 @@ components:
                 type: string
                 description: Identifier of the version, unique within the event (e.g.
                   "birth-v2").
+              label:
+                description: Name of the version, which the UI shows wherever it names the
+                  version. For example, "{event.configVersionLabel}" in the
+                  event summary.
+                $ref: "#/components/schemas/TranslationConfig"
               effectiveFrom:
                 default: 0001-01-01
                 description: Date (YYYY-MM-DD) from which this version is effective. A version
@@ -2593,6 +2598,7 @@ components:
                   $ref: "#/components/schemas/Conditional"
             required:
               - id
+              - label
               - effectiveFrom
               - title
               - summary
@@ -3604,7 +3610,9 @@ components:
                     description: Field value template supports variables from configuration (e.g.
                       "{informant.phoneNo} {informant.email}") and EventMetadata
                       (e.g. "{event.legalStatuses.REGISTERED.acceptedAt, date,
-                      ::dd MMMM yyyy}").
+                      ::dd MMMM yyyy}"). "{event.configVersionLabel}" gives the
+                      label of the configuration version that the record was
+                      created under.
                     $ref: "#/components/schemas/TranslationConfig"
                   label:
                     $ref: "#/components/schemas/TranslationConfig"
