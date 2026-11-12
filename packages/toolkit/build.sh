@@ -44,6 +44,11 @@ npx esbuild src/roles/index.ts --bundle --format=cjs --outdir=./dist/roles --all
 npx esbuild src/authentication/index.ts --bundle --format=cjs --outdir=./dist/authentication --allow-overwrite --packages=external
 cp -r ../commons/build/dist/common/users/authentication.d.ts ./dist/authentication/index.d.ts
 
+# Build core request signing (verification and the Hapi `core` auth strategy)
+npx esbuild src/request-signing/index.ts --bundle --platform=node --format=cjs --outdir=./dist/request-signing --allow-overwrite --packages=external
+mkdir -p ./dist/commons/request-signing
+cp -r ../commons/build/dist/common/request-signing/*.d.ts ./dist/commons/request-signing
+
 # Build api client
 npx esbuild src/api/index.ts --bundle --format=cjs --outdir=./dist/api --allow-overwrite --packages=external
 mkdir -p ./dist/commons/api
