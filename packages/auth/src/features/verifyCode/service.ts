@@ -9,15 +9,13 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { redis } from '@auth/database'
-import { JWT_ISSUER } from '@auth/constants'
 import { env } from '@auth/environment'
+import { coreSigningKey } from '@auth/request-signing'
 import * as crypto from 'crypto'
-import { createToken } from '@auth/features/authenticate/service'
 import {
   triggerUserEventNotification,
   UserName,
-  TriggerEvent,
-  TokenUserType
+  TriggerEvent
 } from '@opencrvs/commons'
 
 interface ICodeDetails {
@@ -86,16 +84,7 @@ export async function sendVerificationCode(
       }
     },
     countryConfigUrl: env.COUNTRY_CONFIG_URL_INTERNAL,
-    authHeader: {
-      Authorization: `Bearer ${await createToken(
-        'auth',
-        [],
-        ['opencrvs:countryconfig-user'],
-        JWT_ISSUER,
-        undefined,
-        TokenUserType.enum.system
-      )}`
-    }
+    signingKey: coreSigningKey
   })
   return undefined
 }

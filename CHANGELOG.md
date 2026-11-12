@@ -97,6 +97,8 @@ Core signs its requests to country config ([RFC 9421](https://www.rfc-editor.org
 
    - every `/config/*` route, including `/config/users` and `/config/locations`, which used `auth: false` or a user token
    - `/certificates`
+   - `/trigger/user/*`
+   - `/trigger/telemetry` and `/trigger/system/ready`
 
    Other routes keep their current auth. A route with `auth: 'core'` must let Hapi read the body, so it cannot use `payload: { output: 'stream' }`.
 
@@ -110,6 +112,7 @@ Core signs its requests to country config ([RFC 9421](https://www.rfc-editor.org
 
 See [Upgrade guidance](#core-signs-its-requests-to-country-config-migrate-your-country-config) for the country config changes.
 
+- `triggerUserEventNotification` from `@opencrvs/toolkit/notification` takes the core `signingKey` instead of an `authHeader`.
 - Gateway's `GET /forms` is removed. Gateway's `GET /config` and `GET /publicConfig` read the application configuration and the certificates from events, and gateway no longer calls country config.
 
 [#14240](https://github.com/opencrvs/opencrvs-core/issues/14240)
