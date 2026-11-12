@@ -45,7 +45,7 @@ describe('user.changeAvatar', () => {
   test('persists provided MinIO path as profileImagePath', async () => {
     const { user, eventsDb } = await setupTestCase()
     const client = createTestClient(user)
-    const path = `/users/${user.id}/avatar-${getUUID()}.png`
+    const path = `users/${user.id}/avatar-${getUUID()}.png`
 
     await client.user.changeAvatar({ userId: user.id, avatar: path })
 
@@ -57,6 +57,24 @@ describe('user.changeAvatar', () => {
 
     expect(dbUser.profileImagePath).toBe(path)
   })
+
+  test.each([
+    () => `users/${getUUID()}/signature.png`,
+    () => `${getUUID()}.png`,
+    () => `events/${getUUID()}/${getUUID()}.png`,
+    (id: string) => `users/../users/${id}/avatar.png`,
+    (id: string) => `/users/${id}/avatar.png`
+  ])(
+    "rejects an avatar outside the caller's own users/ path (%#)",
+    async (toPath) => {
+      const { user } = await setupTestCase()
+      const client = createTestClient(user)
+
+      await expect(
+        client.user.changeAvatar({ userId: user.id, avatar: toPath(user.id) })
+      ).rejects.toMatchObject({ code: 'BAD_REQUEST' })
+    }
+  )
 
   test('rejects non-string avatar payload', async () => {
     const { user } = await setupTestCase()

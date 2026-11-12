@@ -737,7 +737,7 @@ test('Persists all update-endpoint fields to database', async () => {
     data: { updatedKey: 'updatedValue' },
     signature: {
       originalFilename: 'updated-sig.png',
-      path: 'signatures/updated-sig.png',
+      path: `users/${user.id}/updated-sig.png`,
       type: 'image/png'
     }
   })
@@ -752,7 +752,7 @@ test('Persists all update-endpoint fields to database', async () => {
     fullHonorificName: 'Prof. Updated User',
     device: 'Samsung Galaxy S24',
     data: { updatedKey: 'updatedValue' },
-    signature: 'signatures/updated-sig.png'
+    signature: `users/${user.id}/updated-sig.png`
   })
 
   const dbUser = await eventsDb
@@ -771,7 +771,7 @@ test('Persists all update-endpoint fields to database', async () => {
     fullHonorificName: 'Prof. Updated User',
     device: 'Samsung Galaxy S24',
     data: { updatedKey: 'updatedValue' },
-    signaturePath: 'signatures/updated-sig.png'
+    signaturePath: `users/${user.id}/updated-sig.png`
   })
 })
 
@@ -816,4 +816,71 @@ test('preserves drafts when primaryOfficeId stays the same via user.update', asy
   await adminClient.user.update(generateUpdateInput(user))
 
   expect(await draftClient.event.draft.list()).toHaveLength(1)
+})
+
+describe('Signature path', () => {
+  async function updateSignature(makePath: (userId: string) => string) {
+    const { user } = await setupTestCase()
+    const client = createTestClient(user, [USER_EDIT_SCOPE])
+    const path = makePath(user.id)
+
+    return {
+      path,
+      result: client.user.update({
+        id: user.id,
+        signature: { originalFilename: 'sig.png', path, type: 'image/png' }
+      })
+    }
+  }
+
+  test("accepts a file under the user's own path", async () => {
+    const { path, result } = await updateSignature(
+      (id) => `users/${id}/${getUUID()}.png`
+    )
+
+    await expect(result).resolves.toMatchObject({ signature: path })
+  })
+
+  test.each([
+    ['a pre-2.0 key', () => `${getUUID()}.png`],
+    [
+      'a temporary-id upload from user creation',
+      () => `users/tmp-${getUUID()}/${getUUID()}.png`
+    ]
+  ])('accepts the signature the user already has: %s', async (_, makePath) => {
+    const { user } = await setupTestCase()
+    const current = makePath()
+    await updateUserById(user.id, { signaturePath: current })
+    const client = createTestClient(user, [USER_EDIT_SCOPE])
+
+    await expect(
+      client.user.update({
+        id: user.id,
+        signature: {
+          originalFilename: 'sig.png',
+          path: current,
+          type: 'image/png'
+        }
+      })
+    ).resolves.toMatchObject({ signature: current })
+  })
+
+  test.each([
+    ['a record attachment', () => `events/${getUUID()}/${getUUID()}.png`],
+    ["another user's file", () => `users/${getUUID()}/${getUUID()}.png`],
+    ['a bare key', () => `${getUUID()}.png`],
+    [
+      'a different temporary-id upload',
+      () => `users/tmp-${getUUID()}/${getUUID()}.png`
+    ]
+  ])('rejects %s', async (_, makePath) => {
+    const { result } = await updateSignature(makePath)
+
+    await expect(result).rejects.toMatchObject(
+      new TRPCError({
+        code: 'BAD_REQUEST',
+        message: "Signature must be a file under the user's own users/ path"
+      })
+    )
+  })
 })

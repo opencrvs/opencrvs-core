@@ -31,7 +31,8 @@ import {
   UserOrSystem,
   UpdateUserInput,
   CreateUserInputInternal,
-  UserOrSystemSummaryWithStatus
+  UserOrSystemSummaryWithStatus,
+  parseDocumentPath
 } from '@opencrvs/commons'
 import {
   allowedWithAnyOfScopes,
@@ -639,6 +640,14 @@ export const userRouter = router({
           `User is not in active state for given userid: ${ctx.user.id}`
         )
         throw new TRPCError({ code: 'UNAUTHORIZED' })
+      }
+      // Avatars are readable by every user, so only the caller's own files may become one
+      const avatar = parseDocumentPath(input.avatar)
+      if (avatar?.kind !== 'user' || avatar.userId !== ctx.user.id) {
+        throw new TRPCError({
+          code: 'BAD_REQUEST',
+          message: "Avatar must be a file under the user's own users/ path"
+        })
       }
       await updateUserById(UUID.parse(ctx.user.id), {
         profileImagePath: input.avatar
