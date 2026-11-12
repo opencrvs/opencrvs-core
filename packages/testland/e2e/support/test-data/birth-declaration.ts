@@ -221,7 +221,9 @@ export async function createDeclaration(
    * this value entirely (see `buildAction`/`createEvent` in
    * packages/events/src/service/events/events.ts).
    */
-  createdAtLocation?: string
+  createdAtLocation?: string,
+  /** Id of the birth version to create the record under. Defaults to the current version. */
+  configVersionId?: string
 ): Promise<CreateDeclarationResponse> {
   const declaration =
     dec ??
@@ -234,7 +236,8 @@ export async function createDeclaration(
   const createResponse = await client.event.create.mutate({
     type: 'birth',
     transactionId: uuidv4(),
-    createdAtLocation
+    createdAtLocation,
+    configVersionId
   })
 
   const eventId = createResponse.id as string
