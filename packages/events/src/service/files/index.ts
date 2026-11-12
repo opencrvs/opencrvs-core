@@ -9,14 +9,18 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { Readable } from 'stream'
+import { TRPCError } from '@trpc/server'
 import fetch from 'node-fetch'
 import { zfd } from 'zod-form-data'
 import * as z from 'zod/v4'
 import FormData from 'form-data'
 import {
+  ActionValues,
   DocumentPath,
   getFilePathsFromEvent,
+  getFilePathsFromValues,
   joinUrlPaths,
+  parseDocumentPath,
   EventDocument
 } from '@opencrvs/commons'
 import { env } from '@events/environment'
@@ -116,6 +120,36 @@ export async function cleanupUnreferencedFiles(
   return Promise.all(
     filesToDelete.map(async (file: DocumentPath) => deleteFile(file, token))
   )
+}
+
+/**
+ * Throws unless every file the values name is stored under the record's own
+ * prefix, or is already named by the record (e.g. a pre-2.0 key carried over
+ * by a correction). A record's readers can presign every file it names, so a
+ * record must not be able to name anyone else's.
+ */
+export function assertFilesBelongToEvent(
+  event: EventDocument,
+  values: ActionValues
+) {
+  const namedByRecord = getFilePathsFromEvent(event)
+
+  // Files the record already names are carried over as they are (e.g. a
+  // pre-2.0 key in a correction), so only new ones are checked
+  const newFiles = getFilePathsFromValues(values).filter(
+    (path) => !namedByRecord.includes(path)
+  )
+
+  for (const path of newFiles) {
+    const file = parseDocumentPath(path)
+
+    if (file?.kind !== 'event' || file.eventId !== event.id) {
+      throw new TRPCError({
+        code: 'BAD_REQUEST',
+        message: `File does not belong to this record: ${path}`
+      })
+    }
+  }
 }
 
 export const AttachmentInput = zfd.formData({

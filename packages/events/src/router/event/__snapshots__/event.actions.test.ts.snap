@@ -21,7 +21,7 @@ exports[`Action updates > partial declaration update accounts for conditional fi
   "applicant.email": "test@opencrvs.org",
   "applicant.image": {
     "originalFilename": "abcd.png",
-    "path": "4f095fc4-4312-4de2-aa38-86dcc0f71044.png",
+    "path": "events/[sanitized]/4f095fc4-4312-4de2-aa38-86dcc0f71044.png",
     "type": "image/png",
   },
   "applicant.name": {
@@ -87,7 +87,7 @@ exports[`Adding actions > Event document contains all created actions 11`] = `
         "review.comment": "review.comment-TEXTAREA-0",
         "review.signature": {
           "originalFilename": "abcd.png",
-          "path": "4f095fc4-4312-4de2-aa38-86dcc0f71044.png",
+          "path": "events/[sanitized]/4f095fc4-4312-4de2-aa38-86dcc0f71044.png",
           "type": "image/png",
         },
       },
@@ -117,7 +117,7 @@ exports[`Adding actions > Event document contains all created actions 11`] = `
         "applicant.email": "test@opencrvs.org",
         "applicant.image": {
           "originalFilename": "abcd.png",
-          "path": "4f095fc4-4312-4de2-aa38-86dcc0f71044.png",
+          "path": "events/[sanitized]/4f095fc4-4312-4de2-aa38-86dcc0f71044.png",
           "type": "image/png",
         },
         "applicant.name": {
@@ -200,7 +200,7 @@ exports[`Adding actions > Event document contains all created actions 11`] = `
         "applicant.email": "test@opencrvs.org",
         "applicant.image": {
           "originalFilename": "abcd.png",
-          "path": "4f095fc4-4312-4de2-aa38-86dcc0f71044.png",
+          "path": "events/[sanitized]/4f095fc4-4312-4de2-aa38-86dcc0f71044.png",
           "type": "image/png",
         },
         "applicant.name": {

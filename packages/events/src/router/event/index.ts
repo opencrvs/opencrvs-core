@@ -71,7 +71,11 @@ import {
 } from '@events/service/reindex/status'
 import { markAsDuplicate } from '@events/service/events/actions/mark-as-duplicate'
 import { markNotDuplicate } from '@events/service/events/actions/mark-not-duplicate'
-import { cleanupUnreferencedFiles, presignFile } from '@events/service/files'
+import {
+  assertFilesBelongToEvent,
+  cleanupUnreferencedFiles,
+  presignFile
+} from '@events/service/files'
 import { authorizeFileRead } from '@events/service/files/authorize'
 import { writeAuditLog } from '@events/storage/postgres/events/auditLog'
 import { getDuplicateEvents } from '../../service/deduplication/deduplication'
@@ -297,6 +301,8 @@ export const eventRouter = router({
           undefined,
           ctx.event
         )
+
+        assertFilesBelongToEvent(ctx.event, input)
 
         const previousDraft = await draftsRepo.findLatestDraftForAction(
           eventId,

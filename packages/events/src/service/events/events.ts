@@ -32,6 +32,7 @@ import {
   getAvailableActionsForEvent,
   getCurrentEventState,
   getDeclarationFields,
+  getFilePathsFromValues,
   getStatusFromActions,
   isActionVisible,
   isActionEnabled,
@@ -42,7 +43,8 @@ import { getEventConfigurationById } from '@events/service/config/config'
 import {
   cleanupUnreferencedFiles,
   deleteFile,
-  fileExists
+  fileExists,
+  assertFilesBelongToEvent
 } from '@events/service/files'
 import { indexEvent } from '@events/service/indexing/indexing'
 import * as draftsRepo from '@events/storage/postgres/events/drafts'
@@ -364,6 +366,12 @@ export async function addAction(
 ): Promise<EventDocument> {
   // @TODO: Check that this works after making sure data incldues only declaration fields.
   const fieldConfigs = getDeclarationFields(configuration)
+
+  // Most actions (e.g. READ) name no files; skip loading the record for them
+  if (getFilePathsFromValues(input).length > 0) {
+    assertFilesBelongToEvent(await getEventById(eventId), input)
+  }
+
   const fileValuesInCurrentAction = extractFileValues(
     input.declaration,
     fieldConfigs
