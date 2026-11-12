@@ -41,7 +41,7 @@ import {
   configurationErrorNotification
 } from '@client/notification/actions'
 import { getToken } from '@client/utils/authUtils'
-import { ApplicationConfig } from '@opencrvs/commons/client'
+import { ApplicationConfig, setCountryTimeZone } from '@opencrvs/commons/client'
 
 export interface ILocation {
   id: string
@@ -162,6 +162,15 @@ function checkIfDone(
   const loopWithState = liftState(loopOrState)
   const newState = getModel(loopWithState)
   const cmd = getCmd(loopWithState)
+
+  /*
+   * The config comes from the network or, when offline, from storage.
+   * Conditionals and validations resolve "today" in the country's time zone.
+   */
+  const timeZone = newState.offlineData.config?.SYSTEM_IANA_TIMEZONE
+  if (timeZone) {
+    setCountryTimeZone(timeZone)
+  }
   if (
     isOfflineDataLoaded(newState.offlineData) &&
     !oldState.offlineDataLoaded

@@ -31,7 +31,11 @@ import {
   AgeValue
 } from '../events/FieldValue'
 import { TranslationConfig } from '../events/TranslationConfig'
-import { EncodedScope, ITokenPayload, TokenUserType } from '../users/authentication'
+import {
+  EncodedScope,
+  ITokenPayload,
+  TokenUserType
+} from '../users/authentication'
 import { UUID } from '../uuid'
 import {
   ageToDate,
@@ -48,7 +52,7 @@ import { EventIndex } from '../events/EventIndex'
 import { Location } from '../events/locations'
 import { SystemVariables } from '../events/TemplateConfig'
 import { getCurrentEventState } from '../events/state'
-import { isPlainDate } from '../events/PlainDate'
+import { isPlainDate, toPlainDateInTimeZone } from '../events/PlainDate'
 
 const ajv = new Ajv({
   $data: true,
@@ -102,8 +106,30 @@ function resolveDataPath(
   return current
 }
 
-/** Returns today's date as a {@link PlainDate} (YYYY-MM-DD), device-local. */
+/**
+ * The country's time zone (IANA), `SYSTEM_IANA_TIMEZONE` in the application
+ * config. A deployment serves one country, so one value serves the process.
+ */
+let countryTimeZone: string | undefined
+
+/**
+ * Sets the time zone that {@link todayISO} uses. Call it when the application
+ * config loads: the client and the server must resolve "today" in the same
+ * time zone, or the same conditional gives different results near midnight.
+ */
+export function setCountryTimeZone(timeZone: string) {
+  countryTimeZone = timeZone
+}
+
+/**
+ * Returns today's date as a {@link PlainDate} (YYYY-MM-DD) in the country's
+ * time zone. If {@link setCountryTimeZone} was not called, it uses the time
+ * zone of the device or the process.
+ */
 export function todayISO(): PlainDate {
+  if (countryTimeZone) {
+    return toPlainDateInTimeZone(new Date(), countryTimeZone)
+  }
   return formatISO(new Date(), { representation: 'date' }) as PlainDate
 }
 

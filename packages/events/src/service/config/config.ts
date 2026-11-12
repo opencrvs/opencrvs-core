@@ -19,6 +19,7 @@ import {
   logger,
   resolveEventConfigInTimeZone,
   Role,
+  setCountryTimeZone,
   TokenWithBearer,
   validateRoles,
   VersionedEventConfig,
@@ -124,7 +125,10 @@ export async function getApplicationConfig() {
     throw new Error(`Failed to fetch application config: ${res.status}`)
   }
 
-  return ApplicationConfig.parse(await res.json())
+  const config = ApplicationConfig.parse(await res.json())
+  // Conditionals and validations resolve "today" in the country's time zone.
+  setCountryTimeZone(config.SYSTEM_IANA_TIMEZONE)
+  return config
 }
 
 /**

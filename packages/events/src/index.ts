@@ -15,6 +15,7 @@ import { env } from './environment'
 import { server } from './server'
 import { getServiceToken } from './service/auth'
 import {
+  getCountryTimeZone,
   getInMemoryRoles,
   getInMemoryVersionedEventConfigurations
 } from './service/config/config'
@@ -40,6 +41,10 @@ export async function main() {
 
     // Fetch roles here to validate them early on
     await getInMemoryRoles(token)
+
+    // Fetching the application config sets the country's time zone, which
+    // conditionals and validations use to resolve "today".
+    logger.info(`Country time zone: ${await getCountryTimeZone(token)}`)
 
     for (const configuration of configurations) {
       logger.info(`Loaded event configuration: ${configuration.id}`)
