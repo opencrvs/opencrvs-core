@@ -7,15 +7,9 @@
 #
 # Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
 
-# Starts a release. Run it manually with a semver version, e.g. 1.9.24.
-#
-# The release is made on its line's branch, release/<major>.<minor>.x
-# (1.9.24 -> release/1.9.x), which gets two commits: the version bump and an
-# empty CHANGELOG section for the version. A <minor>.0 version cuts the line's
-# branch from develop first.
-#
-# Carrying the release up into the newer lines and develop is done by the
-# forward-merge workflow (forward-merge-release-lines.yml), not here.
+# Starts a release on its line's branch, release/<major>.<minor>.x, where the
+# version bump and an empty CHANGELOG section are committed.
+# forward-merge-release-lines.yml carries it into the newer lines.
 name: Release - Start a new release
 on:
   workflow_dispatch:
@@ -27,6 +21,11 @@ on:
 
 env:
   VERSION: ${{ inputs.version }}
+
+# Pushes the line branch and the draft release's tag. The companion repos and
+# e2e are reached with their own tokens.
+permissions:
+  contents: write
 
 jobs:
   release_workflow:
@@ -46,7 +45,7 @@ jobs:
 
       # Full history is required so lerna can traverse the commit graph.
       - name: Checkout develop
-        uses: actions/checkout@v7
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           ref: develop
           fetch-depth: 0
