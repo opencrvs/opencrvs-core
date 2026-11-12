@@ -53,6 +53,7 @@ import {
 import {
   eventQueryDataGenerator,
   generateActionDocument,
+  generateEmptyTestValidatorContext,
   generateTranslationConfig,
   generateTestValidatorContext,
   withDeclaration
@@ -608,8 +609,7 @@ describe('omitHiddenPaginatedFields', () => {
     const declaration = fieldConfigsToActionPayload(fields, rng)
     const declarationWithoutHiddenFields = omitHiddenPaginatedFields(
       declarationConfig,
-      declaration,
-      {}
+      generateEmptyTestValidatorContext(declaration)
     )
 
     const missingKeys = difference(
@@ -638,8 +638,11 @@ describe('omitHiddenPaginatedFields', () => {
     const declaration = fieldConfigsToActionPayload(fields, rng)
     const declarationWithoutHiddenFields = omitHiddenPaginatedFields(
       declarationConfig,
-      { ...declaration, 'recommender.name': null, 'recommender.id': null },
-      {},
+      generateEmptyTestValidatorContext({
+        ...declaration,
+        'recommender.name': null,
+        'recommender.id': null
+      }),
       true
     )
 
@@ -694,7 +697,10 @@ describe('omitHiddenPaginatedFields', () => {
     }
 
     const values = { 'shared.field': 'value', toggle: 'false' }
-    const result = omitHiddenPaginatedFields(formConfig, values, {})
+    const result = omitHiddenPaginatedFields(
+      formConfig,
+      generateEmptyTestValidatorContext(values)
+    )
 
     expect(result).toMatchObject({ 'shared.field': 'value' })
   })
@@ -1130,12 +1136,20 @@ describe('getActionAnnotationFields() with dialog form', () => {
           }
         } satisfies EventState
       })
+      const { user, leafAdminStructureLocationIds = [] } =
+        generateTestValidatorContext()
+
+      if (!user) {
+        throw new Error('Test validator context has no user')
+      }
+
       expect(
-        dropSecuredDeclarationFields(
-          tennisClubMembershipEvent,
-          eventIndexWithSecuredData,
-          generateTestValidatorContext()
-        ).declaration
+        dropSecuredDeclarationFields(tennisClubMembershipEvent, {
+          user,
+          leafAdminStructureLocationIds,
+          eventIndex: eventIndexWithSecuredData,
+          form: eventIndexWithSecuredData.declaration
+        }).declaration
       ).toEqual({
         'applicant.name': {
           firstname: 'John',

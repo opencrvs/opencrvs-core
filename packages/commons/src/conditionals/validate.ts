@@ -31,7 +31,11 @@ import {
   AgeValue
 } from '../events/FieldValue'
 import { TranslationConfig } from '../events/TranslationConfig'
-import { EncodedScope, ITokenPayload, TokenUserType } from '../authentication'
+import {
+  EncodedScope,
+  ITokenPayload,
+  TokenUserType
+} from '../users/authentication'
 import { UUID } from '../uuid'
 import {
   ageToDate,
@@ -201,24 +205,31 @@ export function buildClientFunctionContext(input: {
 /**
  * Always available.
  */
-type BaseStrictValidatorContext = {
+type ValidatorContextForm = EventState | ActionUpdate
+
+type BaseStrictValidatorContext<T extends ValidatorContextForm> = {
   user: UserValidatorContext
   leafAdminStructureLocationIds: Array<{ id: UUID }>
   eventIndex: EventIndex
   /** Form you are currently editing. TODO: It seems that this should contain merge of declaration and annotation. */
-  form: EventState | ActionUpdate
+  form: T
 }
 
-export type StrictValidatorContextWithoutEventDocument =
+export type StrictValidatorContextWithoutEventDocument<
+  T extends ValidatorContextForm = ValidatorContextForm
+> =
   /** We know that search cannot use eventDocument, so let's start with that. */
-  BaseStrictValidatorContext & { eventDocument?: never }
+  BaseStrictValidatorContext<T> & { eventDocument?: never }
 
-export type StrictValidatorContextWithEventDocument =
-  BaseStrictValidatorContext & { eventDocument: EventDocument }
+export type StrictValidatorContextWithEventDocument<
+  T extends ValidatorContextForm = ValidatorContextForm
+> = BaseStrictValidatorContext<T> & { eventDocument: EventDocument }
 
-export type StrictValidatorContextV2 =
-  | StrictValidatorContextWithEventDocument
-  | StrictValidatorContextWithoutEventDocument
+export type StrictValidatorContextV2<
+  T extends ValidatorContextForm = ValidatorContextForm
+> =
+  | StrictValidatorContextWithEventDocument<T>
+  | StrictValidatorContextWithoutEventDocument<T>
 
 export type ConditionalParametersWithoutEvent = {
   $form: EventState | ActionUpdate

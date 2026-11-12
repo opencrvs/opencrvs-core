@@ -25,6 +25,7 @@ import {
 } from './ActionDocument'
 import {
   getEventValidatorContext,
+  StrictValidatorContextWithoutEventDocument,
   ValidatorContext
 } from '../conditionals/validate'
 import {
@@ -103,6 +104,23 @@ import { defineConfig } from './defineConfig'
 import { toNotificationForm } from './toNotificationForm'
 import { V2_DEFAULT_MOCK_ADMINISTRATIVE_AREAS_MAP } from './mocks.test.utils'
 
+/**
+ * @TODO: Placeholder context to generate test data without a stored event or a user.
+ * Before the strict context, these callers passed an empty context (`{}`).
+ * The user has no role and no scopes, so user conditionals are false, as before.
+ * We handle this case separately.
+ */
+export function generateEmptyTestValidatorContext<
+  T extends EventState | ActionUpdate
+>(form: T): StrictValidatorContextWithoutEventDocument<T> {
+  return {
+    user: { sub: '', scope: [], userType: TokenUserType.enum.user },
+    leafAdminStructureLocationIds: [],
+    // eslint-disable-next-line @typescript-eslint/no-use-before-define
+    eventIndex: eventQueryDataGenerator({ flags: [] }),
+    form
+  }
+}
 /**
  * IANA timezone used in testing. Used for queries that expect similar results independent of the users location (e.g. when event was registered.)
  * Since we query by range, providing UTC offset will result to different results when DST changes during the range.
@@ -414,11 +432,10 @@ export function generateActionDeclarationInput(
     // If this is not done, the mock data might contain hidden or disabled fields, which will cause validation errors
     return omitHiddenPaginatedFields(
       declarationConfig,
-      {
+      generateEmptyTestValidatorContext({
         ...declaration,
         ...overrides
-      },
-      {}, // Intentionally empty. Allow generating fields with custom conditionals.
+      }),
       true
     )
   }
@@ -460,8 +477,8 @@ function generateActionAnnotationInput(
 
   const visibleVerificationPageIds = getVisibleVerificationPageIds(
     findRecordActionPages(configuration, action),
-    annotation,
-    {}
+
+    generateEmptyTestValidatorContext(annotation)
   )
 
   const visiblePageVerificationMap = visibleVerificationPageIds.reduce(
@@ -474,8 +491,8 @@ function generateActionAnnotationInput(
 
   const fieldBasedPayload = omitHiddenFields(
     annotationFields,
-    annotation,
-    {} // Intentionally empty. Allow generating fields with custom conditionals.
+
+    generateEmptyTestValidatorContext(annotation)
   )
 
   return {

@@ -22,7 +22,8 @@ import {
   cloneDeep,
   orderBy,
   isEqual,
-  isEmpty
+  isEmpty,
+  pick
 } from 'lodash'
 import {
   ActionType,
@@ -49,7 +50,7 @@ import {
   isConditionMet,
   isFieldSecured,
   isFieldVisible,
-  ValidatorContext
+  StrictValidatorContextV2
 } from '../conditionals/validate'
 import { Draft } from './Draft'
 import { EventDocument } from './EventDocument'
@@ -112,7 +113,7 @@ export function getDeclarationFields(
  * Used to build the search index mapping: records of every version share one index per
  * event, so its mapping must hold the fields of all of them. Goes away once each version
  * gets its own index (#14335).
- * Known limitation: a field id must keep its type in every version until #14335.
+ * @TODO: reject a field id whose type differs between versions in `defineConfig` (#13973).
  */
 export function getDeclarationFieldsOfAllVersions(
   config: VersionedEventConfig
@@ -349,14 +350,13 @@ export function getActionReviewFields(
 
 export function isPageVisible(
   page: PageConfig,
-  formValues: ActionUpdate,
-  context: ValidatorContext
+  context: StrictValidatorContextV2
 ) {
   if (!page.conditional) {
     return true
   }
 
-  return isConditionMet(page.conditional, formValues, context)
+  return isConditionMet(page.conditional, context)
 }
 
 /**
@@ -367,18 +367,17 @@ export function isPageVisible(
  * values should not affect validation or submission.
  *
  * @template T - The type of the form values
- * @param {T} formValues - The current form values
  * @param {FieldConfig[]} fields - The list of field configurations to check visibility against
- * * @param validatorContext - custom validation context
+ * @param validatorContext - custom validation context. `validatorContext.form` holds the current form values.
  * @returns {Partial<T>} A new object containing only the values for visible fields
  */
 export function omitHiddenFields<T extends EventState | ActionUpdate>(
   fields: FieldConfig[],
-  formValues: T,
-  validatorContext: ValidatorContext,
+  // @TODO: decide whether T is handled within validator context
+  validatorContext: StrictValidatorContextV2 & { form: T },
   includeHiddenFieldsWithNullValues: boolean = false
 ): Partial<T> {
-  const base = cloneDeep(formValues)
+  const base = cloneDeep(validatorContext.form)
 
   // The omitting is done recursively until the object does not change.
   // This is because the previously removed fields might affect the visibility of other fields.
@@ -391,7 +390,11 @@ export function omitHiddenFields<T extends EventState | ActionUpdate>(
       }
 
       const isHidden = fieldConfig.every(
-        (f) => !isFieldVisible(f, prevVisibilityContext, validatorContext)
+        (f) =>
+          !isFieldVisible(f, {
+            ...validatorContext,
+            form: prevVisibilityContext
+          })
       )
 
       if (!isHidden) {
@@ -413,20 +416,22 @@ export function omitHiddenFields<T extends EventState | ActionUpdate>(
 
 export function omitHiddenPaginatedFields<T extends EventState | ActionUpdate>(
   formConfig: FormConfig,
-  values: T,
-  validatorContext: ValidatorContext,
+  // @TODO: decide whether T is handled within validator context
+  validatorContext: StrictValidatorContextV2 & { form: T },
   includeHiddenFieldsWithNullValues: boolean = false
 ) {
+  // @TODO: partition
   const visibleFields = formConfig.pages
-    .filter((p) => isPageVisible(p, values, validatorContext))
+    .filter((p) => isPageVisible(p, validatorContext))
     .flatMap((p) => p.fields)
 
   const hiddenFields = formConfig.pages
-    .filter((p) => !isPageVisible(p, values, validatorContext))
+    .filter((p) => !isPageVisible(p, validatorContext))
     .flatMap((p) => p.fields)
 
-  const valuesExceptHiddenPage = omitBy(values, (_, fieldId) => {
+  const valuesExceptHiddenPage = omitBy(validatorContext.form, (_, fieldId) => {
     return (
+      // @TODO: clean up conditition.
       hiddenFields.some((f) => f.id === fieldId) &&
       !visibleFields.some((f) => f.id === fieldId)
     )
@@ -434,8 +439,8 @@ export function omitHiddenPaginatedFields<T extends EventState | ActionUpdate>(
 
   return omitHiddenFields(
     visibleFields,
-    valuesExceptHiddenPage,
-    validatorContext,
+    // Context needs to change, because hidden fields would otherwise assume full page hides are visible.
+    { ...validatorContext, form: valuesExceptHiddenPage },
     includeHiddenFieldsWithNullValues
   )
 }
@@ -496,27 +501,31 @@ export function isVerificationPage(
 
 export function getVisibleVerificationPageIds(
   pages: PageConfig[],
-  annotation: ActionUpdate,
-  context: ValidatorContext
+  context: StrictValidatorContextV2
 ): string[] {
   return pages
     .filter((page) => isVerificationPage(page))
-    .filter((page) => isPageVisible(page, annotation, context))
+    .filter((page) => isPageVisible(page, context))
     .map((page) => page.id)
 }
 
 export function omitHiddenAnnotationFields(
   actionConfig: ActionConfig,
+  // @TODO: since FORM assumes that declaration and annotation are merged together, clean these up.
   declaration: EventState,
   annotation: ActionUpdate,
-  context: ValidatorContext
+  context: StrictValidatorContextV2
 ) {
   const annotationFields = getActionAnnotationFields(actionConfig)
 
-  return omitHiddenFields(annotationFields, annotation, {
+  // Annotation conditionals can read declaration values, so visibility is evaluated
+  // against the declaration and the annotation together. Only annotation values are returned.
+  const visibleValues = omitHiddenFields(annotationFields, {
     ...context,
-    baseFormState: declaration
+    form: { ...declaration, ...annotation }
   })
+
+  return pick(visibleValues, Object.keys(annotation)) as Partial<ActionUpdate>
 }
 
 /**
@@ -1172,14 +1181,14 @@ export function aggregateActionAnnotations(event: EventDocument): EventState {
  */
 export function dropSecuredDeclarationFields(
   eventConfig: EventConfig,
-  eventIndex: EventIndex,
-  validatorContext: ValidatorContext
+  validatorContext: StrictValidatorContextV2
 ): EventIndex {
+  const { eventIndex } = validatorContext
   const declarationFields = getDeclarationFields(eventConfig)
   const securedFieldIds = new Set(
     declarationFields
       .filter((declarationField) =>
-        isFieldSecured(declarationField, eventIndex, validatorContext)
+        isFieldSecured(declarationField, validatorContext)
       )
       .map((declarationField) => declarationField.id)
   )
