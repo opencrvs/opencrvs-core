@@ -8,8 +8,10 @@
 
 ### Breaking changes
 
-- The gateway's `GET /presigned-url/{filePath*}` route is removed. Use `event.files.presign({ eventId })` or `user.files.presign({ userIds })`, which return presigned URLs keyed by the stored path.
+- The gateway's `GET /presigned-url/{filePath*}` route is removed. Use `event.files.presign({ eventId })` for a record's files, or `user.files.presign({ userIds })` (users only) for avatars and signatures. Both return presigned URLs keyed by the stored path.
 - Upload record attachments with `path: events/{eventId}/`.
+- Actions and drafts may only name files stored under their record's `events/{eventId}/`, or files the record already names. Imported records may also name pre-2.0 keys and their author's own signature. Any other file is rejected with `400`.
+- `user.create`, `user.update` and `user.changeAvatar` only accept a signature or avatar stored under the user's own `users/` path.
 
 ## 2.0.6
 
