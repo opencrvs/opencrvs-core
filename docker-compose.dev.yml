@@ -12,17 +12,21 @@ services:
     volumes:
       - ".secrets/public-key.pem:/secrets/public-key.pem"
       - ".secrets/private-key.pem:/secrets/private-key.pem"
+      - ".secrets/core-request-signing-key.pem:/secrets/core-request-signing-key.pem"
     environment:
       - CERT_PUBLIC_KEY_PATH=/secrets/public-key.pem
       - CERT_PRIVATE_KEY_PATH=/secrets/private-key.pem
+      - CORE_REQUEST_SIGNING_KEY_PATH=/secrets/core-request-signing-key.pem
     ports:
       - "4040:4040"
 
   events:
     volumes:
       - ".secrets/public-key.pem:/secrets/public-key.pem"
+      - ".secrets/core-request-signing-key.pem:/secrets/core-request-signing-key.pem"
     environment:
       - CERT_PUBLIC_KEY_PATH=/secrets/public-key.pem
+      - CORE_REQUEST_SIGNING_KEY_PATH=/secrets/core-request-signing-key.pem
     ports:
       - "5555:5555"
 

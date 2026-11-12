@@ -8,6 +8,9 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
+import { generateKeyPairSync } from 'crypto'
+import { mkdtempSync, writeFileSync } from 'fs'
+import { tmpdir } from 'os'
 import { join } from 'path'
 import fetch from 'jest-fetch-mock'
 
@@ -48,3 +51,17 @@ jest.setMock('src/database', mock)
 
 process.env.CERT_PRIVATE_KEY_PATH = join(__dirname, './cert.key')
 process.env.CERT_PUBLIC_KEY_PATH = join(__dirname, './cert.key.pub')
+
+// A throwaway request-signing key, so no private key is committed for tests.
+const requestSigningKeyPath = join(
+  mkdtempSync(join(tmpdir(), 'auth-test-')),
+  'core-request-signing.pem'
+)
+writeFileSync(
+  requestSigningKeyPath,
+  generateKeyPairSync('ed25519').privateKey.export({
+    format: 'pem',
+    type: 'pkcs8'
+  })
+)
+process.env.CORE_REQUEST_SIGNING_KEY_PATH = requestSigningKeyPath
