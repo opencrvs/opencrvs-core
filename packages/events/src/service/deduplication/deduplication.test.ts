@@ -22,7 +22,7 @@ import { ChildOnboardingEvent } from '@opencrvs/commons/fixtures'
 import { field, and, or, not } from '@opencrvs/commons/events/deduplication'
 import { getOrCreateClient } from '@events/storage/elasticsearch'
 import { getEventIndexName } from '@events/storage/__mocks__/elasticsearch'
-import { encodeEventIndex } from '@events/service/indexing/utils'
+import { encodeEventIndex, encodeFieldId } from '@events/service/indexing/utils'
 import { createIndex } from '../indexing/indexing'
 import {
   generateElasticsearchQuery,
@@ -381,6 +381,54 @@ describe('deduplication tests', () => {
     )
     expect(matchResultForEventWithSameId).toHaveLength(0)
   })
+  it('finds a duplicate that has a field the config of the new record does not have', async () => {
+    // e.g. a record of another version, with a field that the new version removed
+    const esClient = getOrCreateClient()
+
+    const declarationOverrides = {
+      'child.name': { firstname: 'John', surname: 'Smith' },
+      'child.dob': '2011-11-11',
+      'mother.name': { firstname: 'Mother', surname: 'Smith' },
+      'mother.dob': '2000-11-11',
+      'mother.nid': '23412387'
+    }
+
+    const existing = eventQueryDataGenerator(
+      { declaration: declarationOverrides },
+      73
+    )
+    const encoded = encodeEventIndex(existing, ChildOnboardingEvent)
+
+    await esClient.update({
+      index: getEventIndexName(ChildOnboardingEvent.id),
+      id: existing.id,
+      body: {
+        doc: {
+          ...encoded,
+          declaration: {
+            ...encoded.declaration,
+            [encodeFieldId('mother.maritalStatus')]: 'MARRIED'
+          }
+        },
+        doc_as_upsert: true
+      },
+      refresh: 'wait_for'
+    })
+
+    const newRecord = eventQueryDataGenerator(
+      { declaration: declarationOverrides, type: ChildOnboardingEvent.id },
+      37
+    )
+
+    const matches = await searchForDuplicates(
+      newRecord,
+      DeduplicationConfig.parse(LEGACY_BIRTH_DEDUPLICATION_RULES),
+      ChildOnboardingEvent
+    )
+    expect(matches).toHaveLength(1)
+    expect(matches[0].event.declaration['mother.maritalStatus']).toBe('MARRIED')
+  })
+
   it('finds a duplicate with very similar details', async () => {
     await expect(
       findDuplicates({
