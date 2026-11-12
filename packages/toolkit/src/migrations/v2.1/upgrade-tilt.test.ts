@@ -140,6 +140,20 @@ describe('upgradeTilt', () => {
     )
   })
 
+  it('creates tilt/custom.tilt when missing', () => {
+    upgradeTilt(cwd, TEMPLATE_DIR)
+
+    expect(read('tilt/custom.tilt')).toBe(template('tilt/custom.tilt'))
+  })
+
+  it('never overwrites an existing tilt/custom.tilt', () => {
+    write('tilt/custom.tilt', '# country specific\n')
+
+    upgradeTilt(cwd, TEMPLATE_DIR)
+
+    expect(read('tilt/custom.tilt')).toBe('# country specific\n')
+  })
+
   it('leaves files the template does not have in place and warns about them', () => {
     write('tilt/examples/opencrvs-services/values.override.yaml', 'a: 1\n')
 

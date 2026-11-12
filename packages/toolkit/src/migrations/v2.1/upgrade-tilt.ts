@@ -22,8 +22,9 @@
  *      `countryconfig_image_name`.
  *   2. Replaces every file under `tilt/` that core owns (the helpers and
  *      `tilt/examples/`) with the template's.
- *   3. Creates `tilt/helm/<chart>/values.yaml` when missing. These hold the
- *      country's own overrides and are never overwritten.
+ *   3. Creates `tilt/helm/<chart>/values.yaml` and `tilt/custom.tilt` when
+ *      missing. These hold the country's own overrides and customisation
+ *      (the Tiltfile includes `tilt/custom.tilt`) and are never overwritten.
  *   4. Adds `.opencrvs-core-charts/` (the Tiltfile's charts checkout) to
  *      `.tiltignore` and `.gitignore`.
  *
@@ -48,8 +49,14 @@ import {
 import path from 'path'
 import { findTemplateDir, listFiles } from './template-files'
 
-/** Paths under `tilt/` the country owns: created when missing, never replaced. */
+/** Directories under `tilt/` the country owns: files are created when missing, never replaced. */
 const COUNTRY_OWNED_DIR = 'tilt/helm/'
+
+/** Single files under `tilt/` the country owns: created when missing, never replaced. */
+const COUNTRY_OWNED_FILES = ['tilt/custom.tilt']
+
+const isCountryOwned = (file: string) =>
+  file.startsWith(COUNTRY_OWNED_DIR) || COUNTRY_OWNED_FILES.includes(file)
 
 const CHARTS_CHECKOUT_DIR = '.opencrvs-core-charts'
 
@@ -147,9 +154,8 @@ export function upgradeTilt(cwd: string, templateDir: string) {
 
   for (const file of templateFiles) {
     const source = path.join(templateDir, file)
-    const countryOwned = file.startsWith(COUNTRY_OWNED_DIR)
 
-    if (countryOwned && existsSync(path.join(cwd, file))) {
+    if (isCountryOwned(file) && existsSync(path.join(cwd, file))) {
       continue
     }
 
@@ -165,8 +171,7 @@ export function upgradeTilt(cwd: string, templateDir: string) {
   }
 
   const unknownFiles = listFiles(cwd, 'tilt').filter(
-    (file) =>
-      !file.startsWith(COUNTRY_OWNED_DIR) && !templateFiles.includes(file)
+    (file) => !isCountryOwned(file) && !templateFiles.includes(file)
   )
 
   for (const file of unknownFiles) {
