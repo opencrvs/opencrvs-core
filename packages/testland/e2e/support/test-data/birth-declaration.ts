@@ -27,7 +27,7 @@ import {
 import { getSignatureFile, uploadFile } from './utils'
 import { dateToIsoDateString, randomPastDate } from '@e2e/support/helpers'
 
-type InformantRelation = 'MOTHER' | 'BROTHER'
+type InformantRelation = 'MOTHER' | 'LEGAL_GUARDIAN'
 
 function getInformantDetails(
   informantRelation: InformantRelation,

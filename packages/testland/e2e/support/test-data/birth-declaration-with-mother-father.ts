@@ -26,7 +26,7 @@ import {
 import { getSignatureFile, uploadFile } from './utils'
 import { subYears, format } from 'date-fns'
 
-type InformantRelation = 'MOTHER' | 'BROTHER'
+type InformantRelation = 'MOTHER' | 'LEGAL_GUARDIAN'
 
 function getInformantDetails(informantRelation: InformantRelation) {
   if (informantRelation === 'MOTHER') {
@@ -121,7 +121,6 @@ async function getDeclaration({
     'mother.nationality': 'FAR',
     'mother.idType': 'NATIONAL_ID',
     'mother.educationalAttainment': 'NO_SCHOOLING',
-    'mother.maritalStatus': 'MARRIED',
     'mother.nid': faker.string.numeric(10),
     'mother.address': {
       country: 'FAR',
@@ -154,7 +153,6 @@ async function getDeclaration({
         'father.idType': 'NATIONAL_ID',
         'father.nid': faker.string.numeric(10),
         'father.nationality': 'FAR',
-        'father.maritalStatus': 'SINGLE',
         'father.educationalAttainment': 'NONE',
         'father.occupation': 'Unemployed',
         ...(partialDeclaration['father.addressSameAs'] === 'NO' && {

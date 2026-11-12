@@ -66,7 +66,7 @@ test('Correct record - Change ages', async ({ page }) => {
       .split('T')[0]
 
     const payload = {
-      'informant.relation': 'BROTHER',
+      'informant.relation': 'LEGAL_GUARDIAN',
       'informant.email': 'brothers@email.com',
       'informant.name': {
         firstname: faker.person.firstName(),

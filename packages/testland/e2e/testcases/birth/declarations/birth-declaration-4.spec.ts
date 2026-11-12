@@ -94,7 +94,6 @@ test('4. Birth declaration case - 4', async ({ page }) => {
         addressLine3: faker.location.buildingNumber(),
         postcodeOrZip: faker.location.zipCode()
       },
-      maritalStatus: 'Divorced',
       levelOfEducation: 'Tertiary'
     },
     father: {
@@ -107,7 +106,6 @@ test('4. Birth declaration case - 4', async ({ page }) => {
       identifier: {
         type: 'None'
       },
-      maritalStatus: 'Divorced',
       levelOfEducation: 'Tertiary',
       address: {
         sameAsMother: false,
@@ -305,11 +303,6 @@ test('4. Birth declaration case - 4', async ({ page }) => {
         .locator('#postcodeOrZip')
         .fill(declaration.mother.address.postcodeOrZip)
 
-      await page.locator('#mother____maritalStatus').click()
-      await page
-        .getByText(declaration.mother.maritalStatus, { exact: true })
-        .click()
-
       await page.locator('#mother____educationalAttainment').click()
       await page
         .getByText(declaration.mother.levelOfEducation, { exact: true })
@@ -355,11 +348,6 @@ test('4. Birth declaration case - 4', async ({ page }) => {
       await page
         .locator('#postcodeOrZip')
         .fill(declaration.father.address.postcodeOrZip)
-
-      await page.locator('#father____maritalStatus').click()
-      await page
-        .getByText(declaration.father.maritalStatus, { exact: true })
-        .click()
 
       await page.locator('#father____educationalAttainment').click()
       await page
@@ -528,14 +516,6 @@ test('4. Birth declaration case - 4', async ({ page }) => {
 
       /*
        * Expected result: should include
-       * - Mother's Marital status
-       */
-      await expect(page.getByTestId('mother.maritalStatus-value')).toHaveText(
-        declaration.mother.maritalStatus
-      )
-
-      /*
-       * Expected result: should include
        * - Mother's level of education
        */
       await expect(
@@ -594,14 +574,6 @@ test('4. Birth declaration case - 4', async ({ page }) => {
        */
       await expect(page.getByTestId('father.idType-value')).toHaveText(
         declaration.father.identifier.type
-      )
-
-      /*
-       * Expected result: should include
-       * - Father's Marital status
-       */
-      await expect(page.getByTestId('father.maritalStatus-value')).toHaveText(
-        declaration.father.maritalStatus
       )
 
       /*
@@ -807,14 +779,6 @@ test('4. Birth declaration case - 4', async ({ page }) => {
 
       /*
        * Expected result: should include
-       * - Mother's Marital status
-       */
-      await expect(page.getByTestId('mother.maritalStatus-value')).toHaveText(
-        declaration.mother.maritalStatus
-      )
-
-      /*
-       * Expected result: should include
        * - Mother's level of education
        */
       await expect(
@@ -873,14 +837,6 @@ test('4. Birth declaration case - 4', async ({ page }) => {
        */
       await expect(page.getByTestId('father.idType-value')).toHaveText(
         declaration.father.identifier.type
-      )
-
-      /*
-       * Expected result: should include
-       * - Father's Marital status
-       */
-      await expect(page.getByTestId('father.maritalStatus-value')).toHaveText(
-        declaration.father.maritalStatus
       )
 
       /*

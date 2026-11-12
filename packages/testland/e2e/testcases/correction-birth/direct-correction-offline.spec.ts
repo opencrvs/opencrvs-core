@@ -65,7 +65,6 @@ test('Direct correction offline', async ({ page }) => {
         'mother.nationality': 'FAR',
         'mother.idType': 'NATIONAL_ID',
         'mother.nid': faker.string.numeric(10),
-        'mother.maritalStatus': 'SINGLE',
         'mother.educationalAttainment': 'NO_SCHOOLING',
         'mother.occupation': 'Housewife',
         'mother.previousBirths': 0,
@@ -78,7 +77,6 @@ test('Direct correction offline', async ({ page }) => {
         'father.idType': 'NATIONAL_ID',
         'father.nid': faker.string.numeric(10),
         'father.nationality': 'FAR',
-        'father.maritalStatus': 'SINGLE',
         'father.educationalAttainment': 'NO_SCHOOLING',
         'father.occupation': 'Unemployed',
         'father.addressSameAs': 'YES'

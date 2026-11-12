@@ -111,7 +111,12 @@ test('Basic Archival flow', async ({ page }) => {
     const options = await page
       .locator('#action-Dropdown-Content li')
       .allTextContents()
-    expect(options).toStrictEqual(['Assign', 'Escalate', 'Unarchive'])
+    expect(options).toStrictEqual([
+      'Assign',
+      'Escalate',
+      'Unarchive',
+      'v2 only action'
+    ])
   })
 })
 
@@ -243,7 +248,12 @@ test('Archival of rejected declaration', async ({ page }) => {
     const options = await page
       .locator('#action-Dropdown-Content li')
       .allTextContents()
-    expect(options).toStrictEqual(['Assign', 'Escalate', 'Unarchive'])
+    expect(options).toStrictEqual([
+      'Assign',
+      'Escalate',
+      'Unarchive',
+      'v2 only action'
+    ])
   })
 })
 

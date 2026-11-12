@@ -127,7 +127,7 @@ async function getDeclaration({
       .toISOString()
       .split('T')[0], // yesterday
     ...(await getPlaceOfBirth(placeOfBirthType, token)),
-    'informant.relation': 'BROTHER',
+    'informant.relation': 'LEGAL_GUARDIAN',
     'informant.email': 'brothers@email.com',
     'informant.name': {
       firstname: faker.person.firstName(),
