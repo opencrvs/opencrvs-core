@@ -175,7 +175,7 @@ test('Correct record - 2', async ({ page }) => {
       )
 
       await page.locator('#informant____relation').click()
-      await page.getByText('Brother', { exact: true }).click()
+      await page.getByText('Legal guardian', { exact: true }).click()
 
       await page.waitForTimeout(SAFE_INPUT_CHANGE_TIMEOUT_MS)
 
@@ -209,7 +209,7 @@ test('Correct record - 2', async ({ page }) => {
       ).toHaveText('Mother')
 
       await expect(page.getByTestId('informant.relation-value')).toContainText(
-        'Brother'
+        'Legal guardian'
       )
     })
 
@@ -269,7 +269,7 @@ test('Correct record - 2', async ({ page }) => {
     ).toBeVisible()
 
     await expect(
-      page.getByText('Relationship to child' + 'Mother' + 'Brother')
+      page.getByText('Relationship to child' + 'Mother' + 'Legal guardian')
     ).toBeVisible()
 
     const correctionRequest = page.waitForResponse(
@@ -316,7 +316,7 @@ test('Correct record - 2', async ({ page }) => {
       await expect(
         page
           .locator('#listTable-corrections-table-informant')
-          .getByText('Relationship to child' + 'Mother' + 'Brother')
+          .getByText('Relationship to child' + 'Mother' + 'Legal guardian')
       ).toBeVisible()
 
       await expect(
@@ -408,7 +408,7 @@ test('Correct record - 2', async ({ page }) => {
         ).toBeVisible()
 
         await expect(
-          page.getByText('Relationship to child' + 'Mother' + 'Brother')
+          page.getByText('Relationship to child' + 'Mother' + 'Legal guardian')
         ).toBeVisible()
 
         await expect(

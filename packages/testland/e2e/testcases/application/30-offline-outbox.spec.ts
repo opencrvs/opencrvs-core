@@ -171,11 +171,6 @@ test('30: Validate user can send multiple complete and incomplete records offlin
         .locator('#zipCode')
         .fill(declaration.mother.address.postcodeOrZip)
 
-      await page.locator('#mother____maritalStatus').click()
-      await page
-        .getByText(declaration.mother.maritalStatus, { exact: true })
-        .click()
-
       await page.locator('#mother____educationalAttainment').click()
       await page
         .getByText(declaration.mother.levelOfEducation, { exact: true })
@@ -205,11 +200,6 @@ test('30: Validate user can send multiple complete and incomplete records offlin
         .click()
 
       await page.locator('#father____addressSameAs_YES').click()
-
-      await page.locator('#father____maritalStatus').click()
-      await page
-        .getByText(declaration.father.maritalStatus, { exact: true })
-        .click()
 
       await page.locator('#father____educationalAttainment').click()
       await page

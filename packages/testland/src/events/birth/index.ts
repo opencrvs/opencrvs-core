@@ -15,6 +15,8 @@ import {
   defineConfig,
   DocumentMimeType,
   event,
+  EventConfigVersionInput,
+  TranslationConfig,
   EventStatus,
   field,
   FieldType,
@@ -27,30 +29,97 @@ import {
   user
 } from '@opencrvs/toolkit/events'
 import {
-  BIRTH_DECLARATION_FORM,
-  BIRTH_DECLARATION_REVIEW
+  birthDeclarationForm,
+  birthDeclarationReview
 } from './forms/declaration'
 import { advancedSearchBirth } from './advancedSearch'
 
 import { BIRTH_CERTIFICATE_COLLECTOR_FORM } from './forms/printForm'
-import { PlaceOfBirth } from './forms/pages/child'
-import { CORRECTION_FORM } from './forms/correctionForm'
-import { BIRTH_NOTIFICATION_FORM } from './forms/notificationForm'
+import { PlaceOfBirth, TypeOfBirth } from './forms/pages/child'
+import { birthCorrectionForm } from './forms/correctionForm'
+import { birthNotificationForm } from './forms/notificationForm'
 import { dedupConfig } from './dedupConfig'
 import * as verifiableCredentialActions from '@countryconfig/verifiable-credentials/issue-birth-credential-action'
 import {
   Event,
   BIRTH_LATE_REGISTRATION_TARGET_DAYS
 } from '@countryconfig/events/utils'
+import { BIRTH_V2_EFFECTIVE_FROM, BirthVersion } from './versions'
 
-export const birthEvent = defineConfig({
-  id: Event.Birth,
-  declaration: BIRTH_DECLARATION_FORM,
+type CustomActionInput = Extract<
+  EventConfigVersionInput['actions'][number],
+  { type: typeof ActionType.CUSTOM }
+>
+
+/*
+ * Custom actions that only one version has, so that we can check that a record
+ * offers the actions of its own version only. They have no form.
+ */
+const INITIAL_ONLY_ACTION: CustomActionInput = {
+  type: ActionType.CUSTOM,
+  customActionType: 'INITIAL_ONLY_ACTION',
   label: {
-    defaultMessage: 'Birth',
-    description: 'This is what this event is referred as in the system',
-    id: 'event.birth.label'
+    defaultMessage: 'Initial only action',
+    description:
+      "Label of a custom action that only version 'initial' of the birth event has",
+    id: 'event.birth.custom.action.initial-only-action.label'
   },
+  auditHistoryLabel: {
+    defaultMessage: 'Initial only action',
+    description:
+      "Audit history label of a custom action that only version 'initial' of the birth event has",
+    id: 'event.birth.custom.action.initial-only-action.audit-history-label'
+  },
+  form: []
+}
+
+const V2_ONLY_ACTION: CustomActionInput = {
+  type: ActionType.CUSTOM,
+  customActionType: 'V2_ONLY_ACTION',
+  label: {
+    defaultMessage: 'V2 only action',
+    description:
+      "Label of a custom action that only version 'v2' of the birth event has",
+    id: 'event.birth.custom.action.v2-only-action.label'
+  },
+  auditHistoryLabel: {
+    defaultMessage: 'V2 only action',
+    description:
+      "Audit history label of a custom action that only version 'v2' of the birth event has",
+    id: 'event.birth.custom.action.v2-only-action.audit-history-label'
+  },
+  form: [],
+  // The action shows only for a multiple birth. 'child.birthType' is a field
+  // that only version 'v2' has, so QA can check that an action can depend on
+  // a field of its own version.
+  conditionals: [
+    {
+      type: ConditionalType.SHOW,
+      conditional: and(
+        not(field('child.birthType').isFalsy()),
+        not(field('child.birthType').isEqualTo(TypeOfBirth.SINGLE))
+      )
+    }
+  ]
+}
+
+interface BirthVersionInput {
+  id: BirthVersion
+  label: TranslationConfig
+  effectiveFrom?: string
+  /** Custom actions that only this version has */
+  versionActions: CustomActionInput[]
+}
+
+const birthVersion = ({
+  id,
+  label,
+  effectiveFrom,
+  versionActions
+}: BirthVersionInput): EventConfigVersionInput => ({
+  id,
+  label,
+  effectiveFrom,
   dateOfEvent: field('child.dob'),
   placeOfEvent: field('child.birthLocationId'),
   title: {
@@ -371,7 +440,8 @@ export const birthEvent = defineConfig({
     'SEAL',
     'UNSEAL',
     // Also orders the custom revoke, which no role can perform any more
-    'REVOKE_REGISTRATION'
+    'REVOKE_REGISTRATION',
+    ...versionActions.map(({ customActionType }) => customActionType)
   ],
   actions: [
     {
@@ -382,7 +452,7 @@ export const birthEvent = defineConfig({
           'This is shown as the action name anywhere the user can trigger the action from',
         id: 'event.birth.action.Read.label'
       },
-      review: BIRTH_DECLARATION_REVIEW
+      review: birthDeclarationReview(id)
     },
     {
       type: ActionType.NOTIFY,
@@ -392,7 +462,7 @@ export const birthEvent = defineConfig({
           'This is shown as the action name anywhere the user can trigger the action from',
         id: 'event.birth.action.notify.label'
       },
-      notificationForm: BIRTH_NOTIFICATION_FORM,
+      notificationForm: birthNotificationForm(id),
       review: {
         title: {
           defaultMessage:
@@ -418,6 +488,7 @@ export const birthEvent = defineConfig({
     },
     {
       type: ActionType.DECLARE,
+      declaration: birthDeclarationForm(id),
       label: {
         defaultMessage: 'Declare',
         description:
@@ -436,7 +507,7 @@ export const birthEvent = defineConfig({
           }
         }
       ],
-      review: BIRTH_DECLARATION_REVIEW,
+      review: birthDeclarationReview(id),
       deduplication: {
         id: 'birth-deduplication',
         label: {
@@ -502,7 +573,10 @@ export const birthEvent = defineConfig({
       },
       flags: [
         { id: 'validated', operation: 'remove' },
-        { id: 'approval-required-for-late-registration', operation: 'remove' },
+        {
+          id: 'approval-required-for-late-registration',
+          operation: 'remove'
+        },
         {
           id: 'escalated-to-provincial-registrar',
           operation: 'remove',
@@ -1248,7 +1322,7 @@ export const birthEvent = defineConfig({
       conditionals: [
         { type: ConditionalType.SHOW, conditional: not(flag('revoked')) }
       ],
-      correctionForm: CORRECTION_FORM
+      correctionForm: birthCorrectionForm(id)
     },
     {
       type: ActionType.REJECT_CORRECTION,
@@ -1458,7 +1532,40 @@ export const birthEvent = defineConfig({
           conditional: flag('sealed')
         }
       ]
-    }
-  ],
-  advancedSearch: advancedSearchBirth
+    },
+    ...versionActions
+  ]
+})
+
+export const birthEvent = defineConfig({
+  id: Event.Birth,
+  label: {
+    defaultMessage: 'Birth',
+    description: 'This is what this event is referred as in the system',
+    id: 'event.birth.label'
+  },
+  advancedSearch: advancedSearchBirth,
+  versions: [
+    birthVersion({
+      id: BirthVersion.INITIAL,
+      label: {
+        defaultMessage: 'Initial',
+        description:
+          'Name of the birth form version that was in use before 1 September 2026',
+        id: 'event.birth.version.initial.label'
+      },
+      versionActions: [INITIAL_ONLY_ACTION]
+    }),
+    birthVersion({
+      id: BirthVersion.V2,
+      label: {
+        defaultMessage: 'V2',
+        description:
+          'Name of the birth form version that is in use from 1 September 2026',
+        id: 'event.birth.version.v2.label'
+      },
+      effectiveFrom: BIRTH_V2_EFFECTIVE_FROM,
+      versionActions: [V2_ONLY_ACTION]
+    })
+  ]
 })

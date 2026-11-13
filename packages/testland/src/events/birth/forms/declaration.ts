@@ -21,90 +21,106 @@ import {
   user
 } from '@opencrvs/toolkit/events'
 import { securePageWhileSealed } from '@countryconfig/events/utils'
-import { child } from './pages/child'
-import { informant } from './pages/informant'
-import { introduction } from './pages/introduction'
-import { mother } from './pages/mother'
-import { father } from './pages/father'
+import { childPage } from './pages/child'
+import { informantPage } from './pages/informant'
+import { introductionPage } from './pages/introduction'
+import { motherPage } from './pages/mother'
+import { fatherPage } from './pages/father'
 import { documents } from './pages/documents'
+import { BirthVersion } from '../versions'
 
-export const BIRTH_DECLARATION_REVIEW = {
-  title: {
-    id: 'event.birth.action.declare.form.review.title',
-    defaultMessage:
-      '{child.name.firstname, select, __EMPTY__ {Birth declaration} other {{child.name.surname, select, __EMPTY__ {Birth declaration for {child.name.firstname}} other {Birth declaration for {child.name.firstname} {child.name.surname}}}}}',
-    description: 'Title of the form to show in review page'
-  },
-  fields: [
-    {
-      id: 'review.print',
-      type: FieldType.ALPHA_PRINT_BUTTON,
-      label: {
-        defaultMessage: 'Print certificate in advance of registration',
-        id: 'event.birth.action.declare.form.review.print.label',
-        description: 'Label for the print button in the review section'
-      },
-      configuration: {
-        template: 'v2.birth-certified-certificate',
-        buttonLabel: {
+/** The review page of the birth declaration. Only version `v2` asks for the signature of the informant. */
+export function birthDeclarationReview(version: BirthVersion) {
+  return {
+    title: {
+      id: 'event.birth.action.declare.form.review.title',
+      defaultMessage:
+        '{child.name.firstname, select, __EMPTY__ {Birth declaration} other {{child.name.surname, select, __EMPTY__ {Birth declaration for {child.name.firstname}} other {Birth declaration for {child.name.firstname} {child.name.surname}}}}}',
+      description: 'Title of the form to show in review page'
+    },
+    fields: [
+      {
+        id: 'review.print',
+        type: FieldType.ALPHA_PRINT_BUTTON,
+        label: {
           defaultMessage: 'Print certificate in advance of registration',
-          description: "Print button's label",
-          id: 'event.birth.action.declare.form.review.print.label'
-        }
+          id: 'event.birth.action.declare.form.review.print.label',
+          description: 'Label for the print button in the review section'
+        },
+        configuration: {
+          template: 'v2.birth-certified-certificate',
+          buttonLabel: {
+            defaultMessage: 'Print certificate in advance of registration',
+            description: "Print button's label",
+            id: 'event.birth.action.declare.form.review.print.label'
+          }
+        },
+        conditionals: [
+          {
+            type: ConditionalType.SHOW,
+            conditional: and(
+              or(
+                user.hasRole('LOCAL_REGISTRAR'),
+                user.hasRole('PROVINCIAL_REGISTRAR'),
+                user.hasRole('NATIONAL_REGISTRAR')
+              ),
+              not(event.hasAction(ActionType.DECLARE)),
+              not(event.hasAction(ActionType.NOTIFY))
+            )
+          }
+        ]
       },
-      conditionals: [
-        {
-          type: ConditionalType.SHOW,
-          conditional: and(
-            or(
-              user.hasRole('LOCAL_REGISTRAR'),
-              user.hasRole('PROVINCIAL_REGISTRAR'),
-              user.hasRole('NATIONAL_REGISTRAR')
-            ),
-            not(event.hasAction(ActionType.DECLARE)),
-            not(event.hasAction(ActionType.NOTIFY))
-          )
-        }
-      ]
-    },
-    {
-      id: 'review.comment',
-      type: FieldType.TEXTAREA,
-      label: {
-        defaultMessage: 'Comment',
-        id: 'event.birth.action.declare.form.review.comment.label',
-        description: 'Label for the comment field in the review section'
+      {
+        id: 'review.comment',
+        type: FieldType.TEXTAREA,
+        label: {
+          defaultMessage: 'Comment',
+          id: 'event.birth.action.declare.form.review.comment.label',
+          description: 'Label for the comment field in the review section'
+        },
+        required: true
       },
-      required: true
-    },
-    {
-      type: FieldType.SIGNATURE,
-      id: 'review.signature',
-      required: true,
-      label: {
-        defaultMessage: 'Signature of informant',
-        id: 'event.birth.action.declare.form.review.signature.label',
-        description: 'Label for the signature field in the review section'
-      },
-      signaturePromptLabel: {
-        id: 'signature.upload.modal.title',
-        defaultMessage: 'Draw signature',
-        description: 'Title for the modal to draw signature'
-      }
-    }
-  ]
+      ...(version === BirthVersion.V2
+        ? [
+            {
+              type: FieldType.SIGNATURE,
+              id: 'review.signature',
+              required: true,
+              label: {
+                defaultMessage: 'Signature of informant',
+                id: 'event.birth.action.declare.form.review.signature.label',
+                description:
+                  'Label for the signature field in the review section'
+              },
+              signaturePromptLabel: {
+                id: 'signature.upload.modal.title',
+                defaultMessage: 'Draw signature',
+                description: 'Title for the modal to draw signature'
+              }
+            }
+          ]
+        : [])
+    ]
+  }
 }
 
-export const BIRTH_DECLARATION_FORM = defineDeclarationForm({
-  label: {
-    defaultMessage: 'Birth decalration form',
-    id: 'event.birth.action.declare.form.label',
-    description: 'This is what this form is referred as in the system'
-  },
+export function birthDeclarationForm(version: BirthVersion) {
+  return defineDeclarationForm({
+    label: {
+      defaultMessage: 'Birth decalration form',
+      id: 'event.birth.action.declare.form.label',
+      description: 'This is what this form is referred as in the system'
+    },
 
-  // A sealed birth record must not leak declaration data through the search
-  // index - see securePageWhileSealed.
-  pages: [introduction, child, informant, mother, father, documents].map(
-    securePageWhileSealed
-  )
-})
+    // A sealed birth record must not leak declaration data through the search
+    // index - see securePageWhileSealed.
+    pages: [
+      introductionPage(version),
+      childPage(version),
+      informantPage(version),
+      motherPage(version),
+      fatherPage(version),
+      documents
+    ].map(securePageWhileSealed)
+  })
+}

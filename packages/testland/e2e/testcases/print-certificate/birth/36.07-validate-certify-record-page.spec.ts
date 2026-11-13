@@ -27,7 +27,7 @@ test('7.0 Validate "Certify record" page', async ({ page }) => {
   const token = await getToken(CREDENTIALS.REGISTRAR)
   const res = await createDeclaration(
     token,
-    await getDeclaration({ informantRelation: 'BROTHER', token })
+    await getDeclaration({ informantRelation: 'LEGAL_GUARDIAN', token })
   )
   const eventId = res.eventId
   const declaration = res.declaration
@@ -45,9 +45,12 @@ test('7.0 Validate "Certify record" page', async ({ page }) => {
     )
   })
 
-  await test.step('7.1 continue with "Print and issue to Informant (Brother)" redirect to Collector details page', async () => {
+  await test.step('7.1 continue with "Print and issue to Informant (Legal guardian)" redirect to Collector details page', async () => {
     await selectCertificationType(page, 'Birth Certificate')
-    await selectRequesterType(page, 'Print and issue to Informant (Brother)')
+    await selectRequesterType(
+      page,
+      'Print and issue to Informant (Legal guardian)'
+    )
     await page.getByRole('button', { name: 'Continue' }).click()
     await expectInUrl(
       page,

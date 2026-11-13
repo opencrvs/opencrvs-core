@@ -63,7 +63,6 @@ test('Correct record - 4', async ({ page }) => {
       number: faker.location.buildingNumber(),
       zipCode: faker.location.zipCode()
     },
-    maritalStatus: 'Widowed',
     educationLevel: 'Primary'
   }
 
@@ -99,7 +98,6 @@ test('Correct record - 4', async ({ page }) => {
     'father.idType': 'NATIONAL_ID',
     'father.nid': faker.string.numeric(10),
     'father.nationality': 'FAR',
-    'father.maritalStatus': 'SINGLE',
     'father.educationalAttainment': 'NO_SCHOOLING',
     'father.occupation': 'Unemployed',
     'father.addressSameAs': 'YES'
@@ -130,7 +128,6 @@ test('Correct record - 4', async ({ page }) => {
         'mother.nationality': 'FAR',
         'mother.idType': 'NATIONAL_ID',
         'mother.nid': faker.string.numeric(10),
-        'mother.maritalStatus': 'SINGLE',
         'mother.educationalAttainment': 'NO_SCHOOLING',
         'mother.occupation': 'Housewife',
         'mother.previousBirths': 0,
@@ -574,46 +571,6 @@ test('Correct record - 4', async ({ page }) => {
         ).toBeVisible()
       })
 
-      await test.step('4.4.1.7 Change marital status', async () => {
-        await page.getByTestId('change-button-father.maritalStatus').click()
-
-        /*
-         * Expected result: should
-         * - redirect to father's details page
-         * - focus on father's marital status
-         */
-
-        await expectInUrl(page, 'correction')
-        await expectInUrl(page, 'father')
-        await expectInUrl(page, '#father____maritalStatus')
-
-        await page.locator('#father____maritalStatus').click()
-        await page.getByText(updatedFatherDetails.maritalStatus).click()
-
-        await page.getByRole('button', { name: 'Go to review' }).click()
-
-        /*
-         * Expected result: should
-         * - redirect to review page
-         * - show previous marital status with strikethrough
-         * - show updated marital status
-         */
-        await expectInUrl(page, 'correction')
-        await expectInUrl(page, 'review')
-
-        await expect(
-          await page
-            .getByTestId('father.maritalStatus-value')
-            .getByRole('deletion')
-        ).toHaveText('Single')
-
-        await expect(
-          await page
-            .getByTestId('father.maritalStatus-value')
-            .getByText(updatedFatherDetails.maritalStatus)
-        ).toBeVisible()
-      })
-
       await test.step('4.4.1.8 Change level of education', async () => {
         await page
           .getByTestId('change-button-father.educationalAttainment')
@@ -839,13 +796,6 @@ test('Correct record - 4', async ({ page }) => {
 
     await visible(
       page.locator('#listTable-corrections-table-father'),
-      'Marital Status',
-      'Single',
-      'Widowed'
-    )
-
-    await visible(
-      page.locator('#listTable-corrections-table-father'),
       'Level of education',
       'No schooling',
       'Primary'
@@ -1046,13 +996,6 @@ test('Correct record - 4', async ({ page }) => {
             .getByText(x)
         ).toBeVisible()
       )
-    )
-
-    await visible(
-      page.locator('#listTable-corrections-table-father'),
-      'Marital Status',
-      'Single',
-      'Widowed'
     )
 
     await visible(

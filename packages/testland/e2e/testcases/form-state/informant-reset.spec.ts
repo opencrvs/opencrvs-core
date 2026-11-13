@@ -23,7 +23,7 @@ test.describe('Informant details resets when relation is changed', () => {
 
       await page.locator('#informant____relation').click()
       await page
-        .getByText('Brother', {
+        .getByText('Legal guardian', {
           exact: true
         })
         .click()
@@ -62,7 +62,7 @@ test.describe('Informant details resets when relation is changed', () => {
     await test.step('Change informant', async () => {
       await page.locator('#informant____relation').click()
       await page
-        .getByText('Sister', {
+        .getByText('Grandmother', {
           exact: true
         })
         .click()
