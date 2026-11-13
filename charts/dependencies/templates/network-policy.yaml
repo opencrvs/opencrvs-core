@@ -117,12 +117,12 @@ Backup and restore server egress rules.
 
 Standard Kubernetes NetworkPolicy egress peers only support ipBlock,
 podSelector and namespaceSelector - not DNS/FQDN destinations. Postgres and
-MinIO connect to the backup/restore server over SSH (port 22), so the rules
+RustFS connect to the backup/restore server over SSH (port 22), so the rules
 below assume *.host values are literal IP addresses and build a /32 ipBlock
 from them.
 */}}
 {{- $any_backup_restore_enabled := false }}
-{{- range $app := list "postgres" "minio" }}
+{{- range $app := list "postgres" "rustfs" }}
 {{- range $type := list "backup" "restore" }}
 {{- if eq (include (printf "%s.%s_enabled" $app $type) $) "true" }}
 {{- $any_backup_restore_enabled = true }}

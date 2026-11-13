@@ -39,4 +39,4 @@ The service calls each function in this list. The unit and E2E tests of the serv
 - Lifecycle rules for abandoned uploads.
 - Object versioning.
 
-The services Helm chart speaks of a generic `s3` store, but the dependencies chart still deploys MinIO, and the default `s3` values point at it. The Compose files, the backup and restore scripts, and the MinIO client in the cleanup job still belong to MinIO.
+The dependencies chart, the Compose files, and the backup and restore scripts now deploy and serve RustFS, and the default `s3` values point at it. The MinIO client (`mcli`) is still the tool of the backup, restore and cleanup jobs, and it works with any S3 store.
