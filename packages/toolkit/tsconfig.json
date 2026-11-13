@@ -12,6 +12,7 @@
     "rootDir": "./src",
     "outDir": "dist",
     "paths": {
+      "@events/*": ["../events/src/*"],
       "@opencrvs/commons/conditionals": [
         "../commons/src/conditionals/conditionals.ts"
       ],

@@ -37,7 +37,7 @@
     "@formatjs/icu-messageformat-parser": "2.1.0",
     "@opencrvs/commons": "workspace:*",
     "@opencrvs/components": "workspace:*",
-    "@opencrvs/gateway": "workspace:*",
+    "@opencrvs/events": "workspace:*",
     "@reduxjs/toolkit": "^1.8.3",
     "@remix-run/router": "^1.23.2",
     "@tanstack/react-query": "5.81.2",
