@@ -1,0 +1,285 @@
+/*
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at https://mozilla.org/MPL/2.0/.
+ *
+ * OpenCRVS is also distributed under the terms of the Civil Registration
+ * & Healthcare Disclaimer located at http://opencrvs.org/license.
+ *
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
+ */
+import React from 'react'
+import ReactDOM from 'react-dom'
+import * as jsxRuntime from 'react/jsx-runtime'
+import { Pill, Spinner } from '@opencrvs/components'
+import {
+  CUSTOM_FIELD_EXTERNALS_GLOBAL,
+  CustomField,
+  CustomFieldExternalModule,
+  CustomFieldValue,
+  FieldConfig,
+  FieldType,
+  findAllFields,
+  getEventConfigOfVersion,
+  VersionedEventConfig
+} from '@opencrvs/commons/client'
+
+interface InputProps {
+  id: string
+  src: string
+  onChange: (val: CustomFieldValue) => void
+  value?: unknown
+  onBlur?: (e: React.FocusEvent<HTMLElement>) => void
+  disabled?: boolean
+  configuration: unknown
+}
+interface OutputProps {
+  id: string
+  src: string
+  value?: unknown
+  configuration: unknown
+}
+
+interface CustomFieldModule {
+  Input: React.ComponentType<InputProps>
+  Output: React.ComponentType<OutputProps>
+}
+
+/**
+ * What the client hands to the default export of a custom field module.
+ * The module must use this React instance: a second copy of React cannot
+ * run hooks inside the client's render tree.
+ */
+interface CustomFieldModuleContext {
+  React: typeof React
+}
+
+const loadedModules = new Map<string, Promise<CustomFieldModule>>()
+
+/** How many times the import of each module has failed */
+const failedImports = new Map<string, number>()
+
+const externals: Record<CustomFieldExternalModule, unknown> = {
+  react: React,
+  'react/jsx-runtime': jsxRuntime,
+  'react-dom': ReactDOM
+}
+
+/**
+ * Modules bundled with the toolkit plugin read React from this global, also
+ * in their own dependencies and while the module loads. It must exist before
+ * the import.
+ */
+function shareExternals() {
+  Object.assign(globalThis, { [CUSTOM_FIELD_EXTERNALS_GLOBAL]: externals })
+}
+
+/**
+ * The browser keeps a failed import in its module map, and a new import of the
+ * same URL fails again without a new request. So after a failure, the next
+ * import uses a different URL. The service worker removes the `retry`
+ * parameter from its cache key.
+ */
+function importUrl(src: string) {
+  const failures = failedImports.get(src) ?? 0
+  if (failures === 0) {
+    return src
+  }
+  const url = new URL(src, window.location.href)
+  url.searchParams.set('retry', String(failures))
+  return url.href
+}
+
+async function importModule(src: string): Promise<CustomFieldModule> {
+  shareExternals()
+  // https://github.com/rollup/plugins/tree/master/packages/dynamic-import-vars#limitations
+  const imported: { default?: unknown } = await import(
+    /* @vite-ignore */ importUrl(src)
+  )
+
+  if (typeof imported.default !== 'function') {
+    throw new Error(
+      `Custom field module ${src} must have a default export ({ React }) => ({ Input, Output })`
+    )
+  }
+
+  const context: CustomFieldModuleContext = { React }
+  const created = imported.default(context) as Partial<CustomFieldModule>
+
+  if (
+    typeof created.Input !== 'function' ||
+    typeof created.Output !== 'function'
+  ) {
+    throw new Error(
+      `Custom field module ${src} must return both Input and Output components`
+    )
+  }
+
+  return { Input: created.Input, Output: created.Output }
+}
+
+/**
+ * Loads each module only once, so that every render gets the same component
+ * identities and React does not remount the field.
+ */
+async function loadModule(src: string) {
+  const cached = loadedModules.get(src)
+  if (cached) {
+    return cached
+  }
+
+  const loading = importModule(src).catch((error: unknown) => {
+    // Let the next mount try again, e.g. after a network error
+    loadedModules.delete(src)
+    failedImports.set(src, (failedImports.get(src) ?? 0) + 1)
+    throw error
+  })
+  loadedModules.set(src, loading)
+  return loading
+}
+
+/** The module URLs of the custom fields in all versions of all events */
+export function findCustomFieldSources(eventConfigs: VersionedEventConfig[]) {
+  const sources = new Set(
+    eventConfigs
+      .flatMap((config) =>
+        config.versions.map((version) =>
+          getEventConfigOfVersion(config, version.id)
+        )
+      )
+      .flatMap(findAllFields)
+      .filter(
+        (field: FieldConfig): field is CustomField =>
+          field.type === FieldType._EXPERIMENTAL_CUSTOM
+      )
+      .map(({ src }) => src)
+  )
+  return [...sources].sort()
+}
+
+/**
+ * Loads custom field modules ahead of time. The service worker caches them,
+ * so the fields work offline also in a form that the user has not opened yet.
+ */
+export async function preloadCustomFields(sources: string[]) {
+  // A failed load is tried again when the field mounts
+  await Promise.allSettled(sources.map(loadModule))
+}
+
+function LoadError() {
+  return (
+    <Pill
+      label={
+        <>
+          {/* eslint-disable-next-line react/jsx-no-literals */}
+          <div>Error loading component</div>
+        </>
+      }
+      pillTheme="dark"
+      size="small"
+      type="inactive"
+    />
+  )
+}
+
+/**
+ * Keeps an error thrown by country config code inside the field,
+ * so that the rest of the form still works.
+ */
+class CustomFieldErrorBoundary extends React.Component<
+  { src: string; children: React.ReactNode },
+  { hasError: boolean }
+> {
+  state = { hasError: false }
+
+  static getDerivedStateFromError() {
+    return { hasError: true }
+  }
+
+  componentDidCatch(error: unknown) {
+    // eslint-disable-next-line no-console
+    console.error(`Custom field ${this.props.src} failed to render:`, error)
+  }
+
+  render() {
+    if (this.state.hasError) {
+      return <LoadError />
+    }
+    return this.props.children
+  }
+}
+
+function Loader(
+  props:
+    | (InputProps & { component: 'Input' })
+    | (OutputProps & { component: 'Output' })
+) {
+  const [loadedModule, setLoadedModule] =
+    React.useState<CustomFieldModule | null>(null)
+  const [loading, setLoading] = React.useState(true)
+  const { component, ...otherProps } = props
+
+  React.useEffect(() => {
+    let cancelled = false
+    setLoading(true)
+
+    loadModule(props.src)
+      .then((mod) => {
+        if (!cancelled) {
+          setLoadedModule(mod)
+        }
+      })
+      .catch((error: unknown) => {
+        // eslint-disable-next-line no-console
+        console.error(
+          `Failed to import a custom ${props.component.toLowerCase()} dynamically:`,
+          error
+        )
+        if (!cancelled) {
+          setLoadedModule(null)
+        }
+      })
+      .finally(() => {
+        if (!cancelled) {
+          setLoading(false)
+        }
+      })
+
+    return () => {
+      cancelled = true
+    }
+  }, [props.component, props.src])
+
+  if (loading) {
+    return <Spinner id={props.id} />
+  }
+
+  if (!loadedModule) {
+    return <LoadError />
+  }
+
+  const Component = loadedModule[
+    component
+  ] as typeof props.component extends 'Input'
+    ? React.ComponentType<InputProps>
+    : React.ComponentType<OutputProps>
+
+  return (
+    <CustomFieldErrorBoundary src={props.src}>
+      <Component {...otherProps} />
+    </CustomFieldErrorBoundary>
+  )
+}
+
+function Input(props: InputProps) {
+  return <Loader component="Input" {...props} />
+}
+
+function Output(props: OutputProps) {
+  return <Loader component="Output" {...props} />
+}
+
+export const Custom = {
+  Input,
+  Output
+}

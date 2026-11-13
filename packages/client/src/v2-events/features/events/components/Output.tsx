@@ -316,7 +316,14 @@ export function ValueOutput({
   }
 
   if (isCustomFieldType(field)) {
-    return <Custom.Output {...field.config} value={field.value} />
+    return (
+      <Custom.Output
+        configuration={field.config.configuration}
+        id={field.config.id}
+        src={field.config.src}
+        value={field.value}
+      />
+    )
   }
 }
 

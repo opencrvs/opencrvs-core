@@ -461,6 +461,18 @@ const TENNIS_CLUB_DECLARATION_FORM = defineDeclarationForm({
           }
         },
         {
+          id: 'applicant.skillLevel',
+          type: FieldType._EXPERIMENTAL_CUSTOM,
+          src: '/api/countryconfig/static/custom-fields/skill-level.js',
+          required: false,
+          configuration: { max: 5 },
+          label: {
+            defaultMessage: "Applicant's tennis skill level",
+            description: 'This is the label for the field',
+            id: 'event.tennis-club-membership.action.declare.form.section.who.field.skillLevel.label'
+          }
+        },
+        {
           id: 'applicant.isRecommendedByFieldAgent',
           type: FieldType.CHECKBOX,
           analytics: true,
