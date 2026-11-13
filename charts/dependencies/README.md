@@ -150,6 +150,23 @@ Differential-type backup/restore automation (`postgres-on-deploy`, `postgres-bac
 
 The destination is scoped to RFC1918 private ranges (`10.0.0.0/8`, `172.16.0.0/12`, `192.168.0.0/16`) rather than `0.0.0.0/0`, since the only legitimate destination is the API server (a ClusterIP, pod IP, or node IP — always private in a normally-networked cluster) and these pods have no reason to reach the public internet. **If your cluster's nodes have a public IP as their primary interface** (common on bare VPS-style setups without a private VPC network) and the CNI enforces policy against the post-DNAT node IP rather than the ClusterIP, this scoping could exclude the API server — check with `kubectl get nodes -o wide` (INTERNAL-IP vs EXTERNAL-IP) and `kubectl get endpoints kubernetes -n default -o wide` before relying on it, and fall back to `0.0.0.0/0` if needed. These pods are already privileged (their `backup-runner` ServiceAccount can `exec`/`scale`/`delete` arbitrary pods via RBAC), so the extra egress breadth of `0.0.0.0/0` wouldn't add meaningful risk beyond what their RBAC already grants — the private-range scoping here is defense in depth, not a hard requirement.
 
+## Credentials of datastores
+
+Postgres, Elasticsearch, MinIO and Redis follow the same rules. Each one has the values `use_default_credentials` and `admin_user_secret_name` (for Redis: `users_secret`). The chart never changes an existing secret. If the secret exists, the chart does not read `use_default_credentials` and the `admin_*` values.
+
+| Datastore     | `admin_*` values set                                                       | `admin_*` values not set, `use_default_credentials: true` | `admin_*` values not set, `use_default_credentials: false` |
+| ------------- | -------------------------------------------------------------------------- | --------------------------------------------------------- | ---------------------------------------------------------- |
+| MinIO         | `minio.admin_username` and `minio.admin_password`. Set both or none.       | `minioadmin` / `minioadmin`                               | Random values                                              |
+| Postgres      | `postgres.admin_username` and `postgres.admin_password`. Set both or none. | `postgres` / `postgres`                                   | Random values                                              |
+| Elasticsearch | `elasticsearch.admin_password`, the password of `elastic`                  | `elasticadmin`                                            | Random password                                            |
+| Redis         | Not supported                                                              | Username equals password for each user                    | Random values for each name in `redis.auth_users`          |
+
+The chart reads the `admin_*` values when it creates a missing secret, whatever `use_default_credentials` is. Redis has no `admin_*` values. It always has an ACL.
+
+The `opencrvs-services` chart reads the same secrets. Copy them to the namespace of that chart, or give it the same `admin_*` values. See the README of the `opencrvs-services` chart.
+
+> FIXME: The `elasticsearch-opencrvs-users` and `elasticsearch-opencrvs-urls` secrets of the monitoring users use the same names as the secrets of the `opencrvs-services` chart. Deploy the two charts to separate namespaces.
+
 ## Postgres
 
 Postgres configuration section for Helm values.yaml
@@ -160,52 +177,57 @@ This section allows you to configure the postgres deployment within your infrast
 | enabled | bool | true | Enable or disable the Postgres deployment. |
 | image.repository | string | `chumaky/postgres_mongo_fdw` | Postgres Docker image repository. |
 | image.tag | string | `17.6_fdw5.5.2` | Postgres Docker image tag. |
-| use_default_credentials | bool | true | If true, deploys Postgres with default user/password: postgres/postgres |
-| storage_type | string | `global storage_type` | Optional Postgres-specific override for the Kubernetes storage type. Available options are `pvc` or `host_path`. If not set, the global `storage_type` value is used. |
-| pvc.storage_class | string | `n/a` | StorageClass name used for dynamic volume provisioning |
+| use*default_credentials | bool | true | Used when `admin*_`are not set.`true`: `postgres`/`postgres`. `false`: random values. See [Credentials of datastores](#credentials-of-datastores). |
+| admin_user_secret_name | string | `postgres-admin-user`| Secret with the keys`POSTGRES_USER`and`POSTGRES_PASSWORD`. |
+| admin_username | string | `n/a`| Used only when the secret does not exist, whatever`use_default_credentials`is. Set together with`admin_password`. |
+| admin_password | string | `n/a`| Used only when the secret does not exist, whatever`use_default_credentials`is. Set together with`admin_username`. |
+| storage_type | string | `global storage_type`| Optional Postgres-specific override for the Kubernetes storage type. Available options are`pvc`or`host_path`. If not set, the global `storage_type`value is used. |
+| pvc.storage_class | string |`n/a`| StorageClass name used for dynamic volume provisioning |
 | pvc.storage_size | string | 10Gi | Persistent volume claim size for Postgres data volume |
 | pvc.access_mode | string | ReadWriteOnce | Kubernetes PVC access mode |
-| host_data_path | string | `/data/postgres` | Path to persistent data on the host when `storage_type` is `host_path`. |
-| node_selector | dict | `{}` | Label selector for datastore nodes, usually used to keep data persistent |
-| backup.{} | dict | `{}` | Backup configuration section, for more information please check `values.yaml` and **Backup section** in this README |
-| backup.enabled | string | `false` | Backup enabled or disabled, section has higher priority over global `backup` section |
-| backup.type | string | `dump` | `dump` is a full logical database dump, `differential` is a physical backup using pgBackRest |
-| backup.stanza | string | `main` | Stanza name for pgBackRest, use when backup type is `differential` |
-| backup.server_secret | string | `backup-server-ssh-credentials` | Name of the Kubernetes secret with backup server credentials |
-| backup.encryption_secret | string | `backup-encryption-secret` | Name of the Kubernetes secret containing the backup encryption key |
-| backup.schedule | dict | `{}` | Backup cronjob schedule |
-| backup.schedule.dump | string | `0 1 * * *` | Used only when type=dump, if not defined then value from `backup.schedule` is used |
-| backup.schedule.full | string | `0 1 * * 0` | Full backup schedule. Used when type=differential, note that value from `backup.schedule` is ignored |
-| `backup.schedule.differential` | string | `0 1 * * 1-6` | Differential backup schedule. Used when type=differential, note that value from `backup.schedule` is ignored |
-| backup.server_dir | string | `n/a` | Directory to store encrypted backup on backup server, if not defined `backup.backup_server_dir` is used |
-| backup.cronjob | boolean | `true` | Run backup as cronjob, setting to `false` allows to run one time job, e/g manual backup |
-| restore.{} | dict | `{}` | Restore configuration section, for more information please check `values.yaml` and **Restore section** in this README |
-| restore.enabled | string | `false` | Restore enabled or disabled, section has higher priority over global `restore` section |
-| restore.server_secret | string | `backup-server-ssh-credentials` | Name of the Kubernetes secret with backup server credentials, usually backup server is used for restore, thats why credentials are shared |
-| restore.encryption_secret | string | `restore-encryption-secret` | Name of the Kubernetes secret containing the backup encryption key |
-| restore.schedule | string | `0 3 * * *` | Restore cronjob schedule, if not defined then value from `restore.schedule` is used |
-| restore.cronjob | boolean | `true` | Run restore as cronjob, setting to `false` allows to run one time job, e/g manual restore, or disaster recovery scenario |
-| node_port | int | `n/a` | Fixed NodePort to expose port `5432` on. Only used when the global `service_type` is `NodePort`, otherwise a random port is assigned |
-| shm_size | string | `256Mi` | Size of `/dev/shm`, mounted as a memory-backed `emptyDir`. Postgres uses it for parallel query workers; the container runtime's default (typically 64Mi) is easily exhausted, causing "could not resize shared memory segment" errors unrelated to disk space. |
+| host_data_path | string |`/data/postgres`| Path to persistent data on the host when`storage_type`is`host_path`. |
+| node_selector | dict | `{}`| Label selector for datastore nodes, usually used to keep data persistent |
+| backup.{} | dict |`{}`| Backup configuration section, for more information please check`values.yaml`and **Backup section** in this README |
+| backup.enabled | string |`false`| Backup enabled or disabled, section has higher priority over global`backup`section |
+| backup.type | string |`dump`|`dump`is a full logical database dump,`differential`is a physical backup using pgBackRest |
+| backup.stanza | string |`main`| Stanza name for pgBackRest, use when backup type is`differential`|
+| backup.server_secret | string |`backup-server-ssh-credentials`| Name of the Kubernetes secret with backup server credentials |
+| backup.encryption_secret | string |`backup-encryption-secret`| Name of the Kubernetes secret containing the backup encryption key |
+| backup.schedule | dict |`{}`| Backup cronjob schedule |
+| backup.schedule.dump | string |`0 1 _ \* _`| Used only when type=dump, if not defined then value from`backup.schedule`is used |
+| backup.schedule.full | string |`0 1 _ _ 0`| Full backup schedule. Used when type=differential, note that value from`backup.schedule`is ignored |
+|`backup.schedule.differential`| string |`0 1 _ _ 1-6`| Differential backup schedule. Used when type=differential, note that value from`backup.schedule`is ignored |
+| backup.server_dir | string |`n/a`| Directory to store encrypted backup on backup server, if not defined`backup.backup_server_dir`is used |
+| backup.cronjob | boolean |`true`| Run backup as cronjob, setting to`false`allows to run one time job, e/g manual backup |
+| restore.{} | dict |`{}`| Restore configuration section, for more information please check`values.yaml`and **Restore section** in this README |
+| restore.enabled | string |`false`| Restore enabled or disabled, section has higher priority over global`restore`section |
+| restore.server_secret | string |`backup-server-ssh-credentials`| Name of the Kubernetes secret with backup server credentials, usually backup server is used for restore, thats why credentials are shared |
+| restore.encryption_secret | string |`restore-encryption-secret`| Name of the Kubernetes secret containing the backup encryption key |
+| restore.schedule | string |`0 3 _ \* \*`| Restore cronjob schedule, if not defined then value from`restore.schedule`is used |
+| restore.cronjob | boolean |`true`| Run restore as cronjob, setting to`false`allows to run one time job, e/g manual restore, or disaster recovery scenario |
+| node_port | int |`n/a`| Fixed NodePort to expose port`5432`on. Only used when the global`service_type`is`NodePort`, otherwise a random port is assigned |
+| shm_size | string | `256Mi`| Size of`/dev/shm`, mounted as a memory-backed `emptyDir`. Postgres uses it for parallel query workers; the container runtime's default (typically 64Mi) is easily exhausted, causing "could not resize shared memory segment" errors unrelated to disk space. |
 
 ## Elasticsearch
 
 This section allows you to configure the deployment and authentication settings for Elasticsearch.
 
-| Key                     | Type    | Example                                         | Description                                                                                                                                                                |
-| ----------------------- | ------- | ----------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| image.repository        | string  | `docker.elastic.co/elasticsearch/elasticsearch` | Elasticsearch Docker image repository.                                                                                                                                     |
-| image.tag               | string  | `8.19.15`                                       | Elasticsearch Docker image tag.                                                                                                                                            |
-| enabled                 | boolean | true                                            | Enable or disable the Elasticsearch deployment.                                                                                                                            |
-| use_default_credentials | boolean | true                                            | Deploy Elasticsearch without enabled authentication.                                                                                                                       |
-| storage_type            | string  | `global storage_type`                           | Optional Elasticsearch-specific override for the Kubernetes storage type. Available options are `pvc` or `host_path`. If not set, the global `storage_type` value is used. |
-| pvc.storage_class       | string  | `n/a`                                           | StorageClass name used for dynamic volume provisioning                                                                                                                     |
-| pvc.storage_size        | string  | 10Gi                                            | Persistent volume claim size for Postgres data volume                                                                                                                      |
-| pvc.access_mode         | string  | ReadWriteOnce                                   | Kubernetes PVC access mode                                                                                                                                                 |
-| host_data_path          | string  | `/data/elasticsearch`                           | Path to persistent data on the host when `storage_type` is `host_path`.                                                                                                    |
-| node_selector           | dict    | `{}`                                            | Label selector for datastore nodes, usually used to keep data persistent                                                                                                   |
-| node_port               | int     | `n/a`                                           | Fixed NodePort to expose port `9200` on. Only used when the global `service_type` is `NodePort`, otherwise a random port is assigned                                       |
-| node_port_transport     | int     | `n/a`                                           | Fixed NodePort to expose port `9300` on. Only used when the global `service_type` is `NodePort`, otherwise a random port is assigned                                       |
+| Key                     | Type    | Example                                         | Description                                                                                                                                                                                |
+| ----------------------- | ------- | ----------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| image.repository        | string  | `docker.elastic.co/elasticsearch/elasticsearch` | Elasticsearch Docker image repository.                                                                                                                                                     |
+| image.tag               | string  | `8.19.15`                                       | Elasticsearch Docker image tag.                                                                                                                                                            |
+| enabled                 | boolean | true                                            | Enable or disable the Elasticsearch deployment.                                                                                                                                            |
+| use_default_credentials | boolean | true                                            | Security is always enabled. Used when `admin_password` is not set. `true`: password `elasticadmin`. `false`: random password. See [Credentials of datastores](#credentials-of-datastores). |
+| admin_user_secret_name  | string  | `elasticsearch-admin-user`                      | Secret with the key `ELASTIC_PASSWORD`.                                                                                                                                                    |
+| admin_password          | string  | `n/a`                                           | Password of `elastic`. Used only when the secret does not exist, whatever `use_default_credentials` is. If not set: `elasticadmin` or a random password.                                   |
+| storage_type            | string  | `global storage_type`                           | Optional Elasticsearch-specific override for the Kubernetes storage type. Available options are `pvc` or `host_path`. If not set, the global `storage_type` value is used.                 |
+| pvc.storage_class       | string  | `n/a`                                           | StorageClass name used for dynamic volume provisioning                                                                                                                                     |
+| pvc.storage_size        | string  | 10Gi                                            | Persistent volume claim size for Postgres data volume                                                                                                                                      |
+| pvc.access_mode         | string  | ReadWriteOnce                                   | Kubernetes PVC access mode                                                                                                                                                                 |
+| host_data_path          | string  | `/data/elasticsearch`                           | Path to persistent data on the host when `storage_type` is `host_path`.                                                                                                                    |
+| node_selector           | dict    | `{}`                                            | Label selector for datastore nodes, usually used to keep data persistent                                                                                                                   |
+| node_port               | int     | `n/a`                                           | Fixed NodePort to expose port `9200` on. Only used when the global `service_type` is `NodePort`, otherwise a random port is assigned                                                       |
+| node_port_transport     | int     | `n/a`                                           | Fixed NodePort to expose port `9300` on. Only used when the global `service_type` is `NodePort`, otherwise a random port is assigned                                                       |
 
 ## RustFS
 
@@ -247,39 +269,34 @@ Keep these values in later releases, otherwise RustFS stops using that volume. D
 
 ### Configuration options
 
-| Key                     | Type   | Default value                   | Description                                                                                                                                                                                         |
-| ----------------------- | ------ | ------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| enabled                 | bool   | true                            | Enable or disable the rustfs service                                                                                                                                                                |
-| image.repository        | string | `rustfs/rustfs`                 | RustFS Docker image repository.                                                                                                                                                                     |
-| image.tag               | string | `1.0.1`                         | RustFS Docker image tag.                                                                                                                                                                            |
-| use_default_credentials | bool   | true                            | Use `rustfsadmin` / `rustfsadmin`, unless `admin_username` and `admin_password` are set. If `false` and they are not set, random ones are generated. See [RustFS Credentials](#rustfs-credentials). |
-| admin_username          | string | `n/a`                           | RustFS administrator username. Used even if `use_default_credentials` is `true`. Set together with `admin_password`.                                                                                |
-| admin_password          | string | `n/a`                           | RustFS administrator password. Used even if `use_default_credentials` is `true`. Set together with `admin_username`.                                                                                |
-| port                    | int    | `3535`                          | Port of the S3 API.                                                                                                                                                                                 |
-| console.enabled         | bool   | true                            | Serve the admin console on `console.port` and on `rustfs-console.<hostname>`. Users log in with `S3_ADMIN_ACCESS_KEY` and `S3_ADMIN_SECRET_KEY`.                                                    |
-| console.port            | int    | `3536`                          | Port of the admin console. The Service, the IngressRoute and the container use it. Change the port in `network_policy.rules` too.                                                                   |
-| cors_allowed_origins    | string | `*`                             | Origins that may read the S3 API from a browser, passed as `RUSTFS_CORS_ALLOWED_ORIGINS`: `*` or a comma-separated list, for example `https://register.example.org`.                                |
-| storage_type            | string | `global storage_type`           | Optional RustFS-specific override for the Kubernetes storage type. Available options are `pvc` or `host_path`.                                                                                      |
-| pvc.storage_class       | string | `n/a`                           | StorageClass name used for dynamic volume provisioning                                                                                                                                              |
-| pvc.storage_size        | string | 10Gi                            | Persistent volume claim size for the RustFS data volume                                                                                                                                             |
-| pvc.access_mode         | string | ReadWriteOnce                   | Kubernetes PVC access mode                                                                                                                                                                          |
-| pvc.name                | string | `rustfs`                        | Name of the PVC of the RustFS data volume. Set it to `minio` to keep the data of an existing MinIO, see [Migrate from MinIO](#migrate-from-minio).                                                  |
-| host_data_path          | string | `/data/rustfs`                  | Path to persistent data on the host when `storage_type` is `host_path`. Set it to `/data/minio` to keep the data of an existing MinIO, see [Migrate from MinIO](#migrate-from-minio).               |
-| node_selector           | dict   | `{}`                            | Label selector for datastore nodes, usually used to keep data persistent                                                                                                                            |
-| backup.enabled          | bool   | `false`                         | Enable backup of RustFS. The global `backup.enabled` also enables it. See [Backup and restore of the S3 store](#backup-and-restore-of-the-s3-store).                                                |
-| backup.type             | string | `dump`                          | `dump` is a dump of the buckets through the S3 API, `differential` is rsync of the data directory to the backup server.                                                                             |
-| backup.server_secret    | string | `backup-server-ssh-credentials` | Name of the Kubernetes secret with backup server credentials.                                                                                                                                       |
-| backup.host             | string | `n/a`                           | Backup server hostname or IP. Uses the global `backup.host` if not set.                                                                                                                             |
-| backup.schedule         | string | `0 1 * * *`                     | Time to run backup job, if not defined then value from `backup.schedule` is used.                                                                                                                   |
-| backup.server_dir       | string | `n/a`                           | Directory on the backup server. Uses the global value if not set.                                                                                                                                   |
-| restore.enabled         | bool   | `false`                         | Enable restore of RustFS. The global `restore.enabled` also enables it.                                                                                                                             |
-| restore.type            | string | `dump`                          | `dump` (from the encrypted archive) or `differential`, the same as for backup.                                                                                                                      |
-| restore.server_secret   | string | `backup-server-ssh-credentials` | Name of the Kubernetes secret with backup server credentials.                                                                                                                                       |
-| restore.host            | string | `n/a`                           | Backup server hostname or IP. Uses the global `restore.host` if not set.                                                                                                                            |
-| restore.schedule        | string | `0 3 * * *`                     | Restore cronjob schedule, if not defined then value from `restore.schedule` is used.                                                                                                                |
-| env                     | dict   | `{}`                            | Extra environment variables for the RustFS container, see the [RustFS configuration](https://docs.rustfs.com) for the `RUSTFS_*` variables.                                                         |
-| node_port               | int    | `n/a`                           | Fixed NodePort to expose port `3535` on. Only used when the global `service_type` is `NodePort`, otherwise a random port is assigned                                                                |
-| node_port_console       | int    | `n/a`                           | Fixed NodePort to expose port `3536` (console) on. Only used when the global `service_type` is `NodePort`, otherwise a random port is assigned                                                      |
+| Key                     | Type   | Default value                   | Description                                                                                                                                                        |
+| ----------------------- | ------ | ------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| enabled                 | bool   | true                            | Enable or disable RustFS service                                                                                                                                    |
+| image.repository        | string | `rustfs/rustfs`                 | RustFS Docker image repository.                                                                                                                                     |
+| image.tag               | string | `1.0.1`                         | RustFS Docker image tag.                                                                                                                                            |
+| use_default_credentials | bool   | true                            | Used when `admin_*` are not set. `true`: `rustfsadmin` / `rustfsadmin`. `false`: random values. See [Credentials of datastores](#credentials-of-datastores).         |
+| admin_user_secret_name  | string | `s3-opencrvs-users`             | Secret with the keys `S3_ACCESS_KEY`, `S3_SECRET_KEY`, `S3_ADMIN_ACCESS_KEY` and `S3_ADMIN_SECRET_KEY`.                                                            |
+| admin_username          | string | `n/a`                           | Used only when the secret does not exist, whatever `use_default_credentials` is. Set together with `admin_password`.                                               |
+| admin_password          | string | `n/a`                           | Used only when the secret does not exist, whatever `use_default_credentials` is. Set together with `admin_username`.                                               |
+| storage_type            | string | `global storage_type`           | Optional RustFS-specific override for the Kubernetes storage type. Available options are `pvc` or `host_path`. If not set, the global `storage_type` value is used. |
+| pvc.storage_class       | string | `n/a`                           | StorageClass name used for dynamic volume provisioning                                                                                                             |
+| pvc.storage_size        | string | 10Gi                            | Persistent volume claim size for Postgres data volume                                                                                                              |
+| pvc.access_mode         | string | ReadWriteOnce                   | Kubernetes PVC access mode                                                                                                                                         |
+| host_data_path          | string | `/data/rustfs`                  | Path to persistent data on the host when `storage_type` is `host_path`.                                                                                            |
+| node_selector           | dict   | `{}`                            | Label selector for datastore nodes, usually used to keep data persistent                                                                                           |
+| backup.{}               | dict   | `{}`                            | Backup configuration section, for more information please check `values.yaml` and **Backup section** in this README                                                |
+| backup.enabled          | string | `false`                         | Backup enabled or disabled, section has higher priority over global `backup` section                                                                               |
+| backup.type             | string | `dump`                          | `dump` is a full filesystem dump, `differential` is rsync from RustFS filesystem on remote backup server                                                            |
+| backup.server_secret    | string | `backup-server-ssh-credentials` | Name of the Kubernetes secret with backup server credentials                                                                                                       |
+| backup.schedule         | string | `0 1 * * *`                     | Time to run backup job, if not defined then value from `backup.schedule` is used                                                                                   |
+| backup.server_dir       | string | `n/a`                           | Directory on backup server for encrypted archive backups or filesystem rsync. Uses global value if not set                                                         |
+| restore.{}              | dict   | `{}`                            | Restore configuration section, for more information please check `values.yaml` and **Restore section** in this README                                              |
+| restore.enabled         | string | `false`                         | Enables restore functionality; section overrides global `restore` settings.                                                                                        |
+| restore.type            | string | `dump`                          | Restore method: `dump` (from encrypted archive) or `differential` (same as for backup)                                                                             |
+| restore.server_secret   | string | `backup-server-ssh-credentials` | Name of the Kubernetes secret with backup server credentials, usually backup server is used for restore, thats why credentials are shared                          |
+| restore.schedule        | string | `0 3 * * *`                     | Restore cronjob schedule, if not defined then value from `restore.schedule` is used                                                                                |
+| node_port               | int    | `n/a`                           | Fixed NodePort to expose port `3535` on. Only used when the global `service_type` is `NodePort`, otherwise a random port is assigned                               |
+| node_port_console       | int    | `n/a`                           | Fixed NodePort to expose port `3536` (console) on. Only used when the global `service_type` is `NodePort`, otherwise a random port is assigned                     |
 
 ### RustFS hostnames
 
@@ -289,15 +306,7 @@ The subdomain of a hostname must not be the name of another environment that sha
 
 ### RustFS Credentials
 
-The chart writes the credentials to the secret `s3-opencrvs-users` when the secret does not exist. The first rule that fits applies:
-
-1. The secret exists: the chart leaves it as it is, and the values below are not read.
-2. The secret `minio-opencrvs-users` of an earlier version exists: the chart creates `s3-opencrvs-users` from it, with the new key names and the same values, and leaves the old secret in place.
-3. `admin_username` and `admin_password` are set: the chart uses them, whatever `use_default_credentials` is.
-4. `use_default_credentials` is `true`: the chart uses `rustfsadmin` and `rustfsadmin`, which is highly discouraged for production environments.
-5. Otherwise the chart generates a random username and a random password.
-
-Setting only one of `admin_username` and `admin_password` fails the installation with `rustfs.admin_username and rustfs.admin_password must be set together`. RustFS and the backup and restore jobs always read the credentials from the secret, so read the generated ones from it.
+See [Credentials of datastores](#credentials-of-datastores) for the rules. Setting only one of `admin_username` and `admin_password` fails the installation with `rustfs.admin_username and rustfs.admin_password must be set together`. RustFS and the backup and restore jobs always read the credentials from the secret `admin_user_secret_name`, so read the generated ones from it.
 
 RustFS has a single root identity, built from `S3_ADMIN_ACCESS_KEY` and `S3_ADMIN_SECRET_KEY` of the secret. The documents service signs with `S3_ACCESS_KEY` and `S3_SECRET_KEY`, so they must hold the same values. The generated secret does.
 
@@ -356,24 +365,26 @@ Adjust schedules, server credentials, and directories as needed for your deploym
 
 OpenCRVS is using Bitnami package for Redis https://hub.docker.com/r/bitnami/redis due to better security and performance optimization. Please check there full list of available options
 
-| Key       | Default value | Description                                                                                                                          |
-| --------- | ------------- | ------------------------------------------------------------------------------------------------------------------------------------ |
-| enabled   | true          | Enable or disable redis service                                                                                                      |
-| env       | {}            | Flat dictionary (key/value) of environment variables passed to docker container                                                      |
-| auth_mode | disabled      | Authentication mode, possible values `disabled`, `acl` or `password`                                                                 |
-| node_port | `n/a`         | Fixed NodePort to expose port `6379` on. Only used when the global `service_type` is `NodePort`, otherwise a random port is assigned |
+| Key                     | Default value          | Description                                                                                                                                                            |
+| ----------------------- | ---------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| enabled                 | true                   | Enable or disable redis service                                                                                                                                        |
+| env                     | {}                     | Flat dictionary (key/value) of environment variables passed to docker container                                                                                        |
+| use_default_credentials | true                   | Authentication is always enabled. `true`: username equals password for each user. `false`: random values. See [Credentials of datastores](#credentials-of-datastores). |
+| users_secret            | `redis-opencrvs-users` | Secret with the credentials of the OpenCRVS services.                                                                                                                  |
+| node_port               | `n/a`                  | Fixed NodePort to expose port `6379` on. Only used when the global `service_type` is `NodePort`, otherwise a random port is assigned                                   |
 
 ### Redis authentication
 
-Redis service provides following ways for authentication (`credentials.enabled`):
+Authentication is always enabled. The chart always generates an ACL with a `default` user and one user for each name in `redis.auth_users`:
 
-- `disabled`: Option is preferred for local development. Authentication is disabled. Behind the scenes environment variable `ALLOW_EMPTY_PASSWORD` is set to `yes` inside Redis container, check official documentation for more details.
-- `password`: Authentication is performed under one shared account `default`, Environment variable `REDIS_PASSWORD=<random password>` is set inside container and stored as secret `redis-opencrvs-users`.
-- `acl`: Option is preferred for production setup. Each OpenCRVS service has it's own username and password. See next section for more details.
+- `use_default_credentials: true`: the username and the password of each user are the same, in lower case, for example `gateway` / `gateway`. The password of the `default` user is `redispassword`. Use it for local development only.
+- `use_default_credentials: false`: the chart generates a random username and a random password for each user. Use it for production.
+
+The `auth_mode` value is removed, with its modes `disabled`, `password` and `acl`.
 
 ### Redis authorization (ACL)
 
-Behind the scenes helm chart generates random username and password for each OpenCRVS service:
+Behind the scenes the helm chart generates the username and the password for each OpenCRVS service (random if `use_default_credentials` is `false`):
 
 - auth
 - gateway
@@ -529,12 +540,7 @@ Following tools are included in monitoring suite:
 - Logstash
 - APM server
 
-> NOTE: Before enabling monitoring tools make sure Elasticsearch default credentials are disabled:
-
-```yaml
-elasticsearch:
-  use_default_credentials: false
-```
+> NOTE: Elasticsearch security is always enabled. For production, set `elasticsearch.use_default_credentials: false`, so that the password of `elastic` is not `elasticadmin`.
 
 ### Elastalert
 

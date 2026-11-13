@@ -49,6 +49,13 @@ s3:
   admin_username: rustfsadmin
   admin_password: rustfsadmin
 
+elasticsearch:
+  admin_password: elasticadmin
+
+postgres:
+  admin_username: postgres
+  admin_password: postgres
+
 data_seed:
   enabled: false
   env:

@@ -44,9 +44,7 @@ spec:
         fsGroup: 999
       containers:
         - image: {{ include "opencrvs.imageReference" .Values.redis }}
-          {{- if eq .Values.redis.auth_mode "acl" }}
           command: ["redis-server", "/usr/local/etc/redis/redis.conf"]
-          {{- end }}
           name: redis
           {{- if .Values.redis.env }}
           env:
@@ -55,7 +53,6 @@ spec:
           ports:
             - containerPort: 6379
               protocol: TCP
-          {{- if eq .Values.redis.auth_mode "acl" }}
           volumeMounts:
             - name: redis-conf
               mountPath: /usr/local/etc/redis/redis.conf
@@ -65,17 +62,14 @@ spec:
               mountPath: /usr/local/etc/redis/users.acl
               subPath: users.acl
               readOnly: true
-          {{- end }}
       restartPolicy: Always
       volumes:
-      {{- if eq .Values.redis.auth_mode "acl" }}
         - name: redis-acl
           secret:
             secretName: redis-opencrvs-acl
         - name: redis-conf
           configMap:
             name: redis-opencrvs-conf
-      {{- end }}
 
 {{ include "network-policy-rules" (dict "service_name" "redis" "Values" .Values) }}
 {{- end }}

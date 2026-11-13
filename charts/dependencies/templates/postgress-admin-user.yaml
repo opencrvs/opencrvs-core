@@ -1,14 +1,18 @@
-{{/*
-Create postgres Admin user (superuser)
-*/}}
-{{/* Prevent secret mutation between helm upgrades */}}
 {{- $secret := lookup "v1" "Secret" .Release.Namespace .Values.postgres.admin_user_secret_name }}
 {{- if not $secret }}
-  {{- $admin_user := "postgres" }}
-  {{- $admin_password := default (randAlphaNum 16) .Values.postgres.admin_user_password }}
-  {{- if .Values.postgres.use_default_credentials }}
-    {{- $admin_user = "postgres" }}
-    {{- $admin_password = "postgres" }}
+  {{- $admin_user := .Values.postgres.admin_username | default "" }}
+  {{- $admin_password := .Values.postgres.admin_password | default "" }}
+  {{- if and (not $admin_user) (not $admin_password) }}
+    {{- if .Values.postgres.use_default_credentials }}
+      {{- $admin_user = "postgres" }}
+      {{- $admin_password = "postgres" }}
+    {{- else }}
+      {{- $admin_user = randAlphaNum 16 }}
+      {{- $admin_password = randAlphaNum 32 }}
+    {{- end }}
+  {{- end }}
+  {{- if or (not $admin_user) (not $admin_password) }}
+    {{- fail "postgres.admin_username and postgres.admin_password must be set together" }}
   {{- end }}
 ---
 apiVersion: v1

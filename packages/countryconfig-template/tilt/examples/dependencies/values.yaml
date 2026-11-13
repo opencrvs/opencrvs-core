@@ -13,3 +13,15 @@ ingress:
   ssl_enabled: false
 
 storage_type: host_path
+
+minio:
+  use_default_credentials: true
+
+postgres:
+  use_default_credentials: true
+
+elasticsearch:
+  use_default_credentials: true
+
+redis:
+  use_default_credentials: true

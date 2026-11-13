@@ -34,13 +34,6 @@ spec:
           env:
             - name: POSTGRES_HOST
               value: {{ .Values.postgres.host }}
-          # FIXME: Double check property name "managed"
-          {{- if eq .Values.postgres.auth_mode "disabled" }}
-            - name: PGPASSWORD
-              value: postgres
-            - name: POSTGRES_USER
-              value: postgres
-          {{- else if eq .Values.postgres.auth_mode "auto" }}
             - name: PGPASSWORD
               valueFrom:
                 secretKeyRef:
@@ -51,7 +44,6 @@ spec:
                 secretKeyRef:
                   key: POSTGRES_USER
                   name: {{ .Values.postgres.admin_user_secret_name }}
-          {{- end }}
             - name: POSTGRES_DB
               value: {{ .Values.postgres.events_db | replace "-" "_" }}
             - name: EVENTS_APP_ROLE
@@ -112,16 +104,11 @@ spec:
                 done
               done
           env:
-          {{- if eq .Values.elasticsearch.auth_mode "disabled" }}
-            - name: ELASTICSEARCH_HOST
-              value: "{{ .Values.elasticsearch.host }}:{{ .Values.elasticsearch.port }}"
-          {{- else if or (eq .Values.elasticsearch.auth_mode "auto") (eq .Values.elasticsearch.auth_mode "use_secret") }}
             - name: ELASTICSEARCH_HOST
               valueFrom:
                 secretKeyRef:
                   key: SEARCH_ELASTIC_HOST
                   name: {{ .Values.elasticsearch.urls_secret }}
-          {{- end }}
           {{- include "render-env-vars" (dict "service_name" "data_cleanup" "Values" .Values) }}
       restartPolicy: "OnFailure"
 
