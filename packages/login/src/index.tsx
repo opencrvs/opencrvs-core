@@ -26,7 +26,7 @@ const RETRY_TIMEOUT = 5000
 
 WebFont.load({
   google: {
-    families: ['Noto+Sans:600', 'Noto+Sans:400']
+    families: ['Noto+Sans:600', 'Noto+Sans:500', 'Noto+Sans:400']
   }
 })
 storage.configStorage('OpenCRVS')
