@@ -121,7 +121,23 @@ fi
 
 
 echo
-openCRVSPorts=( 3447 9200 6379 4444 3040 5050 2020 7070 1050 3030 3000 3020 2525 2021 3535 3536 9050 2024 20240 20260)
+openCRVSPorts=(
+  9200  # elasticsearch
+  6379  # redis
+  5432  # postgres
+  3535  # rustfs-api
+  3536  # rustfs-console
+  4040  # auth
+  7070  # gateway
+  5555  # events
+  9050  # documents
+  3040  # testland
+  3000  # client
+  3020  # login
+  2024  # mosip-api
+  20240 # mosip-mock
+  20260 # esignet-mock
+)
 for x in "${openCRVSPorts[@]}"
 do
    :
