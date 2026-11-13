@@ -2074,6 +2074,9 @@ importers:
       uuid:
         specifier: ^9.0.0
         version: 9.0.1
+      yaml:
+        specifier: ^2.7.1
+        version: 2.9.0
       zod:
         specifier: ^4.6.5
         version: 4.6.5
@@ -2099,15 +2102,39 @@ importers:
       '@types/prompts':
         specifier: ^2.4.9
         version: 2.4.9
+      '@types/react':
+        specifier: 18.3.1
+        version: 18.3.1
+      '@types/react-dom':
+        specifier: 18.3.0
+        version: 18.3.0
       '@types/ssh2':
         specifier: ^1.15.5
         version: 1.15.5
       '@types/uuid':
         specifier: ^9.0.3
         version: 9.0.8
+      '@vitejs/plugin-react':
+        specifier: ^6.0.4
+        version: 6.0.4(vite@8.1.5(@types/node@26.2.0)(esbuild@0.24.0)(terser@5.51.2)(tsx@4.23.1)(yaml@2.9.0))
       esbuild:
         specifier: ^0.24.0
         version: 0.24.0
+      react:
+        specifier: 18.3.1
+        version: 18.3.1
+      react-dom:
+        specifier: 18.3.1
+        version: 18.3.1(react@18.3.1)
+      survey-core:
+        specifier: ^3.2.3
+        version: 3.2.4
+      survey-react-ui:
+        specifier: ^3.2.3
+        version: 3.2.4(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(survey-core@3.2.4)
+      vite:
+        specifier: ^8.1.5
+        version: 8.1.5(@types/node@26.2.0)(esbuild@0.24.0)(terser@5.51.2)(tsx@4.23.1)(yaml@2.9.0)
       vitest:
         specifier: ^4.1.10
         version: 4.1.10(@opentelemetry/api@1.9.1)(@types/node@26.2.0)(@vitest/coverage-v8@4.1.10)(jsdom@16.7.0)(msw@2.7.3(@types/node@26.2.0)(typescript@7.0.2))(vite@8.1.5(@types/node@26.2.0)(esbuild@0.24.0)(terser@5.51.2)(tsx@4.23.1)(yaml@2.9.0))
@@ -14367,6 +14394,16 @@ packages:
     resolution: {integrity: sha512-ot0WnXS9fgdkgIcePe6RHNk1WA8+muPa6cSjeR3V8K27q9BB1rTE3R1p7Hv0z1ZyAc8s6Vvv8DIyWf681MAt0w==}
     engines: {node: '>= 0.4'}
 
+  survey-core@3.2.4:
+    resolution: {integrity: sha512-xm3VfT7bzgQFzXrabcjyvscH6Y+Tsh3z9Axa8G4emVwPzs9UfhXxKuTAer/5R7CoT/RM5mg9/GtNRYmMeZe0Dg==}
+
+  survey-react-ui@3.2.4:
+    resolution: {integrity: sha512-QguvBUDlEvpz8ip5ej95eDyTU8/MH2j31Z6EaXJL91n4/XhjHbQndNWtGAYf9k99PI+VF64Yx0GKw/n9Bn0anA==}
+    peerDependencies:
+      react: ^16.5.0 || ^17.0.1 || ^18.1.0 || ^19.0.0
+      react-dom: ^16.5.0 || ^17.0.1 || ^18.1.0 || ^19.0.0
+      survey-core: 3.2.4
+
   svg-tags@1.0.0:
     resolution: {integrity: sha512-ovssysQTa+luh7A5Weu3Rta6FJlFBBbInjOh722LIt6klpU2/HtdUbszju/G4devcvk8PGt7FCLv5wftu3THUA==}
 
@@ -21395,6 +21432,11 @@ snapshots:
     dependencies:
       '@rolldown/pluginutils': 1.0.1
       vite: 8.1.5(@types/node@20.19.43)(esbuild@0.28.1)(terser@5.51.2)(tsx@4.23.1)(yaml@2.9.0)
+
+  '@vitejs/plugin-react@6.0.4(vite@8.1.5(@types/node@26.2.0)(esbuild@0.24.0)(terser@5.51.2)(tsx@4.23.1)(yaml@2.9.0))':
+    dependencies:
+      '@rolldown/pluginutils': 1.0.1
+      vite: 8.1.5(@types/node@26.2.0)(esbuild@0.24.0)(terser@5.51.2)(tsx@4.23.1)(yaml@2.9.0)
 
   '@vitest/coverage-v8@4.1.10(vitest@4.1.10)':
     dependencies:
@@ -31272,6 +31314,14 @@ snapshots:
       supports-color: 7.2.0
 
   supports-preserve-symlinks-flag@1.0.0: {}
+
+  survey-core@3.2.4: {}
+
+  survey-react-ui@3.2.4(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(survey-core@3.2.4):
+    dependencies:
+      react: 18.3.1
+      react-dom: 18.3.1(react@18.3.1)
+      survey-core: 3.2.4
 
   svg-tags@1.0.0: {}
 

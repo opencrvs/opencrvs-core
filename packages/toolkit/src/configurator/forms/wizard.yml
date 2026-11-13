@@ -1,0 +1,723 @@
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at https://mozilla.org/MPL/2.0/.
+#
+# OpenCRVS is also distributed under the terms of the Civil Registration
+# & Healthcare Disclaimer located at http://opencrvs.org/license.
+#
+# Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
+# SurveyJS form definition, authored as YAML and compiled to JSON by Vite.
+#
+# Question names are the GitHub secret / variable names used by
+# `yarn environment:init` (opencrvs-core/packages/toolkit/src/environment).
+# `secret: true` marks values that must stay in memory and out of exports;
+# questions of type `secret` are always treated as secrets.
+#
+# Functions used in expressions (isIPv4, isCidrList, areValidKeys, usersWithoutKeys)
+# are registered in src/form/functions.ts.
+#
+# `{githubAvailable}` is false when GitHub was skipped or the connection was lost. Secrets are
+# stored only on GitHub, so then no secret is asked for or generated: src/form/survey.ts adds
+# `and {githubAvailable} = true` to every secret question. What is about GitHub only and is not a
+# secret (the registry page, the email and Sentry switches, disk encryption) says so below.
+title: OpenCRVS Environment configuration
+# The app's own header already says it, so the form does not repeat it on every page.
+showTitle: false
+showQuestionNumbers: "off"
+showTOC: true
+tocLocation: left
+showProgressBar: true
+progressBarLocation: aboveHeader
+progressBarType: requiredQuestions
+# The last page's button opens the review instead of completing the form (see src/app/FormStep.tsx).
+completeText: Review changes
+showCompletedPage: false
+pages:
+  - name: environment
+    title: Environment
+    elements:
+      - type: dropdown
+        name: ENVIRONMENT_NAME
+        title: Environment name
+        description: Pick an existing environment to update it, or type a new name.
+        placeholder: Pick an environment or type a new name
+        isRequired: true
+        allowCustomChoices: true
+        # existing environments are set as choices in src/form/survey.ts
+        validators:
+          - type: regex
+            regex: "^[a-z][a-z0-9-]{1,30}$"
+            text: Use lowercase letters, digits and dashes, starting with a letter.
+      - type: radiogroup
+        name: ENVIRONMENT_TYPE
+        title: Environment type
+        description: Used to set defaults for other questions and properly configure the environment.
+        isRequired: true
+        choices:
+          - { value: non-production, text: Development/Quality assurance/Testing (no PII data) }
+          - { value: production, text: "Staging/Production (hosts PII data, requires frequent backups)" }
+      - type: text
+        name: DOMAIN
+        title: Web domain applied after all subdomains
+        description: The domain for the environment, such as farajaland.opencrvs.org. Subdomains are added automatically.
+        isRequired: true
+        validators:
+          - type: regex
+            regex: "^([a-z0-9]([a-z0-9-]*[a-z0-9])?\\.)+[a-z]{2,}$"
+            caseInsensitive: true
+            text: Enter a domain such as farajaland.opencrvs.org.
+      - type: boolean
+        name: TWO_FA_ENABLED
+        title: Two-factor authentication (2FA)
+        description: Enable two-factor authentication (2FA)? This should be enabled for any environment that hosts PII data.
+        renderAs: checkbox
+        defaultValueExpression: "iif({ENVIRONMENT_TYPE} = 'production', true, false)"
+        setValueIf: "{ENVIRONMENT_TYPE} = 'production'"
+        setValueExpression: "true"
+        enableIf: "{ENVIRONMENT_TYPE} != 'production'"
+      - type: boolean
+        name: ACTIVATE_USERS
+        title: Activate users on creation
+        description: Always off for staging and production.
+        renderAs: checkbox
+        defaultValue: true
+        defaultValueExpression: "iif({ENVIRONMENT_TYPE} = 'production', false, true)"
+        setValueIf: "{ENVIRONMENT_TYPE} = 'production'"
+        setValueExpression: "false"
+        enableIf: "{ENVIRONMENT_TYPE} != 'production'"
+      - type: boolean
+        name: CONFIGURE_EMAIL
+        title: Configure Email (SMTP) settings
+        description: When off, the Email page is skipped.
+        # The SMTP settings are all secrets, so without GitHub there is nothing to configure.
+        visibleIf: "{githubAvailable} = true"
+        renderAs: checkbox
+        defaultValue: false
+        defaultValueExpression: "iif({ENVIRONMENT_TYPE} = 'production', true, false)"
+        setValueIf: "{ENVIRONMENT_TYPE} = 'production'"
+        setValueExpression: "true"
+        enableIf: "{ENVIRONMENT_TYPE} != 'production'"
+      - type: boolean
+        name: CONFIGURE_INFRASTRUCTURE
+        title: Configure Infrastructure (Kubernetes, SSH users, Traefik, disk encryption)
+        description: When off, the Infrastructure pages are skipped.
+        defaultValue: true
+      # A panel groups questions into one titled block on the page.
+      - type: panel
+        name: approval_settings
+        title: Deployment approval
+        elements:
+          - type: boolean
+            name: APPROVAL_REQUIRED
+            title: Approval required?
+            description: Stored per environment.
+            renderAs: checkbox
+            defaultValue: false
+            defaultValueExpression: "iif({ENVIRONMENT_TYPE} = 'production', true, false)"
+            setValueIf: "{ENVIRONMENT_TYPE} = 'production'"
+            setValueExpression: "true"
+            enableIf: "{ENVIRONMENT_TYPE} != 'production'"
+          - type: text
+            name: APPROVERS
+            title: Approvers
+            description: GitHub user names separated by commas. Stored on the repository, so every environment shares the list.
+            visibleIf: "{APPROVAL_REQUIRED} = true"
+            requiredIf: "{APPROVAL_REQUIRED} = true"
+            validators:
+              - type: regex
+                regex: "^[A-Za-z0-9-]+(\\s*,\\s*[A-Za-z0-9-]+)*$"
+                text: Enter GitHub user names separated by commas.
+      - type: secret
+        name: OPENCRVS_METABASE_ADMIN_PASSWORD
+        title: Metabase admin password
+        description: Generated once in your browser. Use Generate to replace it.
+        isRequired: true
+        autoGenerate: true
+
+  - name: registry
+    title: Container registry
+    description: The registry the images are pulled from. A secret that GitHub already has stays locked until you press Edit.
+    # The host is a repository variable and the rest are secrets: all of it lives on GitHub.
+    visibleIf: "{githubAvailable} = true"
+    elements:
+      - type: text
+        name: REGISTRY_HOST
+        title: Registry host
+        defaultValue: docker.io
+        isRequired: true
+        validators:
+          - type: regex
+            regex: "^[a-z0-9]([a-z0-9.-]*[a-z0-9])?(:[0-9]+)?$"
+            caseInsensitive: true
+            text: Enter a host without protocol or path, such as docker.io.
+      - type: secret
+        name: REGISTRY_ORGANISATION
+        title: Organisation (or user) in the registry
+        masked: false
+        isRequired: true
+      - type: secret
+        name: REGISTRY_REPOSITORY
+        title: Private container repository
+        masked: false
+        isRequired: true
+      - type: secret
+        name: REGISTRY_USERNAME
+        title: Registry username
+        masked: false
+        isRequired: true
+      - type: secret
+        name: REGISTRY_TOKEN
+        title: Registry token
+        isRequired: true
+
+  - name: email
+    title: Email
+    visibleIf: "{CONFIGURE_EMAIL} = true and {githubAvailable} = true"
+    elements:
+      - type: secret
+        name: SMTP_HOST
+        title: SMTP host
+        masked: false
+        isRequired: true
+      - type: secret
+        name: SMTP_PORT
+        title: SMTP port
+        masked: false
+        isRequired: true
+        validators:
+          - type: numeric
+            minValue: 1
+            maxValue: 65535
+            text: Enter a port between 1 and 65535.
+      - type: secret
+        name: SMTP_USERNAME
+        title: SMTP username
+        masked: false
+        isRequired: true
+      - type: secret
+        name: SMTP_PASSWORD
+        title: SMTP password
+        isRequired: true
+      - type: secret
+        name: SMTP_SECURE
+        title: Connect using TLS
+        description: "Type: true/false. FIXME: Refactor SMTP_SECURE to be stored as variable in the future"
+        # FIXME: Refactor SMTP_SECURE to be stored as variable in the future
+        # (as a secret GitHub cannot return its value, so the review shows "update" on every apply)
+        secret: true
+      - type: secret
+        name: SENDER_EMAIL_ADDRESS
+        title: Sender email address
+        masked: false
+        isRequired: true
+        validators:
+          - type: email
+      - type: secret
+        name: ALERT_EMAIL
+        title: Alert email address
+        masked: false
+        isRequired: true
+        validators:
+          - type: email
+
+  - name: dependencies
+    title: Data stores
+    description: >-
+      Where each dependency of the OpenCRVS services runs and how the services sign in to it.
+      The credentials are generated once; use Generate to replace one.
+    elements:
+      - type: panel
+        name: elasticsearch_settings
+        title: Elasticsearch
+        elements:
+          # Checked: the component runs in the cluster and nothing is asked. Unchecking it shows the fields, and the checkbox goes.
+          - type: boolean
+            name: USE_BUILTIN_ELASTICSEARCH
+            title: Use built-in component
+            renderAs: checkbox
+            defaultValue: true
+          - type: text
+            name: ELASTICSEARCH_HOST
+            title: Host
+            description: Pre-filled with the address inside the cluster. Change it to use another host.
+            isRequired: true
+            visibleIf: "{USE_BUILTIN_ELASTICSEARCH} = false"
+            defaultValueExpression: "defaultAddress('ELASTICSEARCH_HOST', {ENVIRONMENT_NAME})"
+            validators:
+              - type: regex
+                regex: "^[a-z0-9]([a-z0-9.-]*[a-z0-9])?(:[0-9]+)?$"
+                caseInsensitive: true
+                text: Enter a host without protocol or path.
+          - type: secret
+            name: ELASTICSEARCH_SUPERUSER
+            title: User
+            description: Elasticsearch's built-in superuser is called elastic.
+            visibleIf: "{USE_BUILTIN_ELASTICSEARCH} = false"
+            autoGenerate: true
+            charset: username
+            length: 12
+            isRequired: true
+          - type: secret
+            name: ELASTICSEARCH_SUPERUSER_PASSWORD
+            title: Password
+            visibleIf: "{USE_BUILTIN_ELASTICSEARCH} = false"
+            isRequired: true
+            autoGenerate: true
+      - type: panel
+        name: rustfs_settings
+        title: S3 Storage
+        description: >-
+          S3-compatible file storage. The credentials are for the administrator of the S3 bucket.
+        elements:
+          # Checked: the component runs in the cluster and its host is not asked. Unchecking it shows the host. The credentials are
+          # always asked: the services sign in to the built-in component with them too, so they must be stored either way.
+          - type: boolean
+            name: USE_BUILTIN_RUSTFS
+            title: Use built-in component (RustFS)
+            renderAs: checkbox
+            defaultValue: true
+          - type: text
+            name: S3_HOST
+            title: Host
+            description: Pre-filled with the address inside the cluster. Change it to use another host.
+            visibleIf: "{USE_BUILTIN_RUSTFS} = false"
+            isRequired: true
+            defaultValueExpression: "defaultAddress('S3_HOST', {ENVIRONMENT_NAME})"
+            validators:
+              - type: regex
+                regex: "^[a-z0-9]([a-z0-9.-]*[a-z0-9])?(:[0-9]+)?$"
+                caseInsensitive: true
+                text: Enter a host without protocol or path.
+          - type: secret
+            name: S3_ADMIN_ACCESS_KEY
+            title: User
+            description: The access key of the S3 administrator.
+            isRequired: true
+            autoGenerate: true
+            charset: username
+            length: 12
+          - type: secret
+            name: S3_ADMIN_SECRET_KEY
+            title: Password
+            description: The secret key of the S3 administrator.
+            isRequired: true
+            autoGenerate: true
+      - type: panel
+        name: postgres_settings
+        title: Postgres
+        elements:
+          # Checked: the component runs in the cluster and its host is not asked. Unchecking it shows the host. The credentials are
+          # always asked: the services sign in to the built-in component with them too, so they must be stored either way.
+          - type: boolean
+            name: USE_BUILTIN_POSTGRES
+            title: Use built-in component
+            renderAs: checkbox
+            defaultValue: true
+          - type: text
+            name: POSTGRES_HOST
+            title: Host
+            description: Pre-filled with the address inside the cluster. Change it to use another host.
+            visibleIf: "{USE_BUILTIN_POSTGRES} = false"
+            isRequired: true
+            defaultValueExpression: "defaultAddress('POSTGRES_HOST', {ENVIRONMENT_NAME})"
+            validators:
+              - type: regex
+                regex: "^[a-z0-9]([a-z0-9.-]*[a-z0-9])?(:[0-9]+)?$"
+                caseInsensitive: true
+                text: Enter a host without protocol or path.
+          - type: secret
+            name: POSTGRES_USER
+            title: User
+            isRequired: true
+            autoGenerate: true
+            charset: username
+            length: 12
+          - type: secret
+            name: POSTGRES_PASSWORD
+            title: Password
+            isRequired: true
+            autoGenerate: true
+      - type: panel
+        name: redis_settings
+        title: Redis
+        elements:
+          # Checked: the component runs in the cluster and nothing is asked. Unchecking it shows the fields, and the checkbox goes.
+          - type: boolean
+            name: USE_BUILTIN_REDIS
+            title: Use built-in component
+            renderAs: checkbox
+            defaultValue: true
+          - type: text
+            name: REDIS_HOST
+            title: Host
+            description: Pre-filled with the address inside the cluster. Change it to use another host.
+            visibleIf: "{USE_BUILTIN_REDIS} = false"
+            isRequired: true
+            defaultValueExpression: "defaultAddress('REDIS_HOST', {ENVIRONMENT_NAME})"
+            validators:
+              - type: regex
+                regex: "^[a-z0-9]([a-z0-9.-]*[a-z0-9])?(:[0-9]+)?$"
+                caseInsensitive: true
+                text: Enter a host without protocol or path.
+  - name: monitoring
+    title: Monitoring
+    description: The monitoring stack is Kibana, APM, Filebeat, Metricbeat, Elastalert, the OpenTelemetry Collector and tracing.
+    elements:
+      - type: boolean
+        name: MONITORING_ENABLED
+        title: Enable monitoring
+        defaultValue: true
+      - type: panel
+        name: otel_settings
+        title: OpenTelemetry configuration
+        description: The OpenTelemetry Collector receives traces from the services and sends them to APM.
+        elements:
+          - type: boolean
+            name: OTEL_ENABLED
+            title: Enable OpenTelemetry
+            description: The services send traces to the OpenTelemetry Collector.
+            defaultValue: true
+          # Checked: the collector runs in the cluster and nothing is asked. Unchecking it shows the endpoint, and the checkbox goes.
+          - type: boolean
+            name: USE_BUILTIN_OTEL_COLLECTOR
+            title: Use built-in component
+            renderAs: checkbox
+            defaultValue: true
+            visibleIf: "{OTEL_ENABLED} = true"
+          - type: text
+            name: OTEL_COLLECTOR_ENDPOINT
+            title: OpenTelemetry Collector endpoint
+            description: Pre-filled with the address inside the cluster. Change it to use another collector.
+            visibleIf: "{OTEL_ENABLED} = true and {USE_BUILTIN_OTEL_COLLECTOR} = false"
+            isRequired: true
+            defaultValueExpression: "defaultAddress('OTEL_COLLECTOR_ENDPOINT', {ENVIRONMENT_NAME})"
+            validators:
+              # A URL whose protocol (http:// or https://) is optional, with an optional port and path.
+              - type: regex
+                regex: "^(https?://)?[a-z0-9]([a-z0-9.-]*[a-z0-9])?(:[0-9]+)?(/\\S*)?$"
+                caseInsensitive: true
+                text: Enter a URL or a host, with an optional http:// or https://, such as http://collector.example.org:4317.
+      - type: panel
+        name: kibana_settings
+        title: Kibana
+        visibleIf: "{MONITORING_ENABLED} = true"
+        elements:
+          - type: secret
+            name: KIBANA_USERNAME
+            title: User
+            autoGenerate: true
+            charset: username
+            length: 12
+            isRequired: true
+          - type: secret
+            name: KIBANA_PASSWORD
+            title: Password
+            isRequired: true
+            autoGenerate: true
+      # Sentry is separate from the monitoring stack: it can be used with or without it.
+      - type: panel
+        name: sentry_settings
+        title: Sentry
+        # The DSN is a secret, and the switch only says whether one exists.
+        visibleIf: "{githubAvailable} = true"
+        elements:
+          - type: boolean
+            name: USE_SENTRY
+            title: Use Sentry
+            description: Report errors of the services to Sentry.
+            defaultValue: false
+          - type: secret
+            name: SENTRY_DSN
+            title: Sentry DSN
+            description: The DSN of the Sentry project, such as https://key@o0.ingest.sentry.io/0.
+            visibleIf: "{USE_SENTRY} = true"
+            isRequired: true
+            validators:
+              - type: regex
+                regex: "^https?://\\S+$"
+                text: Enter the DSN of the project, starting with https://.
+
+  - name: backup
+    title: Backup/Restore
+    description: >-
+      Back this environment up to a backup server, or restore it from the backup of another
+      environment. Like the CLI, an environment does one or the other.
+    elements:
+      - type: radiogroup
+        name: BACKUP_OR_RESTORE
+        title: What should this environment do?
+        defaultValue: none
+        choices:
+          - { value: none, text: "Neither" }
+          - { value: backup, text: "Configure backup" }
+          - { value: restore, text: "Configure restore" }
+      - type: panel
+        name: backup_settings
+        title: Backup
+        visibleIf: "{BACKUP_OR_RESTORE} = 'backup'"
+        elements:
+          - type: text
+            name: BACKUP_HOST
+            title: Backup server IP address
+            isRequired: true
+            validators:
+              - type: expression
+                expression: "isIPv4({BACKUP_HOST})"
+                text: Enter an IPv4 address, not a hostname.
+          - type: secret
+            name: BACKUP_SERVER_USER
+            title: Backup server user name
+            masked: true
+            isRequired: true
+          # Not stored: the review shows the backup secrets it leads to (src/plan/backupSecrets.ts). They are
+          # secrets, so without GitHub there is nothing to generate. Only the SSH key pair depends on this box; the
+          # backup encryption passphrase is made once and never replaced.
+          - type: boolean
+            name: GENERATE_BACKUP_SSH_KEYS
+            title: Generate new private/public SSH key pair
+            description: >-
+              The key pair this environment logs in to the backup server with, stored on GitHub as BACKUP_HOST_PRIVATE_KEY
+              and BACKUP_HOST_PUBLIC_KEY. Ticked, and locked, while the environment has no key pair yet: it always gets one.
+              Unticked for an environment that has one; tick it to replace that key pair.
+            visibleIf: "{githubAvailable} = true"
+            renderAs: checkbox
+            defaultValue: false
+            # `backupKeysExist` is set from what GitHub holds (src/form/apply.ts), as the environment type is for 2FA.
+            setValueIf: "{backupKeysExist} = false"
+            setValueExpression: "true"
+            enableIf: "{backupKeysExist} = true"
+          - type: radiogroup
+            name: BACKUP_ENVIRONMENT_MODE
+            title: Backup mode
+            isRequired: true
+            defaultValue: dump
+            choices:
+              - { value: dump, text: "Full dump (daily full database backup)" }
+              - { value: differential, text: "Differential (weekly full, daily diff backup)" }
+      - type: panel
+        name: restore_settings
+        title: Restore
+        visibleIf: "{BACKUP_OR_RESTORE} = 'restore'"
+        elements:
+          - type: dropdown
+            name: RESTORE_ENVIRONMENT_NAME
+            title: Environment to restore from
+            description: Pick an existing environment, or type another name.
+            isRequired: true
+            allowCustomChoices: true
+            # choices are the environments found on GitHub, set in src/form/survey.ts; the environment
+            # being configured is not offered, as it cannot be restored from itself. The validator
+            # covers the same name typed in by hand, or an environment name changed after this was picked.
+            choicesVisibleIf: "{item} != {ENVIRONMENT_NAME}"
+            validators:
+              - type: expression
+                expression: "{RESTORE_ENVIRONMENT_NAME} != {ENVIRONMENT_NAME}"
+                text: An environment cannot be restored from itself. Pick or type another environment.
+          - type: radiogroup
+            name: RESTORE_ENVIRONMENT_MODE
+            title: Backup mode of that environment
+            isRequired: true
+            defaultValue: dump
+            choices:
+              - { value: dump, text: "Full dump (daily full database backup)" }
+              - { value: differential, text: "Differential (weekly full, daily diff backup)" }
+          - type: text
+            name: RESTORE_HOST
+            title: Restore backup server IP address
+            isRequired: true
+            validators:
+              - type: expression
+                expression: "isIPv4({RESTORE_HOST})"
+                text: Enter an IPv4 address, not a hostname.
+
+  - name: cluster
+    title: Kubernetes
+    visibleIf: "{CONFIGURE_INFRASTRUCTURE} = true"
+    elements:
+      - type: text
+        name: KUBE_MASTER_NODE
+        title: Master node hostname or IP
+        description: Leave empty to auto-detect.
+      - type: text
+        name: KUBE_API_HOST
+        title: Kubernetes API endpoint IP
+        description: Leave empty to use the master node.
+      - type: text
+        name: KUBE_API_ALLOWED_CIDRS
+        title: Allowed CIDRs for Kubernetes API access
+        description: Comma-separated, for example 10.0.0.0/24, 192.168.1.5/32. Leave empty to use the API endpoint.
+        validators:
+          - type: expression
+            expression: "{KUBE_API_ALLOWED_CIDRS} empty or isCidrList({KUBE_API_ALLOWED_CIDRS})"
+            text: Enter valid CIDRs separated by commas, for example 10.0.0.0/24.
+      - type: matrixdynamic
+        name: WORKER_NODES
+        title: Worker nodes
+        description: Leave empty for a single-node cluster.
+        rowCount: 0
+        minRowCount: 0
+        hideColumnsIfEmpty: true
+        addRowText: Add worker node
+        noRowsText: No worker nodes. The cluster runs on the master node only.
+        columns:
+          - name: ip
+            title: IP address
+            cellType: text
+            isRequired: true
+            validators:
+              - type: expression
+                expression: "isIPv4({row.ip})"
+                text: Enter an IPv4 address.
+
+  - name: users
+    title: SSH Users
+    visibleIf: "{CONFIGURE_INFRASTRUCTURE} = true"
+    elements:
+      # An html question rather than the page description, which is plain text and cannot be bold.
+      - type: html
+        name: USERS_HELP
+        html: |-
+          <p>People who can log in to the servers over SSH.</p>
+          <ul>
+            <li><strong>Admin</strong> has full access to the OS and Kubernetes.</li>
+            <li><strong>Operator</strong> has read-only OS access and full Kubernetes access.</li>
+          </ul>
+          <p>Present users can log in; absent users have their account disabled.</p>
+      - type: matrixdynamic
+        name: USERS
+        title: Users
+        rowCount: 0
+        minRowCount: 0
+        hideColumnsIfEmpty: true
+        keyName: name
+        keyDuplicationError: User names must be unique.
+        confirmDelete: true
+        confirmDeleteText: Remove this user?
+        addRowText: Add user
+        noRowsText: No users configured. Nobody will be able to log in over SSH.
+        detailPanelMode: underRow
+        detailPanelShowOnAdding: true
+        columns:
+          - name: name
+            title: Username
+            cellType: text
+            isRequired: true
+            minWidth: 120px
+            width: 120px
+            validators:
+              - type: regex
+                regex: "^[a-z_][a-z0-9_-]*[$]?$"
+                text: Use lowercase letters, digits, underscore and hyphen, starting with a letter or underscore.
+          - name: role
+            title: Role
+            cellType: dropdown
+            isRequired: true
+            allowClear: false
+            minWidth: 150px
+            width: 150px
+            defaultValue: operator
+            choices:
+              - { value: admin, text: Admin - Full OS and Kubernetes access }
+              - { value: operator, text: "Operator - Read-only OS, full Kubernetes access" }
+          - name: state
+            title: State
+            cellType: dropdown
+            isRequired: true
+            allowClear: false
+            minWidth: 135px
+            width: 135px
+            defaultValue: present
+            choices:
+              - { value: present, text: Present }
+              - { value: absent, text: Absent }
+        detailElements:
+          - type: comment
+            name: ssh_keys
+            title: SSH public keys
+            description: One per line. Lines starting with # are ignored.
+            rows: 4
+            validators:
+              - type: expression
+                expression: "areValidKeys({row.ssh_keys})"
+                text: Every line must be an SSH public key such as ssh-ed25519 AAAA… Private keys are not accepted.
+      - type: html
+        name: USERS_WITHOUT_KEYS_WARNING
+        visibleIf: "usersWithoutKeys({USERS}) > 0"
+        html: "<p><strong>Warning:</strong> users without SSH keys will not be able to log in remotely.</p>"
+
+  - name: traefik
+    title: Traefik
+    visibleIf: "{CONFIGURE_INFRASTRUCTURE} = true"
+    description: How Traefik, the ingress of the cluster, gets the SSL certificate of the environment.
+    elements:
+      - type: radiogroup
+        name: TRAEFIK_MODE
+        title: SSL certificate
+        isRequired: true
+        defaultValue: lets_encrypt
+        choices:
+          - { value: lets_encrypt, text: "Let's Encrypt certificate (issued and renewed automatically)" }
+          - { value: static_ssl, text: "Static SSL certificate (you provide the certificate and its key)" }
+          - { value: custom, text: "Custom configuration (set it yourself in traefik/values.override.yaml)" }
+      - type: panel
+        name: static_ssl_settings
+        title: Static SSL certificate
+        visibleIf: "{TRAEFIK_MODE} = 'static_ssl'"
+        elements:
+          - type: secret
+            name: SSL_CRT
+            title: Certificate or certificate chain
+            description: PEM text, from -----BEGIN CERTIFICATE----- to -----END CERTIFICATE-----.
+            multiline: true
+            masked: false
+            isRequired: true
+            validators:
+              - type: regex
+                regex: "^\\s*-----BEGIN CERTIFICATE-----[\\s\\S]*-----END CERTIFICATE-----\\s*$"
+                text: Paste the certificate in PEM format, including the BEGIN and END lines.
+          - type: secret
+            name: SSL_KEY
+            title: Certificate key
+            description: PEM text, from -----BEGIN PRIVATE KEY----- to -----END PRIVATE KEY-----.
+            multiline: true
+            isRequired: true
+            validators:
+              - type: regex
+                regex: "^\\s*-----BEGIN ([A-Z]+ )?PRIVATE KEY-----[\\s\\S]*-----END ([A-Z]+ )?PRIVATE KEY-----\\s*$"
+                text: Paste the key in PEM format, including the BEGIN and END lines.
+
+  - name: disk
+    title: Disk encryption
+    # The size is a GitHub variable and the key a secret, so without GitHub encryption cannot be set up here.
+    visibleIf: "{CONFIGURE_INFRASTRUCTURE} = true and {githubAvailable} = true"
+    description: >-
+      Encrypts the data directory of the servers. It can only be chosen when the environment is created:
+      for an existing environment the choice, the size and the key are shown and cannot be changed.
+    elements:
+      - type: boolean
+        name: ENABLE_ENCRYPTION
+        title: Enable disk encryption
+        defaultValue: false
+        enableIf: "{definedSecrets} notcontains 'ENCRYPTION_KEY'"
+      - type: text
+        name: DISK_SPACE
+        title: Encrypted disk size
+        description: >-
+          The size of the encrypted data directory, such as 200g. DO NOT use all of the disk space for
+          OpenCRVS: leave at least 50g for the operating system.
+        visibleIf: "{ENABLE_ENCRYPTION} = true"
+        enableIf: "{definedSecrets} notcontains 'ENCRYPTION_KEY'"
+        defaultValue: 200g
+        isRequired: true
+        validators:
+          - type: regex
+            regex: "^[1-9][0-9]*[mMgGtT]$"
+            text: Enter a size such as 200g.
+      - type: secret
+        name: ENCRYPTION_KEY
+        title: Encryption key
+        description: "Generated once and never edited. Keep a copy: the encrypted data cannot be read without it."
+        visibleIf: "{ENABLE_ENCRYPTION} = true"
+        readOnly: true
+        isRequired: true
+        autoGenerate: true

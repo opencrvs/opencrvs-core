@@ -7,5 +7,15 @@
   // Without it the commons sources resolve through `paths` instead of the built
   // project, and every one of them trips the rootDir check.
   "references": [{ "path": "../commons/tsconfig-commonjs.json" }],
-  "exclude": ["**/node_modules/**", "dist", "**/*.test.ts"]
+  "exclude": [
+    "**/node_modules/**",
+    "dist",
+    "**/*.test.ts",
+    "src/configurator/ui",
+    "src/configurator/tests",
+    "src/configurator/scripts",
+    "src/configurator/server/fakeGitHub.ts",
+    "src/configurator/vite.config.ts",
+    "src/configurator/yamlForms.ts"
+  ]
 }
