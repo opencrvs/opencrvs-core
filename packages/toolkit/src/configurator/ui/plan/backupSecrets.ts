@@ -15,9 +15,9 @@ import type { LocalServerPort } from '../local/port'
 // The CLI keeps three secrets for the backup of an environment: the SSH key pair for the backup server and the
 // passphrase that encrypts the backups. None has a question: they are made when the plan is prepared, and the
 // plan writes them like any other secret.
-export const BACKUP_PRIVATE_KEY = 'BACKUP_HOST_PRIVATE_KEY'
-export const BACKUP_PUBLIC_KEY = 'BACKUP_HOST_PUBLIC_KEY'
-export const BACKUP_PASSPHRASE = 'BACKUP_ENCRYPTION_PASSPHRASE'
+const BACKUP_PRIVATE_KEY = 'BACKUP_HOST_PRIVATE_KEY'
+const BACKUP_PUBLIC_KEY = 'BACKUP_HOST_PUBLIC_KEY'
+const BACKUP_PASSPHRASE = 'BACKUP_ENCRYPTION_PASSPHRASE'
 
 // The form variable that says whether the environment has the key pair on GitHub. The pair has no question, so
 // `definedSecrets` does not list it; the checkbox that asks for a new pair reads this one (see forms/wizard.yml).

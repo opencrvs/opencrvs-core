@@ -23,7 +23,7 @@ import {
   isDirectory
 } from './paths'
 
-export interface InventoryMove {
+interface InventoryMove {
   environment: string
   /** Relative to the repository root. */
   from: string

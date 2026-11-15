@@ -163,7 +163,7 @@ export function updateEnvironmentOptions(
   }
 }
 
-export type WorkflowStatus =
+type WorkflowStatus =
   | 'updated'
   | 'unchanged'
   /** The repository does not have this workflow. */

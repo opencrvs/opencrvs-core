@@ -16,6 +16,9 @@ import { yamlForms } from './src/configurator/yamlForms'
 const require = createRequire(import.meta.url)
 
 export default defineConfig({
+  // Empty on purpose: vitest's defaults apply. knip reads the test files as entry points only when this key exists,
+  // so without it every export that only a test uses is reported as unused.
+  test: {},
   // The configurator's tests import its wizard.yml, see yamlForms.ts
   plugins: [yamlForms()],
   resolve: {

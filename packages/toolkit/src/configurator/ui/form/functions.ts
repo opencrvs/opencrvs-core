@@ -16,9 +16,9 @@ const OCTET = '(25[0-5]|2[0-4]\\d|1\\d\\d|[1-9]?\\d)'
 const IPV4 = new RegExp(`^(${OCTET}\\.){3}${OCTET}$`)
 const CIDR = new RegExp(`^(${OCTET}\\.){3}${OCTET}/([0-9]|[12][0-9]|3[0-2])$`)
 
-export const isIPv4 = (value: unknown) => typeof value === 'string' && IPV4.test(value.trim())
+const isIPv4 = (value: unknown) => typeof value === 'string' && IPV4.test(value.trim())
 
-export const isCidrList = (value: unknown) =>
+const isCidrList = (value: unknown) =>
   typeof value === 'string' && value.split(',').every((cidr) => CIDR.test(cidr.trim()))
 
 // The address a built-in component has inside the cluster, to pre-fill the question that asks for it:

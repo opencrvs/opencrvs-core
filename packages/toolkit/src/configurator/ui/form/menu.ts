@@ -21,7 +21,7 @@ interface MenuGroup {
 }
 
 // The pages of a group follow each other in forms/wizard.yml, because a group is a header placed before its first page.
-export const MENU_GROUPS: MenuGroup[] = [
+const MENU_GROUPS: MenuGroup[] = [
   { id: 'general', title: 'General', pages: ['environment', 'registry', 'email'] },
   { id: 'dependencies', title: 'Dependencies', pages: ['dependencies', 'monitoring', 'backup'] },
   { id: 'infrastructure', title: 'Infrastructure', pages: ['cluster', 'users', 'traefik', 'disk'] }
@@ -59,7 +59,7 @@ export function groupMenu(survey: SurveyModel, groups: MenuGroup[] = MENU_GROUPS
   list.setItems(items)
 }
 
-export const REVIEW_ITEM_ID = 'review'
+const REVIEW_ITEM_ID = 'review'
 
 // The last item of the menu is not a page: it does what the last page's button does and asks to complete the
 // form, which src/app/FormStep.tsx turns into the review (validating every page first). So it can be used from
@@ -89,7 +89,7 @@ export function isShown(question: Question): boolean {
 
 // A page counts as answered when every shown required question has a value.
 // Validators are not run here: they would also fire the async name lookup.
-export const isPageAnswered = (page: PageModel) =>
+const isPageAnswered = (page: PageModel) =>
   page.questions.every((question) => !isShown(question) || !question.isRequired || !question.isEmpty())
 
 // Marks pages in the built-in table of contents with a check once the user has
