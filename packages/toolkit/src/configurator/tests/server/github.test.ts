@@ -166,6 +166,6 @@ describe('what is sent to GitHub', () => {
     const github = new GitHubClient({ token: SECRET, owner: 'a', repo: 'b', baseUrl: 'https://api.github.test', fetch: evil })
     expect(await github.listEnvironments()).toEqual(['qa'])
     expect(calls).toHaveLength(1)
-    expect(calls.every((call) => call.startsWith('https://api.github.test'))).toBe(true)
+    expect(calls.every((call) => new URL(call).origin === 'https://api.github.test')).toBe(true)
   })
 })
