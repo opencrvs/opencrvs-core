@@ -1,5 +1,11 @@
 # Changelog
 
+## 2.1.3 Release Candidate
+
+### Bug fixes
+
+- `npx @opencrvs/toolkit upgrade` removes `COPY typings ./typings` from a v2.0 country config's `Dockerfile`. The Tiltfile it installs no longer sends `typings/` to the image build, so `tilt up` stopped at `[runner 6/6] COPY typings ./typings`. If you already upgraded with 2.1.0, delete that line from your `Dockerfile` [#14050](https://github.com/opencrvs/opencrvs-core/issues/14050)
+
 ## 2.1.2
 
 ### Improvements
