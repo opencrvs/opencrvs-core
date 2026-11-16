@@ -25,9 +25,6 @@ storage_type: host_path
 node_selector:
   role: data1
 
-minio:
-  enabled: false
-
 rustfs:
   enabled: {{rustfs_enabled}}
   use_default_credentials: false

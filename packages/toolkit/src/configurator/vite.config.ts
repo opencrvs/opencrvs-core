@@ -43,7 +43,7 @@ export default defineConfig({
       // Set ENVIRONMENTS_DIR to use another folder for the environments.
       environmentsDir: process.env.ENVIRONMENTS_DIR ?? `${process.cwd()}/environments`,
       projectDir: process.cwd(),
-      // Defaults to https://api.github.com; set GITHUB_API_URL to point at another host (for example the fake in scripts/fake-github.ts).
+      // Defaults to https://api.github.com; set GITHUB_API_URL to point at another host (for example a fake used in tests).
       githubApiUrl: process.env.GITHUB_API_URL,
       // What is needed to render the environment files (read once at start-up).
       files: {

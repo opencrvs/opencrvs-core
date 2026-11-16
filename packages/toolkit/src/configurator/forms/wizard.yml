@@ -127,12 +127,23 @@ pages:
               - type: regex
                 regex: "^[A-Za-z0-9-]+(\\s*,\\s*[A-Za-z0-9-]+)*$"
                 text: Enter GitHub user names separated by commas.
-      - type: secret
-        name: OPENCRVS_METABASE_ADMIN_PASSWORD
-        title: Metabase admin password
-        description: Generated once in your browser. Use Generate to replace it.
-        isRequired: true
-        autoGenerate: true
+      - type: panel
+        name: metabase_settings
+        title: Metabase
+        description: Metabase is the analytics and reporting tool for OpenCRVS. The admin user is created once and never replaced.
+        elements:
+          - type: secret
+            name: OPENCRVS_METABASE_ADMIN_EMAIL
+            title: Metabase admin email
+            description: Put your email address here.
+            isRequired: true
+            defaultValue: user@opencrvs.org
+          - type: secret
+            name: OPENCRVS_METABASE_ADMIN_PASSWORD
+            title: Metabase admin password
+            description: Generated once in your browser. Use Generate to replace it.
+            isRequired: true
+            autoGenerate: true
 
   - name: registry
     title: Container registry
@@ -230,7 +241,9 @@ pages:
         name: elasticsearch_settings
         title: Elasticsearch
         elements:
-          # Checked: the component runs in the cluster and nothing is asked. Unchecking it shows the fields, and the checkbox goes.
+          # Checked: the component runs in the cluster and its host and user are not asked (its superuser is called elastic).
+          # Unchecking it shows them. The password is always asked: the services sign in to the built-in component with it
+          # too, so it must be stored either way.
           - type: boolean
             name: USE_BUILTIN_ELASTICSEARCH
             title: Use built-in component
@@ -260,7 +273,6 @@ pages:
           - type: secret
             name: ELASTICSEARCH_SUPERUSER_PASSWORD
             title: Password
-            visibleIf: "{USE_BUILTIN_ELASTICSEARCH} = false"
             isRequired: true
             autoGenerate: true
       - type: panel

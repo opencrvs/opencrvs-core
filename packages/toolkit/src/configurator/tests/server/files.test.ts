@@ -106,7 +106,8 @@ describe('renderEnvironmentFiles', () => {
       'false'
     ])
     expect(external).toContain('host: es.example.org')
-    expect(external).toMatch(/minio:\n  enabled: false/) // MinIO is never deployed
+    expect(external).not.toMatch(/^minio:/m) // MinIO is gone: the chart has no key for it, in either case
+    expect(builtIn).not.toMatch(/^minio:/m)
   })
 
   it('reads the checkboxes back from the dependencies chart', () => {

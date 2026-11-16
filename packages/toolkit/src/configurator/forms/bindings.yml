@@ -259,5 +259,7 @@ bindings:
     targets: [{ source: github, kind: secret, scope: environment }]
   KIBANA_PASSWORD:
     targets: [{ source: github, kind: secret, scope: environment }]
+  OPENCRVS_METABASE_ADMIN_EMAIL:
+    targets: [{ source: github, kind: secret, scope: environment }]
   OPENCRVS_METABASE_ADMIN_PASSWORD:
     targets: [{ source: github, kind: secret, scope: environment }]

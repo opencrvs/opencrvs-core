@@ -37,9 +37,12 @@ describe('without GitHub', () => {
     for (const name of ['REGISTRY_TOKEN', 'SMTP_HOST', 'SMTP_SECURE', 'BACKUP_SERVER_USER', 'KIBANA_PASSWORD']) {
       expect(isShown(question(survey, name)), name).toBe(true)
     }
+    // The password is asked either way; the user name only for an Elasticsearch of your own.
+    expect(isShown(question(survey, 'ELASTICSEARCH_SUPERUSER_PASSWORD'))).toBe(true)
     // Their own conditions still apply.
-    expect(isShown(question(survey, 'ELASTICSEARCH_SUPERUSER_PASSWORD'))).toBe(false)
+    expect(isShown(question(survey, 'ELASTICSEARCH_SUPERUSER'))).toBe(false)
     survey.setValue('USE_BUILTIN_ELASTICSEARCH', false)
+    expect(isShown(question(survey, 'ELASTICSEARCH_SUPERUSER'))).toBe(true)
     expect(isShown(question(survey, 'ELASTICSEARCH_SUPERUSER_PASSWORD'))).toBe(true)
   })
 

@@ -285,31 +285,39 @@ describe('dependencies page', () => {
   })
 
   // The services sign in to a built-in Postgres and S3 with these too, and every environment keeps them on GitHub.
-  it('always asks the Postgres and S3 credentials, built in or not', async () => {
+  it('always asks the Postgres and S3 credentials and the Elasticsearch password, built in or not', async () => {
     const { survey } = await makeSurvey()
-    const credentials = ['POSTGRES_USER', 'POSTGRES_PASSWORD', 'S3_ADMIN_ACCESS_KEY', 'S3_ADMIN_SECRET_KEY']
+    const credentials = ['POSTGRES_USER', 'POSTGRES_PASSWORD', 'S3_ADMIN_ACCESS_KEY', 'S3_ADMIN_SECRET_KEY', 'ELASTICSEARCH_SUPERUSER_PASSWORD']
     for (const name of credentials) {
       expect(isShown(question(survey, name)), name).toBe(true)
       expect(question(survey, name).isRequired, name).toBe(true)
     }
     survey.setValue('USE_BUILTIN_POSTGRES', false)
     survey.setValue('USE_BUILTIN_RUSTFS', false)
+    survey.setValue('USE_BUILTIN_ELASTICSEARCH', false)
     for (const name of credentials) expect(isShown(question(survey, name)), name).toBe(true)
 
-    // Elasticsearch signs itself in while built in, so its credentials are asked only for another one
-    for (const name of ['ELASTICSEARCH_SUPERUSER', 'ELASTICSEARCH_SUPERUSER_PASSWORD']) expect(isShown(question(survey, name))).toBe(false)
+    // The superuser of a built-in Elasticsearch is always elastic, so its name is asked only for another one
+    survey.setValue('USE_BUILTIN_ELASTICSEARCH', true)
+    expect(isShown(question(survey, 'ELASTICSEARCH_SUPERUSER'))).toBe(false)
+    survey.setValue('USE_BUILTIN_ELASTICSEARCH', false)
+    expect(isShown(question(survey, 'ELASTICSEARCH_SUPERUSER'))).toBe(true)
   })
 
-  it('generates the Postgres and S3 credentials when the page opens, even for built-in components', async () => {
+  it('generates the Postgres and S3 credentials and the Elasticsearch password when the page opens, even for built-in components', async () => {
     const { survey } = await makeSurvey()
     survey.currentPage = survey.getPageByName('dependencies')!
     generateMissingSecrets(survey)
     for (const name of ['POSTGRES_USER', 'S3_ADMIN_ACCESS_KEY']) expect(survey.getValue(name), name).toMatch(/^[a-z][a-z0-9]{11}$/)
-    for (const name of ['POSTGRES_PASSWORD', 'S3_ADMIN_SECRET_KEY']) expect(survey.getValue(name), name).toMatch(/^[0-9a-zA-Z]{16}$/)
+    for (const name of ['POSTGRES_PASSWORD', 'S3_ADMIN_SECRET_KEY', 'ELASTICSEARCH_SUPERUSER_PASSWORD']) {
+      expect(survey.getValue(name), name).toMatch(/^[0-9a-zA-Z]{16}$/)
+    }
     // these are on screen, so they reach the answers that are written (a hidden question's value is left out, see activeValues)
     const written = activeValues(survey)
-    for (const name of ['POSTGRES_USER', 'POSTGRES_PASSWORD', 'S3_ADMIN_ACCESS_KEY', 'S3_ADMIN_SECRET_KEY']) expect(written, name).toHaveProperty(name)
-    for (const name of ['ELASTICSEARCH_SUPERUSER', 'ELASTICSEARCH_SUPERUSER_PASSWORD']) expect(written, name).not.toHaveProperty(name)
+    for (const name of ['POSTGRES_USER', 'POSTGRES_PASSWORD', 'S3_ADMIN_ACCESS_KEY', 'S3_ADMIN_SECRET_KEY', 'ELASTICSEARCH_SUPERUSER_PASSWORD']) {
+      expect(written, name).toHaveProperty(name)
+    }
+    expect(written).not.toHaveProperty('ELASTICSEARCH_SUPERUSER')
   })
 
   it('unchecking a component shows its host, and checking it again hides it', async () => {
