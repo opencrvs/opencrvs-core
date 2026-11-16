@@ -130,15 +130,18 @@ opensrvs_postdeploy_jobs = [
 ]
 
 job_label = '3.Jobs'
+# The services read credentials from secrets that copy-secrets copies from the dependencies namespace.
+# Start them after the copy, so that their pods do not report a missing secret.
+deploy_deps = dependencies + ['copy-secrets']
 previous_jobs = []
 for job in opensrvs_predeploy_jobs:
   if previous_jobs:
-    k8s_resource(job, labels=[job_label], resource_deps=dependencies + previous_jobs)
+    k8s_resource(job, labels=[job_label], resource_deps=deploy_deps + previous_jobs)
   else:
-    k8s_resource(job, labels=[job_label], resource_deps=dependencies + previous_jobs)
+    k8s_resource(job, labels=[job_label], resource_deps=deploy_deps + previous_jobs)
   previous_jobs.append(job)
 
 for workload in opensrvs_services:
-  k8s_resource(workload, labels=[tilt_label], resource_deps=dependencies + opensrvs_predeploy_jobs)
+  k8s_resource(workload, labels=[tilt_label], resource_deps=deploy_deps + opensrvs_predeploy_jobs)
 for job in opensrvs_postdeploy_jobs:
   k8s_resource(job, labels=[job_label], resource_deps=opensrvs_services)
