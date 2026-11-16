@@ -15,11 +15,7 @@ import { faker } from '@faker-js/faker'
 import { v4 as uuidv4 } from 'uuid'
 import { createClient } from '@opencrvs/toolkit/api'
 import { getToken, login } from '@e2e/support/helpers'
-import {
-  CLIENT_URL,
-  CREDENTIALS,
-  GATEWAY_HOST
-} from '@e2e/support/constants'
+import { CLIENT_URL, CREDENTIALS, GATEWAY_HOST } from '@e2e/support/constants'
 import { ASSETS_DIR } from '@e2e/support/paths'
 import { ensureAssignedToUser } from '@e2e/support/utils'
 import {
@@ -44,7 +40,7 @@ async function uploadRecordFile(eventId: string, token: string) {
   form.append('transactionId', uuidv4())
   form.append('path', `events/${eventId}`)
 
-  const response = await fetch(new URL('/upload', GATEWAY_HOST), {
+  const response = await fetch(`${GATEWAY_HOST}/upload`, {
     method: 'POST',
     headers: { Authorization: `Bearer ${token}` },
     body: form
