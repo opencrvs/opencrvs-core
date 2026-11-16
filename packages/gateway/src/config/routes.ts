@@ -17,7 +17,7 @@ import { formsHandler } from '@gateway/features/config/formsHandler'
 import healthCheckHandler from '@gateway/features/healthCheck/handler'
 import { trpcProxy } from '@gateway/v2-events/event-config/routes'
 import { ServerRoute } from '@hapi/hapi'
-import { authProxy, catchAllProxy, rateLimitedAuthProxy } from './proxies'
+import { authProxy, rateLimitedAuthProxy } from './proxies'
 
 export const getRoutes = () => {
   const routes: ServerRoute[] = [
@@ -86,6 +86,8 @@ export const getRoutes = () => {
       }
     },
     authProxy.token,
+    authProxy.refreshToken,
+    authProxy.invalidateToken,
     rateLimitedAuthProxy.authenticate,
     rateLimitedAuthProxy.authenticateSuperUser,
     rateLimitedAuthProxy.verifyUser,
@@ -95,11 +97,6 @@ export const getRoutes = () => {
     rateLimitedAuthProxy.verifySecurityAnswer,
     rateLimitedAuthProxy.sendUserName,
     rateLimitedAuthProxy.changePassword,
-    catchAllProxy.authInternal,
-    // Catch-all is fail-open: it proxies any other /auth/* request with no rate
-    // limiting. Hapi matches by specificity (literal paths beat `{suffix}`), so
-    // any new auth endpoint needs its own rate-limited route added above.
-    catchAllProxy.auth,
     ...trpcProxy
   ]
 
