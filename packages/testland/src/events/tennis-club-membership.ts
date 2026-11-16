@@ -35,6 +35,14 @@ import { getMOSIPIntegrationFields } from './mosip'
 import { MAX_NAME_LENGTH } from './birth/validators'
 import { Event } from './utils/types'
 
+/**
+ * Age-based membership rules are measured against the date the application was
+ * first declared, so they don't drift as the record is validated, registered or corrected.
+ */
+const MEMBERSHIP_AGE_ANCHOR = event.firstAction(ActionType.DECLARE)
+const SENIOR_AGE_DAYS = 365 * 60 + 15
+const JUNIOR_AGE_DAYS = 365 * 18
+
 function applicantAddressFields() {
   const isDomesticAddress = field('applicant.address')
     .get('country')
@@ -489,8 +497,8 @@ const TENNIS_CLUB_DECLARATION_FORM = defineDeclarationForm({
       type: PageTypes.enum.FORM,
       conditional: field('applicant.dob')
         .isBefore()
-        .days(365 * 60 + 15)
-        .inPast(),
+        .days(SENIOR_AGE_DAYS)
+        .before(MEMBERSHIP_AGE_ANCHOR),
       title: {
         id: 'event.tennis-club-membership.action.declare.form.section.senior-pass.title',
         defaultMessage: 'Assign senior pass for applicant',
@@ -1271,6 +1279,18 @@ export const tennisClubMembershipEvent = defineConfig({
     description:
       'This is a fallback title if actual title resolves to empty string'
   },
+  flags: [
+    {
+      id: 'junior-member',
+      label: {
+        id: 'event.tennis-club-membership.flag.junior-member',
+        defaultMessage: 'Junior member',
+        description:
+          'Flag label for an applicant who was under 18 when the application was declared'
+      },
+      requiresAction: false
+    }
+  ],
   summary: {
     fields: [
       {
@@ -1374,7 +1394,17 @@ export const tennisClubMembershipEvent = defineConfig({
         description:
           'This is shown as the action name anywhere the user can trigger the action from',
         id: 'event.tennis-club-membership.action.register.label'
-      }
+      },
+      flags: [
+        {
+          id: 'junior-member',
+          operation: 'add',
+          conditional: field('applicant.dob')
+            .isAfter()
+            .days(JUNIOR_AGE_DAYS)
+            .before(MEMBERSHIP_AGE_ANCHOR)
+        }
+      ]
     },
     {
       type: ActionType.PRINT_CERTIFICATE,
