@@ -209,7 +209,7 @@ const event = Object.assign(eventFn, {
   },
   /**
    * References the date of the first action matching any of the given types,
-   * e.g. `field('child.dob').isAfter().days(30).before(event.firstAction(ActionType.DECLARE))`.
+   * e.g. `field('child.dob').isAfter().days(30).beforeAction(event.firstAction(ActionType.DECLARE))`.
    * Until a matching action exists, the comparison uses $now.
    */
   firstAction: (first: ActionAnchor, ...rest: ActionAnchor[]) =>

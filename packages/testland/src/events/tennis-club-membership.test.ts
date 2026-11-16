@@ -15,11 +15,15 @@ import {
   EventDocument,
   field,
   getDeclarationPages,
+  getEventConfigOfVersion,
   resolveEventCustomFlags,
   UUID,
   validate
 } from '@opencrvs/toolkit/events'
 import { tennisClubMembershipEvent } from './tennis-club-membership'
+
+// The config is not versioned, so defineConfig gives it a single 'initial' version
+const config = getEventConfigOfVersion(tennisClubMembershipEvent, 'initial')
 
 const DECLARED_AT = '2026-01-10T09:00:00.000Z'
 const REGISTERED_AT = '2026-02-20T09:00:00.000Z'
@@ -74,9 +78,7 @@ describe('tennis club membership: age measured against the declaration date', ()
       action(ActionType.REGISTER, REGISTERED_AT)
     ])
 
-    expect(resolveEventCustomFlags(event, tennisClubMembershipEvent)).toContain(
-      'junior-member'
-    )
+    expect(resolveEventCustomFlags(event, config)).toContain('junior-member')
   })
 
   it('would not flag the same applicant if age were measured on the register date', () => {
@@ -107,9 +109,9 @@ describe('tennis club membership: age measured against the declaration date', ()
       action(ActionType.REGISTER, REGISTERED_AT)
     ])
 
-    expect(
-      resolveEventCustomFlags(event, tennisClubMembershipEvent)
-    ).not.toContain('junior-member')
+    expect(resolveEventCustomFlags(event, config)).not.toContain(
+      'junior-member'
+    )
   })
 
   it('does not flag an adult applicant', () => {
@@ -118,13 +120,13 @@ describe('tennis club membership: age measured against the declaration date', ()
       action(ActionType.REGISTER, REGISTERED_AT)
     ])
 
-    expect(
-      resolveEventCustomFlags(event, tennisClubMembershipEvent)
-    ).not.toContain('junior-member')
+    expect(resolveEventCustomFlags(event, config)).not.toContain(
+      'junior-member'
+    )
   })
 
   describe('senior pass page', () => {
-    const seniorPassPage = getDeclarationPages(tennisClubMembershipEvent).find(
+    const seniorPassPage = getDeclarationPages(config).find(
       ({ id }) => id === 'senior-pass'
     )!
     // Turns 60 (+15 days) between declaration and a correction a year later
