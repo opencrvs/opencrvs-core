@@ -14,7 +14,7 @@ import Ajv from 'ajv/dist/2019'
 import addFormats from 'ajv-formats'
 import * as z from 'zod/v4'
 import { $ZodIssue } from 'zod/v4/core'
-import { formatISO, isAfter, isBefore } from 'date-fns'
+import { formatISO, isAfter, isBefore, parseISO } from 'date-fns'
 
 import {
   ActionDateReference,
@@ -127,7 +127,9 @@ function resolveActionDate(
     .map(({ createdAt }) => createdAt)
     .sort()
 
-  return occurrence === 'first' ? dates[0] : dates[dates.length - 1]
+  const date = occurrence === 'first' ? dates[0] : dates[dates.length - 1]
+
+  return date && formatISO(parseISO(date), { representation: 'date' })
 }
 
 /** Returns today's date as a {@link PlainDate} (YYYY-MM-DD), device-local. */
