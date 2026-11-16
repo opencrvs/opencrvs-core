@@ -63,8 +63,8 @@ spec:
             - |
               S3_BUCKET=${S3_BUCKET:-ocrvs}
               echo "Running S3 cleanup script..."
-              mc alias set store $S3_ENDPOINT ${S3_ADMIN_ACCESS_KEY} ${S3_ADMIN_SECRET_KEY}
-              mc rm --recursive --force store/$S3_BUCKET
+              mcli alias set store $S3_ENDPOINT ${S3_ADMIN_ACCESS_KEY} ${S3_ADMIN_SECRET_KEY}
+              mcli rm --recursive --force store/$S3_BUCKET
               echo "Cleanup complete!"
           env:
             - name: S3_ENDPOINT
