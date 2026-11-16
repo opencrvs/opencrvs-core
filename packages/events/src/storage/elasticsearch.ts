@@ -47,6 +47,15 @@ export function getTemporaryIndexName(eventType: string, timestamp: number) {
   return `${getEventIndexName(eventType)}_${timestamp}`
 }
 
+/** Name of the index a reindex builds for one version of an event, before it goes live. */
+export function getTemporaryVersionIndexName(
+  eventType: string,
+  versionId: string,
+  timestamp: number
+) {
+  return `${getEventVersionIndexName(eventType, versionId)}_${timestamp}`
+}
+
 export function getReindexingStatusIndexName() {
   return env.ES_REINDEXING_STATUS_INDEX
 }

@@ -506,7 +506,9 @@ export function getConfigForRecord(
 export async function indexEventsInBulk(
   batch: EventDocument[],
   configs: VersionedEventConfig[],
-  indexNameOverrides?: Map<string, string>
+  /** Where each record is written. Its version's index, unless a reindex is building new ones. */
+  getIndexName = (doc: EventDocument) =>
+    getEventVersionIndexName(doc.type, doc.configVersionId)
 ) {
   const esClient = getOrCreateClient()
 
@@ -531,9 +533,7 @@ export async function indexEventsInBulk(
       return [
         {
           index: {
-            _index:
-              indexNameOverrides?.get(doc.type) ??
-              getEventVersionIndexName(doc.type, doc.configVersionId),
+            _index: getIndexName(doc),
             _id: doc.id
           }
         },

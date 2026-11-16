@@ -9,31 +9,42 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import {
-  getDeclarationFieldsOfAllVersions,
+  getDeclarationFields,
+  toEventConfig,
   VersionedEventConfig
 } from '@opencrvs/commons/events'
 import { logger } from '@opencrvs/commons'
 import {
   getEventAliasName,
   getEventIndexName,
-  getTemporaryIndexName,
+  getTemporaryVersionIndexName,
   getOrCreateClient
 } from '@events/storage/elasticsearch'
 import { createIndex } from '../indexing/indexing'
 
-export async function prepareTemporaryIndex(
+/** Creates one temporary index per version of the event, each mapped from that version's fields. */
+export async function prepareTemporaryIndices(
   eventConfiguration: VersionedEventConfig,
   timestamp: number
 ) {
-  const tempIndexName = getTemporaryIndexName(eventConfiguration.id, timestamp)
-  // Records of every version share the index, so it maps the fields of all of them.
-  const formFields = getDeclarationFieldsOfAllVersions(eventConfiguration)
+  return Promise.all(
+    eventConfiguration.versions.map(async (version) => {
+      const tempIndexName = getTemporaryVersionIndexName(
+        eventConfiguration.id,
+        version.id,
+        timestamp
+      )
+      const formFields = getDeclarationFields(
+        toEventConfig(eventConfiguration, version)
+      )
 
-  logger.info(`Preparing temporary reindex index ${tempIndexName}`)
+      logger.info(`Preparing temporary reindex index ${tempIndexName}`)
 
-  await createIndex(tempIndexName, formFields, false)
+      await createIndex(tempIndexName, formFields, false)
 
-  return tempIndexName
+      return tempIndexName
+    })
+  )
 }
 
 async function getIndicesBehindAlias(

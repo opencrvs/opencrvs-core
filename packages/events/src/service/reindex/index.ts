@@ -18,14 +18,17 @@ import {
   streamEventDocuments
 } from '@events/storage/postgres/events/events'
 import { getClient } from '@events/storage/postgres/events'
-import { getTemporaryIndexName } from '@events/storage/elasticsearch'
+import {
+  getTemporaryIndexName,
+  getTemporaryVersionIndexName
+} from '@events/storage/elasticsearch'
 import { getInMemoryVersionedEventConfigurations } from '../config/config'
 import { getConfigForRecord, indexEventsInBulk } from '../indexing/indexing'
 import {
   cleanupOrphanedIndices,
   cleanupTemporaryIndex,
   finaliseReindexIndex,
-  prepareTemporaryIndex
+  prepareTemporaryIndices
 } from './indexing'
 import {
   completeReindexingStatus,
@@ -121,12 +124,8 @@ async function reindexSearch(
   onBatchProcessed?: (count: number) => Promise<void>,
   onEventsSkipped?: (skipped: SkippedEvent[]) => void
 ) {
-  const indexNameOverrides = new Map(
-    configurations.map((config) => [
-      config.id,
-      getTemporaryIndexName(config.id, timestamp)
-    ])
-  )
+  const getTemporaryIndexOf = (event: EventDocument) =>
+    getTemporaryVersionIndexName(event.type, event.configVersionId, timestamp)
 
   const inFlight = new Set<Promise<void>>()
   let failure: Error | undefined
@@ -172,7 +171,7 @@ async function reindexSearch(
 
     await Promise.all([
       withRetry(async () =>
-        indexEventsInBulk(batch, configurations, indexNameOverrides)
+        indexEventsInBulk(batch, configurations, getTemporaryIndexOf)
       ),
       withRetry(async () => reindexBatchToCountryConfig(token, batch))
     ])
@@ -237,20 +236,21 @@ export async function runReindex(token: TokenWithBearer) {
   ).catch((err) => logger.error('Failed to clean up orphaned indices', err))
 
   /*
-   * Create temporary indices for all event types
+   * Create temporary indices for every version of all event types
    */
-  const temporaryIndices = await Promise.all(
+  const temporaryIndicesByEvent = await Promise.all(
     versionedConfigurations.map(async (configuration) => {
-      const indexNameWithTimestamp = await prepareTemporaryIndex(
+      const indexNamesWithTimestamp = await prepareTemporaryIndices(
         configuration,
         timestamp
       )
       logger.info(
-        `Prepared temporary index ${indexNameWithTimestamp} for event type ${configuration.id}`
+        `Prepared temporary indices ${indexNamesWithTimestamp.join(', ')} for event type ${configuration.id}`
       )
-      return indexNameWithTimestamp
+      return indexNamesWithTimestamp
     })
   )
+  const temporaryIndices = temporaryIndicesByEvent.flat()
   const startSecond = Math.floor(Date.now() / 1000)
   const processedCounts: number[] = []
   let totalProcessed = 0
