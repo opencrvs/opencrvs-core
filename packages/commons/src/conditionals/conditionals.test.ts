@@ -1543,12 +1543,12 @@ describe('date comparisons against an action', () => {
   const confirmed = (
     type: ActionType,
     day: number,
-    status: typeof ActionStatus.Accepted | typeof ActionStatus.Rejected
+    outcome: typeof ActionStatus.Accepted | typeof ActionStatus.Rejected
   ) => [
     action(type, day, { status: ActionStatus.Requested }),
     action(type, day, {
-      id: `${type}-${day}-${status}` as UUID,
-      status,
+      id: `${type}-${day}-${outcome}` as UUID,
+      status: outcome,
       originalActionId: `${type}-${day}` as UUID
     })
   ]

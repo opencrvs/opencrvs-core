@@ -69,7 +69,7 @@
     "@hapi/boom": "^9.1.1",
     "@hapi/hapi": "^20.0.1",
     "@hapi/inert": "^7.0.0",
-    "@opencrvs/toolkit": "2.2.0-rc.5bf5dfc",
+    "@opencrvs/toolkit": "2.2.0-rc.19ec10b",
     "@opentelemetry/auto-instrumentations-node": "^0.78.0",
     "@opentelemetry/resources": "^2.9.0",
     "@opentelemetry/sdk-node": "^0.220.0",
