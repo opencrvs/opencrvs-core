@@ -269,7 +269,16 @@ export function isEventFieldReference(
   return typeof value === 'object' && value !== null && '$$event' in value
 }
 
-export type ActionMatcher = { type: ActionType; customActionType?: string }
+/**
+ * Matches an action by type. A custom action must always name its
+ * `customActionType`, so that it does not match every custom action.
+ */
+export type ActionMatcher =
+  | { type: typeof ActionType.CUSTOM; customActionType: string }
+  | {
+      type: Exclude<ActionType, typeof ActionType.CUSTOM>
+      customActionType?: never
+    }
 
 export type ActionDateReference = {
   $action: {

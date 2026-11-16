@@ -1385,6 +1385,17 @@ describe('date comparisons against an action', () => {
     ).toBe(true)
   })
 
+  it('rejects anchors that cannot match a specific action', () => {
+    // @ts-expect-error at least one action is required
+    event.firstAction()
+    // @ts-expect-error a bare CUSTOM would match every custom action
+    event.firstAction(ActionType.CUSTOM)
+    // @ts-expect-error a custom action must name its customActionType
+    event.lastAction({ type: ActionType.CUSTOM })
+    // @ts-expect-error customActionType is only for custom actions
+    event.firstAction({ type: ActionType.DECLARE, customActionType: 'X' })
+  })
+
   it('skips rejected actions', () => {
     expect(
       validate(

@@ -49,8 +49,16 @@ function eventFn(
   return createEventFieldConfig(fieldId)
 }
 
+/**
+ * An action type, or a matcher for a custom action. A bare `ActionType.CUSTOM`
+ * is not allowed because it would match every custom action.
+ */
+type ActionAnchor =
+  | Exclude<ActionType, typeof ActionType.CUSTOM>
+  | ActionMatcher
+
 function actionDateReference(
-  match: Array<ActionType | ActionMatcher>,
+  match: ActionAnchor[],
   occurrence: 'first' | 'last'
 ): ActionDateReference {
   return {
@@ -196,13 +204,13 @@ const event = Object.assign(eventFn, {
    * e.g. `field('child.dob').isAfter().days(30).before(event.firstAction(ActionType.DECLARE))`.
    * Until a matching action exists, the comparison uses $now.
    */
-  firstAction: (...match: Array<ActionType | ActionMatcher>) =>
-    actionDateReference(match, 'first'),
+  firstAction: (first: ActionAnchor, ...rest: ActionAnchor[]) =>
+    actionDateReference([first, ...rest], 'first'),
   /**
    * Like {@link event.firstAction}, but references the most recent matching action.
    */
-  lastAction: (...match: Array<ActionType | ActionMatcher>) =>
-    actionDateReference(match, 'last'),
+  lastAction: (first: ActionAnchor, ...rest: ActionAnchor[]) =>
+    actionDateReference([first, ...rest], 'last'),
   /**
    * Checks if the event currently has the given status.
    * @param eventStatus - The status to check for.
