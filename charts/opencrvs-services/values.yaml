@@ -411,8 +411,6 @@ gateway:
   port: 7070
   image:
     name: ocrvs-gateway
-  network_policy:
-    ingress_mode: private
   env:
     CHECK_INVALID_TOKEN: 'true'
     CONFIG_SMS_CODE_EXPIRY_SECONDS: '600'

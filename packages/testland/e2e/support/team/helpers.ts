@@ -148,7 +148,7 @@ async function repairSignaturePath(userId: string) {
   form.append('transactionId', uuidv4())
   form.append('path', `users/${userId}`)
 
-  const response = await fetch(new URL('/upload', GATEWAY_HOST), {
+  const response = await fetch(`${GATEWAY_HOST}/upload`, {
     method: 'POST',
     headers: { Authorization: `Bearer ${adminToken}` },
     body: form

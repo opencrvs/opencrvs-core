@@ -70,7 +70,6 @@ helm_resource(
 traefik_deps = [
   'client',
   'countryconfig',
-  'gateway',
   'login',
   'rustfs'
 ]
