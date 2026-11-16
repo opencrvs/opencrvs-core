@@ -9,34 +9,55 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-/**
- * Country config template files bundled into the toolkit by `build.sh`, shared
- * by the codemods that copy them into a country config.
- */
-
-import { existsSync, readdirSync } from 'fs'
+import { execSync } from 'child_process'
+import { existsSync, mkdtempSync, readdirSync, readFileSync, rmSync } from 'fs'
+import { tmpdir } from 'os'
 import path from 'path'
+import { candidateRefs } from '../translations/template'
+
+const CORE_REPO_URL = 'https://github.com/opencrvs/opencrvs-core.git'
+const TEMPLATE_SUBPATH = 'packages/countryconfig-template'
+
+let templateDir: string | undefined
 
 /**
- * Where the bundled template files are: next to the built CLI in `dist/`, or
- * the template package itself when running from source (tests, ts-node).
+ * @returns template directory. If not present, Downloads from github.
+ *
  */
-export function findTemplateDir() {
-  const candidates = [
-    path.resolve(__dirname, 'templates', 'countryconfig-template'),
-    path.resolve(__dirname, '../../../countryconfig-template')
-  ]
+export async function findTemplateDir() {
+  // Called more than once by the upgrade script, save the directory to prevent redownload.
+  if (templateDir) {
+    return templateDir
+  }
+  // 1. Find github ref version based on toolkit.
+  const { version } = JSON.parse(
+    readFileSync(path.join(__dirname, '..', 'package.json'), 'utf-8')
+  )
+  const [major, minor] = version.split('.')
+  const [githubRef] = await candidateRefs(`${major}.${minor}`)
 
-  const templateDir = candidates.find((candidate) =>
-    existsSync(path.join(candidate, 'Tiltfile'))
+  // 2. create temporary directory where templates are downloaded
+  const temporaryCheckoutDir = mkdtempSync(
+    path.join(tmpdir(), 'opencrvs-template-')
   )
 
-  if (!templateDir) {
-    throw new Error(
-      `Country config template files not found in any of: ${candidates.join(', ')}`
-    )
-  }
+  // 3. Remove temporary directory on exit
+  process.on('exit', () =>
+    rmSync(temporaryCheckoutDir, { recursive: true, force: true })
+  )
 
+  // 4. Clone the latest commit without file contents or subdirectories
+  execSync(
+    `git clone --depth 1 --filter=blob:none --sparse --branch ${githubRef} ${CORE_REPO_URL} "${temporaryCheckoutDir}"`,
+    { stdio: 'pipe' }
+  )
+  // 5. Download files from template directory only
+  execSync(`git sparse-checkout set ${TEMPLATE_SUBPATH}`, {
+    cwd: temporaryCheckoutDir,
+    stdio: 'pipe'
+  })
+
+  templateDir = path.join(temporaryCheckoutDir, TEMPLATE_SUBPATH)
   return templateDir
 }
 
