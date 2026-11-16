@@ -56,8 +56,7 @@ import {
 } from 'react-router-typesafe-routes/dom'
 import styled from 'styled-components'
 import { useUsers } from '../../../../../v2-events/hooks/useUsers'
-import { createTemporaryId, isTemporaryId } from '@client/v2-events/utils'
-import { todayISO } from '@opencrvs/commons/client'
+import { getUUID, todayISO } from '@opencrvs/commons/client'
 import { withSuspense } from '@client/v2-events/components/withSuspense'
 import { serializeSearchParams } from '@client/v2-events/features/events/Search/utils'
 import { usePermissions } from '@client/hooks/useAuthorization'
@@ -152,7 +151,7 @@ function useCloseUserForm({
 
 /**
  * Component to initiate the creation of a new user.
- * Immediately navigates to the user editor flow, supplying a temporary user ID and "user.details" page.
+ * Immediately navigates to the user editor flow, supplying the ID of the new user and "user.details" page.
  */
 const CreateNewUserComponent = () => {
   const [{ officeId, from }] = useTypedSearchParams(
@@ -167,10 +166,10 @@ const CreateNewUserComponent = () => {
     navigate(
       ROUTES.V2.SETTINGS.USER.EDIT.buildPath(
         {
-          userId: createTemporaryId(),
+          userId: getUUID(),
           pageId: 'user.details'
         },
-        { from }
+        { from, newUser: true }
       ),
       { replace: true }
     )
@@ -191,7 +190,7 @@ const EditUserComponent = () => {
   const { listRoles } = useRoles()
   const [roles] = listRoles.useSuspenseQuery()
   const selectedRole = roles.find((role) => role.id === formState['role'])
-  const isNewUser = isTemporaryId(userId)
+  const isNewUser = searchParams.newUser === true
   const { getUser } = useUsers()
   const userQuery = getUser.useQuery(userId, { enabled: !isNewUser })
   const targetUser = userQuery.data
@@ -333,7 +332,7 @@ const ReviewUserComponent = () => {
   const { userId } = useTypedParams(ROUTES.V2.SETTINGS.USER.REVIEW)
 
   const [searchParams] = useTypedSearchParams(ROUTES.V2.SETTINGS.USER.REVIEW)
-  const isNewUser = isTemporaryId(userId)
+  const isNewUser = searchParams.newUser === true
   const { getUser, useCreateUser, useUpdateUser } = useUsers()
   const { listRoles } = useRoles()
   const [roles] = listRoles.useSuspenseQuery()
@@ -565,6 +564,7 @@ const ReviewUserComponent = () => {
                 ])
               )
               const payload: CreateUserInput = {
+                id: userId,
                 // Normalise to undefined so an empty string isn't stored as a
                 // unique value, causing duplicate-key errors on the next submit.
                 mobile: formState.phoneNumber || undefined,

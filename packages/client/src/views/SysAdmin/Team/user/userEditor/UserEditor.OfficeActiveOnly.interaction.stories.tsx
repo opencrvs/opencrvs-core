@@ -22,7 +22,7 @@ import { AppRouter } from '@client/v2-events/trpc'
 import { ROUTES } from '@client/v2-events/routes/routes'
 import { routesConfig } from '@client/v2-events/routes/config'
 import { testDataGenerator } from '@client/tests/test-data-generators'
-import { createTemporaryId } from '@client/v2-events/utils'
+import { getUUID } from '@opencrvs/commons/client'
 import { buildInactiveLocation } from '@client/tests/v2-events/location.utils'
 import { useUserFormState } from './useUserFormState'
 
@@ -94,10 +94,10 @@ export const CreateUserOfficePickerExcludesInactiveOffice: StoryObj = {
   parameters: {
     reactRouter: {
       router: routesConfig,
-      initialPath: ROUTES.V2.SETTINGS.USER.EDIT.buildPath({
-        userId: createTemporaryId(),
-        pageId: 'user.office'
-      })
+      initialPath: ROUTES.V2.SETTINGS.USER.EDIT.buildPath(
+        { userId: getUUID(), pageId: 'user.office' },
+        { newUser: true }
+      )
     }
   },
   play: async ({ canvasElement }) => {
