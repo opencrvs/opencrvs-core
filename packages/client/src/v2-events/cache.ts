@@ -90,6 +90,28 @@ export async function cacheFile(
 }
 
 /**
+ * Reads a file from the **BROWSER** cache.
+ * The name of the returned file is the last part of the path.
+ *
+ * @returns undefined if the cache does not have the file.
+ */
+export async function getCachedFile(
+  path: DocumentPath
+): Promise<File | undefined> {
+  const cache = await findFileCache()
+  const response = await cache?.match(toFileUrl(path))
+
+  if (!response) {
+    return undefined
+  }
+
+  const blob = await response.blob()
+  const filename = path.split('/').pop() ?? path
+
+  return new File([blob], filename, { type: blob.type })
+}
+
+/**
  * Removes given file from the **BROWSER** cache.
  * Normalizes the path to an absolute URL (prepends / if missing).
  * @see CACHE_NAME

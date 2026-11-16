@@ -34,6 +34,7 @@ import {
   setQueryDefaults
 } from '../features/events/useEvents/procedures/utils'
 import { precacheFile, precacheFiles } from '../cache'
+import { saveNewUserSignature } from '../features/users/newUserSignature'
 
 type UserWithResolvedFiles = Omit<UserOrSystem, 'signature' | 'avatar'> & {
   signature?: string
@@ -295,6 +296,28 @@ export function useUsers() {
         }
       })
     },
+    /**
+     * Uploads the signature of a new user after the server creates the user.
+     * @see saveNewUserSignature
+     */
+    useSaveNewUserSignature: () =>
+      useMutation({
+        mutationFn: saveNewUserSignature,
+        retry: 2,
+        onSuccess: async (response) => {
+          await queryClient.invalidateQueries({
+            queryKey: trpc.user.get.queryKey(response.id)
+          })
+
+          await queryClient.invalidateQueries({
+            queryKey: trpc.user.list.queryKey()
+          })
+
+          await queryClient.invalidateQueries({
+            queryKey: trpc.user.search.queryKey()
+          })
+        }
+      }),
     useActivateUser: ({
       onSuccess,
       onError

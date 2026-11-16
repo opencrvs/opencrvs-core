@@ -20,6 +20,7 @@ import { ensureFreshAccessToken, getToken } from '@client/utils/authUtils'
 import { cacheFile } from '@client/v2-events/cache'
 import { resolveTemporaryIdInPath } from '@client/v2-events/features/events/useEvents/temporary-id'
 import { queryClient } from '@client/v2-events/trpc'
+import { isTemporaryId } from '@client/v2-events/utils'
 
 interface UploadFileParams {
   file: File
@@ -30,11 +31,42 @@ interface UploadFileParams {
   }
 }
 
+/**
+ * Tells if a path is under the prefix of a user that the server has not created yet.
+ *
+ * The user editor gives a new user a temporary id (`tmp-<uuid>`). The server cannot
+ * store a file under that id, and the stored path must name the real user.
+ */
+export function isNewUserFilePath(path: string) {
+  const [prefix, userId = ''] = path.split('/')
+  return prefix === 'users' && isTemporaryId(userId)
+}
+
+function getFilePath(
+  path: AttachmentPath,
+  file: File,
+  transactionId: string
+): DocumentPath {
+  const extension = file.name.split('.').pop()
+  return joinValues(
+    [path.replace(/\/$/, ''), `${transactionId}.${extension}`],
+    '/'
+  ) as DocumentPath
+}
+
 async function uploadFile({
   file,
   path,
   meta
 }: UploadFileParams): Promise<{ url: string }> {
+  /*
+   * The file of a new user stays in the browser cache. The user editor uploads it
+   * after the server creates the user.
+   */
+  if (isNewUserFilePath(path)) {
+    return { url: getFilePath(path, file, meta.transactionId) }
+  }
+
   await ensureFreshAccessToken()
   const formData = new FormData()
   formData.append('file', file)
@@ -59,6 +91,27 @@ async function uploadFile({
   }
 
   return { url: await response.text() }
+}
+
+/**
+ * Uploads a file that is not attached through a form field.
+ *
+ * @param transactionId gives the file name. An upload with the same transaction id
+ * replaces the same file, so a retry does not store a second copy.
+ * @returns the path where the server stored the file.
+ */
+export async function uploadFileToPath(
+  file: File,
+  path: AttachmentPath,
+  transactionId: string
+): Promise<DocumentPath> {
+  const { url } = await uploadFile({
+    file,
+    path,
+    meta: { transactionId, referenceId: transactionId }
+  })
+
+  return url as DocumentPath
 }
 
 const UPLOAD_MUTATION_KEY = 'uploadFile'
@@ -89,12 +142,7 @@ export function useFileUpload(
       uploadFile({ ...variables, meta: { ...variables.meta } }),
     mutationKey: [UPLOAD_MUTATION_KEY, uniqueIdentifier],
     onMutate: async ({ file, meta }: UploadFileParams) => {
-      const extension = file.name.split('.').pop()
-      const temporaryFilename = `${meta.transactionId}.${extension}`
-      const filePath = joinValues(
-        [path.replace(/\/$/, ''), temporaryFilename],
-        '/'
-      ) as DocumentPath
+      const filePath = getFilePath(path, file, meta.transactionId)
 
       await cacheFile({ url: filePath, file })
 

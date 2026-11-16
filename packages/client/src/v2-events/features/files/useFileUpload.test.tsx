@@ -103,3 +103,27 @@ describe('uploading a file for an event that only has a temporary id', () => {
     expect(uploadedPaths).toEqual([])
   })
 })
+
+describe('uploading a file for a user that only has a temporary id', () => {
+  /*
+   * The user editor gives a new user a temporary id. The server creates the user
+   * later, so the user editor uploads the file after that.
+   */
+  test('keeps the file in the cache and does not upload it', async () => {
+    const temporaryId = createTemporaryId()
+    const onSuccess = vi.fn()
+
+    const { result } = renderHook(
+      () => useFileUpload(`users/${temporaryId}/`, 'signature', { onSuccess }),
+      { wrapper }
+    )
+
+    const { url } = await result.current.uploadFileAsync(file)
+
+    expect(uploadedPaths).toEqual([])
+    expect(url).toMatch(new RegExp(`^users/${temporaryId}/[^/]+\\.jpg$`))
+    expect(onSuccess).toHaveBeenCalledWith(
+      expect.objectContaining({ path: url })
+    )
+  }, 10_000)
+})

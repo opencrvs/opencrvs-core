@@ -882,6 +882,7 @@ misc.notif.sorryError,The message that appears in notification when a new user c
 misc.notif.unassign,Label for unassigned toast notification,You were unassigned from {trackingId},Vous avez été désassigné de {trackingId}
 misc.notif.updatePINSuccess,Label for update PIN success notification toast,Your pin has been successfully updated,Votre code a été mis à jour avec succès
 misc.notif.userAuditSuccess,Label for user audit success notification,"{name} was {action, select, DEACTIVATE {deactivated} REACTIVATE {reactivated} other{deactivated}}","{name} était {action, select, DEACTIVATE {désactivé} REACTIVATE {réactivé} other{désactivé}}"
+misc.notif.userFormSignatureFail,"The message that appears in notification when a new user is created, but the signature of the user could not be saved","New user created, but the signature was not saved. Edit the user to add the signature again.","Nouvel utilisateur créé, mais la signature n'a pas été enregistrée. Modifiez l'utilisateur pour ajouter la signature à nouveau."
 misc.notif.userFormSuccess,The message that appears in notification when a new user is created,New user created,Nouvel utilisateur créé
 misc.notif.userFormUpdateSuccess,The message that appears in notification when user details have been updated,User details have been updated,Les détails de l'utilisateur ont été mis à jour
 misc.pinMatchError,The error displayed if PINs don't match,PIN code did not match. Please try again.,Le code PIN ne correspond pas. Veuillez réessayer.

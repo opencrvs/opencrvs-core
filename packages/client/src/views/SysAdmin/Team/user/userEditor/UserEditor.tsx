@@ -66,6 +66,7 @@ import { showToast } from '@client/v2-events/features/events/useToastAndRedirect
 import { messages as notificationMessages } from '@client/i18n/messages/views/notifications'
 import { getFormBackAction } from '@client/v2-events/layouts/form/FormBackAction'
 import { useUserEditConfig } from '@client/hooks/useUserEditConfig'
+import { isNewUserFilePath } from '@client/v2-events/features/files/useFileUpload'
 import { useUserFormState } from './useUserFormState'
 
 const Container = styled.div`
@@ -334,7 +335,8 @@ const ReviewUserComponent = () => {
 
   const [searchParams] = useTypedSearchParams(ROUTES.V2.SETTINGS.USER.REVIEW)
   const isNewUser = isTemporaryId(userId)
-  const { getUser, useCreateUser, useUpdateUser } = useUsers()
+  const { getUser, useCreateUser, useUpdateUser, useSaveNewUserSignature } =
+    useUsers()
   const { listRoles } = useRoles()
   const [roles] = listRoles.useSuspenseQuery()
   const selectedRole = roles.find(
@@ -421,6 +423,7 @@ const ReviewUserComponent = () => {
   const formState = userForm ?? EMPTY_FORM
   const createUserMutation = useCreateUser()
   const updateUserMutation = useUpdateUser()
+  const saveSignatureMutation = useSaveNewUserSignature()
 
   const handleMutationError = (error: unknown) => {
     if (error instanceof TRPCClientError && error.data?.code === 'CONFLICT') {
@@ -469,7 +472,9 @@ const ReviewUserComponent = () => {
   const isUnauthorized = isNewUserBlocked || isExistingUserBlocked
 
   const isSubmitting =
-    createUserMutation.isPending || updateUserMutation.isPending
+    createUserMutation.isPending ||
+    updateUserMutation.isPending ||
+    saveSignatureMutation.isPending
 
   if (existingUserQuery.isLoading || isSubmitting) {
     const title = isNewUser
@@ -564,6 +569,16 @@ const ReviewUserComponent = () => {
                   formState[f.id] as FieldValue
                 ])
               )
+              /*
+               * The signature of a new user is only in the browser cache, under
+               * the temporary id of the user. It is uploaded after the server
+               * creates the user.
+               */
+              const newUserSignature =
+                formState.signature &&
+                isNewUserFilePath(formState.signature.path)
+                  ? formState.signature
+                  : undefined
               const payload: CreateUserInput = {
                 // Normalise to undefined so an empty string isn't stored as a
                 // unique value, causing duplicate-key errors on the next submit.
@@ -573,23 +588,49 @@ const ReviewUserComponent = () => {
                 device: formState.device || undefined,
                 role: formState.role!,
                 primaryOfficeId: formState.primaryOfficeId as UUID,
-                signature: formState.signature,
+                signature: newUserSignature ? undefined : formState.signature,
                 name: {
                   firstname: formState!.name!.firstname,
                   surname: formState!.name!.surname
                 },
                 data
               }
+              const onUserCreated = ({
+                signatureSaved
+              }: {
+                signatureSaved: boolean
+              }) => {
+                clear()
+                showToast(
+                  signatureSaved
+                    ? {
+                        message: notificationMessages.userFormSuccess,
+                        toastType: 'success',
+                        toastId: 'user-create-success'
+                      }
+                    : {
+                        message: notificationMessages.userFormSignatureFail,
+                        toastType: 'warning',
+                        toastId: 'user-create-signature-fail'
+                      }
+                )
+                navigate(
+                  `${routes.TEAM_USER_LIST}?locationId=${payload.primaryOfficeId}`
+                )
+              }
               createUserMutation.mutate(payload, {
-                onSuccess: () => {
-                  clear()
-                  showToast({
-                    message: notificationMessages.userFormSuccess,
-                    toastType: 'success',
-                    toastId: 'user-create-success'
-                  })
-                  navigate(
-                    `${routes.TEAM_USER_LIST}?locationId=${payload.primaryOfficeId}`
+                onSuccess: (user) => {
+                  if (!newUserSignature) {
+                    onUserCreated({ signatureSaved: true })
+                    return
+                  }
+
+                  saveSignatureMutation.mutate(
+                    { userId: user.id, signature: newUserSignature },
+                    {
+                      onSuccess: () => onUserCreated({ signatureSaved: true }),
+                      onError: () => onUserCreated({ signatureSaved: false })
+                    }
                   )
                 },
                 onError: handleMutationError

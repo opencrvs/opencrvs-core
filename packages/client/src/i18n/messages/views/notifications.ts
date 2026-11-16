@@ -52,6 +52,13 @@ const messagesToDefine = {
       'The message that appears in notification when a new user is created',
     id: 'misc.notif.userFormSuccess'
   },
+  userFormSignatureFail: {
+    defaultMessage:
+      'New user created, but the signature was not saved. Edit the user to add the signature again.',
+    description:
+      'The message that appears in notification when a new user is created, but the signature of the user could not be saved',
+    id: 'misc.notif.userFormSignatureFail'
+  },
   userFormUpdateSuccess: {
     defaultMessage: 'User details have been updated',
     description:
