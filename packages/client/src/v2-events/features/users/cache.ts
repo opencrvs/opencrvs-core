@@ -9,32 +9,29 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { flatten, uniq } from 'lodash'
-import { EventDocument, EventIndex } from '@opencrvs/commons/client'
+import { EventDocument } from '@opencrvs/commons/client'
 import { queryClient, trpcOptionsProxy } from '@client/v2-events/trpc'
-import { findUserIdsFromDocument, findUserIdsFromIndex } from './utils'
+import { getUserIdsFromEventDocument } from './utils'
 
-async function cacheUsers(userIds: string[]) {
-  const { queryFn, ...options } =
-    trpcOptionsProxy.user.list.queryOptions(userIds)
-
-  const users = await queryClient.fetchQuery(options)
-
-  for (const user of users) {
-    queryClient.setQueryData(trpcOptionsProxy.user.get.queryKey(user.id), user)
-  }
-}
-
-export async function cacheUsersFromEventDocument(
+export async function precacheUsersFromEventDocument(
   eventDocument: EventDocument
 ) {
-  const userIds = findUserIdsFromDocument(eventDocument)
-  await cacheUsers(userIds)
+  const userIds = getUserIdsFromEventDocument(eventDocument)
+  if (userIds.length === 0) {
+    return
+  }
+
+  const { queryFn, ...options } =
+    trpcOptionsProxy.user.list.queryOptions(userIds)
+  await queryClient.fetchQuery(options)
 }
 
-export async function cacheUsersFromEventIndices(eventIndices: EventIndex[]) {
-  const userIds = uniq(
-    flatten(eventIndices.map((eventIndex) => findUserIdsFromIndex(eventIndex)))
-  )
-  await cacheUsers(userIds)
+export async function precacheUsers(userIds: string[]) {
+  if (userIds.length === 0) {
+    return
+  }
+
+  const { queryFn, ...options } =
+    trpcOptionsProxy.user.list.queryOptions(userIds)
+  await queryClient.fetchQuery(options)
 }

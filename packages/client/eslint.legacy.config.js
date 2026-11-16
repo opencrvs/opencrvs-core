@@ -29,21 +29,10 @@ module.exports = defineConfig([
       '@typescript-eslint/no-empty-object-type': 'off',
       '@typescript-eslint/ban-ts-comment': 'off',
       '@typescript-eslint/no-unused-expressions': 'off',
-      '@typescript-eslint/no-misused-promises': [
-        'error',
-        {
-          checksVoidReturn: false
-        }
-      ],
       'no-restricted-imports': [
         'error',
         {
           paths: [
-            {
-              name: '@apollo/client/react/components',
-              importNames: ['Query'],
-              message: `Please use our own <Query /> component instead from components/Query.tsx`
-            },
             {
               name: 'date-fns',
               message: 'Please use submodules instead'

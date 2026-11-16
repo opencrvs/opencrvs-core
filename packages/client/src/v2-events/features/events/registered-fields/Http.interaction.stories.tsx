@@ -9,8 +9,8 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import type { Meta, StoryObj } from '@storybook/react'
-import { userEvent, within, expect, waitFor } from '@storybook/test'
+import type { Meta, StoryObj } from '@storybook/react-vite'
+import { userEvent, within, expect, waitFor } from 'storybook/test'
 import React from 'react'
 import styled from 'styled-components'
 import { http, HttpResponse } from 'msw'
@@ -22,7 +22,8 @@ import {
   ConditionalType,
   never,
   user,
-  FieldConfig
+  FieldConfig,
+  toPlainDate
 } from '@opencrvs/commons/client'
 import { TRPCProvider } from '@client/v2-events/trpc'
 import {
@@ -33,6 +34,7 @@ import { useFormDataStringifier } from '@client/v2-events/hooks/useFormDataStrin
 import { useIntlFormatMessageWithFlattenedParams } from '@client/v2-events/messages/utils'
 import { withValidatorContext } from '../../../../../.storybook/decorators'
 import { Review } from '../components/Review'
+import { Http } from './Http'
 
 const meta: Meta<FormFieldGeneratorPropsWithoutRef> = {
   title: 'Inputs/Http',
@@ -415,6 +417,57 @@ export const FetchNidErrors: Story = {
   }
 }
 
+export const FetchOnMountWithoutTrigger: StoryObj<typeof FormFieldGenerator> = {
+  name: 'Fetch NID on mount without trigger',
+  parameters: {
+    chromatic: {
+      disableSnapshot: true
+    },
+    layout: 'centered',
+    msw: {
+      handlers: {
+        nidApi: [http.post('/api/nid', () => HttpResponse.text('1234567890'))]
+      }
+    }
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+    await waitFor(async () => {
+      await expect(canvas.getByTestId('http-on-mount-value')).toHaveTextContent(
+        '1234567890'
+      )
+    })
+  },
+  render: function Component(args) {
+    const [httpValue, setHttpValue] = React.useState<unknown>(null)
+
+    return (
+      <>
+        <Http.Input
+          configuration={{
+            url: '/api/nid',
+            timeout: 5000,
+            method: 'POST',
+            headers: {
+              'Content-Type': 'text/plain'
+            },
+            body: {
+              user: '$user.province'
+            }
+          }}
+          form={{}}
+          onChange={(value) => {
+            setHttpValue(value)
+          }}
+        />
+        <pre data-testid="http-on-mount-value">
+          {JSON.stringify(httpValue, null, 2)}
+        </pre>
+      </>
+    )
+  }
+}
+
 export const HttpTextResponseInCopy: StoryObj<typeof Review> = {
   name: 'HTTP data response text to string',
   parameters: {
@@ -422,7 +475,7 @@ export const HttpTextResponseInCopy: StoryObj<typeof Review> = {
   },
   render: function Component() {
     const allFields = fetchNidFields.flat()
-    const stringifier = useFormDataStringifier()
+    const stringifier = useFormDataStringifier(toPlainDate('2025-01-01'))
     const flattenedIntl = useIntlFormatMessageWithFlattenedParams()
 
     const FORM_DATA = {

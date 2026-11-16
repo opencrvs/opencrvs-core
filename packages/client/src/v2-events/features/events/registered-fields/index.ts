@@ -28,6 +28,7 @@ import { NumberWithUnit } from './NumberWithUnit'
 import { PageHeader } from './PageHeader'
 import { AgeField } from './AgeField'
 import { Paragraph } from './Paragraph'
+import { Heading } from './Heading'
 import { RadioGroup } from './RadioGroup'
 import { RegisteredFieldModule } from './RegisteredField'
 import { Select } from './Select'
@@ -40,6 +41,17 @@ import { AlphaPrintButton } from './AlphaPrintButton'
 import { LinkButton } from './LinkButton'
 import { VerificationStatus } from './VerificationStatus'
 import { QueryParamReader } from './QueryParamReader'
+import { Autocomplete } from './Autocomplete'
+import { ImageView } from './ImageView'
+import { UserRole } from './UserRole'
+import { Custom } from './Custom'
+import { Data } from './Data'
+import { DateRangeField } from './DateRangeField'
+import { Hidden } from './Hidden'
+import { IdReader } from './IdReader'
+import { Loader } from './Loader'
+import { QrReader } from './QrReader'
+import { TextArea } from './TextArea'
 
 export * from './Address'
 export * from './AdministrativeArea'
@@ -56,6 +68,7 @@ export * from './Number'
 export * from './NumberWithUnit'
 export * from './PageHeader'
 export * from './Paragraph'
+export * from './Heading'
 export * from './RadioGroup'
 export * from './Select'
 export * from './SelectCountry'
@@ -65,12 +78,15 @@ export * from './TimeField'
 export * from './AlphaPrintButton'
 export * from './LinkButton'
 export * from './VerificationStatus'
+export * from './Autocomplete'
+export * from './ImageView'
+export * from './UserRole'
 
 export function getRegisteredFieldByFieldConfig<T extends FieldConfig>(
   type: T
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
 ): RegisteredFieldModule<any> | undefined {
-  // eslint-disable-next-line @typescript-eslint/switch-exhaustiveness-check
+  // Don't skip the exhaustive check, it is important we register all field types
   switch (type.type) {
     case FieldType.ADDRESS:
       return Address
@@ -87,10 +103,10 @@ export function getRegisteredFieldByFieldConfig<T extends FieldConfig>(
     case FieldType.ALPHA_PRINT_BUTTON:
       return AlphaPrintButton
     case FieldType.ADMINISTRATIVE_AREA:
-    case FieldType.FACILITY:
-    case FieldType.OFFICE:
       return AdministrativeArea
     case FieldType.LOCATION:
+    case FieldType.FACILITY: // @deprecated
+    case FieldType.OFFICE: // @deprecated
       return LocationSearch
     case FieldType.RADIO_GROUP:
       return RadioGroup
@@ -110,6 +126,10 @@ export function getRegisteredFieldByFieldConfig<T extends FieldConfig>(
       return PageHeader
     case FieldType.PARAGRAPH:
       return Paragraph
+    case FieldType.HEADING:
+      return Heading
+    case FieldType.IMAGE_VIEW:
+      return ImageView
     case FieldType.NAME:
       return Name
     case FieldType.SELECT_DATE_RANGE:
@@ -118,6 +138,8 @@ export function getRegisteredFieldByFieldConfig<T extends FieldConfig>(
       return Search
     case FieldType.HTTP:
       return Http
+    case FieldType.AUTOCOMPLETE:
+      return Autocomplete
     case FieldType.LINK_BUTTON:
       return LinkButton
     case FieldType.VERIFICATION_STATUS:
@@ -126,13 +148,40 @@ export function getRegisteredFieldByFieldConfig<T extends FieldConfig>(
       return QueryParamReader
     case FieldType.AGE:
       return AgeField
+    case FieldType.USER_ROLE:
+      return UserRole
     case FieldType.FILE:
       return File
     case FieldType.FILE_WITH_OPTIONS:
       return FileWithOption
     case FieldType.SIGNATURE:
       return SignatureField
-    default:
+    case FieldType.DATE_RANGE:
+      return DateRangeField
+    case FieldType.DATA:
+      return Data
+    case FieldType.ID_READER:
+      return IdReader
+    case FieldType.QR_READER:
+      return QrReader
+    case FieldType.LOADER:
+      return Loader
+    case FieldType.ALPHA_HIDDEN:
+      return Hidden
+    case FieldType._EXPERIMENTAL_CUSTOM:
+      return Custom
+    case FieldType.TEXTAREA:
+      return TextArea
+    // Plain strings entered through Text, differing only in the input's type.
+    case FieldType.PHONE:
+    case FieldType.ID:
+    case FieldType.EMAIL:
+      return Text
+    /*
+     * FIELD_GROUP is a container rather than a field of its own: callers unwrap
+     * it into its subfields before asking for a module.
+     */
+    case FieldType.FIELD_GROUP:
       return undefined
   }
 }

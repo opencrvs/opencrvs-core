@@ -15,6 +15,7 @@ import {
 } from '@client/utils/constants'
 import { ImageMimeType } from '@opencrvs/commons/client'
 import type { File as FileConfig } from '@opencrvs/commons/client'
+import { fetchFileFromUrl } from '@client/v2-events/cache'
 
 export type IImage = {
   type: string
@@ -115,10 +116,16 @@ export async function getCroppedImage(imageSrc: IImage, croppedArea: Area) {
   // paste generated image at the top left corner
   ctx.putImageData(data, 0, 0)
 
-  return {
-    type: 'image/jpeg',
-    data: canvas.toDataURL('image/jpeg')
-  }
+  const file = await new Promise<File | null>((resolve) => {
+    canvas.toBlob((blob) => {
+      if (!blob) {
+        resolve(null)
+        return
+      }
+      resolve(new File([blob], 'image.jpeg', { type: 'image/jpeg' }))
+    })
+  })
+  return file
 }
 
 export async function getCroppedImageWithTargetSize(
@@ -177,26 +184,6 @@ export async function fetchImageAsBase64(url: string): Promise<string> {
 export const bytesToMB = (bytes: number) =>
   Number(Number(bytes / (1024 * 1024)).toFixed(2))
 
-export async function fetchFileFromUrl(
-  externalUrl: string,
-  filename: string
-): Promise<File | undefined> {
-  const res = await fetch(externalUrl)
-
-  if (!res.ok) {
-    // eslint-disable-next-line no-console
-    console.error(
-      `Failed to fetch file from URL: ${externalUrl}. Status: ${res.status} ${res.statusText}`
-    )
-
-    return undefined
-  }
-
-  const blob = await res.blob()
-
-  return new File([blob], filename, { type: blob.type })
-}
-
 async function getImageFromFile(
   file: File
 ): Promise<{ width: number; height: number; data: string; type: string }> {
@@ -232,8 +219,8 @@ async function getImageFromFile(
 }
 
 function isImageFile(file: File): boolean {
-  return Object.values(ImageMimeType.Enum).includes(
-    file.type as keyof typeof ImageMimeType.Enum
+  return Object.values(ImageMimeType.enum).includes(
+    file.type as keyof typeof ImageMimeType.enum
   )
 }
 

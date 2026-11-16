@@ -8,7 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { Meta, ComponentStory } from '@storybook/react'
+import { Meta, ComponentStory } from '@storybook/react-vite'
 import { LocationSearch, ISearchLocation } from './LocationSearch'
 import React from 'react'
 

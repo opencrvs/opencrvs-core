@@ -13,8 +13,8 @@ import { connect } from 'react-redux'
 import { messages } from '@client/i18n/messages/views/notifications'
 import { userMessages } from '@client/i18n/messages/user'
 import { WrappedComponentProps as IntlShapeProps, injectIntl } from 'react-intl'
-import { getLanguage } from '@opencrvs/client/src/i18n/selectors'
-import { IStoreState } from '@opencrvs/client/src/store'
+import { getLanguage } from '@client/i18n/selectors'
+import { IStoreState } from '@client/store'
 import { Toast } from '@opencrvs/components/lib/Toast'
 import { Link } from '@opencrvs/components/lib/Link'
 import {
@@ -35,9 +35,9 @@ import {
 } from '@client/notification/actions'
 import { TOAST_MESSAGES } from '@client/user/userReducer'
 import * as routes from '@client/navigation/routes'
-import { withOnlineStatus } from '@client/views/OfficeHome/LoadingIndicator'
 import { RouteComponentProps, withRouter } from './WithRouterProps'
 import { formatUrl } from '@client/navigation'
+import { useOnlineStatus } from '@client/utils'
 
 type NotificationProps = ReturnType<typeof mapStateToProps> & {
   children?: React.ReactNode
@@ -146,7 +146,6 @@ const Component = ({
           {intl.formatMessage(messages.draftsSaved)}
         </Toast>
       )}
-
       {submitFormSuccessToast && (
         <Toast
           id="submissionSuccessToast"
@@ -158,7 +157,6 @@ const Component = ({
             : intl.formatMessage(messages.userFormSuccess)}
         </Toast>
       )}
-
       {submitFormErrorToast && (
         <Toast
           id="submissionErrorToast"
@@ -315,6 +313,15 @@ const mapStateToProps = (store: IStoreState) => {
       store.notification.userCreateDuplicateEmailFailedToast,
     userReconnectedToast: store.notification.userReconnectedToast,
     emailAllUsers: store.notification.emailAllUsers
+  }
+}
+
+function withOnlineStatus<ComponentProps>(
+  Component: React.ComponentType<ComponentProps>
+) {
+  return (props: Omit<ComponentProps, 'isOnline'>) => {
+    const isOnline = useOnlineStatus()
+    return <Component isOnline={isOnline} {...(props as ComponentProps)} />
   }
 }
 

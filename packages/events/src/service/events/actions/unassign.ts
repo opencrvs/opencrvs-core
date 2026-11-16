@@ -10,18 +10,24 @@
  */
 
 import { TRPCError } from '@trpc/server'
-import { TokenWithBearer } from '@opencrvs/commons'
+import { last } from 'lodash'
+import {
+  getAcceptedScopesFromToken,
+  getOrThrow,
+  TokenWithBearer
+} from '@opencrvs/commons'
 import {
   ActionStatus,
   ActionType,
-  configurableEventScopeAllowed,
   findLastAssignmentAction,
-  UnassignActionInput
+  getCurrentEventState,
+  UnassignActionInput,
+  userCanAccessEventWithScopes
 } from '@opencrvs/commons/events'
-import { getScopes } from '@opencrvs/commons'
 import { TrpcUserContext } from '@events/context'
 import { getEventConfigurationById } from '@events/service/config/config'
 import { getEventById, processAction } from '@events/service/events/events'
+import { getEventIndexWithAdministrativeHierarchy } from '@events/service/indexing/utils'
 
 export async function unassignRecord({
   input,
@@ -42,29 +48,52 @@ export async function unassignRecord({
 
   // If last assignment action is not 'ASSIGN', simply return the event as it's already unassigned
   if (lastAssignmentAction?.type !== ActionType.ASSIGN) {
-    return event
+    return {
+      ...event,
+      actions: []
+    }
   }
 
   // If event is not assigned to the user who is unassigning, we need to ensure that the user may unassign others
   if (lastAssignmentAction.assignedTo !== user.id) {
     // Ensure that the user has scope to unassign users from this event type
-    const userScopes = getScopes(token)
-    const unassignOtherAllowed = configurableEventScopeAllowed(
-      userScopes,
-      ['record.unassign-others'],
-      event.type
+    const acceptedScopes = getAcceptedScopesFromToken(token, [
+      'record.unassign-others'
+    ])
+
+    if (acceptedScopes.length === 0) {
+      throw new TRPCError({ code: 'FORBIDDEN' })
+    }
+
+    const eventIndex = getCurrentEventState(event, configuration)
+    const eventIndexWithLocationHierarchy =
+      await getEventIndexWithAdministrativeHierarchy(configuration, eventIndex)
+
+    const hasAccess = userCanAccessEventWithScopes(
+      eventIndexWithLocationHierarchy,
+      acceptedScopes,
+      user
     )
 
-    if (!unassignOtherAllowed) {
+    if (!hasAccess) {
       throw new TRPCError({ code: 'FORBIDDEN' })
     }
   }
 
-  return processAction(input, {
-    event,
+  const eventWithUnassign = await processAction(input, {
+    eventId: event.id,
     user,
     token,
     status: ActionStatus.Accepted,
     configuration
   })
+
+  const lastAction = getOrThrow(
+    last(eventWithUnassign.actions),
+    'Event did not have any actions. This should never happen.'
+  )
+  return {
+    ...eventWithUnassign,
+    actions: [lastAction]
+  }
 }

@@ -9,11 +9,10 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { z } from 'zod'
+import * as z from 'zod/v4'
 import { Action } from './ActionDocument'
-import { extendZodWithOpenApi } from 'zod-openapi'
+
 import { UUID } from '../uuid'
-extendZodWithOpenApi(z)
 
 export const EventDocument = z
   .object({
@@ -40,6 +39,17 @@ export const EventDocument = z
         'System-generated tracking identifier used to look up the event.'
       )
   })
-  .openapi({ ref: 'EventDocument' })
+  .meta({ id: 'EventDocument' })
 
 export type EventDocument = z.infer<typeof EventDocument>
+
+export const EventDocumentOnlyLastAction = EventDocument.extend({
+  actions: z
+    .array(Action)
+    .max(1)
+    .describe('Only the last action associated with the event.')
+}).brand('EventDocumentOnlyLastAction')
+
+export type EventDocumentOnlyLastAction = z.infer<
+  typeof EventDocumentOnlyLastAction
+>

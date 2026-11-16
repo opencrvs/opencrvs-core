@@ -8,7 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { z } from 'zod'
+import * as z from 'zod/v4'
 import { AddressField, NameField } from './FieldConfig'
 import { NonEmptyTextValue, TextValue } from './FieldValue'
 import {
@@ -29,13 +29,14 @@ import {
  */
 export function getDynamicNameValue(field: NameField) {
   const nameConfiguration = field.configuration?.name
+  // When no per-subfield required flag is supplied, a required NAME field implies that firstname and surname are required too.
+  // Without this fallback `TextValue` (`z.string()`) accepts empty strings.
+  const firstnameRequired =
+    nameConfiguration?.firstname?.required ?? field.required
+  const surnameRequired = nameConfiguration?.surname?.required ?? field.required
   return z.object({
-    firstname: nameConfiguration?.firstname?.required
-      ? NonEmptyTextValue
-      : TextValue,
-    surname: nameConfiguration?.surname?.required
-      ? NonEmptyTextValue
-      : TextValue,
+    firstname: firstnameRequired ? NonEmptyTextValue : TextValue,
+    surname: surnameRequired ? NonEmptyTextValue : TextValue,
     middlename: nameConfiguration?.middlename?.required
       ? NonEmptyTextValue
       : TextValue.optional()
@@ -65,8 +66,14 @@ export function getDynamicAddressFieldValue(field: AddressField) {
     field.configuration?.streetAddressForm?.map((a) => a.id) ?? []
 
   // @todo - show required validation errors for street level fields like state/street
-  return schema.refine((arg) => {
-    const submittedKeys = Object.keys(arg?.streetLevelDetails ?? {})
+  return (
+    schema as z.ZodType<AddressFieldValue | AddressFieldUpdateValue>
+  ).refine((arg) => {
+    if (!arg) {
+      return true
+    }
+
+    const submittedKeys = Object.keys(arg.streetLevelDetails ?? {})
     const invalidKeys = submittedKeys.filter((k) => !configIds.includes(k))
     if (invalidKeys.length) {
       // eslint-disable-next-line no-console
@@ -76,6 +83,7 @@ export function getDynamicAddressFieldValue(field: AddressField) {
       )
       return false
     }
+
     return true
   })
 }

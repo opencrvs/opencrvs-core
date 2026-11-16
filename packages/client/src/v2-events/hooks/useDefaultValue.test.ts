@@ -9,6 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import {
+  AdministrativeArea,
   AddressField,
   AddressType,
   AgeField,
@@ -18,7 +19,6 @@ import {
   FieldType,
   generateTranslationConfig,
   InteractiveFieldType,
-  Location,
   NameField,
   now,
   SystemVariables,
@@ -29,39 +29,54 @@ import {
 } from '@opencrvs/commons/client'
 import { mapFieldToDefaultValue } from './useDefaultValue'
 
-const PROVINCE_ID = 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' as UUID
-const DISTRICT_ID = 'bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb' as UUID
-const OFFICE_ID = 'cccccccc-cccc-cccc-cccc-cccccccccccc' as UUID
+const PROVINCE_ID = '4afea53a-4dde-4ba1-b51d-500d83860c28' as UUID
+const DISTRICT_ID = '31ec1af8-d81f-448b-9a7a-3ce334004210' as UUID
+const OFFICE_ID = 'c49a1250-1776-4191-84c1-f381d39dab22' as UUID
 
-const mockLocations: Location[] = [
-  {
-    id: OFFICE_ID,
-    parentId: DISTRICT_ID,
-    name: 'Test Office',
-    validUntil: null,
-    locationType: 'CRVS_OFFICE'
-  },
-  {
-    id: DISTRICT_ID,
-    parentId: PROVINCE_ID,
-    name: 'Test District',
-    validUntil: null,
-    locationType: 'ADMIN_STRUCTURE'
-  },
-  {
-    id: PROVINCE_ID,
-    parentId: null,
-    name: 'Test Province',
-    validUntil: null,
-    locationType: 'ADMIN_STRUCTURE'
-  }
-]
+const mockAdministrativeAreas: Map<UUID, AdministrativeArea> = new Map([
+  [
+    DISTRICT_ID,
+    {
+      id: DISTRICT_ID,
+      parentId: PROVINCE_ID,
+      name: 'Test District',
+      status: 'active' as const,
+      versions: [
+        {
+          versionId: DISTRICT_ID,
+          effectiveFrom: '0001-01-01',
+          name: 'Test District',
+          externalId: null,
+          status: 'active' as const
+        }
+      ]
+    }
+  ],
+  [
+    PROVINCE_ID,
+    {
+      id: PROVINCE_ID,
+      parentId: null,
+      name: 'Test Province',
+      status: 'active' as const,
+      versions: [
+        {
+          versionId: PROVINCE_ID,
+          effectiveFrom: '0001-01-01',
+          name: 'Test Province',
+          externalId: null,
+          status: 'active' as const
+        }
+      ]
+    }
+  ]
+])
 
 // Mirrors window.config.ADMIN_STRUCTURE in setupTests.ts: ['province', 'district']
 const mockAdminLevelIds = ['province', 'district']
 
 const mockContext: SystemVariables & {
-  locations: Location[]
+  administrativeAreas: Map<UUID, AdministrativeArea>
   adminLevelIds: string[]
   form: EventState
 } = {
@@ -70,6 +85,7 @@ const mockContext: SystemVariables & {
     firstname: 'John',
     middlename: 'Michael',
     surname: 'Doe',
+    administrativeAreaId: DISTRICT_ID,
     primaryOfficeId: OFFICE_ID,
     name: 'John Michael Doe',
     role: 'REGISTRAR'
@@ -82,7 +98,7 @@ const mockContext: SystemVariables & {
       originPathname: '/'
     }
   },
-  locations: mockLocations,
+  administrativeAreas: mockAdministrativeAreas,
   adminLevelIds: mockAdminLevelIds,
   form: {}
 }
@@ -169,7 +185,45 @@ describe('mapFieldToDefaultValue', () => {
     })
   })
 
-  it('for ADDRESS fields', () => {
+  it('leaves an admin level unset when the user has none at that level', () => {
+    /*
+     * The mock user sits at district level, so nothing answers for a level
+     * below it. Returning an empty string instead of nothing would read as an
+     * answer: `not(field('village').isUndefined())` would pass, and a street
+     * field waiting on that level would appear with the level still blank.
+     */
+    const villageField = {
+      id: 'village',
+      type: FieldType.ADMINISTRATIVE_AREA,
+      label: {
+        defaultMessage: 'Village',
+        description: 'Village label',
+        id: 'field.address.village.label'
+      },
+      configuration: { type: 'ADMIN_STRUCTURE' as const },
+      defaultValue: user('administrativeAreaId').locationLevel('village')
+    } as unknown as Parameters<typeof mapFieldToDefaultValue>[0]
+
+    expect(mapFieldToDefaultValue(villageField, mockContext)).toBeUndefined()
+  })
+
+  it('resolves an admin level the user does have', () => {
+    const districtField = {
+      id: 'district',
+      type: FieldType.ADMINISTRATIVE_AREA,
+      label: {
+        defaultMessage: 'District',
+        description: 'District label',
+        id: 'field.address.district.label'
+      },
+      configuration: { type: 'ADMIN_STRUCTURE' as const },
+      defaultValue: user('administrativeAreaId').locationLevel('district')
+    } as unknown as Parameters<typeof mapFieldToDefaultValue>[0]
+
+    expect(mapFieldToDefaultValue(districtField, mockContext)).toBe(DISTRICT_ID)
+  })
+
+  describe('for ADDRESS fields', () => {
     const addressField = {
       id: 'applicant.address',
       type: FieldType.ADDRESS,

@@ -10,7 +10,7 @@
  */
 
 import React from 'react'
-import { Meta, Story } from '@storybook/react'
+import { Meta, Story } from '@storybook/react-vite'
 import { PasswordInput, PasswordInputProps } from './PasswordInput'
 
 export default {

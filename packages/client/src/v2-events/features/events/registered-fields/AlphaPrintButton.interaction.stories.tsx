@@ -9,8 +9,8 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import type { Meta, StoryObj } from '@storybook/react'
-import { within, expect } from '@storybook/test'
+import type { Meta, StoryObj } from '@storybook/react-vite'
+import { within, expect } from 'storybook/test'
 import React from 'react'
 import styled from 'styled-components'
 import { createTRPCMsw, httpLink } from '@vafanassieff/msw-trpc'
@@ -20,6 +20,7 @@ import {
   and,
   ConditionalType,
   event,
+  EventDocument,
   FieldType,
   tennisClubMembershipEvent,
   TestUserRole,
@@ -31,6 +32,7 @@ import {
 import { ROUTES } from '@client/v2-events/routes'
 import { FormFieldGenerator } from '@client/v2-events/components/forms/FormFieldGenerator'
 import { AppRouter, TRPCProvider } from '@client/v2-events/trpc'
+import { createTemporaryId } from '@client/v2-events/utils'
 
 import { tennisClubMembershipEventDocument } from '../fixtures'
 import { getTestValidatorContext } from '../../../../../.storybook/decorators'
@@ -83,6 +85,7 @@ function createAlphaPrintButtonStoryParameters(
         }),
         element: (
           <StyledFormFieldGenerator
+            attachmentPath={null}
             fields={[
               {
                 id: 'storybook.name',
@@ -115,15 +118,18 @@ export const WithEnableCondition: StoryObj<{}> = {
     {
       type: ConditionalType.ENABLE,
       conditional: and(
-        user.hasRole(TestUserRole.Enum.LOCAL_REGISTRAR),
+        user.hasRole(TestUserRole.enum.LOCAL_REGISTRAR),
         not(event.hasAction(ActionType.DECLARE))
       )
     },
-    getTestValidatorContext(TestUserRole.Enum.LOCAL_REGISTRAR, {
-      ...tennisClubMembershipEventDocument,
-      actions: tennisClubMembershipEventDocument.actions.filter(
-        (action) => action.type === ActionType.CREATE
-      )
+    getTestValidatorContext(TestUserRole.enum.LOCAL_REGISTRAR, {
+      event: {
+        ...tennisClubMembershipEventDocument,
+        actions: tennisClubMembershipEventDocument.actions.filter(
+          (action) => action.type === ActionType.CREATE
+        )
+      },
+      eventConfig: tennisClubMembershipEvent
     })
   ),
   play: async ({ canvasElement }) => {
@@ -139,19 +145,82 @@ export const WithDisableCondition: StoryObj<{}> = {
     {
       type: ConditionalType.ENABLE,
       conditional: and(
-        user.hasRole(TestUserRole.Enum.LOCAL_REGISTRAR),
+        user.hasRole(TestUserRole.enum.LOCAL_REGISTRAR),
         not(event.hasAction(ActionType.DECLARE))
       )
     },
-    getTestValidatorContext(
-      TestUserRole.Enum.LOCAL_REGISTRAR,
-      tennisClubMembershipEventDocument
-    )
+    getTestValidatorContext(TestUserRole.enum.LOCAL_REGISTRAR, {
+      event: tennisClubMembershipEventDocument,
+      eventConfig: tennisClubMembershipEvent
+    })
   ),
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement)
     const button = await canvas.findByTestId('storybook____name')
 
     await expect(button).toBeDisabled()
+  }
+}
+
+/**
+ * Verifies that the AlphaPrintButton renders when the URL `eventId` is a
+ * temporary id (e.g. `tmp-<uuid>`). Before the fix, `UUID.parse()` threw on
+ * non-UUID strings and the component failed to mount on draft records.
+ */
+const temporaryEventId = createTemporaryId()
+const temporaryEventDocument: EventDocument = {
+  ...tennisClubMembershipEventDocument,
+  id: temporaryEventId
+}
+
+export const WithTemporaryEventId: StoryObj<{}> = {
+  parameters: {
+    reactRouter: {
+      router: {
+        path: ROUTES.V2.EVENTS.DECLARE.REVIEW.buildPath({
+          eventId: temporaryEventId
+        }),
+        element: (
+          <StyledFormFieldGenerator
+            attachmentPath={null}
+            fields={[
+              {
+                id: 'storybook.name',
+                type: FieldType.ALPHA_PRINT_BUTTON,
+                label: {
+                  id: 'storybook.name.label',
+                  defaultMessage: 'Name',
+                  description: 'The title for the name input'
+                },
+                configuration: {
+                  template: 'simple-certificate'
+                }
+              }
+            ]}
+            id="my-form"
+            validatorContext={getTestValidatorContext(
+              TestUserRole.enum.LOCAL_REGISTRAR,
+              {
+                event: temporaryEventDocument,
+                eventConfig: tennisClubMembershipEvent
+              }
+            )}
+          />
+        )
+      },
+      initialPath: ROUTES.V2.EVENTS.DECLARE.REVIEW.buildPath({
+        eventId: temporaryEventId
+      })
+    },
+    offline: {
+      events: [temporaryEventDocument]
+    }
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+    const button = await canvas.findByTestId('storybook____name')
+
+    await expect(button).toBeInTheDocument()
+    await expect(button).toBeEnabled()
   }
 }

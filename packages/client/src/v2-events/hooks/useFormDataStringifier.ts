@@ -11,15 +11,19 @@
 import { IntlShape, useIntl } from 'react-intl'
 import { useSelector } from 'react-redux'
 import {
+  ClientAdministrativeArea,
+  ClientLocation,
   EventState,
   FieldConfig,
   FieldValue,
-  Location
+  UUID,
+  PlainDate
 } from '@opencrvs/commons/client'
 import { getRegisteredFieldByFieldConfig } from '@client/v2-events/features/events/registered-fields'
 import { AdminStructureItem } from '@client/utils/referenceApi'
 import { getOfflineData } from '@client/offline/selectors'
 import { useLocations } from './useLocations'
+import { useAdministrativeAreas } from './useAdministrativeAreas'
 interface RecursiveStringRecord {
   [key: string]: string | undefined | RecursiveStringRecord
 }
@@ -55,10 +59,16 @@ function formDataStringifierFactory(stringifier: FieldStringifier) {
 /**
  *
  * Used for transforming the form data to a string representation. Useful with useIntl hook, where all the properties need to be present.
+ *
+ * `anchor` is the record anchor (date of event, falling back to the record's
+ * creation date) — every location-bearing declaration field in this form is
+ * resolved at that single date.
  */
 export const getFormDataStringifier = (
   intl: IntlShape,
-  locations: Location[],
+  locations: Map<UUID, ClientLocation>,
+  administrativeAreas: Map<UUID, ClientAdministrativeArea>,
+  anchor: PlainDate,
   adminLevels?: AdminStructureItem[]
 ) => {
   const stringifier = (fieldConfig: FieldConfig, value: FieldValue) => {
@@ -71,6 +81,8 @@ export const getFormDataStringifier = (
       return field.toCertificateVariables(value, {
         intl,
         locations,
+        administrativeAreas,
+        anchor,
         config: fieldConfig,
         adminLevels
       })
@@ -79,6 +91,8 @@ export const getFormDataStringifier = (
       return field.stringify(value, {
         intl,
         locations,
+        administrativeAreas,
+        anchor,
         config: fieldConfig
       })
     }
@@ -88,12 +102,21 @@ export const getFormDataStringifier = (
   return formDataStringifierFactory(stringifier)
 }
 
-export function useFormDataStringifier() {
+export function useFormDataStringifier(anchor: PlainDate) {
   const intl = useIntl()
   const { getLocations } = useLocations()
-  const [locations] = getLocations.useSuspenseQuery()
+  const { getAdministrativeAreas } = useAdministrativeAreas()
+
+  const locations = getLocations.useSuspenseQuery()
+  const administrativeAreas = getAdministrativeAreas.useSuspenseQuery()
   const { config } = useSelector(getOfflineData)
   const adminLevels = config.ADMIN_STRUCTURE
 
-  return getFormDataStringifier(intl, locations, adminLevels)
+  return getFormDataStringifier(
+    intl,
+    locations,
+    administrativeAreas,
+    anchor,
+    adminLevels
+  )
 }

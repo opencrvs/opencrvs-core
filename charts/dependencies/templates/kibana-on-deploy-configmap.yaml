@@ -1,0 +1,22 @@
+{{- if .Values.monitoring.enabled }}
+apiVersion: v1
+data:
+  setup.sh: |
+{{ .Files.Get "files/kibana/setup.sh" | indent 4 }}
+kind: ConfigMap
+metadata:
+  labels:
+    app: kibana
+  name: kibana-on-deploy-script
+
+---
+apiVersion: v1
+data:
+  config.ndjson: |
+{{ .Files.Get "files/kibana/config.ndjson" | indent 4 }}
+kind: ConfigMap
+metadata:
+  labels:
+    app: kibana
+  name: kibana-on-deploy-config
+{{- end }}

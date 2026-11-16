@@ -11,22 +11,26 @@ coverage
 build
 
 # misc
+CLAUDE.local.md
 .claude/*
 !.claude/settings.json
+!.claude/skills/
+!.claude/hooks/
 .claude-working/
+CLAUDE.md
 .DS_Store
 .env*
 *.log
 .secrets/*
 .wireit/*
 .wireit
+.nx
 
 # gitignore graphql schema due to it often being accidentally edited
 packages/gateway/src/graphql/schema.d.ts
 packages/gateway/src/graphql/schema.graphql
 
 # But, keep the .gitignore so the folder is created
-!.secrets/.gitignore
 .idea
 .idea/*
 .vim
@@ -41,3 +45,5 @@ deploy_key
 
 # local markdown files
 *.local.md
+# swc plugin cache
+.swc/

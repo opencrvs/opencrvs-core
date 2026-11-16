@@ -9,7 +9,6 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { ApolloServer, BaseContext } from '@apollo/server'
 import { getPlugins } from '@gateway/config/plugins'
 import { getRoutes } from '@gateway/config/routes'
 import {
@@ -27,12 +26,8 @@ import * as Hapi from '@hapi/hapi'
 import { logger, validateFunc } from '@opencrvs/commons'
 import { readFileSync } from 'fs'
 
-import { ApolloServerPluginLandingPageLocalDefault } from '@apollo/server/plugin/landingPage/default'
-import hapiApollo from '@as-integrations/hapi'
-import { getApolloConfig } from '@gateway/graphql/config'
-import * as database from '@gateway/utils/redis'
-import { badRequest, Boom, isBoom } from '@hapi/boom'
-import { Context } from './graphql/context'
+import * as redis from '@gateway/utils/redis'
+import { badRequest, isBoom } from '@hapi/boom'
 import { RateLimitError } from './rate-limit'
 
 const publicCert = readFileSync(CERT_PUBLIC_KEY_PATH)
@@ -49,15 +44,15 @@ export async function createServer() {
     routes: {
       cors: { origin: whitelist },
       validate: {
-        failAction: async (_, _2, err: Boom) => {
+        failAction: async (_, _2, err?: Error) => {
           if (process.env.NODE_ENV === 'production') {
             // In prod, log a limited error message and throw the default Bad Request error.
-            logger.error(`ValidationError: ${err.message}`)
+            logger.error(`ValidationError: ${err?.message}`)
             throw badRequest(`Invalid request payload input`)
           } else {
             // During development, log and respond with the full error.
-            logger.error(err.message)
-            throw err
+            logger.error(err?.message ?? 'Validation error')
+            throw err ?? badRequest(`Invalid request payload input`)
           }
         }
       },
@@ -67,11 +62,6 @@ export async function createServer() {
   const plugins = getPlugins()
 
   await app.register(plugins)
-
-  const apolloServer = new ApolloServer<BaseContext>({
-    ...getApolloConfig(),
-    plugins: [ApolloServerPluginLandingPageLocalDefault({ footer: false })]
-  })
 
   app.auth.strategy('jwt', 'jwt', {
     key: publicCert,
@@ -111,11 +101,11 @@ export async function createServer() {
     if (request.response instanceof RateLimitError) {
       return reply
         .response({
-          statusCode: 402,
+          statusCode: 429,
           error: 'Rate limit exceeded',
           message: request.response.message
         })
-        .code(402)
+        .code(429)
     }
 
     return reply.continue
@@ -133,44 +123,17 @@ export async function createServer() {
   }
 
   async function start() {
-    await apolloServer.start()
+    // Start redis before application server.
+    // We have had issues where redis was not ready when the server started which resulted in redis instance being undefined.
 
-    await app.register({
-      plugin: hapiApollo,
-      options: {
-        path: '/graphql',
-        postRoute: {
-          options: {
-            auth: {
-              strategy: 'jwt',
-              mode: 'try'
-            }
-          }
-        },
-        getRoute: {
-          options: {
-            auth: {
-              strategy: 'jwt',
-              mode: 'try'
-            }
-          }
-        },
-        context: async ({ request }) => new Context(request),
-        apolloServer
-      }
-    })
-
-    // Start database before application server.
-    // We have had issues where the database was not ready when the server started which resulted in redis instance being undefined.
-
-    await database.start()
+    await redis.start()
     await app.start()
     app.log('info', `server started on port ${PORT}`)
   }
 
   async function stop() {
     await app.stop()
-    await database.stop()
+    await redis.stop()
     app.log('info', 'server stopped')
   }
 

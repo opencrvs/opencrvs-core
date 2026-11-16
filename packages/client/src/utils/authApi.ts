@@ -10,9 +10,7 @@
  */
 import axios, { AxiosRequestConfig, AxiosResponse } from 'axios'
 
-const client = axios.create({
-  baseURL: window.config.AUTH_URL
-})
+const client = axios.create({})
 
 function request<T>(options: AxiosRequestConfig) {
   const onSuccess = (response: AxiosResponse<T>) => {
@@ -24,7 +22,7 @@ function request<T>(options: AxiosRequestConfig) {
 
 const invalidateToken = (token: string): Promise<void> => {
   return request({
-    url: new URL('invalidateToken', window.config.AUTH_URL).toString(),
+    url: '/api/auth/invalidateToken',
     method: 'POST',
     data: { token }
   })

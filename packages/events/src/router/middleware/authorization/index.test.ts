@@ -9,26 +9,26 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { SCOPES, TestUserRole, UUID } from '@opencrvs/commons'
+import { encodeScope, TestUserRole } from '@opencrvs/commons'
 import { MiddlewareOptions } from '@events/router/middleware/utils'
-import { createTestToken } from '@events/tests/utils'
+import { createTestToken, TEST_SYSTEM_ID } from '@events/tests/utils'
 import { TrpcContext } from '@events/context'
-import { requiresAnyOfScopes, userCanReadEvent } from '.'
+import { allowedWithAnyOfScopes } from '.'
 
-describe('requiresScopes()', () => {
+describe('allowedWithAnyOfScopes()', () => {
   test('should throw TRPCError with code "FORBIDDEN" if none of the required scopes are present on the token', async () => {
-    const middleware = requiresAnyOfScopes([
-      SCOPES.RECORD_REGISTER,
-      SCOPES.RECORD_CONFIRM_REGISTRATION
+    const middleware = allowedWithAnyOfScopes([
+      'record.notify',
+      'record.reindex'
     ])
 
     // missing all of the required scopes
     const mockOpts = {
       ctx: {
         token: createTestToken({
-          userId: 'test-user-id',
-          scopes: ['record.declare[event=birth|death|tennis-club-membership]'],
-          role: TestUserRole.Enum.REGISTRATION_AGENT
+          userId: TEST_SYSTEM_ID,
+          scopes: [encodeScope({ type: 'record.declare' })],
+          role: TestUserRole.enum.REGISTRATION_AGENT
         })
       },
       next: vi.fn()
@@ -42,18 +42,18 @@ describe('requiresScopes()', () => {
   })
 
   test('should call next if any of the required scopes are present on the token', async () => {
-    const middleware = requiresAnyOfScopes([
-      SCOPES.RECORD_REGISTER,
-      SCOPES.RECORD_CONFIRM_REGISTRATION
+    const middleware = allowedWithAnyOfScopes([
+      'record.notify',
+      'record.reindex'
     ])
 
     // has one of the required scopes
     const mockOpts = {
       ctx: {
         token: createTestToken({
-          userId: 'test-user-id',
-          scopes: [SCOPES.RECORD_CONFIRM_REGISTRATION],
-          role: TestUserRole.Enum.REGISTRATION_AGENT
+          userId: TEST_SYSTEM_ID,
+          scopes: [encodeScope({ type: 'record.reindex' })],
+          role: TestUserRole.enum.REGISTRATION_AGENT
         })
       },
       next: vi.fn()
@@ -62,51 +62,5 @@ describe('requiresScopes()', () => {
     await middleware(mockOpts)
 
     expect(mockOpts.next).toHaveBeenCalled()
-  })
-})
-
-describe('userCanReadEvent()', () => {
-  test('throws FORBIDDEN when token eventId does not match the requested event', async () => {
-    const mockOpts = {
-      ctx: {
-        token: createTestToken({
-          eventId: 'event-a',
-          role: TestUserRole.Enum.FIELD_AGENT,
-          userId: 'test-user-id',
-          scopes: [SCOPES.RECORD_READ]
-        })
-      },
-      input: 'event-b' as UUID,
-      next: vi.fn()
-    } as unknown as MiddlewareOptions<TrpcContext>
-
-    await expect(userCanReadEvent(mockOpts)).rejects.toMatchObject({
-      code: 'FORBIDDEN',
-      message: 'Token does not grant access to this event'
-    })
-
-    expect(mockOpts.next).not.toHaveBeenCalled()
-  })
-
-  test('passes eventId check when token eventId matches the requested event', async () => {
-    // Token and input share the same event ID — the check passes.
-    // The middleware then proceeds to getEventById (DB call) which will fail,
-    // but the failure will not be the eventId-specific FORBIDDEN.
-    const mockOpts = {
-      ctx: {
-        token: createTestToken({
-          eventId: 'some-event-id',
-          role: TestUserRole.Enum.FIELD_AGENT,
-          userId: 'test-user-id',
-          scopes: [SCOPES.RECORD_READ]
-        })
-      },
-      input: 'some-event-id' as UUID,
-      next: vi.fn()
-    } as unknown as MiddlewareOptions<TrpcContext>
-
-    await expect(userCanReadEvent(mockOpts)).rejects.not.toMatchObject({
-      message: 'Token does not grant access to this event'
-    })
   })
 })

@@ -16,11 +16,7 @@ import { referenceApi } from './utils/referenceApi'
 import 'core-js/features/array/flat'
 // eslint-disable-next-line import/no-unassigned-import
 import 'jsdom-worker'
-import { roleQueries } from './forms/user/query/queries'
-import { userQueries } from './user/queries'
 import { mockOfflineData } from './tests/mock-offline-data'
-// eslint-disable-next-line import/no-unassigned-import
-import './tests/queryMock'
 import { vi } from 'vitest'
 import createFetchMock from 'vitest-fetch-mock'
 
@@ -28,76 +24,11 @@ import createFetchMock from 'vitest-fetch-mock'
  * Navigator & Window
  */
 window.HTMLElement.prototype.scrollIntoView = vi.fn()
-const config = {
-  API_GATEWAY_URL: 'http://localhost:7070/',
-  CONFIG_API_URL: 'http://localhost:2021',
-  LOGIN_URL: 'http://localhost:3020',
-  AUTH_URL: 'http://localhost:4040',
-  MINIO_BUCKET: 'ocrvs',
-  MINIO_BASE_URL: 'http://localhost:3535',
-  COUNTRY_CONFIG_URL: 'http://localhost:3040',
-  APPLICATION_NAME: 'Farajaland CRVS',
-  BIRTH: {
-    REGISTRATION_TARGET: 45,
-    LATE_REGISTRATION_TARGET: 365,
-    PRINT_IN_ADVANCE: true
-  },
-  COUNTRY: 'BGD',
-  CURRENCY: {
-    isoCode: 'ZMW',
-    languagesAndCountry: ['en-ZM']
-  },
-  DEATH: {
-    REGISTRATION_TARGET: 45,
-    PRINT_IN_ADVANCE: true
-  },
-  ADMIN_STRUCTURE: [
-    {
-      id: 'province',
-      label: {
-        id: 'field.address.province.label',
-        defaultMessage: 'Province',
-        description: 'Label for province in address'
-      }
-    },
-    {
-      id: 'district',
-      label: {
-        id: 'field.address.district.label',
-        defaultMessage: 'District',
-        description: 'Label for district in address'
-      }
-    }
-  ],
-  DASHBOARDS: [
-    {
-      id: 'test',
-      title: {
-        id: 'navigation.dashboard',
-        defaultMessage: 'Test Dashboard',
-        description: 'Title for the test dashboard'
-      },
-      url: '/'
-    }
-  ],
-  FEATURES: {
-    V2_EVENTS: false,
-    DEATH_REGISTRATION: true,
-    MARRIAGE_REGISTRATION: true,
-    EXTERNAL_VALIDATION_WORKQUEUE: false,
-    PRINT_DECLARATION: true
-  },
-  LANGUAGES: 'en,bn,fr',
-  USER_NOTIFICATION_DELIVERY_METHOD: 'sms',
-  INFORMANT_NOTIFICATION_DELIVERY_METHOD: 'sms',
-  NID_NUMBER_PATTERN: /^[0-9]{9}$/,
-  PHONE_NUMBER_PATTERN: /^01[1-9][0-9]{8}$/
-}
 
-vi.stubGlobal('config', config)
+// `window.config` is stubbed in ./setupConfig.ts, which runs before this file.
 
 /*
- * GraphQL Queries
+ * Profile queries
  */
 import { queries } from './profile/queries'
 
@@ -112,11 +43,13 @@ import {
   getItem,
   setItem
 } from './tests/util'
-import { DASHBOARD } from './navigation/routes'
 
 vi.doMock('@client/forms/user/fieldDefinitions/createUser', () => ({
   createUserForm: mockOfflineData.userForms
 }))
+
+vi.mock('@client/v2-events/hooks/useLocations')
+vi.mock('@client/v2-events/hooks/useAdministrativeAreas')
 
 vi.mock('@client/forms/handlebarHelpers', async () => {
   return {
@@ -132,28 +65,6 @@ vi.mock('@client/forms/conditionals', async () => {
     ...actual,
     conditionals: actual.builtInConditionals,
     initConditionals: () => Promise.resolve()
-  }
-})
-
-vi.mock('@client/forms/validators', async () => {
-  /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
-  const actual = (await vi.importActual('@client/forms/validators')) as any
-  return {
-    ...actual,
-    validators: await vi.importActual('@client/utils/validate'),
-    initValidators: () => Promise.resolve()
-  }
-})
-
-vi.mock('@client/forms/handlebarHelpers', async () => {
-  const actual = (await vi.importActual(
-    '@client/forms/handlebarHelpers'
-    /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
-  )) as any
-  return {
-    ...actual,
-    handlebarHelpers: {},
-    initHandlebarHelpers: () => Promise.resolve()
   }
 })
 
@@ -209,9 +120,6 @@ console.warn = warn
 console.error = error
 console.debug = debug
 queries.fetchUserDetails = vi.fn()
-roleQueries.fetchRoles = vi.fn()
-
-userQueries.searchUsers = vi.fn()
 
 vi.doMock(
   '@client/utils/referenceApi',
@@ -227,9 +135,7 @@ vi.doMock(
         }),
       loadConfig: () => Promise.resolve(mockConfigResponse),
       loadConfigAnonymousUser: () => Promise.resolve(mockConfigResponse),
-      loadForms: () => Promise.resolve({ forms: mockOfflineData.forms }),
       importConditionals: () => Promise.resolve({}),
-      importValidators: () => Promise.resolve({}),
       importHandlebarHelpers: () => Promise.resolve({})
     }
   })
@@ -271,9 +177,8 @@ beforeEach(() => {
 
   const userData: IUserData[] = [
     {
-      userID: userDetails.userMgntUserID,
-      userPIN: '$2a$10$xQBLcbPgGQNu9p6zVchWuu6pmCrQIjcb6k2W1PIVUxVTE/PumWM82',
-      declarations: []
+      userID: userDetails.id,
+      userPIN: '$2a$10$xQBLcbPgGQNu9p6zVchWuu6pmCrQIjcb6k2W1PIVUxVTE/PumWM82'
     }
   ]
 

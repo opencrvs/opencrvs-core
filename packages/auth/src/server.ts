@@ -42,13 +42,12 @@ import invalidateTokenHandler, {
   reqInvalidateTokenSchema
 } from '@auth/features/invalidateToken/handler'
 import verifyUserHandler, {
-  requestSchema as reqVerifyUserSchema,
-  responseSchema as resVerifyUserSchema
+  requestSchema as reqVerifyUserSchema
 } from '@auth/features/retrievalSteps/verifyUser/handler'
-import verifyNumberHandler, {
-  requestSchema as reqVerifyNumberSchema,
-  responseSchema as resVerifyNumberSchema
-} from '@auth/features/retrievalSteps/verifyNumber/handler'
+import verifyRecoveryTokenHandler, {
+  requestSchema as reqVerifyRecoveryTokenSchema,
+  responseSchema as resVerifyRecoveryTokenSchema
+} from '@auth/features/retrievalSteps/verifyRecoveryToken/handler'
 import verifySecurityQuestionHandler, {
   verifySecurityQuestionSchema,
   verifySecurityQuestionResSchema
@@ -62,16 +61,14 @@ import sendUserNameHandler, {
 import { tokenHandler } from '@auth/features/oauthToken/handler'
 import { logger } from '@opencrvs/commons'
 import { getPublicKey } from '@auth/features/authenticate/service'
-import anonymousTokenHandler, {
-  responseSchema as anonymousResponseSchema
-} from './features/anonymousToken/handler'
+import serviceTokenHandler from './features/serviceToken/handler'
 import reindexingTokenHandler, {
   responseSchema as reindexResponseSchema
 } from './features/reindexToken/handler'
 import integrationCreatorTokenHandler, {
   responseSchema as integrationCreatorResponseSchema
 } from './features/integrationCreatorToken/handler'
-import { Boom, badRequest } from '@hapi/boom'
+import { badRequest } from '@hapi/boom'
 
 export type AuthServer = {
   server: Hapi.Server
@@ -80,31 +77,22 @@ export type AuthServer = {
 }
 
 export async function createServer() {
-  let whitelist: string[] = [env.DOMAIN]
-  if (env.DOMAIN[0] !== '*') {
-    whitelist = [
-      env.COUNTRY_CONFIG_URL_EXTERNAL,
-      env.LOGIN_URL,
-      env.CLIENT_APP_URL
-    ]
-  }
-  logger.info(`Whitelist: ${JSON.stringify(whitelist)}`)
   const server = new Hapi.Server({
     host: env.AUTH_HOST,
     port: env.AUTH_PORT,
     routes: {
-      cors: { origin: whitelist },
+      cors: false,
       payload: { maxBytes: 52428800, timeout: DEFAULT_TIMEOUT },
       response: {
-        failAction: async (req, _2, err: Boom) => {
+        failAction: async (req, _2, err: Error | undefined) => {
           if (process.env.NODE_ENV === 'production') {
             // In prod, log a limited error message and throw the default Bad Request error.
-            logger.error(`Response validationError: ${err.message}`)
+            logger.error(`Response validationError: ${err?.message}`)
             throw badRequest(`Invalid response payload returned from handler`)
           } else {
             // During development, log and respond with the full error.
             logger.error(
-              `${req.path} response has a validation error: ${err.message}`
+              `${req.path} response has a validation error: ${err?.message}`
             )
             throw err
           }
@@ -137,19 +125,19 @@ export async function createServer() {
     }
   })
 
-  // curl -H 'Content-Type: application/json' http://localhost:4040/anonymous-token
+  // curl -H 'Content-Type: application/json' http://localhost:4040/internal/service-token
   server.route({
     method: 'GET',
-    path: '/anonymous-token',
-    handler: anonymousTokenHandler,
+    path: '/internal/service-token',
+    handler: serviceTokenHandler,
     options: {
-      tags: ['api'],
-      description: 'Authenticate an anonymous user',
+      tags: ['api', 'deprecated'],
+      description: `
+      Deprecated: Authenticate as the OpenCRVS service user.
+      This is still used by events service to fetch events configuration from country config on startup
+      when there is no user interaction involved.`,
       notes:
-        'Returns a token to be used for endpoints that allow unauthorized access such as certificate verification endpoints',
-      response: {
-        schema: anonymousResponseSchema
-      }
+        'Returns a token to be used for endpoints that allow unauthorized access such as certificate verification endpoints. Token contains no scopes.'
     }
   })
   // curl -H 'Content-Type: application/json' http://localhost:4040/reindexing-token
@@ -335,29 +323,30 @@ export async function createServer() {
         payload: reqVerifyUserSchema
       },
       response: {
-        schema: resVerifyUserSchema
+        schema: false
       }
     }
   })
 
-  // curl -H 'Content-Type: application/json' -d '{ "mobile": "" }' http://localhost:4040/verifyUser
-
+  // curl -H 'Content-Type: application/json' -d '{ "token": "" }' http://localhost:4040/verifyRecoveryToken
   server.route({
     method: 'POST',
-    path: '/verifyNumber',
-    handler: verifyNumberHandler,
+    path: '/verifyRecoveryToken',
+    handler: verifyRecoveryTokenHandler,
     options: {
       tags: ['api'],
       description:
         'Second step of password or username retrieval steps.' +
-        'Check if provided verification code is valid or not.',
+        'Exchanges the token from an emailed/texted recovery link for a nonce.',
       notes:
-        'Verifies code for given nonce and returns a random security question for that user.',
+        'Verifies the recovery token, rotates it to a fresh single-use nonce, ' +
+        'and returns a random security question for that user. ' +
+        'Not to be confused with /verifyToken, which checks the invalid-token blocklist.',
       validate: {
-        payload: reqVerifyNumberSchema
+        payload: reqVerifyRecoveryTokenSchema
       },
       response: {
-        schema: resVerifyNumberSchema
+        schema: resVerifyRecoveryTokenSchema
       }
     }
   })

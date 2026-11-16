@@ -8,25 +8,36 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-
+/* eslint-disable max-lines */
 import { TRPCError } from '@trpc/server'
+import { http, HttpResponse } from 'msw'
 import {
   ActionStatus,
   ActionType,
   generateUuid,
   getAcceptedActions,
   getUUID,
-  SCOPES,
   TENNIS_CLUB_MEMBERSHIP,
   createPrng,
-  AddressType
+  AddressType,
+  encodeScope,
+  getCurrentEventState,
+  EventStatus
 } from '@opencrvs/commons'
+import { tennisClubMembershipEvent } from '@opencrvs/commons/fixtures'
 import {
+  createInitialisationTestClient,
   createSystemTestClient,
   createTestClient,
-  setupTestCase
+  setupTestCase,
+  systemInitialisationTestSetup,
+  TEST_SYSTEM_ID,
+  TEST_SYSTEM_ID_2
 } from '@events/tests/utils'
-import { getLocations } from '@events/storage/postgres/events/locations'
+import { getLocations } from '@events/storage/postgres/administrative-hierarchy/locations'
+import { EventNotFoundError } from '@events/service/events/events'
+import { mswServer } from '@events/tests/msw'
+import { env } from '@events/environment'
 
 describe('event.actions.notify', () => {
   describe('authorization', () => {
@@ -42,7 +53,11 @@ describe('event.actions.notify', () => {
 
     test(`allows access if required scope is present`, async () => {
       const { user } = await setupTestCase()
-      const client = createTestClient(user)
+      const client = createTestClient(user, [
+        encodeScope({
+          type: 'record.notify'
+        })
+      ])
 
       await expect(
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -53,28 +68,46 @@ describe('event.actions.notify', () => {
     test('disallows access with API scope with incorrect event type', async () => {
       const { user, generator } = await setupTestCase()
       const eventCreateClient = createTestClient(user, [
-        `record.create[event=${TENNIS_CLUB_MEMBERSHIP}]`,
-        `record.notify[event=${TENNIS_CLUB_MEMBERSHIP}]`
+        encodeScope({
+          type: 'record.create',
+          options: {
+            event: [TENNIS_CLUB_MEMBERSHIP]
+          }
+        })
       ])
 
       const event = await eventCreateClient.event.create(
         generator.event.create()
       )
 
-      const client = createTestClient(user, ['record.notify[event=some-event]'])
+      const notifyClient = createTestClient(user, [
+        encodeScope({
+          type: 'record.notify',
+          options: { event: ['some-other-event'] }
+        })
+      ])
 
       await expect(
-        client.event.actions.notify.request(
+        notifyClient.event.actions.notify.request(
           generator.event.actions.notify(event.id)
         )
-      ).rejects.toMatchObject(new TRPCError({ code: 'FORBIDDEN' }))
+        // User has record.notify scope, but not for the correct event type, so should get not found to prevent information leakage about the existence of the event
+      ).rejects.toMatchObject(new EventNotFoundError(event.id))
     })
 
     test('allows access with API scope with correct event type', async () => {
       const { user } = await setupTestCase()
       const client = createTestClient(user, [
-        `record.create[event=${TENNIS_CLUB_MEMBERSHIP}]`,
-        `record.notify[event=${TENNIS_CLUB_MEMBERSHIP}]`
+        encodeScope({
+          type: 'record.create',
+          options: {
+            event: [TENNIS_CLUB_MEMBERSHIP]
+          }
+        }),
+        encodeScope({
+          type: 'record.notify',
+          options: { event: [TENNIS_CLUB_MEMBERSHIP] }
+        })
       ])
 
       await expect(
@@ -116,7 +149,20 @@ describe('event.actions.notify', () => {
 
   test(`${ActionType.NOTIFY} action fails if payload includes field with unexpected type`, async () => {
     const { user, generator } = await setupTestCase()
-    const client = createTestClient(user)
+    const client = createTestClient(user, [
+      encodeScope({
+        type: 'record.create',
+        options: {
+          event: [TENNIS_CLUB_MEMBERSHIP]
+        }
+      }),
+      encodeScope({
+        type: 'record.notify',
+        options: {
+          event: [TENNIS_CLUB_MEMBERSHIP]
+        }
+      })
+    ])
 
     const event = await client.event.create(generator.event.create())
     const payload = {
@@ -140,7 +186,20 @@ describe('event.actions.notify', () => {
 
   test(`${ActionType.NOTIFY} action fails if payload includes field that is not in the declaration`, async () => {
     const { user, generator } = await setupTestCase()
-    const client = createTestClient(user)
+    const client = createTestClient(user, [
+      encodeScope({
+        type: 'record.create',
+        options: {
+          event: [TENNIS_CLUB_MEMBERSHIP]
+        }
+      }),
+      encodeScope({
+        type: 'record.notify',
+        options: {
+          event: [TENNIS_CLUB_MEMBERSHIP]
+        }
+      })
+    ])
 
     const event = await client.event.create(generator.event.create())
     const payload = {
@@ -159,7 +218,20 @@ describe('event.actions.notify', () => {
 
   test(`${ActionType.NOTIFY} action does not fail even if invalid value is sent`, async () => {
     const { user, generator } = await setupTestCase()
-    const client = createTestClient(user)
+    const client = createTestClient(user, [
+      encodeScope({
+        type: 'record.create',
+        options: {
+          event: [TENNIS_CLUB_MEMBERSHIP]
+        }
+      }),
+      encodeScope({
+        type: 'record.notify',
+        options: {
+          event: [TENNIS_CLUB_MEMBERSHIP]
+        }
+      })
+    ])
 
     const event = await client.event.create(generator.event.create())
     const payload = {
@@ -190,7 +262,20 @@ describe('event.actions.notify', () => {
 
   test(`${ActionType.NOTIFY} is idempotent`, async () => {
     const { user, generator } = await setupTestCase()
-    const client = createTestClient(user)
+    const client = createTestClient(user, [
+      encodeScope({
+        type: 'record.create',
+        options: {
+          event: [TENNIS_CLUB_MEMBERSHIP]
+        }
+      }),
+      encodeScope({
+        type: 'record.notify',
+        options: {
+          event: [TENNIS_CLUB_MEMBERSHIP]
+        }
+      })
+    ])
 
     const event = await client.event.create(generator.event.create())
 
@@ -209,40 +294,67 @@ describe('event.actions.notify', () => {
     test('should require createdAtLocation for system user', async () => {
       const { user, generator, rng } = await setupTestCase()
 
-      const dataSeedingClient = createTestClient(user, [
-        SCOPES.USER_DATA_SEEDING
-      ])
+      const client = createTestClient(user, [])
+      await systemInitialisationTestSetup()
+      const seeder = createInitialisationTestClient()
 
-      const parentId = generateUuid(rng)
+      const administrativeAreaId = generateUuid(rng)
 
       const locationRng = createPrng(843)
 
-      const locationPayload = generator.locations.set(
-        [{ id: parentId }, { parentId: parentId }, { parentId: parentId }],
+      const administrativeAreaPayload = generator.administrativeAreas.set(
+        [{ id: administrativeAreaId }],
         locationRng
       )
 
-      await dataSeedingClient.locations.set(locationPayload)
+      const locationPayload = generator.locations.set(
+        [{ administrativeAreaId }, { administrativeAreaId }],
+        locationRng
+      )
 
-      const locations = await dataSeedingClient.locations.list()
+      await seeder.administrativeAreas.set(administrativeAreaPayload)
+      await seeder.locations.set(locationPayload)
 
-      const client = createSystemTestClient('test-system', [
-        `record.create[event=${TENNIS_CLUB_MEMBERSHIP}]`,
-        `record.notify[event=${TENNIS_CLUB_MEMBERSHIP}]`
+      const locations = await client.locations.list()
+
+      const childLocation = locations.find(
+        (l) => l.administrativeAreaId === administrativeAreaId
+      )
+
+      if (!childLocation) {
+        throw new Error('Child location not found')
+      }
+
+      const systemClient = createSystemTestClient(TEST_SYSTEM_ID, [
+        encodeScope({
+          type: 'record.create',
+          options: {
+            event: [TENNIS_CLUB_MEMBERSHIP]
+          }
+        }),
+        encodeScope({
+          type: 'record.notify',
+          options: {
+            event: [TENNIS_CLUB_MEMBERSHIP]
+          }
+        })
       ])
 
-      const event = await client.event.create(generator.event.create())
+      const event = await systemClient.event.create({
+        ...generator.event.create(),
+        createdAtLocation: childLocation.id
+      })
 
       const payload = generator.event.actions.notify(event.id)
 
       // Should throw error since createdAtLocation is not given
       await expect(
-        client.event.actions.notify.request(payload)
+        systemClient.event.actions.notify.request(payload)
       ).rejects.toMatchSnapshot()
 
       // Should throw error since given createdAtLocation is not an uuid
       await expect(
-        client.event.actions.notify.request({
+        systemClient.event.actions.notify.request({
           ...payload,
           createdAtLocation: 'foobar'
         })
@@ -250,28 +362,22 @@ describe('event.actions.notify', () => {
 
       // Should throw error since given createdAtLocation is not a valid location
       await expect(
-        client.event.actions.notify.request({
+        systemClient.event.actions.notify.request({
           ...payload,
           createdAtLocation: getUUID()
         })
       ).rejects.toMatchSnapshot()
 
       await expect(
-        client.event.actions.notify.request({
+        systemClient.event.actions.notify.request({
           ...payload,
-          createdAtLocation: parentId
+          createdAtLocation: administrativeAreaId
         })
       ).rejects.toMatchSnapshot()
 
-      const childLocation = locations.find((l) => l.parentId === parentId)
-
-      if (!childLocation) {
-        throw new Error('Child location not found')
-      }
-
       // should succeed, since it is a valid location id
       await expect(
-        client.event.actions.notify.request({
+        systemClient.event.actions.notify.request({
           ...payload,
           createdAtLocation: childLocation.id
         })
@@ -281,19 +387,41 @@ describe('event.actions.notify', () => {
     test('should not require assignment or create unassign action for system user', async () => {
       const { generator } = await setupTestCase()
 
-      let client = createSystemTestClient('test-system', [
-        `record.create[event=${TENNIS_CLUB_MEMBERSHIP}]`,
-        `record.notify[event=${TENNIS_CLUB_MEMBERSHIP}]`
-      ])
-
-      const event = await client.event.create(generator.event.create())
-
-      client = createSystemTestClient('test-system-2', [
-        `record.create[event=${TENNIS_CLUB_MEMBERSHIP}]`,
-        `record.notify[event=${TENNIS_CLUB_MEMBERSHIP}]`
+      let client = createSystemTestClient(TEST_SYSTEM_ID, [
+        encodeScope({
+          type: 'record.create',
+          options: {
+            event: [TENNIS_CLUB_MEMBERSHIP]
+          }
+        }),
+        encodeScope({
+          type: 'record.notify',
+          options: {
+            event: [TENNIS_CLUB_MEMBERSHIP]
+          }
+        })
       ])
 
       const locations = await getLocations()
+      const event = await client.event.create({
+        ...generator.event.create(),
+        createdAtLocation: locations[3].id
+      })
+
+      client = createSystemTestClient(TEST_SYSTEM_ID_2, [
+        encodeScope({
+          type: 'record.create',
+          options: {
+            event: [TENNIS_CLUB_MEMBERSHIP]
+          }
+        }),
+        encodeScope({
+          type: 'record.notify',
+          options: {
+            event: [TENNIS_CLUB_MEMBERSHIP]
+          }
+        })
+      ])
 
       await client.event.actions.notify.request({
         ...generator.event.actions.notify(event.id),
@@ -303,7 +431,7 @@ describe('event.actions.notify', () => {
       const { user } = await setupTestCase()
       client = createTestClient(user)
 
-      const fetchedEvent = await client.event.get(event.id)
+      const fetchedEvent = await client.event.get({ eventId: event.id })
       expect(fetchedEvent.actions.length).toEqual(4)
       expect(fetchedEvent.actions).toEqual([
         expect.objectContaining({ type: ActionType.CREATE }),
@@ -318,37 +446,32 @@ describe('event.actions.notify', () => {
         expect.objectContaining({ type: ActionType.READ })
       ])
     })
-
-    test('system user should not be able to perform action on assigned event', async () => {
-      const { user, generator } = await setupTestCase()
-
-      let client = createTestClient(user)
-      const event = await client.event.create(generator.event.create())
-
-      client = createSystemTestClient('test-system-2', [
-        `record.create[event=${TENNIS_CLUB_MEMBERSHIP}]`,
-        `record.notify[event=${TENNIS_CLUB_MEMBERSHIP}]`
-      ])
-
-      await expect(
-        client.event.actions.notify.request(
-          generator.event.actions.notify(event.id)
-        )
-      ).rejects.toMatchSnapshot()
-    })
   })
 
   test('System client receives error for malformed input', async () => {
-    const { user, generator } = await setupTestCase()
+    const { user, generator, locations } = await setupTestCase()
 
     let client = createTestClient(user)
 
-    client = createSystemTestClient('test-system-2', [
-      `record.create[event=${TENNIS_CLUB_MEMBERSHIP}]`,
-      `record.notify[event=${TENNIS_CLUB_MEMBERSHIP}]`
+    client = createSystemTestClient(TEST_SYSTEM_ID_2, [
+      encodeScope({
+        type: 'record.create',
+        options: {
+          event: [TENNIS_CLUB_MEMBERSHIP]
+        }
+      }),
+      encodeScope({
+        type: 'record.notify',
+        options: {
+          event: [TENNIS_CLUB_MEMBERSHIP]
+        }
+      })
     ])
 
-    const event = await client.event.create(generator.event.create())
+    const event = await client.event.create({
+      ...generator.event.create(),
+      createdAtLocation: locations[0].id
+    })
     await expect(
       client.event.actions.notify.request({
         eventId: event.id,
@@ -366,7 +489,20 @@ describe('event.actions.notify', () => {
 
   test('Can not create a record with partial address when addressType is missing', async () => {
     const { user, generator } = await setupTestCase()
-    const client = createTestClient(user)
+    const client = createTestClient(user, [
+      encodeScope({
+        type: 'record.create',
+        options: {
+          event: [TENNIS_CLUB_MEMBERSHIP]
+        }
+      }),
+      encodeScope({
+        type: 'record.notify',
+        options: {
+          event: [TENNIS_CLUB_MEMBERSHIP]
+        }
+      })
+    ])
     const event = await client.event.create(generator.event.create())
 
     await expect(
@@ -387,7 +523,21 @@ describe('event.actions.notify', () => {
 
   test('Can create a record with partial address', async () => {
     const { user, generator } = await setupTestCase()
-    const client = createTestClient(user)
+    const client = createTestClient(user, [
+      encodeScope({
+        type: 'record.create',
+        options: {
+          event: [TENNIS_CLUB_MEMBERSHIP]
+        }
+      }),
+      encodeScope({
+        type: 'record.notify',
+        options: {
+          event: [TENNIS_CLUB_MEMBERSHIP]
+        }
+      })
+    ])
+
     const event = await client.event.create(generator.event.create())
 
     const response = await client.event.actions.notify.request({
@@ -416,7 +566,20 @@ describe('event.actions.notify', () => {
 
   test('Can create a record with mixed address', async () => {
     const { user, generator } = await setupTestCase()
-    const client = createTestClient(user)
+    const client = createTestClient(user, [
+      encodeScope({
+        type: 'record.create',
+        options: {
+          event: [TENNIS_CLUB_MEMBERSHIP]
+        }
+      }),
+      encodeScope({
+        type: 'record.notify',
+        options: {
+          event: [TENNIS_CLUB_MEMBERSHIP]
+        }
+      })
+    ])
     const event = await client.event.create(generator.event.create())
 
     const response = await client.event.actions.notify.request({
@@ -442,5 +605,147 @@ describe('event.actions.notify', () => {
     expect(
       activeActions.find((action) => action.type === ActionType.UNASSIGN)
     ).toBeDefined()
+  })
+})
+
+describe('3rd party integration confirmation behaviour', () => {
+  function mockActionApi(action: ActionType, status: number) {
+    return mswServer.use(
+      http.post<never, { actionId: string }>(
+        `${env.COUNTRY_CONFIG_URL}/trigger/events/tennis-club-membership/actions/${action}`,
+        () => {
+          return HttpResponse.json({}, { status })
+        }
+      )
+    )
+  }
+
+  test('Throws when integration responds with 202 when keepAssignment is given', async () => {
+    mockActionApi(ActionType.NOTIFY, 202)
+    const { generator, user } = await setupTestCase()
+
+    const client = createTestClient(user)
+
+    const event = await client.event.create(generator.event.create())
+
+    await expect(
+      client.event.actions.notify.request(
+        generator.event.actions.notify(event.id, { keepAssignment: true })
+      )
+    ).rejects.toThrow('Confirmation API did not return a synchronous response.')
+  })
+
+  test('Throws when integration responds with 202 when keepAssignmentIfRejected is given', async () => {
+    mockActionApi(ActionType.NOTIFY, 202)
+    const { generator, user } = await setupTestCase()
+
+    const client = createTestClient(user)
+
+    const event = await client.event.create(generator.event.create())
+
+    await expect(
+      client.event.actions.notify.request(
+        generator.event.actions.notify(event.id, {
+          keepAssignmentIfRejected: true
+        })
+      )
+    ).rejects.toThrow('Confirmation API did not return a synchronous response.')
+  })
+
+  test('Throws when integration responds with 202 when keepAssignmentIfAccepted is given', async () => {
+    mockActionApi(ActionType.NOTIFY, 202)
+
+    const { generator, user } = await setupTestCase()
+
+    const client = createTestClient(user)
+
+    const event = await client.event.create(generator.event.create())
+
+    await expect(
+      client.event.actions.notify.request(
+        generator.event.actions.notify(event.id, {
+          keepAssignmentIfAccepted: true
+        })
+      )
+    ).rejects.toThrow('Confirmation API did not return a synchronous response.')
+  })
+
+  test('Unassigns when integration responds with 202', async () => {
+    mockActionApi(ActionType.NOTIFY, 202)
+
+    const { generator, user } = await setupTestCase()
+
+    const client = createTestClient(user)
+
+    const event = await client.event.create(generator.event.create())
+
+    const response = await client.event.actions.notify.request(
+      generator.event.actions.notify(event.id)
+    )
+
+    const lastAction = response.actions[response.actions.length - 1]
+
+    expect(lastAction.type).toEqual(ActionType.UNASSIGN)
+    expect(lastAction.status).toEqual(ActionStatus.Accepted)
+
+    const currentState = getCurrentEventState(
+      response,
+      tennisClubMembershipEvent
+    )
+
+    expect(currentState.flags).toEqual(['notify:requested'])
+    expect(currentState.status).toEqual(EventStatus.enum.CREATED)
+    expect(currentState.assignedTo).toEqual(undefined)
+  })
+
+  test('Records a rejected action when integration responds with 400', async () => {
+    mockActionApi(ActionType.NOTIFY, 400)
+
+    const { generator, user } = await setupTestCase()
+
+    const client = createTestClient(user)
+
+    const event = await client.event.create(generator.event.create())
+
+    const response = await client.event.actions.notify.request(
+      generator.event.actions.notify(event.id)
+    )
+
+    expect(
+      response.actions.find(
+        (action) =>
+          action.type === ActionType.NOTIFY &&
+          action.status === ActionStatus.Rejected
+      )
+    ).toBeDefined()
+  })
+
+  test('Keeps assignment when integration responds with 500', async () => {
+    mockActionApi(ActionType.NOTIFY, 500)
+
+    const { generator, user } = await setupTestCase()
+
+    const client = createTestClient(user)
+
+    const event = await client.event.create(generator.event.create())
+
+    await expect(
+      client.event.actions.notify.request(
+        generator.event.actions.notify(event.id)
+      )
+    ).rejects.toThrow(
+      'Unexpected failure from country config action confirmation API'
+    )
+
+    const eventAfterFailure = await client.event.get({ eventId: event.id })
+
+    const currentState = getCurrentEventState(
+      eventAfterFailure,
+      tennisClubMembershipEvent
+    )
+
+    expect(currentState.flags).toEqual(['notify:requested'])
+    expect(currentState.status).toEqual(EventStatus.enum.CREATED)
+    expect(currentState.assignedTo).toEqual(user.id)
   })
 })

@@ -1,0 +1,899 @@
+/*
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at https://mozilla.org/MPL/2.0/.
+ *
+ * OpenCRVS is also distributed under the terms of the Civil Registration
+ * & Healthcare Disclaimer located at http://opencrvs.org/license.
+ *
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
+ */
+
+/* eslint-disable max-lines */
+import { createPrng, generateUuid, TestUserRole } from './test.utils'
+import { SystemContext, UserContext } from '../users/User'
+import {
+  AdministrativeArea,
+  canAccessEventWithScope,
+  canAccessOtherUserWithScopes,
+  EventIndexWithAdministrativeHierarchy,
+  getLocationHierarchy,
+  Location,
+  UserWithResolvedHierarchy
+} from './locations'
+import { RecordScopeV2, UserScopeV2 } from 'src/scopes'
+import { UUID } from 'src/uuid'
+
+describe('canAccessEventWithScope()', () => {
+  const rng = createPrng(83429)
+
+  // Arbitrary UUIDs. The actual values don't matter as long as they are consistent across the test.
+  const provinceUuid = generateUuid(rng)
+  const districtUuid = generateUuid(rng)
+  const officeUuid = generateUuid(rng)
+  const createdById = generateUuid(rng)
+
+  const notifiedEvent = {
+    type: 'birth',
+    id: generateUuid(rng),
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+    createdBy: generateUuid(rng),
+    status: 'NOTIFIED' as const,
+    trackingId: generateUuid(rng),
+    declaration: {},
+    flags: [],
+    potentialDuplicates: [],
+    placeOfEvent: [provinceUuid, districtUuid, officeUuid],
+    legalStatuses: {
+      NOTIFIED: {
+        acceptedAt: new Date().toISOString(),
+        createdAt: new Date().toISOString(),
+        createdBy: createdById,
+        createdAtLocation: [provinceUuid, districtUuid, officeUuid]
+      },
+      DECLARED: undefined,
+      REGISTERED: undefined
+    }
+  } satisfies EventIndexWithAdministrativeHierarchy
+
+  const declaredEvent = {
+    id: generateUuid(rng),
+    type: 'birth',
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+    status: 'DECLARED' as const,
+    trackingId: generateUuid(rng),
+    declaration: {},
+    flags: [],
+    potentialDuplicates: [],
+    createdBy: createdById,
+    createdAtLocation: [provinceUuid, districtUuid, officeUuid],
+    placeOfEvent: [provinceUuid, districtUuid, officeUuid],
+    legalStatuses: {
+      NOTIFIED: undefined,
+      DECLARED: {
+        acceptedAt: new Date().toISOString(),
+        createdAt: new Date().toISOString(),
+        createdBy: createdById,
+        createdAtLocation: [provinceUuid, districtUuid, officeUuid]
+      },
+      REGISTERED: undefined
+    }
+  } satisfies EventIndexWithAdministrativeHierarchy
+
+  const registeredEvent = {
+    ...declaredEvent,
+    legalStatuses: {
+      NOTIFIED: undefined,
+      DECLARED: {
+        acceptedAt: new Date().toISOString(),
+        createdAt: new Date().toISOString(),
+        createdBy: createdById,
+        createdAtLocation: [provinceUuid, districtUuid, officeUuid]
+      },
+      REGISTERED: {
+        acceptedAt: new Date().toISOString(),
+        createdAt: new Date().toISOString(),
+        registrationNumber: '12345',
+        createdBy: createdById,
+        createdAtLocation: [provinceUuid, districtUuid, officeUuid]
+      }
+    }
+  } satisfies EventIndexWithAdministrativeHierarchy
+
+  const systemContext = {
+    type: 'system',
+    id: createdById
+  } satisfies SystemContext
+
+  const userContext = {
+    type: 'user',
+    id: createdById,
+    primaryOfficeId: officeUuid,
+    administrativeAreaId: districtUuid,
+    role: TestUserRole.enum.FIELD_AGENT
+  } satisfies UserContext
+
+  const locationOptions = [
+    { placeOfEvent: 'location' },
+    { createdIn: 'location' },
+    { declaredIn: 'location' },
+    { registeredIn: 'location' }
+  ] satisfies RecordScopeV2['options'][]
+
+  const userOptions = [
+    { createdBy: 'user' },
+    { declaredBy: 'user' },
+    { registeredBy: 'user' }
+  ] satisfies RecordScopeV2['options'][]
+
+  const registeredOnlyOptions = [
+    { registeredIn: 'location' },
+    { registeredBy: 'user' }
+  ] satisfies RecordScopeV2['options'][]
+
+  const notifiedOnlyOptions = [
+    { notifiedIn: 'location' },
+    { notifiedBy: 'user' }
+  ] satisfies RecordScopeV2['options'][]
+
+  const eventOptions = [
+    { event: ['birth'] },
+    { event: undefined },
+    { event: ['birth', 'death'] }
+  ] satisfies RecordScopeV2['options'][]
+
+  describe('System user', () => {
+    /**
+     * System users are not bound to any location, so giving them a scope that requires access to a specific location should not grant them access.
+     */
+    test.each(locationOptions)(
+      'should not access event with location-based scope %j',
+      (options) => {
+        expect(
+          canAccessEventWithScope(
+            registeredEvent,
+            { type: 'record.print-certified-copies', options },
+            systemContext
+          )
+        ).toBe(false)
+      }
+    )
+
+    test.each(userOptions)(
+      /**
+       * From business rules perspective system users can only perform create and notify actions. On the unit test level, we want to illustrate that 'canAccessEventWithScope' is agnostic of the action type, and matches the context with scope options.
+       */
+      'should access a event with user-based scope %j',
+      (options) => {
+        expect(
+          canAccessEventWithScope(
+            registeredEvent,
+            { type: 'record.print-certified-copies', options },
+            systemContext
+          )
+        ).toBe(true)
+      }
+    )
+
+    test.each(registeredOnlyOptions)(
+      'should not access an unregistered event with registered scope %j',
+      (options) => {
+        expect(
+          canAccessEventWithScope(
+            declaredEvent,
+            { type: 'record.print-certified-copies', options },
+            systemContext
+          )
+        ).toBe(false)
+      }
+    )
+
+    test('should access notified event with notifiedBy:user scope', () => {
+      expect(
+        canAccessEventWithScope(
+          notifiedEvent,
+          { type: 'record.edit', options: { notifiedBy: 'user' } },
+          systemContext
+        )
+      ).toBe(true)
+    })
+
+    test.each(notifiedOnlyOptions)(
+      'should not access an unnotified event with notified scope %j',
+      (options) => {
+        expect(
+          canAccessEventWithScope(
+            declaredEvent,
+            { type: 'record.edit', options },
+            systemContext
+          )
+        ).toBe(false)
+      }
+    )
+
+    test.each(eventOptions)(
+      'should access event with event type-based scope %j',
+      (options) => {
+        expect(
+          canAccessEventWithScope(
+            registeredEvent,
+            { type: 'record.print-certified-copies', options },
+            systemContext
+          )
+        ).toBe(true)
+      }
+    )
+  })
+
+  describe('Human user', () => {
+    test.each(locationOptions)(
+      'should access event with correct location scope %j',
+      (options) => {
+        expect(
+          canAccessEventWithScope(
+            registeredEvent,
+            { type: 'record.print-certified-copies', options },
+            userContext
+          )
+        ).toBe(true)
+      }
+    )
+
+    test.each(userOptions)(
+      'should access event with user-based scope %j',
+      (options) => {
+        expect(
+          canAccessEventWithScope(
+            registeredEvent,
+            { type: 'record.print-certified-copies', options },
+            userContext
+          )
+        ).toBe(true)
+      }
+    )
+
+    test.each(registeredOnlyOptions)(
+      'should not access an unregistered event with registered scope %j',
+      (options) => {
+        expect(
+          canAccessEventWithScope(
+            declaredEvent,
+            { type: 'record.print-certified-copies', options },
+            userContext
+          )
+        ).toBe(false)
+      }
+    )
+
+    test.each(notifiedOnlyOptions)(
+      'should access notified event with notified scope %j',
+      (options) => {
+        expect(
+          canAccessEventWithScope(
+            notifiedEvent,
+            { type: 'record.edit', options },
+            userContext
+          )
+        ).toBe(true)
+      }
+    )
+
+    test.each(notifiedOnlyOptions)(
+      'should not access an unnotified event with notified scope %j',
+      (options) => {
+        expect(
+          canAccessEventWithScope(
+            declaredEvent,
+            { type: 'record.edit', options },
+            userContext
+          )
+        ).toBe(false)
+      }
+    )
+
+    test.each(eventOptions)(
+      'should access event with event type-based scope %j',
+      (options) => {
+        expect(
+          canAccessEventWithScope(
+            registeredEvent,
+            { type: 'record.print-certified-copies', options },
+            userContext
+          )
+        ).toBe(true)
+      }
+    )
+
+    test('should access an event they created even when it was declared by another user (createdBy:user)', () => {
+      // The user created the record, but a different user re-declared it, so
+      // DECLARED.createdBy no longer points to them. createdBy is based on the
+      // immutable CREATE author, so it should still grant access...
+      const reDeclaredByAnotherUser = {
+        ...declaredEvent,
+        createdBy: userContext.id,
+        legalStatuses: {
+          DECLARED: {
+            acceptedAt: new Date().toISOString(),
+            createdAt: new Date().toISOString(),
+            createdBy: generateUuid(rng),
+            createdAtLocation: [provinceUuid, districtUuid, officeUuid]
+          },
+          NOTIFIED: undefined,
+          REGISTERED: undefined
+        }
+      } satisfies EventIndexWithAdministrativeHierarchy
+
+      expect(
+        canAccessEventWithScope(
+          reDeclaredByAnotherUser,
+          { type: 'record.edit', options: { createdBy: 'user' } },
+          userContext
+        )
+      ).toBe(true)
+
+      // ...whereas a declaredBy:user scope would not, since the latest DECLARE
+      // was authored by someone else.
+      expect(
+        canAccessEventWithScope(
+          reDeclaredByAnotherUser,
+          { type: 'record.edit', options: { declaredBy: 'user' } },
+          userContext
+        )
+      ).toBe(false)
+    })
+
+    describe('createdIn', () => {
+      const undeclaredEvent = {
+        type: 'birth',
+        id: generateUuid(rng),
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+        status: 'CREATED' as const,
+        trackingId: generateUuid(rng),
+        declaration: {},
+        flags: [],
+        potentialDuplicates: [],
+        createdBy: createdById,
+        createdAtLocation: [provinceUuid, districtUuid, officeUuid],
+        placeOfEvent: [provinceUuid, districtUuid, officeUuid],
+        legalStatuses: {
+          DECLARED: undefined,
+          NOTIFIED: undefined,
+          REGISTERED: undefined
+        }
+      } satisfies EventIndexWithAdministrativeHierarchy
+
+      const colleagueAtSameOffice = {
+        type: 'user',
+        id: generateUuid(rng),
+        primaryOfficeId: officeUuid,
+        administrativeAreaId: districtUuid,
+        role: TestUserRole.enum.FIELD_AGENT
+      } satisfies UserContext
+
+      test.each([
+        { createdIn: 'location' },
+        { createdIn: 'administrativeArea' }
+      ] satisfies RecordScopeV2['options'][])(
+        'grants access to an event that has not been declared yet with scope %j',
+        (options) => {
+          expect(
+            canAccessEventWithScope(
+              undeclaredEvent,
+              { type: 'record.read', options },
+              userContext
+            )
+          ).toBe(true)
+        }
+      )
+
+      test.each([
+        { declaredIn: 'location' },
+        { declaredIn: 'administrativeArea' },
+        { declaredBy: 'user' }
+      ] satisfies RecordScopeV2['options'][])(
+        'declared-based scope %j does not match an event that has not been declared yet',
+        (options) => {
+          expect(
+            canAccessEventWithScope(
+              undeclaredEvent,
+              { type: 'record.read', options },
+              userContext
+            )
+          ).toBe(false)
+        }
+      )
+
+      test('grants access to a colleague at the same office, unlike createdBy', () => {
+        expect(
+          canAccessEventWithScope(
+            undeclaredEvent,
+            { type: 'record.read', options: { createdIn: 'location' } },
+            colleagueAtSameOffice
+          )
+        ).toBe(true)
+
+        expect(
+          canAccessEventWithScope(
+            undeclaredEvent,
+            { type: 'record.read', options: { createdBy: 'user' } },
+            colleagueAtSameOffice
+          )
+        ).toBe(false)
+      })
+
+      test('is not reassigned when another office declares the event', () => {
+        const declaredByAnotherOffice = {
+          ...undeclaredEvent,
+          status: 'DECLARED' as const,
+          legalStatuses: {
+            DECLARED: {
+              acceptedAt: new Date().toISOString(),
+              createdAt: new Date().toISOString(),
+              createdBy: generateUuid(rng),
+              createdAtLocation: [generateUuid(rng)]
+            },
+            NOTIFIED: undefined,
+            REGISTERED: undefined
+          }
+        } satisfies EventIndexWithAdministrativeHierarchy
+
+        expect(
+          canAccessEventWithScope(
+            declaredByAnotherOffice,
+            { type: 'record.read', options: { createdIn: 'location' } },
+            userContext
+          )
+        ).toBe(true)
+
+        expect(
+          canAccessEventWithScope(
+            declaredByAnotherOffice,
+            { type: 'record.read', options: { declaredIn: 'location' } },
+            userContext
+          )
+        ).toBe(false)
+      })
+    })
+  })
+
+  describe('flags option', () => {
+    test('should not access event with a "noneOf" flag it carries', () => {
+      expect(
+        canAccessEventWithScope(
+          { ...registeredEvent, flags: ['sealed'] },
+          {
+            type: 'record.read',
+            options: { flags: { noneOf: ['sealed'] } }
+          },
+          userContext
+        )
+      ).toBe(false)
+    })
+
+    test('should not access a sealed event with a flag-limited duplicate review scope', () => {
+      expect(
+        canAccessEventWithScope(
+          { ...registeredEvent, flags: ['sealed'] },
+          {
+            type: 'record.review-duplicates',
+            options: { flags: { noneOf: ['sealed'] } }
+          },
+          userContext
+        )
+      ).toBe(false)
+    })
+
+    test('should access an unsealed event with a flag-limited duplicate review scope', () => {
+      expect(
+        canAccessEventWithScope(
+          { ...registeredEvent, flags: [] },
+          {
+            type: 'record.review-duplicates',
+            options: { flags: { noneOf: ['sealed'] } }
+          },
+          userContext
+        )
+      ).toBe(true)
+    })
+
+    test('should access event without a "noneOf" flag it does not carry', () => {
+      expect(
+        canAccessEventWithScope(
+          { ...registeredEvent, flags: [] },
+          {
+            type: 'record.read',
+            options: { flags: { noneOf: ['sealed'] } }
+          },
+          userContext
+        )
+      ).toBe(true)
+    })
+
+    test('should access event carrying one of the "anyOf" flags', () => {
+      expect(
+        canAccessEventWithScope(
+          { ...registeredEvent, flags: ['incomplete'] },
+          {
+            type: 'record.read',
+            options: { flags: { anyOf: ['incomplete', 'rejected'] } }
+          },
+          userContext
+        )
+      ).toBe(true)
+    })
+
+    test('should not access event carrying none of the "anyOf" flags', () => {
+      expect(
+        canAccessEventWithScope(
+          { ...registeredEvent, flags: [] },
+          {
+            type: 'record.read',
+            options: { flags: { anyOf: ['incomplete', 'rejected'] } }
+          },
+          userContext
+        )
+      ).toBe(false)
+    })
+
+    test('should access event carrying all of the "allOf" flags', () => {
+      expect(
+        canAccessEventWithScope(
+          { ...registeredEvent, flags: ['incomplete', 'rejected'] },
+          {
+            type: 'record.read',
+            options: { flags: { allOf: ['incomplete', 'rejected'] } }
+          },
+          userContext
+        )
+      ).toBe(true)
+    })
+
+    test('should not access event missing one of the "allOf" flags', () => {
+      expect(
+        canAccessEventWithScope(
+          { ...registeredEvent, flags: ['incomplete'] },
+          {
+            type: 'record.read',
+            options: { flags: { allOf: ['incomplete', 'rejected'] } }
+          },
+          userContext
+        )
+      ).toBe(false)
+    })
+  })
+
+  describe('status option', () => {
+    test('should access event whose status is included in the filter', () => {
+      expect(
+        canAccessEventWithScope(
+          { ...declaredEvent, status: 'DECLARED' },
+          {
+            type: 'record.edit',
+            options: { status: ['DECLARED'] }
+          },
+          userContext
+        )
+      ).toBe(true)
+    })
+
+    test('should not access event whose status is not included in the filter', () => {
+      expect(
+        canAccessEventWithScope(
+          { ...registeredEvent, status: 'REGISTERED' },
+          {
+            type: 'record.edit',
+            options: { status: ['DECLARED'] }
+          },
+          userContext
+        )
+      ).toBe(false)
+    })
+
+    test('should access any status when the filter is not set', () => {
+      expect(
+        canAccessEventWithScope(
+          { ...registeredEvent, status: 'REGISTERED' },
+          {
+            type: 'record.edit',
+            options: {}
+          },
+          userContext
+        )
+      ).toBe(true)
+    })
+  })
+
+  test('should not access event if user does not meet any of the scope options', () => {
+    // Negative test cases to ensure we don't accidentally remove checks.
+    const userFromAnotherOfficeContext = {
+      type: 'user',
+      id: generateUuid(), // Different user
+      primaryOfficeId: generateUuid(rng), // Different office
+      administrativeAreaId: generateUuid(rng), // Different administrative area
+      role: TestUserRole.enum.FIELD_AGENT
+    } satisfies UserContext
+
+    const singleOptions = [
+      { placeOfEvent: 'location' },
+      { placeOfEvent: 'administrativeArea' },
+      { createdBy: 'user' },
+      { createdIn: 'location' },
+      { createdIn: 'administrativeArea' },
+      { notifiedIn: 'location' },
+      { notifiedIn: 'administrativeArea' },
+      { notifiedBy: 'user' },
+      { declaredIn: 'location' },
+      { declaredIn: 'administrativeArea' },
+      { registeredIn: 'location' },
+      { registeredIn: 'administrativeArea' },
+      { declaredBy: 'user' },
+      { registeredBy: 'user' }
+    ] satisfies RecordScopeV2['options'][]
+
+    singleOptions.forEach((options) => {
+      expect(
+        canAccessEventWithScope(
+          registeredEvent,
+          {
+            type: 'record.print-certified-copies',
+            options
+          },
+          userFromAnotherOfficeContext
+        )
+      ).toBe(false)
+    })
+  })
+
+  describe('User without an administrative area', () => {
+    // The event is in a different administrative area than the user's office,
+    // so access can only be granted by the "no administrative area" branch.
+    const eventInAnotherArea = {
+      ...registeredEvent,
+      createdAtLocation: [generateUuid(rng)],
+      placeOfEvent: [generateUuid(rng)],
+      legalStatuses: {
+        NOTIFIED: {
+          acceptedAt: new Date().toISOString(),
+          createdAt: new Date().toISOString(),
+          createdBy: generateUuid(rng),
+          createdAtLocation: [generateUuid(rng)]
+        },
+        DECLARED: {
+          acceptedAt: new Date().toISOString(),
+          createdAt: new Date().toISOString(),
+          createdBy: generateUuid(rng),
+          createdAtLocation: [generateUuid(rng)]
+        },
+        REGISTERED: {
+          acceptedAt: new Date().toISOString(),
+          createdAt: new Date().toISOString(),
+          registrationNumber: '12345',
+          createdBy: generateUuid(rng),
+          createdAtLocation: [generateUuid(rng)]
+        }
+      }
+    } satisfies EventIndexWithAdministrativeHierarchy
+
+    const adminAreaOptions = [
+      { placeOfEvent: 'administrativeArea' },
+      { createdIn: 'administrativeArea' },
+      { notifiedIn: 'administrativeArea' },
+      { declaredIn: 'administrativeArea' },
+      { registeredIn: 'administrativeArea' }
+    ] satisfies RecordScopeV2['options'][]
+
+    const userWithNullArea = {
+      type: 'user',
+      id: createdById,
+      primaryOfficeId: officeUuid,
+      administrativeAreaId: null,
+      role: TestUserRole.enum.FIELD_AGENT
+    } satisfies UserContext
+
+    const userWithUndefinedArea = {
+      type: 'user',
+      id: createdById,
+      primaryOfficeId: officeUuid,
+      administrativeAreaId: undefined,
+      role: TestUserRole.enum.FIELD_AGENT
+    } satisfies UserContext
+
+    test.each(adminAreaOptions)(
+      'grants access when administrativeAreaId is null with scope %j',
+      (options) => {
+        expect(
+          canAccessEventWithScope(
+            eventInAnotherArea,
+            { type: 'record.print-certified-copies', options },
+            userWithNullArea
+          )
+        ).toBe(true)
+      }
+    )
+
+    test.each(adminAreaOptions)(
+      'grants access when administrativeAreaId is undefined with scope %j',
+      (options) => {
+        expect(
+          canAccessEventWithScope(
+            eventInAnotherArea,
+            { type: 'record.print-certified-copies', options },
+            userWithUndefinedArea
+          )
+        ).toBe(true)
+      }
+    )
+  })
+})
+
+describe('canAccessOtherUserWithScopes()', () => {
+  const rng = createPrng(11111)
+  const adminAreaUuid = generateUuid(rng)
+  const officeUuid = generateUuid(rng)
+  const otherOfficeUuid = generateUuid(rng)
+
+  // The user being viewed lives in a different administrative area
+  const targetUser: UserWithResolvedHierarchy = {
+    role: TestUserRole.enum.FIELD_AGENT,
+    administrativeHierarchy: [adminAreaUuid, otherOfficeUuid],
+    primaryOfficeId: otherOfficeUuid
+  }
+
+  const scopeWithAdminAreaAccess: UserScopeV2 = {
+    type: 'user.read',
+    options: { accessLevel: 'administrativeArea' }
+  }
+
+  it('grants access when calling user has administrativeAreaId: null (root jurisdiction)', () => {
+    const callingUser: UserContext = {
+      type: 'user',
+      id: generateUuid(rng),
+      primaryOfficeId: officeUuid,
+      administrativeAreaId: null,
+      role: TestUserRole.enum.LOCAL_SYSTEM_ADMIN
+    }
+
+    expect(
+      canAccessOtherUserWithScopes({
+        scopes: [scopeWithAdminAreaAccess],
+        userToAccess: targetUser,
+        user: callingUser
+      })
+    ).toBe(true)
+  })
+
+  it('grants access when calling user has administrativeAreaId: undefined (root jurisdiction)', () => {
+    const callingUser: UserContext = {
+      type: 'user',
+      id: generateUuid(rng),
+      primaryOfficeId: officeUuid,
+      administrativeAreaId: undefined,
+      role: TestUserRole.enum.LOCAL_SYSTEM_ADMIN
+    }
+
+    expect(
+      canAccessOtherUserWithScopes({
+        scopes: [scopeWithAdminAreaAccess],
+        userToAccess: targetUser,
+        user: callingUser
+      })
+    ).toBe(true)
+  })
+
+  it('denies access when calling user has an administrativeAreaId not in the target hierarchy', () => {
+    const unrelatedAreaId = generateUuid(rng)
+    const callingUser: UserContext = {
+      type: 'user',
+      id: generateUuid(rng),
+      primaryOfficeId: officeUuid,
+      administrativeAreaId: unrelatedAreaId,
+      role: TestUserRole.enum.LOCAL_SYSTEM_ADMIN
+    }
+
+    expect(
+      canAccessOtherUserWithScopes({
+        scopes: [scopeWithAdminAreaAccess],
+        userToAccess: targetUser,
+        user: callingUser
+      })
+    ).toBe(false)
+  })
+})
+
+function mockVersionFields(id: UUID, name: string) {
+  return {
+    status: 'active' as const,
+    versions: [
+      {
+        versionId: id,
+        effectiveFrom: '0001-01-01',
+        name,
+        externalId: null,
+        status: 'active' as const
+      }
+    ]
+  }
+}
+
+const province: AdministrativeArea = {
+  id: 'aaaaaaaa-aaaa-4aaa-aaaa-aaaaaaaaaaaa' as UUID,
+  name: 'Province',
+  externalId: null,
+  parentId: null,
+  ...mockVersionFields(
+    'aaaaaaaa-aaaa-4aaa-aaaa-aaaaaaaaaaaa' as UUID,
+    'Province'
+  )
+}
+
+const district: AdministrativeArea = {
+  id: 'bbbbbbbb-bbbb-4bbb-bbbb-bbbbbbbbbbbb' as UUID,
+  name: 'District',
+  externalId: null,
+  parentId: province.id,
+  ...mockVersionFields(
+    'bbbbbbbb-bbbb-4bbb-bbbb-bbbbbbbbbbbb' as UUID,
+    'District'
+  )
+}
+
+const office: Location = {
+  id: 'cccccccc-cccc-4ccc-cccc-cccccccccccc' as UUID,
+  name: 'District Office',
+  externalId: null,
+  administrativeAreaId: district.id,
+  locationType: 'CRVS_OFFICE',
+  ...mockVersionFields(
+    'cccccccc-cccc-4ccc-cccc-cccccccccccc' as UUID,
+    'District Office'
+  )
+}
+
+const officeWithoutArea: Location = {
+  id: 'dddddddd-dddd-4ddd-dddd-dddddddddddd' as UUID,
+  name: 'Standalone Office',
+  externalId: null,
+  administrativeAreaId: null,
+  locationType: 'CRVS_OFFICE',
+  ...mockVersionFields(
+    'dddddddd-dddd-4ddd-dddd-dddddddddddd' as UUID,
+    'Standalone Office'
+  )
+}
+
+function buildMaps() {
+  const administrativeAreas = new Map<UUID, AdministrativeArea>([
+    [province.id, province],
+    [district.id, district]
+  ])
+  const locations = new Map<UUID, Location>([
+    [office.id, office],
+    [officeWithoutArea.id, officeWithoutArea]
+  ])
+  return { administrativeAreas, locations }
+}
+
+describe('getLocationHierarchy', () => {
+  it('returns root-first hierarchy for a location with an administrative area', () => {
+    const result = getLocationHierarchy(office.id, buildMaps())
+    expect(result).toEqual([province.id, district.id, office.id])
+  })
+
+  it('returns only the location id when it has no administrative area', () => {
+    const result = getLocationHierarchy(officeWithoutArea.id, buildMaps())
+    expect(result).toEqual([officeWithoutArea.id])
+  })
+
+  it('returns root-first hierarchy for an administrative area id', () => {
+    const result = getLocationHierarchy(district.id, buildMaps())
+    expect(result).toEqual([province.id, district.id])
+  })
+
+  it('returns single-element array for a root administrative area', () => {
+    const result = getLocationHierarchy(province.id, buildMaps())
+    expect(result).toEqual([province.id])
+  })
+})

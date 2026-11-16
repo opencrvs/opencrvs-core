@@ -10,12 +10,11 @@
  */
 
 import React from 'react'
-import { Meta, StoryObj } from '@storybook/react'
-import { expect, fn, userEvent, waitFor, within } from '@storybook/test'
+import { Meta, StoryObj } from '@storybook/react-vite'
+import { expect, within } from 'storybook/test'
 import { TRPCProvider } from '../trpc'
 import { TRPCErrorBoundary, throwStructuredError } from './TRPCErrorBoundary'
 import { ROUTES } from './routes'
-import { routesConfig } from './config'
 
 const meta: Meta<typeof TRPCErrorBoundary> = {
   title: 'Components/interaction/TRPCErrorBoundary',

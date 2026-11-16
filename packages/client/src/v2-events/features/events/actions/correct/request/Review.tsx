@@ -18,9 +18,10 @@ import {
 import {
   ActionType,
   getDeclaration,
-  getCurrentEventState
+  getCurrentEventState,
+  eventAttachmentPath
 } from '@opencrvs/commons/client'
-import { PrimaryButton } from '@opencrvs/components/lib/buttons'
+import { Button } from '@opencrvs/components'
 import { buttonMessages } from '@client/i18n/messages'
 import { Review as ReviewComponent } from '@client/v2-events/features/events/components/Review'
 import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
@@ -28,6 +29,7 @@ import { useEventFormData } from '@client/v2-events/features/events/useEventForm
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
 import { useIntlFormatMessageWithFlattenedParams } from '@client/v2-events/messages/utils'
 import { FormLayout } from '@client/v2-events/layouts'
+import { recordAnchorDate } from '@client/v2-events/utils'
 import { ROUTES } from '@client/v2-events/routes'
 import { makeFormFieldIdFormikCompatible } from '@client/v2-events/components/forms/utils'
 import { validationErrorsInActionFormExist } from '@client/v2-events/components/forms/validation'
@@ -36,8 +38,8 @@ import { hasDeclarationFieldChanged } from '../utils'
 
 export function Review() {
   const { eventId } = useTypedParams(ROUTES.V2.EVENTS.REQUEST_CORRECTION.REVIEW)
-  const [{ workqueue: slug }] = useTypedSearchParams(
-    ROUTES.V2.EVENTS.VALIDATE.REVIEW
+  const [{ backTo }] = useTypedSearchParams(
+    ROUTES.V2.EVENTS.REQUEST_CORRECTION.REVIEW
   )
   const intl = useIntl()
   const navigate = useNavigate()
@@ -91,6 +93,8 @@ export function Review() {
   return (
     <FormLayout route={ROUTES.V2.EVENTS.REQUEST_CORRECTION}>
       <ReviewComponent.Body
+        anchor={recordAnchorDate(eventIndex)}
+        attachmentPath={eventAttachmentPath(eventId)}
         form={form}
         formConfig={formConfig}
         isCorrection={true}
@@ -99,6 +103,7 @@ export function Review() {
           actionConfig.label,
           previousFormValues
         )}
+        treatMissingValuesAsCleared={true}
         validatorContext={validatorContext}
         onEdit={({ pageId, fieldId }) => {
           navigate(
@@ -106,28 +111,30 @@ export function Review() {
               { pageId, eventId },
               {
                 from: 'review',
-                workqueue: slug
+                backTo
               },
               fieldId ? makeFormFieldIdFormikCompatible(fieldId) : undefined
             )
           )
         }}
       >
-        <PrimaryButton
+        <Button
           key="continue_button"
           disabled={!anyValuesHaveChanged || incomplete}
           id="continue_button"
+          size="large"
+          type="primary"
           onClick={() => {
             navigate(
               ROUTES.V2.EVENTS.REQUEST_CORRECTION.SUMMARY.buildPath(
                 { eventId },
-                { workqueue: slug }
+                { backTo }
               )
             )
           }}
         >
           {intl.formatMessage(buttonMessages.continueButton)}
-        </PrimaryButton>
+        </Button>
       </ReviewComponent.Body>
     </FormLayout>
   )

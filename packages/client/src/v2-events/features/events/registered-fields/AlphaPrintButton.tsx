@@ -28,6 +28,7 @@ import { useUsers } from '@client/v2-events/hooks/useUsers'
 import { useLocations } from '@client/v2-events/hooks/useLocations'
 import { useAppConfig } from '@client/v2-events/hooks/useAppConfig'
 import { useEventFormData } from '../useEventFormData'
+import { useAdministrativeAreas } from '../../../hooks/useAdministrativeAreas'
 
 interface PrintButtonProps {
   id: string
@@ -45,9 +46,10 @@ interface PrintButtonProps {
 const addedButtonLabel = { id: 'buttons.print', defaultMessage: 'Print' }
 
 /**
- * Indicates that declaration action changed declaration content. Satisfies V1 spec.
+ * Client-only synthetic action appended before certificate rendering, which represents the current printing action.
+ * This allows e.g. current user details to be accessed on the SVG being printed.
  */
-export const DECLARATION_ACTION_UPDATE = 'UPDATE' as const
+const DECLARATION_ACTION_UPDATE = 'UPDATE' as const
 type DECLARATION_ACTION_UPDATE = typeof DECLARATION_ACTION_UPDATE
 
 export const AlphaPrintButton = {
@@ -62,16 +64,19 @@ export const AlphaPrintButton = {
     const intl = useIntl()
     const location = useLocation()
     const parts = location.pathname.split('/')
-    const eventId = UUID.parse(parts[3])
+    // Do not use UUID.parse(), as the value here could be a temporary ID, i.e. tmp-<uuid>
+    const eventId = parts[3] as UUID
     const { getEvent } = useEvents()
     const { certificateTemplates, language } = useAppConfig()
-    const { getUser } = useUsers()
+    const { getUsers } = useUsers()
     const { getLocations } = useLocations()
+    const { getAdministrativeAreas } = useAdministrativeAreas()
     const event = getEvent.getFromCache(eventId)
     const actions = getAcceptedActions(event)
-    const users = getUser.getAllCached()
+    const users = getUsers.getAllCached()
+    const locations = getLocations.useSuspenseQuery()
+    const administrativeAreas = getAdministrativeAreas.useSuspenseQuery()
 
-    const [locations] = getLocations.useSuspenseQuery()
     const { eventConfiguration } = useEventConfiguration(event.type)
     const formDeclaration = useEventFormData((state) => state.getFormValues())
 
@@ -100,8 +105,8 @@ export const AlphaPrintButton = {
         declaration: formDeclaration,
         annotation: null,
         originalActionId: null,
-        createdBySignature: userDetails.localRegistrar?.signature,
-        createdAtLocation: userDetails.primaryOffice.id as UUID
+        createdBySignature: userDetails.signature,
+        createdAtLocation: userDetails.primaryOfficeId
       }
     ]
 
@@ -112,6 +117,7 @@ export const AlphaPrintButton = {
       } as EventDocument,
       config: eventConfiguration,
       locations,
+      administrativeAreas,
       users,
       certificateConfig,
       language

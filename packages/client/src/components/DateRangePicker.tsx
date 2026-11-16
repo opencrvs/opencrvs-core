@@ -11,11 +11,8 @@
 import { buttonMessages, constantsMessages } from '@client/i18n/messages'
 import styled from 'styled-components'
 import format from '@client/utils/date-formatting'
-import {
-  CircleButton,
-  PrimaryButton,
-  SecondaryButton
-} from '@opencrvs/components/lib/buttons'
+import { CircleButton } from '@opencrvs/components/lib/buttons'
+import { Button } from '@opencrvs/components'
 import { IActionObject } from '@opencrvs/components/lib/common-types'
 import {
   Calendar,
@@ -24,7 +21,6 @@ import {
   ChevronRight,
   Cross
 } from '@opencrvs/components/lib/icons'
-import addDays from 'date-fns/addDays'
 import addYears from 'date-fns/addYears'
 import endOfDay from 'date-fns/endOfDay'
 import endOfYear from 'date-fns/endOfYear'
@@ -115,11 +111,12 @@ interface MonthSelectorProps {
   selectedDate: Date
 }
 
-export const PickerButton = styled(SecondaryButton)`
-  height: 32px;
-  padding: 0;
+export const PickerButton = styled(Button)`
+  margin: 0;
+  height: 40px;
 `
-export const ContentWrapper = styled.div`
+
+const ContentWrapper = styled.div`
   display: flex;
   justify-content: space-between;
   width: 100%;
@@ -372,10 +369,11 @@ export const CancelableArea = styled.div`
     opacity: 0.5;
   }
 `
-const StyledPrimaryButton = styled(PrimaryButton)`
+const StyledButton = styled(Button)`
   padding: 8px 16px;
   height: auto;
 `
+
 function DateRangePickerComponent(props: IDateRangePickerProps) {
   const [modalVisible, setModalVisible] = useState<boolean>(
     props.usedInsideHOC ? true : false
@@ -667,6 +665,7 @@ function DateRangePickerComponent(props: IDateRangePickerProps) {
     <div>
       {!props.usedInsideHOC && (
         <PickerButton
+          type="secondary"
           id="date-range-picker-action"
           onClick={() => setModalVisible(true)}
         >
@@ -742,7 +741,8 @@ function DateRangePickerComponent(props: IDateRangePickerProps) {
               {routes[activeRoute].renderComponent()}
             </ModalBodyMobile>
             <ModalFooter>
-              <StyledPrimaryButton
+              <StyledButton
+                type="primary"
                 id="date-range-confirm-action"
                 onClick={() => {
                   props.onDatesChange({
@@ -755,7 +755,7 @@ function DateRangePickerComponent(props: IDateRangePickerProps) {
                 disabled={isAfter(startDate, endDate)}
               >
                 {intl.formatMessage(buttonMessages.select)}
-              </StyledPrimaryButton>
+              </StyledButton>
             </ModalFooter>
           </ModalContainer>
           <CancelableArea

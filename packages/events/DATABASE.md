@@ -27,7 +27,7 @@ Login with the connection string `postgres://<user>:<password>@localhost:5432/ev
 
 ## Migrations
 
-Unlike MongoDB and other NoSQL databases, PostgreSQL **requires** writing migrations to create tables where data is written into. This structure is called a schema.
+Unlike NoSQL databases, PostgreSQL **requires** writing migrations to create tables where data is written into. This structure is called a schema.
 
 Before migrations are run, the database is initialized using an [init script](../migration/src/migrations/postgres/0001_init.sql). This initialization is ran in the root `docker-compose.dev-deps.yml` file.
 

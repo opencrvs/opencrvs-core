@@ -21,12 +21,14 @@ jest.mock('../../minio/client', () => {
     __esModule: true,
     minioClient: {
       putObject: (...args: unknown[]) => minioPutMock(...args),
-      statObject: (...args: unknown[]) => {
-        minioStatMock(...args)
-        return true
-      }
+      statObject: (...args: unknown[]) => minioStatMock(...args)
     }
   }
+})
+
+/** What Minio throws when the object is not in the bucket. */
+const objectNotFound = Object.assign(new Error('Not found'), {
+  code: 'NotFound'
 })
 
 describe('fileExistsHandler', () => {
@@ -40,7 +42,7 @@ describe('fileExistsHandler', () => {
 
   beforeEach(async () => {
     minioPutMock.mockClear()
-    minioStatMock.mockClear()
+    minioStatMock.mockReset().mockReturnValue({ metaData: {} })
     server = await createServer()
   })
 
@@ -101,6 +103,64 @@ describe('fileExistsHandler', () => {
 
     expect(res.statusCode).toBe(200)
   })
+
+  it('Handles missing bucket from file paths with multiple directories', async () => {
+    const path = 'event-12345'
+    const transactionId = 'transaction-12345'
+
+    const res = await server.server.inject({
+      method: 'GET',
+      url: `/files/${path}/${transactionId}.txt`,
+      headers: {
+        authorization: `Bearer ${token}`
+      }
+    })
+
+    const [bucket, filename] = minioStatMock.mock.calls[0]
+    expect(bucket).toBe(MINIO_BUCKET)
+    expect(filename).toBe(`${path}/${transactionId}.txt`)
+
+    expect(res.statusCode).toBe(200)
+  })
+
+  it('Handles missing bucket from file', async () => {
+    const path = 'event-12345'
+    const transactionId = 'transaction-12345'
+
+    const res = await server.server.inject({
+      method: 'GET',
+      url: `/files/${path}/${transactionId}.txt`,
+      headers: {
+        authorization: `Bearer ${token}`
+      }
+    })
+
+    const [bucket, filename] = minioStatMock.mock.calls[0]
+    expect(bucket).toBe(MINIO_BUCKET)
+    expect(filename).toBe(`${path}/${transactionId}.txt`)
+
+    expect(res.statusCode).toBe(200)
+  })
+
+  it('handles explicit "/" without bucket as start of of file path', async () => {
+    const path = 'event-12345'
+    const transactionId = 'transaction-12345'
+
+    const res = await server.server.inject({
+      method: 'GET',
+      // double slash is handled
+      url: `/files//${path}/${transactionId}.txt`,
+      headers: {
+        authorization: `Bearer ${token}`
+      }
+    })
+
+    const [bucket, filename] = minioStatMock.mock.calls[0]
+    expect(bucket).toBe(MINIO_BUCKET)
+    expect(filename).toBe(`${path}/${transactionId}.txt`)
+
+    expect(res.statusCode).toBe(200)
+  })
 })
 
 describe('fileUploadHandler', () => {
@@ -114,7 +174,8 @@ describe('fileUploadHandler', () => {
 
   beforeEach(async () => {
     minioPutMock.mockClear()
-    minioStatMock.mockClear()
+    // By default the key is free, which is the ordinary case for a new upload.
+    minioStatMock.mockReset().mockRejectedValue(objectNotFound)
     server = await createServer()
   })
 
@@ -158,7 +219,7 @@ describe('fileUploadHandler', () => {
       }
     })
 
-    expect(res.payload).toEqual(`/${MINIO_BUCKET}/${path}/${transactionId}.txt`)
+    expect(res.payload).toEqual(`${path}/${transactionId}.txt`)
 
     const [bucket, filename] = minioPutMock.mock.calls[0]
     expect(bucket).toBe(MINIO_BUCKET)
@@ -167,7 +228,7 @@ describe('fileUploadHandler', () => {
     expect(res.statusCode).toBe(200)
   })
 
-  it('adds bucket to file path', async () => {
+  it('returns file path without bucket prefix', async () => {
     const transactionId = 'transaction-2'
     const body =
       `--${boundary}${CRLF}` +
@@ -186,13 +247,80 @@ describe('fileUploadHandler', () => {
       }
     })
 
-    expect(res.payload).toEqual(`/${MINIO_BUCKET}/${transactionId}.txt`)
+    expect(res.payload).toEqual(`${transactionId}.txt`)
 
     const [bucket, filename] = minioPutMock.mock.calls[0]
     expect(bucket).toBe(MINIO_BUCKET)
     expect(filename).toBe(`${transactionId}.txt`)
 
     expect(res.statusCode).toBe(200)
+  })
+
+  const uploadTo = (transactionId: string) => {
+    const body =
+      `--${boundary}${CRLF}` +
+      createFormProperty('transactionId', transactionId) +
+      `--${boundary}${CRLF}` +
+      createFormProperty('file', 'test upload', 'file') +
+      `--${boundary}--${CRLF}`
+
+    return server.server.inject({
+      method: 'POST',
+      url: '/files',
+      payload: Buffer.from(body, 'utf8'),
+      headers: {
+        'Content-Type': `multipart/form-data; boundary=${boundary}`,
+        authorization: `Bearer ${token}`
+      }
+    })
+  }
+
+  it('refuses to replace a file uploaded by someone else', async () => {
+    minioStatMock.mockResolvedValue({
+      metaData: { 'created-by': 'another-user' }
+    })
+
+    const res = await uploadTo('transaction-3')
+
+    expect(res.statusCode).toBe(403)
+    expect(minioPutMock).not.toHaveBeenCalled()
+  })
+
+  it('lets the original uploader replace their own file', async () => {
+    minioStatMock.mockResolvedValue({ metaData: { 'created-by': '123123' } })
+
+    const res = await uploadTo('transaction-4')
+
+    expect(res.statusCode).toBe(200)
+    expect(minioPutMock).toHaveBeenCalled()
+  })
+
+  it('persists the client-reported content type so extensions Minio cannot infer (e.g. .jfif) stay renderable', async () => {
+    const transactionId = 'transaction-jfif'
+    const body =
+      `--${boundary}${CRLF}` +
+      createFormProperty('transactionId', transactionId) +
+      `--${boundary}${CRLF}` +
+      `Content-Disposition: form-data; name="file"; filename="photo.jfif"${CRLF}` +
+      `Content-Type: image/jpeg${CRLF}${CRLF}` +
+      `jpeg-bytes${CRLF}` +
+      `--${boundary}--${CRLF}`
+
+    const res = await server.server.inject({
+      method: 'POST',
+      url: '/files',
+      payload: Buffer.from(body, 'utf8'),
+      headers: {
+        'Content-Type': `multipart/form-data; boundary=${boundary}`,
+        authorization: `Bearer ${token}`
+      }
+    })
+
+    expect(res.statusCode).toBe(200)
+    expect(res.payload).toEqual(`${transactionId}.jfif`)
+
+    const metaData = minioPutMock.mock.calls[0][3]
+    expect(metaData['content-type']).toBe('image/jpeg')
   })
 })
 

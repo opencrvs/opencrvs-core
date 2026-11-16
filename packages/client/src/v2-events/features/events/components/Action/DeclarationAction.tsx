@@ -12,15 +12,17 @@
 import React, { PropsWithChildren, useEffect, useMemo } from 'react'
 import { useTypedParams } from 'react-router-typesafe-routes/dom'
 import { useNavigate } from 'react-router-dom'
+import { findLast } from 'lodash'
 import {
-  Draft,
   createEmptyDraft,
   findActiveDraftForEvent,
+  findPendingCorrectionAction,
   getActionAnnotation,
   ActionType,
   deepMerge,
   getUUID,
   deepDropNulls,
+  isMetaAction,
   mergeDrafts,
   EventDocument,
   EventConfig,
@@ -36,11 +38,53 @@ import { createTemporaryId } from '@client/v2-events/utils'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
 import { ROUTES } from '@client/v2-events/routes'
 import { NavigationStack } from '@client/v2-events/components/NavigationStack'
-import { useUserAllowedActions } from '@client/v2-events/features/workqueues/EventOverview/components/useAllowedActionConfigurations'
+import { useUserAllowedActions } from '@client/v2-events/features/workqueues/Actions/useUserAllowedActions'
 import { useToastAndRedirect } from '@client/v2-events/features/events/useToastAndRedirect'
 import { useEventConfiguration } from '../../useEventConfiguration'
-import { isLastActionCorrectionRequest } from '../../actions/correct/utils'
-import { AvailableActionTypes, getPreviousDeclarationActionType } from './utils'
+import {
+  AvailableActionTypes,
+  getAnnotationForActionType,
+  getPreviousDeclarationActionType
+} from './utils'
+
+function isLastActionCorrectionRequest(event: EventDocument) {
+  const writeActions = event.actions.filter((a) => !isMetaAction(a.type))
+  const lastWriteAction = writeActions[writeActions.length - 1]
+  return lastWriteAction.type === ActionType.REQUEST_CORRECTION
+}
+
+/**
+ * `getActionAnnotation` prefills a form from the last action of the same
+ * type, ignoring which correction cycle it belongs to. Correction actions
+ * can repeat per cycle, so that prefill may be from an earlier, resolved
+ * cycle. Returns false when it is — caller should discard it then.
+ */
+function shouldReuseHistoricalAnnotation(
+  event: EventDocument,
+  actionType: ActionType
+) {
+  if (actionType === ActionType.REQUEST_CORRECTION) {
+    return isLastActionCorrectionRequest(event)
+  }
+
+  if (
+    actionType === ActionType.APPROVE_CORRECTION ||
+    actionType === ActionType.REJECT_CORRECTION
+  ) {
+    const pendingCorrectionRequest = findPendingCorrectionAction(event.actions)
+    const lastActionOfType = findLast(
+      event.actions,
+      (a) => a.type === actionType
+    ) as { requestId?: string } | undefined
+
+    return (
+      !!pendingCorrectionRequest &&
+      lastActionOfType?.requestId === pendingCorrectionRequest.id
+    )
+  }
+
+  return true
+}
 
 /**
  *
@@ -57,8 +101,9 @@ function useActionGuard(
   configuration: EventConfig
 ) {
   const eventState = getCurrentEventState(event, configuration)
+
   const availableActions = getAvailableActionsForEvent(eventState)
-  const { isActionAllowed } = useUserAllowedActions(event.type)
+  const { isActionAllowed } = useUserAllowedActions(eventState)
   const { redirectToEventOverviewPage } = useToastAndRedirect()
   // If the action is not available for the event, redirect to the overview page
   if (!availableActions.includes(actionType)) {
@@ -90,8 +135,15 @@ function useActionGuard(
     )
   }
 
-  // If the user may not perform the action, redirect to the unauthorized page
-  if (!isActionAllowed(actionType)) {
+  // In the declare flow, user is allowed if they have permission for either DECLARE or NOTIFY;
+  // otherwise strict permission by action type.
+  const isPermitted =
+    actionType === ActionType.DECLARE
+      ? isActionAllowed(ActionType.DECLARE) ||
+        isActionAllowed(ActionType.NOTIFY)
+      : isActionAllowed(actionType)
+
+  if (!isPermitted) {
     throw new Error(
       `User does not have permission to perform action ${actionType} on event ${event.id}`
     )
@@ -125,7 +177,7 @@ function DeclarationActionComponent({
 
   useActionGuard(actionType, event, configuration)
 
-  const remoteDraft: Draft | undefined = getRemoteDraftByEventId(event.id)
+  const remoteDraft = getRemoteDraftByEventId(event.id)
 
   const activeRemoteDraft = remoteDraft
     ? findActiveDraftForEvent(event, remoteDraft)
@@ -186,7 +238,7 @@ function DeclarationActionComponent({
     }
   }
 
-  const mergedDraft: Draft = activeRemoteDraft
+  const mergedDraft = activeRemoteDraft
     ? mergeDrafts(activeRemoteDraft, localDraftWithAdjustedTimestamp)
     : localDraftWithAdjustedTimestamp
 
@@ -197,11 +249,7 @@ function DeclarationActionComponent({
   )
 
   const actionAnnotation = useMemo(() => {
-    // For correction request, if we are not reviewing a correction, we don't want to use any previous action annotation
-    if (
-      actionType === ActionType.REQUEST_CORRECTION &&
-      !isLastActionCorrectionRequest(event)
-    ) {
+    if (!shouldReuseHistoricalAnnotation(event, actionType)) {
       return deepDropNulls(mergedDraft.action.annotation || {})
     }
 
@@ -222,21 +270,7 @@ function DeclarationActionComponent({
       return {}
     }
 
-    const prevActionAnnotation = getActionAnnotation({
-      event,
-      actionType: previousActionType
-    })
-
-    // If we found annotation data from the previous action, use that.
-    if (Object.keys(prevActionAnnotation).length) {
-      return prevActionAnnotation
-    }
-
-    // As a fallback, lets see if there is a notify action annotation and use that.
-    return getActionAnnotation({
-      event,
-      actionType: ActionType.NOTIFY
-    })
+    return getAnnotationForActionType({ event, actionType: previousActionType })
   }, [event, actionType])
 
   useEffect(() => {
@@ -284,7 +318,7 @@ function DeclarationActionContainer({
 
   const navigate = useNavigate()
   const { redirectToEventOverviewPage } = useToastAndRedirect()
-  const event = events.getEvent.findFromCache(eventId).data
+  const event = events.getEvent.useFindEventFromCache(eventId).data
 
   // Missing event should not happen in "regular" application flow.
   // 1. User clicks browser 'back' button after completing flow.

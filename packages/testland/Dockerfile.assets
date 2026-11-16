@@ -1,0 +1,7 @@
+FROM alpine:3.24
+
+# Directory inside the assets image
+WORKDIR /assets
+
+# Copy assets
+COPY --chmod=755 assets /assets

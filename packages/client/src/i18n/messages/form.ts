@@ -10,7 +10,7 @@
  */
 import { defineMessages } from 'react-intl'
 
-export const formMessageDescriptors = {
+export const formMessages = defineMessages({
   addFile: {
     defaultMessage: 'Add file',
     description: 'text for add file button',
@@ -20,6 +20,11 @@ export const formMessageDescriptors = {
     defaultMessage: 'Upload',
     description: 'text for upload file button',
     id: 'form.field.label.uploadFile'
+  },
+  imageLoadFailed: {
+    defaultMessage: 'Failed to load document',
+    description: 'shown when a supporting document image fails to load',
+    id: 'form.field.label.imageLoadFailed'
   },
   iDType: {
     id: 'form.field.label.iDType',
@@ -197,40 +202,10 @@ export const formMessageDescriptors = {
     description: "Input label for certificate collector's first name",
     id: 'form.field.label.firstName'
   },
-  certifyRecordToMother: {
-    defaultMessage: 'Print and issue to mother',
-    description: 'Label for mother select option to certify record',
-    id: 'form.field.label.app.certifyRecordTo.mother'
-  },
-  certifyRecordToInformant: {
-    defaultMessage: 'Print and issue to informant ({informant})',
-    description: 'Label for mother select option to certify record',
-    id: 'form.field.label.app.certifyRecordTo.informant'
-  },
-  someoneElseCollector: {
-    defaultMessage: 'Print and issue to someone else',
-    description: 'Other Label',
-    id: 'form.field.label.someoneElseCollector'
-  },
   certificatePrintInAdvance: {
     defaultMessage: 'Print in advance',
     description: 'Label for certificate collection option',
     id: 'form.field.label.certificatePrintInAdvance'
-  },
-  certifyRecordToFather: {
-    defaultMessage: 'Print and issue to father',
-    description: 'Label for father select option to certify record',
-    id: 'form.field.label.app.certifyRecordTo.father'
-  },
-  certifyRecordToGroom: {
-    defaultMessage: 'Print and issue to groom',
-    description: 'Label for groom select option to certify record',
-    id: 'form.field.label.app.certifyRecordTo.groom'
-  },
-  certifyRecordToBride: {
-    defaultMessage: 'Print and issue to bride',
-    description: 'Label for bride select option to certify record',
-    id: 'form.field.label.app.certifyRecordTo.bride'
   },
   typeOfId: {
     defaultMessage: 'Type of ID',
@@ -347,29 +322,6 @@ export const formMessageDescriptors = {
     description: 'Label for select option birth certificate',
     id: 'form.field.label.docTypeBirthCert'
   },
-  nidVerified: {
-    defaultMessage: 'Authenticated',
-    description: 'label for unverified nid state',
-    id: 'form.field.nidVerified'
-  },
-  nidNotVerified: {
-    defaultMessage: 'Authenticate',
-    description: 'label for verified nid state',
-    id: 'form.field.nidNotVerified'
-  },
-  nidOffline: {
-    defaultMessage:
-      'National ID authentication is currently not available offline.',
-    description:
-      'Label for indicating offline status for the user. NID verification is not currently available offline.',
-    id: 'form.field.nidVerificationOngoing'
-  },
-  nidNotVerifiedReviewSection: {
-    defaultMessage: 'Unauthenticated',
-    description:
-      'Label for indicating unauthenticated status for the a review section',
-    id: 'form.field.nidNotVerifiedReviewSection'
-  },
   fileSizeError: {
     defaultMessage: 'File size must be less than 2MB',
     description: 'text for error on file size',
@@ -435,6 +387,4 @@ export const formMessageDescriptors = {
     description: 'The title of user form',
     id: 'form.section.user.title'
   }
-}
-
-export const formMessages = defineMessages(formMessageDescriptors)
+})

@@ -8,9 +8,9 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import type { Meta, StoryObj } from '@storybook/react'
+import type { Meta, StoryObj } from '@storybook/react-vite'
 import { TestUserRole } from '@opencrvs/commons/client'
-import { ROUTES, routesConfig } from '@client/v2-events/routes'
+import { routesConfig } from '@client/v2-events/routes'
 import * as V1_LEGACY_ROUTES from '@client/navigation/routes'
 import { OrganisationPage } from './Organisation'
 
@@ -25,7 +25,7 @@ type Story = StoryObj<typeof OrganisationPage>
 export const OrganisationPageStory: Story = {
   name: 'Organisation Page',
   parameters: {
-    userRole: TestUserRole.Enum.LOCAL_REGISTRAR,
+    userRole: TestUserRole.enum.LOCAL_REGISTRAR,
     reactRouter: {
       router: routesConfig,
       initialPath: V1_LEGACY_ROUTES.ORGANISATIONS_INDEX

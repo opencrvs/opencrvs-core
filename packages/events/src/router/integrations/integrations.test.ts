@@ -1,0 +1,279 @@
+/*
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at https://mozilla.org/MPL/2.0/.
+ *
+ * OpenCRVS is also distributed under the terms of the Civil Registration
+ * & Healthcare Disclaimer located at http://opencrvs.org/license.
+ *
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
+ */
+
+import { UUID, encodeScope, getUUID } from '@opencrvs/commons'
+import { getClient } from '@events/storage/postgres/events'
+import {
+  createSystemTestClient,
+  createTestClient,
+  setupTestCase
+} from '@events/tests/utils'
+
+const SYSTEM_ID = getUUID()
+const scope = encodeScope({ type: 'integration.create' })
+
+describe('integrations', () => {
+  describe('integrations.create', () => {
+    test('creates a system client and returns credentials', async () => {
+      const { user } = await setupTestCase()
+      const client = createTestClient(user, [scope])
+
+      const result = await client.integrations.create({
+        name: 'My Test Integration',
+        scopes: [encodeScope({ type: 'record.import' })]
+      })
+
+      expect(result).toHaveProperty('clientId')
+      expect(result).toHaveProperty('shaSecret')
+      expect(result).toHaveProperty('clientSecret')
+      expect(typeof result.clientId).toBe('string')
+      expect(typeof result.shaSecret).toBe('string')
+      expect(typeof result.clientSecret).toBe('string')
+    })
+
+    test('inserts a row into system_clients table', async () => {
+      const { user } = await setupTestCase()
+      const client = createTestClient(user, [scope])
+
+      const result = await client.integrations.create({
+        name: 'DB Check Integration',
+        scopes: [encodeScope({ type: 'record.import' })]
+      })
+
+      const db = getClient()
+      const rows = await db
+        .selectFrom('systemClients')
+        .selectAll()
+        .where('id', '=', result.clientId as UUID)
+        .execute()
+
+      expect(rows).toHaveLength(1)
+      expect(rows[0].name).toBe('DB Check Integration')
+      expect(rows[0].scopes).toEqual([encodeScope({ type: 'record.import' })])
+      expect(rows[0].status).toBe('active')
+      expect(rows[0].secretHash).toBeTruthy()
+      expect(rows[0].salt).toBeTruthy()
+      expect(rows[0].shaSecret).toBeTruthy()
+      expect(rows[0].createdBy).toBe(user.id)
+    })
+
+    test('records no creator when the caller is a system client', async () => {
+      const client = createSystemTestClient(SYSTEM_ID, [scope])
+
+      const result = await client.integrations.create({
+        name: 'System Created Integration',
+        scopes: [encodeScope({ type: 'record.import' })]
+      })
+
+      const db = getClient()
+      const rows = await db
+        .selectFrom('systemClients')
+        .selectAll()
+        .where('id', '=', result.clientId as UUID)
+        .execute()
+
+      expect(rows).toHaveLength(1)
+      // A system caller — the startup bootstrap token — has no users(id)
+      // behind it, and created_by is a foreign key into users
+      expect(rows[0].createdBy).toBeNull()
+    })
+
+    test('writes an audit log entry', async () => {
+      const { user } = await setupTestCase()
+      const client = createTestClient(user, [scope])
+
+      const result = await client.integrations.create({
+        name: 'Audit Integration',
+        scopes: [encodeScope({ type: 'record.import' })]
+      })
+
+      const db = getClient()
+      const logs = await db
+        .selectFrom('auditLog')
+        .selectAll()
+        .where('clientId', '=', user.id)
+        .where('operation', '=', 'integrations.create')
+        .execute()
+
+      expect(logs).toHaveLength(1)
+      expect(logs[0].requestData).toMatchObject({
+        name: 'Audit Integration',
+        scopes: [encodeScope({ type: 'record.import' })]
+      })
+      expect(logs[0].responseSummary).toMatchObject({
+        clientId: result.clientId
+      })
+      // Credentials must not be in audit log
+      expect(logs[0].responseSummary).not.toHaveProperty('shaSecret')
+      expect(logs[0].responseSummary).not.toHaveProperty('clientSecret')
+    })
+
+    test('seeds pre-shared credentials so the integrating system can authenticate with the pair it already holds', async () => {
+      const client = createSystemTestClient(SYSTEM_ID, [scope])
+      const clientId = getUUID()
+      const clientSecret = 'pre-shared-secret'
+
+      const result = await client.integrations.create({
+        name: 'Pre-shared Integration',
+        scopes: [encodeScope({ type: 'record.import' })],
+        credentials: { clientId, clientSecret }
+      })
+
+      expect(result.clientId).toBe(clientId)
+      expect(result.clientSecret).toBe(clientSecret)
+
+      const authenticated = await client.integrations.authenticate({
+        client_id: clientId,
+        client_secret: clientSecret
+      })
+
+      expect(authenticated.id).toBe(clientId)
+      expect(authenticated.status).toBe('active')
+    })
+
+    test('keeps pre-shared credentials out of the audit log', async () => {
+      const client = createSystemTestClient(SYSTEM_ID, [scope])
+      const clientId = getUUID()
+
+      await client.integrations.create({
+        name: 'Pre-shared Audit Integration',
+        scopes: [encodeScope({ type: 'record.import' })],
+        credentials: { clientId, clientSecret: 'pre-shared-secret' }
+      })
+
+      const db = getClient()
+      const logs = await db
+        .selectFrom('auditLog')
+        .selectAll()
+        .where('clientId', '=', SYSTEM_ID)
+        .where('operation', '=', 'integrations.create')
+        .execute()
+
+      expect(logs).toHaveLength(1)
+      // The client id is not secret and is recorded in responseSummary; the
+      // secret must never appear, whether generated or supplied by the caller
+      expect(JSON.stringify(logs[0])).not.toContain('pre-shared-secret')
+    })
+
+    test('rejects a pre-shared client id that is already taken', async () => {
+      const client = createSystemTestClient(SYSTEM_ID, [scope])
+      const clientId = getUUID()
+
+      await client.integrations.create({
+        name: 'First Claim',
+        scopes: [encodeScope({ type: 'record.import' })],
+        credentials: { clientId, clientSecret: 'pre-shared-secret' }
+      })
+
+      await expect(
+        client.integrations.create({
+          name: 'Second Claim',
+          scopes: [encodeScope({ type: 'record.import' })],
+          credentials: { clientId, clientSecret: 'another-secret' }
+        })
+      ).rejects.toThrow(/already exists/)
+    })
+  })
+
+  describe('integrations.list', () => {
+    test('returns empty array when no clients exist', async () => {
+      const { user } = await setupTestCase()
+      const client = createTestClient(user, [scope])
+
+      const result = await client.integrations.list()
+
+      expect(result).toEqual([])
+    })
+
+    test('lists created integration clients', async () => {
+      const { user } = await setupTestCase()
+      const client = createTestClient(user, [scope])
+
+      await client.integrations.create({
+        name: 'Integration A',
+        scopes: [encodeScope({ type: 'record.import' })]
+      })
+      await client.integrations.create({
+        name: 'Integration B',
+        scopes: [encodeScope({ type: 'record.import' })]
+      })
+
+      const result = await client.integrations.list()
+
+      expect(result).toHaveLength(2)
+      expect(result.map((r) => r.name).sort()).toEqual([
+        'Integration A',
+        'Integration B'
+      ])
+      result.forEach((r) => {
+        expect(r).toHaveProperty('id')
+        expect(r).toHaveProperty('name')
+        expect(r).toHaveProperty('scopes')
+        expect(r).toHaveProperty('status')
+        expect(r.status).toBe('active')
+      })
+    })
+
+    test('filters by status', async () => {
+      const { user } = await setupTestCase()
+      const client = createTestClient(user, [scope])
+
+      await client.integrations.create({
+        name: 'Active Integration',
+        scopes: [encodeScope({ type: 'record.import' })]
+      })
+
+      // Manually set one to disabled to test filtering
+      const created = await client.integrations.create({
+        name: 'Disabled Integration',
+        scopes: [encodeScope({ type: 'record.import' })]
+      })
+
+      const db = getClient()
+      await db
+        .updateTable('systemClients')
+        .set({ status: 'disabled' })
+        .where('id', '=', created.clientId as UUID)
+        .execute()
+
+      const activeOnly = await client.integrations.list({ status: 'active' })
+      expect(activeOnly).toHaveLength(1)
+      expect(activeOnly[0].name).toBe('Active Integration')
+
+      const disabledOnly = await client.integrations.list({
+        status: 'disabled'
+      })
+      expect(disabledOnly).toHaveLength(1)
+      expect(disabledOnly[0].name).toBe('Disabled Integration')
+    })
+  })
+
+  describe('integrations.authenticate', () => {
+    test('authenticates a system client and returns system details', async () => {
+      const { user } = await setupTestCase()
+      const client = createTestClient(user, [scope])
+
+      const created = await client.integrations.create({
+        name: 'Auth Integration',
+        scopes: [encodeScope({ type: 'record.import' })]
+      })
+
+      const result = await client.integrations.authenticate({
+        client_id: created.clientId as UUID,
+        client_secret: created.clientSecret
+      })
+
+      expect(result.id).toBe(created.clientId)
+      expect(result.status).toBe('active')
+      expect(result.scope).toContain(encodeScope({ type: 'record.import' }))
+    })
+  })
+})

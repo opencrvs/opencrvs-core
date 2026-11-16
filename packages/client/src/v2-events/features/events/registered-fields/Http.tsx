@@ -21,7 +21,7 @@ import {
   isTemplateVariable,
   SystemVariables
 } from '@opencrvs/commons/client'
-import { getToken } from '@client/utils/authUtils'
+import { ensureFreshAccessToken, getToken } from '@client/utils/authUtils'
 import { useSystemVariables } from '@client/v2-events/hooks/useSystemVariables'
 import { parseFieldReferenceToValue } from '@client/v2-events/components/forms/FormFieldGenerator/utils'
 
@@ -29,6 +29,7 @@ async function fetchWithTimeout(
   input: RequestInfo | URL,
   init: RequestInit & { timeout?: number } = {}
 ) {
+  await ensureFreshAccessToken()
   const { timeout, headers, ...rest } = init
   const controller = new AbortController()
   const id = timeout ? setTimeout(() => controller.abort(), timeout) : null
@@ -101,16 +102,18 @@ async function fetchHttpFieldValue(
 }
 
 export interface Props {
-  parentValue?: FieldValue
-  configuration: Omit<HttpField['configuration'], 'trigger'>
+  configuration: HttpField['configuration']
   form: Record<string, FieldValue>
   onChange: (val: HttpFieldValue) => void
+  trigger?:
+    | { mode: 'onMount' }
+    | { mode: 'onChange'; value: FieldValue | undefined }
 }
 
-function HttpInput({ parentValue, configuration, form, onChange }: Props) {
+function HttpInput({ configuration, form, onChange, trigger }: Props) {
   const systemVariables = useSystemVariables()
   const firstRunRef = useRef(true)
-  const prevParentRef = useRef<FieldValue | undefined>(undefined)
+  const prevTriggerValueRef = useRef<FieldValue | undefined>(undefined)
 
   const mutation = useMutation<unknown, HttpError>({
     mutationFn: async () =>
@@ -143,22 +146,33 @@ function HttpInput({ parentValue, configuration, form, onChange }: Props) {
   })
 
   React.useEffect(() => {
-    // 1) skip on first mount
+    const normalizedTrigger = trigger ?? { mode: 'onMount' as const }
+
     if (firstRunRef.current) {
       firstRunRef.current = false
-      prevParentRef.current = parentValue
+
+      if (normalizedTrigger.mode === 'onMount') {
+        mutation.mutate()
+        return
+      }
+
+      prevTriggerValueRef.current = normalizedTrigger.value
       return
     }
 
-    // 2) trigger on following mounts if the value tracked changes
+    if (normalizedTrigger.mode === 'onMount') {
+      return
+    }
+
     if (
-      !isEqual(parentValue, prevParentRef.current) &&
-      parentValue !== undefined
+      !isEqual(normalizedTrigger.value, prevTriggerValueRef.current) &&
+      normalizedTrigger.value !== undefined
     ) {
-      prevParentRef.current = parentValue
       mutation.mutate()
     }
-  }, [parentValue, mutation])
+
+    prevTriggerValueRef.current = normalizedTrigger.value
+  }, [trigger, mutation])
 
   return null
 }

@@ -8,7 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import type { Meta, StoryObj } from '@storybook/react'
+import type { Meta, StoryObj } from '@storybook/react-vite'
 import { createTRPCMsw, httpLink } from '@vafanassieff/msw-trpc'
 import superjson from 'superjson'
 import React from 'react'
@@ -84,7 +84,6 @@ const registeredEvent = generateEventDocument({
   actions: [
     { type: ActionType.CREATE },
     { type: ActionType.DECLARE },
-    { type: ActionType.VALIDATE },
     { type: ActionType.REGISTER },
     { type: ActionType.PRINT_CERTIFICATE }
   ]

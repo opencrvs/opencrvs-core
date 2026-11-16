@@ -10,12 +10,23 @@
  */
 
 import { TRPCError } from '@trpc/server'
-import { ActionType, PageTypes } from '@opencrvs/commons'
+import { http, HttpResponse } from 'msw'
+import {
+  ActionStatus,
+  ActionType,
+  encodeScope,
+  EventStatus,
+  getCurrentEventState,
+  PageTypes
+} from '@opencrvs/commons'
+import { tennisClubMembershipEvent } from '@opencrvs/commons/fixtures'
 import {
   createEvent,
   createTestClient,
   setupTestCase
 } from '@events/tests/utils'
+import { mswServer } from '@events/tests/msw'
+import { env } from '@events/environment'
 
 test('prevents forbidden access if missing required scope', async () => {
   const { user, generator } = await setupTestCase()
@@ -31,7 +42,12 @@ test('prevents forbidden access if missing required scope', async () => {
 test(`allows access if required scope is present`, async () => {
   const { user, generator } = await setupTestCase()
   const client = createTestClient(user, [
-    'record.registered.print-certified-copies[event=birth|death|tennis-club-membership]'
+    encodeScope({
+      type: 'record.print-certified-copies',
+      options: {
+        event: ['birth', 'death', 'tennis-club-membership']
+      }
+    })
   ])
 
   await expect(
@@ -47,7 +63,6 @@ test(`Has validation errors when required ${PageTypes.enum.VERIFICATION} page fi
 
   const event = await createEvent(client, generator, [
     ActionType.DECLARE,
-    ActionType.VALIDATE,
     ActionType.REGISTER
   ])
 
@@ -68,7 +83,6 @@ test(`Has no validation errors when required ${PageTypes.enum.VERIFICATION} page
 
   const event = await createEvent(client, generator, [
     ActionType.DECLARE,
-    ActionType.VALIDATE,
     ActionType.REGISTER
   ])
 
@@ -102,7 +116,6 @@ test(`PRINT_CERTIFICATE action can be added to registered event`, async () => {
 
   const event = await createEvent(client, generator, [
     ActionType.DECLARE,
-    ActionType.VALIDATE,
     ActionType.REGISTER
   ])
 
@@ -122,7 +135,6 @@ test('when mandatory field is invalid, conditional hidden fields are still skipp
 
   const event = await createEvent(client, generator, [
     ActionType.DECLARE,
-    ActionType.VALIDATE,
     ActionType.REGISTER
   ])
 
@@ -141,7 +153,6 @@ test(`PRINT_CERTIFICATE is idempotent`, async () => {
 
   const event = await createEvent(client, generator, [
     ActionType.DECLARE,
-    ActionType.VALIDATE,
     ActionType.REGISTER
   ])
 
@@ -159,20 +170,194 @@ test(`PRINT_CERTIFICATE is idempotent`, async () => {
   expect(firstResponse).toEqual(secondResponse)
 })
 
-test(`PRINT_CERTIFICATE is not allowed if the event is waiting for correction`, async () => {
-  const { user, generator } = await setupTestCase()
-  const client = createTestClient(user)
+describe('3rd party integration confirmation behaviour', () => {
+  function mockActionApi(action: ActionType, status: number) {
+    return mswServer.use(
+      http.post<never, { actionId: string }>(
+        `${env.COUNTRY_CONFIG_URL}/trigger/events/tennis-club-membership/actions/${action}`,
+        () => {
+          return HttpResponse.json({}, { status })
+        }
+      )
+    )
+  }
 
-  const event = await createEvent(client, generator, [
-    ActionType.DECLARE,
-    ActionType.VALIDATE,
-    ActionType.REGISTER,
-    ActionType.REQUEST_CORRECTION
-  ])
+  test('Throws when integration responds with 202 when keepAssignment is given', async () => {
+    mockActionApi(ActionType.PRINT_CERTIFICATE, 202)
+    const { generator, user } = await setupTestCase()
 
-  await expect(
-    client.event.actions.printCertificate.request(
+    const client = createTestClient(user)
+
+    const event = await client.event.create(generator.event.create())
+
+    await client.event.actions.declare.request(
+      generator.event.actions.declare(event.id, { keepAssignment: true })
+    )
+
+    await client.event.actions.register.request(
+      generator.event.actions.register(event.id, { keepAssignment: true })
+    )
+
+    await expect(
+      client.event.actions.printCertificate.request(
+        generator.event.actions.printCertificate(event.id, {
+          keepAssignment: true
+        })
+      )
+    ).rejects.toThrow('Confirmation API did not return a synchronous response.')
+  })
+
+  test('Throws when integration responds with 202 when keepAssignmentIfRejected is given', async () => {
+    mockActionApi(ActionType.PRINT_CERTIFICATE, 202)
+    const { generator, user } = await setupTestCase()
+
+    const client = createTestClient(user)
+
+    const event = await client.event.create(generator.event.create())
+
+    await client.event.actions.declare.request(
+      generator.event.actions.declare(event.id, { keepAssignment: true })
+    )
+
+    await client.event.actions.register.request(
+      generator.event.actions.register(event.id, {
+        keepAssignment: true
+      })
+    )
+
+    await expect(
+      client.event.actions.printCertificate.request(
+        generator.event.actions.printCertificate(event.id, {
+          keepAssignmentIfRejected: true
+        })
+      )
+    ).rejects.toThrow('Confirmation API did not return a synchronous response.')
+  })
+
+  test('Throws when integration responds with 202 when keepAssignmentIfAccepted is given', async () => {
+    mockActionApi(ActionType.PRINT_CERTIFICATE, 202)
+    const { generator, user } = await setupTestCase()
+
+    const client = createTestClient(user)
+
+    const event = await client.event.create(generator.event.create())
+
+    await client.event.actions.declare.request(
+      generator.event.actions.declare(event.id, { keepAssignment: true })
+    )
+    await client.event.actions.register.request(
+      generator.event.actions.register(event.id, {
+        keepAssignment: true
+      })
+    )
+    await expect(
+      client.event.actions.printCertificate.request(
+        generator.event.actions.printCertificate(event.id, {
+          keepAssignmentIfAccepted: true
+        })
+      )
+    ).rejects.toThrow('Confirmation API did not return a synchronous response.')
+  })
+
+  test('Unassigns when integration responds with 202', async () => {
+    mockActionApi(ActionType.PRINT_CERTIFICATE, 202)
+
+    const { generator, user } = await setupTestCase()
+
+    const client = createTestClient(user)
+
+    const event = await client.event.create(generator.event.create())
+
+    await client.event.actions.declare.request(
+      generator.event.actions.declare(event.id, { keepAssignment: true })
+    )
+
+    await client.event.actions.register.request(
+      generator.event.actions.register(event.id, { keepAssignment: true })
+    )
+
+    const response = await client.event.actions.printCertificate.request(
       generator.event.actions.printCertificate(event.id)
     )
-  ).rejects.toThrowErrorMatchingSnapshot()
+
+    const lastAction = response.actions[response.actions.length - 1]
+
+    expect(lastAction.type).toEqual(ActionType.UNASSIGN)
+    expect(lastAction.status).toEqual(ActionStatus.Accepted)
+
+    const currentState = getCurrentEventState(
+      response,
+      tennisClubMembershipEvent
+    )
+
+    expect(currentState.flags).toEqual(['print_certificate:requested'])
+    expect(currentState.status).toEqual(EventStatus.enum.REGISTERED)
+    expect(currentState.assignedTo).toEqual(undefined)
+  })
+
+  test('Records a rejected action when integration responds with 400', async () => {
+    mockActionApi(ActionType.PRINT_CERTIFICATE, 400)
+
+    const { generator, user } = await setupTestCase()
+
+    const client = createTestClient(user)
+
+    const event = await client.event.create(generator.event.create())
+
+    await client.event.actions.declare.request(
+      generator.event.actions.declare(event.id, { keepAssignment: true })
+    )
+
+    await client.event.actions.register.request(
+      generator.event.actions.register(event.id, { keepAssignment: true })
+    )
+
+    const response = await client.event.actions.printCertificate.request(
+      generator.event.actions.printCertificate(event.id)
+    )
+
+    expect(
+      response.actions.find(
+        (action) =>
+          action.type === ActionType.PRINT_CERTIFICATE &&
+          action.status === ActionStatus.Rejected
+      )
+    ).toBeDefined()
+  })
+
+  test('Keeps assignment when integration responds with 500', async () => {
+    mockActionApi(ActionType.PRINT_CERTIFICATE, 500)
+
+    const { generator, user } = await setupTestCase()
+
+    const client = createTestClient(user)
+
+    const event = await client.event.create(generator.event.create())
+
+    await client.event.actions.declare.request(
+      generator.event.actions.declare(event.id, { keepAssignment: true })
+    )
+    await client.event.actions.register.request(
+      generator.event.actions.register(event.id, { keepAssignment: true })
+    )
+
+    await expect(
+      client.event.actions.printCertificate.request(
+        generator.event.actions.printCertificate(event.id)
+      )
+    ).rejects.toThrow(
+      'Unexpected failure from country config action confirmation API'
+    )
+
+    const eventAfterFailure = await client.event.get({ eventId: event.id })
+
+    const currentState = getCurrentEventState(
+      eventAfterFailure,
+      tennisClubMembershipEvent
+    )
+
+    expect(currentState.flags).toEqual(['print_certificate:requested'])
+    expect(currentState.status).toEqual(EventStatus.enum.REGISTERED)
+    expect(currentState.assignedTo).toEqual(user.id)
+  })
 })

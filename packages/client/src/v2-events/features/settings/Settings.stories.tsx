@@ -8,7 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import type { Meta, StoryObj } from '@storybook/react'
+import type { Meta, StoryObj } from '@storybook/react-vite'
 import { TestUserRole } from '@opencrvs/commons/client'
 import { ROUTES, routesConfig } from '@client/v2-events/routes'
 import { SettingsPage } from './Settings'
@@ -23,7 +23,7 @@ type Story = StoryObj<typeof SettingsPage>
 
 export const LocalRegistrar: Story = {
   parameters: {
-    userRole: TestUserRole.Enum.LOCAL_REGISTRAR,
+    userRole: TestUserRole.enum.LOCAL_REGISTRAR,
     reactRouter: {
       router: routesConfig,
       initialPath: ROUTES.V2.SETTINGS.buildPath({})
@@ -33,7 +33,7 @@ export const LocalRegistrar: Story = {
 
 export const FieldAgent: Story = {
   parameters: {
-    userRole: TestUserRole.Enum.FIELD_AGENT,
+    userRole: TestUserRole.enum.FIELD_AGENT,
     reactRouter: {
       router: routesConfig,
       initialPath: ROUTES.V2.SETTINGS.buildPath({})
@@ -43,7 +43,7 @@ export const FieldAgent: Story = {
 
 export const RegistrationAgent: Story = {
   parameters: {
-    userRole: TestUserRole.Enum.REGISTRATION_AGENT,
+    userRole: TestUserRole.enum.REGISTRATION_AGENT,
     reactRouter: {
       router: routesConfig,
       initialPath: ROUTES.V2.SETTINGS.buildPath({})
@@ -53,7 +53,7 @@ export const RegistrationAgent: Story = {
 
 export const LocalSystemAdmin: Story = {
   parameters: {
-    userRole: TestUserRole.Enum.LOCAL_SYSTEM_ADMIN,
+    userRole: TestUserRole.enum.LOCAL_SYSTEM_ADMIN,
     reactRouter: {
       router: routesConfig,
       initialPath: ROUTES.V2.SETTINGS.buildPath({})
@@ -63,7 +63,7 @@ export const LocalSystemAdmin: Story = {
 
 export const AssignedOfficeDisplayed: Story = {
   parameters: {
-    userRole: TestUserRole.Enum.LOCAL_REGISTRAR,
+    userRole: TestUserRole.enum.LOCAL_REGISTRAR,
     reactRouter: {
       router: routesConfig,
       initialPath: ROUTES.V2.SETTINGS.buildPath({})

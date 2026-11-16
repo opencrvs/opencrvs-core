@@ -12,7 +12,7 @@ import * as elasticsearch from '@elastic/elasticsearch'
 import { inject, vi } from 'vitest'
 
 /** @knipignore */
-export const getEventIndexName = vi.fn()
+export const getEventIndexName = vi.fn<(type: string) => string>()
 /** @knipignore */
 export const getEventAliasName = vi.fn()
 
@@ -26,6 +26,4 @@ export function getOrCreateClient() {
 export const getReindexingStatusIndexName = vi.fn()
 
 /** @knipignore */
-export function getTemporaryIndexName(eventType: string, timestamp: number) {
-  return `${getEventIndexName(eventType)}_${timestamp}`
-}
+export const getTemporaryIndexName = vi.fn()

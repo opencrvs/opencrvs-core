@@ -9,231 +9,258 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import fetch from 'node-fetch'
-import { OPENCRVS_SPECIFICATION_URL } from './constants'
 import { env } from './environment'
-import { TypeOf, z } from 'zod'
+import { z } from 'zod'
 import { raise } from './utils'
 import { fromZodError } from 'zod-validation-error'
+import { getUUID, LocationVersion } from '@opencrvs/commons'
+import { createInitialisationClient } from './initialisation-client'
+import { formatUnwrittenFailure } from './seed-failure'
+import { Read, validatedContents } from './read'
 
-const LOCATION_TYPES = [
-  'ADMIN_STRUCTURE',
-  'HEALTH_FACILITY',
-  'CRVS_OFFICE'
-] as const
+/** Strict, here and below: every optional field is one a typo can silently
+ * drop — an unrecognised `verisons` would cost a location its whole history
+ * without a word. */
+const RawLocationVersionSchema = z.strictObject({
+  effectiveFrom: z.iso.date().optional(),
+  name: z.string(),
+  externalId: z.string().optional(),
+  status: z.enum(['active', 'inactive'])
+})
 
-const LocationSchema = z.array(
-  z.object({
-    id: z.string(),
-    name: z.string(),
-    alias: z.string().optional(),
-    partOf: z.string(),
-    locationType: z.enum(LOCATION_TYPES),
-    jurisdictionType: z
-      .enum([
-        'STATE',
-        'DISTRICT',
-        'LOCATION_LEVEL_3',
-        'LOCATION_LEVEL_4',
-        'LOCATION_LEVEL_5'
-      ])
-      .optional(),
-    statistics: z
-      .array(
-        z.object({
-          year: z.number(),
-          male_population: z.number(),
-          female_population: z.number(),
-          population: z.number(),
-          crude_birth_rate: z.number()
-        })
-      )
-      .optional()
-  })
-)
+const RawLocationSchema = z.strictObject({
+  id: z.string(),
+  name: z.string(),
+  partOf: z.string(),
+  locationType: z.string(),
+  versions: z.array(RawLocationVersionSchema).optional()
+})
 
-function validateAdminStructure(locations: TypeOf<typeof LocationSchema>) {
-  const locationsMap = new Map(
-    locations.map(({ statistics, ...loc }) => {
-      return [
-        loc.id,
-        {
-          ...loc,
-          statistics: new Map(
-            (statistics ?? []).map(({ year, ...stats }) => [year, stats])
-          )
-        }
-      ]
-    })
-  )
+const RawAdministrativeAreaSchema = RawLocationSchema.omit({
+  locationType: true
+})
 
-  // Create a map of parent-child relationships
-  const locationNodeMap = new Map(
-    locations.map((loc) => [
-      loc.id,
-      { id: loc.id, children: new Array<string>() }
-    ])
-  )
-  // this is the root location
-  locationNodeMap.set('0', { id: '0', children: [] })
-  locations.forEach((loc) => {
-    const parent = locationNodeMap.get(loc.partOf.split('/')[1])
-    if (!parent) {
-      raise(`Parent location "${loc.partOf}" not found for ${loc.name}`)
-    }
-    parent.children.push(loc.id)
-  })
+const CountryConfigLocationResponse = z.object({
+  locations: z.array(RawLocationSchema),
+  administrativeAreas: z.array(RawAdministrativeAreaSchema)
+})
 
-  // Validate statistics only for top-level locations (states)
-  const statisticsErrors: Error[] = []
-  locationNodeMap.get('0')!.children.forEach((stateId) => {
-    const state = locationsMap.get(stateId)!
-    if (!state.statistics || state.statistics.size === 0) {
-      statisticsErrors.push(
-        new Error(
-          `Top-level location (state) "${state.name}" must have statistics data`
-        )
-      )
-      return
-    }
-
-    // Validate statistics data for the state
-    for (const [year, stats] of state.statistics.entries()) {
-      if (stats.population < stats.male_population + stats.female_population) {
-        statisticsErrors.push(
-          new Error(
-            `Location: ${state.name}, year: ${year} -> Sum of male population and female population ${
-              stats.male_population + stats.female_population
-            } is higher than the total population ${stats.population}`
-          )
-        )
-      }
-    }
-  })
-
-  if (statisticsErrors.length > 0) {
-    raise(statisticsErrors.map((error) => error.message).join('\n'))
-  }
-
-  return locationsMap
+/** One node of the hierarchy that parsed: an administrative area or a
+ * location. The ids here are the country config's own, which is what an office
+ * reference and a node's `partOf` are written in terms of. */
+export interface ParsedPlace {
+  id: string
+  name: string
+  /** `Location/<id>`, or `Location/0` at the root of the hierarchy. */
+  partOf: string
 }
 
-async function getLocations() {
-  const url = new URL('locations', env.COUNTRY_CONFIG_HOST).toString()
-  const res = await fetch(url)
-  if (!res.ok) {
-    raise(`Expected to get the locations from ${url}`)
-  }
-  const parsedLocations = LocationSchema.safeParse(await res.json())
-  if (!parsedLocations.success) {
-    raise(
-      fromZodError(parsedLocations.error, {
-        prefix: `Error validating locations data returned from ${url}`
-      })
-    )
-  }
-  const adminStructureMap = validateAdminStructure(
-    parsedLocations.data.filter(
-      ({ locationType }) => locationType === 'ADMIN_STRUCTURE'
-    )
-  )
-  parsedLocations.data
-    .filter(({ locationType }) => locationType !== 'ADMIN_STRUCTURE')
-    .forEach((facilityOrOffice) => {
-      if (!adminStructureMap.get(facilityOrOffice.partOf.split('/')[1])) {
-        raise(
-          `Parent location "${facilityOrOffice.partOf}" not found for ${facilityOrOffice.name}`
-        )
-      }
-    })
-  return parsedLocations.data
+/** Which half of the hierarchy a node belongs to. Only locations are offices,
+ * and only areas are ever parents. */
+export type PlaceKind = 'administrativeArea' | 'location'
+
+interface PlaceRef {
+  place: PlaceKind
+  id: string
+  name: string
 }
 
-const bundleToLocationEntries = (bundle: fhir3.Bundle<fhir3.Location>) =>
-  (bundle.entry ?? [])
-    .map((bundleEntry) => bundleEntry.resource)
-    .filter((maybeLocation): maybeLocation is fhir3.Location =>
-      Boolean(maybeLocation)
-    )
+export type LocationProblem =
+  | { kind: 'hierarchyUnparsed'; message: string }
+  | { kind: 'unparentedNode'; node: PlaceRef; partOf: string }
 
-function locationBundleToIdentifier(
-  bundle: fhir3.Bundle<fhir3.Location>
-): string[] {
-  return bundleToLocationEntries(bundle)
-    .map((location) => getExternalIdFromIdentifier(location.identifier))
-    .filter((maybeId): maybeId is string => Boolean(maybeId))
+/** What the write path sends. The ids here are freshly minted, and the
+ * country config's own ids survive as `externalId`. */
+export interface LocationPayload {
+  administrativeAreas: {
+    id: string
+    name: string
+    parentId: string | null
+    externalId: string
+    versions?: LocationVersion[]
+  }[]
+  locations: {
+    id: string
+    name: string
+    administrativeAreaId: string | null
+    locationType: string
+    externalId: string
+    versions?: LocationVersion[]
+  }[]
 }
 
 /**
- * Get the externally defined id for location. Defined in country-config.
+ * `payload` is kept alongside the parsed nodes because minting the ids discards
+ * the `partOf` the checks need, and states a parent as an id the checks have no
+ * way to resolve.
  */
+export type LocationRead = Read<
+  {
+    administrativeAreas: ParsedPlace[]
+    locations: ParsedPlace[]
+    payload: LocationPayload
+  },
+  LocationProblem
+>
 
-const getExternalIdFromIdentifier = (
-  identifiers: fhir3.Location['identifier']
-) =>
-  identifiers
-    ?.find(({ system }) =>
-      [
-        `${OPENCRVS_SPECIFICATION_URL}id/statistical-code`,
-        `${OPENCRVS_SPECIFICATION_URL}id/internal-id`
-      ].some((identifierSystem) => identifierSystem === system)
-    )
-    ?.value?.split('_')
-    .pop()
-
-export async function seedLocations(token: string) {
-  const savedLocations = (
-    await Promise.all(
-      LOCATION_TYPES.map((type) =>
-        getLocationsByType(type)
-          .then((res) => res.json())
-          .then((bundle: fhir3.Bundle<fhir3.Location>) =>
-            locationBundleToIdentifier(bundle)
-          )
-      )
-    )
-  ).flat()
-
-  const savedLocationsSet = new Set(savedLocations)
-  const locations = (await getLocations()).filter((location) => {
-    return !savedLocationsSet.has(location.id)
-  })
-  const res = await fetch(`${env.GATEWAY_HOST}/locations?`, {
-    method: 'POST',
-    headers: {
-      Authorization: `Bearer ${token}`,
-      'Content-Type': 'application/fhir+json'
-    },
-    body: JSON.stringify(
-      locations
-        // statisticalID & code are legacy properties
-        .map(({ id, locationType, ...loc }) => ({
-          statisticalID: id,
-          code: locationType,
-          ...loc
-        }))
-    )
-  })
-
-  if (!res.ok) {
-    raise(await res.text())
+/**
+ * Builds a seedable `versions` history from the country config's raw version
+ * entries: assigns each element a fresh `versionId` and defaults an absent
+ * `effectiveFrom` to the beginning-of-time sentinel, since the `set`
+ * mutation's schema requires every element to carry both, unlike the raw
+ * wire format.
+ */
+function buildSeededVersions(
+  rawVersions: z.output<typeof RawLocationVersionSchema>[] | undefined
+): LocationVersion[] | undefined {
+  if (!rawVersions) {
+    return undefined
   }
 
-  const response: fhir3.Bundle<fhir3.BundleEntryResponse> = await res.json()
-  response.entry?.forEach((res, index) => {
-    if (res.response?.status !== '201') {
-      // eslint-disable-next-line no-console
-      console.log(
-        `Failed to create location resource for: "${locations[index].name}"`
-      )
-    }
-  })
+  return rawVersions.map((version) => ({
+    versionId: getUUID(),
+    effectiveFrom: version.effectiveFrom || '0001-01-01',
+    name: version.name,
+    externalId: version.externalId ?? null,
+    status: version.status
+  }))
 }
 
-function getLocationsByType(type: string) {
-  return fetch(`${env.GATEWAY_HOST}/locations?type=${type}&_count=0`, {
-    headers: {
-      'Content-Type': 'application/fhir+json',
-      'Cache-Control': 'no-store'
+function buildPayload({
+  administrativeAreas,
+  locations
+}: z.output<typeof CountryConfigLocationResponse>): LocationPayload {
+  const administrativeHierarchyIdMap = new Map(
+    administrativeAreas.map(({ id }) => [id, getUUID()])
+  )
+
+  const locationIdMap = new Map(locations.map(({ id }) => [id, getUUID()]))
+
+  return {
+    administrativeAreas: administrativeAreas.map((a) => ({
+      id: administrativeHierarchyIdMap.get(a.id)!,
+      name: a.name,
+      parentId:
+        administrativeHierarchyIdMap.get(a.partOf.split('/')[1]) || null,
+      externalId: a.id,
+      versions: buildSeededVersions(a.versions)
+    })),
+    locations: locations.map((loc) => ({
+      id: locationIdMap.get(loc.id)!,
+      name: loc.name,
+      administrativeAreaId:
+        administrativeHierarchyIdMap.get(loc.partOf.split('/')[1]) || null,
+      locationType: loc.locationType,
+      externalId: loc.id,
+      versions: buildSeededVersions(loc.versions)
+    }))
+  }
+}
+
+export const ROOT_ADMINISTRATIVE_AREA_ID = '0'
+
+/** One check covers both halves of the hierarchy: areas nest inside areas and
+ * locations hang off them, so only areas are ever parents. */
+function unparentedNodes(
+  nodes: ParsedPlace[],
+  place: PlaceKind,
+  declaredAreas: Set<string>
+): LocationProblem[] {
+  return nodes
+    .filter(({ partOf }) => {
+      const parentId = partOf.split('/')[1]
+      return (
+        parentId !== ROOT_ADMINISTRATIVE_AREA_ID && !declaredAreas.has(parentId)
+      )
+    })
+    .map(({ id, name, partOf }) => ({
+      kind: 'unparentedNode' as const,
+      node: { place, id, name },
+      partOf
+    }))
+}
+
+function brokenHierarchy(
+  administrativeAreas: ParsedPlace[],
+  locations: ParsedPlace[]
+): LocationProblem[] {
+  const declaredAreas = new Set(administrativeAreas.map(({ id }) => id))
+
+  return [
+    ...unparentedNodes(
+      administrativeAreas,
+      'administrativeArea',
+      declaredAreas
+    ),
+    ...unparentedNodes(locations, 'location', declaredAreas)
+  ]
+}
+
+export function parseLocations(document: unknown): LocationRead {
+  const parsed = CountryConfigLocationResponse.safeParse(document)
+
+  if (!parsed.success) {
+    return {
+      readable: false,
+      problem: {
+        kind: 'hierarchyUnparsed',
+        message: fromZodError(parsed.error, { prefix: null }).message
+      }
     }
-  })
+  }
+
+  const { administrativeAreas, locations } = parsed.data
+
+  return {
+    readable: true,
+    administrativeAreas,
+    locations,
+    payload: buildPayload(parsed.data),
+    problems: brokenHierarchy(administrativeAreas, locations)
+  }
+}
+
+export async function readLocations(): Promise<LocationRead> {
+  const url = new URL('config/locations', env.COUNTRY_CONFIG_HOST).toString()
+  const res = await fetch(url)
+
+  if (!res.ok) {
+    raise(formatUnwrittenFailure(`Expected to get the locations from ${url}`))
+  }
+
+  return parseLocations(await res.json())
+}
+
+export function parsedPlaces(read: LocationRead): {
+  administrativeAreas: ParsedPlace[]
+  locations: ParsedPlace[]
+} {
+  return read.readable
+    ? {
+        administrativeAreas: read.administrativeAreas,
+        locations: read.locations
+      }
+    : { administrativeAreas: [], locations: [] }
+}
+
+/**
+ * The offices the seed-data declares
+ */
+export function getDeclaredOffices(read: LocationRead): Set<string> {
+  return new Set(parsedPlaces(read).locations.map(({ id }) => id))
+}
+
+/** The payload to write, which only exists once validation has passed. */
+export function toLocationPayload(read: LocationRead): LocationPayload {
+  return validatedContents(read, 'The hierarchy').payload
+}
+
+export async function seedLocations(
+  token: string,
+  { administrativeAreas, locations }: LocationPayload
+) {
+  const client = createInitialisationClient(token)
+
+  await client.administrativeAreas.set.mutate(administrativeAreas)
+  await client.locations.set.mutate(locations)
 }

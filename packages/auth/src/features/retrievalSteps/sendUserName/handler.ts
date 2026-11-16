@@ -16,15 +16,16 @@ import { unauthorized } from '@hapi/boom'
 import {
   getRetrievalStepInformation,
   RetrievalSteps,
-  deleteRetrievalStepInformation
+  deleteRetrievalStepInformation,
+  RETRIEVAL_FLOW_USER_NAME
 } from '@auth/features/retrievalSteps/verifyUser/service'
-import {
-  logger,
-  triggerUserEventNotification,
-  personNameFromV1ToV2
-} from '@opencrvs/commons'
-import { postUserActionToMetrics } from '@auth/metrics'
+import { triggerUserEventNotification, TokenUserType } from '@opencrvs/commons'
 import { env } from '@auth/environment'
+import { JWT_ISSUER } from '@auth/constants'
+import {
+  createToken,
+  recordAnonymousUserAuditEvent
+} from '@auth/features/authenticate/service'
 
 interface IPayload {
   nonce: string
@@ -41,40 +42,55 @@ export default async function sendUserNameHandler(
     throw unauthorized()
   })
 
-  if (retrievalStepInformation.status !== RetrievalSteps.SECURITY_Q_VERIFIED) {
+  /*
+   * Two conditions, one rejection, deliberately. A record that never got past
+   * the security question and a record belonging to the password-reset flow
+   * both have to be refused here, and they have to be refused the same way:
+   * whoever is calling must not be able to tell which of the two they hit.
+   */
+  if (
+    retrievalStepInformation.status !== RetrievalSteps.SECURITY_Q_VERIFIED ||
+    retrievalStepInformation.retrieveFlow !== RETRIEVAL_FLOW_USER_NAME
+  ) {
     return h.response().code(401)
   }
-
-  const remoteAddress =
-    request.headers['x-real-ip'] || request.info.remoteAddress
-  const userAgent =
-    request.headers['x-real-user-agent'] || request.headers['user-agent']
 
   await triggerUserEventNotification({
     event: 'username-reminder',
     payload: {
       recipient: {
-        name: personNameFromV1ToV2(retrievalStepInformation.userFullName),
+        name: retrievalStepInformation.userFullName,
         mobile: retrievalStepInformation.mobile,
         email: retrievalStepInformation.email
       },
       username: retrievalStepInformation.username
     },
     countryConfigUrl: env.COUNTRY_CONFIG_URL_INTERNAL,
-    authHeader: { Authorization: request.headers.authorization }
+    /*
+     * Username retrieval is a pre-authentication flow: the caller proves
+     * itself with the nonce, not a token, so there is no incoming
+     * Authorization header to forward. Mint a short-lived system token
+     * instead — the same way the 2FA and password-reset code notifications do
+     * — so country config can require auth on `/trigger/user/*`.
+     */
+    authHeader: {
+      Authorization: `Bearer ${await createToken(
+        'auth',
+        [],
+        ['opencrvs:countryconfig-user'],
+        JWT_ISSUER,
+        undefined,
+        TokenUserType.enum.system
+      )}`
+    }
   })
 
-  try {
-    await postUserActionToMetrics(
-      'USERNAME_REMINDER',
-      request.headers.authorization,
-      remoteAddress,
-      userAgent,
-      retrievalStepInformation.practitionerId
-    )
-  } catch (err) {
-    logger.error(err.message)
-  }
+  await recordAnonymousUserAuditEvent({
+    operation: 'user.username_reminder',
+    requestData: {
+      subjectId: retrievalStepInformation.userId
+    }
+  })
 
   await deleteRetrievalStepInformation(payload.nonce)
   return h.response().code(200)

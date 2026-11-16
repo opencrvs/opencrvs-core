@@ -11,19 +11,27 @@
 
 import React, { useEffect, useState } from 'react'
 import { Outlet, RouteObject } from 'react-router-dom'
+
 import { useSelector } from 'react-redux'
+import { useIntl } from 'react-intl'
 import { onlineManager } from '@tanstack/react-query'
-import { ActionType, SCOPES } from '@opencrvs/commons/client'
+import {
+  ActionType,
+  isSelectableAtAnchor,
+  todayISO
+} from '@opencrvs/commons/client'
 import { APPLICATION_VERSION } from '@client/utils/constants'
+import { errorMessages, buttonMessages } from '@client/i18n/messages'
+import { buildLoginUrl } from '@client/components/VersionMismatchModal'
+import { useLocations } from '@client/v2-events/hooks/useLocations'
 import * as V1_LEGACY_ROUTES from '@client/navigation/routes'
 import { Debug } from '@client/v2-events/features/debug/debug'
 import { router as correctionRequestRouter } from '@client/v2-events/features/events/actions/correct/request/router'
 import { router as correctionReviewRouter } from '@client/v2-events/features/events/actions/correct/review/router'
 import * as Declare from '@client/v2-events/features/events/actions/declare'
+import * as Edit from '@client/v2-events/features/events/actions/edit'
 import { DeleteEventIndex } from '@client/v2-events/features/events/actions/delete'
 import * as PrintCertificate from '@client/v2-events/features/events/actions/print-certificate'
-import * as Register from '@client/v2-events/features/events/actions/register'
-import * as Validate from '@client/v2-events/features/events/actions/validate'
 import {
   AdvancedSearch,
   SearchResult
@@ -32,7 +40,10 @@ import { EventSelectionIndex } from '@client/v2-events/features/events/index'
 import { EventOverviewIndex } from '@client/v2-events/features/workqueues/EventOverview/EventOverview'
 import { router as workqueueRouter } from '@client/v2-events/features/workqueues/router'
 import { EventOverviewLayout, WorkqueueLayout } from '@client/v2-events/layouts'
-import { TRPCErrorBoundary } from '@client/v2-events/routes/TRPCErrorBoundary'
+import {
+  throwStructuredError,
+  TRPCErrorBoundary
+} from '@client/v2-events/routes/TRPCErrorBoundary'
 import {
   queryClient,
   trpcOptionsProxy,
@@ -47,6 +58,11 @@ import { getUserDetails } from '@client/profile/profileSelectors'
 import { SettingsPage } from '@client/v2-events/features/settings/Settings'
 import { TeamPage } from '@client/v2-events/features/team/Team'
 import { OrganisationPage } from '@client/v2-events/features/organisation/Organisation'
+import {
+  CreateNewUser,
+  EditUser,
+  ReviewUser
+} from '@client/views/SysAdmin/Team/user/userEditor/UserEditor'
 import { RedirectToWorkqueue } from '../layouts/redirectToWorkqueue'
 import { SearchLayout } from '../layouts/search'
 import { useWorkqueues } from '../hooks/useWorkqueue'
@@ -55,6 +71,7 @@ import { ProtectedRoute } from '../../components/ProtectedRoute'
 import { UserAudit } from '../../views/UserAudit/UserAudit'
 import { SystemList } from '../../views/SysAdmin/Config/Systems/Systems'
 import AllUserEmail from '../../views/SysAdmin/Communications/AllUserEmail/AllUserEmail'
+import { EventHistoryIndex } from '../features/workqueues/EventOverview/components/EventHistory'
 import { PerformanceDashboard } from '../features/performance/Dashboard'
 import { ROUTES } from './routes'
 import { Toaster } from './Toaster'
@@ -64,17 +81,55 @@ function PrefetchQueries() {
 
   useEffect(() => {
     {
-      const { queryKey, queryFn } =
-        trpcOptionsProxy.locations.list.queryOptions()
+      const locationsQuery = trpcOptionsProxy.locations.list.queryOptions()
+
+      const administrativeAreasQuery =
+        trpcOptionsProxy.administrativeAreas.list.queryOptions()
 
       // only fetch if we don't already have it cached
-      if (!queryClient.getQueryData(queryKey)) {
-        void queryClient.prefetchQuery({ queryKey, queryFn })
+      if (!queryClient.getQueryData(locationsQuery.queryKey)) {
+        void queryClient.prefetchQuery({
+          queryKey: locationsQuery.queryKey,
+          queryFn: locationsQuery.queryFn
+        })
+      }
+
+      // only fetch if we don't already have it cached
+      if (!queryClient.getQueryData(administrativeAreasQuery.queryKey)) {
+        void queryClient.prefetchQuery({
+          queryKey: administrativeAreasQuery.queryKey,
+          queryFn: administrativeAreasQuery.queryFn
+        })
       }
     }
     void prefetch()
     // NOTE: Using anything else than prefetch will trigger load for each render. Destructure rather than passing entire object.
   }, [prefetch])
+
+  return null
+}
+
+// How often to re-check whether the logged-in user's office has gone inactive.
+const OFFICE_STATUS_POLL_INTERVAL_MS = 5 * 60 * 1000
+
+function OfficeStatusWatcher({ officeId }: { officeId: string }) {
+  const intl = useIntl()
+  const { getLocation } = useLocations()
+  const { data: office } = getLocation.useQuery(officeId, {
+    refetchInterval: OFFICE_STATUS_POLL_INTERVAL_MS
+  })
+
+  if (office && !isSelectableAtAnchor(office.versions, todayISO())) {
+    throwStructuredError({
+      title: intl.formatMessage(errorMessages.officeInactive),
+      message: intl.formatMessage(errorMessages.officeInactiveDescription),
+      redirection: {
+        label: intl.formatMessage(buttonMessages.backToLogin),
+        path: buildLoginUrl(intl.locale)
+      },
+      variant: 'notice'
+    })
+  }
 
   return null
 }
@@ -173,11 +228,15 @@ export const routesConfig = {
     return (
       <NavigationHistoryProvider>
         <TRPCErrorBoundary>
-          <TRPCProvider storeIdentifier={currentUser.id}>
+          <TRPCProvider
+            storeIdentifier={currentUser.id}
+            userCacheKey={`${currentUser.primaryOfficeId}:${currentUser.role}`}
+          >
             <Outlet />
             <Debug />
             <Toaster />
             <PrefetchQueries />
+            <OfficeStatusWatcher officeId={currentUser.primaryOfficeId} />
           </TRPCProvider>
         </TRPCErrorBoundary>
       </NavigationHistoryProvider>
@@ -190,16 +249,26 @@ export const routesConfig = {
     },
     workqueueRouter,
     {
-      path: ROUTES.V2.EVENTS.VIEW.path,
-      element: <ReadonlyViewIndex />
-    },
-    {
-      path: ROUTES.V2.EVENTS.OVERVIEW.path,
+      path: ROUTES.V2.EVENTS.EVENT.path,
       element: (
         <EventOverviewLayout>
-          <EventOverviewIndex />
+          <Outlet />
         </EventOverviewLayout>
-      )
+      ),
+      children: [
+        {
+          index: true,
+          element: <EventOverviewIndex />
+        },
+        {
+          path: ROUTES.V2.EVENTS.EVENT.RECORD.path,
+          element: <ReadonlyViewIndex />
+        },
+        {
+          path: ROUTES.V2.EVENTS.EVENT.AUDIT.path,
+          element: <EventHistoryIndex />
+        }
+      ]
     },
     {
       path: ROUTES.V2.EVENTS.CREATE.path,
@@ -232,51 +301,29 @@ export const routesConfig = {
       ]
     },
     {
-      path: ROUTES.V2.EVENTS.VALIDATE.path,
+      path: ROUTES.V2.EVENTS.EDIT.path,
       element: (
-        <DeclarationAction actionType={ActionType.VALIDATE}>
+        <DeclarationAction actionType={ActionType.EDIT}>
           <Outlet />
         </DeclarationAction>
       ),
       children: [
         {
           index: true,
-          element: <Validate.Pages />
+          element: <Edit.Pages />
         },
         {
-          path: ROUTES.V2.EVENTS.VALIDATE.PAGES.path,
-          element: <Validate.Pages />
+          path: ROUTES.V2.EVENTS.EDIT.PAGES.path,
+          element: <Edit.Pages />
         },
         {
-          path: ROUTES.V2.EVENTS.VALIDATE.REVIEW.path,
-          element: <Validate.Review />
+          path: ROUTES.V2.EVENTS.EDIT.REVIEW.path,
+          element: <Edit.Review />
         }
       ]
     },
     correctionRequestRouter,
     correctionReviewRouter,
-    {
-      path: ROUTES.V2.EVENTS.REGISTER.path,
-      element: (
-        <DeclarationAction actionType={ActionType.REGISTER}>
-          <Outlet />
-        </DeclarationAction>
-      ),
-      children: [
-        {
-          index: true,
-          element: <Register.Pages />
-        },
-        {
-          path: ROUTES.V2.EVENTS.REGISTER.PAGES.path,
-          element: <Register.Pages />
-        },
-        {
-          path: ROUTES.V2.EVENTS.REGISTER.REVIEW.path,
-          element: <Register.Review />
-        }
-      ]
-    },
     {
       path: ROUTES.V2.EVENTS.REVIEW_POTENTIAL_DUPLICATE.path,
       element: <ReviewDuplicateIndex />
@@ -332,9 +379,29 @@ export const routesConfig = {
       element: <SettingsPage />
     },
     {
+      path: ROUTES.V2.SETTINGS.USER.VIEW.path,
+      element: (
+        <WorkqueueLayout>
+          <UserAudit />
+        </WorkqueueLayout>
+      )
+    },
+    {
+      path: ROUTES.V2.SETTINGS.USER.CREATE.path,
+      element: <CreateNewUser />
+    },
+    {
+      path: ROUTES.V2.SETTINGS.USER.EDIT.path,
+      element: <EditUser />
+    },
+    {
+      path: ROUTES.V2.SETTINGS.USER.REVIEW.path,
+      element: <ReviewUser />
+    },
+    {
       path: ROUTES.V2.DASHBOARD.path,
       element: (
-        <ProtectedRoute scopes={[SCOPES.PERFORMANCE_READ_DASHBOARDS]}>
+        <ProtectedRoute scopes={['performance.read-dashboards']}>
           <PerformanceDashboard />
         </ProtectedRoute>
       )
@@ -346,35 +413,15 @@ export const routesConfig = {
     {
       path: ROUTES.V2.path + V1_LEGACY_ROUTES.TEAM_USER_LIST,
       element: (
-        <ProtectedRoute
-          scopes={[
-            SCOPES.ORGANISATION_READ_LOCATIONS,
-            SCOPES.ORGANISATION_READ_LOCATIONS_MY_OFFICE,
-            SCOPES.ORGANISATION_READ_LOCATIONS_MY_JURISDICTION
-          ]}
-        >
+        <ProtectedRoute scopes={['organisation.read-locations']}>
           <TeamPage />
         </ProtectedRoute>
       )
     },
     {
-      path: ROUTES.V2.path + V1_LEGACY_ROUTES.USER_PROFILE,
-      element: (
-        <WorkqueueLayout>
-          <UserAudit hideNavigation={true} />
-        </WorkqueueLayout>
-      )
-    },
-    {
       path: ROUTES.V2.path + V1_LEGACY_ROUTES.ORGANISATIONS_INDEX,
       element: (
-        <ProtectedRoute
-          scopes={[
-            SCOPES.ORGANISATION_READ_LOCATIONS,
-            SCOPES.ORGANISATION_READ_LOCATIONS_MY_OFFICE,
-            SCOPES.ORGANISATION_READ_LOCATIONS_MY_JURISDICTION
-          ]}
-        >
+        <ProtectedRoute scopes={['organisation.read-locations']}>
           <OrganisationPage />
         </ProtectedRoute>
       )
@@ -382,9 +429,9 @@ export const routesConfig = {
     {
       path: ROUTES.V2.path + V1_LEGACY_ROUTES.SYSTEM_LIST,
       element: (
-        <ProtectedRoute scopes={[SCOPES.CONFIG_UPDATE_ALL]}>
+        <ProtectedRoute scopes={['config.update-all']}>
           <WorkqueueLayout>
-            <SystemList hideNavigation={true} />
+            <SystemList />
           </WorkqueueLayout>
         </ProtectedRoute>
       )
@@ -392,9 +439,9 @@ export const routesConfig = {
     {
       path: ROUTES.V2.path + V1_LEGACY_ROUTES.ALL_USER_EMAIL,
       element: (
-        <ProtectedRoute scopes={[SCOPES.CONFIG_UPDATE_ALL]}>
+        <ProtectedRoute scopes={['config.update-all']}>
           <WorkqueueLayout>
-            <AllUserEmail hideNavigation={true} />
+            <AllUserEmail />
           </WorkqueueLayout>
         </ProtectedRoute>
       )

@@ -8,33 +8,50 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import type { Meta, StoryObj } from '@storybook/react'
+import type { Meta, StoryObj } from '@storybook/react-vite'
 import { createTRPCMsw, httpLink } from '@vafanassieff/msw-trpc'
-
-import { fireEvent, within, expect, userEvent, waitFor } from '@storybook/test'
+import {
+  fireEvent,
+  within,
+  expect,
+  fn,
+  userEvent,
+  waitFor
+} from 'storybook/test'
 import React from 'react'
 import superjson from 'superjson'
 import { noop } from 'lodash'
 import {
-  ActionType,
   AddressFieldValue,
   AddressType,
   ConditionalType,
   defineDeclarationForm,
   field,
+  FieldConfig,
   FieldType,
-  generateEventDocument,
+  DocumentPath,
   generateTranslationConfig,
   never,
   TENNIS_CLUB_DECLARATION_FORM,
-  tennisClubMembershipEvent
+  tennisClubMembershipEvent,
+  toPlainDate,
+  eventAttachmentPath
 } from '@opencrvs/commons/client'
 import { AppRouter, TRPCProvider } from '@client/v2-events/trpc'
-import { tennisClubMembershipEventDocument } from '@client/v2-events/features/events/fixtures'
+import {
+  storybookEventId,
+  tennisClubMembershipEventDocument
+} from '@client/v2-events/features/events/fixtures'
 import { useModal } from '@client/v2-events/hooks/useModal'
-import { ROUTES, routesConfig } from '@client/v2-events/routes'
-import { withValidatorContext } from '../../../../../.storybook/decorators'
-import { RejectionState, Review } from './Review'
+import {
+  getTestValidatorContext,
+  withValidatorContext
+} from '../../../../../.storybook/decorators'
+import {
+  AcceptActionModalResult,
+  Review,
+  RejectActionModalResult
+} from './Review'
 
 /* eslint-disable max-lines */
 const mockDeclaration = {
@@ -107,29 +124,6 @@ export const ReviewWithoutChanges: Story = {
   }
 }
 
-const reviewActionMessages = {
-  title: {
-    id: 'changeModal.title',
-    defaultMessage: 'This is a title',
-    description: 'The title for review action'
-  },
-  description: {
-    id: 'changeModal.description',
-    defaultMessage: 'This is a description',
-    description: 'The title for review action'
-  },
-  onConfirm: {
-    id: 'ourOnConfirm',
-    defaultMessage: 'Confirm test',
-    description: 'The title for review action'
-  },
-  onReject: {
-    id: 'ourOnReject',
-    defaultMessage: 'Reject test',
-    description: 'The title for review action'
-  }
-}
-
 export const ChangeModalInteraction: StoryObj<typeof Review.Body> = {
   play: async ({ canvasElement, step }) => {
     const canvas = within(canvasElement)
@@ -153,30 +147,6 @@ export const ChangeModalInteraction: StoryObj<typeof Review.Body> = {
   render: function Component(args) {
     const [modal, openModal] = useModal()
 
-    async function handleDeclaration() {
-      await openModal<boolean | null>((close) => {
-        return (
-          <Review.ActionModal.Accept
-            action="Declare"
-            close={close}
-            copy={{
-              description: generateTranslationConfig('description'),
-              title: generateTranslationConfig('title'),
-              onCancel: generateTranslationConfig('onCancel'),
-              onConfirm: generateTranslationConfig('onConfirm'),
-              eventLabel: tennisClubMembershipEvent.label
-            }}
-          />
-        )
-      })
-    }
-
-    async function handleRejection() {
-      await openModal<RejectionState | null>((close) => (
-        <Review.ActionModal.Reject close={close} />
-      ))
-    }
-
     async function handleEdit() {
       await openModal<boolean | null>((close) => (
         <Review.EditModal close={close}></Review.EditModal>
@@ -193,15 +163,7 @@ export const ChangeModalInteraction: StoryObj<typeof Review.Body> = {
           formConfig={TENNIS_CLUB_DECLARATION_FORM}
           title="My test action"
           onEdit={handleEdit}
-        >
-          <Review.Actions
-            icon="Check"
-            incomplete={false}
-            messages={reviewActionMessages}
-            onConfirm={handleDeclaration}
-            onReject={handleRejection}
-          />
-        </Review.Body>
+        ></Review.Body>
         {modal}
       </>
     )
@@ -241,8 +203,12 @@ export const ReviewWithValidationErrors: Story = {
     const [modal, openModal] = useModal()
 
     async function handleRejection() {
-      await openModal<RejectionState | null>((close) => (
-        <Review.ActionModal.Reject close={close} />
+      await openModal<RejectActionModalResult | null>((close) => (
+        <Review.ActionModal.Reject
+          attachmentPath={eventAttachmentPath(storybookEventId)}
+          close={close}
+          eventConfiguration={tennisClubMembershipEvent}
+        />
       ))
     }
     return (
@@ -253,13 +219,6 @@ export const ReviewWithValidationErrors: Story = {
         title="My test action"
         onEdit={noop}
       >
-        <Review.Actions
-          icon="Check"
-          incomplete={false}
-          messages={reviewActionMessages}
-          onConfirm={noop}
-          onReject={handleRejection}
-        />
         {modal}
       </Review.Body>
     )
@@ -288,11 +247,6 @@ export const ReviewWithConditionallyHiddenFields: Story = {
   render: function Component(args) {
     const [modal, openModal] = useModal()
 
-    async function handleRejection() {
-      await openModal<RejectionState | null>((close) => (
-        <Review.ActionModal.Reject close={close} />
-      ))
-    }
     return (
       <Review.Body
         {...args}
@@ -395,165 +349,9 @@ export const ReviewWithConditionallyHiddenFields: Story = {
         title="My review page for testing conditionally hidden fields"
         onEdit={noop}
       >
-        <Review.Actions
-          icon="Check"
-          incomplete={false}
-          messages={reviewActionMessages}
-          onConfirm={noop}
-          onReject={handleRejection}
-        />
         {modal}
       </Review.Body>
     )
-  }
-}
-
-export const RejectModalInteraction: StoryObj<typeof Review.Body> = {
-  play: async ({ canvasElement, step }) => {
-    const canvas = within(canvasElement)
-
-    await step('Open reject modal', async () => {
-      const [changeButton] = await canvas.findAllByRole('button', {
-        name: 'Reject test'
-      })
-
-      await fireEvent.click(changeButton)
-
-      const modal = await canvas.findByTestId('reject-modal')
-
-      await within(modal).findByRole('heading', {
-        name: 'Reason for rejection?'
-      })
-      const textarea = await within(modal).findByTestId('reject-reason')
-      const checkbox = await within(modal).findByRole('checkbox')
-      const cancel = await within(modal).findByRole('button', {
-        name: 'Cancel'
-      })
-      const archive = await within(modal).findByRole('button', {
-        name: 'Archive'
-      })
-      const sendForUpdate = await within(modal).findByRole('button', {
-        name: 'Send For Update'
-      })
-
-      await expect(cancel).toBeEnabled()
-      await expect(archive).toBeDisabled()
-      await expect(sendForUpdate).toBeDisabled()
-
-      await userEvent.type(textarea, 'Duplicate', { delay: 100 })
-
-      await expect(archive).toBeEnabled()
-      await expect(sendForUpdate).toBeEnabled()
-
-      await userEvent.click(checkbox)
-
-      await expect(archive).toBeEnabled()
-      await expect(sendForUpdate).toBeDisabled()
-
-      await userEvent.click(cancel)
-
-      await waitFor(async () => {
-        await expect(
-          canvas.queryByTestId('reject-modal')
-        ).not.toBeInTheDocument()
-      })
-    })
-  },
-  render: function Component(args) {
-    const [modal, openModal] = useModal()
-
-    async function handleDeclaration() {
-      await openModal<boolean | null>((close) => {
-        return (
-          <Review.ActionModal.Accept
-            action="Declare"
-            close={close}
-            copy={{
-              description: generateTranslationConfig('description'),
-              title: generateTranslationConfig('title'),
-              onCancel: generateTranslationConfig('onCancel'),
-              onConfirm: generateTranslationConfig('onConfirm'),
-              eventLabel: tennisClubMembershipEvent.label
-            }}
-          />
-        )
-      })
-    }
-
-    async function handleRejection() {
-      await openModal<RejectionState | null>((close) => (
-        <Review.ActionModal.Reject close={close} />
-      ))
-    }
-
-    async function handleEdit() {
-      await openModal<boolean | null>((close) => (
-        <Review.EditModal close={close}></Review.EditModal>
-      ))
-
-      return
-    }
-
-    return (
-      <>
-        <Review.Body
-          {...args}
-          form={mockDeclaration}
-          formConfig={TENNIS_CLUB_DECLARATION_FORM}
-          title="My test action"
-          onEdit={handleEdit}
-        >
-          <Review.Actions
-            icon="Check"
-            incomplete={false}
-            messages={reviewActionMessages}
-            onConfirm={handleDeclaration}
-            onReject={handleRejection}
-          />
-        </Review.Body>
-        {modal}
-      </>
-    )
-  }
-}
-
-const declareEventDocument = generateEventDocument({
-  configuration: tennisClubMembershipEvent,
-  actions: [{ type: ActionType.CREATE }, { type: ActionType.DECLARE }]
-})
-
-const eventDocumentWithoutSurname = {
-  ...declareEventDocument,
-  actions: declareEventDocument.actions.map((action) => {
-    if (action.type !== ActionType.DECLARE || action.status !== 'Accepted') {
-      return action
-    }
-
-    return {
-      ...action,
-      declaration: {
-        ...action.declaration,
-        'applicant.name': {
-          firstname: 'John',
-          surname: ''
-        }
-      }
-    }
-  })
-}
-
-export const ReviewWithIncompleteName: Story = {
-  name: 'Review with incomplete name',
-  parameters: {
-    offline: {
-      events: [eventDocumentWithoutSurname]
-    },
-    reactRouter: {
-      router: routesConfig,
-      initialPath: ROUTES.V2.EVENTS.VALIDATE.REVIEW.buildPath({
-        eventId: eventDocumentWithoutSurname.id
-      })
-    }
   }
 }
 
@@ -762,5 +560,358 @@ export const AccordionExpandedWhenMemberHasAValue: Story = {
     const canvas = within(canvasElement)
     await expect(await canvas.findByText('Hide')).toBeInTheDocument()
     await expect(canvas.queryByText('Show')).not.toBeInTheDocument()
+  }
+}
+
+const annotationTextField: FieldConfig = {
+  id: 'annotation.comment',
+  type: FieldType.TEXT,
+  conditionals: [],
+  label: {
+    id: 'annotation.comment.label',
+    defaultMessage: 'Comment',
+    description: 'Label for annotation comment field'
+  }
+}
+
+const reviewCommentField: FieldConfig = {
+  id: 'review.comment',
+  type: FieldType.TEXT,
+  label: {
+    id: 'review.comment.label',
+    defaultMessage: 'Comment',
+    description: 'Label for review comment field'
+  }
+}
+
+const reviewSignatureField: FieldConfig = {
+  id: 'review.signature',
+  type: FieldType.SIGNATURE,
+  conditionals: [],
+  signaturePromptLabel: {
+    id: 'review.signature.prompt',
+    defaultMessage: 'Please sign here',
+    description: 'Prompt label for review signature modal'
+  },
+  label: {
+    id: 'review.signature.label',
+    defaultMessage: 'Signature',
+    description: 'Label for review signature field'
+  },
+  configuration: {
+    maxFileSize: 5 * 1024 * 1024
+  }
+}
+
+const annotationPrintButtonField: FieldConfig = {
+  id: 'annotation.printButton',
+  type: FieldType.ALPHA_PRINT_BUTTON,
+  conditionals: [],
+  label: {
+    id: 'annotation.printButton.label',
+    defaultMessage: 'Print',
+    description: 'Label for annotation print button field'
+  },
+  configuration: {
+    template: 'birth-certificate'
+  }
+}
+
+const annotationConditionalTextField: FieldConfig = {
+  id: 'annotation.conditionalField',
+  type: FieldType.TEXT,
+  conditionals: [
+    {
+      type: ConditionalType.DISPLAY_ON_REVIEW,
+      conditional: field('annotation.conditionalField').isEqualTo('show-me')
+    }
+  ],
+  label: {
+    id: 'annotation.conditionalField.label',
+    defaultMessage: 'Conditional field',
+    description: 'Label for conditionally shown annotation field'
+  }
+}
+
+/**
+ * During record creation the annotation fields (e.g. signature, comment) are shown
+ * as editable inputs via FormFieldGenerator. The readonly list of annotations is
+ * not shown because there are no previously submitted annotation values to display.
+ *
+ * Requires reactRouter with /event/:eventId so SignatureField.Input can upload files.
+ */
+export const ReviewDuringCreateNoAnnotationFields: Story = {
+  parameters: {
+    reactRouter: {
+      router: {
+        path: '/event/:eventId',
+        element: (
+          <Review.Body
+            anchor={toPlainDate('2025-01-01')}
+            annotation={{}}
+            attachmentPath={eventAttachmentPath(storybookEventId)}
+            form={mockDeclaration}
+            formConfig={TENNIS_CLUB_DECLARATION_FORM}
+            readonlyMode={false}
+            reviewFields={[reviewCommentField, reviewSignatureField]}
+            title="Member declaration for John Doe"
+            validatorContext={getTestValidatorContext()}
+            onAnnotationChange={noop}
+            onEdit={noop}
+          />
+        )
+      },
+      initialPath: '/event/test-event-123'
+    }
+  }
+}
+
+export const ReadonlyAnnotationList: Story = {
+  args: {
+    readonlyMode: true,
+    reviewFields: [annotationTextField],
+    annotation: {
+      'annotation.comment': 'Only annotation'
+    }
+  }
+}
+
+export const ReadonlyAnnotationHidesAlphaPrintButton: Story = {
+  args: {
+    readonlyMode: true,
+    reviewFields: [annotationTextField, annotationPrintButtonField],
+    annotation: {
+      'annotation.comment': 'Hides alpha print button',
+      'annotation.printButton': null
+    }
+  }
+}
+
+export const ReadonlyAnnotationFromNotifyAction: Story = {
+  args: {
+    readonlyMode: true,
+    reviewFields: [annotationTextField],
+    annotation: {
+      'annotation.comment': 'Notified by field agent'
+    }
+  }
+}
+
+export const ReadonlyAnnotationConditionallyHiddenField: Story = {
+  args: {
+    readonlyMode: true,
+    reviewFields: [annotationTextField, annotationConditionalTextField],
+    annotation: {
+      'annotation.comment': 'Always visible. One field hidden.',
+      // condition not satisfied — value does not equal 'show-me'
+      'annotation.conditionalField': 'hidden-value'
+    }
+  }
+}
+
+export const ReadonlyAnnotationConditionallyShownField: Story = {
+  args: {
+    readonlyMode: true,
+    reviewFields: [annotationTextField, annotationConditionalTextField],
+    annotation: {
+      'annotation.comment': 'Always visible.',
+      // condition satisfied — value equals 'show-me'
+      'annotation.conditionalField': 'show-me'
+    }
+  }
+}
+
+export const ReadonlyNoAnnotationSection: Story = {
+  args: {
+    readonlyMode: true,
+    reviewFields: undefined,
+    annotation: undefined
+  }
+}
+
+export const ReadonlyAnnotationWithSignature: Story = {
+  args: {
+    readonlyMode: true,
+    reviewFields: [reviewCommentField, reviewSignatureField],
+    annotation: {
+      'review.comment': 'commentsssdsdsds',
+      'review.signature': {
+        path: '4f095fc4-4312-4de2-aa38-86dcc0f71044.png' as DocumentPath,
+        type: 'image/png',
+        originalFilename: 'signature-review____signature-1773128010978.png'
+      }
+    }
+  }
+}
+
+const modalCommentsField: FieldConfig = {
+  id: 'comments',
+  type: FieldType.TEXTAREA,
+  conditionals: [],
+  label: generateTranslationConfig('Comments')
+}
+
+const modalCategoryField: FieldConfig = {
+  id: 'category',
+  type: FieldType.SELECT,
+  conditionals: [],
+  label: generateTranslationConfig('Category'),
+  options: [
+    { value: 'option-a', label: generateTranslationConfig('Option A') },
+    { value: 'option-b', label: generateTranslationConfig('Option B') }
+  ]
+}
+
+const acceptModalRequiredField: FieldConfig = {
+  id: 'required-comment',
+  type: FieldType.TEXT,
+  required: true,
+  conditionals: [],
+  label: generateTranslationConfig('Required comment')
+}
+
+/**
+ * AcceptActionModal (Review.ActionModal.Accept) renders configurable form fields
+ * via FormFieldGenerator. With no required fields present, there are no
+ * validation errors, so the confirm button starts out enabled.
+ */
+export const AcceptModalWithFormFields: Story = {
+  render: function Component() {
+    return (
+      <Review.ActionModal.Accept
+        action="Declare"
+        attachmentPath={eventAttachmentPath(storybookEventId)}
+        close={fn()}
+        copy={{
+          title: generateTranslationConfig('Declare this event?'),
+          onConfirm: generateTranslationConfig('Confirm')
+        }}
+        declaration={{}}
+        eventConfiguration={tennisClubMembershipEvent}
+        eventType="Tennis club membership"
+        fields={[modalCommentsField, modalCategoryField]}
+      />
+    )
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+
+    await expect(await canvas.findByText('Comments')).toBeInTheDocument()
+    await expect(await canvas.findByText('Category')).toBeInTheDocument()
+
+    const confirmButton = await canvas.findByRole('button', {
+      name: 'Confirm'
+    })
+    await expect(confirmButton).toBeEnabled()
+  }
+}
+
+const acceptModalRequiredFieldClose =
+  fn<(result: AcceptActionModalResult | null) => void>()
+
+/**
+ * When a configured field is required, the confirm button is disabled until
+ * the field has a valid value. Confirming afterwards resolves `close` with
+ * the entered value.
+ */
+export const AcceptModalWithRequiredField: Story = {
+  render: function Component() {
+    return (
+      <Review.ActionModal.Accept
+        action="Declare"
+        attachmentPath={eventAttachmentPath(storybookEventId)}
+        close={acceptModalRequiredFieldClose}
+        copy={{
+          title: generateTranslationConfig('Declare this event?'),
+          onConfirm: generateTranslationConfig('Confirm')
+        }}
+        declaration={{}}
+        eventConfiguration={tennisClubMembershipEvent}
+        eventType="Tennis club membership"
+        fields={[acceptModalRequiredField]}
+      />
+    )
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+
+    const confirmButton = await canvas.findByRole('button', {
+      name: 'Confirm'
+    })
+    await expect(confirmButton).toBeDisabled()
+
+    const input = await canvas.findByTestId('text__required-comment')
+    await userEvent.type(input, 'Looks good to me')
+    await userEvent.tab()
+
+    await expect(confirmButton).toBeEnabled()
+
+    // The required-field error must clear once the committed value is valid
+    await waitFor(async () =>
+      expect(canvas.queryByText('Required')).not.toBeInTheDocument()
+    )
+
+    await userEvent.click(confirmButton)
+
+    await waitFor(async () =>
+      expect(acceptModalRequiredFieldClose).toHaveBeenCalledWith({
+        values: { 'required-comment': 'Looks good to me' }
+      })
+    )
+  }
+}
+
+const rejectModalWithFormFieldsClose =
+  fn<(result: RejectActionModalResult | null) => void>()
+
+/**
+ * RejectActionModal already has a core-defined form: the rejection reason
+ * textarea. Config-defined fields render below it, and their values are
+ * resolved alongside the reason on confirm.
+ */
+export const RejectModalWithFormFields: Story = {
+  render: function Component() {
+    return (
+      <Review.ActionModal.Reject
+        attachmentPath={eventAttachmentPath(storybookEventId)}
+        close={rejectModalWithFormFieldsClose}
+        eventConfiguration={tennisClubMembershipEvent}
+        fields={[modalCommentsField, modalCategoryField]}
+      />
+    )
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+
+    // Core-defined reason field and config-defined fields render together
+    const reasonInput = await canvas.findByTestId('reject-reason')
+    await expect(await canvas.findByText('Comments')).toBeInTheDocument()
+    await expect(await canvas.findByText('Category')).toBeInTheDocument()
+
+    const confirmButton = await canvas.findByRole('button', {
+      name: 'Send For Update'
+    })
+    // The core reason field gates the confirm button
+    await expect(confirmButton).toBeDisabled()
+
+    await userEvent.type(reasonInput, 'Missing supporting documents')
+    await expect(confirmButton).toBeEnabled()
+
+    const commentsInput = canvasElement.querySelector('textarea#comments')
+    await expect(commentsInput).toBeInTheDocument()
+    await userEvent.type(
+      commentsInput as HTMLTextAreaElement,
+      'Please attach the certificate'
+    )
+    await userEvent.tab()
+
+    await userEvent.click(confirmButton)
+
+    await waitFor(async () =>
+      expect(rejectModalWithFormFieldsClose).toHaveBeenCalledWith({
+        reason: 'Missing supporting documents',
+        values: { comments: 'Please attach the certificate' }
+      })
+    )
   }
 }

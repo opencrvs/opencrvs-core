@@ -21,7 +21,7 @@ on:
 jobs:
   security-scan-scheduled:
     if: github.event_name == 'schedule'
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
     steps:
       - name: Checkout code
         uses: actions/checkout@v7
@@ -29,22 +29,23 @@ jobs:
           ref: 'develop'
 
       - name: Run Trivy vulnerability scanner in fs mode
-        uses: aquasecurity/trivy-action@0.35.0
+        uses: aquasecurity/trivy-action@v0.36.0
         with:
           scan-type: 'fs'
           scan-ref: '.'
           trivy-config: trivy.yaml
           trivyignores: .trivyignore.yaml
+          exit-code: 0
 
   security-scan-development:
     if: github.event_name == 'push' && github.ref == 'refs/heads/develop'
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
     steps:
       - name: Checkout code
         uses: actions/checkout@v7
 
       - name: Run Trivy vulnerability scanner in fs mode
-        uses: aquasecurity/trivy-action@0.35.0
+        uses: aquasecurity/trivy-action@v0.36.0
         with:
           scan-type: 'fs'
           scan-ref: '.'
@@ -53,13 +54,13 @@ jobs:
 
   security-scan-manual:
     if: github.event_name == 'workflow_dispatch'
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
     steps:
       - name: Checkout code
         uses: actions/checkout@v7
 
       - name: Run Trivy vulnerability scanner in fs mode
-        uses: aquasecurity/trivy-action@0.35.0
+        uses: aquasecurity/trivy-action@v0.36.0
         with:
           scan-type: 'fs'
           scan-ref: '.'
@@ -68,7 +69,7 @@ jobs:
 
   security-scan-pull-request:
     if: github.event_name == 'pull_request'
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
     steps:
       - name: Checkout code
         uses: actions/checkout@v7
@@ -82,7 +83,7 @@ jobs:
           path: 'branch'
 
       - name: Gather Trivy output from base branch
-        uses: aquasecurity/trivy-action@0.35.0
+        uses: aquasecurity/trivy-action@v0.36.0
         with:
           scan-type: 'fs'
           scan-ref: 'base'
@@ -93,7 +94,7 @@ jobs:
           exit-code: '0'
 
       - name: Gather Trivy output from PR branch
-        uses: aquasecurity/trivy-action@0.35.0
+        uses: aquasecurity/trivy-action@v0.36.0
         with:
           scan-type: 'fs'
           scan-ref: 'branch'

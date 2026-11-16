@@ -1,0 +1,2 @@
+user: ${SMTP_USERNAME}
+password: ${SMTP_PASSWORD}

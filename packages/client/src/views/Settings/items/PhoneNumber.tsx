@@ -8,31 +8,28 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import * as React from 'react'
-import { useIntl, FormattedMessage } from 'react-intl'
 import {
-  LabelContainer,
-  ValueContainer,
-  DynamicHeightLinkButton
-} from '@client/views/Settings/items/components'
-import { useSelector } from 'react-redux'
-import { IStoreState } from '@client/store'
-import {
-  constantsMessages,
   buttonMessages,
+  constantsMessages,
   userMessages
 } from '@client/i18n/messages'
-import { ListViewItemSimplified } from '@opencrvs/components/lib/ListViewSimplified'
-import { Toast } from '@opencrvs/components/lib/Toast'
 import { useOnlineStatus } from '@client/utils'
+import { useCurrentUser } from '@client/v2-events/hooks/useCurrentUser'
 import { ChangePhoneModal } from '@client/views/Settings/ChangePhoneModal/ChangePhoneModal'
+import {
+  DynamicHeightLinkButton,
+  SettingsRow
+} from '@client/views/Settings/items/components'
+import { Toast } from '@opencrvs/components/lib/Toast'
+import * as React from 'react'
+import { FormattedMessage, useIntl } from 'react-intl'
 
-export function PhoneNumber() {
+export function usePhoneNumber(): SettingsRow {
   const intl = useIntl()
   const isOnline = useOnlineStatus()
-  const mobile = useSelector<IStoreState, string>(
-    (state) => state.profile.userDetails?.mobile || ''
-  )
+  const { currentUser } = useCurrentUser()
+
+  const mobile = currentUser?.mobile || ''
 
   const [showSuccessNotification, setShowSuccessNotification] =
     React.useState(false)
@@ -48,35 +45,34 @@ export function PhoneNumber() {
     toggleSuccessNotification()
   }
 
-  return (
-    <>
-      <ListViewItemSimplified
-        label={
-          <LabelContainer>
-            {intl.formatMessage(constantsMessages.labelPhone)}
-          </LabelContainer>
-        }
-        value={<ValueContainer>{mobile}</ValueContainer>}
-        actions={
-          <DynamicHeightLinkButton
-            data-testid="change-phone-button"
-            onClick={toggleChangePhoneModal}
-            disabled={!isOnline}
-          >
-            {intl.formatMessage(buttonMessages.change)}
-          </DynamicHeightLinkButton>
-        }
-      />
-      <ChangePhoneModal
-        show={showModal}
-        onClose={toggleChangePhoneModal}
-        onSuccess={handleSuccess}
-      />
-      {showSuccessNotification && (
-        <Toast type="success" onClose={toggleSuccessNotification}>
-          <FormattedMessage {...userMessages.phoneNumberUpdated} />
-        </Toast>
-      )}
-    </>
-  )
+  return {
+    id: 'phone-number',
+    item: {
+      label: intl.formatMessage(constantsMessages.labelPhone),
+      value: mobile,
+      actions: (
+        <DynamicHeightLinkButton
+          data-testid="change-phone-button"
+          onClick={toggleChangePhoneModal}
+          disabled={!isOnline}
+        >
+          {intl.formatMessage(buttonMessages.change)}
+        </DynamicHeightLinkButton>
+      )
+    },
+    overlay: (
+      <>
+        <ChangePhoneModal
+          show={showModal}
+          onClose={toggleChangePhoneModal}
+          onSuccess={handleSuccess}
+        />
+        {showSuccessNotification && (
+          <Toast type="success" onClose={toggleSuccessNotification}>
+            <FormattedMessage {...userMessages.phoneNumberUpdated} />
+          </Toast>
+        )}
+      </>
+    )
+  }
 }

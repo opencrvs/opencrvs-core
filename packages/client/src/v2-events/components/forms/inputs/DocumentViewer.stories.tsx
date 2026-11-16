@@ -9,11 +9,10 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import type { Meta, StoryObj } from '@storybook/react'
+import type { Meta, StoryObj } from '@storybook/react-vite'
 import React from 'react'
-import { FullDocumentPath } from '@opencrvs/commons/client'
+import { DocumentPath } from '@opencrvs/commons/client'
 import { TRPCProvider } from '@client/v2-events/trpc'
-import { getUnsignedFileUrl } from '@client/v2-events/cache'
 import { DocumentViewer } from './DocumentViewer'
 
 const meta: Meta<typeof DocumentViewer> = {
@@ -45,7 +44,7 @@ export const DocumentViewerSingleOption: StoryObj<typeof DocumentViewer> = {
       {
         value: {
           filename: 'fish.svg',
-          url: getUnsignedFileUrl('/ocrvs/fish.svg' as FullDocumentPath),
+          url: 'fish.svg' as DocumentPath,
           id: '1'
         },
         label: 'Option 1'

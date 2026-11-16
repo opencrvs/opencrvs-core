@@ -29,11 +29,16 @@ import {
   EventStatus,
   DEFAULT_DATE_OF_EVENT_PROPERTY,
   ActionDocument,
-  Location,
-  UserOrSystem,
+  ClientLocation,
+  toPlainDate,
+  UUID,
+  ClientAdministrativeArea,
   getActionAnnotationFields,
+  getDeclarationFields,
   FieldUpdateValue,
-  FieldConfig
+  FieldConfig,
+  UserOrSystemSummary,
+  TokenUserType
 } from '@opencrvs/commons/client'
 import { DateField } from '@client/v2-events/features/events/registered-fields'
 import { getHandlebarHelpers } from '@client/forms/handlebarHelpers'
@@ -42,6 +47,7 @@ import { getUsersFullName } from '@client/v2-events/utils'
 import { getFormDataStringifier } from '@client/v2-events/hooks/useFormDataStringifier'
 import { LocationSearch } from '@client/v2-events/features/events/registered-fields'
 import { AdminStructureItem } from '@client/utils/referenceApi'
+import { toFileUrl } from '@client/v2-events/cache'
 
 interface FontFamilyTypes {
   normal: string
@@ -67,20 +73,24 @@ function pickAnnotationFieldValues(
   }, {})
 }
 
-function findUserById(userId: string, users: UserOrSystem[]) {
+function findUserById(userId: string, users: UserOrSystemSummary[]) {
   const user = users.find((u) => u.id === userId)
 
   if (!user) {
     return {
       name: '',
-      signature: '',
       fullHonorificName: ''
     }
   }
 
+  if (user.type === TokenUserType.enum.system) {
+    return {
+      name: getUsersFullName(user.name)
+    }
+  }
+
   return {
-    name: getUsersFullName(user.name, 'en'),
-    signature: user.signature ?? '',
+    name: getUsersFullName(user.name),
     fullHonorificName: user.fullHonorificName ?? ''
   }
 }
@@ -89,6 +99,7 @@ export const stringifyEventMetadata = ({
   metadata,
   intl,
   locations,
+  administrativeAreas,
   users,
   adminLevels
 }: {
@@ -99,46 +110,52 @@ export const stringifyEventMetadata = ({
     }
   >
   intl: IntlShape
-  locations: Location[]
-  users: UserOrSystem[]
+  locations: Map<UUID, ClientLocation>
+  administrativeAreas: Map<UUID, ClientAdministrativeArea>
+  users: UserOrSystemSummary[]
   adminLevels: AdminStructureItem[]
 }) => {
+  // The record anchor — date of event, falling back to the record's creation
+  // date. Used for the date fields, whose output is anchor-independent anyway.
+  const recordAnchor = toPlainDate(
+    metadata.dateOfEvent ?? metadata[DEFAULT_DATE_OF_EVENT_PROPERTY]
+  )
+
+  // Shared resolution context. Every DateField output is anchored at the record
+  // anchor; LocationSearch additionally needs adminLevels and a per-fact anchor.
+  const dateOptions = {
+    intl,
+    locations,
+    administrativeAreas,
+    anchor: recordAnchor
+  }
+  const locationOptions = { intl, locations, administrativeAreas, adminLevels }
+
   return {
-    modifiedAt: DateField.toCertificateVariables(metadata.modifiedAt, {
-      intl,
-      locations
-    }),
+    modifiedAt: DateField.toCertificateVariables(
+      metadata.modifiedAt,
+      dateOptions
+    ),
     assignedTo: findUserById(metadata.assignedTo ?? '', users),
-    // @TODO: DATE_OF_EVENT config needs to be defined some other way and bake it in.
     dateOfEvent: metadata.dateOfEvent
-      ? DateField.toCertificateVariables(metadata.dateOfEvent, {
-          intl,
-          locations
-        })
+      ? DateField.toCertificateVariables(metadata.dateOfEvent, dateOptions)
       : DateField.toCertificateVariables(
           metadata[DEFAULT_DATE_OF_EVENT_PROPERTY],
-          {
-            intl,
-            locations
-          }
+          dateOptions
         ),
-    createdAt: DateField.toCertificateVariables(metadata.createdAt, {
-      intl,
-      locations
-    }),
+    createdAt: DateField.toCertificateVariables(
+      metadata.createdAt,
+      dateOptions
+    ),
     createdBy: findUserById(metadata.createdBy, users),
     createdAtLocation: LocationSearch.toCertificateVariables(
       metadata.createdAtLocation,
-      {
-        intl,
-        locations,
-        adminLevels
-      }
+      { ...locationOptions, anchor: toPlainDate(metadata.createdAt) }
     ),
-    updatedAt: DateField.toCertificateVariables(metadata.updatedAt, {
-      intl,
-      locations
-    }),
+    updatedAt: DateField.toCertificateVariables(
+      metadata.updatedAt,
+      dateOptions
+    ),
     updatedBy: metadata.updatedBy
       ? findUserById(metadata.updatedBy, users)
       : '',
@@ -149,11 +166,7 @@ export const stringifyEventMetadata = ({
     updatedByUserRole: metadata.updatedByUserRole,
     updatedAtLocation: LocationSearch.toCertificateVariables(
       metadata.updatedAtLocation,
-      {
-        intl,
-        locations,
-        adminLevels
-      }
+      { ...locationOptions, anchor: toPlainDate(metadata.updatedAt) }
     ),
     flags: [],
     legalStatuses: {
@@ -161,7 +174,7 @@ export const stringifyEventMetadata = ({
         ? {
             createdAt: DateField.toCertificateVariables(
               metadata.legalStatuses.DECLARED.createdAt,
-              { intl, locations }
+              dateOptions
             ),
             createdBy: findUserById(
               metadata.legalStatuses.DECLARED.createdBy,
@@ -169,22 +182,23 @@ export const stringifyEventMetadata = ({
             ),
             createdAtLocation: LocationSearch.toCertificateVariables(
               metadata.legalStatuses.DECLARED.createdAtLocation,
-              { intl, locations, adminLevels }
+              {
+                ...locationOptions,
+                anchor: toPlainDate(metadata.legalStatuses.DECLARED.createdAt)
+              }
             ),
             acceptedAt: DateField.toCertificateVariables(
               metadata.legalStatuses.DECLARED.acceptedAt,
-              { intl, locations }
+              dateOptions
             ),
-            createdByRole: metadata.legalStatuses.DECLARED.createdByRole,
-            createdBySignature:
-              metadata.legalStatuses.DECLARED.createdBySignature
+            createdByRole: metadata.legalStatuses.DECLARED.createdByRole
           }
         : null,
       [EventStatus.enum.REGISTERED]: metadata.legalStatuses.REGISTERED
         ? {
             createdAt: DateField.toCertificateVariables(
               metadata.legalStatuses.REGISTERED.createdAt,
-              { intl, locations }
+              dateOptions
             ),
             createdBy: findUserById(
               metadata.legalStatuses.REGISTERED.createdBy,
@@ -192,22 +206,18 @@ export const stringifyEventMetadata = ({
             ),
             createdAtLocation: LocationSearch.toCertificateVariables(
               metadata.legalStatuses.REGISTERED.createdAtLocation,
-              { intl, locations, adminLevels }
+              {
+                ...locationOptions,
+                anchor: toPlainDate(metadata.legalStatuses.REGISTERED.createdAt)
+              }
             ),
             acceptedAt: DateField.toCertificateVariables(
               metadata.legalStatuses.REGISTERED.acceptedAt,
-              { intl, locations }
+              dateOptions
             ),
             createdByRole: metadata.legalStatuses.REGISTERED.createdByRole,
             registrationNumber:
-              metadata.legalStatuses.REGISTERED.registrationNumber,
-            createdBySignature: metadata.legalStatuses.REGISTERED
-              .createdBySignature
-              ? new URL(
-                  metadata.legalStatuses.REGISTERED.createdBySignature,
-                  window.config.MINIO_BASE_URL
-                ).href
-              : undefined
+              metadata.legalStatuses.REGISTERED.registrationNumber
           }
         : null
     },
@@ -238,6 +248,7 @@ export function compileSvg({
   review,
   language,
   config,
+  administrativeAreas,
   adminLevels
 }: {
   templateString: string
@@ -247,8 +258,9 @@ export function compileSvg({
   }
   $actions: ActionDocument[]
   $declaration: EventState
-  locations: Location[]
-  users: UserOrSystem[]
+  locations: Map<UUID, ClientLocation>
+  administrativeAreas: Map<UUID, ClientAdministrativeArea>
+  users: UserOrSystemSummary[]
   /**
    * Indicates whether certificate is reviewed or actually printed
    * in V1 "preview" was used. In V2, "review" is used to remain consistent with action terminology (review of print action rather than preview of certificate).
@@ -268,12 +280,20 @@ export function compileSvg({
 
   const customHelpers = getHandlebarHelpers()
 
+  // The record anchor — date of event, falling back to the record's creation
+  // date — resolves every location-bearing declaration field.
+  const recordAnchor = toPlainDate(
+    $metadata.dateOfEvent ?? $metadata[DEFAULT_DATE_OF_EVENT_PROPERTY]
+  )
+
   const stringifyDeclaration = getFormDataStringifier(
     intl,
     locations,
+    administrativeAreas,
+    recordAnchor,
     adminLevels
   )
-  const fieldConfigs = config.declaration.pages.flatMap((x) => x.fields)
+  const fieldConfigs = getDeclarationFields(config)
   const resolvedDeclaration = stringifyDeclaration(fieldConfigs, $declaration)
 
   for (const helperName of Object.keys(customHelpers)) {
@@ -335,12 +355,22 @@ export function compileSvg({
    * @example {'foo': {'bar': {'baz': 'quix'}} } // $lookup 'foo.bar.baz' => 'quix'
    * @example { 'informant.address': { 'other': { 'district': 'quix' } } } // $lookup 'informant.address.other.district' => 'quix'
    */
-  function $lookup(obj: EventMetadata | EventState, propertyPath: string) {
+  function $lookup(
+    // e.g. ($action 'REGISTER') resolves to undefined when the event has no such action
+    obj: EventMetadata | EventState | undefined,
+    propertyPath: string
+  ) {
     function doLookup() {
+      // Mirror getMixedPath's missing-path semantics so templates
+      // can guard with {{#ifCond ... '!==' undefined}} instead of crashing.
+      if (obj == null) {
+        return undefined
+      }
       const resolvedMetadata = stringifyEventMetadata({
         metadata: $metadata,
         intl,
         locations,
+        administrativeAreas,
         users,
         adminLevels
       })
@@ -358,12 +388,10 @@ export function compileSvg({
         const actionConfig = config.actions.find(
           (a) => a.type === action.data.type
         )
-        if (!actionConfig) {
-          throw new Error(
-            'Action config not found for action type ' + action.data.type
-          )
-        }
-        const annotationFields = getActionAnnotationFields(actionConfig)
+
+        const annotationFields = actionConfig
+          ? getActionAnnotationFields(actionConfig)
+          : []
 
         const annotation =
           action.data.annotation != null
@@ -375,23 +403,29 @@ export function compileSvg({
                 )
               )
             : {}
-
+        const actionAnchor = toPlainDate(action.data.createdAt)
         const resolvedAction = {
           id: action.data.id,
           type: action.data.type,
           createdAt: DateField.stringify(action.data.createdAt, {
             intl,
-            locations
+            locations,
+            administrativeAreas,
+            anchor: actionAnchor
           }),
           createdBy: users.find((user) => user.id === action.data.createdBy),
           createdByUserType: action.data.createdByUserType,
-          createdBySignature: action.data.createdBySignature,
+          createdBySignature:
+            action.data.createdBySignature &&
+            toFileUrl(action.data.createdBySignature),
           createdAtLocation: LocationSearch.toCertificateVariables(
             action.data.createdAtLocation,
             {
               intl,
               locations,
-              adminLevels
+              administrativeAreas,
+              adminLevels,
+              anchor: actionAnchor
             }
           ),
           createdByRole: action.data.createdByRole,
@@ -524,6 +558,30 @@ export function compileSvg({
   )
 
   /**
+   * Handlebars helper: $join
+   *
+   * Joins provided values with the given separator, filtering out any empty or falsy values.
+   * Useful for rendering location hierarchies where some admin levels may be absent
+   * (e.g. an office registered directly under a province with no district).
+   *
+   * @param separator - The string to join with (e.g. ", ")
+   * @param values - One or more values to filter and join
+   * @returns The non-empty values joined by separator
+   *
+   * @example {{ $join ", " district province country }} // "Ibombo, Central, Farajaland"
+   * @example {{ $join ", " "" province country }}      // "Central, Farajaland" (empty district omitted)
+   * @example {{ $join ", " "" "" country }}            // "Farajaland" (both empty omitted)
+   */
+  Handlebars.registerHelper('$join', function (
+    ...args: [...(string | undefined | null)[], Handlebars.HelperOptions]
+  ) {
+    const separator = args[0] as string
+    const values = args.slice(1, -1) as Array<string | undefined | null>
+    return values.filter(Boolean).join(separator)
+    /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
+  } as any)
+
+  /**
    * Handlebars helper: $OR
    * Returns the first truthy value between v1 and v2.
    */
@@ -634,6 +692,10 @@ src: url("${url}") format("truetype");
   return serializer.serializeToString(svg)
 }
 
+export function isFetchableHref(href: string): boolean {
+  return /^https?:\/\/|^\//.test(href)
+}
+
 async function downloadAndEmbedImages(svgString: string): Promise<string> {
   const parser = new DOMParser()
   const doc = parser.parseFromString(svgString, 'image/svg+xml')
@@ -646,7 +708,10 @@ async function downloadAndEmbedImages(svgString: string): Promise<string> {
         imageElement.getAttribute('href') ||
         imageElement.getAttribute('xlink:href')
 
-      if (href && (href.startsWith('http://') || href.startsWith('https://'))) {
+      // Matches absolute URLs (http/https) and absolute paths (/...) —
+      // covers external resources (logos, passport photos) and same-origin paths
+      // served by the service worker cache (e.g. /users/<id>/sig.png).
+      if (href && isFetchableHref(href)) {
         const response = await fetch(href)
         const blob = await response.blob()
 

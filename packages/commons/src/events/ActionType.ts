@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { z } from 'zod'
+import * as z from 'zod/v4'
 
 /**
  * Actions recognized by the system
@@ -21,14 +21,15 @@ export const ActionType = {
   NOTIFY: 'NOTIFY',
   // Declaration actions
   DECLARE: 'DECLARE',
-  VALIDATE: 'VALIDATE',
   REGISTER: 'REGISTER',
+  EDIT: 'EDIT',
   // Declaration system actions. Non-configurable.
   DUPLICATE_DETECTED: 'DUPLICATE_DETECTED',
   REJECT: 'REJECT', // REJECT_DECLARATION
   MARK_AS_DUPLICATE: 'MARK_AS_DUPLICATE',
   MARK_AS_NOT_DUPLICATE: 'MARK_AS_NOT_DUPLICATE',
   ARCHIVE: 'ARCHIVE',
+  UNARCHIVE: 'UNARCHIVE',
   // Record actions
   PRINT_CERTIFICATE: 'PRINT_CERTIFICATE',
   REQUEST_CORRECTION: 'REQUEST_CORRECTION',
@@ -37,7 +38,9 @@ export const ActionType = {
   // General actions
   READ: 'READ',
   ASSIGN: 'ASSIGN',
-  UNASSIGN: 'UNASSIGN'
+  UNASSIGN: 'UNASSIGN',
+  // Custom action
+  CUSTOM: 'CUSTOM'
 } as const
 
 export type ActionType = (typeof ActionType)[keyof typeof ActionType]
@@ -45,14 +48,16 @@ export type ActionType = (typeof ActionType)[keyof typeof ActionType]
 export const ConfirmableActions = [
   ActionType.NOTIFY,
   ActionType.DECLARE,
-  ActionType.VALIDATE,
+  ActionType.EDIT,
   ActionType.REGISTER,
   ActionType.REJECT,
   ActionType.ARCHIVE,
+  ActionType.UNARCHIVE,
   ActionType.PRINT_CERTIFICATE,
   ActionType.REQUEST_CORRECTION,
   ActionType.APPROVE_CORRECTION,
-  ActionType.REJECT_CORRECTION
+  ActionType.REJECT_CORRECTION,
+  ActionType.CUSTOM
 ] as const
 
 /** Testing building types from enums as an alternative */
@@ -61,21 +66,25 @@ export const ActionTypes = z.enum([
   'CREATE',
   'NOTIFY',
   'DECLARE',
-  'VALIDATE',
+  'EDIT',
   'REGISTER',
   'DUPLICATE_DETECTED',
   'REJECT',
   'MARK_AS_DUPLICATE',
   'MARK_AS_NOT_DUPLICATE',
   'ARCHIVE',
+  'UNARCHIVE',
   'PRINT_CERTIFICATE',
   'REQUEST_CORRECTION',
   'REJECT_CORRECTION',
   'APPROVE_CORRECTION',
   'READ',
   'ASSIGN',
-  'UNASSIGN'
+  'UNASSIGN',
+  'CUSTOM'
 ])
+
+export type ActionTypes = z.infer<typeof ActionTypes>
 
 /**
  * Non-persisted actions that are used in the client to control the UI.
@@ -89,7 +98,7 @@ export type ClientSpecificAction =
 
 const declarationActionValues = [
   ActionTypes.enum.DECLARE,
-  ActionTypes.enum.VALIDATE,
+  ActionTypes.enum.EDIT,
   ActionTypes.enum.REGISTER,
   ActionTypes.enum.NOTIFY,
   ActionTypes.enum.DUPLICATE_DETECTED
@@ -125,18 +134,25 @@ export const writeActions = ActionTypes.exclude([
   ActionType.UNASSIGN
 ])
 
-/** Actions which are visible in action menu and workqueue */
-export const workqueueActions = ActionTypes.exclude([
-  ActionType.CREATE,
-  ActionType.NOTIFY,
-  ActionType.DUPLICATE_DETECTED,
+/** Actions which are availabe for Workqueue CTA menu and workqueue */
+export const WorkqueueActionType = ActionTypes.extract([
+  ActionType.READ,
+  ActionType.DELETE,
+  ActionType.DECLARE,
+  ActionType.REGISTER,
+  ActionType.EDIT,
   ActionType.REJECT,
-  ActionType.MARK_AS_NOT_DUPLICATE,
-  ActionType.REJECT_CORRECTION,
-  ActionType.APPROVE_CORRECTION
+  ActionType.MARK_AS_DUPLICATE,
+  ActionType.ARCHIVE,
+  ActionType.UNARCHIVE,
+  ActionType.PRINT_CERTIFICATE,
+  ActionType.REQUEST_CORRECTION
 ])
+export type WorkqueueActionType = z.infer<typeof WorkqueueActionType>
 
-export type WorkqueueActionType = z.infer<typeof workqueueActions>
+/**
+ * Actions available for display in client. Superset of ActionType.
+ */
 export type DisplayableAction = ActionType | ClientSpecificAction
 
 const META_ACTIONS: DisplayableAction[] = [

@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import React, { useState } from 'react'
+import React, { useRef } from 'react'
 import { defineMessages, useIntl } from 'react-intl'
 import { Navigate, useNavigate } from 'react-router-dom'
 import { v4 as uuid } from 'uuid'
@@ -26,10 +26,11 @@ import {
   EventConfig,
   getOrThrow,
   getAcceptedActions,
-  SystemRole,
   getUUID,
-  UUID,
-  PrintCertificateAction
+  PrintCertificateAction,
+  TokenUserType,
+  User,
+  getCurrentEventState
 } from '@opencrvs/commons/client'
 import {
   Box,
@@ -37,12 +38,11 @@ import {
   Content,
   Frame,
   Icon,
-  ResponsiveModal,
+  Dialog,
   Spinner,
   Stack,
   Toast
 } from '@opencrvs/components'
-import { Print } from '@opencrvs/components/lib/icons'
 import { ROUTES } from '@client/v2-events/routes'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
 import { useModal } from '@client/v2-events/hooks/useModal'
@@ -57,8 +57,9 @@ import { validationErrorsInActionFormExist } from '@client/v2-events/components/
 import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
 import { useOnlineStatus } from '@client/utils'
 import { getUserDetails } from '@client/profile/profileSelectors'
-import { useUserAllowedActions } from '@client/v2-events/features/workqueues/EventOverview/components/useAllowedActionConfigurations'
+import { useUserAllowedActions } from '@client/v2-events/features/workqueues/Actions/useUserAllowedActions'
 import { useValidatorContext } from '@client/v2-events/hooks/useValidatorContext'
+import { useAdministrativeAreas } from '../../../../hooks/useAdministrativeAreas'
 
 const CertificateContainer = styled.div`
   svg {
@@ -90,13 +91,13 @@ const messages = defineMessages({
   },
   printAndIssueModalTitle: {
     id: 'print.certificate.review.printAndIssueModalTitle',
-    defaultMessage: 'Print and issue certificate?',
+    defaultMessage: 'Print certified copy?',
     description: 'Print and issue certificate modal title text'
   },
   printAndIssueModalBody: {
     id: 'print.certificate.review.modal.body.printAndIssue',
     defaultMessage:
-      'A Pdf of the certificate will open in a new tab for printing and issuing.',
+      'This will generate a certified copy of the record for printing.',
     description: 'Print certificate modal body text'
   },
   makeCorrection: {
@@ -145,7 +146,7 @@ function getPrintForm(configuration: EventConfig) {
 
 export function Review() {
   const { eventId } = useTypedParams(ROUTES.V2.EVENTS.PRINT_CERTIFICATE.REVIEW)
-  const [{ templateId, workqueue: slug }] = useTypedSearchParams(
+  const [{ templateId, backTo }] = useTypedSearchParams(
     ROUTES.V2.EVENTS.PRINT_CERTIFICATE.REVIEW
   )
 
@@ -158,29 +159,37 @@ export function Review() {
   const intl = useIntl()
   const navigate = useNavigate()
   const isOnline = useOnlineStatus()
+  const isOnlineRef = useRef(isOnline)
+  isOnlineRef.current = isOnline
   const [modal, openModal] = useModal()
 
-  const { getEvent, onlineActions } = useEvents()
+  const {
+    getEvent,
+    onlineActions,
+    actions: { assignment }
+  } = useEvents()
   const fullEvent = getEvent.getFromCache(eventId)
+  const { eventConfiguration } = useEventConfiguration(fullEvent.type)
+  const fullEventIndex = getCurrentEventState(fullEvent, eventConfiguration)
   const validatorContext = useValidatorContext(fullEvent)
-  const actions = getAcceptedActions(fullEvent)
 
-  const userIds = getUserIdsFromActions(actions, [SystemRole.enum.HEALTH])
+  const userIds = getUserIdsFromActions(getAcceptedActions(fullEvent))
 
   const { getUsers } = useUsers()
   const [users] = getUsers.useSuspenseQuery(userIds)
 
   const { getLocations } = useLocations()
-  const [locations] = getLocations.useSuspenseQuery()
+  const { getAdministrativeAreas } = useAdministrativeAreas()
+  const locations = getLocations.useSuspenseQuery()
+  const administrativeAreas = getAdministrativeAreas.useSuspenseQuery()
 
   const { certificateTemplates, language } = useAppConfig()
   const certificateConfig = certificateTemplates.find(
     (template) => template.id === templateId
   )
 
-  const { eventConfiguration } = useEventConfiguration(fullEvent.type)
   const formConfig = getPrintForm(eventConfiguration)
-  const { isActionAllowed } = useUserAllowedActions(fullEvent.type)
+  const { isActionAllowed } = useUserAllowedActions(fullEventIndex)
   const userDetails = useSelector(getUserDetails)
   const { isPending } = onlineActions.printCertificate
 
@@ -188,16 +197,19 @@ export function Review() {
     throw new Error('User details are not available')
   }
 
-  const userFromUsersList = users.find((user) => user.id === userDetails.id)
+  const userFromUsersList = users.find((user) => user.id === userDetails.id) as
+    | User
+    | undefined
   if (!userFromUsersList) {
     throw new Error(`User with id ${userDetails.id} not found in users list`)
   }
 
-  const actionsWithAnOptimisticPrintAction = actions.concat({
+  // Pass the full action list (not only accepted actions) to the certificate
+  const actionsWithAnOptimisticPrintAction = fullEvent.actions.concat({
     type: ActionType.PRINT_CERTIFICATE,
     id: getUUID(),
     transactionId: getUUID(),
-    createdByUserType: 'user',
+    createdByUserType: TokenUserType.enum.user,
     createdAt: new Date().toISOString(),
     createdBy: userFromUsersList.id,
     createdByRole: userFromUsersList.role,
@@ -206,7 +218,7 @@ export function Review() {
     annotation,
     originalActionId: null,
     createdBySignature: userFromUsersList.signature,
-    createdAtLocation: userDetails.primaryOffice.id as UUID,
+    createdAtLocation: userDetails.primaryOfficeId,
     content: {
       templateId: certificateConfig?.id
     }
@@ -216,6 +228,7 @@ export function Review() {
     event: { ...fullEvent, actions: actionsWithAnOptimisticPrintAction },
     config: eventConfiguration,
     locations,
+    administrativeAreas,
     users,
     certificateConfig,
     language
@@ -238,7 +251,7 @@ export function Review() {
       <Navigate
         to={ROUTES.V2.EVENTS.PRINT_CERTIFICATE.buildPath(
           { eventId },
-          { workqueue: slug }
+          { backTo }
         )}
       />
     )
@@ -250,15 +263,13 @@ export function Review() {
 
   const handleCorrection = () =>
     navigate(
-      ROUTES.V2.EVENTS.REQUEST_CORRECTION.buildPath(
-        { eventId },
-        { workqueue: slug }
-      )
+      ROUTES.V2.EVENTS.REQUEST_CORRECTION.buildPath({ eventId }, { backTo })
     )
 
   const handlePrint = async () => {
     const confirmed = await openModal<boolean>((close) => (
-      <ResponsiveModal
+      <Dialog
+        isOpen
         actions={[
           <Button
             key="close-modal"
@@ -272,7 +283,7 @@ export function Review() {
           </Button>,
           <Button
             key="print-certificate"
-            disabled={!isOnline || isPending}
+            disabled={!isOnlineRef.current || isPending}
             id="print-certificate"
             type="primary"
             onClick={() => close(true)}
@@ -280,14 +291,12 @@ export function Review() {
             {intl.formatMessage(messages.print)}
           </Button>
         ]}
-        contentHeight={100}
-        handleClose={() => close(false)}
         id="confirm-print-modal"
-        show={true}
         title={intl.formatMessage(messages.printAndIssueModalTitle)}
+        onClose={() => close(false)}
       >
         {intl.formatMessage(messages.printAndIssueModalBody)}
-      </ResponsiveModal>
+      </Dialog>
     ))
 
     /**
@@ -298,8 +307,9 @@ export function Review() {
         const printCertificate = await preparePdfCertificate(fullEvent)
 
         await onlineActions.printCertificate.mutateAsync({
-          fullEvent,
+          keepAssignment: true,
           eventId: fullEvent.id,
+          fullEvent,
           declaration: {},
           annotation,
           content: { templateId },
@@ -308,6 +318,11 @@ export function Review() {
         })
 
         printCertificate()
+
+        await assignment.unassign.mutateAsync({
+          eventId,
+          transactionId: getUUID()
+        })
 
         toast.custom(
           <Toast
@@ -322,9 +337,13 @@ export function Review() {
           }
         )
 
-        slug
-          ? navigate(ROUTES.V2.WORKQUEUES.WORKQUEUE.buildPath({ slug }))
-          : navigate(ROUTES.V2.EVENTS.OVERVIEW.buildPath({ eventId }))
+        if (backTo) {
+          navigate(backTo, { replace: true })
+        } else {
+          navigate(ROUTES.V2.EVENTS.EVENT.buildPath({ eventId }), {
+            replace: true
+          })
+        }
       } catch (error) {
         // TODO: add notification alert
         // eslint-disable-next-line no-console
@@ -348,10 +367,7 @@ export function Review() {
   )
 
   return (
-    <FormLayout
-      appbarIcon={<Print />}
-      route={ROUTES.V2.EVENTS.PRINT_CERTIFICATE}
-    >
+    <FormLayout route={ROUTES.V2.EVENTS.PRINT_CERTIFICATE}>
       <Frame.LayoutCentered>
         <Stack direction="column">
           <Box>

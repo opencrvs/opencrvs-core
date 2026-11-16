@@ -9,20 +9,19 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { FullDocumentPath } from '../documents'
-import { ActionDocument, ActionStatus } from './ActionDocument'
+import { DocumentPath } from '../documents'
+import { Action, ActionDocument } from './ActionDocument'
 import { FileFieldValue, FileFieldWithOptionValue } from './CompositeFieldValue'
 import { EventDocument } from './EventDocument'
 import { uniq } from 'lodash'
 
-export function getFilePathsFromEvent(
-  event: EventDocument
-): FullDocumentPath[] {
+function carriesFieldValues(action: Action): action is ActionDocument {
+  return 'declaration' in action
+}
+
+export function getFilePathsFromEvent(event: EventDocument): DocumentPath[] {
   const filepaths = event.actions
-    .filter(
-      (action): action is ActionDocument =>
-        action.status !== ActionStatus.Rejected
-    )
+    .filter(carriesFieldValues)
     .flatMap((action) => {
       const declarationValues = Object.values(action.declaration)
       const annotationValues = Object.values(action.annotation ?? {})

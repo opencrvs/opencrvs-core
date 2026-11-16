@@ -14,12 +14,20 @@ import { eventRouter } from './event'
 import { userRouter } from './user'
 import { locationRouter } from './locations'
 import { workqueueRouter } from './workqueue'
+import { administrativeAreaRouter } from './administrative-areas'
+import { integrationsRouter } from './integrations'
+import { attachmentsRouter } from './attachments'
+import { announcementRouter } from './announcement'
 
 export const appRouter = router({
   event: eventRouter,
   user: userRouter,
   locations: locationRouter,
-  workqueue: workqueueRouter
+  workqueue: workqueueRouter,
+  administrativeAreas: administrativeAreaRouter,
+  integrations: integrationsRouter,
+  attachments: attachmentsRouter,
+  announcement: announcementRouter
 })
 
 /** @knipignore */

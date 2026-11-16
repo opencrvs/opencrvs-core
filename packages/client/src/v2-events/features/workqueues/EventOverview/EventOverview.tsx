@@ -10,56 +10,43 @@
  */
 import React from 'react'
 import { useTypedParams } from 'react-router-typesafe-routes/dom'
-import { useSelector } from 'react-redux'
-import { useIntl } from 'react-intl'
 import {
+  ActionType,
   EventDocument,
   getCurrentEventState,
   dangerouslyGetCurrentEventStateWithDrafts,
   EventIndex,
   applyDraftToEventIndex,
   deepDropNulls,
-  EventStatus,
-  getOrThrow
+  dropSecuredDeclarationFields
 } from '@opencrvs/commons/client'
 import { Content, ContentSize } from '@opencrvs/components/lib/Content'
-import { IconWithName } from '@client/v2-events/components/IconWithName'
+import { EventIcon } from '@client/v2-events/components/EventIcon'
 import { ROUTES } from '@client/v2-events/routes'
 import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
-import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
 import { useUsers } from '@client/v2-events/hooks/useUsers'
-import { getLocations } from '@client/offline/selectors'
 import { withSuspense } from '@client/v2-events/components/withSuspense'
-import {
-  AssignmentStatus,
-  getAssignmentStatus,
-  flattenEventIndex,
-  getUsersFullName
-} from '@client/v2-events/utils'
+import { flattenEventIndex, getUsersFullName } from '@client/v2-events/utils'
 import { useEventTitle } from '@client/v2-events/features/events/useEvents/useEventTitle'
-import { DownloadButton } from '@client/v2-events/components/DownloadButton'
-import { useAuthentication } from '@client/utils/userUtils'
 import { useValidatorContext } from '@client/v2-events/hooks/useValidatorContext'
 import { useDrafts } from '../../drafts/useDrafts'
 import { DuplicateWarning } from '../../events/actions/dedup/DuplicateWarning'
-import { EventHistory, EventHistorySkeleton } from './components/EventHistory'
+import { DuplicateReviewUnavailable } from '../../events/actions/dedup/DuplicateReviewUnavailable'
+import {
+  DuplicatesAvailability,
+  useDuplicatesAvailable
+} from '../../events/actions/dedup/useDuplicatesAvailable'
+import { useUserAllowedActions } from '../Actions/useUserAllowedActions'
 import { EventSummary } from './components/EventSummary'
-import { ActionMenu } from './components/ActionMenu'
-import { EventOverviewProvider } from './EventOverviewContext'
+import { useEventOverviewInfo } from './components/useEventOverviewInfo'
 
 /**
- * Renders the event overview page, including the event summary and history.
+ * Renders the event overview page which shows a summary of the event.
  */
-function EventOverviewFull({
-  event,
-  onAction
-}: {
-  event: EventDocument
-  onAction: () => void
-}) {
+function EventOverviewFull({ event }: { event: EventDocument }) {
   const { eventConfiguration } = useEventConfiguration(event.type)
-  const eventIndex = getCurrentEventState(event, eventConfiguration)
   const validatorContext = useValidatorContext(event)
+  const eventIndex = getCurrentEventState(event, eventConfiguration)
   const { status } = eventIndex
   const { getRemoteDraftByEventId } = useDrafts()
   const draft = getRemoteDraftByEventId(eventIndex.id, {
@@ -74,15 +61,28 @@ function EventOverviewFull({
       })
     : getCurrentEventState(event, eventConfiguration)
 
-  const { getUser } = useUsers()
-  const intl = useIntl()
+  // NOTE: Summary is build to expect all fields, including secured ones.
+  // In cases where title is secured, we do not show it. This is to keep it consistent with the rest of the application, since they depend on event.search for their data.
+  const eventWithoutSecuredFields = dropSecuredDeclarationFields(
+    eventConfiguration,
+    eventWithDrafts,
+    validatorContext
+  )
 
-  const assignedToUser = getUser.useQuery(eventWithDrafts.assignedTo || '', {
-    enabled: !!eventWithDrafts.assignedTo
-  })
+  const { getEventTitle } = useEventTitle()
+  const { title } = getEventTitle(eventConfiguration, eventWithoutSecuredFields)
+
+  const { getUsers } = useUsers()
+
+  const assignedToUser = getUsers.useQueryById(
+    eventWithDrafts.assignedTo || '',
+    {
+      enabled: !!eventWithDrafts.assignedTo
+    }
+  )
 
   const assignedTo = assignedToUser.data
-    ? getUsersFullName(assignedToUser.data.name, intl.locale)
+    ? getUsersFullName(assignedToUser.data.name)
     : null
 
   const { flags, ...flattenedEventIndex } = {
@@ -93,34 +93,25 @@ function EventOverviewFull({
     'event.assignedTo': assignedTo,
     flags: eventIndex.flags
   }
-  const { getEventTitle } = useEventTitle()
-  const { title } = getEventTitle(eventConfiguration, eventWithDrafts)
 
   return (
     <Content
-      icon={() => <IconWithName flags={flags} name={''} status={status} />}
-      size={ContentSize.LARGE}
+      icon={() => (
+        <EventIcon
+          event={eventIndex}
+          eventConfig={eventConfiguration}
+          name={''}
+        />
+      )}
+      size={ContentSize.NORMAL}
       title={title}
       titleColor={event.id ? 'copy' : 'grey600'}
-      topActionButtons={[
-        <ActionMenu key={event.id} eventId={event.id} onAction={onAction} />,
-        <DownloadButton
-          key={`DownloadButton-${eventIndex.id}`}
-          event={eventIndex}
-          isDraft={eventIndex.status === EventStatus.Values.CREATED}
-        />
-      ]}
     >
       <EventSummary
-        event={event}
+        event={flattenedEventIndex}
         eventConfiguration={eventConfiguration}
-        eventIndex={flattenedEventIndex}
-        flags={flags}
-      />
-      <EventHistory
-        eventConfiguration={eventConfiguration}
-        fullEvent={event}
-        validatorContext={validatorContext}
+        eventDocument={event}
+        eventIndex={eventIndex}
       />
     </Content>
   )
@@ -129,13 +120,7 @@ function EventOverviewFull({
 /**
  * Renders the protected event overview page with PII hidden in the event summary
  */
-function EventOverviewProtected({
-  eventIndex,
-  onAction
-}: {
-  eventIndex: EventIndex
-  onAction: () => void
-}) {
+function EventOverviewProtected({ eventIndex }: { eventIndex: EventIndex }) {
   const { eventConfiguration } = useEventConfiguration(eventIndex.type)
   const { status } = eventIndex
   const { getRemoteDraftByEventId } = useDrafts()
@@ -147,14 +132,16 @@ function EventOverviewProtected({
       )
     : eventIndex
 
-  const { getUser } = useUsers()
-  const intl = useIntl()
+  const { getUsers } = useUsers()
 
-  const assignedToUser = getUser.useQuery(eventWithDrafts.assignedTo || '', {
-    enabled: !!eventWithDrafts.assignedTo
-  })
+  const assignedToUser = getUsers.useQueryById(
+    eventWithDrafts.assignedTo || '',
+    {
+      enabled: !!eventWithDrafts.assignedTo
+    }
+  )
   const assignedTo = assignedToUser.data
-    ? getUsersFullName(assignedToUser.data.name, intl.locale)
+    ? getUsersFullName(assignedToUser.data.name)
     : null
 
   const { flags, ...flattenedEventIndex } = {
@@ -171,79 +158,66 @@ function EventOverviewProtected({
 
   return (
     <Content
-      icon={() => <IconWithName flags={flags} name={''} status={status} />}
-      size={ContentSize.LARGE}
+      icon={() => (
+        <EventIcon
+          event={eventIndex}
+          eventConfig={eventConfiguration}
+          name={''}
+        />
+      )}
+      size={ContentSize.NORMAL}
       title={title}
       titleColor={eventIndex.id ? 'copy' : 'grey600'}
-      topActionButtons={[
-        <ActionMenu
-          key={eventIndex.id}
-          eventId={eventIndex.id}
-          onAction={onAction}
-        />,
-        <DownloadButton
-          key={`DownloadButton-${eventIndex.id}`}
-          event={eventIndex}
-          isDraft={eventIndex.status === EventStatus.Values.CREATED}
-        />
-      ]}
     >
       <EventSummary
         hideSecuredFields
+        event={flattenedEventIndex}
         eventConfiguration={eventConfiguration}
-        eventIndex={flattenedEventIndex}
-        flags={flags}
+        eventIndex={eventIndex}
       />
-      <EventHistorySkeleton />
     </Content>
   )
 }
 
 function EventOverviewContainer() {
-  const params = useTypedParams(ROUTES.V2.EVENTS.OVERVIEW)
-  const { searchEventById } = useEvents()
-  const { getEvent } = useEvents()
-  const { getUser } = useUsers()
-  const users = getUser.getAllCached()
-  const maybeAuth = useAuthentication()
-  const authentication = getOrThrow(
-    maybeAuth,
-    'Authentication is not available but is required'
+  const params = useTypedParams(ROUTES.V2.EVENTS.EVENT)
+  const { eventIndex, fullEvent, shouldShowFullOverview } =
+    useEventOverviewInfo(params.eventId)
+  const { isActionAllowed } = useUserAllowedActions(eventIndex)
+  const hasDuplicateReviewScope = isActionAllowed(ActionType.MARK_AS_DUPLICATE)
+  const duplicatesAvailability = useDuplicatesAvailable(
+    eventIndex,
+    hasDuplicateReviewScope
   )
 
-  const locations = useSelector(getLocations)
+  /*
+   * Mid-check neither banner would be honest, so show none. Without an answer
+   * the plain warning stands: only a refusal justifies blaming jurisdiction.
+   */
+  const duplicateWarning = (
+    <DuplicateWarning
+      duplicateTrackingIds={eventIndex.potentialDuplicates.map(
+        ({ trackingId }) => trackingId
+      )}
+    />
+  )
 
-  // Suspense query is not used here because we want to refetch when an event action is performed
-  const getEventQuery = searchEventById.useQuery(params.eventId)
-  const eventIndex = getEventQuery.data?.results[0]
-  const fullEvent = getEvent.findFromCache(params.eventId).data
-
-  if (!eventIndex) {
-    return
-  }
-  const assignmentStatus = getAssignmentStatus(eventIndex, authentication.sub)
-
-  const shouldShowFullOverview =
-    fullEvent && assignmentStatus === AssignmentStatus.ASSIGNED_TO_SELF
+  const duplicateBanner = {
+    [DuplicatesAvailability.UNDETERMINED]: duplicateWarning,
+    [DuplicatesAvailability.CHECKING]: null,
+    [DuplicatesAvailability.AVAILABLE]: duplicateWarning,
+    [DuplicatesAvailability.UNAVAILABLE]: <DuplicateReviewUnavailable />
+  }[duplicatesAvailability]
 
   return (
-    <EventOverviewProvider locations={locations} users={users}>
-      {eventIndex.potentialDuplicates.length > 0 && (
-        <DuplicateWarning
-          duplicateTrackingIds={eventIndex.potentialDuplicates.map(
-            ({ trackingId }) => trackingId
-          )}
-        />
-      )}
+    <>
+      {eventIndex.potentialDuplicates.length > 0 && duplicateBanner}
       {shouldShowFullOverview ? (
-        <EventOverviewFull event={fullEvent} onAction={getEventQuery.refetch} />
+        <EventOverviewFull event={fullEvent} />
       ) : (
-        <EventOverviewProtected
-          eventIndex={eventIndex}
-          onAction={getEventQuery.refetch}
-        />
+        <EventOverviewProtected eventIndex={eventIndex} />
       )}
-    </EventOverviewProvider>
+    </>
   )
 }
 

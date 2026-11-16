@@ -20,7 +20,12 @@ import {
 } from '../ActionDocument'
 import { EventDocument } from '../EventDocument'
 import { EventIndex } from '../EventIndex'
-import { EventStatus, ZodDate, ZodDateTime } from '../EventMetadata'
+import {
+  EventMetadata,
+  EventStatus,
+  ZodDate,
+  ZodDateTime
+} from '../EventMetadata'
 import { Draft } from '../Draft'
 import {
   aggregateActionDeclarations,
@@ -31,32 +36,58 @@ import {
 } from '../utils'
 import { getActionUpdateMetadata, getLegalStatuses } from './utils'
 import { EventConfig } from '../EventConfig'
-import { getFlagsFromActions } from './flags'
+import { getEventFlags } from './flags'
 import { getUUID, UUID } from '../../uuid'
-import {
-  DocumentPath,
-  FullDocumentPath,
-  FullDocumentUrl
-} from '../../documents'
+import { DocumentPath } from '../../documents'
+import { AddressFieldValue, AddressType } from '../CompositeFieldValue'
 import { isFieldReference } from '../../conditionals/conditionals'
 
 export function getStatusFromActions(actions: Array<Action>) {
-  return actions
-    .filter(({ status }) => status === ActionStatus.Accepted)
+  const acceptedActions = actions.filter(
+    ({ status }) => status === ActionStatus.Accepted
+  )
+
+  // ARCHIVE/UNARCHIVE don't represent real progress, they just park/unpark the
+  // record. Whether the record is currently archived is determined by which of
+  // the two happened most recently.
+  const isCurrentlyArchived = acceptedActions.reduce<boolean>(
+    (archived, action) => {
+      if (action.type === ActionType.ARCHIVE) {
+        return true
+      }
+      if (action.type === ActionType.UNARCHIVE) {
+        return false
+      }
+      return archived
+    },
+    false
+  )
+
+  if (isCurrentlyArchived) {
+    return EventStatus.enum.ARCHIVED
+  }
+
+  // Not currently archived: derive status as if archiving never happened, so
+  // unarchiving always restores exactly the status the record had before it
+  // was archived, no matter how many archive/unarchive cycles occurred.
+  return acceptedActions
+    .filter(
+      ({ type }) => type !== ActionType.ARCHIVE && type !== ActionType.UNARCHIVE
+    )
     .reduce<EventStatus>((status, action) => {
       switch (action.type) {
         case ActionType.CREATE:
           return EventStatus.enum.CREATED
         case ActionType.DECLARE:
           return EventStatus.enum.DECLARED
-        case ActionType.VALIDATE:
-          return EventStatus.enum.VALIDATED
         case ActionType.REGISTER:
           return EventStatus.enum.REGISTERED
-        case ActionType.ARCHIVE:
-          return EventStatus.enum.ARCHIVED
         case ActionType.NOTIFY:
           return EventStatus.enum.NOTIFIED
+        // Already filtered out above; listed here only to satisfy exhaustiveness.
+        case ActionType.ARCHIVE:
+        case ActionType.UNARCHIVE:
+        case ActionType.CUSTOM:
         case ActionType.PRINT_CERTIFICATE:
         case ActionType.ASSIGN:
         case ActionType.UNASSIGN:
@@ -68,6 +99,7 @@ export function getStatusFromActions(actions: Array<Action>) {
         case ActionType.MARK_AS_DUPLICATE:
         case ActionType.REJECT_CORRECTION:
         case ActionType.READ:
+        case ActionType.EDIT:
         default:
           return status
       }
@@ -87,36 +119,19 @@ export function getAssignedUserFromActions(actions: Array<ActionDocument>) {
   }, null)
 }
 
-export function getAssignedUserSignatureFromActions(
-  actions: Array<ActionDocument>
-) {
-  return actions.reduce<null | string>((signature, action) => {
-    if (action.type === ActionType.ASSIGN) {
-      return action.createdBySignature || null
-    }
-    if (action.type === ActionType.UNASSIGN) {
-      return null
-    }
-
-    return signature
-  }, null)
-}
-
 type NonNullableDeep<T> = T extends [unknown, ...unknown[]] // <-- ✨ tiny change: handle tuples first
   ? { [K in keyof T]: NonNullableDeep<NonNullable<T[K]>> }
   : T extends UUID
     ? T
-    : T extends FullDocumentPath
+    : T extends DocumentPath
       ? T
-      : T extends DocumentPath
-        ? T
-        : T extends FullDocumentUrl
-          ? T
-          : T extends (infer U)[]
-            ? NonNullableDeep<U>[]
-            : T extends object
-              ? { [K in keyof T]: NonNullableDeep<NonNullable<T[K]>> }
-              : NonNullable<T>
+      : T extends string
+        ? NonNullable<T>
+        : T extends (infer U)[]
+          ? NonNullableDeep<U>[]
+          : T extends object
+            ? { [K in keyof T]: NonNullableDeep<NonNullable<T[K]>> }
+            : NonNullable<T>
 
 /**
  * @returns Given arbitrary object, recursively remove all keys with null values
@@ -177,6 +192,55 @@ export function resolveDateOfEvent(
   return parsedDate.success ? extractDateString(parsedDate.data) : undefined
 }
 
+export const DEFAULT_PLACE_OF_EVENT_PROPERTY =
+  'createdAtLocation' satisfies keyof EventMetadata
+
+/**
+ *
+ * @param value value to parse
+ * @param oldValue fallback value, its needed when the value is invalid but we want
+ * to keep the previous valid value, since this can be used mutliple times in one flow
+ * @returns successfully parsed UUID or fallback value
+ */
+function getParsedUUID(value: unknown, oldValue?: UUID) {
+  const parsed = UUID.safeParse(value)
+  return parsed.success ? parsed.data : oldValue
+}
+
+export function resolvePlaceOfEvent(
+  eventMetadata: {
+    createdAtLocation?: UUID | undefined | null
+  },
+  declaration: EventState,
+  config: EventConfig
+): UUID | undefined | null {
+  let placeOfEvent: UUID | undefined | null = getParsedUUID(
+    eventMetadata[DEFAULT_PLACE_OF_EVENT_PROPERTY]
+  )
+
+  if (config.placeOfEvent) {
+    const addressFieldValue = AddressFieldValue.safeParse(
+      declaration[config.placeOfEvent.$$field]
+    )
+    if (
+      addressFieldValue.success &&
+      addressFieldValue.data.addressType === AddressType.DOMESTIC &&
+      addressFieldValue.data.administrativeArea
+    ) {
+      placeOfEvent = getParsedUUID(
+        addressFieldValue.data.administrativeArea,
+        placeOfEvent
+      )
+    } else {
+      placeOfEvent = getParsedUUID(
+        declaration[config.placeOfEvent.$$field],
+        placeOfEvent
+      )
+    }
+  }
+  return placeOfEvent
+}
+
 export function extractPotentialDuplicatesFromActions(
   actions: Action[]
 ): PotentialDuplicate[] {
@@ -205,13 +269,13 @@ export function extractPotentialDuplicatesFromActions(
  */
 export function getCurrentEventState(
   event: EventDocument,
-  /** @TODO: remove config parameter, it is only used by resolveDateOfEvent. See if it can be achieved in some other way. */
   config: EventConfig
 ): EventIndex {
   // Always work with sorted event actions
   const sortedActions = event.actions
     .slice()
     .sort((a, b) => a.createdAt.localeCompare(b.createdAt))
+
   const creationAction = sortedActions.find(
     (action) => action.type === ActionType.CREATE
   )
@@ -243,17 +307,20 @@ export function getCurrentEventState(
     createdBy: creationAction.createdBy,
     createdByUserType: creationAction.createdByUserType,
     createdAtLocation: creationAction.createdAtLocation,
-    createdBySignature: creationAction.createdBySignature,
     updatedAt: acceptedActionMetadata.createdAt,
     assignedTo: getAssignedUserFromActions(acceptedActions),
-    assignedToSignature: getAssignedUserSignatureFromActions(acceptedActions),
     updatedBy: requestActionMetadata.createdBy,
     updatedAtLocation: requestActionMetadata.createdAtLocation,
     declaration,
     trackingId: event.trackingId,
     updatedByUserRole: requestActionMetadata.createdByRole,
+    placeOfEvent: resolvePlaceOfEvent(
+      { createdAtLocation: creationAction.createdAtLocation },
+      declaration,
+      config
+    ),
     potentialDuplicates: extractPotentialDuplicatesFromActions(sortedActions),
-    flags: getFlagsFromActions(sortedActions)
+    flags: getEventFlags(event, config)
   })
 
   return deepDropNulls({
@@ -321,6 +388,11 @@ export function applyDeclarationToEventIndex(
   return {
     ...eventIndex,
     dateOfEvent: resolveDateOfEvent(
+      eventIndex,
+      updatedDeclaration,
+      eventConfiguration
+    ),
+    placeOfEvent: resolvePlaceOfEvent(
       eventIndex,
       updatedDeclaration,
       eventConfiguration

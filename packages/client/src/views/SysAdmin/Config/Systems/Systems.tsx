@@ -8,61 +8,49 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { Header } from '@client/components/Header/Header'
-import { Navigation } from '@client/components/interface/Navigation'
-import { buttonMessages, constantsMessages } from '@client/i18n/messages'
+import { buttonMessages } from '@client/i18n/messages'
 import { integrationMessages } from '@client/i18n/messages/views/integrations'
 import { EMPTY_STRING } from '@client/utils/constants'
-import {
-  EventType,
-  System,
-  SystemStatus,
-  SystemType,
-  WebhookPermission
-} from '@client/utils/gateway'
-import { Label } from '@client/views/Settings/items/components'
-import { DeleteSystemModal } from '@client/views/SysAdmin/Config/Systems/DeleteSystemModal'
-import { WebhookModal } from '@client/views/SysAdmin/Config/Systems/WebhookModal'
+import { useUsers } from '@client/v2-events/hooks/useUsers'
+import { getUsersFullName } from '@client/v2-events/utils'
+import { z } from 'zod'
 import {
   Alert,
-  CheckboxGroup,
   InputField,
   Link,
-  ListViewItemSimplified,
-  ListViewSimplified,
+  List,
   Pill,
   Select,
   Spinner,
   Stack,
   TextInput,
   Toast,
+  Dialog,
   ToggleMenu
 } from '@opencrvs/components'
 import { Button } from '@opencrvs/components/lib/Button'
 import { Content } from '@opencrvs/components/lib/Content'
-import { FormTabs } from '@opencrvs/components/lib/FormTabs'
-import { Frame } from '@opencrvs/components/lib/Frame'
 import { Icon } from '@opencrvs/components/lib/Icon'
-import { ResponsiveModal } from '@opencrvs/components/lib/ResponsiveModal'
 import { Text } from '@opencrvs/components/lib/Text'
 import React, { useCallback, useState } from 'react'
-import { IntlShape, useIntl } from 'react-intl'
+import { FormattedMessage, useIntl } from 'react-intl'
 import styled from 'styled-components'
-import { useSystems } from './useSystems'
+import {
+  useIntegrations,
+  IntegrationItem,
+  IntegrationDetails
+} from './useIntegrations'
 import { CopyButton } from '@opencrvs/components/lib/CopyButton/CopyButton'
-import { SystemRole } from '@opencrvs/commons/client'
-
-interface ToggleModal {
-  modalVisible: boolean
-  selectedClient: System | null
-}
-
-const ButtonLink = styled(Link)`
-  text-align: left;
-`
 
 const PaddedAlert = styled(Alert)`
   margin-top: 16px;
+`
+
+const AlignedList = styled(List)`
+  td,
+  th {
+    vertical-align: middle;
+  }
 `
 
 const StyledSpinner = styled(Spinner)`
@@ -71,213 +59,258 @@ const StyledSpinner = styled(Spinner)`
 const Field = styled.div`
   margin-top: 16px;
 `
-const populatePermissions = (
-  webhooks: WebhookPermission[] = [],
-  type: string
-) => {
-  const { __typename, ...rest } = webhooks.find((ite) => ite.event === type)!
-  return rest
+
+const ScopeList = styled.div`
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+`
+
+const ScopeTag = styled.span`
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 12px;
+  background-color: ${({ theme }) => theme.colors.grey100};
+  color: ${({ theme }) => theme.colors.grey500};
+  ${({ theme }) => theme.fonts.reg12};
+`
+
+const SystemRole = z.enum(['HEALTH', 'RECORD_SEARCH'])
+
+/** Map raw scope strings to human-readable labels */
+function scopeToLabel(scope: string): string {
+  return scope
 }
 
-/**
- *
- * Wrapper component that adds Frame around the page if withFrame is true.
- * Created only for minimising impact of possible regression during v2 regression test period.
- */
-function WithFrame({
-  children,
-  isHidden,
-  intl,
-  toggleModal
-}: {
-  children: React.ReactNode
-  isHidden: boolean
-  intl: IntlShape
-  toggleModal: () => void
-}) {
-  if (isHidden) {
-    return <>{children}</>
-  }
-
-  return (
-    <Frame
-      header={
-        <Header
-          mobileRight={[
-            {
-              icon: () => <Icon name="Plus" />,
-              handler: toggleModal
-            }
-          ]}
-        />
-      }
-      navigation={<Navigation loadWorkqueueStatuses={false} />}
-      skipToContentText={intl.formatMessage(
-        constantsMessages.skipToMainContent
-      )}
-    >
-      {children}
-    </Frame>
-  )
+interface ToggleActivationState {
+  integration: IntegrationItem | null
 }
 
-export function SystemList({ hideNavigation }: { hideNavigation?: boolean }) {
+interface RevealKeysState {
+  visible: boolean
+  integration: IntegrationItem | null
+  details: IntegrationDetails | null
+  loading: boolean
+}
+
+interface DeleteConfirmState {
+  integration: IntegrationItem | null
+}
+
+interface RefreshSecretState {
+  integration: IntegrationItem | null
+}
+
+export function SystemList() {
   const intl = useIntl()
   const [showModal, setShowModal] = React.useState(false)
-  const [toggleKeyModal, setToggleKeyModal] = useState<ToggleModal>({
-    modalVisible: false,
-    selectedClient: null
+  const [newClientName, setNewClientName] = useState(EMPTY_STRING)
+  const [newSystemType, setNewSystemType] = useState<string>(
+    SystemRole.enum.HEALTH
+  )
+
+  const [toggleActivation, setToggleActivation] =
+    useState<ToggleActivationState>({ integration: null })
+
+  const [revealKeys, setRevealKeys] = useState<RevealKeysState>({
+    visible: false,
+    integration: null,
+    details: null,
+    loading: false
   })
 
-  const [selectedTab, setSelectedTab] = React.useState(EventType.Birth)
+  const [deleteConfirm, setDeleteConfirm] = useState<DeleteConfirmState>({
+    integration: null
+  })
 
-  const checkboxHandler = (permissions: string[], event: EventType) => {
-    event === EventType.Birth
-      ? setBirthPermissions({ event, permissions })
-      : setDeathPermissions({ event, permissions })
-  }
+  const [refreshSecretConfirm, setRefreshSecretConfirm] =
+    useState<RefreshSecretState>({ integration: null })
+
+  const [clientDetails, setClientDetails] = useState<IntegrationItem | null>(
+    null
+  )
+
+  const [toastMessage, setToastMessage] = useState<{
+    message: string
+    type: 'success' | 'error'
+  } | null>(null)
 
   const toggleModal = useCallback(() => {
     setShowModal((prev) => !prev)
   }, [])
 
   const {
-    closePermissionModal,
-    systemToDeleteData,
-    deleteSystem,
-    systemToDelete,
-    setSystemToDelete,
-    systemToDeleteLoading,
-    systemToDeleteError,
-    updatePermissionsData,
-    updatePermissionsLoading,
-    updatePermissionsError,
-    updatePermissions,
-    systemToShowPermission,
-    setSystemToShowPermission,
-    birthPermissions,
-    setBirthPermissions,
-    deathPermissions,
-    setDeathPermissions,
-    existingSystems,
-    deactivateSystem,
-    systemToToggleActivation,
-    setSystemToToggleActivation,
-    activateSystem,
-    registerSystem,
-    registerSystemData,
-    newClientName,
-    newSystemType,
-    setNewSystemType,
-    onChangeClientName,
-    activateSystemLoading,
-    deactivateSystemLoading,
-    registerSystemLoading,
-    registerSystemError,
-    activateSystemData,
-    deactivateSystemData,
-    activateSystemError,
-    deactivateSystemError,
-    clearNewSystemDraft,
-    clientRefreshToken,
-    refreshTokenData,
-    refreshTokenLoading,
-    refreshTokenError,
-    resetData
-  } = useSystems()
+    integrations,
+    isLoading,
+    createIntegration,
+    createResult,
+    isCreating,
+    createError,
+    resetCreate,
+    deactivateIntegration,
+    isDeactivating,
+    activateIntegration,
+    isActivating,
+    deleteIntegration,
+    isDeleting,
+    getIntegration,
+    refreshSecret,
+    refreshSecretData,
+    isRefreshingSecret,
+    resetRefreshSecret
+  } = useIntegrations()
 
-  function changeActiveStatusIntl(status: SystemStatus) {
-    if (status !== SystemStatus.Active) {
-      return intl.formatMessage(integrationMessages.activate)
-    } else {
-      return intl.formatMessage(integrationMessages.deactivate)
+  const { getUsers } = useUsers()
+  const users = getUsers.getAllCached()
+
+  const onChangeClientName = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setNewClientName(String(event.target.value))
+  }
+
+  const clearNewSystemDraft = () => {
+    setNewClientName(EMPTY_STRING)
+    setNewSystemType(SystemRole.enum.HEALTH)
+  }
+
+  const handleRegisterSystem = async () => {
+    const type = newSystemType
+    if (type !== 'HEALTH' && type !== 'RECORD_SEARCH') {
+      return
+    }
+    await createIntegration({ name: newClientName, type })
+  }
+
+  const handleToggleActivation = async () => {
+    const integration = toggleActivation.integration
+    if (!integration) return
+    try {
+      if (integration.status === 'active') {
+        await deactivateIntegration(integration.id)
+        setToastMessage({
+          message: intl.formatMessage(
+            integrationMessages.deactivateClientStatus
+          ),
+          type: 'success'
+        })
+      } else {
+        await activateIntegration(integration.id)
+        setToastMessage({
+          message: intl.formatMessage(integrationMessages.activateClientStatus),
+          type: 'success'
+        })
+      }
+    } catch {
+      setToastMessage({
+        message: intl.formatMessage(integrationMessages.error),
+        type: 'error'
+      })
+    }
+    setToggleActivation({ integration: null })
+  }
+
+  const handleDelete = async () => {
+    const integration = deleteConfirm.integration
+    if (!integration) return
+    try {
+      await deleteIntegration(integration.id)
+      setToastMessage({
+        message: intl.formatMessage(integrationMessages.deleteSystemMsg),
+        type: 'success'
+      })
+    } catch {
+      setToastMessage({
+        message: intl.formatMessage(integrationMessages.error),
+        type: 'error'
+      })
+    }
+    setDeleteConfirm({ integration: null })
+  }
+
+  const handleRevealKeys = async (integration: IntegrationItem) => {
+    setRevealKeys({
+      visible: true,
+      integration,
+      details: null,
+      loading: true
+    })
+    try {
+      const details = await getIntegration(integration.id)
+      setRevealKeys({
+        visible: true,
+        integration,
+        details: details as IntegrationDetails,
+        loading: false
+      })
+    } catch {
+      setRevealKeys({
+        visible: true,
+        integration,
+        details: null,
+        loading: false
+      })
     }
   }
 
-  const toggleRevealKeyModal = useCallback(
-    function toggleRevealKeyModal(system?: System) {
-      if (system !== undefined) {
-        setToggleKeyModal({
-          ...toggleKeyModal,
-          modalVisible: true,
-          selectedClient: system
-        })
-      } else {
-        setToggleKeyModal({
-          ...toggleKeyModal,
-          modalVisible: false
-        })
-      }
-    },
-    [toggleKeyModal]
-  )
+  const handleRefreshSecret = async () => {
+    const integration = refreshSecretConfirm.integration
+    if (!integration) return
+    try {
+      await refreshSecret(integration.id)
+    } catch {
+      setToastMessage({
+        message: intl.formatMessage(integrationMessages.error),
+        type: 'error'
+      })
+      setRefreshSecretConfirm({ integration: null })
+    }
+  }
 
-  const getMenuItems = (system: System) => {
+  const closeRefreshSecret = () => {
+    setRefreshSecretConfirm({ integration: null })
+    resetRefreshSecret()
+  }
+
+  const closeRevealKeys = () => {
+    setRevealKeys({
+      visible: false,
+      integration: null,
+      details: null,
+      loading: false
+    })
+    resetRefreshSecret()
+  }
+
+  const getMenuItems = (integration: IntegrationItem) => {
     const menuItems: { handler: () => void; label: string }[] = [
       {
-        handler: () => {
-          toggleRevealKeyModal(system)
-        },
+        handler: () => setClientDetails(integration),
+        label: intl.formatMessage(integrationMessages.clientDetails)
+      },
+      {
+        handler: () => handleRevealKeys(integration),
         label: intl.formatMessage(integrationMessages.revealKeys)
+      },
+      {
+        handler: () => setRefreshSecretConfirm({ integration }),
+        label: intl.formatMessage(integrationMessages.refreshSecret)
+      },
+      {
+        handler: () => setToggleActivation({ integration }),
+        label:
+          integration.status === 'active'
+            ? intl.formatMessage(integrationMessages.deactivate)
+            : intl.formatMessage(integrationMessages.activate)
+      },
+      {
+        handler: () => setDeleteConfirm({ integration }),
+        label: intl.formatMessage(integrationMessages.delete)
       }
     ]
-
-    if (system.type === SystemRole.enum.WEBHOOK) {
-      menuItems.push({
-        handler: () => {
-          setSystemToShowPermission(system)
-          setBirthPermissions(
-            populatePermissions(system.settings!.webhook!, EventType.Birth)
-          )
-          setDeathPermissions(
-            populatePermissions(system.settings!.webhook!, EventType.Death)
-          )
-        },
-        label: intl.formatMessage(buttonMessages.edit)
-      })
-    }
-
-    menuItems.push({
-      handler: () => {
-        setSystemToToggleActivation(system)
-      },
-      label: changeActiveStatusIntl(system.status)
-    })
-
-    menuItems.push({
-      handler: () => {
-        setSystemToDelete(system)
-      },
-      label: intl.formatMessage(integrationMessages.delete)
-    })
-
     return menuItems
   }
 
-  const systemTypeLabels = {
-    HEALTH: intl.formatMessage(integrationMessages.eventNotification),
-    RECORD_SEARCH: intl.formatMessage(integrationMessages.recordSearch),
-    NATIONAL_ID: intl.formatMessage(integrationMessages.nationalId),
-    WEBHOOK: intl.formatMessage(integrationMessages.webhook),
-    IMPORT_EXPORT: intl.formatMessage(integrationMessages.importExport)
-  }
-
-  const systemToLabel = (system: System) => {
-    if (!system.type) {
-      // Integrations registered through countryconfig have no legacy type
-      return intl.formatMessage(integrationMessages.apiIntegration)
-    }
-    return system.type !== 'REINDEX'
-      ? systemTypeLabels[system.type]
-      : 'INVALID_SYSTEM_TYPE__REINDEX'
-  }
-
   return (
-    <WithFrame
-      isHidden={!!hideNavigation}
-      intl={intl}
-      toggleModal={toggleModal}
-    >
+    <>
       <Content
         title={intl.formatMessage(integrationMessages.pageTitle)}
         topActionButtons={[
@@ -294,124 +327,273 @@ export function SystemList({ hideNavigation }: { hideNavigation?: boolean }) {
       >
         {intl.formatMessage(integrationMessages.pageIntroduction)}
 
-        <ListViewSimplified>
-          {existingSystems.map((system: System) => (
-            <ListViewItemSimplified
-              key={system.clientId}
-              actions={
-                <>
-                  {system.status === SystemStatus.Active ? (
-                    <Pill
-                      label={intl.formatMessage(integrationMessages.active)}
-                      type="active"
-                    />
-                  ) : (
-                    <Pill
-                      label={intl.formatMessage(integrationMessages.inactive)}
-                      type="inactive"
-                    />
-                  )}
+        {isLoading && <Spinner id="system-list-spinner" size={24} />}
 
-                  <ToggleMenu
-                    id={`toggleMenu-${system.clientId}`}
-                    menuItems={getMenuItems(system)}
-                    toggleButton={
-                      <Icon
-                        name="DotsThreeVertical"
-                        color="primary"
-                        size="large"
+        <AlignedList>
+          {integrations.map((integration: IntegrationItem) => {
+            const user = users.find((user) => user.id === integration.createdBy)
+            return (
+              <List.Item
+                key={integration.id}
+                actions={
+                  <>
+                    {integration.status === 'active' ? (
+                      <Pill
+                        label={intl.formatMessage(integrationMessages.active)}
+                        type="active"
                       />
-                    }
-                  />
-                </>
-              }
-              label={system.name}
-              value={systemToLabel(system)}
-            />
-          ))}
+                    ) : (
+                      <Pill
+                        label={intl.formatMessage(integrationMessages.inactive)}
+                        type="inactive"
+                      />
+                    )}
 
-          {systemToToggleActivation && (
-            <ResponsiveModal
-              title={
-                systemToToggleActivation.status === SystemStatus.Active
-                  ? intl.formatMessage(integrationMessages.deactivateClient)
-                  : intl.formatMessage(integrationMessages.activateClient)
-              }
-              contentHeight={50}
-              responsive={false}
-              actions={[
-                <Button
-                  type="tertiary"
-                  id="cancel"
-                  key="cancel"
-                  onClick={() => {
-                    setSystemToToggleActivation(undefined)
-                  }}
-                >
-                  {intl.formatMessage(buttonMessages.cancel)}
-                </Button>,
+                    <ToggleMenu
+                      id={`toggleMenu-${integration.id}`}
+                      menuItems={getMenuItems(integration)}
+                      toggleButton={
+                        <Icon
+                          name="DotsThreeVertical"
+                          color="primary"
+                          size="large"
+                        />
+                      }
+                    />
+                  </>
+                }
+                label={integration.name}
+                value={
+                  <Text variant="reg14" element="p" color="grey500">
+                    {user
+                      ? intl.formatMessage(integrationMessages.createdOnBy, {
+                          date: intl.formatDate(
+                            new Date(integration.createdAt),
+                            {
+                              year: 'numeric',
+                              month: 'long',
+                              day: 'numeric'
+                            }
+                          ),
+                          user: getUsersFullName(user.name)
+                        })
+                      : intl.formatMessage(integrationMessages.createdOn, {
+                          date: intl.formatDate(
+                            new Date(integration.createdAt),
+                            {
+                              year: 'numeric',
+                              month: 'long',
+                              day: 'numeric'
+                            }
+                          )
+                        })}
+                  </Text>
+                }
+              />
+            )
+          })}
+        </AlignedList>
+      </Content>
 
-                systemToToggleActivation.status === SystemStatus.Active ? (
-                  <Button
-                    type="primary"
-                    key="confirm"
-                    id="confirm"
-                    loading={deactivateSystemLoading}
-                    onClick={() => {
-                      deactivateSystem()
-                    }}
-                  >
-                    {intl.formatMessage(buttonMessages.confirm)}
-                  </Button>
-                ) : (
-                  <Button
-                    type="primary"
-                    key="confirm"
-                    id="confirm"
-                    loading={activateSystemLoading}
-                    onClick={() => {
-                      activateSystem()
-                    }}
-                  >
-                    {intl.formatMessage(buttonMessages.confirm)}
-                  </Button>
-                )
-              ]}
-              show={true}
-              handleClose={() => setSystemToToggleActivation(undefined)}
-            >
-              {systemToToggleActivation.status === SystemStatus.Active
-                ? intl.formatMessage(integrationMessages.deactivateClientText)
-                : intl.formatMessage(integrationMessages.activateClientText)}
-            </ResponsiveModal>
-          )}
-        </ListViewSimplified>
-        <ResponsiveModal
+      {/* Client Details Modal */}
+      {clientDetails && (
+        <Dialog
+          title={intl.formatMessage(integrationMessages.clientDetails)}
+          variant="large"
+          width={512}
+          onClose={() => setClientDetails(null)}
           actions={[
-            <Link
-              key="cancel-link"
-              onClick={() => {
-                toggleRevealKeyModal()
-                resetData()
-              }}
+            <Button
+              type="tertiary"
+              key="close"
+              id="closeClientDetails"
+              onClick={() => setClientDetails(null)}
             >
               {intl.formatMessage(buttonMessages.cancel)}
-            </Link>
+            </Button>
           ]}
-          autoHeight={true}
-          width={512}
-          titleHeightAuto={true}
-          show={toggleKeyModal.modalVisible}
-          handleClose={() => {
-            toggleRevealKeyModal()
-            resetData()
-          }}
-          title={toggleKeyModal.selectedClient?.name ?? ''}
         >
-          <Text variant="reg16" element="p" id="revealKeyId">
-            {intl.formatMessage(integrationMessages.uniqueKeysDescription)}
-          </Text>
+          <Stack direction="column" alignItems="stretch" gap={16}>
+            <Stack direction="column" alignItems="stretch" gap={4}>
+              <Text variant="bold16" element="span">
+                {intl.formatMessage(integrationMessages.clientName)}
+              </Text>
+              <Text variant="reg16" element="span">
+                {clientDetails.name}
+              </Text>
+            </Stack>
+            <Stack direction="column" alignItems="stretch" gap={8}>
+              <Text variant="bold16" element="span">
+                {intl.formatMessage(integrationMessages.scopes)}
+              </Text>
+              <ScopeList>
+                {clientDetails.scopes.map((scope) => (
+                  <ScopeTag key={scope}>{scopeToLabel(scope)}</ScopeTag>
+                ))}
+              </ScopeList>
+            </Stack>
+          </Stack>
+        </Dialog>
+      )}
 
+      {/* Toggle Activation Modal */}
+      {toggleActivation.integration && (
+        <Dialog
+          title={
+            toggleActivation.integration.status === 'active'
+              ? intl.formatMessage(integrationMessages.deactivateClient)
+              : intl.formatMessage(integrationMessages.activateClient)
+          }
+          subtitle={toggleActivation.integration.name}
+          actions={[
+            <Button
+              type="tertiary"
+              id="cancel"
+              key="cancel"
+              onClick={() => setToggleActivation({ integration: null })}
+            >
+              {intl.formatMessage(buttonMessages.cancel)}
+            </Button>,
+            <Button
+              type="primary"
+              key="confirm"
+              id="confirm"
+              loading={isDeactivating || isActivating}
+              onClick={handleToggleActivation}
+            >
+              {intl.formatMessage(buttonMessages.confirm)}
+            </Button>
+          ]}
+          onClose={() => setToggleActivation({ integration: null })}
+        >
+          {toggleActivation.integration.status === 'active'
+            ? intl.formatMessage(integrationMessages.deactivateClientText)
+            : intl.formatMessage(integrationMessages.activateClientText)}
+        </Dialog>
+      )}
+
+      {/* Delete Confirmation Modal */}
+      {deleteConfirm.integration && (
+        <Dialog
+          title={intl.formatMessage(integrationMessages.delete)}
+          subtitle={deleteConfirm.integration.name}
+          actions={[
+            <Button
+              type="tertiary"
+              id="cancelDelete"
+              key="cancelDelete"
+              onClick={() => setDeleteConfirm({ integration: null })}
+            >
+              {intl.formatMessage(buttonMessages.cancel)}
+            </Button>,
+            <Button
+              type="primary"
+              key="confirmDelete"
+              id="confirmDelete"
+              loading={isDeleting}
+              onClick={handleDelete}
+            >
+              {intl.formatMessage(integrationMessages.delete)}
+            </Button>
+          ]}
+          onClose={() => setDeleteConfirm({ integration: null })}
+        >
+          <FormattedMessage {...integrationMessages.deleteSystemText} />
+        </Dialog>
+      )}
+
+      {refreshSecretConfirm.integration && (
+        <Dialog
+          variant="large"
+          width={512}
+          title={intl.formatMessage(integrationMessages.refreshSecret)}
+          subtitle={refreshSecretConfirm.integration.name}
+          actions={
+            refreshSecretData
+              ? []
+              : [
+                  <Button
+                    type="tertiary"
+                    id="cancelRefreshSecret"
+                    key="cancelRefreshSecret"
+                    onClick={closeRefreshSecret}
+                  >
+                    {intl.formatMessage(buttonMessages.cancel)}
+                  </Button>,
+                  <Button
+                    type="primary"
+                    id="confirmRefreshSecret"
+                    key="confirmRefreshSecret"
+                    loading={isRefreshingSecret}
+                    onClick={handleRefreshSecret}
+                  >
+                    {intl.formatMessage(integrationMessages.refreshSecret)}
+                  </Button>
+                ]
+          }
+          onClose={closeRefreshSecret}
+        >
+          {refreshSecretData ? (
+            <Stack direction="column" alignItems="stretch" gap={16}>
+              <Text variant="reg16" element="p">
+                {intl.formatMessage(
+                  integrationMessages.refreshSecretSuccessText
+                )}
+              </Text>
+              <Stack direction="column" alignItems="stretch" gap={8}>
+                <Text variant="bold16" element="span">
+                  {intl.formatMessage(integrationMessages.clientSecret)}
+                </Text>
+                <Stack justifyContent="space-between" alignItems="center">
+                  <Text
+                    variant="reg16"
+                    element="span"
+                    id="refreshedClientSecret"
+                  >
+                    {refreshSecretData.clientSecret}
+                  </Text>
+                  <CopyButton
+                    copiedLabel={intl.formatMessage(buttonMessages.copied)}
+                    copyLabel={intl.formatMessage(buttonMessages.copy)}
+                    data={refreshSecretData.clientSecret}
+                  />
+                </Stack>
+              </Stack>
+            </Stack>
+          ) : (
+            <Stack direction="column" alignItems="stretch" gap={16}>
+              <Text variant="reg16" element="p">
+                {intl.formatMessage(integrationMessages.refreshSecretText)}
+              </Text>
+              <Alert type="error" customIcon={<Icon name="WarningCircle" />}>
+                {intl.formatMessage(integrationMessages.refreshSecretWarning)}
+              </Alert>
+            </Stack>
+          )}
+        </Dialog>
+      )}
+
+      {/* Reveal Keys Modal */}
+      <Dialog
+        actions={[
+          <Link key="cancel-link" onClick={closeRevealKeys}>
+            {intl.formatMessage(buttonMessages.cancel)}
+          </Link>
+        ]}
+        variant="large"
+        width={512}
+        isOpen={revealKeys.visible}
+        onClose={closeRevealKeys}
+        title={intl.formatMessage(integrationMessages.revealKeys)}
+        subtitle={revealKeys.integration?.name ?? ''}
+      >
+        <Text variant="reg16" element="p" id="revealKeyId">
+          {intl.formatMessage(integrationMessages.uniqueKeysDescription)}
+        </Text>
+
+        {revealKeys.loading ? (
+          <Spinner id="revealKeysSpinner" size={24} />
+        ) : (
           <Stack alignItems="stretch" direction="column" gap={16}>
             <Stack alignItems="stretch" direction="column" gap={8}>
               <Text variant="bold16" element="span">
@@ -419,12 +601,12 @@ export function SystemList({ hideNavigation }: { hideNavigation?: boolean }) {
               </Text>
               <Stack justifyContent="space-between" alignItems="center">
                 <Text variant="reg16" element="span">
-                  {toggleKeyModal.selectedClient?.clientId}
+                  {revealKeys.integration?.id}
                 </Text>
                 <CopyButton
                   copiedLabel={intl.formatMessage(buttonMessages.copied)}
                   copyLabel={intl.formatMessage(buttonMessages.copy)}
-                  data={toggleKeyModal.selectedClient?.clientId as string}
+                  data={revealKeys.integration?.id as string}
                 />
               </Stack>
             </Stack>
@@ -432,31 +614,9 @@ export function SystemList({ hideNavigation }: { hideNavigation?: boolean }) {
               <Text variant="bold16" element="span">
                 {intl.formatMessage(integrationMessages.clientSecret)}
               </Text>
-              {refreshTokenLoading ? (
-                <Spinner baseColor="#4C68C1" id="Spinner" size={24} />
-              ) : refreshTokenData && refreshTokenData?.refreshSystemSecret ? (
-                <Stack justifyContent="space-between" alignItems="center">
-                  <Text variant="reg16" element="span">
-                    {refreshTokenData.refreshSystemSecret?.clientSecret}
-                  </Text>
-                  <CopyButton
-                    copiedLabel={intl.formatMessage(buttonMessages.copied)}
-                    copyLabel={intl.formatMessage(buttonMessages.copy)}
-                    data={
-                      refreshTokenData.refreshSystemSecret
-                        ?.clientSecret as string
-                    }
-                  />
-                </Stack>
-              ) : (
-                <ButtonLink
-                  onClick={() => {
-                    clientRefreshToken(toggleKeyModal.selectedClient?.clientId)
-                  }}
-                >
-                  {intl.formatMessage(buttonMessages.refresh)}
-                </ButtonLink>
-              )}
+              <Text variant="reg16" element="p" color="grey500">
+                {intl.formatMessage(integrationMessages.clientSecretHiddenNote)}
+              </Text>
             </Stack>
             <Stack direction="column" alignItems="stretch" gap={8}>
               <Text variant="bold16" element="span">
@@ -464,21 +624,25 @@ export function SystemList({ hideNavigation }: { hideNavigation?: boolean }) {
               </Text>
               <Stack justifyContent="space-between" alignItems="center">
                 <Text variant="reg16" element="span">
-                  {toggleKeyModal.selectedClient?.shaSecret}
+                  {revealKeys.details?.shaSecret ?? '—'}
                 </Text>
-                <CopyButton
-                  copiedLabel={intl.formatMessage(buttonMessages.copied)}
-                  copyLabel={intl.formatMessage(buttonMessages.copy)}
-                  data={toggleKeyModal.selectedClient?.shaSecret as string}
-                />
+                {revealKeys.details?.shaSecret && (
+                  <CopyButton
+                    copiedLabel={intl.formatMessage(buttonMessages.copied)}
+                    copyLabel={intl.formatMessage(buttonMessages.copy)}
+                    data={revealKeys.details.shaSecret}
+                  />
+                )}
               </Stack>
             </Stack>
           </Stack>
-        </ResponsiveModal>
-      </Content>
-      <ResponsiveModal
+        )}
+      </Dialog>
+
+      {/* Create Client Modal */}
+      <Dialog
         actions={
-          registerSystemData
+          createResult
             ? []
             : [
                 <Link
@@ -486,7 +650,7 @@ export function SystemList({ hideNavigation }: { hideNavigation?: boolean }) {
                   onClick={() => {
                     toggleModal()
                     clearNewSystemDraft()
-                    resetData()
+                    resetCreate()
                   }}
                 >
                   {intl.formatMessage(buttonMessages.cancel)}
@@ -496,7 +660,7 @@ export function SystemList({ hideNavigation }: { hideNavigation?: boolean }) {
                   id="submitClientForm"
                   disabled={!newSystemType || newClientName === EMPTY_STRING}
                   onClick={() => {
-                    registerSystem()
+                    handleRegisterSystem()
                   }}
                   type="primary"
                 >
@@ -504,28 +668,28 @@ export function SystemList({ hideNavigation }: { hideNavigation?: boolean }) {
                 </Button>
               ]
         }
+        variant="large"
         width={512}
-        autoHeight={true}
-        titleHeightAuto={true}
-        show={showModal}
-        handleClose={() => {
+        isOpen={showModal}
+        onClose={() => {
           toggleModal()
           clearNewSystemDraft()
-          resetData()
+          resetCreate()
         }}
         title={
-          registerSystemData?.registerSystem?.system.name ??
-          intl.formatMessage(integrationMessages.createClient)
+          createResult
+            ? newClientName
+            : intl.formatMessage(integrationMessages.createClient)
         }
         id="createClientModal"
       >
         <Text variant="reg16" element="p" id="uniqueKeyId">
-          {!registerSystemData && !registerSystemLoading
+          {!createResult && !isCreating
             ? intl.formatMessage(integrationMessages.newIntegrationDescription)
             : intl.formatMessage(integrationMessages.uniqueKeysDescription)}
         </Text>
 
-        {!registerSystemData && !registerSystemLoading && (
+        {!createResult && !isCreating && (
           <>
             <Field>
               <InputField
@@ -552,31 +716,25 @@ export function SystemList({ hideNavigation }: { hideNavigation?: boolean }) {
               >
                 <Select
                   onChange={(val) => {
-                    setNewSystemType(val as SystemType)
+                    setNewSystemType(val)
                   }}
-                  value={newSystemType ?? SystemType.Health}
+                  value={newSystemType}
                   options={[
                     {
                       label: intl.formatMessage(
-                        integrationMessages.eventNotification
+                        integrationMessages.integrationType,
+                        {
+                          type: SystemRole.enum.HEALTH
+                        }
                       ),
                       value: SystemRole.enum.HEALTH
                     },
                     {
                       label: intl.formatMessage(
-                        integrationMessages.recordSearch
+                        integrationMessages.integrationType,
+                        { type: SystemRole.enum.RECORD_SEARCH }
                       ),
                       value: SystemRole.enum.RECORD_SEARCH
-                    },
-                    {
-                      label: intl.formatMessage(integrationMessages.webhook),
-                      value: SystemRole.enum.WEBHOOK
-                    },
-                    {
-                      label: intl.formatMessage(
-                        integrationMessages.importExport
-                      ),
-                      value: SystemRole.enum.IMPORT_EXPORT
                     }
                   ]}
                   id={'permissions-selectors'}
@@ -616,136 +774,10 @@ export function SystemList({ hideNavigation }: { hideNavigation?: boolean }) {
                 </Link>
               </PaddedAlert>
             )}
-
-            {newSystemType === SystemRole.enum.WEBHOOK && (
-              <>
-                <PaddedAlert type="info">
-                  {intl.formatMessage(integrationMessages.webhookDescription)}
-                  {'\n'}
-                  <Link
-                    onClick={() => {
-                      window.open(
-                        'https://documentation.opencrvs.org/',
-                        '_blank'
-                      )
-                    }}
-                    font="bold16"
-                  >
-                    documentation.opencrvs.org
-                  </Link>
-                </PaddedAlert>
-                <Field>
-                  <InputField
-                    id="select-input"
-                    touched={false}
-                    label={intl.formatMessage(integrationMessages.label)}
-                  >
-                    <div>
-                      <Label>
-                        {intl.formatMessage(
-                          integrationMessages.webhookPermissionsDescription
-                        )}
-                      </Label>
-                      <FormTabs
-                        sections={[
-                          {
-                            id: EventType.Birth,
-                            title: intl.formatMessage(integrationMessages.birth)
-                          },
-                          {
-                            id: EventType.Death,
-                            title: intl.formatMessage(integrationMessages.death)
-                          }
-                        ]}
-                        activeTabId={selectedTab}
-                        onTabClick={(tabId: EventType) => setSelectedTab(tabId)}
-                      />
-                      {selectedTab === EventType.Birth ? (
-                        <CheckboxGroup
-                          id="birthCheckboxGroup"
-                          options={[
-                            {
-                              label: intl.formatMessage(
-                                integrationMessages.childDetails
-                              ),
-                              value: 'child-details'
-                            },
-                            {
-                              label: intl.formatMessage(
-                                integrationMessages.motherDetails
-                              ),
-                              value: 'mother-details'
-                            },
-                            {
-                              label: intl.formatMessage(
-                                integrationMessages.fatherDetails
-                              ),
-                              value: 'father-details'
-                            },
-                            {
-                              label: intl.formatMessage(
-                                integrationMessages.informantDetails
-                              ),
-                              value: 'informant-details'
-                            },
-                            {
-                              label: intl.formatMessage(
-                                integrationMessages.documentDetails
-                              ),
-                              value: 'supporting-documents'
-                            }
-                          ]}
-                          name="test-checkbox-group1"
-                          value={birthPermissions.permissions ?? []}
-                          onChange={(newValue) => {
-                            checkboxHandler(newValue, EventType.Birth)
-                          }}
-                        />
-                      ) : (
-                        <CheckboxGroup
-                          id="deathCheckboxGroup"
-                          options={[
-                            {
-                              label: intl.formatMessage(
-                                integrationMessages.deceasedDetails
-                              ),
-                              value: 'deceased-details'
-                            },
-                            {
-                              label: intl.formatMessage(
-                                integrationMessages.deathEventDetails
-                              ),
-                              value: 'death-encounter'
-                            },
-                            {
-                              label: intl.formatMessage(
-                                integrationMessages.informantDetails
-                              ),
-                              value: 'informant-details'
-                            },
-                            {
-                              label: intl.formatMessage(
-                                integrationMessages.documentDetails
-                              ),
-                              value: 'supporting-documents'
-                            }
-                          ]}
-                          name="test-checkbox-group1"
-                          value={deathPermissions.permissions ?? []}
-                          onChange={(newValue) => {
-                            checkboxHandler(newValue, EventType.Death)
-                          }}
-                        />
-                      )}
-                    </div>
-                  </InputField>
-                </Field>
-              </>
-            )}
           </>
         )}
 
-        {!registerSystemData && registerSystemLoading && (
+        {!createResult && isCreating && (
           <>
             <Text variant="bold16" element="span">
               {intl.formatMessage(integrationMessages.clientId)}
@@ -762,7 +794,7 @@ export function SystemList({ hideNavigation }: { hideNavigation?: boolean }) {
           </>
         )}
 
-        {registerSystemData?.registerSystem && (
+        {createResult && (
           <Stack alignItems="stretch" direction="column" gap={16}>
             <Stack alignItems="stretch" direction="column" gap={4}>
               <Text variant="bold16" element="span">
@@ -770,14 +802,12 @@ export function SystemList({ hideNavigation }: { hideNavigation?: boolean }) {
               </Text>
               <Stack justifyContent="space-between" alignItems="center">
                 <Text variant="reg16" element="span">
-                  {registerSystemData.registerSystem.system.clientId}
+                  {createResult.clientId}
                 </Text>
                 <CopyButton
                   copiedLabel={intl.formatMessage(buttonMessages.copied)}
                   copyLabel={intl.formatMessage(buttonMessages.copy)}
-                  data={
-                    registerSystemData.registerSystem.system.clientId as string
-                  }
+                  data={createResult.clientId}
                 />
               </Stack>
             </Stack>
@@ -787,14 +817,12 @@ export function SystemList({ hideNavigation }: { hideNavigation?: boolean }) {
               </Text>
               <Stack justifyContent="space-between" alignItems="center">
                 <Text variant="reg16" element="span">
-                  {registerSystemData.registerSystem.clientSecret}
+                  {createResult.clientSecret}
                 </Text>
                 <CopyButton
                   copiedLabel={intl.formatMessage(buttonMessages.copied)}
                   copyLabel={intl.formatMessage(buttonMessages.copy)}
-                  data={
-                    registerSystemData.registerSystem.clientSecret as string
-                  }
+                  data={createResult.clientSecret}
                 />
               </Stack>
             </Stack>
@@ -804,97 +832,40 @@ export function SystemList({ hideNavigation }: { hideNavigation?: boolean }) {
               </Text>
               <Stack justifyContent="space-between" alignItems="center">
                 <Text variant="reg16" element="span">
-                  {registerSystemData.registerSystem.system.shaSecret}
+                  {createResult.shaSecret}
                 </Text>
                 <CopyButton
                   copiedLabel={intl.formatMessage(buttonMessages.copied)}
                   copyLabel={intl.formatMessage(buttonMessages.copy)}
-                  data={
-                    registerSystemData.registerSystem.system.shaSecret as string
-                  }
+                  data={createResult.shaSecret}
                 />
               </Stack>
             </Stack>
           </Stack>
         )}
-      </ResponsiveModal>
+      </Dialog>
 
-      {systemToShowPermission && (
-        <WebhookModal
-          system={systemToShowPermission}
-          loading={updatePermissionsLoading}
-          updatePermissions={updatePermissions}
-          birthPermissions={birthPermissions}
-          deathPermissions={deathPermissions}
-          setBirthPermissions={setBirthPermissions}
-          setDeathPermissions={setDeathPermissions}
-          closeModal={closePermissionModal}
-        />
-      )}
-
-      {systemToDelete && (
-        <DeleteSystemModal
-          system={systemToDelete}
-          loading={systemToDeleteLoading}
-          closeModal={() => setSystemToDelete(undefined)}
-          deleteSystem={deleteSystem}
-        />
-      )}
-
-      {activateSystemData && (
-        <Toast
-          type="success"
-          id="toggleClientActiveStatusToast"
-          onClose={() => resetData()}
-        >
-          {intl.formatMessage(integrationMessages.activateClientStatus)}
-        </Toast>
-      )}
-      {deactivateSystemData && (
-        <Toast
-          type="success"
-          id="toggleClientDeActiveStatusToast"
-          onClose={() => resetData()}
-        >
-          {intl.formatMessage(integrationMessages.deactivateClientStatus)}
-        </Toast>
-      )}
-      {updatePermissionsData && (
-        <Toast
-          type="success"
-          id="updaPermissionsSuccess"
-          onClose={() => resetData()}
-        >
-          {intl.formatMessage(integrationMessages.updatePermissionsMsg)}
-        </Toast>
-      )}
-
-      {systemToDeleteData && (
-        <Toast
-          type="success"
-          id="systemToDeleteSuccess"
-          onClose={() => resetData()}
-        >
-          {intl.formatMessage(integrationMessages.deleteSystemMsg)}
-        </Toast>
-      )}
-
-      {(activateSystemError ||
-        deactivateSystemError ||
-        registerSystemError ||
-        refreshTokenError ||
-        updatePermissionsError ||
-        systemToDeleteError) && (
+      {createError && (
         <Toast
           type="error"
-          id="toggleClientStatusToast"
+          id="createErrorToast"
           onClose={() => {
-            resetData()
+            resetCreate()
           }}
         >
           {intl.formatMessage(integrationMessages.error)}
         </Toast>
       )}
-    </WithFrame>
+
+      {toastMessage && (
+        <Toast
+          type={toastMessage.type === 'success' ? 'success' : 'error'}
+          id="actionToast"
+          onClose={() => setToastMessage(null)}
+        >
+          {toastMessage.message}
+        </Toast>
+      )}
+    </>
   )
 }

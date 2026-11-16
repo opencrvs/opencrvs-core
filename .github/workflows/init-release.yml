@@ -10,19 +10,20 @@
 # Starts a release. Run it manually with a semver version.
 #
 # A "channel" is the <major>.<minor> a version belongs to: 1.9.17 is on 1.9,
-# 2.0.3 on 2.0. master tracks the channel that last shipped.
+# 2.0.3 on 2.0. The newest channel is the highest one with a published
+# release, and develop carries its work.
 #
 # The release branch is cut from the previous patch, or from develop for a
 # minor or major, and gets the version bump and CHANGELOG commits. Where it
 # merges depends on its channel:
 #
-#   master's channel  release/<version> -> master, plus a merge-back into
-#                     develop
-#   an older channel  no PR to master. One merge-back PR into the next
-#                     unreleased patch of the nearest channel above: 1.9.17
-#                     merges into release/2.0.2 when 2.0.1 is the newest
-#                     published 2.0. The hotfix reaches master through that
-#                     channel's own release.
+#   the newest channel  one merge-back PR into develop, carrying the version
+#                       bump and the CHANGELOG entry
+#   an older channel    one merge-back PR into the next unreleased patch of
+#                       the nearest channel above: 1.9.17 merges into
+#                       release/2.0.2 when 2.0.1 is the newest published 2.0.
+#                       The hotfix reaches develop through that channel's own
+#                       release.
 name: Release - Start a new release
 on:
   workflow_dispatch:
@@ -38,7 +39,7 @@ env:
 
 jobs:
   release_workflow:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-26.04
     steps:
       # Runs before the checkout, so it cannot read the repository.
       - name: Determine the base branch
@@ -64,6 +65,22 @@ jobs:
           fetch-depth: 0
           token: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v6
+
+      - name: Use Node.js from .nvmrc
+        uses: actions/setup-node@v6
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+
+      # Nx needs node_modules to compute the project graph; without an
+      # install, `npx lerna` falls back to fetching an unpinned latest
+      # lerna/nx from the registry, which can fail to parse this repo's
+      # pnpm-lock.yaml.
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
       # An older channel climbs one channel at a time, so the target is the next
       # unreleased patch of x.<y+1>, or of <x+1>.0 when x.<y+1> never shipped.
       # That branch must already exist: its own release cuts it, with its own
@@ -74,20 +91,32 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           IFS='.' read -r x y _ <<< "$VERSION"
-          IFS='.' read -r mx my _ <<< "$(git show origin/master:package.json | jq -r .version)"
-          echo "master is on $mx.$my"
+
+          # every published release as "<major> <minor> <patch>". Major and
+          # minor stay separate fields so they compare as numbers — as one
+          # string, awk reads "1.10" and "1.1" as the same value.
+          published=$(gh release list --limit 200 --exclude-drafts --exclude-pre-releases \
+            --json tagName --jq '.[].tagName' \
+            | sed -n 's/^v\([0-9]*\)\.\([0-9]*\)\.\([0-9]*\)$/\1 \2 \3/p')
+
+          # The newest channel, which used to be read off master's package.json.
+          # A release on an older channel never merges up past the channel above
+          # it, so the highest published <major>.<minor> is the newest channel.
+          read -r mx my <<< "$(echo "$published" \
+            | awk 'NR == 1 { mx = $1; my = $2 }
+                   $1 > mx || ($1 == mx && $2 > my) { mx = $1; my = $2 }
+                   END { print mx, my }')"
+
+          if [ -z "$mx" ]; then
+            echo "::error::No published release found, so the newest channel cannot be determined."
+            exit 1
+          fi
+          echo "the newest published channel is $mx.$my"
 
           if [ "$x" -gt "$mx" ] || { [ "$x" -eq "$mx" ] && [ "$y" -ge "$my" ]; }; then
-            target=master
+            target=develop
             merge_back=develop
           else
-            # every published release as "<major> <minor> <patch>". Major and
-            # minor stay separate fields so they compare as numbers — as one
-            # string, awk reads "1.10" and "1.1" as the same value.
-            published=$(gh release list --limit 200 --exclude-drafts --exclude-pre-releases \
-              --json tagName --jq '.[].tagName' \
-              | sed -n 's/^v\([0-9]*\)\.\([0-9]*\)\.\([0-9]*\)$/\1 \2 \3/p')
-
             for candidate in "$x $((y + 1))" "$((x + 1)) 0"; do
               read -r cx cy <<< "$candidate"
               patch=$(echo "$published" | awk -v a="$cx" -v b="$cy" '$1 == a && $2 == b { print $3 }' | sort -n | tail -1)
@@ -113,6 +142,7 @@ jobs:
           # 1.9.17 into 2.0.2 -> merge-back/release-1917-into-202.
           slug="${merge_back#release/}"
           echo "$VERSION -> $target, merging back into $merge_back"
+          echo "newest_channel=$mx.$my" >> $GITHUB_OUTPUT
           echo "target_branch=$target" >> $GITHUB_OUTPUT
           echo "merge_back_target=$merge_back" >> $GITHUB_OUTPUT
           echo "mergeback_branch=merge-back/release-${VERSION//./}-into-${slug//./}" >> $GITHUB_OUTPUT
@@ -132,8 +162,49 @@ jobs:
 
           git checkout -b "$RELEASE_BRANCH"
 
-          npx lerna exec "yarn version --new-version $VERSION --no-git-tag-version"
-          yarn version --new-version "$VERSION" --no-git-tag-version
+          npx lerna exec "npm version --new-version $VERSION --no-git-tag-version"
+          npm version $VERSION --no-git-tag-version --allow-same-version
+
+          # Bump helm chart version
+          find charts/ -name Chart.yaml -exec sed -i -E "s/^(version|appVersion):.*/\1: v$VERSION/" {} \;
+          # Update core and countryconfig image in opencrvs services chart
+          sed -i.bak -E '
+          /^platform:/,/^[^[:space:]]/ {
+            s/^([[:space:]]*tag:[[:space:]]*).*/\1v'"$VERSION"'/
+          }
+          /^countryconfig:/,/^[^[:space:]]/ {
+            /^[[:space:]]*image:/,/^[[:space:]]{2}[a-zA-Z0-9_-]+:/ {
+              s/^([[:space:]]*tag:[[:space:]]*).*/\1v'"$VERSION"'/
+            }
+          }
+          ' charts/opencrvs-services/values.yaml
+          rm charts/opencrvs-services/values.yaml.bak
+          # Read the two tags back: a pattern that stopped matching must fail the
+          # run, not leave the previous release's tag in place.
+          platform_tag=$(awk '/^[^[:space:]]/ { p = ($0 ~ /^platform:/) } p && $1 == "tag:" { print $2; exit }' charts/opencrvs-services/values.yaml)
+          countryconfig_tag=$(awk '/^[^[:space:]]/ { c = ($0 ~ /^countryconfig:/) } c && $1 == "tag:" { print $2; exit }' charts/opencrvs-services/values.yaml)
+          if [ "$platform_tag" != "v$VERSION" ] || [ "$countryconfig_tag" != "v$VERSION" ]; then
+            echo "::error::charts/opencrvs-services/values.yaml: image tags are '$platform_tag' and '$countryconfig_tag', expected v$VERSION"
+            exit 1
+          fi
+          # Update utilities image in Dependencies helm chart
+          sed -i.bak -E '
+          /^utilities:/,/^[^[:space:]]/ {
+            /^[[:space:]]*image:/,/^[[:space:]]{2}[a-zA-Z0-9_-]+:/ {
+              s/^([[:space:]]*tag:[[:space:]]*).*/\1v'"$VERSION"'/
+            }
+          }
+          ' charts/dependencies/values.yaml
+          rm charts/dependencies/values.yaml.bak
+
+          # Point the countryconfig-template Tiltfile's local-dev defaults at
+          # this release, so `tilt up` picks up the right core images and
+          # Helm charts out of the box without anyone needing to export
+          # OPENCRVS_CORE_IMAGE_TAG / OPENCRVS_CORE_REF by hand.
+          sed -i.bak -E 's#(core_images_tag = os\.getenv\("OPENCRVS_CORE_IMAGE_TAG", ")[^"]*(")#\1v${{ inputs.version }}\2#' packages/countryconfig-template/Tiltfile
+          sed -i.bak -E 's#(core_ref = os\.getenv\("OPENCRVS_CORE_REF", ")[^"]*(")#\1release/${{ inputs.version }}\2#' packages/countryconfig-template/Tiltfile
+          rm packages/countryconfig-template/Tiltfile.bak
+
           git add .
           git commit -m "chore: update version to $VERSION"
 
@@ -227,6 +298,7 @@ jobs:
         run: |
           BRANCH="${{ steps.target.outputs.mergeback_branch }}"
           TARGET="${{ steps.target.outputs.merge_back_target }}"
+          NEWEST_CHANNEL="${{ steps.target.outputs.newest_channel }}"
           RESOLVED="${{ steps.merge_back.outputs.auto_resolved }}"
 
           # base, head, title, body. An already-open PR is left alone, so a
@@ -247,17 +319,20 @@ jobs:
           fi
 
           if [ "$TARGET" = "develop" ]; then
-            create_pr master "$RELEASE_BRANCH" "Release v$VERSION" "$BODY"
             TITLE="chore: merge release v$VERSION back to develop"
-            NOTE="Merge release branch back to develop to include version bump and changelog updates."
+            NOTE="$BODY
+
+          ---
+
+          > Merge the release branch back into \`develop\` to include the version bump and changelog updates."
           else
-            echo "$VERSION is on an older channel than master, so no release PR to master."
+            echo "$VERSION is on an older channel than $NEWEST_CHANNEL, so it does not merge straight into develop."
             TITLE="chore: merge release v$VERSION into $TARGET"
             NOTE="$BODY
 
           ---
 
-          > **Note:** \`$VERSION\` is on an older channel than the one \`master\` tracks, so no release PR to \`master\` is opened. This PR carries the release up into \`$TARGET\`, and it reaches \`master\` and \`develop\` through that channel's own release."
+          > **Note:** \`$VERSION\` is on an older channel than \`$NEWEST_CHANNEL\`, so it does not merge straight into \`develop\`. This PR carries the release up into \`$TARGET\`, and it reaches \`develop\` through that channel's own release."
 
             if [ -n "$RESOLVED" ]; then
               NOTE="$NOTE
@@ -276,15 +351,12 @@ jobs:
       # run was started on, and take the target branch worked out above rather
       # than deriving it themselves.
       #
-      # TODO: countryconfig, testland and helm-charts only cut release branches on
-      # the 1.9.x line; 2.0 ships its charts from this repo. Drop them from this
-      # list once this branch reaches develop.
+      # countryconfig and testland are not triggered: they now live in this
+      # repository as packages/countryconfig-template and packages/testland, so
+      # the release branch above covers them.
       - name: Trigger the companion workflows
         env:
-          COUNTRYCONFIG_TOKEN: ${{ secrets.COUNTRYCONFIG_WORKFLOW_TOKEN }}
           INFRASTRUCTURE_TOKEN: ${{ secrets.INFRASTRUCTURE_WORKFLOW_TOKEN }}
-          TESTLAND_TOKEN: ${{ secrets.TESTLAND_WORKFLOW_TOKEN }}
-          HELM_CHARTS_TOKEN: ${{ secrets.HELM_CHARTS_WORKFLOW_TOKEN }}
         run: |
           trigger() { # repo, token
             GH_TOKEN="$2" gh workflow run init-release.yml \
@@ -295,10 +367,7 @@ jobs:
             echo "Triggered init-release in $1"
           }
 
-          trigger opencrvs-countryconfig "$COUNTRYCONFIG_TOKEN"
           trigger infrastructure "$INFRASTRUCTURE_TOKEN"
-          trigger opencrvs-testland "$TESTLAND_TOKEN"
-          trigger helm-charts "$HELM_CHARTS_TOKEN"
 
       - name: Create the release branch in the e2e repo
         env:

@@ -11,13 +11,16 @@
 
 import { useMemo } from 'react'
 import {
+  EventConfig,
   EventDocument,
+  EventValidatorContext,
+  getEventValidatorContext,
   getOrThrow,
   ValidatorContext
 } from '@opencrvs/commons/client'
-import { getToken, getTokenPayload } from '@client/utils/authUtils'
 import { useAuthentication } from '../../utils/userUtils'
-import { useSuspenseAdminLeafLevelLocations } from './useLocations'
+import { useEventConfigurations } from '../features/events/useEventConfiguration'
+import { useSuspenseGetLeafAdministrativeAreaIds } from './useAdministrativeAreas'
 
 /**
  * Private hook for reading user details. Since the user is authenticated, we can assume the token is valid, and some other process throws an error when it becomes invalid.
@@ -33,13 +36,37 @@ function useUser() {
   )
 }
 
+export function resolveEventValidatorContext(
+  configs: EventConfig[],
+  event?: EventDocument
+): EventValidatorContext | undefined {
+  const eventConfig = configs.find((c) => c.id === event?.type)
+
+  if (!event || !eventConfig) {
+    return undefined
+  }
+
+  return getEventValidatorContext(event, eventConfig)
+}
+
 export function useValidatorContext(event?: EventDocument): ValidatorContext {
-  const leafAdminStructureLocationIds = useSuspenseAdminLeafLevelLocations()
+  const leafAdminStructureLocationIds =
+    useSuspenseGetLeafAdministrativeAreaIds()
   const user = useUser()
+  const configs = useEventConfigurations()
+
+  /**
+   * Aggregating the action history is expensive and conditionals are evaluated
+   * per field, per conditional type — so compute it once per (event, config).
+   */
+  const eventContext = useMemo(
+    () => resolveEventValidatorContext(configs, event),
+    [event, configs]
+  )
 
   return {
     user,
     leafAdminStructureLocationIds,
-    event
+    event: eventContext
   }
 }

@@ -19,19 +19,20 @@ import {
   ActionType,
   EventDocument,
   EventIndex,
-  getActionReview,
   getCurrentEventState,
-  getDeclaration
+  getDeclaration,
+  eventAttachmentPath
 } from '@opencrvs/commons/client'
-import { FormTabs, Frame, Icon, IFormTabs, Spinner } from '@opencrvs/components'
-import { Duplicate } from '@opencrvs/components/lib/icons'
+import { FormTabs, Frame, Icon, IFormTabs } from '@opencrvs/components'
 import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
 import { ROUTES } from '@client/v2-events/routes'
 import { Review as ReviewComponent } from '@client/v2-events/features/events/components/Review'
 import { useIntlFormatMessageWithFlattenedParams } from '@client/v2-events/messages/utils'
 import { withSuspense } from '@client/v2-events/components/withSuspense'
+import { SuspenseLoadingFallback } from '@client/v2-events/components/SuspenseLoadingFallback'
 import { FormHeader } from '@client/v2-events/layouts/form/FormHeader'
+import { recordAnchorDate } from '@client/v2-events/utils'
 import { findLocalEventDocument } from '../../useEvents/api'
 import { useValidatorContext } from '../../../../hooks/useValidatorContext'
 import { DuplicateForm } from './DuplicateForm'
@@ -108,6 +109,12 @@ export const duplicateMessages = {
     id: 'duplicates.content.registeredBy',
     defaultMessage: 'Registered by',
     description: 'Registered by label for duplicates comparison'
+  },
+  notDuplicateContentConfirmationDescription: {
+    id: 'duplicates.content.notDuplicateContentConfirmationDescription',
+    defaultMessage:
+      'By clicking "Confirm", the event will be marked as not a duplicate.',
+    description: 'Not a duplicate content confirmation description message'
   }
 }
 
@@ -131,7 +138,7 @@ function ReviewDuplicate() {
   const intl = useIntl()
   const navigate = useNavigate()
   const events = useEvents()
-  const event = events.getEvent.findFromCache(eventId).data
+  const event = events.getEvent.useFindEventFromCache(eventId).data
   const validatorContext = useValidatorContext(event)
 
   useEffect(() => {
@@ -140,7 +147,7 @@ function ReviewDuplicate() {
       console.warn(
         `Event with id ${eventId} not found in cache. Redirecting to overview.`
       )
-      return navigate(ROUTES.V2.EVENTS.OVERVIEW.buildPath({ eventId }))
+      return navigate(ROUTES.V2.EVENTS.EVENT.buildPath({ eventId }))
     }
   }, [event, eventId, navigate])
 
@@ -185,7 +192,14 @@ function ReviewDuplicate() {
     }))
   ]
 
-  const { title, fields } = getActionReview(configuration, ActionType.READ)
+  const actionConfiguration = configuration.actions.find(
+    (a) => a.type === ActionType.READ
+  )
+  if (!actionConfiguration) {
+    throw new Error('Action configuration not found')
+  }
+
+  const { title, fields } = actionConfiguration.review
   const { formatMessage } = useIntlFormatMessageWithFlattenedParams()
 
   const formConfig = getDeclaration(configuration)
@@ -194,7 +208,6 @@ function ReviewDuplicate() {
     <Frame
       header={
         <FormHeader
-          appbarIcon={<Duplicate />}
           label={intl.formatMessage(duplicateMessages.duplicateReviewHeader, {
             event: intl.formatMessage(configuration.label)
           })}
@@ -211,9 +224,13 @@ function ReviewDuplicate() {
         />
       </TopBar>
       {selectedTab === event.trackingId ? (
-        <React.Suspense fallback={<Spinner id="event-form-spinner" />}>
+        <React.Suspense
+          fallback={<SuspenseLoadingFallback id="event-form-spinner" />}
+        >
           <ReviewComponent.Body
             readonlyMode
+            anchor={recordAnchorDate(eventState)}
+            attachmentPath={eventAttachmentPath(eventState.id)}
             banner={<DuplicateForm eventIndex={eventState} />}
             form={eventState.declaration}
             formConfig={formConfig}

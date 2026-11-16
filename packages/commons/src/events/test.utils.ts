@@ -23,10 +23,15 @@ import {
   ActionUpdate
 } from './ActionDocument'
 import {
+  getEventValidatorContext,
+  ValidatorContext
+} from '../conditionals/validate'
+import {
   ApproveCorrectionActionInput,
   ArchiveActionInput,
   AssignActionInput,
   DeclareActionInput,
+  EditActionInput,
   MarkAsDuplicateActionInput,
   MarkNotDuplicateActionInput,
   NotifyActionInput,
@@ -34,12 +39,12 @@ import {
   RejectCorrectionActionInput,
   RejectDeclarationActionInput,
   RequestCorrectionActionInput,
-  UnassignActionInput,
-  ValidateActionInput
+  UnarchiveActionInput,
+  UnassignActionInput
 } from './ActionInput'
 import { ActionType, DeclarationUpdateActions } from './ActionType'
 import { Draft } from './Draft'
-import { EventConfig } from './EventConfig'
+import { EventConfig, EventConfigInput } from './EventConfig'
 import { EventDocument } from './EventDocument'
 import { EventIndex } from './EventIndex'
 import { EventInput } from './EventInput'
@@ -55,6 +60,12 @@ import {
 import { TranslationConfig } from './TranslationConfig'
 import { FieldConfig } from './FieldConfig'
 import { ActionConfig } from './ActionConfig'
+import {
+  LocationVersion,
+  SetLocationPayload,
+  SetAdministrativeAreaPayload,
+  ClientAdministrativeArea
+} from './locations'
 import { EventStatus } from './EventMetadata'
 import { defineWorkqueues, WorkqueueConfig } from './WorkqueueConfig'
 import { TENNIS_CLUB_MEMBERSHIP } from './Constants'
@@ -65,9 +76,16 @@ import {
   HttpFieldValue
 } from './CompositeFieldValue'
 import { FieldValue, PlainDate } from './FieldValue'
-import { TokenUserType } from '../authentication'
-import { z } from 'zod'
-import { FullDocumentPath } from '../documents'
+import {
+  EncodedScope,
+  encodeScope,
+  ITokenPayload,
+  TokenUserType
+} from '../authentication'
+import * as z from 'zod/v4'
+import { DocumentPath } from '../documents'
+import { defineConfig } from './defineConfig'
+import { V2_DEFAULT_MOCK_ADMINISTRATIVE_AREAS_MAP } from './mocks.test.utils'
 
 /**
  * IANA timezone used in testing. Used for queries that expect similar results independent of the users location (e.g. when event was registered.)
@@ -86,12 +104,14 @@ export const TestUserRole = z.enum([
   'NATIONAL_REGISTRAR',
   'REGISTRATION_AGENT',
   'NATIONAL_SYSTEM_ADMIN',
-  'SOCIAL_WORKER'
+  'SOCIAL_WORKER',
+  'COMMUNITY_LEADER',
+  'PROVINCIAL_REGISTRAR'
 ])
 
 export type TestUserRole = z.infer<typeof TestUserRole>
 
-function pickRandom<T>(rng: () => number, items: T[]): T {
+export function pickRandom<T>(rng: () => number, items: T[]): T {
   return items[Math.floor(rng() * items.length)]
 }
 
@@ -155,8 +175,28 @@ export function generateRegistrationNumber(rng: () => number): string {
   return registrationNumber
 }
 
-export function generateRandomSignature(rng: () => number): string {
-  return `/random-bucket/${generateUuid(rng)}.png`
+export function generateRandomSignature(rng: () => number): DocumentPath {
+  return `${generateUuid(rng)}.png` as DocumentPath
+}
+
+/**
+ * Builds one element of a location / administrative area `versions` history.
+ * Every field is defaulted so a call names only what its assertion is about —
+ * an `effectiveFrom`, a `name`, or an explicit `versionId` when the test needs
+ * to control version identity.
+ */
+export function locationVersion(
+  overrides: Partial<LocationVersion> = {},
+  rng?: () => number
+): LocationVersion {
+  return {
+    versionId: generateUuid(rng),
+    effectiveFrom: '0001-01-01',
+    name: 'Location name',
+    externalId: null,
+    status: 'active',
+    ...overrides
+  }
 }
 
 /**
@@ -165,8 +205,22 @@ export function generateRandomSignature(rng: () => number): string {
 function mapFieldTypeToMockValue(
   field: FieldConfig,
   i: number,
-  rng: () => number
+  rng: () => number,
+  /**
+   * Given hierarchy, ensures that related fields (e.g. location and administrative area) have valid values based on the hierarchy.
+   */
+  administrativeHierarchy?: {
+    administrativeAreas: SetAdministrativeAreaPayload[]
+    locations: SetLocationPayload[]
+  }
 ): FieldValue {
+  const leafLevelAdministrativeAreas =
+    administrativeHierarchy?.administrativeAreas.filter((aa) =>
+      administrativeHierarchy?.administrativeAreas.every(
+        (other) => other.parentId !== aa.id
+      )
+    )
+
   switch (field.type) {
     case FieldType.FIELD_GROUP: {
       const nestedValue: Record<string, FieldValue> = field.fields.reduce(
@@ -193,17 +247,24 @@ function mapFieldTypeToMockValue(
     case FieldType.COUNTRY:
     case FieldType.RADIO_GROUP:
     case FieldType.PARAGRAPH:
+    case FieldType.HEADING:
+    case FieldType.IMAGE_VIEW:
     case FieldType.ADMINISTRATIVE_AREA:
-    case FieldType.FACILITY:
     case FieldType.PHONE:
     case FieldType.QUERY_PARAM_READER:
     case FieldType.ID:
-    case FieldType.OFFICE:
     case FieldType.LINK_BUTTON:
     case FieldType.LOADER:
+    case FieldType.ALPHA_HIDDEN:
       return `${field.id}-${field.type}-${i}`
     case FieldType.VERIFICATION_STATUS:
       return 'verified'
+    case FieldType.FACILITY:
+    case FieldType.OFFICE:
+      return administrativeHierarchy?.locations
+        ? pickRandom(rng, administrativeHierarchy.locations)?.id
+        : ('a45b982a-5c7b-4bd9-8fd8-a42d0994054c' as UUID)
+
     case FieldType.NAME:
       return generateRandomName(rng)
     case FieldType.NUMBER:
@@ -221,9 +282,9 @@ function mapFieldTypeToMockValue(
       return {
         country: 'FAR',
         addressType: AddressType.DOMESTIC,
-        // @NOTE: This happens to map to a valid location in events test environment. Updating it will break tests.
-        // @TODO:  Find a way to give out context aware mock values in the future.
-        administrativeArea: '27160bbd-32d1-4625-812f-860226bfb92a' as UUID,
+        administrativeArea: leafLevelAdministrativeAreas
+          ? pickRandom(rng, leafLevelAdministrativeAreas)?.id
+          : ('27160bbd-32d1-4625-812f-860226bfb92a' as UUID),
         streetLevelDetails: {
           town: 'Example Town',
           residentialArea: 'Example Residential Area',
@@ -255,11 +316,12 @@ function mapFieldTypeToMockValue(
     case FieldType.SIGNATURE:
     case FieldType.FILE:
       return {
-        path: '/ocrvs/4f095fc4-4312-4de2-aa38-86dcc0f71044.png' as FullDocumentPath,
+        path: '4f095fc4-4312-4de2-aa38-86dcc0f71044.png' as DocumentPath,
         originalFilename: 'abcd.png',
         type: 'image/png'
       } satisfies FileFieldValue
     case FieldType.SEARCH:
+    case FieldType.AUTOCOMPLETE:
     case FieldType.HTTP:
       return {
         error: null,
@@ -268,22 +330,37 @@ function mapFieldTypeToMockValue(
       } satisfies HttpFieldValue
     case FieldType.FILE_WITH_OPTIONS:
     case FieldType.DATA:
+    case FieldType._EXPERIMENTAL_CUSTOM:
       return undefined
     case FieldType.QR_READER:
       return Object.create(null)
     case FieldType.ID_READER:
       return Object.create(null)
+    case FieldType.USER_ROLE:
+      return TestUserRole.enum.FIELD_AGENT
   }
 }
 
 export function fieldConfigsToActionPayload(
   fields: FieldConfig[],
-  rng: () => number
+  rng: () => number,
+  /**
+   * Given hierarchy, ensures that related fields (e.g. location and administrative area) have valid values based on the hierarchy.
+   */
+  administrativeHierarchy?: {
+    administrativeAreas: SetAdministrativeAreaPayload[]
+    locations: SetLocationPayload[]
+  }
 ): ActionUpdate {
   return fields.reduce(
     (acc, field, i) => ({
       ...acc,
-      [field.id]: mapFieldTypeToMockValue(field, i, rng)
+      [field.id]: mapFieldTypeToMockValue(
+        field,
+        i,
+        rng,
+        administrativeHierarchy
+      )
     }),
     {}
   )
@@ -293,19 +370,31 @@ export function generateActionDeclarationInput(
   configuration: EventConfig,
   action: ActionType,
   rng: () => number,
-  overrides?: ActionUpdate
+  overrides?: ActionUpdate,
+  /**
+   * Given hierarchy, ensures that related fields (e.g. location and administrative area) have valid values based on the hierarchy.
+   */
+  administrativeHierarchy?: {
+    administrativeAreas: SetAdministrativeAreaPayload[]
+    locations: SetLocationPayload[]
+  }
 ): ActionUpdate {
   const parsed = DeclarationUpdateActions.safeParse(action)
 
   if (isEmpty(overrides) && typeof overrides === 'object') {
     return {}
   }
+
   if (parsed.success) {
     const fields = getDeclarationFields(configuration)
 
     const declarationConfig = getDeclaration(configuration)
 
-    const declaration = fieldConfigsToActionPayload(fields, rng)
+    const declaration = fieldConfigsToActionPayload(
+      fields,
+      rng,
+      administrativeHierarchy
+    )
 
     // Strip away hidden or disabled fields from mock action declaration
     // If this is not done, the mock data might contain hidden or disabled fields, which will cause validation errors
@@ -403,8 +492,7 @@ export function eventPayloadGenerator(
         omitFields = []
       }: {
         eventId: UUID
-        actionType: Draft['action']['type']
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        actionType: Draft['action']['type'] // eslint-disable-next-line @typescript-eslint/no-explicit-any
         annotation?: Record<string, any>
         omitFields?: string[] // list of declaration fields to exclude
       },
@@ -426,7 +514,7 @@ export function eventPayloadGenerator(
             },
             'applicant.dob': '2020-01-02',
             'applicant.image': {
-              path: '/ocrvs/e56d1dd3-2cd4-452a-b54e-bf3e2d830605.png',
+              path: 'e56d1dd3-2cd4-452a-b54e-bf3e2d830605.png' as DocumentPath,
               originalFilename: 'Screenshot.png',
               type: 'image/png'
             }
@@ -439,7 +527,7 @@ export function eventPayloadGenerator(
           },
           createdAt: new Date().toISOString(),
           createdBy: '@todo',
-          createdByUserType: TokenUserType.Enum.user,
+          createdByUserType: TokenUserType.enum.user,
           createdByRole: '@todo'
         }
       }
@@ -453,7 +541,13 @@ export function eventPayloadGenerator(
         input: Partial<
           Pick<
             DeclareActionInput,
-            'transactionId' | 'declaration' | 'annotation' | 'keepAssignment'
+            | 'transactionId'
+            | 'declaration'
+            | 'annotation'
+            | 'keepAssignment'
+            | 'keepAssignmentIfAccepted'
+            | 'keepAssignmentIfRejected'
+            | 'waitFor'
           >
         > = {}
       ) => ({
@@ -480,7 +574,12 @@ export function eventPayloadGenerator(
         input: Partial<
           Pick<
             NotifyActionInput,
-            'transactionId' | 'declaration' | 'keepAssignment'
+            | 'transactionId'
+            | 'declaration'
+            | 'keepAssignment'
+            | 'keepAssignmentIfRejected'
+            | 'keepAssignmentIfAccepted'
+            | 'waitFor'
           >
         > = {}
       ) => {
@@ -505,66 +604,75 @@ export function eventPayloadGenerator(
           transactionId: input.transactionId ?? getUUID(),
           declaration,
           eventId,
-          keepAssignment: input.keepAssignment
+          keepAssignment: input.keepAssignment,
+          keepAssignmentIfAccepted: input.keepAssignmentIfAccepted,
+          keepAssignmentIfRejected: input.keepAssignmentIfRejected,
+          waitFor: input.waitFor
         }
       },
-      validate: (
+      edit: (
         eventId: string,
         input: Partial<
           Pick<
-            ValidateActionInput,
-            'transactionId' | 'declaration' | 'annotation' | 'keepAssignment'
+            EditActionInput,
+            | 'transactionId'
+            | 'declaration'
+            | 'annotation'
+            | 'keepAssignment'
+            | 'keepAssignmentIfAccepted'
+            | 'keepAssignmentIfRejected'
+            | 'waitFor'
           >
         > = {}
       ) => ({
-        type: ActionType.VALIDATE,
+        type: ActionType.EDIT,
         transactionId: input.transactionId ?? getUUID(),
         declaration:
           input.declaration ??
-          generateActionDeclarationInput(
-            configuration,
-            ActionType.VALIDATE,
-            rng
-          ),
+          generateActionDeclarationInput(configuration, ActionType.EDIT, rng),
         annotation:
           input.annotation ??
-          generateActionAnnotationInput(
-            configuration,
-            ActionType.VALIDATE,
-            rng
-          ),
-        duplicates: [],
+          generateActionAnnotationInput(configuration, ActionType.EDIT, rng),
         eventId,
         ...input
       }),
       assign: (
         eventId: string,
         input: Partial<
-          Pick<AssignActionInput, 'transactionId' | 'assignedTo'>
+          Pick<AssignActionInput, 'transactionId' | 'assignedTo' | 'waitFor'>
         > = {}
       ) => ({
         type: ActionType.ASSIGN,
         transactionId: input.transactionId ?? getUUID(),
         declaration: {},
         assignedTo: input.assignedTo ?? getUUID(),
-        eventId
+        eventId,
+        waitFor: input.waitFor
       }),
       unassign: (
         eventId: string,
-        input: Partial<Pick<UnassignActionInput, 'transactionId'>> = {}
+        input: Partial<
+          Pick<UnassignActionInput, 'transactionId' | 'waitFor'>
+        > = {}
       ) => ({
         type: ActionType.UNASSIGN,
         transactionId: input.transactionId ?? getUUID(),
         declaration: {},
         assignedTo: null,
-        eventId
+        eventId,
+        waitFor: input.waitFor
       }),
       archive: (
         eventId: string,
         input: Partial<
           Pick<
             ArchiveActionInput,
-            'transactionId' | 'declaration' | 'keepAssignment'
+            | 'transactionId'
+            | 'declaration'
+            | 'keepAssignment'
+            | 'keepAssignmentIfRejected'
+            | 'keepAssignmentIfAccepted'
+            | 'waitFor'
           >
         > = {}
       ) => ({
@@ -572,11 +680,28 @@ export function eventPayloadGenerator(
         transactionId: input.transactionId ?? getUUID(),
         declaration: {},
         annotation: {},
-        duplicates: [],
         eventId,
-        content: {
-          reason: `${ActionType.ARCHIVE}`
-        },
+        ...input
+      }),
+      unarchive: (
+        eventId: string,
+        input: Partial<
+          Pick<
+            UnarchiveActionInput,
+            | 'transactionId'
+            | 'declaration'
+            | 'keepAssignment'
+            | 'keepAssignmentIfRejected'
+            | 'keepAssignmentIfAccepted'
+            | 'waitFor'
+          >
+        > = {}
+      ) => ({
+        type: ActionType.UNARCHIVE,
+        transactionId: input.transactionId ?? getUUID(),
+        declaration: {},
+        annotation: {},
+        eventId,
         ...input
       }),
       reject: (
@@ -584,7 +709,12 @@ export function eventPayloadGenerator(
         input: Partial<
           Pick<
             RejectDeclarationActionInput,
-            'transactionId' | 'annotation' | 'keepAssignment'
+            | 'transactionId'
+            | 'annotation'
+            | 'keepAssignment'
+            | 'keepAssignmentIfAccepted'
+            | 'keepAssignmentIfRejected'
+            | 'waitFor'
           >
         > = {}
       ) => ({
@@ -594,7 +724,6 @@ export function eventPayloadGenerator(
         annotation:
           input.annotation ??
           generateActionAnnotationInput(configuration, ActionType.REJECT, rng),
-        duplicates: [],
         eventId,
         content: { reason: `${ActionType.REJECT}` },
         ...input
@@ -609,6 +738,9 @@ export function eventPayloadGenerator(
             | 'annotation'
             | 'keepAssignment'
             | 'registrationNumber'
+            | 'keepAssignmentIfAccepted'
+            | 'keepAssignmentIfRejected'
+            | 'waitFor'
           >
         > = {}
       ) => ({
@@ -636,7 +768,12 @@ export function eventPayloadGenerator(
         input: Partial<
           Pick<
             RegisterActionInput,
-            'transactionId' | 'annotation' | 'keepAssignment'
+            | 'transactionId'
+            | 'annotation'
+            | 'keepAssignment'
+            | 'keepAssignmentIfRejected'
+            | 'keepAssignmentIfAccepted'
+            | 'waitFor'
           >
         > = {}
       ) => ({
@@ -659,7 +796,13 @@ export function eventPayloadGenerator(
           input: Partial<
             Pick<
               RequestCorrectionActionInput,
-              'transactionId' | 'declaration' | 'annotation' | 'keepAssignment'
+              | 'transactionId'
+              | 'declaration'
+              | 'annotation'
+              | 'keepAssignment'
+              | 'keepAssignmentIfRejected'
+              | 'keepAssignmentIfAccepted'
+              | 'waitFor'
             >
           > = {}
         ) => ({
@@ -683,7 +826,10 @@ export function eventPayloadGenerator(
               rng
             ),
           eventId,
-          keepAssignment: input.keepAssignment
+          keepAssignment: input.keepAssignment,
+          keepAssignmentIfAccepted: input.keepAssignmentIfAccepted,
+          keepAssignmentIfRejected: input.keepAssignmentIfRejected,
+          waitFor: input.waitFor
         }),
         approve: (
           eventId: string,
@@ -691,7 +837,12 @@ export function eventPayloadGenerator(
           input: Partial<
             Pick<
               ApproveCorrectionActionInput,
-              'transactionId' | 'annotation' | 'keepAssignment'
+              | 'transactionId'
+              | 'annotation'
+              | 'keepAssignment'
+              | 'keepAssignmentIfRejected'
+              | 'keepAssignmentIfAccepted'
+              | 'waitFor'
             >
           > = {}
         ) => ({
@@ -707,7 +858,10 @@ export function eventPayloadGenerator(
             ),
           eventId,
           requestId,
-          keepAssignment: input.keepAssignment
+          keepAssignment: input.keepAssignment,
+          keepAssignmentIfAccepted: input.keepAssignmentIfAccepted,
+          keepAssignmentIfRejected: input.keepAssignmentIfRejected,
+          waitFor: input.waitFor
         }),
         reject: (
           eventId: string,
@@ -715,7 +869,13 @@ export function eventPayloadGenerator(
           input: Partial<
             Pick<
               RejectCorrectionActionInput,
-              'transactionId' | 'annotation' | 'keepAssignment' | 'content'
+              | 'transactionId'
+              | 'annotation'
+              | 'content'
+              | 'keepAssignment'
+              | 'keepAssignmentIfRejected'
+              | 'keepAssignmentIfAccepted'
+              | 'waitFor'
             >
           >
         ) => ({
@@ -731,8 +891,11 @@ export function eventPayloadGenerator(
             ),
           eventId,
           requestId,
+          content: input.content ?? { reason: 'too late' },
           keepAssignment: input.keepAssignment,
-          content: input.content ?? { reason: '' }
+          keepAssignmentIfAccepted: input.keepAssignmentIfAccepted,
+          keepAssignmentIfRejected: input.keepAssignmentIfRejected,
+          waitFor: input.waitFor
         })
       },
       duplicate: {
@@ -815,8 +978,8 @@ export function generateActionDocument<T extends ActionType>({
     // @TODO: This should be fixed in the future.
     createdAt: new Date(Date.now() - 500).toISOString(),
     createdBy: generateUuid(rng),
-    createdByUserType: TokenUserType.Enum.user,
-    createdByRole: TestUserRole.Enum.FIELD_AGENT,
+    createdByUserType: TokenUserType.enum.user,
+    createdByRole: TestUserRole.enum.FIELD_AGENT,
     id: getUUID(),
     createdAtLocation: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c' as UUID,
     declaration: generateActionDeclarationInput(
@@ -833,15 +996,29 @@ export function generateActionDocument<T extends ActionType>({
 
   switch (action) {
     case ActionType.READ:
-      return { ...actionBase, type: action }
     case ActionType.MARK_AS_NOT_DUPLICATE:
+    case ActionType.DECLARE:
+    case ActionType.UNASSIGN:
+    case ActionType.CREATE:
+    case ActionType.NOTIFY:
+    case ActionType.REGISTER:
+    case ActionType.REQUEST_CORRECTION:
+    case ActionType.UNARCHIVE:
       return { ...actionBase, type: action }
+    case ActionType.EDIT:
+      return {
+        ...actionBase,
+        type: action,
+        content: { comment: 'Test comment' }
+      }
+    case ActionType.CUSTOM:
+      return {
+        ...actionBase,
+        type: action,
+        customActionType: 'CUSTOM_ACTION_TYPE'
+      }
     case ActionType.MARK_AS_DUPLICATE:
       return { ...actionBase, type: action, content: undefined }
-    case ActionType.DECLARE:
-      return { ...actionBase, type: action }
-    case ActionType.UNASSIGN:
-      return { ...actionBase, type: action }
     case ActionType.ASSIGN: {
       const assignActionDefaults = defaults as
         | Partial<Extract<ActionDocument, { type: 'ASSIGN' }>>
@@ -852,16 +1029,11 @@ export function generateActionDocument<T extends ActionType>({
         type: action
       }
     }
-    case ActionType.VALIDATE:
-      return { ...actionBase, type: action }
     case ActionType.ARCHIVE:
       return { ...actionBase, type: action, content: { reason: 'Archive' } }
     case ActionType.REJECT:
       return { ...actionBase, type: action, content: { reason: 'Reject' } }
-    case ActionType.CREATE:
-      return { ...actionBase, type: action }
-    case ActionType.NOTIFY:
-      return { ...actionBase, type: action }
+
     case ActionType.PRINT_CERTIFICATE: {
       const printActionDefaults = defaults as
         | Partial<PrintCertificateAction>
@@ -872,8 +1044,6 @@ export function generateActionDocument<T extends ActionType>({
         content: printActionDefaults?.content
       }
     }
-    case ActionType.REQUEST_CORRECTION:
-      return { ...actionBase, type: action }
     case ActionType.APPROVE_CORRECTION:
       return { ...actionBase, requestId: getUUID(), type: action }
     case ActionType.REJECT_CORRECTION:
@@ -882,11 +1052,6 @@ export function generateActionDocument<T extends ActionType>({
         requestId: getUUID(),
         type: action,
         content: { reason: 'Correction rejection' }
-      }
-    case ActionType.REGISTER:
-      return {
-        ...actionBase,
-        type: action
       }
     case ActionType.DUPLICATE_DETECTED: {
       const duplicateActionDefaults = defaults as
@@ -948,7 +1113,7 @@ export function generateEventDocument({
   defaults?: Partial<EventDocument>
 }): EventDocument {
   return {
-    trackingId: getUUID(),
+    trackingId: generateTrackingId(rng),
     type: configuration.id,
     actions: actions.map((action, i) =>
       generateActionDocument({
@@ -1084,8 +1249,6 @@ export const eventQueryDataGenerator = (
     createdBy: overrides.createdBy ?? generateUuid(rng),
     createdAtLocation: overrides.createdAtLocation ?? generateUuid(rng),
     updatedAtLocation: overrides.updatedAtLocation ?? generateUuid(rng),
-    createdBySignature:
-      overrides.createdBySignature ?? generateRandomSignature(rng),
     updatedAt:
       overrides.updatedAt ?? addDays(new Date(createdAt), 1).toISOString(),
     assignedTo: overrides.assignedTo ?? null,
@@ -1106,15 +1269,6 @@ export const generateTranslationConfig = (
   id: message.trim().replace(/\s+/g, '_').toLowerCase()
 })
 
-export const BearerTokenByUserType = {
-  fieldAgent:
-    'eyJhbGciOiJFZERTQSIsInR5cCI6IkpXVCJ9.eyJzY29wZSI6WyJyZWNvcmQuY3JlYXRlW2V2ZW50PWJpcnRofGRlYXRofHRlbm5pcy1jbHViLW1lbWJlcnNoaXBdIiwicmVjb3JkLmRlY2xhcmVbZXZlbnQ9YmlydGh8ZGVhdGh8dGVubmlzLWNsdWItbWVtYmVyc2hpcF0iLCJyZWNvcmQuZGVjbGFyYXRpb24tc3VibWl0LWluY29tcGxldGUiLCJyZWNvcmQuZGVjbGFyYXRpb24tc3VibWl0LWZvci1yZXZpZXciLCJzZWFyY2guYmlydGgiLCJzZWFyY2guZGVhdGgiLCJzZWFyY2gubWFycmlhZ2UiLCJkZW1vIl0sInVzZXJUeXBlIjoidXNlciIsImlhdCI6MTc0ODUyNjQ4OCwiZXhwIjoxNzQ5MTMxMjg4LCJhdWQiOlsib3BlbmNydnM6YXV0aC11c2VyIiwib3BlbmNydnM6dXNlci1tZ250LXVzZXIiLCJvcGVuY3J2czpoZWFydGgtdXNlciIsIm9wZW5jcnZzOmdhdGV3YXktdXNlciIsIm9wZW5jcnZzOm5vdGlmaWNhdGlvbi11c2VyIiwib3BlbmNydnM6d29ya2Zsb3ctdXNlciIsIm9wZW5jcnZzOnNlYXJjaC11c2VyIiwib3BlbmNydnM6bWV0cmljcy11c2VyIiwib3BlbmNydnM6Y291bnRyeWNvbmZpZy11c2VyIiwib3BlbmNydnM6d2ViaG9va3MtdXNlciIsIm9wZW5jcnZzOmNvbmZpZy11c2VyIiwib3BlbmNydnM6ZG9jdW1lbnRzLXVzZXIiXSwiaXNzIjoib3BlbmNydnM6YXV0aC1zZXJ2aWNlIiwic3ViIjoiNjc3ZmIwODYzMGYzYWJmYTMzMDcyNzBmIn0.FnnE0BziJF2sJ7GcYMPDLub-KS27NRT7i6bW0eJiSrnmKzk2CB0n0RaDpmMeugCajNq7Vwom7AlOLcUi1cdvDg',
-  registrationAgent:
-    'eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJzY29wZSI6WyJyZWNvcmQucmVhZCIsInJlY29yZC5kZWNsYXJlLWJpcnRoIiwicmVjb3JkLmRlY2xhcmUtZGVhdGgiLCJyZWNvcmQuZGVjbGFyZS1tYXJyaWFnZSIsInJlY29yZC5kZWNsYXJhdGlvbi1lZGl0IiwicmVjb3JkLmRlY2xhcmF0aW9uLXN1Ym1pdC1mb3ItYXBwcm92YWwiLCJyZWNvcmQuZGVjbGFyYXRpb24tc3VibWl0LWZvci11cGRhdGVzIiwicmVjb3JkLmRlY2xhcmF0aW9uLWFyY2hpdmUiLCJyZWNvcmQuZGVjbGFyYXRpb24tcmVpbnN0YXRlIiwicmVjb3JkLnJlZ2lzdHJhdGlvbi1yZXF1ZXN0LWNvcnJlY3Rpb24iLCJyZWNvcmQuZGVjbGFyYXRpb24tcHJpbnQtc3VwcG9ydGluZy1kb2N1bWVudHMiLCJyZWNvcmQuZXhwb3J0LXJlY29yZHMiLCJyZWNvcmQucmVnaXN0cmF0aW9uLXByaW50Jmlzc3VlLWNlcnRpZmllZC1jb3BpZXMiLCJwZXJmb3JtYW5jZS5yZWFkIiwicGVyZm9ybWFuY2UucmVhZC1kYXNoYm9hcmRzIiwib3JnYW5pc2F0aW9uLnJlYWQtbG9jYXRpb25zOm15LW9mZmljZSIsInNlYXJjaC5iaXJ0aCIsInNlYXJjaC5kZWF0aCIsInNlYXJjaC5tYXJyaWFnZSIsImRlbW8iXSwidXNlclR5cGUiOiJ1c2VyIiwiaWF0IjoxNzQ4NTI2NDY4LCJleHAiOjE3NDkxMzEyNjgsImF1ZCI6WyJvcGVuY3J2czphdXRoLXVzZXIiLCJvcGVuY3J2czp1c2VyLW1nbnQtdXNlciIsIm9wZW5jcnZzOmhlYXJ0aC11c2VyIiwib3BlbmNydnM6Z2F0ZXdheS11c2VyIiwib3BlbmNydnM6bm90aWZpY2F0aW9uLXVzZXIiLCJvcGVuY3J2czp3b3JrZmxvdy11c2VyIiwib3BlbmNydnM6c2VhcmNoLXVzZXIiLCJvcGVuY3J2czptZXRyaWNzLXVzZXIiLCJvcGVuY3J2czpjb3VudHJ5Y29uZmlnLXVzZXIiLCJvcGVuY3J2czp3ZWJob29rcy11c2VyIiwib3BlbmNydnM6Y29uZmlnLXVzZXIiLCJvcGVuY3J2czpkb2N1bWVudHMtdXNlciJdLCJpc3MiOiJvcGVuY3J2czphdXRoLXNlcnZpY2UiLCJzdWIiOiI2NzdmYjA4NjMwZjNhYmZhMzMwNzI3MTgifQ.C0R3cda9tczdJyadyJzk_wjVx79yiQ4r2BZbrF5VMTol97CwqMk1cPKVv5xZR1fHW5nhYl1X_vsmTYx-p9oSmcAYVud-4Z24TrA3oZ214zCB8RW_RmmFzJSczwe-9Son-96JOpRJTz2F-F_SSmblF0cjndJ-iXCAbOn1hmQ1q45NqaV-oFaFWigvAaRoBFcEvGufQxss_NjRmG12ooENSfWQl0tYM9BmTw4JQo2xerwJcgaJTrtDgRagkuiR7zhVNjcoT64AQiSRp5KmWRhbU4ozlJ2tfy1ccD9jJkbQTf1AZT2pl1diusjstJYFuM9QPFPOyCO0umaxYfgSer_Hmg',
-  localRegistrar:
-    'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzY29wZSI6WyJyZWNvcmQucmVhZCIsInJlY29yZC5jcmVhdGVbZXZlbnQ9djIuYmlydGh8djIuZGVhdGh8dGVubmlzLWNsdWItbWVtYmVyc2hpcF0iLCJyZWNvcmQuZGVjbGFyZVtldmVudD12Mi5iaXJ0aHx2Mi5kZWF0aHx0ZW5uaXMtY2x1Yi1tZW1iZXJzaGlwXSIsInJlY29yZC5kZWNsYXJhdGlvbi1lZGl0IiwicmVjb3JkLmRlY2xhcmF0aW9uLXN1Ym1pdC1mb3ItdXBkYXRlcyIsInJlY29yZC5yZXZpZXctZHVwbGljYXRlcyIsInJlY29yZC5kZWNsYXJhdGlvbi1hcmNoaXZlIiwicmVjb3JkLmRlY2xhcmF0aW9uLXJlaW5zdGF0ZSIsInJlY29yZC5yZWdpc3RlciIsInJlY29yZC5yZWdpc3RyYXRpb24tY29ycmVjdCIsInJlY29yZC5kZWNsYXJhdGlvbi1wcmludC1zdXBwb3J0aW5nLWRvY3VtZW50cyIsInJlY29yZC5leHBvcnQtcmVjb3JkcyIsInJlY29yZC51bmFzc2lnbi1vdGhlcnMiLCJyZWNvcmQucmVnaXN0cmF0aW9uLXByaW50Jmlzc3VlLWNlcnRpZmllZC1jb3BpZXMiLCJyZWNvcmQuY29uZmlybS1yZWdpc3RyYXRpb24iLCJyZWNvcmQucmVqZWN0LXJlZ2lzdHJhdGlvbiIsInBlcmZvcm1hbmNlLnJlYWQiLCJwZXJmb3JtYW5jZS5yZWFkLWRhc2hib2FyZHMiLCJwcm9maWxlLmVsZWN0cm9uaWMtc2lnbmF0dXJlIiwib3JnYW5pc2F0aW9uLnJlYWQtbG9jYXRpb25zOm15LW9mZmljZSIsInNlYXJjaC5iaXJ0aCIsInNlYXJjaC5kZWF0aCIsInNlYXJjaC5tYXJyaWFnZSIsImRlbW8iXSwidXNlclR5cGUiOiJ1c2VyIiwiaWF0IjoxNzQ4NTI2NDIwLCJleHAiOjE3NDkxMzEyMjAsImF1ZCI6WyJvcGVuY3J2czphdXRoLXVzZXIiLCJvcGVuY3J2czp1c2VyLW1nbnQtdXNlciIsIm9wZW5jcnZzOmhlYXJ0aC11c2VyIiwib3BlbmNydnM6Z2F0ZXdheS11c2VyIiwib3BlbmNydnM6bm90aWZpY2F0aW9uLXVzZXIiLCJvcGVuY3J2czp3b3JrZmxvdy11c2VyIiwib3BlbmNydnM6c2VhcmNoLXVzZXIiLCJvcGVuY3J2czptZXRyaWNzLXVzZXIiLCJvcGVuY3J2czpjb3VudHJ5Y29uZmlnLXVzZXIiLCJvcGVuY3J2czp3ZWJob29rcy11c2VyIiwib3BlbmNydnM6Y29uZmlnLXVzZXIiLCJvcGVuY3J2czpkb2N1bWVudHMtdXNlciJdLCJpc3MiOiJvcGVuY3J2czphdXRoLXNlcnZpY2UiLCJzdWIiOiI2NzdmYjA4NjMwZjNhYmZhMzMwNzI3MjEifQ.l5dVQfKERBCbF2HNBg6YcuiUQX-BXyowG63sHmTPNJo'
-}
-
 export const generateWorkqueues = (
   slug: string = 'all-events'
 ): WorkqueueConfig[] =>
@@ -1131,12 +1285,149 @@ export const generateWorkqueues = (
         type: 'and',
         clauses: [{ eventType: tennisClubMembershipEvent.id }]
       },
-      actions: [
-        {
-          type: 'DEFAULT',
-          conditionals: []
-        }
-      ],
+      action: { type: ActionType.READ },
       icon: 'Draft'
     }
   ])
+
+/**
+ * Backend focused event config generator for testing fields in a lightweight way.
+ *
+ * @param id - The unique identifier for the event.
+ * @param fields - Field configurations to include in the event declaration. Everything in a single page.
+ * @param placeOfEventId - Optional place of event field id.
+ * @param dateOfEventId - Optional date of event field id.
+ */
+export const generateEventConfig = ({
+  id,
+  fields,
+  placeOfEventId,
+  dateOfEventId,
+  actions = []
+}: {
+  id: string
+  fields: FieldConfig[]
+  placeOfEventId?: string
+  dateOfEventId?: string
+  /** Extra actions appended to the default READ + DECLARE pair, e.g. a REQUEST_CORRECTION action with its own correctionForm. */
+  actions?: EventConfigInput['actions']
+}): EventConfig => {
+  return defineConfig({
+    id,
+    label: generateTranslationConfig(id),
+    title: generateTranslationConfig(`${id} Event`),
+    summary: {
+      fields: []
+    },
+    placeOfEvent: placeOfEventId ? { $$field: placeOfEventId } : undefined,
+    dateOfEvent: dateOfEventId ? { $$field: dateOfEventId } : undefined,
+    declaration: {
+      label: generateTranslationConfig(`${id} Declaration`),
+      pages: [
+        {
+          id: 'page1',
+          title: generateTranslationConfig('Page 1'),
+          fields
+        }
+      ]
+    },
+    actions: [
+      {
+        type: ActionType.READ,
+        label: generateTranslationConfig('Read'),
+        review: {
+          title: generateTranslationConfig('Review Read Action'),
+          fields: []
+        }
+      },
+      {
+        type: ActionType.DECLARE,
+        label: generateTranslationConfig('Declare'),
+        review: {
+          title: generateTranslationConfig('Review Declare Action'),
+          fields: []
+        }
+      },
+      ...actions
+    ]
+  })
+}
+
+/**
+ * Get the leaf administrative area IDs from a list of administrative areas.
+ *
+ * A leaf administrative area is defined as an administrative area that does not have any children in the provided list.
+ * AdministrativeArea  might have a CRVS_OFFICE as children, but is still considered to be a leaf administrative area.
+ *
+ * @param administrativeAreas - The list of administrative areas to search.
+ * @returns The list of leaf administrative area IDs.
+ */
+export function getLeafAdministrativeAreaIds(
+  administrativeAreas: Map<UUID, ClientAdministrativeArea>
+): Array<{ id: UUID }> {
+  const nonLeafAdministrativeAreaIds = new Set<string>()
+
+  for (const [, location] of administrativeAreas) {
+    if (location.parentId) {
+      nonLeafAdministrativeAreaIds.add(location.parentId)
+    }
+  }
+
+  const result: { id: UUID }[] = []
+  for (const [id] of administrativeAreas) {
+    if (!nonLeafAdministrativeAreaIds.has(id)) {
+      result.push({ id })
+    }
+  }
+
+  return result
+}
+
+/**
+ *
+ * @returns TokenPayload. Useful for building test setup for ValidatorContext
+ */
+function generateUserTokenPayload({
+  role,
+  scope
+}: {
+  role?: TestUserRole
+  scope?: EncodedScope[]
+}): ITokenPayload {
+  return {
+    // @TODO: Validate which fields are necessary https://github.com/opencrvs/opencrvs-core/issues/13530
+    sub: generateUuid(),
+    algorithm: 'RS256',
+    exp: '1787221786',
+    role: role ?? TestUserRole.enum.FIELD_AGENT,
+    scope: scope ?? [
+      encodeScope({
+        type: 'record.read'
+      })
+    ],
+    userType: TokenUserType.enum.user
+  }
+}
+
+export function generateTestValidatorContext(
+  userRole?: TestUserRole,
+  eventWithConfig?: { event: EventDocument; eventConfig: EventConfig }
+): ValidatorContext {
+  const user = generateUserTokenPayload({ role: userRole })
+
+  const leafAdminStructureLocationIds = getLeafAdministrativeAreaIds(
+    V2_DEFAULT_MOCK_ADMINISTRATIVE_AREAS_MAP
+  )
+
+  if (!eventWithConfig) {
+    return { user, leafAdminStructureLocationIds }
+  }
+
+  const { event, eventConfig } = eventWithConfig
+
+  return {
+    user,
+    leafAdminStructureLocationIds,
+    event: getEventValidatorContext(event, eventConfig)
+  }
+}

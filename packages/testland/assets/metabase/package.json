@@ -1,0 +1,13 @@
+{
+  "name": "@opencrvs/dashboards",
+  "version": "1.8.1",
+  "description": "OpenCRVS performance dashboards",
+  "type": "module",
+  "main": "index.js",
+  "scripts": {
+    "start": "./run-dev.sh",
+    "db:shell": "./open-shell.sh"
+  },
+  "author": "Riku Rouvila",
+  "license": "MPL-2.0"
+}

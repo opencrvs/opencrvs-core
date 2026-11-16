@@ -14,6 +14,8 @@ import { cloneDeep } from 'lodash'
 import {
   ActionDocument,
   ActionType,
+  ClientAdministrativeArea,
+  ClientLocation,
   CertificateTemplateConfig,
   EventConfig,
   EventDocument,
@@ -21,11 +23,12 @@ import {
   FieldType,
   getAcceptedActions,
   getCurrentEventState,
+  getDeclarationFields,
   isMinioUrl,
   LanguageConfig,
-  Location,
   PrintCertificateAction,
-  UserOrSystem
+  UserOrSystemSummary,
+  UUID
 } from '@opencrvs/commons/client'
 import {
   addFontsToSvg,
@@ -45,8 +48,7 @@ async function replaceMinioUrlWithBase64(
   // Clone to avoid mutating the original declaration
   const declarationClone = cloneDeep(declaration)
 
-  const fileFieldIds = config.declaration.pages
-    .flatMap((page) => page.fields)
+  const fileFieldIds = getDeclarationFields(config)
     .filter((field) => field.type === FieldType.FILE)
     .map((field) => field.id)
 
@@ -66,14 +68,16 @@ export const usePrintableCertificate = ({
   event,
   config,
   locations,
+  administrativeAreas,
   users,
   certificateConfig,
   language
 }: {
   event: EventDocument
   config: EventConfig
-  locations: Location[]
-  users: UserOrSystem[]
+  locations: Map<UUID, ClientLocation>
+  administrativeAreas: Map<UUID, ClientAdministrativeArea>
+  users: UserOrSystemSummary[]
   certificateConfig?: CertificateTemplateConfig
   language?: LanguageConfig
 }) => {
@@ -115,6 +119,7 @@ export const usePrintableCertificate = ({
     $actions: getAcceptedActions(event),
     review: true,
     locations,
+    administrativeAreas,
     users,
     language,
     config,
@@ -150,6 +155,7 @@ export const usePrintableCertificate = ({
       $declaration: declarationWithResolvedImages,
       $actions: getAcceptedActions(event),
       locations,
+      administrativeAreas,
       review: false,
       users,
       language,

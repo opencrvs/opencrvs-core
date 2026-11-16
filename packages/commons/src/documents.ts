@@ -9,12 +9,11 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { z } from 'zod'
-import { extendZodWithOpenApi } from 'zod-openapi'
-extendZodWithOpenApi(z)
+import * as z from 'zod/v4'
+import { UUID } from './uuid'
 
 export const MINIO_REGEX =
-  /^https?:\/\/[^\/]+(.*)?\/[^\/?]+\.(jpg|png|jpeg|pdf|svg)(\?.*)?$/i
+  /^https?:\/\/[^\/]+(.*)?\/[^\/?]+\.(jpg|jpeg|jfif|png|pdf|svg)(\?.*)?$/i
 
 export function isBase64FileString(str: string) {
   if (str === '' || str.trim() === '') {
@@ -38,8 +37,8 @@ export type FullDocumentUrl = z.infer<typeof FullDocumentUrl>
 
 export const FullDocumentPath = z
   .string()
-  .transform((val) => (val.startsWith('/') ? val : `/${val}`))
-  .openapi({ effectType: 'input', type: 'string' })
+  .overwrite((val) => (val.startsWith('/') ? val : `/${val}`))
+  .meta({ effectType: 'input', type: 'string' })
   .describe(
     'A full absolute path with bucket name, starting from the root of the S3 server, /bucket-name/document-id.jpg'
   )
@@ -50,11 +49,44 @@ export const DocumentPath = z
   .string()
   .brand('DocumentPath')
   .describe(
-    'A full identifier starting from the root of the S3 bucket, e.g. /document-id.jpg or /directory/document-id.jpg but never /bucket-name/document-id.jpg'
+    'A relative path within the S3 bucket, never starting with /. e.g. document-id.jpg or directory/document-id.jpg. The document service constructs the full /bucket/path internally.'
   )
 
 export type DocumentPath = z.infer<typeof DocumentPath>
 
 export const toDocumentPath = (path: FullDocumentPath): DocumentPath => {
   return path.split('/').slice(2).join('/') as DocumentPath
+}
+/**
+ * The prefix under which every attachment belonging to a record is stored.
+ * Deletion and sweeps operate on this prefix, so an object written outside one
+ * belongs to no record and nothing will ever remove it.
+ */
+export type EventAttachmentPath = `events/${string}/`
+
+/**
+ * The prefix under which a user's own assets are stored, their avatar and their
+ * signature. These are shared across every record the user touches, so deleting
+ * a record must never reach them.
+ */
+export type UserAttachmentPath = `users/${string}/`
+
+/**
+ * Where a form writes the files uploaded into it. Every upload path is one of
+ * these two, and nothing may upload without one.
+ */
+export type AttachmentPath = EventAttachmentPath | UserAttachmentPath
+
+export function eventAttachmentPath(eventId: UUID): EventAttachmentPath {
+  return `events/${eventId}/`
+}
+
+export function userAttachmentPath(userId: UUID): UserAttachmentPath {
+  return `users/${userId}/`
+}
+
+const ATTACHMENT_PATH = /^(events|users)\/[^/]+\/$/
+
+export function isAttachmentPath(value: string): value is AttachmentPath {
+  return ATTACHMENT_PATH.test(value)
 }

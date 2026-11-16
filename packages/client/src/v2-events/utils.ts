@@ -12,53 +12,143 @@ import { uniq, isString, get, mergeWith } from 'lodash'
 import { v4 as uuid } from 'uuid'
 import {
   ActionDocument,
+  EventConfig,
   EventIndex,
-  Scope,
-  ActionScopes,
+  EventState,
   WorkqueueConfigWithoutQuery,
+  isFieldReference,
   joinValues,
+  LocationVersion,
+  PlainDate,
+  toPlainDate,
   UUID,
-  SystemRole,
-  Location,
   UserOrSystem,
+  ClientAdministrativeArea,
+  ActionType,
   flattenEntries,
-  EventMetadataDateFieldId
+  EventMetadataDateFieldId,
+  getAcceptedScopesByType,
+  decodeScope,
+  RecordScopeTypeV2,
+  EncodedScope,
+  getAdministrativeAreaHierarchy,
+  resolveVersion,
+  ZodDate
 } from '@opencrvs/commons/client'
+import {
+  findSelectedVersion,
+  parseVersionedLocation,
+  toNamedVersions,
+  VersionedEntity
+} from '@client/v2-events/VersionedLocation'
 
-export function getUsersFullName(name: UserOrSystem['name'], language: string) {
+export function getUsersFullName(name: UserOrSystem['name']) {
   if (typeof name === 'string') {
     return name
   }
 
-  const match = name.find((n) => n.use === language) ?? name[0]
+  return joinValues([name.firstname, name.surname])
+}
+export interface LocationOption {
+  value: string
+  label: string
+}
 
-  return joinValues([...match.given, match.family])
+/**
+ * Builds advanced-search filter options: one row per distinct name a location or
+ * administrative area has ever carried, each pinned to the version that carried
+ * it (@see VersionedLocation). Both selectors call this.
+ *
+ * Ordinary forms list a single current-name option instead of calling this.
+ */
+export function buildHistoricalLocationNameOptions<T extends VersionedEntity>(
+  items: T[]
+): LocationOption[] {
+  return items.flatMap((item) =>
+    toNamedVersions(item).map(({ name, selection }) => ({
+      value: selection,
+      label: name
+    }))
+  )
+}
+
+/**
+ * Narrows a value to the plain id every non-display surface expects
+ */
+export function toLocationId(value: string): string
+export function toLocationId(value: unknown): string | undefined
+export function toLocationId(value: unknown): string | undefined {
+  const parsed = parseVersionedLocation(value)
+
+  if (parsed) {
+    return parsed.locationId
+  }
+
+  return typeof value === 'string' ? value : undefined
+}
+
+/**
+ * The option a location or administrative-area field value is currently on.
+ * A pinned value identifies its row by version.
+ */
+export function findLocationOption(
+  options: LocationOption[],
+  value: string | null | undefined
+): LocationOption | null {
+  if (!value) {
+    return null
+  }
+
+  const locationId = toLocationId(value)
+
+  return (
+    options.find((option) => option.value === value) ??
+    options.find((option) => toLocationId(option.value) === locationId) ??
+    null
+  )
+}
+
+/**
+ * The entity a location or administrative-area field value names, and the
+ * version to display for it:
+ * the pinned one for a search value, the one in effect at `anchor` for a
+ * declaration's bare id. Undefined when the value names neither.
+ */
+export function resolveLocationValue<T extends VersionedEntity>(
+  value: unknown,
+  entities: Map<UUID, T>,
+  anchor: PlainDate
+): { entity: T; version: LocationVersion } | undefined {
+  const pinned = findSelectedVersion(value, entities)
+
+  if (pinned) {
+    return pinned
+  }
+
+  const id = UUID.safeParse(toLocationId(value)).data
+  const entity = id && entities.get(id)
+
+  return entity
+    ? { entity, version: resolveVersion(entity.versions, anchor) }
+    : undefined
 }
 
 /** Utility to get all keys from union */
 type AllKeys<T> = T extends T ? keyof T : never
 
 /**
- * @returns unique ids of users are referenced in the ActionDocument array.
  * Used for fetching user data in bulk.
+ * @returns unique ids of users which are referenced in the ActionDocument array.
  */
-export const getUserIdsFromActions = (
-  actions: ActionDocument[],
-  ignoreRoles?: SystemRole[]
-) => {
+export const getUserIdsFromActions = (actions: ActionDocument[]) => {
   const userIdFields = [
     'createdBy',
     'assignedTo'
   ] satisfies AllKeys<ActionDocument>[]
 
-  const userIds = actions
-    .filter(
-      ({ createdByRole }) =>
-        !ignoreRoles?.some((role) => role === createdByRole)
-    )
-    .flatMap((action) =>
-      userIdFields.map((fieldName) => get(action, fieldName)).filter(isString)
-    )
+  const userIds = actions.flatMap((action) =>
+    userIdFields.map((fieldName) => get(action, fieldName)).filter(isString)
+  )
 
   return uniq(userIds)
 }
@@ -105,33 +195,67 @@ export function convertDateFieldsToUnixTimestamps(
 
 export type RequireKey<T, K extends keyof T> = Omit<T, K> & Required<Pick<T, K>>
 
+/**
+ * The record anchor — the date at which a record's declaration fields resolve
+ * their locations: its date of event, falling back to the record's creation
+ * date. `dateOfEvent` is already the plain-date result of `resolveDateOfEvent`;
+ * `createdAt` is a datetime, so its date portion is taken.
+ */
+export function recordAnchorDate(eventState: {
+  dateOfEvent?: string | null
+  createdAt: string
+}): PlainDate {
+  return toPlainDate(eventState.dateOfEvent ?? eventState.createdAt)
+}
+
+/**
+ * Same anchor as {@link recordAnchorDate}, computed while a declaration is
+ * still being filled in: the event's date-of-event field read off the
+ * in-progress form values (there is no persisted record yet to resolve it
+ * from), falling back to the record's creation date when that field is
+ * empty or not yet configured.
+ */
+export function liveAnchorDate({
+  dateOfEvent,
+  form,
+  createdAt
+}: {
+  dateOfEvent?: EventConfig['dateOfEvent']
+  form: EventState
+  createdAt: string
+}): PlainDate {
+  const fieldValue =
+    dateOfEvent && isFieldReference(dateOfEvent)
+      ? form[dateOfEvent.$$field]
+      : undefined
+
+  const parsedDate = ZodDate.safeParse(fieldValue)
+
+  return recordAnchorDate({
+    dateOfEvent: parsedDate.success ? parsedDate.data : undefined,
+    createdAt
+  })
+}
+
+/**
+ * The name a cached location or administrative area carried at `anchor`,
+ * resolved from its version history — or an empty string when the entity is
+ * absent. Centralises the missing-entity guard so present-tense surfaces
+ * don't each hand-roll their own.
+ */
+export function resolveLocationName(
+  entity: { versions: LocationVersion[] } | undefined,
+  anchor: PlainDate
+): string {
+  return entity ? resolveVersion(entity.versions, anchor).name : ''
+}
+
 export function isTemporaryId(id: string) {
   return id.startsWith('tmp-')
 }
 
 export function createTemporaryId() {
   return `tmp-${uuid()}` as UUID
-}
-
-export const AssignmentStatus = {
-  ASSIGNED_TO_SELF: 'ASSIGNED_TO_SELF',
-  ASSIGNED_TO_OTHERS: 'ASSIGNED_TO_OTHERS',
-  UNASSIGNED: 'UNASSIGNED'
-} as const
-
-type AssignmentStatus = (typeof AssignmentStatus)[keyof typeof AssignmentStatus]
-
-export function getAssignmentStatus(
-  eventState: EventIndex,
-  userId: string
-): AssignmentStatus {
-  if (!eventState.assignedTo) {
-    return AssignmentStatus.UNASSIGNED
-  }
-
-  return eventState.assignedTo == userId
-    ? AssignmentStatus.ASSIGNED_TO_SELF
-    : AssignmentStatus.ASSIGNED_TO_OTHERS
 }
 
 export function filterEmptyValues(
@@ -158,12 +282,25 @@ export enum CoreWorkqueues {
   DRAFT = 'draft'
 }
 
-export function hasOutboxWorkqueue(scopes: Scope[]) {
-  return scopes.some((scope) => ActionScopes.safeParse(scope).success)
+export function hasOutboxWorkqueue(scopes: EncodedScope[]) {
+  const hasRecordScope = scopes.some((s) => {
+    const scope = decodeScope(s)
+    return (
+      scope &&
+      RecordScopeTypeV2.options.includes(scope.type as RecordScopeTypeV2)
+    )
+  })
+
+  return hasRecordScope
 }
 
-export function hasDraftWorkqueue(scopes: Scope[]) {
-  return scopes.some((scope) => scope.startsWith('record.declare'))
+export function hasDraftWorkqueue(scopes: EncodedScope[]) {
+  return (
+    getAcceptedScopesByType({
+      acceptedScopes: ['record.create'],
+      scopes
+    }).length > 0
+  )
 }
 
 export const WORKQUEUE_OUTBOX: WorkqueueConfigWithoutQuery = {
@@ -172,7 +309,6 @@ export const WORKQUEUE_OUTBOX: WorkqueueConfigWithoutQuery = {
     defaultMessage: 'Outbox',
     description: 'Title of outbox workqueue'
   },
-  actions: [],
   slug: CoreWorkqueues.OUTBOX,
   icon: 'PaperPlaneTilt'
 }
@@ -180,10 +316,10 @@ export const WORKQUEUE_OUTBOX: WorkqueueConfigWithoutQuery = {
 export const WORKQUEUE_DRAFT: WorkqueueConfigWithoutQuery = {
   name: {
     id: 'workqueues.draft.title',
-    defaultMessage: 'My drafts',
+    defaultMessage: 'Drafts',
     description: 'Title of draft workqueue'
   },
-  actions: [],
+  action: { type: ActionType.DECLARE },
   slug: CoreWorkqueues.DRAFT,
   icon: 'FileDotted'
 }
@@ -206,42 +342,39 @@ export function mergeWithoutNullsOrUndefined<T>(
   })
 }
 
-type OutputMode = 'withIds' | 'withNames'
 /*
-Function to traverse the administrative level hierarchy from an arbitrary / leaf point
+  Function to traverse the administrative level hierarchy from an arbitrary / leaf point, returning ids.
 */
 export function getAdminLevelHierarchy(
-  locationId: string | undefined,
-  locations: Location[],
+  administrativeAreaId: string | undefined | null,
+  administrativeAreas: Map<UUID, ClientAdministrativeArea>,
   adminStructure: string[],
-  outputMode: OutputMode = 'withIds'
-) {
-  // Collect location objects from leaf to root
-  const collectedLocations: Location[] = []
-
-  const srcLocation = locationId
-    ? locations.find((l) => l.id === locationId.toString())
-    : null
-
-  if (srcLocation?.locationType === 'ADMIN_STRUCTURE') {
-    collectedLocations.push(srcLocation)
-  }
-
-  let current = srcLocation
-    ? locations.find((l) => l.id === srcLocation.parentId)
-    : null
-
-  while (current) {
-    collectedLocations.push(current)
-    if (!current.parentId) {
-      break
-    }
-    const parentId = current.parentId
-    current = locations.find((l) => l.id === parentId)
-  }
-
+  outputMode?: 'withIds'
+): Partial<Record<string, string>>
+/*
+  Same traversal, but returning each level's name as resolved at `anchor`.
+  A separate overload (rather than an optional param) so a `withNames` call
+  cannot compile without stating its anchor.
+*/
+export function getAdminLevelHierarchy(
+  administrativeAreaId: string | undefined | null,
+  administrativeAreas: Map<UUID, ClientAdministrativeArea>,
+  adminStructure: string[],
+  outputMode: 'withNames',
+  anchor: PlainDate
+): Partial<Record<string, string>>
+export function getAdminLevelHierarchy(
+  administrativeAreaId: string | undefined | null,
+  administrativeAreas: Map<UUID, ClientAdministrativeArea>,
+  adminStructure: string[],
+  outputMode: 'withIds' | 'withNames' = 'withIds',
+  anchor?: PlainDate
+): Partial<Record<string, string>> {
   // Reverse so root is first, leaf is last
-  collectedLocations.reverse()
+  const collectedLocations = getAdministrativeAreaHierarchy(
+    administrativeAreaId,
+    administrativeAreas
+  ).reverse()
 
   // Map collected locations to the provided admin structure
   const hierarchy: Partial<Record<string, string>> = {}
@@ -252,7 +385,8 @@ export function getAdminLevelHierarchy(
   ) {
     hierarchy[adminStructure[i]] =
       outputMode === 'withNames'
-        ? collectedLocations[i].name
+        ? resolveVersion(collectedLocations[i].versions, anchor as PlainDate)
+            .name
         : collectedLocations[i].id
   }
 

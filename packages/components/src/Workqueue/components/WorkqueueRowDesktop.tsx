@@ -84,7 +84,11 @@ export const WorkqueueRowDesktop = (props: IWorkqueueRow) => {
       {props.displayItems.map((item, index) => {
         const clickable = props.clickable || Boolean(item.rowClickable)
         return (
-          <StyledBox key={index} hideLastBorder={props.hideLastBorder}>
+          <StyledBox
+            key={index}
+            hideLastBorder={props.hideLastBorder}
+            data-testid="row-item"
+          >
             <RowWrapper
               id={'row_' + index}
               clickable={clickable}

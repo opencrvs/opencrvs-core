@@ -61,7 +61,7 @@ test('file references finder returns all file references from action document', 
           },
           'senior-pass.id': '23423423423',
           'applicant.image': {
-            path: '/ocrvs/105b69b3-415f-4e53-b912-ef71484cb6c0/e1fb6470-a836-4346-b46b-982304eb25df.jpeg',
+            path: '105b69b3-415f-4e53-b912-ef71484cb6c0/e1fb6470-a836-4346-b46b-982304eb25df.jpeg',
             type: 'image/jpeg',
             originalFilename: 'IMG_5601 2.jpeg'
           },
@@ -69,7 +69,7 @@ test('file references finder returns all file references from action document', 
         },
         annotation: {
           'review.signature': {
-            path: '/ocrvs/105b69b3-415f-4e53-b912-ef71484cb6c0/ff45a750-d09e-4d06-b2c7-eda3f4b32417.png',
+            path: '105b69b3-415f-4e53-b912-ef71484cb6c0/ff45a750-d09e-4d06-b2c7-eda3f4b32417.png',
             type: 'image/png',
             originalFilename: 'signature-review____signature-1758182094797.png'
           }
@@ -82,8 +82,8 @@ test('file references finder returns all file references from action document', 
   } as EventDocument
 
   expect(getFilePathsFromEvent(data)).toEqual([
-    '/ocrvs/105b69b3-415f-4e53-b912-ef71484cb6c0/e1fb6470-a836-4346-b46b-982304eb25df.jpeg',
-    '/ocrvs/105b69b3-415f-4e53-b912-ef71484cb6c0/ff45a750-d09e-4d06-b2c7-eda3f4b32417.png'
+    '105b69b3-415f-4e53-b912-ef71484cb6c0/e1fb6470-a836-4346-b46b-982304eb25df.jpeg',
+    '105b69b3-415f-4e53-b912-ef71484cb6c0/ff45a750-d09e-4d06-b2c7-eda3f4b32417.png'
   ])
 })
 test('file references finder considers files in a rejected action as existing file references', () => {
@@ -135,7 +135,7 @@ test('file references finder considers files in a rejected action as existing fi
           },
           'senior-pass.id': '23423423423',
           'applicant.image': {
-            path: '/ocrvs/105b69b3-415f-4e53-b912-ef71484cb6c0/e1fb6470-a836-4346-b46b-982304eb25df.jpeg',
+            path: '105b69b3-415f-4e53-b912-ef71484cb6c0/e1fb6470-a836-4346-b46b-982304eb25df.jpeg',
             type: 'image/jpeg',
             originalFilename: 'IMG_5601 2.jpeg'
           },
@@ -143,7 +143,7 @@ test('file references finder considers files in a rejected action as existing fi
         },
         annotation: {
           'review.signature': {
-            path: '/ocrvs/105b69b3-415f-4e53-b912-ef71484cb6c0/ff45a750-d09e-4d06-b2c7-eda3f4b32417.png',
+            path: '105b69b3-415f-4e53-b912-ef71484cb6c0/ff45a750-d09e-4d06-b2c7-eda3f4b32417.png',
             type: 'image/png',
             originalFilename: 'signature-review____signature-1758182094797.png'
           }
@@ -168,7 +168,61 @@ test('file references finder considers files in a rejected action as existing fi
   } as EventDocument
 
   expect(getFilePathsFromEvent(data)).toEqual([
-    '/ocrvs/105b69b3-415f-4e53-b912-ef71484cb6c0/e1fb6470-a836-4346-b46b-982304eb25df.jpeg',
-    '/ocrvs/105b69b3-415f-4e53-b912-ef71484cb6c0/ff45a750-d09e-4d06-b2c7-eda3f4b32417.png'
+    '105b69b3-415f-4e53-b912-ef71484cb6c0/e1fb6470-a836-4346-b46b-982304eb25df.jpeg',
+    '105b69b3-415f-4e53-b912-ef71484cb6c0/ff45a750-d09e-4d06-b2c7-eda3f4b32417.png'
+  ])
+})
+
+test('file references finder counts files named by a synchronously rejected action', () => {
+  const data = {
+    id: '105b69b3-415f-4e53-b912-ef71484cb6c0',
+    type: 'tennis-club-membership',
+    createdAt: '2025-09-18T07:54:00.073Z',
+    updatedAt: '2025-09-18T07:54:00.073Z',
+    actions: [
+      {
+        id: '64718c96-f85f-4940-89bb-de713d060f2c',
+        transactionId: 'tmp-ed5518a7-a2bb-45f9-a393-fcd358e06c94',
+        createdByUserType: 'user',
+        createdAt: '2025-09-18T07:54:00.073Z',
+        createdBy: '68c122bc28f080e722d4927c',
+        createdByRole: 'LOCAL_REGISTRAR',
+        createdAtLocation: 'f3da7778-161e-44a1-9e64-ab93dc1fe77f',
+        declaration: {},
+        status: 'Accepted',
+        type: 'CREATE'
+      },
+      {
+        id: 'dc5a0fd6-90b9-4540-96ba-55e79e89dddf',
+        transactionId: '06f057c3-8904-4570-9a23-8c558a2af46b',
+        createdByUserType: 'user',
+        createdAt: '2025-09-18T07:55:04.728Z',
+        createdBy: '68c122bc28f080e722d4927c',
+        createdByRole: 'LOCAL_REGISTRAR',
+        createdAtLocation: 'f3da7778-161e-44a1-9e64-ab93dc1fe77f',
+        declaration: {
+          'applicant.image': {
+            path: 'events/105b69b3-415f-4e53-b912-ef71484cb6c0/e1fb6470-a836-4346-b46b-982304eb25df.jpeg',
+            type: 'image/jpeg',
+            originalFilename: 'IMG_5601 2.jpeg'
+          }
+        },
+        annotation: {
+          'review.signature': {
+            path: 'events/105b69b3-415f-4e53-b912-ef71484cb6c0/ff45a750-d09e-4d06-b2c7-eda3f4b32417.png',
+            type: 'image/png',
+            originalFilename: 'signature-1758182094797.png'
+          }
+        },
+        status: 'Rejected',
+        type: 'DECLARE'
+      }
+    ],
+    trackingId: 'ICJY4Z'
+  } as EventDocument
+
+  expect(getFilePathsFromEvent(data)).toEqual([
+    'events/105b69b3-415f-4e53-b912-ef71484cb6c0/e1fb6470-a836-4346-b46b-982304eb25df.jpeg',
+    'events/105b69b3-415f-4e53-b912-ef71484cb6c0/ff45a750-d09e-4d06-b2c7-eda3f4b32417.png'
   ])
 })

@@ -25,7 +25,7 @@ export async function svgUploadHandler(
   request: Hapi.Request,
   h: Hapi.ResponseToolkit
 ) {
-  const userId = getUserId(request.headers.authorization)
+  const userId = getUserId(request.headers.authorization as `Bearer ${string}`)
   if (!userId)
     return Promise.reject(
       new Error(
@@ -48,6 +48,6 @@ export async function svgUploadHandler(
       .response({ refUrl: `/${MINIO_BUCKET}/${generateFileName}` })
       .code(200)
   } catch (error) {
-    return h.response(error).code(400)
+    return h.response(error as Error).code(400)
   }
 }

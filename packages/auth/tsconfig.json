@@ -1,8 +1,8 @@
 {
   "compilerOptions": {
-    "baseUrl": "./src",
     "paths": {
-      "@auth/*": ["./*"]
+      "@auth/*": ["./src/*"],
+      "@events/*": ["../events/src/*"]
     },
     "target": "es6",
     "module": "node16",
@@ -12,16 +12,16 @@
     "sourceMap": true,
     "moduleResolution": "node16",
     "rootDir": ".",
-    "lib": ["esnext.asynciterable", "es6", "es2019"],
+    "lib": ["esnext.asynciterable", "es6", "es2019", "DOM.Iterable", "es2021"],
     "forceConsistentCasingInFileNames": true,
     "noImplicitReturns": true,
     "noImplicitThis": true,
     "noImplicitAny": true,
     "strictNullChecks": true,
     "noUnusedLocals": true,
-    "types": ["fhir", "jest"]
+    "types": ["jest"]
   },
-  "include": ["resources/**/*.ts", "src/**/*.ts", "typings"],
+  "include": ["resources/**/*.ts", "src/**/*.ts", "typings", "test/setupJest.ts"],
   "exclude": [
     "node_modules",
     "build",

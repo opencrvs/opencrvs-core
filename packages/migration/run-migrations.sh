@@ -10,75 +10,89 @@
 
 set -e # fail if any of the commands fails
 
-HEARTH_CONFIG=./build/dist/src/migrate-mongo-config-hearth.js
 : "${EVENTS_POSTGRES_URL:=postgres://events_migrator:migrator_password@localhost:5432/events}"
-OPENHIM_CONFIG=./build/dist/src/migrate-mongo-config-openhim.js
-APP_CONFIG=./build/dist/src/migrate-mongo-config-application-config.js
-USER_MGNT_CONFIG=./build/dist/src/migrate-mongo-config-user-mgnt.js
-PERFORMANCE_CONFIG=./build/dist/src/migrate-mongo-config-performance.js
 
-SCRIPT_PATH=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
+SCRIPT_PATH=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" &>/dev/null && pwd)
 
 export NODE_OPTIONS=--dns-result-order=ipv4first
 
-# hearth migrations
-yarn --cwd $SCRIPT_PATH migrate-mongo up --file $HEARTH_CONFIG
-yarn --cwd $SCRIPT_PATH migrate-mongo status --file $HEARTH_CONFIG
+run_pg_migrations() {
+  MIGRATIONS_PATH="$1"
+  local database_url="$2"
+  local schema="$3"
+  local migrations_table="${4:-pgmigrations}"
 
-# events migrations
+  BACKUP_PATH="$MIGRATIONS_PATH/backup"
+
+  mkdir -p "$BACKUP_PATH"
+
+  # Only SQL files need envsubst — JS migration files use process.env directly
+  # and running envsubst on them would corrupt JS template literals (${...} syntax)
+  SQL_FILES_TO_MIGRATE=$(ls -p "$MIGRATIONS_PATH" | grep -v / | grep '\.sql$' || true)
+
+  # --- define cleanup function ---
+  # As this function is being called via 'trap', the variables
+  # used inside need to be global
+  restore_backups() {
+    echo "Restoring original migration files in $MIGRATIONS_PATH"
+    for migration_file in $SQL_FILES_TO_MIGRATE; do
+      if [ -f "$BACKUP_PATH/$migration_file" ]; then
+        mv "$BACKUP_PATH/$migration_file" "$MIGRATIONS_PATH/$migration_file"
+      fi
+    done
+    rm -rf "$BACKUP_PATH"
+  }
+
+  # Always run restore_backups when the function exits
+  trap restore_backups EXIT
+
+  # --- Backup originals ---
+  for migration_file in $SQL_FILES_TO_MIGRATE; do
+    echo "Creating backup for $MIGRATIONS_PATH/$migration_file"
+    cp "$MIGRATIONS_PATH/$migration_file" "$BACKUP_PATH/$migration_file"
+  done
+
+  # --- envsubst ---
+  for migration_file in $SQL_FILES_TO_MIGRATE; do
+    echo "Updating environment variables in $MIGRATIONS_PATH/$migration_file"
+    envsubst <"$MIGRATIONS_PATH/$migration_file" >"$MIGRATIONS_PATH/$migration_file.tmp"
+    mv "$MIGRATIONS_PATH/$migration_file.tmp" "$MIGRATIONS_PATH/$migration_file"
+  done
+
+  # --no-check-order is required, not optional. Release branches carry migrations
+  # whose timestamps sort after work that was authored earlier on develop but ships
+  # later (1783382400000 shipped in v1.9.16; 30 develop migrations sort before it).
+  # node-pg-migrate's order check zips the ledger's run order against the on-disk
+  # name order positionally, so any such branch trips it. Once a database has run
+  # migrations out of name order the ledger stays non-canonical, so this flag has
+  # to remain from here on.
+  # --- Run migrations ---
+  # --no-check-order is required, not optional. Release branches carry migrations
+  # whose timestamps sort after work that was authored earlier on develop but ships
+  # later (1783382400000 shipped in v1.9.16; 30 develop migrations sort before it).
+  # node-pg-migrate's order check zips the ledger's run order against the on-disk
+  # name order positionally, so any such branch trips it. Once a database has run
+  # migrations out of name order the ledger stays non-canonical, so this flag has
+  # to remain from here on.
+  echo "Running migrations for schema '$schema' in $MIGRATIONS_PATH"
+  DATABASE_URL="$database_url" \
+    pnpm --dir "$SCRIPT_PATH" exec node-pg-migrate up \
+    --schema="$schema" \
+    --no-check-order \
+    --migrations-dir="$MIGRATIONS_PATH" \
+    --migrations-table="$migrations_table" \
+    --no-check-order
+
+  # If migration succeeds, remove trap before exit so cleanup still happens normally
+  trap - EXIT
+  restore_backups
+}
+
+# needed for events migrations
 export EVENTS_DB_USER="${EVENTS_DB_USER:-events_app}"
-MIGRATIONS_PATH=$SCRIPT_PATH/src/migrations/events
-BACKUP_PATH=$MIGRATIONS_PATH/backup
 
-mkdir -p $BACKUP_PATH
-
-FILES_TO_MIGRATE=$(ls -p $MIGRATIONS_PATH | grep -v /)
-
-# Creating a backup of the original files as they need to be
-# overwritten by the envsubst before running the migrations
-for migration_file in $FILES_TO_MIGRATE
-do
-  echo "Creating backup for $MIGRATIONS_PATH/$migration_file"
-  cp $MIGRATIONS_PATH/$migration_file $BACKUP_PATH/$migration_file
-done
-
-for migration_file in $FILES_TO_MIGRATE
-do
-  echo "Updating environment variables in $MIGRATIONS_PATH/$migration_file"
-  envsubst < $MIGRATIONS_PATH/$migration_file > $MIGRATIONS_PATH/$migration_file.tmp
-  mv $MIGRATIONS_PATH/$migration_file.tmp $MIGRATIONS_PATH/$migration_file
-done
-
-# --no-check-order is required, not optional. Release branches carry migrations
-# whose timestamps sort after work that was authored earlier on develop but ships
-# later (1783382400000 shipped in v1.9.16; 30 develop migrations sort before it).
-# node-pg-migrate's order check zips the ledger's run order against the on-disk
-# name order positionally, so any such branch trips it. Once a database has run
-# migrations out of name order the ledger stays non-canonical, so this flag has
-# to remain from here on.
-DATABASE_URL=${EVENTS_POSTGRES_URL} yarn --cwd $SCRIPT_PATH node-pg-migrate up --schema=app --no-check-order --migrations-dir=./src/migrations/events
-
-# Reverting to the original state after running the migrations
-for migration_file in $FILES_TO_MIGRATE
-do
-  echo "Reverting original file $MIGRATIONS_PATH/$migration_file"
-  mv $BACKUP_PATH/$migration_file $MIGRATIONS_PATH/$migration_file
-done
-
-rm -rf $BACKUP_PATH
-
-#openhim migrations
-yarn --cwd $SCRIPT_PATH migrate-mongo up --file $OPENHIM_CONFIG
-yarn --cwd $SCRIPT_PATH migrate-mongo status --file $OPENHIM_CONFIG
-
-# Application Config migration
-yarn --cwd $SCRIPT_PATH migrate-mongo up --file $APP_CONFIG
-yarn --cwd $SCRIPT_PATH migrate-mongo status --file $APP_CONFIG
-
-# User mgnt migration
-yarn --cwd $SCRIPT_PATH migrate-mongo up --file $USER_MGNT_CONFIG
-yarn --cwd $SCRIPT_PATH migrate-mongo status --file $USER_MGNT_CONFIG
-
-# performance migration
-yarn --cwd $SCRIPT_PATH migrate-mongo up --file $PERFORMANCE_CONFIG
-yarn --cwd $SCRIPT_PATH migrate-mongo status --file $PERFORMANCE_CONFIG
+# Run events migrations
+run_pg_migrations \
+  "$SCRIPT_PATH/src/migrations/events" \
+  "$EVENTS_POSTGRES_URL" \
+  "app"

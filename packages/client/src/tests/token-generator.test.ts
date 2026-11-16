@@ -9,47 +9,71 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { TestUserRole, TokenUserType } from '@opencrvs/commons/client'
-import { testDataGenerator } from './test-data-generators'
-import { generateToken } from './util'
+import { createPublicKey } from 'node:crypto'
+import { readFileSync } from 'fs'
+import * as jwt from 'jsonwebtoken'
+import testUserTokens from 'virtual:test-tokens'
+import {
+  certKeyPath,
+  TEST_TOKEN_AUDIENCE,
+  TEST_TOKEN_ISSUER
+} from './generate-token'
+import { testUserTokenClaims } from './test-users'
 
-it('Generates tokens', () => {
-  const generator = testDataGenerator()
-  const token = {
-    fieldAgent: generateToken({
-      scope: generator.user.scopes.fieldAgent,
-      subject: generator.user.id.fieldAgent,
-      userType: TokenUserType.enum.user,
-      role: TestUserRole.Enum.FIELD_AGENT
-    }),
-    registrationAgent: generateToken({
-      scope: generator.user.scopes.registrationAgent,
-      subject: generator.user.id.registrationAgent,
-      userType: TokenUserType.enum.user,
-      role: TestUserRole.Enum.REGISTRATION_AGENT
-    }),
-    localRegistrar: generateToken({
-      scope: generator.user.scopes.localRegistrar,
-      subject: generator.user.id.localRegistrar,
-      userType: TokenUserType.enum.user,
-      role: TestUserRole.Enum.LOCAL_REGISTRAR
-    }),
-    localSystemAdmin: generateToken({
-      scope: generator.user.scopes.localSystemAdmin,
-      subject: generator.user.id.localSystemAdmin,
-      userType: TokenUserType.enum.user,
-      role: TestUserRole.Enum.LOCAL_SYSTEM_ADMIN
-    }),
-    nationalSystemAdmin: generateToken({
-      scope: generator.user.scopes.nationalSystemAdmin,
-      subject: generator.user.id.nationalSystemAdmin,
-      userType: TokenUserType.enum.user,
-      role: TestUserRole.Enum.NATIONAL_SYSTEM_ADMIN
+const publicKey = createPublicKey(readFileSync(certKeyPath))
+
+describe('virtual:test-tokens', () => {
+  it('has a token for every test user', () => {
+    expect(Object.keys(testUserTokens).sort()).toEqual(
+      Object.keys(testUserTokenClaims).sort()
+    )
+  })
+
+  it.each(Object.entries(testUserTokenClaims))(
+    '%s token is signed and carries its claims',
+    (key, { scope, subject, userType, role }) => {
+      const payload = jwt.verify(
+        testUserTokens[key as keyof typeof testUserTokens],
+        publicKey,
+        {
+          algorithms: ['RS256'],
+          issuer: TEST_TOKEN_ISSUER,
+          audience: TEST_TOKEN_AUDIENCE
+        }
+      )
+
+      expect(payload).toMatchObject({ scope, sub: subject, userType, role })
+    }
+  )
+
+  /*
+   * Spelled out rather than read from `testUserTokenClaims`, so a wrong
+   * subject, role or scope in the claims fails here.
+   */
+  it('signs the expected user, role and key scopes', () => {
+    expect(jwt.decode(testUserTokens.legacyDefault)).toMatchObject({
+      sub: 'b77b78af-a259-4bc1-85d5-b1e8c1382273',
+      role: 'FIELD_AGENT',
+      userType: 'user',
+      scope: []
     })
-  }
-  expect(token.fieldAgent).toMatchSnapshot('fieldAgent token')
-  expect(token.registrationAgent).toMatchSnapshot('registrationAgent token')
-  expect(token.localRegistrar).toMatchSnapshot('localRegistrar token')
-  expect(token.localSystemAdmin).toMatchSnapshot('localSystemAdmin token')
-  expect(token.nationalSystemAdmin).toMatchSnapshot('nationalSystemAdmin token')
+    expect(jwt.decode(testUserTokens.fieldAgent)).toMatchObject({
+      sub: '8f8b431b-ef47-4068-b678-ef2dd93e9208',
+      role: 'FIELD_AGENT',
+      userType: 'user',
+      scope: expect.arrayContaining([
+        'type=record.create',
+        'type=record.declare'
+      ])
+    })
+    expect(jwt.decode(testUserTokens.fieldAgent)).not.toMatchObject({
+      scope: expect.arrayContaining(['type=record.register'])
+    })
+    expect(jwt.decode(testUserTokens.localRegistrar)).toMatchObject({
+      sub: 'aa13a268-ae48-4a30-9450-554aebaab203',
+      role: 'LOCAL_REGISTRAR',
+      userType: 'user',
+      scope: expect.arrayContaining(['type=record.register'])
+    })
+  })
 })

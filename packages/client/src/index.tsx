@@ -15,9 +15,10 @@ import { storage } from '@client/storage'
 import { createStore } from '@client/store'
 import * as React from 'react'
 import { createRoot } from 'react-dom/client'
-import { SubmissionController } from '@client/SubmissionController'
 import { createBrowserRouter } from 'react-router-dom'
 import WebFont from 'webfontloader'
+import { checkAuthComplete } from '@client/profile/profileActions'
+import { forceRefreshAccessToken, getToken } from '@client/utils/authUtils'
 import { App, routesConfig } from './App'
 
 WebFont.load({
@@ -36,6 +37,15 @@ function userReconnectedToast() {
 }
 
 window.addEventListener('online', userReconnectedToast)
+
+if (import.meta.env.DEV) {
+  window.__refreshToken = async () => {
+    await forceRefreshAccessToken()
+    store.dispatch(checkAuthComplete(getToken()))
+    // eslint-disable-next-line no-console
+    console.info('[dev] Token refreshed.')
+  }
+}
 
 const container = document.getElementById('root')
 const root = createRoot(container!)
@@ -57,5 +67,3 @@ void navigator.serviceWorker.ready.then(() => {
   console.debug('Service worker is ready')
   root.render(<App router={router} store={store} />)
 })
-
-new SubmissionController(store).start()

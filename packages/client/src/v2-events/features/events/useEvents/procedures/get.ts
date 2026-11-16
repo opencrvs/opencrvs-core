@@ -9,23 +9,26 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { useQuery, useSuspenseQuery } from '@tanstack/react-query'
-
+import { useEffect } from 'react'
+import {
+  useQuery,
+  useSuspenseQuery,
+  UseSuspenseQueryOptions
+} from '@tanstack/react-query'
 import { useIntl } from 'react-intl'
 import { EventDocument, UUID } from '@opencrvs/commons/client'
 import { useEventConfigurations } from '@client/v2-events/features/events/useEventConfiguration'
-import { cacheFiles } from '@client/v2-events/features/files/cache'
+import { cacheFilesFromEventDocument } from '@client/v2-events/features/files/cache'
 import {
   useTRPC,
   trpcOptionsProxy,
   queryClient,
   trpcClient
 } from '@client/v2-events/trpc'
-import { cacheUsersFromEventDocument } from '@client/v2-events/features/users/cache'
+import { precacheUsersFromEventDocument } from '@client/v2-events/features/users/cache'
 import { throwStructuredError } from '@client/v2-events/routes/TRPCErrorBoundary'
 import { ROUTES } from '@client/v2-events/routes'
 import { buttonMessages } from '@client/i18n/messages'
-import { updateLocalEventIndex } from '../api'
 import { setQueryDefaults } from './utils'
 
 /*
@@ -43,6 +46,7 @@ setQueryDefaults(trpcOptionsProxy.event.get, {
       meta,
       queryKey: [, input]
     } = params[0]
+
     if (!meta) {
       throw new Error(
         'api.event.get was called without passing mandatory event configuration'
@@ -54,74 +58,103 @@ setQueryDefaults(trpcOptionsProxy.event.get, {
     if (typeof queryOptions.queryFn !== 'function') {
       throw new Error('queryFn is not a function')
     }
+
     /*
      * This is a query directly to the tRPC server
      */
     const response = await queryOptions.queryFn(...params)
 
-    const eventDocument = EventDocument.parse(response)
+    const eventDocument = response
 
     await Promise.all([
-      cacheFiles(eventDocument),
-      cacheUsersFromEventDocument(eventDocument)
+      cacheFilesFromEventDocument(eventDocument),
+      precacheUsersFromEventDocument(eventDocument)
     ])
-
-    updateLocalEventIndex(eventDocument.id, eventDocument)
 
     return eventDocument
   }
 })
 
-function viewEvent(id: string) {
+async function fetchEventForViewing(id: UUID): Promise<EventDocument> {
+  const eventDocument = await trpcClient.event.get.query({ eventId: id })
+
+  await Promise.all([
+    cacheFilesFromEventDocument(eventDocument),
+    precacheUsersFromEventDocument(eventDocument)
+  ])
+
+  return eventDocument
+}
+
+// Both branches call the same hooks in the same order — cachedAssignedEvent
+// can flip mid-session, and branching hooks on it breaks rules-of-hooks.
+// Only the queryOptions passed to useSuspenseQuery differ per branch.
+function useGetOrDownloadEvent(id: UUID) {
   const trpc = useTRPC()
   const eventConfig = useEventConfigurations()
-  const options = trpc.event.get.queryOptions(id)
-  return useSuspenseQuery({
-    // In this case we can use the queryFn as this is a ad-hoc query
-    ...options,
-    queryKey: [['view-event', id]],
-    queryFn: async () => {
-      const eventDocument = await trpcClient.event.get.query(id)
-      await Promise.all([
-        cacheFiles(eventDocument),
-        cacheUsersFromEventDocument(eventDocument)
-      ])
-      return eventDocument
-    },
-    meta: {
-      eventConfig
-    },
-    gcTime: 0,
-    /*
-     * We never want to refetch this query automatically
-     * because it is the user's explicit (audit logged) action to fetch a record
-     */
-    staleTime: Infinity,
-    refetchOnMount: false,
-    refetchOnReconnect: false,
-    refetchOnWindowFocus: false
-  }).data
+  const cachedAssignedEvent = queryClient.getQueryData(
+    trpc.event.get.queryKey({ eventId: id })
+  )
+
+  const viewEventQueryKey = [['view-event', id]]
+
+  useEffect(() => {
+    return () => {
+      queryClient.removeQueries({ queryKey: viewEventQueryKey, exact: true })
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [id])
+
+  const { queryFn, ...assignedQueryOptions } = trpc.event.get.queryOptions({
+    eventId: id
+  })
+
+  // The tRPC-derived branch's error type doesn't structurally match a plain
+  // `Error`, but both branches resolve to the same `EventDocument` on
+  // success, which is all the caller relies on.
+  const queryOptions = (
+    cachedAssignedEvent
+      ? {
+          // Assigned & cached: read from cache without network
+          ...assignedQueryOptions,
+          queryKey: trpc.event.get.queryKey({ eventId: id }),
+          meta: { eventConfig },
+          staleTime: Infinity,
+          refetchOnMount: false,
+          refetchOnReconnect: false,
+          refetchOnWindowFocus: false
+        }
+      : {
+          // Not downloaded: always a real network call and a real loading state
+          queryKey: viewEventQueryKey,
+          queryFn: async () => fetchEventForViewing(id),
+          gcTime: 0,
+          staleTime: Infinity,
+          refetchOnMount: false,
+          refetchOnReconnect: false,
+          refetchOnWindowFocus: false
+        }
+  ) as UseSuspenseQueryOptions<EventDocument>
+
+  return useSuspenseQuery(queryOptions).data
 }
 
 export function useGetEvent() {
   const trpc = useTRPC()
 
-  /*
+  /**
    * Purpose of this functions is to be able to check if
    * an event has been downloaded and to get its data
    * from the cache without making a network request.
    */
-  const findFromCache = (id: string) => {
+  const useFindEventFromCache = (id: string) => {
     const eventConfig = useEventConfigurations()
-    // Skip the queryFn defined by tRPC and use our own default defined above
-    const { queryFn, ...options } = trpc.event.get.queryOptions(id)
+    const { queryFn, ...options } = trpc.event.get.queryOptions({ eventId: id })
 
     return useQuery({
       ...options,
-      queryKey: trpc.event.get.queryKey(id),
-      meta: {
-        eventConfig
-      },
+      queryKey: trpc.event.get.queryKey({ eventId: id }),
+      meta: { eventConfig },
       /*
        * We never want to refetch this query automatically
        * because it is the user's explicit (audit logged) action to fetch a record
@@ -135,44 +168,32 @@ export function useGetEvent() {
   }
 
   return {
-    findFromCache,
-    /*
-     * This downloads the event document from the server without caching it
-     */
-    viewEvent,
+    useFindEventFromCache,
+    useGetOrDownloadEvent,
     getFromCache: (id: UUID) => {
       const intl = useIntl()
       const eventConfig = useEventConfigurations()
-      // Skip the queryFn defined by tRPC and use our own default defined above
-      const { queryFn, ...queryOptions } = trpc.event.get.queryOptions(id)
-
-      const downloaded = queryClient.getQueryData(trpc.event.get.queryKey(id))
-      const downloadedForViewing = queryClient.getQueryData([
-        ['view-event', id]
-      ])
-
-      if (downloadedForViewing) {
-        return viewEvent(id)
-      }
+      const { queryFn, ...queryOptions } = trpc.event.get.queryOptions({
+        eventId: id
+      })
+      const downloaded = queryClient.getQueryData(
+        trpc.event.get.queryKey({ eventId: id })
+      )
 
       if (!downloaded) {
         throwStructuredError({
           message: `Event with id ${id} not found in cache. Please ensure the event is first assigned and downloaded to the browser.`,
           redirection: {
             label: intl.formatMessage(buttonMessages.refresh),
-            path: ROUTES.V2.EVENTS.OVERVIEW.buildPath({ eventId: id })
+            path: ROUTES.V2.EVENTS.EVENT.buildPath({ eventId: id })
           }
         })
       }
 
       return useSuspenseQuery({
         ...queryOptions,
-        queryKey: downloadedForViewing
-          ? [['view-event', id]]
-          : trpc.event.get.queryKey(id),
-        meta: {
-          eventConfig
-        },
+        queryKey: trpc.event.get.queryKey({ eventId: id }),
+        meta: { eventConfig },
         /*
          * We never want to refetch this query automatically
          * because it is the user's explicit (audit logged) action to fetch a record

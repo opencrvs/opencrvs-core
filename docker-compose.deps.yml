@@ -9,10 +9,6 @@
 volumes:
   metricbeat:
 services:
-  mongo1:
-    image: mongo:4.4
-    restart: unless-stopped
-
   redis:
     image: redis:8
     restart: unless-stopped
@@ -22,22 +18,6 @@ services:
     restart: unless-stopped
     environment:
       - discovery.type=single-node
-
-  influxdb:
-    image: influxdb:1.8.10
-    restart: unless-stopped
-
-  hearth:
-    image: opencrvs/hearth:1.1.0
-    environment:
-      - mongodb__url=mongodb://mongo1/hearth-dev
-      - logger__level=warn
-      - authentication__type=disabled
-      - idGenerator=uuidv4
-      - server__fhirVersion=stu3
-    depends_on:
-      - mongo1
-    restart: unless-stopped
 
   minio:
     image: ghcr.io/opencrvs/minio:release.2025-06-13t11-33-47z

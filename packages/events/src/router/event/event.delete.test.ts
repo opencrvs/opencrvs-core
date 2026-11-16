@@ -10,11 +10,13 @@
  */
 
 import { TRPCError } from '@trpc/server'
+import { http, HttpResponse } from 'msw'
 import {
   ActionStatus,
   ActionType,
   DraftInput,
-  FullDocumentPath,
+  encodeScope,
+  DocumentPath,
   getUUID
 } from '@opencrvs/commons'
 import { env } from '@events/environment'
@@ -39,7 +41,12 @@ test('prevents forbidden access if missing required scope', async () => {
 test('allows access with required scope', async () => {
   const { user } = await setupTestCase()
   const client = createTestClient(user, [
-    'record.declare[event=birth|death|tennis-club-membership]'
+    encodeScope({
+      type: 'record.declare',
+      options: {
+        event: ['birth', 'death', 'tennis-club-membership']
+      }
+    })
   ])
 
   await expect(
@@ -63,15 +70,41 @@ test('stored events can be deleted', async () => {
   const event = await client.event.create(generator.event.create())
 
   // at this point event should exist
-  expect(client.event.get(event.id)).toBeDefined()
+  await expect(client.event.get({ eventId: event.id })).resolves.toBeDefined()
 
   const removedEvent = await client.event.delete({ eventId: event.id })
   expect(removedEvent.id).toBe(event.id)
 
   // now event should be removed
-  await expect(client.event.get(event.id)).rejects.toThrow(
+  await expect(client.event.get({ eventId: event.id })).rejects.toThrow(
     `Event not found with ID: ${event.id}`
   )
+})
+
+test("deleting a record deletes everything under the record's prefix", async () => {
+  const { user, generator } = await setupTestCase()
+  const client = createTestClient(user)
+
+  const event = await client.event.create(generator.event.create())
+
+  const deletedPrefixes: string[] = []
+
+  mswServer.use(
+    http.delete(`${env.DOCUMENTS_URL}/prefix/:prefix*`, ({ request }) => {
+      deletedPrefixes.push(
+        new URL(request.url).pathname.replace('/prefix/', '')
+      )
+      return HttpResponse.json({ deleted: 0 })
+    })
+  )
+
+  await client.event.delete({ eventId: event.id })
+
+  /*
+   * Deletion works on the prefix rather than on a walk over the fields of the
+   * event document, so a file that no action ever referenced goes too.
+   */
+  expect(deletedPrefixes).toEqual([`events/${event.id}/`])
 })
 
 test('declared event can not be deleted', async () => {
@@ -113,7 +146,7 @@ describe('check unreferenced draft attachments are deleted while final action su
           'applicant.image': {
             type: 'image/png',
             originalFilename: `${n}-abcd.png`,
-            path: `/ocrvs/${n}-4f095fc4-4312-4de2-aa38-86dcc0f71044.png` as FullDocumentPath
+            path: `${n}-4f095fc4-4312-4de2-aa38-86dcc0f71044.png` as DocumentPath
           }
         },
         transactionId: getUUID(),
@@ -128,7 +161,7 @@ describe('check unreferenced draft attachments are deleted while final action su
           'applicant.image': {
             type: 'image/png',
             originalFilename: `${n}-abcd.png`,
-            path: `/ocrvs/${n}-4f095fc4-4312-4de2-aa38-86dcc0f71044.png` as FullDocumentPath
+            path: `${n}-4f095fc4-4312-4de2-aa38-86dcc0f71044.png` as DocumentPath
           }
         },
         transactionId: getUUID(),
@@ -146,7 +179,7 @@ describe('check unreferenced draft attachments are deleted while final action su
     // declaring final action submission
     await client.event.actions.declare.request(getDeclaration(6))
 
-    const updatedEvent = await client.event.get(event.id)
+    const updatedEvent = await client.event.get({ eventId: event.id })
 
     // since declare action has been submitted 5 times
     expect(updatedEvent.actions).toEqual([

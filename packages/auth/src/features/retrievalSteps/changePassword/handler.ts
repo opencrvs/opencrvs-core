@@ -17,7 +17,8 @@ import { changePassword } from '@auth/features/retrievalSteps/changePassword/ser
 import {
   getRetrievalStepInformation,
   RetrievalSteps,
-  deleteRetrievalStepInformation
+  deleteRetrievalStepInformation,
+  RETRIEVAL_FLOW_PASSWORD
 } from '@auth/features/retrievalSteps/verifyUser/service'
 
 interface IPayload {
@@ -36,21 +37,20 @@ export default async function changePasswordHandler(
     throw unauthorized()
   })
 
-  if (retrievalStepInformation.status !== RetrievalSteps.SECURITY_Q_VERIFIED) {
+  /*
+   * Two conditions, one rejection, deliberately. A record that never got past
+   * the security question and a record belonging to the username-reminder flow
+   * both have to be refused here, and they have to be refused the same way:
+   * whoever is calling must not be able to tell which of the two they hit.
+   */
+  if (
+    retrievalStepInformation.status !== RetrievalSteps.SECURITY_Q_VERIFIED ||
+    retrievalStepInformation.retrieveFlow !== RETRIEVAL_FLOW_PASSWORD
+  ) {
     return h.response().code(401)
   }
 
-  const remoteAddress =
-    request.headers['x-real-ip'] || request.info.remoteAddress
-  const userAgent =
-    request.headers['x-real-user-agent'] || request.headers['user-agent']
-
-  await changePassword(
-    retrievalStepInformation.userId,
-    payload.newPassword,
-    remoteAddress,
-    userAgent
-  )
+  await changePassword(retrievalStepInformation.userId, payload.newPassword)
   await deleteRetrievalStepInformation(payload.nonce)
   return h.response().code(200)
 }

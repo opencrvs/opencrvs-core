@@ -4,13 +4,18 @@ FROM ${BASE_IMAGE}:${BRANCH}
 
 USER node
 
+COPY --chown=node:node packages/events/package.json /app/packages/events/package.json
+
+WORKDIR /app/packages/events
+RUN pnpm install --frozen-lockfile
 COPY --chown=node:node packages/events /app/packages/events
+RUN pnpm build:types
 
 WORKDIR /app/packages/gateway
 COPY --chown=node:node packages/gateway/*.json /app/packages/gateway/
 
-RUN yarn install --frozen-lockfile
+RUN pnpm install --frozen-lockfile
 COPY --chown=node:node packages/gateway /app/packages/gateway
-RUN yarn build
+RUN pnpm build
 
-CMD [ "yarn", "start:prod" ]
+CMD [ "pnpm", "start:prod" ]

@@ -11,6 +11,7 @@
 import React from 'react'
 import { SelectField, SelectOption } from '@opencrvs/commons/client'
 import { Select as SelectComponent } from '@opencrvs/components'
+import { formMessages } from '@client/i18n/messages'
 import { useIntlWithFormData } from '@client/v2-events/messages/utils'
 import { StringifierContext } from './RegisteredField'
 
@@ -60,6 +61,7 @@ function SelectInput({
       isClearable={isClearable}
       noOptionsMessage={formattedNoOptionsMessage}
       options={formattedOptions}
+      placeholder={props.placeholder ?? intl.formatMessage(formMessages.select)}
       value={inputValue}
       // The underlying Select reports a cleared value as an empty string.
       // Store it as null so the value is explicitly removed when the

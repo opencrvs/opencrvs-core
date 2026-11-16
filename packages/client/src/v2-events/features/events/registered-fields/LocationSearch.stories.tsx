@@ -9,10 +9,11 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import type { Meta, StoryObj } from '@storybook/react'
+import type { Meta, StoryObj } from '@storybook/react-vite'
 import React from 'react'
-import { within, expect, fn } from '@storybook/test'
-import { userEvent } from '@storybook/testing-library'
+import { within, expect, fn } from 'storybook/test'
+import { userEvent } from 'storybook/test'
+import { toPlainDate } from '@opencrvs/commons/client'
 import { TRPCProvider } from '@client/v2-events/trpc'
 // NOTE: If you do not import from index, you might encounter: ReferenceError: Cannot access 'LocationSearch' before initialization
 import { LocationSearch } from '.'
@@ -38,8 +39,9 @@ export const LocationSearchInput: StoryObj<typeof LocationSearch.Input> = {
   },
   args: {
     id: 'location-search',
-    searchableResource: ['locations', 'facilities', 'offices'],
-    value: ''
+    locationTypes: ['HEALTH_FACILITY', 'CRVS_OFFICE'],
+    value: '',
+    anchor: toPlainDate('2025-01-01')
   }
 }
 
@@ -55,34 +57,37 @@ export const LocationSearchInputWithActiveLocations: StoryObj<
   },
   args: {
     id: 'location-search',
-    searchableResource: ['facilities'],
+    locationTypes: ['HEALTH_FACILITY'],
     value: 'abc',
+    anchor: toPlainDate('2025-01-01'),
     onChange: fn()
   },
   play: async ({ canvasElement, step, args }) => {
-    await step('Locations starting with "i" are visible', async () => {
-      const canvas = within(canvasElement)
-      const input =
-        await canvas.findByTestId<HTMLInputElement>('location-search')
+    await step(
+      'Locations with the letter "i" in them are visible',
+      async () => {
+        const canvas = within(canvasElement)
+        const input = await canvas.findByRole('combobox')
 
-      await userEvent.type(input, 'i')
-      input.blur()
+        await userEvent.type(input, 'i')
 
-      await expect(args.onChange).toHaveBeenCalled()
-      await expect(args.onChange).toHaveBeenCalledWith(undefined)
+        await expect(
+          canvas.findByText('Ibombo Rural Health Centre')
+        ).resolves.toBeInTheDocument()
 
-      await expect(
-        canvas.findByText('Ibombo Rural Health Centre')
-      ).resolves.toBeInTheDocument()
+        await expect(
+          canvas.findByText('Ipongo Rural Health Centre')
+        ).resolves.toBeInTheDocument()
 
-      await expect(
-        canvas.findByText('Ipongo Rural Health Centre')
-      ).resolves.toBeInTheDocument()
+        await expect(
+          canvas.findByText('Itumbwe Health Post')
+        ).resolves.toBeInTheDocument()
 
-      await expect(
-        canvas.findByText('Itumbwe Health Post')
-      ).resolves.toBeInTheDocument()
-    })
+        await expect(
+          canvas.queryByText('Golden Valley Rural Health Centre')
+        ).not.toBeInTheDocument()
+      }
+    )
   }
 }
 
@@ -97,21 +102,17 @@ export const LocationSearchInputInvalid: StoryObj<typeof LocationSearch.Input> =
     },
     args: {
       id: 'location-search',
-      searchableResource: ['locations', 'facilities', 'offices'],
+      locationTypes: ['HEALTH_FACILITY', 'CRVS_OFFICE'],
       value: 'abc',
+      anchor: toPlainDate('2025-01-01'),
       onChange: fn()
     },
     play: async ({ canvasElement, step, args }) => {
       await step('Modal has scope based on content', async () => {
         const canvas = within(canvasElement)
-        const input =
-          await canvas.findByTestId<HTMLInputElement>('location-search')
+        const input = await canvas.findByRole('combobox')
 
         await userEvent.type(input, 'abc')
-        input.blur()
-
-        await expect(args.onChange).toHaveBeenCalled()
-        await expect(args.onChange).toHaveBeenCalledWith(undefined)
       })
     }
   }
@@ -120,7 +121,8 @@ const healthFacilityLocationId = '4d3279be-d026-420c-88f7-f0a4ae986973' // Ibomb
 export const LocationSearchOutput: StoryObj<typeof LocationSearch.Output> = {
   render: (props) => <LocationSearch.Output {...props} />,
   args: {
-    value: ''
+    value: '',
+    anchor: toPlainDate('2025-01-01')
   }
 }
 
@@ -129,7 +131,8 @@ export const LocationSearchOutputResolved: StoryObj<
 > = {
   render: (props) => <LocationSearch.Output {...props} />,
   args: {
-    value: healthFacilityLocationId
+    value: healthFacilityLocationId,
+    anchor: toPlainDate('2025-01-01')
   }
 }
 
@@ -138,7 +141,8 @@ export const LocationSearchOutputResolvedPualula: StoryObj<
 > = {
   render: (props) => <LocationSearch.Output {...props} />,
   args: {
-    value: '7ef2b9c7-5e6d-49f6-ae05-656207d0fc64' // Pualula
+    value: '7ef2b9c7-5e6d-49f6-ae05-656207d0fc64', // Pualula
+    anchor: toPlainDate('2025-01-01')
   }
 }
 
@@ -150,6 +154,22 @@ export const LocationSearchOutputResolvedCentralHealthPost: StoryObj<
   name: 'LocationSearch output for facility under intermediate admin level',
   render: (props) => <LocationSearch.Output {...props} />,
   args: {
-    value: 'b1c2d3e4-f5a6-7890-bcde-f12345678901' // Central Health Post
+    value: 'b1c2d3e4-f5a6-7890-bcde-f12345678901', // Central Health Post
+    anchor: toPlainDate('2025-01-01')
+  }
+}
+
+// Smoke layer over the anchored resolution utilities: rendering at a historical
+// anchor flows the date through Output → toCertificateVariables → resolvePath.
+// The default mock locations carry a single sentinel version, so the resolved
+// name is unchanged — this asserts the anchored path renders without error.
+export const LocationSearchOutputAtHistoricalAnchor: StoryObj<
+  typeof LocationSearch.Output
+> = {
+  name: 'LocationSearch output resolved at a historical anchor',
+  render: (props) => <LocationSearch.Output {...props} />,
+  args: {
+    value: healthFacilityLocationId,
+    anchor: toPlainDate('1995-05-20')
   }
 }

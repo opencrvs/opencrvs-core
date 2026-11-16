@@ -1,0 +1,544 @@
+# NOTES:
+# Liveness and readiness probes defaults are here:
+# We are good to go with defaults for now
+# https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/#configure-probes
+
+###############################################################################
+# Dependencies configuration
+###############################################################################
+# Please update values.yaml for your particular environment with correct values
+# Default values for dependencies are configured with considerations:
+# - All dependencies are deployed by dependencies helm chart
+# - Dependencies are deployed in opencrvs-deps-dev namespace
+
+# Elasticsearch configuration, including the hostname and port.
+elasticsearch:
+  host: elasticsearch.opencrvs-deps-dev.svc.cluster.local
+  port: 9200
+  reindex_enabled: true
+  cronjob:
+    enabled: false
+    schedule: '0 2 * * *'
+  # auth_mode:
+  # - disabled: No authentication enabled, password-less access to databases
+  # - auto: Users are managed by OpenCRVS helm chart, this mode requires secret to be created with Elasticsearch admin user
+  # - use_secret: Kubernetes Secrets needs to be created manually, users are managed by the datastore administrator, but helm
+  #               will pick up data from users_secret and urls_secret
+  # - managed: Kubernetes Secrets needs to be created manually and mapped manually for each service, for more information
+  #            please check README.md
+  # It is recommended to setup auto or use_secret values for server environment
+  auth_mode: disabled
+
+  admin_user_secret_name: elasticsearch-admin-user
+  urls_secret: elasticsearch-opencrvs-urls
+  # INTERNAL USAGE ONLY: DON'T MODIFY THIS SECTION
+  # List of users to create and grant authorization to Elasticsearch.
+  # Column separated pair of placeholder and user name, <PLACEHOLDER>:<USERNAME>
+  # Placeholders are converted to variables:
+  # - <PLACEHOLDER>_ELASTIC_USERNAME
+  # - <PLACEHOLDER>_ELASTIC_PASSWORD
+  # If <USERNAME> is not provided, then random username is generated.
+  # Password is always generated randomly.
+  # Values are stored in secret named `elasticsearch-opencrvs-users`.
+  auth_users:
+    - SEARCH:search
+  # TEMPORAL SECRET TO STORE ELASTICSEARCH USERS
+  users_secret: elasticsearch-opencrvs-users
+
+# MinIO configuration, including the hostname and port.
+minio:
+  host: minio-0.minio.opencrvs-deps-dev.svc.cluster.local
+  port: '3535'
+  # external_url: external <host/ip>[:port] available for client browser to issue signed document URL.
+  #                   Default: minio.<opencrvs domain>
+  # external_protocol: external protocol (http or https) available for client browser. (Default: helm chart http_scheme)
+  # auth_mode:
+  # - disabled: No authentication enabled, password-less access to databases
+  # - use_secret: Kubernetes Secrets needs to be created manually, users are managed by the datastore administrator, but helm
+  #               will pick up data from users_secret
+  # - managed: Kubernetes Secrets needs to be created manually and mapped manually for each service, for more information
+  #            please check README.md
+  auth_mode: disabled
+  users_secret: minio-opencrvs-users
+  # Image used as client to run OpenCRVS configuration scripts
+  image:
+    repository: ghcr.io/opencrvs/minio-mc
+    tag: 'release.2025-05-21t01-59-54z'
+
+redis:
+  host: redis-0.redis.opencrvs-deps-dev.svc.cluster.local
+  # auth_mode:
+  # - disabled: No authentication enabled, password-less access to databases
+  # - use_secret: Kubernetes Secrets needs to be created manually, users are managed by the datastore administrator, but helm
+  #               will pick up data from users_secret
+  # - managed: Kubernetes Secrets needs to be created manually and mapped manually for each service, for more information
+  #            please check README.md
+  auth_mode: disabled
+  users_secret: redis-opencrvs-users
+
+postgres:
+  # Postgres hostname configuration
+  host: postgres-0.postgres.opencrvs-deps-dev.svc.cluster.local
+  port: 5432
+  sslmode: disable
+  auth_mode: disabled
+  # auth_mode:
+  # - disabled: Default credentials are used postgres/postgres
+  # - auto: Users are managed by OpenCRVS helm chart, this mode requires secret to be created with Postgres admin user
+  # - use_secret: Kubernetes Secrets needs to be created manually, users are managed by Postgres administrator, but helm
+  #               will pick up data from users_secret and urls_secret
+  # - managed: Kubernetes Secrets needs to be created manually and mapped manually for each service, for more information
+  #            please check README.md
+  # It is recommended to setup auto or use_secret values for server environment
+
+  # Postgres databases and users to create, if `use_default_credentials` is set to `false`.
+  admin_user_secret_name: postgres-admin-user
+  users_secret: postgres-opencrvs-users
+  urls_secret: postgres-urls
+
+  # Image used as client to run OpenCRVS configuration scripts
+  image:
+    repository: postgres
+    tag: 17.6
+
+  # FIXME: Refactor this in the future when we get more databases
+  events_db: events
+  events_migrator: events_migrator
+  events_app: events_app
+  events_analytics: analytics
+  on_restore_cronjob:
+    enabled: false
+    schedule: '0 2 * * *'
+###############################################################################
+# Application configuration
+###############################################################################
+
+# Hostname for OpenCRVS application, without wildcard or subdomain.
+# All OpenCRVS services will be available under domain:
+hostname: opencrvs.localhost
+
+# subdomain_separator: separator between hostname and subdomains
+# generic form: <subdomain><subdomain_separator><hostname>
+# OpenCRVS can be deployed in different ways:
+# - as set of subdomains to hostname, examples:
+#            - auth.opencrvs.localhost
+#            - register.opencrvs.localhost
+# - as set of variations to main domain,
+#   in this variant wildcard certificate is needed only to one domain, examples:
+#            - auth-opencrvs.localhost
+#            - register-opencrvs.localhost
+subdomain_separator: '.'
+
+# This section allows manually define credentials
+credentials:
+  {}
+  # super_user_password: Define super user password from stdin
+
+# WARNING: Use only with Tilt
+# Define path to static files internal OpenCRVS certificates
+certs:
+  {}
+  # cert_file: File with certificate
+  # key_file: File with key
+
+ingress:
+  # Access OpenCRVS services at https://<hostname>/
+  # For example, https://farajaland.org/
+  ssl_enabled: true
+  # Generate SSL Certificate by TLS resolver instead of using default traefik Certificate
+  tls_resolver: ''
+  # Restrict the Metabase admin console to specific source IP ranges,
+  # using Traefik's ipAllowList middleware. It is otherwise reachable by
+  # anyone who can resolve its hostname. The public dashboards embedded in
+  # the Performance page are not covered: every user needs them, so they
+  # follow application_allowlist below. Leave empty to leave the console
+  # publicly reachable (not recommended for production - see "Hardening"
+  # in README.md).
+  # Example:
+  #   admin_console_allowlist:
+  #     - 203.0.113.0/24
+  #     - 198.51.100.42/32
+  admin_console_allowlist: []
+  # Restrict the whole OpenCRVS application (client, login, gateway,
+  # countryconfig and the public Metabase dashboards embedded in the
+  # Performance page) to specific source IP ranges, using Traefik's
+  # ipAllowList middleware. Unlike admin_console_allowlist above, this
+  # gates every public entry point, not just admin consoles - useful for
+  # deployments that want to allow only the deploying country's own IP
+  # ranges, cutting off most automated/opportunistic attacks without
+  # requiring a VPN. admin_console_allowlist is always merged in, so admin
+  # console IPs never need repeating here. Leave empty to leave the
+  # application publicly reachable (not recommended for production - see
+  # "Hardening" in README.md).
+  # Example:
+  #   application_allowlist:
+  #     - 203.0.113.0/24
+  #     - 198.51.100.42/32
+  application_allowlist: []
+
+# Kubernetes NetworkPolicy configuration for OpenCRVS workloads.
+# Requires a CNI provider that enforces Kubernetes NetworkPolicy.
+network_policy:
+  # Render NetworkPolicy resources. Requires a CNI provider that enforces
+  # NetworkPolicy - set to false on clusters without one.
+  enabled: true
+  # Baseline policy for ingress to OpenCRVS pods. One of:
+  # - deny: deny ingress unless another NetworkPolicy allows it (default).
+  # - private: allow ingress only from RFC1918 private ranges
+  #            (10.0.0.0/8, 172.16.0.0/12, 192.168.0.0/16).
+  # - full: no baseline policy; ingress is unrestricted.
+  ingress_mode: deny
+  # Baseline policy for egress from OpenCRVS pods. Same modes as
+  # ingress_mode, applied to egress instead. Defaults to "private" rather
+  # than "deny": OpenCRVS pods need to reach the dependencies chart's
+  # namespace (see allowed_namespaces below) and typically nothing else
+  # outside the cluster/VPC, so private strikes a safe-by-default balance
+  # without requiring every deployment to enumerate allowed_namespaces up
+  # front. Services that genuinely need public internet (e.g. countryconfig,
+  # for SMTP/SMS provider integrations) opt out individually via their own
+  # network_policy.egress_mode: full; see "Hardening" in README.md.
+  egress_mode: private
+  # Allow OpenCRVS pods in this namespace to communicate with each other.
+  # This keeps the chart practical while blocking unexpected cross-namespace
+  # and external traffic by default.
+  allow_same_namespace: true
+  # Namespaces OpenCRVS pods are allowed to reach. Only takes effect when
+  # egress_mode is not "full". Required for the OpenCRVS application to
+  # keep working once egress is denied by default (e.g. auth/gateway
+  # reaching redis/postgres/elasticsearch/minio), since the dependencies
+  # chart is typically deployed to a separate namespace. See "Hardening"
+  # in README.md.
+  allowed_namespaces: []
+  # Extra annotations/labels applied to every generated NetworkPolicy's
+  # metadata (not the podSelector). Override per service under
+  # <service>.network_policy.annotations / .labels, which take precedence
+  # over these; a rule under network_policy.rules/custom_rules can further
+  # override via its own annotations/labels.
+  annotations: {}
+  labels: {}
+
+# See kubernetes documentation for more information on service types:
+# https://kubernetes.io/docs/concepts/services-networking/service/
+service_type: ClusterIP
+
+# timezone: You can specify a time zone for a CronJobs
+# https://kubernetes.io/docs/concepts/workloads/controllers/cron-jobs/#time-zones
+# For CronJobs with no time zone specified, the kube-controller-manager interprets schedules relative to its local time zone.
+# Example:
+# timezone: "Etc/UTC"
+
+# Kubernetes HTTP Probes configuration
+probes:
+  liveness:
+    # FIXME: /ping is not real healthz, just checking if http server is up
+    path: /ping
+    periodSeconds: 3
+    timeoutSeconds: 3
+  readiness:
+    path: /ping
+    periodSeconds: 3
+    timeoutSeconds: 3
+  startup:
+    path: /ping
+    periodSeconds: 3
+    timeoutSeconds: 1
+
+# Horizontal Pod Autoscaler (HPA) configuration:
+hpa:
+  enabled: true
+  minReplicas: 1
+  maxReplicas: 2
+  averageUtilization: 75
+
+# Pod Disruption Budget (PDB) configuration:
+pdb:
+  enabled: true
+  minAvailable: 50%
+
+# ServiceAccount configuration.
+# By default, the chart creates one ServiceAccount per workload.
+# Override annotations globally here, or per workload under
+# <workload>.service_account.annotations.
+service_account:
+  create: true
+  annotations: {}
+  automount_service_account_token: true
+
+# Deployment rollout strategy, applied to all services below unless
+# overridden per-service under <service>.strategy (e.g. auth.strategy).
+# - Recreate: terminate all existing pods before creating replacements.
+#   Guarantees old pods are gone before new ones start; causes a brief
+#   outage for that service during rollout.
+# - RollingUpdate: swap pods gradually. Optionally set maxSurge and/or
+#   maxUnavailable (globally here, or per-service) to tune it; Kubernetes'
+#   own defaults (25%/25%) apply if neither is set.
+strategy:
+  type: Recreate
+
+# Resources allocated to OpenCRVS microservices (Kubernetes PODs):
+resources:
+  memoryRequest: '128Mi'
+  cpuRequest: '100m'
+  memoryLimit: '2Gi'
+  cpuLimit: '2'
+
+# Global environment variables applied to
+# all OpenCRVS microservices (Kubernetes PODs):
+env:
+  OPENCRVS_ENVIRONMENT: production
+  NODE_ENV: production
+  MINIO_BUCKET: ocrvs
+  # LOG_LEVEL: debug
+
+  # Sentry DSN (Data Source Name) configuration for error tracking.
+  # Note: The SENTRY_DSN should be defined at the global level of environment variables.
+  # SENTRY_DSN: https://...@o309867.ingest.sentry.io/....
+
+# OpenTelemetry tracing configuration for instrumented OpenCRVS services.
+# When enabled, auth, countryconfig, documents, events and gateway receive
+# OTEL exporter and resource environment variables.
+otel:
+  enabled: false
+  # Defaults to env.NODE_ENV
+  # deployment_environment: production
+  exporter_otlp_endpoint: ''
+  exporter_otlp_protocol: grpc
+
+# OpenCRVS core image tag:
+# Deprecated: use platform.tag instead.
+image:
+  tag: v1.9.12
+
+# Deprecated: use platform.imagePullSecrets instead.
+imagePullSecrets: []
+
+# Default image configuration for the OpenCRVS platform.
+# These values apply to all OpenCRVS services unless overridden
+# by a service-specific image configuration.
+platform:
+  # Default tag for all OpenCRVS images.
+  tag: v2.1.2
+
+  # Default repository for all OpenCRVS images,
+  # for example: ghcr.io/opencrvs or myorg
+  repository: ghcr.io/opencrvs
+
+  # Secrets used to pull images from private registries, if needed.
+  # Example:
+  # imagePullSecrets:
+  #   - name: registry-secret
+  imagePullSecrets: []
+
+# Shared utilities image used by helper jobs and init containers.
+# Full image reference is resolved the same way as for application images:
+# <platform.repository>/<utilities.image.name>:<platform.tag>
+# Override repository or tag here only if the utilities image is published separately.
+utilities:
+  image:
+    name: ocrvs-utilities
+
+##############################################################
+# Per service configuration:
+auth:
+  port: 4040
+  env:
+    TWO_FA_ENABLED: true
+  image:
+    name: ocrvs-auth
+    # optional overrides:
+    # registry: registry.example.com
+    # repository: custom-org
+    # tag: v2.0.0
+
+client:
+  network_policy:
+    ingress_mode: private
+  port: 3000
+  image:
+    name: ocrvs-client
+  # client is an nginx docker image
+  # nginx_conf_d_configmaps: see description for login.nginx_conf_d_configmaps section
+
+  # Health check probes configuration
+  probes:
+    liveness:
+      path: /health/ready
+      periodSeconds: 30
+    readiness:
+      path: /health/ready
+      periodSeconds: 30
+    startup:
+      path: /health/ready
+
+  env:
+    # FIXME: Do we need define this variable?
+    DECLARED_DECLARATION_SEARCH_QUERY_COUNT: 100
+
+# Countryconfig service configuration, including the image tag and port number.
+countryconfig:
+  image:
+    name: opencrvs/ocrvs-countryconfig
+    tag: v2.1.2
+  port: 3040
+  network_policy:
+    # countryconfig needs public-internet egress regardless of the global
+    # network_policy.egress_mode: it integrates with per-country SMTP
+    # servers and SMS gateways (e.g. Infobip) at arbitrary external hosts
+    # configured via env vars/secrets, not fixed IPs a private-range or
+    # namespace-scoped rule could cover.
+    egress_mode: full
+    ingress_mode: private
+
+dashboards:
+  enabled: false
+  image:
+    name: metabase
+    repository: metabase
+    tag: v0.56.4
+  port: 4444
+  network_policy:
+    ingress_mode: private
+  use_default_credentials: true
+  env:
+    METABASE_DATABASE_SSL: false
+    OPENCRVS_METABASE_MAP_NAME: Farajaland
+    OPENCRVS_METABASE_MAP_REGION_KEY: State
+    OPENCRVS_METABASE_MAP_REGION_NAME: State
+    OPENCRVS_METABASE_SITE_NAME: OpenCRVS Dashboards
+  # For stable work we need at least 4Gi of memory (check metabase logs at startup)
+  resources:
+    memoryRequest: '2Gi'
+    cpuRequest: '250m'
+    memoryLimit: '2Gi'
+    cpuLimit: '2'
+
+documents:
+  port: 9050
+  image:
+    name: ocrvs-documents
+
+gateway:
+  port: 7070
+  image:
+    name: ocrvs-gateway
+  network_policy:
+    ingress_mode: private
+  env:
+    CHECK_INVALID_TOKEN: 'true'
+    CONFIG_SMS_CODE_EXPIRY_SECONDS: '600'
+    CONFIG_TOKEN_EXPIRY_SECONDS: '604800'
+    COUNTRY: FAR
+    DISABLE_RATE_LIMIT: 'false'
+    LANGUAGES: 'en,fr'
+
+login:
+  port: 3020
+  image:
+    name: ocrvs-login
+  network_policy:
+    ingress_mode: private
+  # login is an nginx docker image
+  # nginx_conf_d_configmaps:
+  #     List of Configmap names to store custom configuration:
+  #     - each configmap must contain one configuration file
+  #     - configuration file name must match with configmap name
+  #     - each configmap is mounted inside /etc/nginx/conf.d.
+  # Example:
+  # nginx_conf_d_configmaps:
+  #   - login-nginx-headers
+  #   - login-nginx-auth
+  # Mounted files:
+  # ls -1 /etc/nginx/conf.d
+  # login-nginx-headers.conf
+  # login-nginx-auth.conf
+  # default.conf <- this file exists by default
+  # Example command to create configmap:
+  # kubectl create configmap login-nginx-login --from-file=foo.conf --from-file=login-nginx-login.conf
+  # login-nginx-login: is configmap name
+  # login-nginx-login.conf is file name. it should be same as configmap with .conf ending
+
+  # Health check probes configuration
+  probes:
+    liveness:
+      path: /health/ready
+      periodSeconds: 30
+    readiness:
+      path: /health/ready
+      periodSeconds: 30
+    startup:
+      path: /health/ready
+
+events:
+  port: 5555
+  image:
+    name: ocrvs-events
+  env:
+    ES_INDEX_PREFIX: events
+    TWO_FA_ENABLED: true
+  probes:
+    liveness:
+      path: /health/ready
+      timeoutSeconds: 10
+    readiness:
+      path: /health/ready
+      timeoutSeconds: 10
+    startup:
+      path: /health/ready
+      timeoutSeconds: 10
+
+##############################################################
+# One time jobs:
+# Common service account for Helm pre/post deployment jobs.
+deployment_jobs:
+  service_account:
+    name: deployment-jobs
+    annotations:
+      'helm.sh/hook': pre-install,pre-upgrade
+      'helm.sh/hook-weight': '-10'
+      'helm.sh/hook-delete-policy': before-hook-creation
+  network_policy:
+    annotations:
+      'helm.sh/hook': pre-install,pre-upgrade
+      'helm.sh/hook-weight': '-10'
+    ingress_mode: deny
+    egress_mode: full
+
+# data_migration: Job to migrate datastores while deployment
+data_migration:
+  image:
+    name: ocrvs-migration
+
+# data_cleanup: Wipe all persistent data from datastores including users
+# By running this job on production environment all data will be lost
+data_cleanup:
+  enabled: false
+
+# data_seed: Initial data seeding into datastore, this job works only with clean environment
+# make sure your environment was cleaned up before running this job
+data_seed:
+  enabled: true
+  image:
+    name: ocrvs-data-seeder
+  env:
+    # When users are seeded, are they immediately active using a test password and
+    # six zeros as a 2-Factor auth code. Always set to false in production and staging.
+    ACTIVATE_USERS: 'false'
+
+validation:
+  enabled: false
+  timeout_seconds: 5
+  active_deadline_seconds: 300
+  cert_endpoint: 'https://traefik.traefik.svc.cluster.local'
+  monitoring_enabled: false
+  allow_insecure_https: false
+  smtp_secret_name: smtp-config
+  preflight:
+    enabled: true
+    hook_weight: '0'
+  postdeploy:
+    enabled: true
+    hook_weight: '5'
+
+on_restore_cronjob:
+  enabled: false
+  schedule: '0 3 * * *'

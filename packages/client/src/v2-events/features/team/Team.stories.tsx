@@ -8,11 +8,11 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import type { Meta, StoryObj } from '@storybook/react'
+import type { Meta, StoryObj } from '@storybook/react-vite'
 import { TestUserRole } from '@opencrvs/commons/client'
-import { ROUTES, routesConfig } from '@client/v2-events/routes'
+import { V2_DEFAULT_MOCK_LOCATIONS } from '@opencrvs/commons/client'
+import { routesConfig } from '@client/v2-events/routes'
 import * as V1_LEGACY_ROUTES from '@client/navigation/routes'
-import { V2_DEFAULT_MOCK_LOCATIONS } from '../../../../.storybook/default-request-handlers'
 import { TeamPage } from './Team'
 
 const meta: Meta<typeof TeamPage> = {
@@ -30,10 +30,22 @@ const locationId = V2_DEFAULT_MOCK_LOCATIONS.find(
 export const TeamPageStory: Story = {
   name: 'Team Page',
   parameters: {
-    userRole: TestUserRole.Enum.LOCAL_REGISTRAR,
+    userRole: TestUserRole.enum.LOCAL_REGISTRAR,
     reactRouter: {
       router: routesConfig,
       initialPath: V1_LEGACY_ROUTES.TEAM_USER_LIST + `?locationId=${locationId}`
     }
   }
+}
+
+export const TeamPageMobile: Story = {
+  name: 'Team Page - Mobile',
+  parameters: {
+    userRole: TestUserRole.enum.NATIONAL_SYSTEM_ADMIN,
+    reactRouter: {
+      router: routesConfig,
+      initialPath: V1_LEGACY_ROUTES.TEAM_USER_LIST + `?locationId=${locationId}`
+    }
+  },
+  globals: { viewport: { value: 'Tablet' } }
 }

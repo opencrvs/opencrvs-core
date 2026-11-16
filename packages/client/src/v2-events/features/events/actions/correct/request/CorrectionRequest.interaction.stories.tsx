@@ -8,12 +8,12 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import type { Meta, StoryObj } from '@storybook/react'
+import type { Meta, StoryObj } from '@storybook/react-vite'
 import { createTRPCMsw, httpLink } from '@vafanassieff/msw-trpc'
 import React, { useEffect } from 'react'
 import { Outlet } from 'react-router-dom'
 import superjson from 'superjson'
-import { expect, waitFor, within, userEvent } from '@storybook/test'
+import { expect, waitFor, within, userEvent } from 'storybook/test'
 import {
   ActionType,
   generateEventDocument,
@@ -140,6 +140,8 @@ export const ReviewWithParentFieldChanges: Story = {
       await userEvent.click(
         canvas.getByTestId('change-button-applicant.address')
       )
+
+      await canvas.findByText('Who is applying for the membership?')
 
       // make senior-pass page available meeting conditional with applicant dob
       await userEvent.clear(canvas.getByTestId('applicant____dob-dd'))
@@ -305,7 +307,6 @@ const eventWithAddress = generateEventDocument({
   actions: [
     { type: ActionType.CREATE },
     { type: ActionType.DECLARE },
-    { type: ActionType.VALIDATE },
     { type: ActionType.REGISTER }
   ]
 })
@@ -337,7 +338,7 @@ export const AddressStaysUnchangedInSummaryWhenNotEdited: Story = {
 
       await canvas.findByText("Applicant's address")
 
-      const cell = canvas.getByTestId('row-value-applicant.address')
+      const cell = canvas.getByTestId('applicant.address-value')
 
       await expect(cell).toHaveTextContent(
         'FarajalandCentralIsangoExample TownExample Residential AreaExample Street55123456'
@@ -361,7 +362,7 @@ export const AddressStaysUnchangedInSummaryWhenNotEdited: Story = {
     await step('Validate review content stays the same', async () => {
       await canvas.findByText("Applicant's address")
 
-      const cell = canvas.getByTestId('row-value-applicant.address')
+      const cell = canvas.getByTestId('applicant.address-value')
 
       await expect(cell).toHaveTextContent(
         'FarajalandCentralIsangoExample TownExample Residential AreaExample Street55123456'

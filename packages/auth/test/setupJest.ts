@@ -9,9 +9,9 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { join } from 'path'
-import * as fetch from 'jest-fetch-mock'
+import fetch from 'jest-fetch-mock'
 
-jest.setMock('node-fetch', { default: fetch })
+jest.setMock('node-fetch', { __esModule: true, default: fetch })
 
 const database: { [key: string]: string } = {}
 
@@ -32,12 +32,19 @@ const mock = {
       const keyExists = !!database[key]
       delete database[key]
       return keyExists ? 1 : 0
+    }),
+    // GETDEL: returns the value and removes the key, or null if absent.
+    // Read and delete stay in one synchronous body so that, as with the real
+    // command, no caller can observe the value between the two.
+    getDel: jest.fn().mockImplementation(async (key) => {
+      const value = database[key] ?? null
+      delete database[key]
+      return value
     })
   }
 }
 
 jest.setMock('src/database', mock)
-jest.setMock('src/metrics', { postUserActionToMetrics: jest.fn() })
 
 process.env.CERT_PRIVATE_KEY_PATH = join(__dirname, './cert.key')
 process.env.CERT_PUBLIC_KEY_PATH = join(__dirname, './cert.key.pub')

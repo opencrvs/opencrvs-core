@@ -9,18 +9,21 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { userEvent, screen } from '@storybook/test'
+import { userEvent, screen } from 'storybook/test'
 import React from 'react'
 import { createTRPCMsw, httpLink } from '@vafanassieff/msw-trpc'
 import superjson from 'superjson'
-import { Meta, StoryObj } from '@storybook/react'
+import { Meta, StoryObj } from '@storybook/react-vite'
 import {
   ActionType,
   getCurrentEventState,
-  tennisClubMembershipEvent
+  AssignmentStatus,
+  tennisClubMembershipEvent,
+  TestUserRole
 } from '@opencrvs/commons/client'
+
 import { AppRouter } from '@client/v2-events/trpc'
-import { AssignmentStatus } from '@client/v2-events/utils'
+
 import { tennisClubMembershipEventDocument } from '@client/v2-events/features/events/fixtures'
 import {
   addLocalEventConfig,
@@ -28,7 +31,7 @@ import {
 } from '@client/v2-events/features/events/useEvents/api'
 import { testDataGenerator } from '@client/tests/test-data-generators'
 import { ActionMenu } from '../ActionMenu'
-import { getMockEvent, UserRoles } from './ActionMenu.common'
+import { getMockEvent } from './ActionMenu.common'
 
 const event = getMockEvent(
   [
@@ -38,7 +41,7 @@ const event = getMockEvent(
     ActionType.UNASSIGN,
     AssignmentStatus.ASSIGNED_TO_OTHERS
   ],
-  UserRoles.LOCAL_REGISTRAR
+  TestUserRole.enum.LOCAL_REGISTRAR
 )
 
 const tRPCMsw = createTRPCMsw<AppRouter>({

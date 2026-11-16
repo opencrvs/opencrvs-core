@@ -9,14 +9,9 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-export * from './fixtures/birth-bundle'
-export * from './fixtures/death-bundle'
-export * from './fixtures/marriage-bundle'
-export * from './fixtures/location'
-export * from './fixtures/practitioner'
 export * from './fixtures/tennis-club-membership-event'
 export * from './fixtures/football-club-membership-event'
 export * from './fixtures/library-membership-event'
-export * from './fixtures/v2-birth-event'
+export * from './fixtures/child-onboarding-event'
 export * from './fixtures/forms'
 export * from './fixtures/digital-identity-issuance-event'

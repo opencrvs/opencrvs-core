@@ -12,7 +12,7 @@
 import * as React from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useIntl } from 'react-intl'
-import { stringify } from 'query-string'
+import { stringify } from 'qs'
 import { Icon } from '@opencrvs/components/lib/Icon'
 import { NavigationGroup } from '@opencrvs/components/lib/SideNavigation/NavigationGroup'
 import { NavigationItem } from '@opencrvs/components/lib/SideNavigation/NavigationItem'
@@ -27,7 +27,7 @@ import { formatUrl } from '@client/navigation'
 import { navigationMessages } from '@client/i18n/messages/views/navigation'
 import { useHasAccessToNavigationItem } from '@client/components/interface/useHasAccessToNavigationItem'
 
-const conmmunicationTab: string[] = [
+const communicationTab = [
   WORKQUEUE_TABS.informantNotification,
   WORKQUEUE_TABS.emailAllUsers
 ]
@@ -39,10 +39,12 @@ const conmmunicationTab: string[] = [
  * */
 export function OrganisationNavigationGroup({
   currentWorkqueueSlug,
-  primaryOfficeId
+  primaryOfficeId,
+  menuCollapse
 }: {
   currentWorkqueueSlug?: string
   primaryOfficeId: string | undefined
+  menuCollapse?: () => void // Only relevant for mobile view
 }) {
   const [isConfigExpanded, setIsConfigExpanded] = React.useState(false)
   const [isCommunicationExpanded, setIsCommunicationExpanded] =
@@ -58,19 +60,22 @@ export function OrganisationNavigationGroup({
       {hasAccess(TAB_GROUPS.organisations) && (
         <NavigationGroup>
           <NavigationItem
+            data-testid={`navigation_${WORKQUEUE_TABS.organisation}`}
             icon={() => <Icon name="Buildings" size="small" />}
             id={`navigation_${WORKQUEUE_TABS.organisation}`}
             isSelected={currentWorkqueueSlug === WORKQUEUE_TABS.organisation}
             label={intl.formatMessage(
               navigationMessages[WORKQUEUE_TABS.organisation]
             )}
-            onClick={() =>
+            onClick={() => {
               navigate(
                 formatUrl(routes.ORGANISATIONS_INDEX, {
                   locationId: '' // NOTE: Empty string is required
                 })
               )
-            }
+              // Collapse menu on mobile after navigation}
+              menuCollapse?.()
+            }}
           />
           {hasAccess(WORKQUEUE_TABS.team) && (
             <NavigationItem
@@ -89,6 +94,7 @@ export function OrganisationNavigationGroup({
                     })
                   })
                 }
+                menuCollapse?.()
               }}
             />
           )}
@@ -112,17 +118,21 @@ export function OrganisationNavigationGroup({
                 )}
                 onClick={() => setIsConfigExpanded(!isConfigExpanded)}
               />
-              {(isConfigExpanded ||
-                currentWorkqueueSlug === WORKQUEUE_TABS.systems) && (
-                <NavigationSubItem
-                  id={`navigation_${WORKQUEUE_TABS.systems}`}
-                  isSelected={currentWorkqueueSlug === WORKQUEUE_TABS.systems}
-                  label={intl.formatMessage(
-                    navigationMessages[WORKQUEUE_TABS.systems]
-                  )}
-                  onClick={() => navigate(routes.SYSTEM_LIST)}
-                />
-              )}
+              {hasAccess(WORKQUEUE_TABS.systems) &&
+                (isConfigExpanded ||
+                  currentWorkqueueSlug === WORKQUEUE_TABS.systems) && (
+                  <NavigationSubItem
+                    id={`navigation_${WORKQUEUE_TABS.systems}`}
+                    isSelected={currentWorkqueueSlug === WORKQUEUE_TABS.systems}
+                    label={intl.formatMessage(
+                      navigationMessages[WORKQUEUE_TABS.systems]
+                    )}
+                    onClick={() => {
+                      navigate(routes.SYSTEM_LIST)
+                      menuCollapse?.()
+                    }}
+                  />
+                )}
             </>
           )}
           {hasAccess(WORKQUEUE_TABS.config) && (
@@ -130,7 +140,7 @@ export function OrganisationNavigationGroup({
               <NavigationItem
                 expandableIcon={() =>
                   isCommunicationExpanded ||
-                  conmmunicationTab.some(
+                  communicationTab.some(
                     (tab) => tab === currentWorkqueueSlug
                   ) ? (
                     <Expandable selected={true} />
@@ -140,7 +150,7 @@ export function OrganisationNavigationGroup({
                 }
                 icon={() => <Icon name="ChatCircle" size="small" />}
                 id={`navigation_${WORKQUEUE_TABS.communications}_main`}
-                isSelected={conmmunicationTab.some(
+                isSelected={communicationTab.some(
                   (tab) => tab === currentWorkqueueSlug
                 )}
                 label={intl.formatMessage(
@@ -151,7 +161,7 @@ export function OrganisationNavigationGroup({
                 }
               />
               {(isCommunicationExpanded ||
-                conmmunicationTab.some(
+                communicationTab.some(
                   (tab) => tab === currentWorkqueueSlug
                 )) && (
                 <NavigationSubItem
@@ -162,7 +172,10 @@ export function OrganisationNavigationGroup({
                   label={intl.formatMessage(
                     navigationMessages[WORKQUEUE_TABS.emailAllUsers]
                   )}
-                  onClick={() => navigate(routes.ALL_USER_EMAIL)}
+                  onClick={() => {
+                    navigate(routes.ALL_USER_EMAIL)
+                    menuCollapse?.()
+                  }}
                 />
               )}
             </>

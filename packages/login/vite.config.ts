@@ -8,7 +8,8 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { defineConfig, HttpProxy, loadEnv, ProxyOptions } from 'vite'
+import { loadEnv } from 'vite'
+import { defineConfig } from 'vitest/config'
 import react from '@vitejs/plugin-react'
 import tsconfigPaths from 'vite-tsconfig-paths'
 import { VitePWA } from 'vite-plugin-pwa'
@@ -20,8 +21,23 @@ import { IncomingMessage, ServerResponse } from 'node:http'
 dns.setDefaultResultOrder('ipv4first')
 
 // https://vitejs.dev/config/
-export default defineConfig(({ mode }): any => {
+export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, 'env')
+
+  const registerRedirectPlugin = () => ({
+    name: 'register-redirect',
+    configureServer(server: import('vite').ViteDevServer) {
+      server.middlewares.use((req, res, next) => {
+        if (req.url?.startsWith('/register')) {
+          const suffix = req.url.replace(/^\/register/, '') || '/'
+          res.writeHead(302, { Location: `http://localhost:3000${suffix}` })
+          res.end()
+          return
+        }
+        next()
+      })
+    }
+  })
 
   const htmlPlugin = () => {
     return {
@@ -46,6 +62,7 @@ export default defineConfig(({ mode }): any => {
       registerType: 'autoUpdate',
       workbox: {
         cacheId: 'ocrvs-login',
+        maximumFileSizeToCacheInBytes: 10 * 1024 * 1024,
         runtimeCaching: [
           {
             urlPattern: /config\.js/,
@@ -53,7 +70,7 @@ export default defineConfig(({ mode }): any => {
           }
         ],
         navigateFallback: '/index.html',
-        navigateFallbackDenylist: [/^\/__.*$/]
+        navigateFallbackDenylist: [/^\/__.*$/, /^\/register/]
       },
       devOptions: {
         enabled: false
@@ -69,7 +86,13 @@ export default defineConfig(({ mode }): any => {
         transformMixedEsModules: true
       }
     },
-    plugins: [htmlPlugin(), react(), tsconfigPaths(), vitePWAPlugin()],
+    plugins: [
+      htmlPlugin(),
+      react(),
+      tsconfigPaths(),
+      vitePWAPlugin(),
+      registerRedirectPlugin()
+    ],
     test: {
       environment: 'jsdom',
       setupFiles: './src/setupTests.ts',
@@ -90,11 +113,16 @@ export default defineConfig(({ mode }): any => {
           changeOrigin: true,
           rewrite: (path: string) => path.replace(/^\/api\/countryconfig/, '')
         },
+        '/api/': {
+          target: 'http://localhost:7070',
+          changeOrigin: true,
+          rewrite: (path: string) => path.replace(/^\/api/, '')
+        },
         '/health/ready': {
           target: 'http://localhost:3040',
           changeOrigin: true,
           rewrite: (path: string) => path.replace(/^\/health\/ready/, '/ping'),
-          configure: (proxy: HttpProxy.Server, _options: ProxyOptions) => {
+          configure: (proxy, _options) => {
             proxy.on(
               'proxyRes',
               (
@@ -132,29 +160,22 @@ export default defineConfig(({ mode }): any => {
               }
             )
 
-            proxy.on(
-              'error',
-              (
-                _err: Error,
-                req: IncomingMessage,
-                res: ServerResponse<IncomingMessage>
-              ) => {
-                if (req.url === '/health/ready') {
-                  res.writeHead(500, { 'Content-Type': 'application/json' })
-                  res.end(
-                    JSON.stringify({
-                      status: 'error',
-                      checks: {
-                        countryconfig: {
-                          status: 'error',
-                          error: 'Country config service unavailable'
-                        }
+            proxy.on('error', (_err, req, res) => {
+              if (req.url === '/health/ready' && 'writeHead' in res) {
+                res.writeHead(500, { 'Content-Type': 'application/json' })
+                res.end(
+                  JSON.stringify({
+                    status: 'error',
+                    checks: {
+                      countryconfig: {
+                        status: 'error',
+                        error: 'Country config service unavailable'
                       }
-                    })
-                  )
-                }
+                    }
+                  })
+                )
               }
-            )
+            })
           }
         }
       }

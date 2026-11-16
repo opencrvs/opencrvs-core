@@ -17,20 +17,22 @@ export const env = cleanEnv(process.env, {
   REDIS_PASSWORD: str({ default: undefined }),
   AUTH_HOST: str({ default: '0.0.0.0' }),
   AUTH_PORT: port({ default: 4040 }),
-  USER_MANAGEMENT_URL: url({ devDefault: 'http://localhost:3030/' }),
-  METRICS_URL: url({ devDefault: 'http://localhost:1050' }),
+  EVENTS_URL: url({ devDefault: 'http://localhost:5555/' }),
   DOMAIN: str({ devDefault: '*' }),
-  COUNTRY_CONFIG_URL_EXTERNAL: url({ devDefault: 'http://localhost:3040/' }), // used for external requests (CORS whitelist)
-  COUNTRY_CONFIG_URL_INTERNAL: url({ devDefault: 'http://localhost:3040/' }), // used for internal service-to-service communication
-  LOGIN_URL: url({ devDefault: 'http://localhost:3020/' }),
-  CLIENT_APP_URL: url({ devDefault: 'http://localhost:3000/' }),
+  COUNTRY_CONFIG_URL_INTERNAL: url({ devDefault: 'http://localhost:3040/' }),
   CERT_PRIVATE_KEY_PATH: str({ devDefault: '../../.secrets/private-key.pem' }),
   CERT_PUBLIC_KEY_PATH: str({ devDefault: '../../.secrets/public-key.pem' }),
-  QA_ENV: bool({ default: false }),
+  TWO_FA_ENABLED: bool({
+    devDefault: false,
+    default: true,
+    desc: 'Enable two-factor authentication. When disabled, verification codes are set to 000000.'
+  }),
 
-  CONFIG_TOKEN_EXPIRY_SECONDS: num({ default: 604800 }), // 1 week
+  CONFIG_TOKEN_EXPIRY_SECONDS: num({ default: 600 }), // 10 minutes (access token)
+  CONFIG_REFRESH_TOKEN_EXPIRY_SECONDS: num({ default: 604800 }), // 1 week (refresh token)
+  CONFIG_REFRESH_TOKEN_GRACE_SECONDS: num({ default: 60 }), // grace window for prev RT replay
   CONFIG_SMS_CODE_EXPIRY_SECONDS: num({ default: 600 }), // 10 minutes
   CONFIG_SYSTEM_TOKEN_EXPIRY_SECONDS: num({ default: 600 }), // 10 minutes
   CONFIG_REINDEX_TOKEN_EXPIRY_SECONDS: num({ default: 3600 }), // 1 hour
-  CONFIG_ACTION_CONFIRMATION_TOKEN_EXPIRY_SECONDS: num({ default: 604800 }) // 1 week
+  CONFIG_RECOVERY_LINK_EXPIRY_SECONDS: num({ default: 3600 }) // 1 hour (account recovery link)
 })

@@ -23,7 +23,6 @@ describe('buildLoginUrl', () => {
   })
 
   it('falls back to /login when LOGIN_URL is not set', () => {
-    // @ts-expect-error intentionally removing LOGIN_URL
     window.config.LOGIN_URL = undefined
     const url = buildLoginUrl('en')
     expect(url).toContain(`${window.location.origin}/login`)

@@ -62,6 +62,7 @@ export interface IDynamicValues {
     | null
     | undefined
     | Record<string, unknown>
+    | ((event: React.MouseEvent) => void)
 }
 
 export interface IActionObject {
@@ -72,6 +73,6 @@ export interface IActionObject {
 }
 
 export interface IActionComponent {
-  actionComponent: JSX.Element
+  actionComponent: JSX.Element | (() => React.ReactElement)
 }
 export type IAction = IActionObject | IActionComponent

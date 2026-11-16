@@ -15,7 +15,51 @@ import {
 } from '@opencrvs/commons/client'
 import { queryClient, trpcOptionsProxy } from '@client/v2-events/trpc'
 import { tennisClubMembershipEventDocument } from '@client/v2-events/features/events/fixtures'
-import { addLocalEventConfig, updateLocalEventIndex } from './api'
+import {
+  addLocalEventConfig,
+  deleteLocalEvent,
+  setEventData,
+  updateLocalEventIndex
+} from './api'
+
+describe('deleteLocalEvent', () => {
+  const eventDocument = tennisClubMembershipEventDocument
+  const { id } = eventDocument
+
+  beforeEach(() => {
+    global.caches = {
+      keys: vi.fn().mockResolvedValue([])
+    } as unknown as CacheStorage
+    queryClient.clear()
+    addLocalEventConfig(tennisClubMembershipEvent)
+  })
+
+  afterAll(() => {
+    queryClient.clear()
+  })
+
+  it('clears event.get cache entry', async () => {
+    queryClient.setQueryData(
+      trpcOptionsProxy.event.get.queryKey({ eventId: id }),
+      eventDocument
+    )
+
+    setEventData(eventDocument.id, eventDocument)
+
+    await deleteLocalEvent(eventDocument)
+
+    expect(
+      queryClient.getQueryData(
+        trpcOptionsProxy.event.search.queryKey({
+          query: {
+            type: 'and',
+            clauses: [{ id }]
+          }
+        })
+      )
+    ).toBeUndefined()
+  })
+})
 
 describe('updateLocalEventIndex', () => {
   beforeEach(() => {

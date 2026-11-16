@@ -12,6 +12,7 @@
 import { FieldConditional, TranslationConfig } from 'src/events'
 import { SelectOption, ValidationConfig } from 'src/events/FieldConfig'
 import { createSearchConfig } from '../searchConfigs'
+import { JurisdictionReference } from '../users/userReferences'
 
 /**
  * Returns configuration options for the field.
@@ -23,6 +24,7 @@ export function createFieldConfig(
     conditionals?: FieldConditional[]
     validations?: ValidationConfig[]
     searchCriteriaLabelPrefix?: TranslationConfig
+    allowedLocations?: JurisdictionReference
   }
 ) {
   const baseField = {

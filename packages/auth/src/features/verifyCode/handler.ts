@@ -17,9 +17,10 @@ import {
 } from '@auth/features/verifyCode/service'
 import {
   getStoredUserInformation,
-  createToken
+  createToken,
+  createRefreshToken,
+  recordUserAuditEvent
 } from '@auth/features/authenticate/service'
-import { postUserActionToMetrics } from '@auth/metrics'
 import { logger, TokenUserType } from '@opencrvs/commons'
 import { WEB_USER_JWT_AUDIENCES, JWT_ISSUER } from '@auth/constants'
 
@@ -30,6 +31,7 @@ interface IVerifyPayload {
 
 interface IVerifyResponse {
   token: string
+  refreshToken: string
 }
 export default async function authenticateHandler(
   request: Hapi.Request,
@@ -50,28 +52,19 @@ export default async function authenticateHandler(
     WEB_USER_JWT_AUDIENCES,
     JWT_ISSUER,
     role,
-    false,
     TokenUserType.enum.user
   )
 
+  const refreshToken = await createRefreshToken(userId, TokenUserType.enum.user)
+
   await deleteUsedVerificationCode(nonce)
-  const response: IVerifyResponse = { token }
-  const remoteAddress =
-    request.headers['x-real-ip'] || request.info.remoteAddress
-  const userAgent =
-    request.headers['x-real-user-agent'] || request.headers['user-agent']
 
-  try {
-    await postUserActionToMetrics(
-      'LOGGED_IN',
-      response.token,
-      remoteAddress,
-      userAgent
-    )
-  } catch (err) {
-    logger.error(err)
-  }
+  void recordUserAuditEvent(userId, {
+    operation: 'user.logged_in',
+    requestData: { subjectId: userId }
+  })
 
+  const response: IVerifyResponse = { token, refreshToken }
   return response
 }
 export const requestSchema = Joi.object({
@@ -79,5 +72,6 @@ export const requestSchema = Joi.object({
   code: Joi.string()
 })
 export const responseSchma = Joi.object({
-  token: Joi.string()
+  token: Joi.string(),
+  refreshToken: Joi.string()
 })

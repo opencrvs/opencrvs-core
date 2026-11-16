@@ -19,34 +19,40 @@ import {
   FieldConfig,
   FieldType,
   FieldTypesToHideInReview,
+  getDeclaration,
+  getDeclarationPages,
   isFieldDisplayedOnReview,
-  isPageVisible
+  isPageVisible,
+  PlainDate,
+  resolveVersion,
+  toPlainDate,
+  todayISO,
+  UUID,
+  ValidatorContext
 } from '@opencrvs/commons/client'
 import {
-  ComparisonListView,
   Content,
   ContentSize,
   FullBodyContent,
+  List,
   Stack,
   Text
 } from '@opencrvs/components'
 import { summaryMessages } from '@client/v2-events/features/workqueues/EventOverview/components/EventSummary'
 import { useIntlFormatMessageWithFlattenedParams } from '@client/v2-events/messages/utils'
-import { flattenEventIndex, getUsersFullName } from '@client/v2-events/utils'
+import {
+  flattenEventIndex,
+  getUsersFullName,
+  recordAnchorDate
+} from '@client/v2-events/utils'
 import { useUsers } from '@client/v2-events/hooks/useUsers'
-import { noop } from '@client/v2-events'
 import { useValidatorContext } from '@client/v2-events/hooks/useValidatorContext'
+import { useLocations } from '@client/v2-events/hooks/useLocations'
+import { useAdministrativeAreas } from '@client/v2-events/hooks/useAdministrativeAreas'
 import { useEventConfiguration } from '../../useEventConfiguration'
 import { Output, ValueOutput } from '../../components/Output'
-import { AdministrativeArea } from '../../registered-fields'
 import { DocumentViewer } from '../../components/DocumentViewer'
 import { duplicateMessages } from './ReviewDuplicate'
-
-const RightAlignedOnSmallScreen = styled(Text)`
-  @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
-    text-align: end;
-  }
-`
 
 const SupportingDocumentWrapper = styled(Stack)`
   position: sticky;
@@ -96,6 +102,9 @@ function SupportingDocumentList({
     .map((field) => (
       <DocWrapper key={field.id}>
         {ValueOutput({
+          // File fields only — no location is rendered, so today's anchor is
+          // inert here.
+          anchor: todayISO(),
           config: field,
           value: declaration[field.id]
         })}
@@ -107,11 +116,33 @@ function UserFullName({ userId }: { userId: string }) {
   const intl = useIntl()
   const users = useUsers()
 
-  const user = users.getUser.useQuery(userId).data
+  const user = users.getUsers.useQueryById(userId).data
   if (!user) {
     return null
   }
-  return getUsersFullName(user.name, intl.locale)
+  return getUsersFullName(user.name)
+}
+
+function RegisteredAtOfficeName({
+  id,
+  anchor
+}: {
+  id?: UUID
+  anchor: PlainDate
+}) {
+  const { getLocations } = useLocations()
+  const { getAdministrativeAreas } = useAdministrativeAreas()
+
+  const locations = getLocations.useSuspenseQuery()
+  const administrativeAreas = getAdministrativeAreas.useSuspenseQuery()
+
+  // The registered-at office renders under the name it carried on the date the
+  // record was registered.
+  const versions = id
+    ? (locations.get(id)?.versions ?? administrativeAreas.get(id)?.versions)
+    : undefined
+
+  return versions ? resolveVersion(versions, anchor).name : null
 }
 
 export function DuplicateComparison({
@@ -142,82 +173,139 @@ export function DuplicateComparison({
   const originalDeclaration = originalEventState.declaration
   const potentialDuplicateDeclaration = potentialDuplicateEventState.declaration
 
+  // Each side's declaration fields render at that record's own anchor —
+  // date of event, falling back to the record's creation date.
+  const originalAnchor = recordAnchorDate(originalEventState)
+  const potentialDuplicateAnchor = recordAnchorDate(
+    potentialDuplicateEventState
+  )
+
+  // The registered-at office renders at each record's registration date, per
+  // the per-fact anchoring rule. Falls back to today when unregistered.
+  const originalRegistrationAnchor =
+    (originalEventState.legalStatuses.REGISTERED
+      ? toPlainDate(originalEventState.legalStatuses.REGISTERED.createdAt)
+      : undefined) ?? todayISO()
+  const potentialDuplicateRegistrationAnchor =
+    (potentialDuplicateEventState.legalStatuses.REGISTERED
+      ? toPlainDate(
+          potentialDuplicateEventState.legalStatuses.REGISTERED.createdAt
+        )
+      : undefined) ?? todayISO()
+
   const hideFieldTypes = [
     ...FieldTypesToHideInReview,
     FieldType.FILE,
     FieldType.FILE_WITH_OPTIONS
   ]
 
-  const comparisonData: ComparisonDeclaration[] =
-    eventConfiguration.declaration.pages
-      .filter(
-        (page) =>
-          isPageVisible(
-            page,
+  const comparisonData: ComparisonDeclaration[] = getDeclarationPages(
+    eventConfiguration
+  )
+    .filter(
+      (page) =>
+        isPageVisible(
+          page,
+          originalDeclaration,
+          validatorContextOfOriginalEvent
+        ) ||
+        isPageVisible(
+          page,
+          potentialDuplicateDeclaration,
+          validatorContextOfPotentialDuplicateEvent
+        )
+    )
+    .map((page) => ({
+      title: intl.formatMessage(page.title),
+      data: page.fields
+        .filter(
+          (field) =>
+            isFieldDisplayedOnReview(
+              field,
+              originalDeclaration,
+              validatorContextOfOriginalEvent
+            ) ||
+            isFieldDisplayedOnReview(
+              field,
+              potentialDuplicateDeclaration,
+              validatorContextOfPotentialDuplicateEvent
+            )
+        )
+        .filter(
+          ({ type }) =>
+            !hideFieldTypes.some((typeToHide) => type === typeToHide)
+        )
+        // Group fields by label.id, preserving form order. Multiple fields
+        // can share the same label (e.g. "child.birthLocation" /
+        // "child.birthLocation.privateHome" / "child.birthLocation.other"
+        // all map to "Location of birth"). We render one row per unique
+        // label and pick the active field per side separately below.
+        .reduce<Array<{ labelId: string; fields: FieldConfig[] }>>(
+          (acc, field) => {
+            const existing = acc.find((g) => g.labelId === field.label.id)
+
+            // If the field already exists, add it to the existing group
+            if (existing) {
+              existing.fields.push(field)
+            } else {
+              // If the field does not exist, create a new group for it
+              acc.push({ labelId: field.label.id, fields: [field] })
+            }
+            return acc
+          },
+          []
+        )
+        .map(({ fields }) => {
+          // Each side may have a different field "active" — e.g. when one
+          // record uses HEALTH_FACILITY and the other was corrected to
+          // PRIVATE_HOME, the LOCATION field is active on one side and the
+          // ADDRESS field on the other. Pick the field whose conditional
+          // is satisfied per declaration so the comparison row shows the
+          // value the user actually entered, not a stale field config.
+          const pickFieldForReview = (
+            declaration: EventState,
+            ctx: ValidatorContext
+          ): FieldConfig =>
+            fields.find((f) => isFieldDisplayedOnReview(f, declaration, ctx)) ??
+            fields[0]
+
+          const leftField = pickFieldForReview(
             originalDeclaration,
             validatorContextOfOriginalEvent
-          ) ||
-          isPageVisible(
-            page,
+          )
+          const rightField = pickFieldForReview(
             potentialDuplicateDeclaration,
             validatorContextOfPotentialDuplicateEvent
           )
-      )
-      .map((page) => ({
-        title: intl.formatMessage(page.title),
-        data: page.fields
-          .filter(
-            (field) =>
-              isFieldDisplayedOnReview(
-                field,
-                originalDeclaration,
-                validatorContextOfOriginalEvent
-              ) ||
-              isFieldDisplayedOnReview(
-                field,
-                potentialDuplicateDeclaration,
-                validatorContextOfPotentialDuplicateEvent
-              )
-          )
-          .filter(
-            ({ type }) =>
-              !hideFieldTypes.some((typeToHide) => type === typeToHide)
-          )
-          // Refer to 'findPreviousValueWithSameLabel' in Output.tsx for explanation
-          .reduce<FieldConfig[]>((acc, field) => {
-            const fieldWithSameLabelDontExist = !acc.find(
-              (f) => f.label.id === field.label.id
-            )
-            if (fieldWithSameLabelDontExist) {
-              acc.push(field)
-            }
-            return acc
-          }, [])
-          .map((field) => ({
-            label: intl.formatMessage(field.label),
+
+          return {
+            label: intl.formatMessage(fields[0].label),
             rightValue: (
               <Output
+                anchor={potentialDuplicateAnchor}
                 displayEmptyAsDash={true}
                 eventConfig={eventConfiguration}
-                field={field}
-                formConfig={eventConfiguration.declaration}
+                field={rightField}
+                formConfig={getDeclaration(eventConfiguration)}
                 previousForm={potentialDuplicateDeclaration}
-                value={potentialDuplicateDeclaration[field.id]}
+                value={potentialDuplicateDeclaration[rightField.id]}
               />
             ),
             leftValue: (
               <Output
+                anchor={originalAnchor}
                 displayEmptyAsDash={true}
                 eventConfig={eventConfiguration}
-                field={field}
-                formConfig={eventConfiguration.declaration}
+                field={leftField}
+                formConfig={getDeclaration(eventConfiguration)}
                 previousForm={originalDeclaration}
-                value={originalDeclaration[field.id]}
+                value={originalDeclaration[leftField.id]}
               />
             )
-          }))
-      }))
-      .filter(({ data }) => data.length > 0)
+          }
+        })
+    }))
+    .filter(({ data }) => data.length > 0)
 
   const declarationDetailsComparison: ComparisonDeclaration = {
     title: intl.formatMessage(duplicateMessages.duplicateDeclarationDetails),
@@ -265,13 +353,15 @@ export function DuplicateComparison({
       {
         label: intl.formatMessage(duplicateMessages.registeredAt),
         rightValue: flattenedPotentialDuplicateEvent['event.registeredAt'] ? (
-          <AdministrativeArea.Output
-            value={flattenedPotentialDuplicateEvent['event.registeredAt']}
+          <RegisteredAtOfficeName
+            anchor={potentialDuplicateRegistrationAnchor}
+            id={flattenedPotentialDuplicateEvent['event.registeredAt']}
           />
         ) : null,
         leftValue: flattenedOriginalEvent['event.registeredAt'] ? (
-          <AdministrativeArea.Output
-            value={flattenedOriginalEvent['event.registeredAt']}
+          <RegisteredAtOfficeName
+            anchor={originalRegistrationAnchor}
+            id={flattenedOriginalEvent['event.registeredAt']}
           />
         ) : null
       },
@@ -316,44 +406,28 @@ export function DuplicateComparison({
                   <Text color="grey600" element="span" variant="bold18">
                     {sections.title}
                   </Text>
-                  <ComparisonListView
-                    key={`comparison-${index}`}
-                    headings={[
-                      originalEventState.trackingId,
-                      potentialDuplicateEventState.trackingId
-                    ]}
-                  >
+                  <List key={`comparison-${index}`}>
+                    <List.Header
+                      value={
+                        <Text color="negative" element="span" variant="reg16">
+                          {originalEventState.trackingId}
+                        </Text>
+                      }
+                      value2={
+                        <Text color="grey600" element="span" variant="reg16">
+                          {potentialDuplicateEventState.trackingId}
+                        </Text>
+                      }
+                    />
                     {sections.data.map((item, id) => (
-                      <ComparisonListView.Row
+                      <List.Item
                         key={`row-${id}`}
-                        heading={{
-                          right: potentialDuplicateEventState.trackingId,
-                          left: originalEventState.trackingId
-                        }}
-                        label={
-                          <Text color="grey600" element="span" variant="bold16">
-                            {item.label}
-                          </Text>
-                        }
-                        leftValue={
-                          <RightAlignedOnSmallScreen
-                            element="span"
-                            variant="reg16"
-                          >
-                            {item.leftValue}
-                          </RightAlignedOnSmallScreen>
-                        }
-                        rightValue={
-                          <RightAlignedOnSmallScreen
-                            element="span"
-                            variant="reg16"
-                          >
-                            {item.rightValue}
-                          </RightAlignedOnSmallScreen>
-                        }
+                        label={item.label}
+                        value={item.leftValue}
+                        value2={item.rightValue}
                       />
                     ))}
-                  </ComparisonListView>
+                  </List>
                 </div>
               )
             })}
@@ -375,16 +449,14 @@ export function DuplicateComparison({
               </Text>
               <DocumentViewer
                 comparisonView={true}
-                disabled={true}
                 form={originalDeclaration}
-                formConfig={eventConfiguration.declaration}
+                formConfig={getDeclaration(eventConfiguration)}
                 showInMobile={false}
-                onEdit={noop}
               />
               <MobileOnly>
                 <SupportingDocumentList
                   declaration={originalDeclaration}
-                  declarationConfig={eventConfiguration.declaration}
+                  declarationConfig={getDeclaration(eventConfiguration)}
                 />
               </MobileOnly>
             </div>
@@ -394,16 +466,14 @@ export function DuplicateComparison({
               </Text>
               <DocumentViewer
                 comparisonView={true}
-                disabled={true}
                 form={potentialDuplicateDeclaration}
-                formConfig={eventConfiguration.declaration}
+                formConfig={getDeclaration(eventConfiguration)}
                 showInMobile={false}
-                onEdit={noop}
               />
               <MobileOnly>
                 <SupportingDocumentList
                   declaration={potentialDuplicateDeclaration}
-                  declarationConfig={eventConfiguration.declaration}
+                  declarationConfig={getDeclaration(eventConfiguration)}
                 />
               </MobileOnly>
             </div>

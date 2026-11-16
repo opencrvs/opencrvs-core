@@ -12,7 +12,7 @@ import React, { useState } from 'react'
 import { PINKeypad } from '@opencrvs/components/lib/PINKeypad'
 import { CountryLogo } from '@opencrvs/components/lib/icons'
 import * as bcrypt from 'bcryptjs'
-import { storage } from '@opencrvs/client/src/storage'
+import { storage } from '@client/storage'
 import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
 import { messages } from '@client/i18n/messages/views/pin'
 import { getCurrentUserID, IUserData } from '@client/declarations'
@@ -87,8 +87,7 @@ const CreatePinComponent = ({
     } else {
       allUserData.push({
         userID: currentUserID,
-        userPIN: hash,
-        declarations: []
+        userPIN: hash
       })
     }
     await storage.setItem('USER_DATA', JSON.stringify(allUserData))

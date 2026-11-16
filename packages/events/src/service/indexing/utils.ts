@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import _ from 'lodash'
-import { estypes } from '@elastic/elasticsearch'
+import { type estypes } from '@elastic/elasticsearch'
 import {
   AddressFieldValue,
   AddressType,
@@ -19,13 +19,50 @@ import {
   EventConfig,
   EventIndex,
   EventState,
+  FieldType,
   FieldValue,
   getDeclarationFieldById,
+  FieldConfig,
+  getDeclarationFields,
   isAgeFieldType,
   isNameFieldType,
   NameFieldValue,
-  QueryInputType
+  QueryInputType,
+  UUID
 } from '@opencrvs/commons/events'
+import {
+  JurisdictionFilter,
+  RecordScopeV2,
+  UserFilter,
+  ResolvedRecordScopeV2
+} from '@opencrvs/commons'
+import { getAdministrativeHierarchyById } from '@events/storage/postgres/administrative-hierarchy/locations'
+import { TrpcUserContext } from '../../context'
+
+/**
+ * The declaration fields of a config do not change, so the lookup is built once per
+ * config rather than once per event. Indexing resolves this map for every event in
+ * every batch, where rebuilding it was a fifth of the per-event cost.
+ */
+const declarationFieldConfigsByEventConfig = new WeakMap<
+  EventConfig,
+  Partial<Record<string, FieldConfig>>
+>()
+
+function getDeclarationFieldConfigs(
+  eventConfig: EventConfig
+): Partial<Record<string, FieldConfig>> {
+  const cached = declarationFieldConfigsByEventConfig.get(eventConfig)
+  if (cached) {
+    return cached
+  }
+
+  const fieldConfigs = Object.fromEntries(
+    getDeclarationFields(eventConfig).map((f) => [f.id, f])
+  )
+  declarationFieldConfigsByEventConfig.set(eventConfig, fieldConfigs)
+  return fieldConfigs
+}
 
 export type EncodedEventIndex = EventIndex
 export const FIELD_ID_SEPARATOR = '____'
@@ -137,6 +174,241 @@ function stripIndexFieldsFromValue(
   return value
 }
 
+const LocationFieldTypes: FieldType[] = [
+  FieldType.ADDRESS,
+  FieldType.LOCATION,
+  FieldType.ADMINISTRATIVE_AREA,
+  FieldType.FACILITY,
+  FieldType.OFFICE
+]
+
+/**
+ * Extracts only the leaf-level location from Elasticsearch location hierarchies.
+ *
+ * Elasticsearch stores locations as arrays of UUIDs representing the full administrative
+ * hierarchy from top to bottom (e.g., [province_uuid, district_uuid, facility_uuid]).
+ * This function extracts only the leaf-level location UUID (the last element in each array),
+ * which represents the most specific location.
+ *
+ * Example: { locationId: [province_uuid, distrcit_uuid, crvs_office_uuid] }
+ *       → { locationId: crvs_office_uuid }  // Only the leaf-level location
+ *
+ * @param eventConfig Event configuration containing field definitions
+ * @param event Event index retrieved from Elasticsearch
+ * @returns Event index with only leaf-level location UUIDs (last element from each hierarchy)
+ */
+export function getEventIndexWithoutLocationHierarchy(
+  eventConfig: EventConfig,
+  event: EventIndex
+) {
+  const takeLast = (v: unknown) => (Array.isArray(v) ? v[v.length - 1] : v)
+
+  // Normalize top-level locations
+  event.createdAtLocation = takeLast(event.createdAtLocation)
+  event.updatedAtLocation = takeLast(event.updatedAtLocation)
+  event.placeOfEvent = takeLast(event.placeOfEvent)
+
+  if (event.legalStatuses.NOTIFIED) {
+    event.legalStatuses.NOTIFIED.createdAtLocation = takeLast(
+      event.legalStatuses.NOTIFIED.createdAtLocation
+    )
+  }
+
+  if (event.legalStatuses.DECLARED) {
+    event.legalStatuses.DECLARED.createdAtLocation = takeLast(
+      event.legalStatuses.DECLARED.createdAtLocation
+    )
+  }
+
+  if (event.legalStatuses.REGISTERED) {
+    event.legalStatuses.REGISTERED.createdAtLocation = takeLast(
+      event.legalStatuses.REGISTERED.createdAtLocation
+    )
+  }
+
+  const fieldConfigs = getDeclarationFieldConfigs(eventConfig)
+
+  // Process declaration fields
+  for (const [key, value] of Object.entries(event.declaration)) {
+    const fieldConfig = fieldConfigs[key]
+    if (!fieldConfig || !LocationFieldTypes.includes(fieldConfig.type)) {
+      continue
+    }
+
+    if (fieldConfig.type === FieldType.ADDRESS) {
+      const address = value as AddressFieldValue
+      if (address.addressType === AddressType.DOMESTIC) {
+        address.administrativeArea = takeLast(address.administrativeArea)
+        event.declaration[key] = address
+        continue
+      }
+    }
+
+    // All other types just take the last value
+    event.declaration[key] = takeLast(value)
+  }
+
+  return event
+}
+
+/**
+ * Expands leaf-level hierarchy UUIDs into full administrative hierarchies for Elasticsearch indexing.
+ *
+ * Takes an event with single location UUIDs (leaf-level) (ex: event.createdAtLocation) and expands each into an array representing the
+ * complete administrative hierarchy from top to bottom.
+ *
+ * Example: { locationId: location_uuid }
+ *       → { locationId: [province_uuid, district_uuid, location_uuid] }
+ *
+ * Example: { administrativeArea: admin_area_uuid }
+ *      → { administrativeArea: [parent_uuid, admin_area_uuid] }
+ *
+ * Uses an in-memory cache to avoid redundant database lookups for the same administrative hierarchies.
+ *
+ * @param eventConfig Event configuration containing field definitions
+ * @param event Event index with leaf-level UUIDs
+ * @param administrativeHierarchy Optional in-memory cache for administrative hierarchies, to avoid redundant lookups
+ * @returns Event index with resolved hierarchies (arrays of UUIDs from top to leaf)
+ */
+export async function getEventIndexWithAdministrativeHierarchy(
+  eventConfig: EventConfig,
+  event: EventIndex
+) {
+  const buildAdministrativeHierarchyById = async (
+    id: UUID
+  ): Promise<string[]> => {
+    if (!id) {
+      return []
+    }
+
+    return getAdministrativeHierarchyById(id)
+  }
+  /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
+  const tempEvent = { ...event, declaration: { ...event.declaration } } as any
+  // Normalize top-level locations
+  if (event.createdAtLocation) {
+    tempEvent.createdAtLocation = await buildAdministrativeHierarchyById(
+      event.createdAtLocation
+    )
+  }
+
+  if (event.placeOfEvent) {
+    tempEvent.placeOfEvent = await buildAdministrativeHierarchyById(
+      event.placeOfEvent
+    )
+  }
+
+  if (event.updatedAtLocation) {
+    tempEvent.updatedAtLocation = await buildAdministrativeHierarchyById(
+      event.updatedAtLocation
+    )
+  }
+
+  if (event.legalStatuses.NOTIFIED?.createdAtLocation) {
+    tempEvent.legalStatuses.NOTIFIED.createdAtLocation =
+      await buildAdministrativeHierarchyById(
+        event.legalStatuses.NOTIFIED.createdAtLocation
+      )
+  }
+
+  if (event.legalStatuses.DECLARED?.createdAtLocation) {
+    tempEvent.legalStatuses.DECLARED.createdAtLocation =
+      await buildAdministrativeHierarchyById(
+        event.legalStatuses.DECLARED.createdAtLocation
+      )
+  }
+
+  if (event.legalStatuses.REGISTERED?.createdAtLocation) {
+    tempEvent.legalStatuses.REGISTERED.createdAtLocation =
+      await buildAdministrativeHierarchyById(
+        event.legalStatuses.REGISTERED.createdAtLocation
+      )
+  }
+
+  const fieldConfigs = getDeclarationFieldConfigs(eventConfig)
+
+  // Process declaration fields
+  for (const [k, value] of Object.entries(event.declaration)) {
+    const key = decodeFieldId(k)
+    const fieldConfig = fieldConfigs[key]
+    if (!fieldConfig || !LocationFieldTypes.includes(fieldConfig.type)) {
+      continue
+    }
+
+    if (fieldConfig.type === FieldType.ADDRESS) {
+      const parsed = AddressFieldValue.safeParse(value)
+      if (parsed.success && parsed.data.addressType === AddressType.DOMESTIC) {
+        /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
+        const address: Record<string, any> = parsed.data
+        address.administrativeArea = await buildAdministrativeHierarchyById(
+          address.administrativeArea
+        )
+
+        tempEvent.declaration[k] = address
+        continue
+      }
+    }
+
+    // All other location types are assigned to location hierarchy
+    const uuid = UUID.safeParse(value)
+
+    if (uuid.success) {
+      tempEvent.declaration[k] = await buildAdministrativeHierarchyById(
+        uuid.data
+      )
+    }
+  }
+
+  return tempEvent
+}
+
+/**
+ * Lists every location id {@link getEventIndexWithAdministrativeHierarchy} would
+ * resolve for this event, so a caller can prime the hierarchy cache for a whole
+ * batch in one query instead of paying a round trip per field.
+ *
+ * Mirrors that function's traversal rather than sharing it, so the two can drift.
+ * A missed id is only a missed prefetch — the resolver still falls back to its own
+ * lookup — so drift costs a round trip, never correctness.
+ */
+export function collectLocationIds(
+  eventConfig: EventConfig,
+  event: EventIndex
+): string[] {
+  const ids: (string | null | undefined)[] = [
+    event.createdAtLocation,
+    event.placeOfEvent,
+    event.updatedAtLocation,
+    event.legalStatuses.NOTIFIED?.createdAtLocation,
+    event.legalStatuses.DECLARED?.createdAtLocation,
+    event.legalStatuses.REGISTERED?.createdAtLocation
+  ]
+
+  const fieldConfigs = getDeclarationFieldConfigs(eventConfig)
+
+  for (const [k, value] of Object.entries(event.declaration)) {
+    const fieldConfig = fieldConfigs[decodeFieldId(k)]
+    if (!fieldConfig || !LocationFieldTypes.includes(fieldConfig.type)) {
+      continue
+    }
+
+    if (fieldConfig.type === FieldType.ADDRESS) {
+      const parsed = AddressFieldValue.safeParse(value)
+      if (parsed.success && parsed.data.addressType === AddressType.DOMESTIC) {
+        ids.push(parsed.data.administrativeArea)
+        continue
+      }
+    }
+
+    const uuid = UUID.safeParse(value)
+    if (uuid.success) {
+      ids.push(uuid.data)
+    }
+  }
+
+  return _.compact(ids)
+}
+
 export function decodeEventIndex(
   eventConfig: EventConfig,
   event: EncodedEventIndex
@@ -153,21 +425,6 @@ export function decodeEventIndex(
         )
       }),
       {}
-    )
-  }
-}
-
-export function removeSecuredFields(
-  eventConfig: EventConfig,
-  event: EventIndex
-): EventIndex {
-  return {
-    ...event,
-    declaration: Object.fromEntries(
-      Object.entries(event.declaration).filter(
-        ([fieldId]) =>
-          getDeclarationFieldById(eventConfig, fieldId).secured !== true
-      )
     )
   }
 }
@@ -229,4 +486,78 @@ export function generateQueryForAddressField(
       should: undefined
     }
   } satisfies estypes.QueryDslQueryContainer
+}
+
+export function valueFromTotal(total?: number | estypes.SearchTotalHits) {
+  if (!total) {
+    return 0
+  }
+  if (typeof total === 'number') {
+    return total
+  } else {
+    return total.value
+  }
+}
+
+function getLocationIdsFromScopeOptions(
+  filter: string | undefined,
+  user: TrpcUserContext
+) {
+  if (!filter) {
+    return undefined
+  }
+
+  if (filter === JurisdictionFilter.enum.all) {
+    return undefined
+  }
+
+  if (filter === JurisdictionFilter.enum.location) {
+    return user.primaryOfficeId
+  }
+
+  if (filter === JurisdictionFilter.enum.administrativeArea) {
+    return user.administrativeAreaId
+  }
+
+  throw new Error(`Unknown jurisdiction filter: ${filter}`)
+}
+
+/**
+ *
+ * @param scope V2 scope
+ * @param user User context
+ * @returns Resolves location-based scope options to actual IDs based on user context.
+ */
+export function resolveRecordActionScopeToIds(
+  scope: RecordScopeV2,
+  user: TrpcUserContext
+): ResolvedRecordScopeV2 {
+  const { type } = scope
+
+  // We parse on the next step, and by default fields that do not match, are stripped out.
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const options = scope.options as any
+  const resolved = ResolvedRecordScopeV2.parse({
+    type,
+    options: {
+      event: options?.event,
+      placeOfEvent: getLocationIdsFromScopeOptions(options?.placeOfEvent, user),
+      notifiedIn: getLocationIdsFromScopeOptions(options?.notifiedIn, user),
+      notifiedBy:
+        options?.notifiedBy === UserFilter.enum.user ? user.id : undefined,
+      createdBy:
+        options?.createdBy === UserFilter.enum.user ? user.id : undefined,
+      createdIn: getLocationIdsFromScopeOptions(options?.createdIn, user),
+      declaredIn: getLocationIdsFromScopeOptions(options?.declaredIn, user),
+      declaredBy:
+        options?.declaredBy === UserFilter.enum.user ? user.id : undefined,
+      registeredIn: getLocationIdsFromScopeOptions(options?.registeredIn, user),
+      registeredBy:
+        options?.registeredBy === UserFilter.enum.user ? user.id : undefined,
+      // `flags` requires no user-context resolution, so it's passed through unchanged.
+      flags: options?.flags
+    }
+  })
+
+  return resolved
 }

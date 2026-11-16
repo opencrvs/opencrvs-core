@@ -9,16 +9,18 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import type { Meta, StoryObj } from '@storybook/react'
+import type { Meta, StoryObj } from '@storybook/react-vite'
 import React from 'react'
 import styled from 'styled-components'
-import { within, expect } from '@storybook/test'
-import { userEvent } from '@storybook/testing-library'
+import { within, expect } from 'storybook/test'
+import { userEvent, waitFor } from 'storybook/test'
 import {
   ConditionalType,
   FieldType,
   not,
-  alwaysTrue
+  alwaysTrue,
+  generateTranslationConfig,
+  defineConditional
 } from '@opencrvs/commons/client'
 import {
   FormFieldGenerator,
@@ -57,7 +59,15 @@ export const WithHiddenOption: Story = {
   },
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement)
-    await userEvent.click(await canvas.findByRole('textbox'))
+    const control = await waitFor(() => {
+      const el = canvasElement.querySelector('.react-select__control')
+      if (!el) {
+        throw new Error('Dropdown not found')
+      }
+      return el
+    })
+    await userEvent.click(control)
+
     await expect(canvas.queryByText('Apple')).toBeInTheDocument()
     await expect(canvas.queryByText('Banana')).not.toBeInTheDocument()
     await expect(canvas.queryByText('Cherry')).toBeInTheDocument()
@@ -115,6 +125,80 @@ export const WithHiddenOption: Story = {
   }
 }
 
+async function getPlaceholderElement(canvasElement: HTMLElement) {
+  return waitFor(() => {
+    const el = canvasElement.querySelector('.react-select__placeholder')
+    if (!el) {
+      throw new Error('Placeholder not found')
+    }
+    return el
+  })
+}
+
+export const WithDefaultPlaceholder: Story = {
+  name: 'With default placeholder',
+  parameters: {
+    layout: 'centered'
+  },
+  play: async ({ canvasElement }) => {
+    // An empty select with no configured placeholder shows "Select",
+    // not react-select's built-in "Select..." default.
+    const placeholder = await getPlaceholderElement(canvasElement)
+    await expect(placeholder).toHaveTextContent(/^Select$/)
+  },
+  render: function Component(args) {
+    return (
+      <StyledFormFieldGenerator
+        {...args}
+        fields={[
+          {
+            id: 'storybook.select',
+            type: FieldType.SELECT,
+            label: generateTranslationConfig('Favourite fruit'),
+            options: [
+              { value: 'apple', label: generateTranslationConfig('Apple') },
+              { value: 'banana', label: generateTranslationConfig('Banana') }
+            ]
+          }
+        ]}
+        id="my-form"
+      />
+    )
+  }
+}
+
+export const WithConfiguredPlaceholder: Story = {
+  name: 'With configured placeholder',
+  parameters: {
+    layout: 'centered'
+  },
+  play: async ({ canvasElement }) => {
+    // A configured placeholder overrides the "Select" default.
+    const placeholder = await getPlaceholderElement(canvasElement)
+    await expect(placeholder).toHaveTextContent(/^Choose a fruit$/)
+  },
+  render: function Component(args) {
+    return (
+      <StyledFormFieldGenerator
+        {...args}
+        fields={[
+          {
+            id: 'storybook.select',
+            type: FieldType.SELECT,
+            label: generateTranslationConfig('Favourite fruit'),
+            placeholder: generateTranslationConfig('Choose a fruit'),
+            options: [
+              { value: 'apple', label: generateTranslationConfig('Apple') },
+              { value: 'banana', label: generateTranslationConfig('Banana') }
+            ]
+          }
+        ]}
+        id="my-form"
+      />
+    )
+  }
+}
+
 export const WithDisabledOption: Story = {
   name: 'With disabled option',
   parameters: {
@@ -122,7 +206,14 @@ export const WithDisabledOption: Story = {
   },
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement)
-    await userEvent.click(await canvas.findByRole('textbox'))
+    const control = await waitFor(() => {
+      const el = canvasElement.querySelector('.react-select__control')
+      if (!el) {
+        throw new Error('Dropdown not found')
+      }
+      return el
+    })
+    await userEvent.click(control)
     const bananaOption = canvas.queryByText('Banana')
     await expect(bananaOption).toBeInTheDocument()
     // this can be replaced with aria-disabled attribute once the react-select
@@ -180,6 +271,90 @@ export const WithDisabledOption: Story = {
                 }
               }
             ]
+          }
+        ]}
+        id="my-form"
+      />
+    )
+  }
+}
+
+export const OptionsHideUnderlyingElement: Story = {
+  parameters: {
+    layout: 'centered'
+  },
+  play: async ({ canvasElement }) => {
+    const control = await waitFor(() => {
+      const el = canvasElement.querySelector('.react-select__control')
+      if (!el) {
+        throw new Error('Dropdown not found')
+      }
+      return el
+    })
+    await userEvent.click(control)
+  },
+  render: function Component(args) {
+    return (
+      <StyledFormFieldGenerator
+        {...args}
+        fields={[
+          {
+            id: 'storybook.select',
+            type: FieldType.SELECT,
+            label: {
+              id: 'storybook.select.label',
+              defaultMessage: 'Favourite fruit',
+              description: 'The label for the select input'
+            },
+            options: [
+              {
+                value: 'apple',
+                label: generateTranslationConfig('Apple')
+              },
+              {
+                value: 'banana',
+                label: generateTranslationConfig('Banana')
+              },
+              {
+                value: 'cherry',
+                label: generateTranslationConfig('Cherry')
+              },
+              {
+                value: 'Citrus',
+                label: generateTranslationConfig('Citrus')
+              },
+              {
+                value: 'Pear',
+                label: generateTranslationConfig('Pear')
+              },
+              {
+                value: 'Strawberry',
+                label: generateTranslationConfig('Strawberry')
+              }
+            ]
+          },
+          {
+            id: 'child.brn-search',
+            type: FieldType.SEARCH,
+            label: generateTranslationConfig('Farmer id'),
+            placeholder: generateTranslationConfig('Enter farmer id'),
+            helperText: generateTranslationConfig('Enter a 10-digit farmer id'),
+            configuration: {
+              validation: {
+                validator: defineConditional({
+                  type: 'string',
+                  pattern: '^[0-9]{10}$',
+                  description: 'Must be numeric and 10 digits long'
+                }),
+                message: generateTranslationConfig('Invalid value')
+              },
+              query: {
+                type: 'or' as const,
+                clauses: []
+              },
+              limit: 10,
+              offset: 0
+            }
           }
         ]}
         id="my-form"

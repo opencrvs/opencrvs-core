@@ -27,7 +27,9 @@ import {
   EventDocument,
   ConditionalType,
   field as conditionalField,
-  not
+  not,
+  encodeScope,
+  EventStatus
 } from '@opencrvs/commons'
 import {
   tennisClubMembershipEvent,
@@ -35,7 +37,9 @@ import {
 } from '@opencrvs/commons/fixtures'
 import {
   createTestClient,
+  createSystemTestClient,
   setupTestCase,
+  TEST_SYSTEM_ID,
   TEST_USER_DEFAULT_SCOPES
 } from '@events/tests/utils'
 import { CreatedUser, payloadGenerator } from '@events/tests/generators'
@@ -46,6 +50,7 @@ import {
 import { encodeEventIndex } from '@events/service/indexing/utils'
 import { mswServer } from '@events/tests/msw'
 import { env } from '@events/environment'
+import { EventNotFoundError } from '@events/service/events/events'
 
 function getRequestedRegisterAction(response: EventDocument) {
   const savedAction = response.actions.find(
@@ -84,21 +89,33 @@ describe('Declare action', () => {
     ).rejects.toMatchObject(new TRPCError({ code: 'FORBIDDEN' }))
   })
 
-  test('prevents forbidden access if configurable scope does not have required event type allowed', async () => {
-    const client = createTestClient(user, ['record.declare[event=death]'])
+  test('prevents access if configurable scope does not have required event type allowed', async () => {
+    const client = createTestClient(user, [
+      encodeScope({
+        type: 'record.declare',
+        options: {
+          event: ['death']
+        }
+      })
+    ])
 
     await expect(
       client.event.actions.declare.request(
         generator.event.actions.declare(eventId, {})
       )
-    ).rejects.toMatchObject(new TRPCError({ code: 'FORBIDDEN' }))
+    ).rejects.toMatchObject(new EventNotFoundError(eventId))
   })
 
   test('allows access if required scope is present', async () => {
     const client = createTestClient(user, [
-      'record.create[event=death|birth|tennis-club-membership]',
-      'record.declare[event=death|birth|tennis-club-membership]'
+      encodeScope({
+        type: 'record.declare',
+        options: {
+          event: ['death', 'birth', 'tennis-club-membership']
+        }
+      })
     ])
+
     await expect(
       client.event.actions.declare.request(
         generator.event.actions.declare(eventId, {})
@@ -107,7 +124,11 @@ describe('Declare action', () => {
   })
 
   test('Validation error message contains all the offending fields', async () => {
-    const client = createTestClient(user)
+    const client = createTestClient(user, [
+      encodeScope({
+        type: 'record.declare'
+      })
+    ])
 
     const data = generator.event.actions.declare(eventId, {
       declaration: {
@@ -123,7 +144,11 @@ describe('Declare action', () => {
   })
 
   test('when mandatory field is invalid, conditional hidden fields are still skipped', async () => {
-    const client = createTestClient(user)
+    const client = createTestClient(user, [
+      encodeScope({
+        type: 'record.declare'
+      })
+    ])
 
     const data = generator.event.actions.declare(eventId, {
       declaration: {
@@ -152,7 +177,11 @@ describe('Declare action', () => {
   })
 
   test('Skips required field validation when they are conditionally hidden', async () => {
-    const client = createTestClient(user)
+    const client = createTestClient(user, [
+      encodeScope({
+        type: 'record.declare'
+      })
+    ])
 
     const form = {
       'applicant.dob': '2024-02-01',
@@ -185,42 +214,42 @@ describe('Declare action', () => {
     }
   })
 
-  test('Skips required review field validation when review field is conditionally hidden', async () => {
-    // Build a modified event where review.signature is required but only shown when applicant.dobUnknown is truthy
-    const modifiedEvent = {
-      ...tennisClubMembershipEvent,
-      actions: tennisClubMembershipEvent.actions.map((action) => {
-        if (action.type !== ActionType.DECLARE) {
-          return action
+  // review.signature is required, but only shown when applicant.dobUnknown is truthy
+  const eventWithConditionalSignature = {
+    ...tennisClubMembershipEvent,
+    actions: tennisClubMembershipEvent.actions.map((action) => {
+      if (action.type !== ActionType.DECLARE) {
+        return action
+      }
+      return {
+        ...action,
+        review: {
+          ...action.review,
+          fields: action.review.fields.map((f) =>
+            f.id !== 'review.signature'
+              ? f
+              : {
+                  ...f,
+                  required: true,
+                  conditionals: [
+                    {
+                      type: ConditionalType.SHOW,
+                      conditional: not(
+                        conditionalField('applicant.dobUnknown').isFalsy()
+                      )
+                    }
+                  ]
+                }
+          )
         }
-        return {
-          ...action,
-          review: {
-            ...action.review,
-            fields: action.review.fields.map((f) =>
-              f.id !== 'review.signature'
-                ? f
-                : {
-                    ...f,
-                    required: true,
-                    conditionals: [
-                      {
-                        type: ConditionalType.SHOW,
-                        conditional: not(
-                          conditionalField('applicant.dobUnknown').isFalsy()
-                        )
-                      }
-                    ]
-                  }
-            )
-          }
-        }
-      })
-    }
+      }
+    })
+  }
 
+  test('Skips required review field validation when review field is conditionally hidden', async () => {
     mswServer.use(
-      http.get(`${env.COUNTRY_CONFIG_URL}/events`, () => {
-        return HttpResponse.json([modifiedEvent])
+      http.get(`${env.COUNTRY_CONFIG_URL}/config/events`, () => {
+        return HttpResponse.json([eventWithConditionalSignature])
       })
     )
 
@@ -251,8 +280,51 @@ describe('Declare action', () => {
     ).resolves.not.toThrow()
   })
 
-  test('gives validation error when a conditional page, which is visible, has a required field', async () => {
+  test('Accepts a review field whose visibility depends on the declaration', async () => {
+    mswServer.use(
+      http.get(`${env.COUNTRY_CONFIG_URL}/config/events`, () => {
+        return HttpResponse.json([eventWithConditionalSignature])
+      })
+    )
+
     const client = createTestClient(user)
+    const event = await client.event.create(generator.event.create())
+
+    const declaration = {
+      'applicant.dobUnknown': true,
+      'applicant.age': 30,
+      'applicant.name': { firstname: 'John', surname: 'Doe' },
+      'recommender.none': true,
+      'applicant.address': {
+        country: 'FAR',
+        addressType: AddressType.DOMESTIC,
+        administrativeArea: '27160bbd-32d1-4625-812f-860226bfb92a',
+        streetLevelDetails: { state: 'state', district2: 'district2' }
+      }
+    } satisfies ActionUpdate
+
+    const data = generator.event.actions.declare(event.id, {
+      declaration,
+      annotation: {
+        'review.signature': {
+          path: '4f095fc4-4312-4de2-aa38-86dcc0f71044.png',
+          originalFilename: 'abcd.png',
+          type: 'image/png'
+        }
+      }
+    })
+
+    await expect(
+      client.event.actions.declare.request(data)
+    ).resolves.not.toThrow()
+  })
+
+  test('gives validation error when a conditional page, which is visible, has a required field', async () => {
+    const client = createTestClient(user, [
+      encodeScope({
+        type: 'record.declare'
+      })
+    ])
 
     const form = {
       // When the applicant.dob is before 1950-01-01, the senior-pass.id field on senior-pass page is required
@@ -283,7 +355,9 @@ describe('Declare action', () => {
   })
 
   test('successfully validates a fields on a conditional page, which is visible', async () => {
-    const client = createTestClient(user)
+    const client = createTestClient(user, [
+      encodeScope({ type: 'record.declare' })
+    ])
 
     const form = {
       // When the applicant.dob is before 1950-01-01, the senior-pass.id field on senior-pass page is required
@@ -319,7 +393,9 @@ describe('Declare action', () => {
   })
 
   test('Prevents adding birth date in future', async () => {
-    const client = createTestClient(user)
+    const client = createTestClient(user, [
+      encodeScope({ type: 'record.declare' })
+    ])
 
     const form = {
       'applicant.dob': '2040-02-01',
@@ -350,7 +426,9 @@ describe('Declare action', () => {
   })
 
   test('validation prevents including hidden fields', async () => {
-    const client = createTestClient(user)
+    const client = createTestClient(user, [
+      encodeScope({ type: 'record.declare' })
+    ])
 
     const data = generator.event.actions.declare(eventId, {
       declaration: {
@@ -369,7 +447,9 @@ describe('Declare action', () => {
   })
 
   test('validation prevents including miscellaneous fields', async () => {
-    const client = createTestClient(user)
+    const client = createTestClient(user, [
+      encodeScope({ type: 'record.declare' })
+    ])
 
     const data = generator.event.actions.declare(eventId, {
       declaration: {
@@ -388,11 +468,14 @@ describe('Declare action', () => {
   })
 
   test('valid action is appended to event actions', async () => {
-    const client = createTestClient(user)
+    const client = createTestClient(user, [
+      encodeScope({ type: 'record.read' }),
+      encodeScope({ type: 'record.declare' })
+    ])
 
     const data = generator.event.actions.declare(eventId)
     await client.event.actions.declare.request(data)
-    const updatedEvent = await client.event.get(eventId)
+    const updatedEvent = await client.event.get({ eventId })
 
     expect(updatedEvent.actions).toEqual([
       expect.objectContaining({ type: ActionType.CREATE }),
@@ -413,7 +496,9 @@ describe('Declare action', () => {
   })
 
   test(`DECLARE is idempotent`, async () => {
-    const client = createTestClient(user)
+    const client = createTestClient(user, [
+      encodeScope({ type: 'record.declare' })
+    ])
 
     const data = generator.event.actions.declare(eventId, {
       keepAssignment: true
@@ -436,7 +521,9 @@ describe('Declare action', () => {
         }
       )
     )
-    const client = createTestClient(user)
+    const client = createTestClient(user, [
+      encodeScope({ type: 'record.declare' })
+    ])
 
     const data = generator.event.actions.declare(eventId, {
       keepAssignment: true
@@ -459,7 +546,7 @@ describe('Declare action', () => {
 
 test('deduplication and annotation check is performed after declaration', async () => {
   mswServer.use(
-    http.get(`${env.COUNTRY_CONFIG_URL}/events`, () => {
+    http.get(`${env.COUNTRY_CONFIG_URL}/config/events`, () => {
       return HttpResponse.json([
         tennisClubMembershipEventWithDedupCheck(ActionType.DECLARE)
       ])
@@ -468,7 +555,11 @@ test('deduplication and annotation check is performed after declaration', async 
   const esClient = getOrCreateClient()
   const prng = createPrng(73)
   const { user, generator } = await setupTestCase()
-  const client = createTestClient(user)
+  const client = createTestClient(user, [
+    encodeScope({ type: 'record.create' }),
+    encodeScope({ type: 'record.read' }),
+    encodeScope({ type: 'record.declare' })
+  ])
 
   const newEvent = await client.event.create(generator.event.create())
   const existingEventId = getUUID()
@@ -681,7 +772,10 @@ describe('Declare action - hidden field nullification', () => {
     test('accepts hidden field with null value (intentional clearing)', async () => {
       const client = createTestClient(user, [
         ...TEST_USER_DEFAULT_SCOPES,
-        'search[event=tennis-club-membership,access=my-jurisdiction]'
+        encodeScope({
+          type: 'record.search',
+          options: { event: [TENNIS_CLUB_MEMBERSHIP] }
+        })
       ])
 
       const payload = generator.event.actions.declare(eventId, {
@@ -974,5 +1068,166 @@ describe('Declare action - hidden field nullification', () => {
         'Field with id nonexistent.field not found in event config'
       )
     })
+  })
+})
+
+test('System user can not declare an event, even with the right scope', async () => {
+  const { generator, locations } = await setupTestCase()
+  const systemUserClient = createSystemTestClient(TEST_SYSTEM_ID, [
+    encodeScope({ type: 'record.create' }),
+    encodeScope({ type: 'record.declare' })
+  ])
+
+  const event = await systemUserClient.event.create({
+    ...generator.event.create(),
+    createdAtLocation: locations[0].id
+  })
+
+  await expect(
+    systemUserClient.event.actions.declare.request(
+      generator.event.actions.declare(event.id)
+    )
+  ).rejects.toMatchObject(new TRPCError({ code: 'FORBIDDEN' }))
+})
+
+describe('3rd party integration confirmation behaviour', () => {
+  function mockActionApi(action: ActionType, status: number) {
+    return mswServer.use(
+      http.post<never, { actionId: string }>(
+        `${env.COUNTRY_CONFIG_URL}/trigger/events/tennis-club-membership/actions/${action}`,
+        () => {
+          return HttpResponse.json({}, { status })
+        }
+      )
+    )
+  }
+
+  test('Throws when integration responds with 202 when keepAssignment is given', async () => {
+    mockActionApi(ActionType.DECLARE, 202)
+    const { generator, user } = await setupTestCase()
+
+    const client = createTestClient(user)
+
+    const event = await client.event.create(generator.event.create())
+
+    await expect(
+      client.event.actions.declare.request(
+        generator.event.actions.declare(event.id, { keepAssignment: true })
+      )
+    ).rejects.toThrow('Confirmation API did not return a synchronous response.')
+  })
+
+  test('Throws when integration responds with 202 when keepAssignmentIfRejected is given', async () => {
+    mockActionApi(ActionType.DECLARE, 202)
+    const { generator, user } = await setupTestCase()
+
+    const client = createTestClient(user)
+
+    const event = await client.event.create(generator.event.create())
+
+    await expect(
+      client.event.actions.declare.request(
+        generator.event.actions.declare(event.id, {
+          keepAssignmentIfRejected: true
+        })
+      )
+    ).rejects.toThrow('Confirmation API did not return a synchronous response.')
+  })
+
+  test('Throws when integration responds with 202 when keepAssignmentIfAccepted is given', async () => {
+    mockActionApi(ActionType.DECLARE, 202)
+
+    const { generator, user } = await setupTestCase()
+
+    const client = createTestClient(user)
+
+    const event = await client.event.create(generator.event.create())
+
+    await expect(
+      client.event.actions.declare.request(
+        generator.event.actions.declare(event.id, {
+          keepAssignmentIfAccepted: true
+        })
+      )
+    ).rejects.toThrow('Confirmation API did not return a synchronous response.')
+  })
+
+  test('Unassigns when integration responds with 202', async () => {
+    mockActionApi(ActionType.DECLARE, 202)
+
+    const { generator, user } = await setupTestCase()
+
+    const client = createTestClient(user)
+
+    const event = await client.event.create(generator.event.create())
+
+    const response = await client.event.actions.declare.request(
+      generator.event.actions.declare(event.id)
+    )
+
+    const lastAction = response.actions[response.actions.length - 1]
+
+    expect(lastAction.type).toEqual(ActionType.UNASSIGN)
+    expect(lastAction.status).toEqual(ActionStatus.Accepted)
+
+    const currentState = getCurrentEventState(
+      response,
+      tennisClubMembershipEvent
+    )
+
+    expect(currentState.flags).toEqual(['declare:requested'])
+    expect(currentState.status).toEqual(EventStatus.enum.CREATED)
+    expect(currentState.assignedTo).toEqual(undefined)
+  })
+
+  test('Records a rejected action when integration responds with 400', async () => {
+    mockActionApi(ActionType.DECLARE, 400)
+
+    const { generator, user } = await setupTestCase()
+
+    const client = createTestClient(user)
+
+    const event = await client.event.create(generator.event.create())
+
+    const response = await client.event.actions.declare.request(
+      generator.event.actions.declare(event.id)
+    )
+
+    expect(
+      response.actions.find(
+        (action) =>
+          action.type === ActionType.DECLARE &&
+          action.status === ActionStatus.Rejected
+      )
+    ).toBeDefined()
+  })
+
+  test('Keeps assignment when integration responds with 500', async () => {
+    mockActionApi(ActionType.DECLARE, 500)
+
+    const { generator, user } = await setupTestCase()
+
+    const client = createTestClient(user)
+
+    const event = await client.event.create(generator.event.create())
+
+    await expect(
+      client.event.actions.declare.request(
+        generator.event.actions.declare(event.id)
+      )
+    ).rejects.toThrow(
+      'Unexpected failure from country config action confirmation API'
+    )
+
+    const eventAfterFailure = await client.event.get({ eventId: event.id })
+
+    const currentState = getCurrentEventState(
+      eventAfterFailure,
+      tennisClubMembershipEvent
+    )
+
+    expect(currentState.flags).toEqual(['declare:requested'])
+    expect(currentState.status).toEqual(EventStatus.enum.CREATED)
+    expect(currentState.assignedTo).toEqual(user.id)
   })
 })

@@ -8,11 +8,11 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { Meta, StoryObj } from '@storybook/react'
+import { Meta, StoryObj } from '@storybook/react-vite'
 import React from 'react'
 import { createTRPCMsw, httpLink } from '@vafanassieff/msw-trpc'
 import superjson from 'superjson'
-import { expect, fn, userEvent, waitFor, within } from '@storybook/test'
+import { expect, within, userEvent } from 'storybook/test'
 import {
   tennisClubMembershipEvent,
   generateEventDraftDocument,
@@ -22,12 +22,17 @@ import {
 } from '@opencrvs/commons/client'
 import { ROUTES, routesConfig } from '@client/v2-events/routes'
 import { AppRouter, TRPCProvider } from '@client/v2-events/trpc'
-import { tennisClubMembershipEventDocument } from '../../events/fixtures'
+import { testDataGenerator } from '@client/tests/test-data-generators'
+import {
+  tennisClubMembershipEventDocument,
+  tennisClubMembershipEventWithArchiveAndUnarchive
+} from '../../events/fixtures'
 import { EventOverviewIndex } from './EventOverview'
+
+const generator = testDataGenerator()
 
 const meta: Meta<typeof EventOverviewIndex> = {
   title: 'EventOverview/Interaction',
-  component: EventOverviewIndex,
   parameters: {
     userRole: TestUserRole.enum.LOCAL_REGISTRAR
   },
@@ -89,7 +94,7 @@ export const WithConfigurableSummaryFieldHavingEventMetadataValue: Story = {
     },
     reactRouter: {
       router: routesConfig,
-      initialPath: ROUTES.V2.EVENTS.OVERVIEW.buildPath({
+      initialPath: ROUTES.V2.EVENTS.EVENT.buildPath({
         eventId: tennisClubMembershipEventDocument.id
       })
     },
@@ -115,10 +120,11 @@ export const WithConfigurableSummaryFieldHavingEventMetadataValue: Story = {
     }
   },
   play: async ({ canvasElement, step }) => {
+    const canvas = within(canvasElement)
+
     await step(
       'Check the registration date embedded in text is shown in the summary',
       async () => {
-        const canvas = within(canvasElement)
         const registrationDateField =
           await canvas.findByText('Registration date')
         await expect(registrationDateField).toBeInTheDocument()
@@ -126,6 +132,64 @@ export const WithConfigurableSummaryFieldHavingEventMetadataValue: Story = {
         const registrationDateValue =
           await canvas.findByText('January 23, 2025')
         await expect(registrationDateValue).toBeInTheDocument()
+      }
+    )
+
+    await step('Can navigate to user profile from Audit history', async () => {
+      await userEvent.click(
+        await canvas.findByRole('button', { name: 'Audit' })
+      )
+
+      const userButtons = await canvas.findAllByRole('button', {
+        name: 'Kennedy Mweene'
+      })
+      await userEvent.click(userButtons[0])
+
+      await expect(
+        await canvas.findByText('Assigned registration office')
+      ).toBeInTheDocument()
+
+      await expect(await canvas.findByText('Logged out')).toBeInTheDocument()
+    })
+  }
+}
+
+export const ArchiveAndUnarchiveShowInAuditHistory: Story = {
+  parameters: {
+    offline: {
+      events: [tennisClubMembershipEventWithArchiveAndUnarchive]
+    },
+    reactRouter: {
+      router: routesConfig,
+      initialPath: ROUTES.V2.EVENTS.EVENT.buildPath({
+        eventId: tennisClubMembershipEventWithArchiveAndUnarchive.id
+      })
+    },
+    msw: {
+      handlers: {
+        user: [
+          tRPCMsw.user.list.query(() => {
+            return [generator.user.localRegistrar().summary]
+          }),
+          tRPCMsw.user.get.query(() => {
+            return generator.user.localRegistrar().v2
+          })
+        ]
+      }
+    }
+  },
+  play: async ({ canvasElement, step }) => {
+    const canvas = within(canvasElement)
+
+    await step(
+      'Archive and unarchive actions show correct labels in Audit history',
+      async () => {
+        await userEvent.click(
+          await canvas.findByRole('button', { name: 'Audit' })
+        )
+
+        await expect(await canvas.findByText('Archived')).toBeInTheDocument()
+        await expect(await canvas.findByText('Unarchived')).toBeInTheDocument()
       }
     )
   }
