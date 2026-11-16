@@ -356,6 +356,14 @@ export function getEventConfigOfVersion(
   return toEventConfig(config, getConfigVersion(config, versionId))
 }
 
+/**
+ * @returns `versionId` as it appears in the name of the version's search index:
+ * lower-cased, with every character other than a-z, 0-9, '-' and '_' replaced by '_'.
+ */
+export function getVersionIndexSegment(versionId: string) {
+  return versionId.toLowerCase().replace(/[^a-z0-9_-]/g, '_')
+}
+
 /** Orders versions by `effectiveFrom`, earliest first. */
 export function byEffectiveFrom(a: EventConfigVersion, b: EventConfigVersion) {
   return a.effectiveFrom.localeCompare(b.effectiveFrom)
@@ -477,12 +485,16 @@ export function resolveEventConfig(config: VersionedEventConfig): EventConfig {
 /**
  * Versions are told apart by `id` and by `effectiveFrom`: no two versions may share
  * either, and at most one may omit `effectiveFrom` (effective from the beginning of time).
+ * Each version has its own search index, named after its id, so two ids may not give
+ * the same name either.
  */
 function validateVersionList(
   config: VersionedEventConfig,
   ctx: z.RefinementCtx<VersionedEventConfig>
 ) {
   const ids = new Set<string>()
+  /** Id of the first version with each search index name */
+  const versionIdByIndexSegment = new Map<string, string>()
   /** Id of the first version with each `effectiveFrom` */
   const versionIdByEffectiveFrom = new Map<string, string>()
 
@@ -495,6 +507,18 @@ function validateVersionList(
       })
     }
     ids.add(version.id)
+
+    const indexSegment = getVersionIndexSegment(version.id)
+    const sameIndexSegmentId = versionIdByIndexSegment.get(indexSegment)
+    if (sameIndexSegmentId === undefined) {
+      versionIdByIndexSegment.set(indexSegment, version.id)
+    } else if (sameIndexSegmentId !== version.id) {
+      ctx.addIssue({
+        code: 'custom',
+        message: `Event '${config.id}' has versions '${sameIndexSegmentId}' and '${version.id}', whose ids give the same search index name ('${indexSegment}'). Version ids must still differ once lower-cased and with every character other than a-z, 0-9, '-' and '_' replaced by '_'.`,
+        path: ['versions', index, 'id']
+      })
+    }
 
     const sameEffectiveFromId = versionIdByEffectiveFrom.get(
       version.effectiveFrom

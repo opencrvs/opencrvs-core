@@ -267,6 +267,36 @@ describe('defineConfig()', () => {
       )
     })
 
+    it('should reject two versions whose ids give the same search index name, naming the event and both ids', () => {
+      expect(() =>
+        defineConfig({
+          id: eventId,
+          label,
+          advancedSearch,
+          versions: [
+            { ...v1, id: 'birth v1' },
+            { ...v2, id: 'Birth.V1' }
+          ]
+        })
+      ).toThrow(
+        `Event '${eventId}' has versions 'birth v1' and 'Birth.V1', whose ids give the same search index name ('birth_v1').`
+      )
+    })
+
+    it('should accept two versions whose ids give different search index names', () => {
+      expect(() =>
+        defineConfig({
+          id: eventId,
+          label,
+          advancedSearch,
+          versions: [
+            { ...v1, id: 'birth-v1' },
+            { ...v2, id: 'birth_v1' }
+          ]
+        })
+      ).not.toThrow()
+    })
+
     it('should reject two versions with the same `effectiveFrom`, naming the event and the date', () => {
       expect(() =>
         defineConfig({
