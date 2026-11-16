@@ -30,7 +30,8 @@ import {
   validateDateOfEvent,
   validateAdvancedSearchConfig,
   validateExactlyOneDeclareAction,
-  validateNotificationForm
+  validateNotificationForm,
+  validateVersionList
 } from './eventConfigValidation'
 
 export const EventFieldReference = z
@@ -480,63 +481,6 @@ export function resolveEventConfigInTimeZone(
  */
 export function resolveEventConfig(config: VersionedEventConfig): EventConfig {
   return resolveEventConfigInTimeZone(config, 'UTC')
-}
-
-/**
- * Versions are told apart by `id` and by `effectiveFrom`: no two versions may share
- * either, and at most one may omit `effectiveFrom` (effective from the beginning of time).
- * Each version has its own search index, named after its id, so two ids may not give
- * the same name either.
- */
-function validateVersionList(
-  config: VersionedEventConfig,
-  ctx: z.RefinementCtx<VersionedEventConfig>
-) {
-  const ids = new Set<string>()
-  /** Id of the first version with each search index name */
-  const versionIdByIndexSegment = new Map<string, string>()
-  /** Id of the first version with each `effectiveFrom` */
-  const versionIdByEffectiveFrom = new Map<string, string>()
-
-  config.versions.forEach((version, index) => {
-    if (ids.has(version.id)) {
-      ctx.addIssue({
-        code: 'custom',
-        message: `Event '${config.id}' has more than one version with id '${version.id}'. Each version must have a different id.`,
-        path: ['versions', index, 'id']
-      })
-    }
-    ids.add(version.id)
-
-    const indexSegment = getVersionIndexSegment(version.id)
-    const sameIndexSegmentId = versionIdByIndexSegment.get(indexSegment)
-    if (sameIndexSegmentId === undefined) {
-      versionIdByIndexSegment.set(indexSegment, version.id)
-    } else if (sameIndexSegmentId !== version.id) {
-      ctx.addIssue({
-        code: 'custom',
-        message: `Event '${config.id}' has versions '${sameIndexSegmentId}' and '${version.id}', whose ids give the same search index name ('${indexSegment}'). Version ids must still differ once lower-cased and with every character other than a-z, 0-9, '-' and '_' replaced by '_'.`,
-        path: ['versions', index, 'id']
-      })
-    }
-
-    const sameEffectiveFromId = versionIdByEffectiveFrom.get(
-      version.effectiveFrom
-    )
-    if (sameEffectiveFromId !== undefined) {
-      const versionIds = `'${sameEffectiveFromId}', '${version.id}'`
-      ctx.addIssue({
-        code: 'custom',
-        message:
-          version.effectiveFrom !== DEFAULT_EFFECTIVE_FROM
-            ? `Event '${config.id}' has more than one version with \`effectiveFrom\` '${version.effectiveFrom}' (${versionIds}). Each version must have a different \`effectiveFrom\`.`
-            : `Event '${config.id}' has more than one version without \`effectiveFrom\` (${versionIds}). At most one version may omit it.`,
-        path: ['versions', index, 'effectiveFrom']
-      })
-    } else {
-      versionIdByEffectiveFrom.set(version.effectiveFrom, version.id)
-    }
-  })
 }
 
 /**
