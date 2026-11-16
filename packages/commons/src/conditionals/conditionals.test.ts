@@ -1597,6 +1597,68 @@ describe('date comparisons against an action', () => {
   })
 })
 
+describe('date comparisons against the local date of an action', () => {
+  // Local times, so that the tests hold in any time zone the tests run in
+  const declaredAt = (hours: number, minutes: number) =>
+    new Date(2026, 1, 10, hours, minutes).toISOString()
+
+  const params = (dob: string, createdAt?: string) => ({
+    $now: '2026-02-10',
+    $online: false,
+    $form: { 'child.dob': dob },
+    $event: {
+      id: '123' as UUID,
+      type: 'birth',
+      trackingId: 'TEST12',
+      createdAt: declaredAt(0, 0),
+      updatedAt: declaredAt(0, 0),
+      actions: createdAt
+        ? [
+            {
+              id: 'declare' as UUID,
+              type: ActionType.DECLARE,
+              createdAt,
+              createdBy: '12345',
+              createdByUserType: TokenUserType.enum.user,
+              createdByRole: 'some-role',
+              declaration: {},
+              createdAtLocation: '123456' as UUID,
+              status: ActionStatus.Accepted,
+              transactionId: '123456'
+            }
+          ]
+        : []
+    }
+  })
+
+  it('gives the same result after the action as in the form on that day', () => {
+    // After midnight local time, the UTC date is the day before in a UTC+ zone
+    const onTime = field('child.dob')
+      .isAfter()
+      .days(30)
+      .beforeAction(event.firstAction(ActionType.DECLARE))
+    const dob = '2026-01-11'
+
+    expect(validate(onTime, params(dob))).toBe(false)
+    expect(validate(onTime, params(dob, declaredAt(0, 30)))).toBe(false)
+  })
+
+  it('ignores the time of day of the action', () => {
+    const lateBy30Days = field('child.dob')
+      .isBefore()
+      .days(30)
+      .beforeAction(event.firstAction(ActionType.DECLARE))
+
+    expect(
+      validate(lateBy30Days, params('2026-01-11', declaredAt(15, 0)))
+    ).toBe(false)
+    expect(
+      validate(lateBy30Days, params('2026-01-10', declaredAt(15, 0)))
+    ).toBe(true)
+    expect(validate(lateBy30Days, params('2026-01-11'))).toBe(false)
+  })
+})
+
 describe('"valid name" conditionals', () => {
   describe('Valid names', () => {
     it('Only firstname and surname', () => {
