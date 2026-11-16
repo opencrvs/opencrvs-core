@@ -111,6 +111,7 @@ tilt_label = '1.OpenCRVS'
 
 opensrvs_predeploy_jobs = [
   'postgres-on-deploy',
+  'elasticsearch-on-deploy',
   'data-migration',
   'data-migration-analytics'
 ]
