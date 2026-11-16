@@ -4,6 +4,71 @@
 
 ### Upgrade guidance
 
+#### MinIO replaced with plain S3
+
+##### What changed
+
+- **The documents service speaks plain S3.** It uses the AWS SDK for JavaScript instead of the MinIO client, and reads its settings from `S3_*` variables, not `MINIO_*`. [packages/documents/README.md](packages/documents/README.md) lists the settings and the stores that were tried.
+- **The dependencies chart deploys RustFS, not MinIO.** The `minio` values are not read any more, so move your settings to `rustfs`. RustFS has its own hostnames (`rustfs.<hostname>` and `rustfs-console.<hostname>`), its own Service (`rustfs`) and default credentials (`rustfsadmin`). The backup and restore jobs are now `rustfs-backup` and `rustfs-restore`.
+- **The client allows the S3 origin.** Its Content-Security-Policy allows the origin of the S3 public endpoint, so browsers can read documents from a store on another domain. The services chart sets it as `S3_PUBLIC_ORIGIN`. When it is not set, nothing is added.
+- **The data cleanup job keeps the bucket,** with its CORS and access rules, and a batch delete that the store partly refuses now fails.
+
+##### How to migrate
+
+###### Infrastructure
+
+**Back up the data.** After RustFS writes to the volume, going back to MinIO loses the user metadata of the objects that RustFS wrote. Use `minio-backup` kubernetes cronjob:
+```
+kubectl create job --from cronjob/minio-backup minio-backup-manual
+```
+
+**Add the `keep` annotation to the PVC of MinIO,** if you use `storage_type: pvc`:
+
+> [!WARNING]
+> Run this **before** `helm upgrade`, or you can lose all documents:
+>
+> ```bash
+> kubectl annotate pvc minio helm.sh/resource-policy=keep
+> ```
+>
+> The PVC `minio` has no `keep` annotation. If `rustfs.pvc.name` is not `minio`, `helm upgrade` deletes the PVC, and the objects can be deleted with it.
+
+###### Helm chart values
+
+Skip these steps if `environment:init` manages your environment. Otherwise update your values.
+
+1. Rename the `minio:` block to `s3:`. A `minio:` block that is left behind is ignored without a warning.
+2. Replace `external_url` and `external_protocol` with `public_endpoint`, a URL with the protocol. Without it, the chart signs document URLs for `rustfs.<hostname>`.
+
+   ```yaml
+   # Before
+   minio:
+     external_url: s3.example.org
+     external_protocol: https
+
+   # After
+   s3:
+     public_endpoint: https://s3.example.org
+   ```
+
+3. **Point RustFS at the data of MinIO,** so that it adopts the existing objects. Keep these values in later releases, or RustFS stops using that data:
+
+   - For `storage_type: host_path`: set `rustfs.host_data_path` to `/data/minio`
+   - For `storage_type: pvc`: set `rustfs.pvc.name: minio`, and copy `storage_class`, `storage_size` and `access_mode` from `minio.pvc`, unchanged.
+
+4. Rename the variables of the `documents` service:
+
+   | Before                        | After                                                                                  |
+   | ----------------------------- | -------------------------------------------------------------------------------------- |
+   | `MINIO_HOST`, `MINIO_PORT`    | `S3_ENDPOINT`, for example `http://rustfs:3535`. Required in production                |
+   | `MINIO_URL`, `MINIO_PROTOCOL` | `S3_PUBLIC_ENDPOINT`, for example `https://rustfs.example.org`. Required in production |
+   | `MINIO_BUCKET`                | `S3_BUCKET`                                                                            |
+   | `MINIO_BUCKET_REGION`         | `S3_BUCKET_REGION`                                                                     |
+   | `MINIO_ACCESS_KEY`            | `S3_ACCESS_KEY`                                                                        |
+   | `MINIO_SECRET_KEY`            | `S3_SECRET_KEY`                                                                        |
+
+See [Migrate from MinIO](charts/dependencies/README.md#migrate-from-minio) for more detail. [#13348](https://github.com/opencrvs/opencrvs-core/issues/13348)
+
 #### Outbox: empty it before you deploy
 
 2.2 changes the shape of the event configuration the client keeps offline, so the client clears its local cache the first time it loads after the upgrade. The outbox is part of that cache: **any action still waiting in a user's outbox when 2.2 loads is discarded** and cannot be recovered.
@@ -224,26 +289,6 @@ export default defineRoles(roles, eventConfigs)
 
 The data seeder checks the same rules, and reports each role that breaks them.
 
-#### Object store settings renamed from `MINIO_*` to `S3_*`
-
-**NOTE:** If your environment is managed by `environment:init` skip this section, otherwise update your helm chart values manually.
-
-`environment:init` keeps the credentials of the object store you already run. While the previous `MINIO_ROOT_USER` and `MINIO_ROOT_PASSWORD` secrets exist, it does not generate `S3_ADMIN_ACCESS_KEY` and `S3_ADMIN_SECRET_KEY`. The secrets migration workflow of your infrastructure repository copies them to the new names the next time the environment is deployed.
-
-- Rename the `minio:` block of your values to `s3:`. A `minio:` block that is left behind is ignored without a warning, and the defaults apply.
-
-- In the `s3` block, `external_url` and `external_protocol` are replaced by `public_endpoint`, a URL with the protocol, and the new `protocol` (default `http`) is the protocol that the services use to reach the store. Without `public_endpoint` the chart still signs document URLs for `minio.<hostname>`. If you set `external_url`, move it to `public_endpoint`, with the protocol.
-
-- The documents service reads two URLs, with the protocol, where it read a host, a port and a protocol. Following variable names were changed, make sure your helm chart values were updated:
-  | Before | After |
-  | --------------------- | ------------------ |
-  | `MINIO_HOST`, `MINIO_PORT` | `S3_ENDPOINT`, for example `http://minio:3535`. Required in production |
-  | `MINIO_URL`, `MINIO_PROTOCOL` | `S3_PUBLIC_ENDPOINT`, for example `https://minio.example.org`. Required in production, also when it is the same as `S3_ENDPOINT` |
-  | `MINIO_BUCKET` | `S3_BUCKET` |
-  | `MINIO_BUCKET_REGION` | `S3_BUCKET_REGION` |
-  | `MINIO_ACCESS_KEY` | `S3_ACCESS_KEY` |
-  | `MINIO_SECRET_KEY` | `S3_SECRET_KEY` |
-
 #### `event.hasAction` counts only accepted actions
 
 `event.hasAction(...)` and its `minCount`, `maxCount`, `withFields` and `withTemplate` variants now match only actions with status `Accepted`. Before, an action awaiting confirmation (`Requested`) or refused by the country configuration (`Rejected`) counted too, and an action confirmed synchronously counted twice, once for its `Requested` and once for its `Accepted` document. A confirmed action is matched with the details of its request (`createdBy`, `createdByRole`, `createdAtLocation`, `declaration`, `annotation`, `content`), so `withTemplate` and `withFields` match what they matched before, also when the country configuration confirms the action asynchronously.
@@ -283,18 +328,6 @@ Advanced search fields open with the declaration form's `defaultValue`, so a nam
 
 Only TEXT, TEXTAREA, EMAIL, PHONE, ID, SELECT, RADIO_GROUP, COUNTRY, LOCATION, ADMINISTRATIVE_AREA, NUMBER and DATE fields take a value. Other field types, such as NAME and ADDRESS, and dates searched as a range accept only `true` or `false`. Fields using `config.searchFields` don't support `defaultValue`. An event configuration that breaks these rules fails validation. [#14047](https://github.com/opencrvs/opencrvs-core/issues/14047)
 
-#### Documents service speaks plain S3
-
-The documents service now reaches its object store through the AWS SDK for JavaScript (Apache-2.0) instead of the MinIO client, and reads its settings from `S3_*` environment variables. MinIO is still the store that OpenCRVS deploys. **The settings were renamed, so check [Object store settings renamed from `MINIO_*` to `S3_*`](#object-store-settings-renamed-from-minio_-to-s3_) before you upgrade.**
-
-The change prepares for replacing MinIO. Stores differ in which parts of S3 they implement. [packages/documents/README.md](packages/documents/README.md) lists the settings, the version each store was tried on and what to check when you use another.
-
-The client's Content-Security-Policy allows the origin of the S3 public endpoint in `connect-src`, so browsers can read documents from a store on another domain, such as `storage.googleapis.com`. The services chart sets it as `S3_PUBLIC_ORIGIN` on the client. A deployment without the chart can set that variable on the client container. When it is not set, nothing is added.
-
-The data cleanup job now empties the bucket and keeps it, where it removed the bucket and made it again. The bucket keeps its settings, such as CORS and access rules.
-
-A batch delete that the store partly refuses now fails instead of passing silently, so a sweep that could not delete a file reports it. [#13348](https://github.com/opencrvs/opencrvs-core/issues/13348)
-
 #### Container registry other than Docker Hub
 
 The toolkit and the country configuration template work with any container registry that implements the OCI Registry v2 API, for example GHCR. The `DOCKERHUB_ACCOUNT`, `DOCKERHUB_REPO`, `DOCKER_USERNAME` and `DOCKER_TOKEN` secrets are renamed to `REGISTRY_ORGANISATION`, `REGISTRY_REPOSITORY`, `REGISTRY_USERNAME` and `REGISTRY_TOKEN`. The new repository variable `REGISTRY_HOST` (default `docker.io`) sets the registry, and the pull secret `dockerhub-credentials` is now `registry-credentials`. `environment:init` asks for these and checks them with the Registry v2 API. `check-before-build.sh` now takes `REGISTRY_USERNAME REGISTRY_TOKEN IMAGE_TAG [REGISTRY_HOST]`. [#14209](https://github.com/opencrvs/opencrvs-core/issues/14209)
@@ -324,7 +357,6 @@ The toolkit and the country configuration template work with any container regis
 
 - Removed the unused `POST /upload` endpoint from the documents service, together with the `file-type` library it used. That library had a denial-of-service vulnerability, where a crafted file could stop the service from responding ([CVE-2026-31808](https://nvd.nist.gov/vuln/detail/CVE-2026-31808), Medium). The endpoint has had no consumer since the user-mgnt service was removed, and file uploads go through `POST /files`, so nothing changes in the application. The documents service is not reachable from outside the cluster. Only a country configuration that calls `http://documents:9050/upload` directly is affected, and it should send the file to `POST /files` instead. [#14326](https://github.com/opencrvs/opencrvs-core/pull/14326)
 
-
 ## 2.1.3 Release Candidate
 
 ### Bug fixes
@@ -338,7 +370,6 @@ The toolkit and the country configuration template work with any container regis
 ### Improvements
 
 - Apply fix for pgbackrest maintainance process [#14035](https://github.com/opencrvs/opencrvs-core/pull/14035)
-
 
 ## 2.1.0
 

@@ -48,27 +48,23 @@ elasticsearch:
 # S3 object store configuration, including the hostname and port.
 # The defaults point at the S3 datastore that the dependencies chart deploys.
 s3:
-  host: minio-0.minio.opencrvs-deps-dev.svc.cluster.local
+  host: rustfs-0.rustfs.opencrvs-deps-dev.svc.cluster.local
   port: '3535'
   # Protocol that the services use to reach the object store: http or https.
   protocol: http
   # public_endpoint: URL that browsers use to reach the object store. Presigned document URLs are signed for it.
-  #                  Default: <http or https>://minio<subdomain_separator><hostname>, where the dependencies chart exposes
+  #                  Default: <http or https>://rustfs<subdomain_separator><hostname>, where the dependencies chart exposes
   #                  its object store. The protocol is https if `ingress.ssl_enabled` is true.
   #                  Set it for a store that is exposed elsewhere, for example https://s3.example.org
   # The services always read the credentials from users_secret. Keys: S3_ACCESS_KEY, S3_SECRET_KEY, S3_ADMIN_ACCESS_KEY, S3_ADMIN_SECRET_KEY
   # The dependencies chart creates it in its own namespace, copy it here. See README.md
   users_secret: s3-opencrvs-users
   # Admin username and password of the object store, used to create users_secret when it does not exist yet,
-  # for example the values that the dependencies chart got as `minio.admin_username` and `minio.admin_password`.
+  # for example the values that the dependencies chart got as `rustfs.admin_username` and `rustfs.admin_password`.
   # `helm install` and `helm upgrade` fail without them if users_secret does not exist. `helm template` cannot read the
   # cluster, so it renders the secret only with them. An existing users_secret is left as it is.
-  # admin_username: minioadmin
-  # admin_password: minioadmin
-  # Image used as client to run OpenCRVS configuration scripts. It needs the `mc` command line client.
-  image:
-    repository: ghcr.io/opencrvs/minio-mc
-    tag: 'release.2025-05-21t01-59-54z'
+  # admin_username: rustfsadmin
+  # admin_password: rustfsadmin
 
 redis:
   host: redis-0.redis.opencrvs-deps-dev.svc.cluster.local

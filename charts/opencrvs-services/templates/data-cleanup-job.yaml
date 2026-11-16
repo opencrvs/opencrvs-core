@@ -65,7 +65,7 @@ spec:
                   name: {{ .Values.postgres.users_secret }}
                   key: EVENTS_MIGRATOR_POSTGRES_USER
         - name: cleanup-s3
-          image: {{ include "opencrvs.imageReference" .Values.s3 }}
+          image: {{ include "opencrvs.image" (dict "root" . "service" .Values.utilities) }}
           command: ["/bin/bash", "-c"]
           args:
             - |

@@ -49,8 +49,8 @@ export const env = cleanEnv(process.env, {
    */
   S3_BUCKET: str({ default: 'ocrvs' }),
   S3_BUCKET_REGION: str({ default: 'local' }),
-  S3_ACCESS_KEY: str({ default: 'minioadmin' }),
-  S3_SECRET_KEY: str({ default: 'minioadmin' })
+  S3_ACCESS_KEY: str({ default: 'rustfsadmin' }),
+  S3_SECRET_KEY: str({ default: 'rustfsadmin' })
 })
 
 export const S3_PRESIGNED_URL_EXPIRY_IN_SECOND = PRODUCTION ? 3600 : 259200
