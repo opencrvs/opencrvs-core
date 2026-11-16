@@ -21,6 +21,7 @@ import {
   generateEventDocument,
   generateUuid,
   getUUID,
+  INITIAL_EVENT_CONFIG_VERSION_ID,
   TENNIS_CLUB_MEMBERSHIP,
   TokenUserType,
   encodeScope
@@ -39,6 +40,7 @@ import {
 import {
   getEventAliasName,
   getEventIndexName,
+  getEventVersionIndexName,
   getOrCreateClient
 } from '@events/storage/elasticsearch'
 import { mswServer } from '@events/tests/msw'
@@ -608,9 +610,42 @@ describe('cleanupOrphanedIndices', () => {
     const orphanIndex = `${getEventIndexNameMock(TENNIS_CLUB_MEMBERSHIP)}_${Date.now() - TWO_DAYS_MS}`
     await esClient.indices.create({ index: orphanIndex })
 
-    await cleanupOrphanedIndices([tennisClubMembershipEvent.id])
+    await cleanupOrphanedIndices([versionedTennisClubMembershipEvent])
 
     expect(await esClient.indices.exists({ index: orphanIndex })).toBe(false)
+  })
+
+  test('deletes an old temp index of a version with no alias', async () => {
+    const esClient = getOrCreateClient()
+    useProductionIndexNames()
+
+    const versionIndexName = getEventVersionIndexName(
+      TENNIS_CLUB_MEMBERSHIP,
+      INITIAL_EVENT_CONFIG_VERSION_ID
+    )
+    const orphanIndex = `${versionIndexName}_${Date.now() - TWO_DAYS_MS}`
+    await esClient.indices.create({ index: orphanIndex })
+
+    await cleanupOrphanedIndices([versionedTennisClubMembershipEvent])
+
+    expect(await esClient.indices.exists({ index: orphanIndex })).toBe(false)
+  })
+
+  test('leaves the bare index of a version (no timestamp suffix) untouched even without an alias', async () => {
+    const esClient = getOrCreateClient()
+    useProductionIndexNames()
+
+    const versionIndexName = getEventVersionIndexName(
+      TENNIS_CLUB_MEMBERSHIP,
+      INITIAL_EVENT_CONFIG_VERSION_ID
+    )
+    await esClient.indices.create({ index: versionIndexName })
+
+    await cleanupOrphanedIndices([versionedTennisClubMembershipEvent])
+
+    expect(await esClient.indices.exists({ index: versionIndexName })).toBe(
+      true
+    )
   })
 
   test('leaves a recent temp index alone, as it may belong to an in-progress reindex', async () => {
@@ -620,7 +655,7 @@ describe('cleanupOrphanedIndices', () => {
     const inProgressIndex = `${getEventIndexNameMock(TENNIS_CLUB_MEMBERSHIP)}_${Date.now()}`
     await esClient.indices.create({ index: inProgressIndex })
 
-    await cleanupOrphanedIndices([tennisClubMembershipEvent.id])
+    await cleanupOrphanedIndices([versionedTennisClubMembershipEvent])
 
     expect(await esClient.indices.exists({ index: inProgressIndex })).toBe(true)
   })
@@ -635,7 +670,7 @@ describe('cleanupOrphanedIndices', () => {
       aliases: { [getEventAliasName()]: {} }
     })
 
-    await cleanupOrphanedIndices([tennisClubMembershipEvent.id])
+    await cleanupOrphanedIndices([versionedTennisClubMembershipEvent])
 
     expect(await esClient.indices.exists({ index: liveIndex })).toBe(true)
   })
@@ -648,7 +683,7 @@ describe('cleanupOrphanedIndices', () => {
     const liveIndexName = getEventIndexNameMock(TENNIS_CLUB_MEMBERSHIP)
     await esClient.indices.create({ index: liveIndexName })
 
-    await cleanupOrphanedIndices([tennisClubMembershipEvent.id])
+    await cleanupOrphanedIndices([versionedTennisClubMembershipEvent])
 
     expect(await esClient.indices.exists({ index: liveIndexName })).toBe(true)
   })
@@ -660,13 +695,13 @@ describe('cleanupOrphanedIndices', () => {
     // `<prefix>_marriage_2025` ends in `_<digits>`, so a loose suffix match
     // would mistake it for a temp index.
     const configuration = {
-      ...tennisClubMembershipEvent,
+      ...versionedTennisClubMembershipEvent,
       id: 'marriage_2025'
     }
     const liveIndexName = getEventIndexNameMock(configuration.id)
     await esClient.indices.create({ index: liveIndexName })
 
-    await cleanupOrphanedIndices([configuration.id])
+    await cleanupOrphanedIndices([configuration])
 
     expect(await esClient.indices.exists({ index: liveIndexName })).toBe(true)
   })
@@ -678,7 +713,7 @@ describe('cleanupOrphanedIndices', () => {
     const foreignIndex = `${getEventIndexNameMock('not-configured')}_${Date.now() - TWO_DAYS_MS}`
     await esClient.indices.create({ index: foreignIndex })
 
-    await cleanupOrphanedIndices([tennisClubMembershipEvent.id])
+    await cleanupOrphanedIndices([versionedTennisClubMembershipEvent])
 
     expect(await esClient.indices.exists({ index: foreignIndex })).toBe(true)
   })
@@ -701,7 +736,7 @@ describe('cleanupOrphanedIndices', () => {
     // A failed delete must not throw out of cleanupOrphanedIndices -- it's a
     // best-effort step that shouldn't be able to block the reindex it precedes.
     await expect(
-      cleanupOrphanedIndices([tennisClubMembershipEvent.id])
+      cleanupOrphanedIndices([versionedTennisClubMembershipEvent])
     ).resolves.not.toThrow()
 
     expect(deleteSpy).toHaveBeenCalledWith({ index: orphanIndex })

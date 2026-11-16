@@ -116,13 +116,21 @@ export async function cleanupTemporaryIndex(tempIndexName: string) {
 // A reindex takes minutes, so anything newer may still be an in-progress run.
 const ORPHAN_MIN_AGE_MS = 24 * 60 * 60 * 1000
 
-/** A temp index (`<type index>_<timestamp>`) with no alias never finished reindexing (e.g. killed mid-run) and is safe to delete. */
-export async function cleanupOrphanedIndices(eventTypes: string[]) {
+/**
+ * A temp index (`<version index>_<timestamp>`) with no alias never finished reindexing
+ * (e.g. killed mid-run) and is safe to delete. So is one named `<type index>_<timestamp>`,
+ * left over from before each version had its own index.
+ */
+export async function cleanupOrphanedIndices(
+  configurations: Pick<VersionedEventConfig, 'id' | 'versions'>[]
+) {
   const esClient = getOrCreateClient()
   const cutoff = Date.now() - ORPHAN_MIN_AGE_MS
-  const typeIndexNames = eventTypes.map((eventType) =>
-    getEventIndexName(eventType)
-  )
+  const typeIndexNames = configurations.map(({ id }) => getEventIndexName(id))
+  const liveNames = configurations.flatMap(({ id, versions }) => [
+    getEventIndexName(id),
+    ...versions.map((version) => getEventVersionIndexName(id, version.id))
+  ])
 
   // An empty index list would make getAlias return every index in the cluster.
   if (typeIndexNames.length === 0) {
@@ -137,10 +145,10 @@ export async function cleanupOrphanedIndices(eventTypes: string[]) {
     .filter(
       ([index, { aliases }]) =>
         Object.keys(aliases).length === 0 &&
-        typeIndexNames.some((typeIndexName) => {
-          const timestamp = index.slice(typeIndexName.length + 1)
+        liveNames.some((liveName) => {
+          const timestamp = index.slice(liveName.length + 1)
           return (
-            index.startsWith(`${typeIndexName}_`) &&
+            index.startsWith(`${liveName}_`) &&
             /^\d{13}$/.test(timestamp) &&
             Number(timestamp) < cutoff
           )

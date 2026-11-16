@@ -228,9 +228,9 @@ export async function runReindex(token: TokenWithBearer) {
     await getInMemoryVersionedEventConfigurations(token)
 
   // Best-effort: leftover orphans are retried on the next run.
-  await cleanupOrphanedIndices(
-    versionedConfigurations.map(({ id }) => id)
-  ).catch((err) => logger.error('Failed to clean up orphaned indices', err))
+  await cleanupOrphanedIndices(versionedConfigurations).catch((err) =>
+    logger.error('Failed to clean up orphaned indices', err)
+  )
 
   /*
    * Create temporary indices for every version of all event types
