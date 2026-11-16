@@ -31,7 +31,8 @@ import {
   emptyMessage,
   BIRTH_LATE_REGISTRATION_TARGET_DAYS,
   defaultStreetAddressConfiguration,
-  getNestedFieldValidators
+  getNestedFieldValidators,
+  LATE_REGISTRATION_ANCHOR
 } from '@countryconfig/events/utils'
 import { BirthVersion } from '../../versions'
 import {
@@ -308,7 +309,7 @@ export function childPage(version: BirthVersion) {
                 field('child.dob')
                   .isAfter()
                   .days(BIRTH_LATE_REGISTRATION_TARGET_DAYS)
-                  .inPast()
+                  .beforeAction(LATE_REGISTRATION_ANCHOR)
               ),
               field('child.dob').isBefore().now()
             )

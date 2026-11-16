@@ -1584,17 +1584,6 @@ describe('date comparisons against an action', () => {
       )
     ).toBe(true)
   })
-
-  it('compares after the action with .afterAction()', () => {
-    const declaredWithin = field('child.dob')
-      .isBefore()
-      .days(30)
-      .afterAction(event.firstAction(ActionType.DECLARE))
-    // dob is before declaration + 30 days: always true for a past dob
-    expect(
-      validate(declaredWithin, params([action(ActionType.DECLARE, 10)]))
-    ).toBe(true)
-  })
 })
 
 describe('date comparisons against the local date of an action', () => {
@@ -1656,6 +1645,40 @@ describe('date comparisons against the local date of an action', () => {
       validate(lateBy30Days, params('2026-01-10', declaredAt(15, 0)))
     ).toBe(true)
     expect(validate(lateBy30Days, params('2026-01-11'))).toBe(false)
+  })
+
+  // Declared on 2026-02-10, so the boundaries are 2026-01-11 and 2026-03-12
+  const declared = declaredAt(12, 0)
+  const declare = event.firstAction(ActionType.DECLARE)
+
+  it.each([
+    ['isAfter().days(30).beforeAction()', '2026-01-12', '2026-01-11'],
+    ['isBefore().days(30).beforeAction()', '2026-01-10', '2026-01-11'],
+    ['isAfter().days(30).afterAction()', '2026-03-13', '2026-03-12'],
+    ['isBefore().days(30).afterAction()', '2026-03-11', '2026-03-12']
+  ])('%s is true on %s and false on %s', (name, trueOn, falseOn) => {
+    const conditionals = {
+      'isAfter().days(30).beforeAction()': field('child.dob')
+        .isAfter()
+        .days(30)
+        .beforeAction(declare),
+      'isBefore().days(30).beforeAction()': field('child.dob')
+        .isBefore()
+        .days(30)
+        .beforeAction(declare),
+      'isAfter().days(30).afterAction()': field('child.dob')
+        .isAfter()
+        .days(30)
+        .afterAction(declare),
+      'isBefore().days(30).afterAction()': field('child.dob')
+        .isBefore()
+        .days(30)
+        .afterAction(declare)
+    }
+    const conditional = conditionals[name as keyof typeof conditionals]
+
+    expect(validate(conditional, params(trueOn, declared))).toBe(true)
+    expect(validate(conditional, params(falseOn, declared))).toBe(false)
   })
 })
 

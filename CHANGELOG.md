@@ -340,6 +340,26 @@ The toolkit and the country configuration template work with any container regis
 1. Update `.github/TEMPLATES/secret-migration.yaml`, `github-to-k8s-sync-env.yml` and `deploy-opencrvs.yml` from [opencrvs/infrastructure](https://github.com/opencrvs/infrastructure). The secrets are copied to the new names on the next deployment.
 2. Add `publish-to-registry.yml` from the template to your country configuration repository. **Do not delete `publish-to-dockerhub.yml`**: replace its content with the template's deprecated version, because release branches such as `release/2.1.1` still use it.
 
+#### Measure late registration from the declaration, not from today
+
+A date rule such as "the child was born more than 365 days ago" used to compare with today's date only. So a record that was declared on time could become late later. For example, the "Reason for delayed registration" field appeared, and was required, when a registrar reviewed or corrected the record after the deadline.
+
+Date rules can now compare with the date of an action on the record:
+
+```ts
+field('child.dob')
+  .isAfter()
+  .days(BIRTH_LATE_REGISTRATION_TARGET_DAYS)
+  .beforeAction(event.firstAction(ActionType.NOTIFY, ActionType.DECLARE))
+```
+
+- `event.firstAction(...)` uses the first matching action and `event.lastAction(...)` uses the most recent one. Give one or more action types, for example `ActionType.DECLARE`, or `ActionType.NOTIFY` and `ActionType.DECLARE` to use whichever came first. For a custom action, give `{ type: ActionType.CUSTOM, customActionType: 'MY_ACTION' }`.
+- Use `.beforeAction(...)` for a number of days before the action, and `.afterAction(...)` for a number of days after it. Both work after `isAfter().days(n)` and `isBefore().days(n)`.
+- Only actions that the country configuration accepted count. Until a matching action exists, for example while the declaration form is filled in, the rule compares with today, as before.
+- The rules work in form conditionals and validators, and in the conditionals of action flags.
+
+The country configuration template now uses `event.firstAction(ActionType.NOTIFY, ActionType.DECLARE)` for the late registration rules of birth and death. To get the same behaviour, replace `.inPast()` with `.beforeAction(...)` in your late registration rules. [#14329](https://github.com/opencrvs/opencrvs-core/issues/14329)
+
 ### Improvements
 
 - Review auth_mode secret management for OpenCRVS helm chart [#14234](https://github.com/opencrvs/opencrvs-core/issues/14234)
