@@ -29,7 +29,8 @@ import {
   emptyMessage,
   BIRTH_LATE_REGISTRATION_TARGET_DAYS,
   defaultStreetAddressConfiguration,
-  getNestedFieldValidators
+  getNestedFieldValidators,
+  LATE_REGISTRATION_ANCHOR
 } from '@countryconfig/events/utils'
 import {
   farajalandNameConfig,
@@ -289,7 +290,7 @@ export const child = defineFormPage({
               field('child.dob')
                 .isAfter()
                 .days(BIRTH_LATE_REGISTRATION_TARGET_DAYS)
-                .inPast()
+                .beforeAction(LATE_REGISTRATION_ANCHOR)
             ),
             field('child.dob').isBefore().now()
           )

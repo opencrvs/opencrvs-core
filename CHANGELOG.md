@@ -2,6 +2,10 @@
 
 ## 2.1.3 Release Candidate
 
+### Improvements
+
+- Measure late registration from the declaration date. Date rules could only compare with today, so a record declared on time became late when a registrar reviewed or corrected it after the deadline. Date rules can now compare with the date of an action on the record, for example `field('child.dob').isAfter().days(365).beforeAction(event.firstAction(ActionType.NOTIFY, ActionType.DECLARE))`. Use `event.firstAction(...)` or `event.lastAction(...)` with one or more action types, and `.beforeAction(...)` or `.afterAction(...)` after `isAfter().days(n)` or `isBefore().days(n)`. Only accepted actions count. Until one exists, the rule compares with today. To get the same behaviour, replace `.inPast()` with `.beforeAction(...)` in your late registration rules. [#14329](https://github.com/opencrvs/opencrvs-core/issues/14329)
+
 ### Bug fixes
 
 - The utilities image now includes `minio-client` and GNU `coreutils`. The S3 backup and restore jobs of the dependencies chart installed them with `apk` on every run, which fails without access to a package repository. [#14293](https://github.com/opencrvs/opencrvs-core/pull/14293)

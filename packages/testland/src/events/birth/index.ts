@@ -39,7 +39,8 @@ import { dedupConfig } from './dedupConfig'
 import * as verifiableCredentialActions from '@countryconfig/verifiable-credentials/issue-birth-credential-action'
 import {
   Event,
-  BIRTH_LATE_REGISTRATION_TARGET_DAYS
+  BIRTH_LATE_REGISTRATION_TARGET_DAYS,
+  LATE_REGISTRATION_ANCHOR
 } from '@countryconfig/events/utils'
 
 export const birthEvent = defineConfig({
@@ -427,7 +428,7 @@ export const birthEvent = defineConfig({
               field('child.dob')
                 .isAfter()
                 .days(BIRTH_LATE_REGISTRATION_TARGET_DAYS)
-                .inPast()
+                .beforeAction(LATE_REGISTRATION_ANCHOR)
             ),
             field('child.dob').isBefore().now()
           )

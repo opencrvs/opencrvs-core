@@ -14,6 +14,7 @@ import { Action, ActionStatus } from '../ActionDocument'
 import { ActionType } from '../ActionType'
 import { EventConfig } from '../EventConfig'
 import { EventDocument } from '../EventDocument'
+import { event as eventConditionals } from '../event'
 import { field } from '../field'
 import { FieldType } from '../FieldType'
 import { PageTypes } from '../PageConfig'
@@ -968,5 +969,76 @@ describe('getEventFlags() – any inherent flag is clearable by action config', 
     expect(getEventFlags(event, eventConfig)).not.toContain(
       InherentFlags.INCOMPLETE
     )
+  })
+})
+
+describe('resolveEventCustomFlags() – late registration against the declaration', () => {
+  const isLate = field('child.dob')
+    .isBefore()
+    .days(30)
+    .beforeAction(eventConditionals.firstAction(ActionType.DECLARE))
+
+  const lateRegistrationFlag = {
+    id: 'late-registration',
+    operation: 'add',
+    conditional: isLate
+  } as const
+
+  const lateRegistrationConfig: DeepPartial<EventConfig> = {
+    actions: [
+      {
+        type: ActionType.DECLARE,
+        declaration: {
+          label: { id: '', defaultMessage: '', description: '' },
+          pages: [
+            {
+              id: 'child',
+              type: PageTypes.enum.FORM,
+              title: { id: '', defaultMessage: '', description: '' },
+              fields: [{ id: 'child.dob', type: FieldType.DATE }]
+            }
+          ]
+        },
+        flags: [lateRegistrationFlag]
+      },
+      { type: ActionType.APPROVE_CORRECTION, flags: [lateRegistrationFlag] }
+    ]
+  }
+
+  const dob = '2026-01-01'
+
+  const declaredOn = (date: string): DeepPartial<Action> => ({
+    type: ActionType.DECLARE,
+    declaration: { 'child.dob': dob },
+    createdAt: `${date}T12:00:00.000Z`,
+    status: ActionStatus.Accepted
+  })
+
+  const correctionApprovedOn = (date: string): DeepPartial<Action> => ({
+    type: ActionType.APPROVE_CORRECTION,
+    requestId: 'some-request-id',
+    declaration: {},
+    createdAt: `${date}T12:00:00.000Z`,
+    status: ActionStatus.Accepted
+  })
+
+  test('does not add the flag when a record declared on time is corrected after the deadline', () => {
+    const event: DeepPartial<EventDocument> = {
+      actions: [declaredOn('2026-01-20'), correctionApprovedOn('2026-03-01')]
+    }
+
+    // @ts-expect-error - allow partial actions and event config
+    const flags = resolveEventCustomFlags(event, lateRegistrationConfig)
+    expect(flags).not.toContain('late-registration')
+  })
+
+  test('adds the flag when the record is declared after the deadline', () => {
+    const event: DeepPartial<EventDocument> = {
+      actions: [declaredOn('2026-02-15')]
+    }
+
+    // @ts-expect-error - allow partial actions and event config
+    const flags = resolveEventCustomFlags(event, lateRegistrationConfig)
+    expect(flags).toContain('late-registration')
   })
 })
