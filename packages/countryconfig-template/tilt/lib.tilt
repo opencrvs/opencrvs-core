@@ -14,13 +14,14 @@ def copy_secrets(dependencies_namespace, opencrvs_namespace):
         "elasticsearch-admin-user",
         "redis-opencrvs-users",
         "s3-opencrvs-users",
-        "mongodb-admin-user",
         "postgres-admin-user",
     ]
+    # The services chart renders some of these secrets too, so the name alone matches two objects.
+    # Name the namespace to select the secret that the dependencies chart creates.
     k8s_resource(
         new_name="deps-secrets",
-        objects=["{}:secret".format(secret) for secret in secrets_to_copy],
-        labels=['3.Dependencies']
+        objects=["{}:secret:{}".format(secret, dependencies_namespace) for secret in secrets_to_copy],
+        labels=['4.Dependencies']
     )
     local_resource(
       "copy-secrets",
