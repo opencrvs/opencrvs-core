@@ -49,12 +49,16 @@ s3:
   admin_username: rustfsadmin
   admin_password: rustfsadmin
 
+# `helm template` renders the chart again on every reload of Tilt. With random passwords, each reload would give
+# the services new passwords that the datastores do not know. Default credentials stay the same on every render.
 elasticsearch:
   admin_password: elasticadmin
+  use_default_credentials: true
 
 postgres:
   admin_username: postgres
   admin_password: postgres
+  use_default_credentials: true
 
 data_seed:
   enabled: false
