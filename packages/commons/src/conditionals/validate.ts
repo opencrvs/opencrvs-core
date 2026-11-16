@@ -40,7 +40,11 @@ import {
   AgeValue
 } from '../events/FieldValue'
 import { TranslationConfig } from '../events/TranslationConfig'
-import { EncodedScope, ITokenPayload, TokenUserType } from '../users/authentication'
+import {
+  EncodedScope,
+  ITokenPayload,
+  TokenUserType
+} from '../users/authentication'
 import { UUID } from '../uuid'
 import {
   ageToDate,
@@ -116,7 +120,7 @@ function resolveActionDate(
   { match, occurrence }: ActionDateReference['$action']
 ): string | undefined {
   const dates = (event?.actions ?? [])
-    .filter(({ status }) => status !== ActionStatus.Rejected)
+    .filter(({ status }) => status === ActionStatus.Accepted)
     .filter((action) =>
       match.some(
         ({ type, customActionType }) =>
