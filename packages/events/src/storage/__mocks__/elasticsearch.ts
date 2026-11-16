@@ -14,6 +14,9 @@ import { inject, vi } from 'vitest'
 /** @knipignore */
 export const getEventIndexName = vi.fn<(type: string) => string>()
 /** @knipignore */
+export const getEventVersionIndexName =
+  vi.fn<(type: string, versionId: string) => string>()
+/** @knipignore */
 export const getEventAliasName = vi.fn()
 
 /** @knipignore */

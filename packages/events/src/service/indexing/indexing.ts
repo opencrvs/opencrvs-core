@@ -24,7 +24,8 @@ import {
   FieldConfig,
   FieldType,
   getCurrentEventState,
-  getDeclarationFieldsOfAllVersions,
+  getDeclarationFields,
+  toEventConfig,
   WorkqueueCountInput,
   getEventConfigById,
   SearchQuery,
@@ -43,6 +44,7 @@ import {
 import {
   getEventAliasName,
   getEventIndexName,
+  getEventVersionIndexName,
   getOrCreateClient
 } from '@events/storage/elasticsearch'
 import { primeAdministrativeHierarchyCache } from '@events/storage/postgres/administrative-hierarchy/locations'
@@ -388,33 +390,93 @@ export async function createIndex(
   }
 }
 
+/**
+ * Creates the index of one version of an event, searchable through the event's alias
+ * and the global alias.
+ */
+export async function createVersionIndex(
+  eventType: string,
+  versionId: string,
+  formFields: FieldConfig[]
+) {
+  const indexName = getEventVersionIndexName(eventType, versionId)
+  await createIndex(indexName, formFields)
+  await getOrCreateClient().indices.putAlias({
+    index: indexName,
+    name: getEventIndexName(eventType)
+  })
+}
+
+/** @returns the indices behind `name`, an index or an alias, with their aliases. Empty when neither exists. */
+async function getIndicesBehind(name: string) {
+  const esClient = getOrCreateClient()
+
+  if (!(await esClient.indices.exists({ index: name }))) {
+    return {}
+  }
+  return esClient.indices.getAlias({ index: name })
+}
+
+/**
+ * Makes sure every version of the event has a name its records can be written to.
+ *
+ * Records of every version used to share one index. Until a reindex gives each version
+ * its own, the version names are aliases of that shared index, so it keeps answering
+ * queries with nothing written elsewhere.
+ */
 export async function ensureIndexExists(
   eventConfiguration: VersionedEventConfig
 ) {
   const esClient = getOrCreateClient()
-  const indexName = getEventIndexName(eventConfiguration.id)
+  const eventIndexName = getEventIndexName(eventConfiguration.id)
+  const versions = eventConfiguration.versions.map((version) => ({
+    version,
+    indexName: getEventVersionIndexName(eventConfiguration.id, version.id)
+  }))
 
-  const isAlreadyWriteAlias = await esClient.indices.existsAlias({
-    name: indexName
-  })
-  if (isAlreadyWriteAlias) {
-    logger.info(
-      `Write alias ${indexName} already exists — index setup already complete`
+  const indicesOfEvent = await getIndicesBehind(eventIndexName)
+  // The shared index is the one no version's name resolves to yet. None is left once
+  // a reindex has run, or on a fresh install.
+  const [sharedIndex] = Object.entries(indicesOfEvent)
+    .filter(
+      ([index, { aliases }]) =>
+        !versions.some(
+          ({ indexName }) => indexName === index || indexName in aliases
+        )
     )
-    return
+    .map(([index]) => index)
+
+  if (sharedIndex) {
+    await ensureAlias(sharedIndex)
   }
 
-  const hasConcreteIndex = await esClient.indices.exists({ index: indexName })
+  for (const { version, indexName } of versions) {
+    if (await esClient.indices.exists({ index: indexName })) {
+      continue
+    }
 
-  if (!hasConcreteIndex) {
-    logger.info(`Creating index ${indexName}`)
-    await createIndex(
-      indexName,
-      getDeclarationFieldsOfAllVersions(eventConfiguration)
+    // Until a reindex, records of this version are written to the shared index.
+    if (sharedIndex) {
+      logger.info(`Aliasing ${indexName} to shared index ${sharedIndex}`)
+      await esClient.indices.putAlias({ index: sharedIndex, name: indexName })
+      continue
+    }
+
+    const formFields = getDeclarationFields(
+      toEventConfig(eventConfiguration, version)
     )
-  } else {
-    logger.info(`Index ${indexName} already exists as a concrete index.`)
-    await ensureAlias(indexName)
+
+    // An alias cannot take the name of an index. A reindex replaces that index.
+    if (eventIndexName in indicesOfEvent) {
+      logger.warn(
+        `Creating index ${indexName} outside ${eventIndexName}, which is still an index. Reindex to include it.`
+      )
+      await createIndex(indexName, formFields)
+      continue
+    }
+
+    logger.info(`Creating index ${indexName}`)
+    await createVersionIndex(eventConfiguration.id, version.id, formFields)
   }
 }
 
@@ -470,7 +532,8 @@ export async function indexEventsInBulk(
         {
           index: {
             _index:
-              indexNameOverrides?.get(doc.type) ?? getEventIndexName(doc.type),
+              indexNameOverrides?.get(doc.type) ??
+              getEventVersionIndexName(doc.type, doc.configVersionId),
             _id: doc.id
           }
         },
@@ -513,7 +576,7 @@ export async function indexEvent(
   waitFor: boolean
 ) {
   const esClient = getOrCreateClient()
-  const indexName = getEventIndexName(event.type)
+  const indexName = getEventVersionIndexName(event.type, event.configVersionId)
   const eventIndex = eventToEventIndex(event, config)
 
   const eventIndexWithAdministrativeHierarchy =

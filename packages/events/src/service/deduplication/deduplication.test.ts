@@ -23,7 +23,7 @@ import { field, and, or, not } from '@opencrvs/commons/events/deduplication'
 import { getOrCreateClient } from '@events/storage/elasticsearch'
 import { getEventIndexName } from '@events/storage/__mocks__/elasticsearch'
 import { encodeEventIndex } from '@events/service/indexing/utils'
-import { createIndex } from '../indexing/indexing'
+import { createEventIndex } from '@events/tests/createEventIndex'
 import {
   generateElasticsearchQuery,
   searchForDuplicates
@@ -142,8 +142,8 @@ async function findDuplicates(eventComparison: Record<string, FieldValue[]>) {
 }
 
 beforeEach(async () => {
-  return createIndex(
-    getEventIndexName(ChildOnboardingEvent.id),
+  return createEventIndex(
+    ChildOnboardingEvent.id,
     getDeclarationFields(ChildOnboardingEvent)
   )
 })
