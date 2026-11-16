@@ -10,9 +10,15 @@
 # Carries each release line's changes into every newer line and develop, so a
 # fix made on an older line also reaches the newer ones. Conflicts are resolved
 # by Claude Code only after a reviewer approves the resolve-conflicts job, so
-# no tokens are spent on a line that shouldn't get the changes. Pushes use
-# GITHUB_TOKEN, so CI starts on these PRs only once a person pushes to them.
-# The logic lives in .github/scripts/forward-merge/, which runs locally too.
+# no tokens are spent on a line that shouldn't get the changes. The logic lives
+# in .github/scripts/forward-merge/, which runs locally too.
+#
+# Pushes and PRs use the forward-merge GitHub App when the repository has its
+# client ID (variable FORWARD_MERGE_APP_CLIENT_ID) and private key (secret
+# FORWARD_MERGE_APP_PRIVATE_KEY): GITHUB_TOKEN may not push changes to
+# .github/workflows/, and its pushes don't start CI. Without them the
+# workflow falls back to GITHUB_TOKEN, and merges that change workflow files
+# are left to a person.
 name: Release - Forward-merge release lines
 
 on:
@@ -45,12 +51,11 @@ jobs:
       hops: ${{ steps.plan.outputs.hops }}
       conflicted: ${{ steps.plan.outputs.conflicted }}
     steps:
-      # Full commit history for the trial merges, file contents only as needed.
+      # A full clone: a partial one fails to fetch some files on demand.
       - name: Checkout
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           fetch-depth: 0
-          filter: blob:none
           persist-credentials: false
 
       - name: Try the merge into each newer line
@@ -83,8 +88,23 @@ jobs:
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           fetch-depth: 0
-          filter: blob:none
           persist-credentials: false
+
+      # The scripts run from a copy: the job checks out branches that may not
+      # have them yet.
+      - name: Copy the scripts
+        run: cp -r .github/scripts/forward-merge "$RUNNER_TEMP/forward-merge"
+
+      - name: Get a token from the forward-merge app
+        id: app-token
+        if: vars.FORWARD_MERGE_APP_CLIENT_ID != ''
+        uses: actions/create-github-app-token@64ab729a6294000f5aa4a4bc0b73d1f32bc45510 # v3.3.0
+        with:
+          client-id: ${{ vars.FORWARD_MERGE_APP_CLIENT_ID }}
+          private-key: ${{ secrets.FORWARD_MERGE_APP_PRIVATE_KEY }}
+          permission-contents: write
+          permission-pull-requests: write
+          permission-workflows: write
 
       - name: Push and open or update the PR into ${{ matrix.hop.target }}
         env:
@@ -92,8 +112,9 @@ jobs:
           HOP: ${{ toJSON(matrix.hop) }}
           REVIEWERS: ${{ needs.plan.outputs.reviewers }}
           DRY_RUN: ${{ inputs.dry_run == true }}
-          GH_TOKEN: ${{ github.token }}
-        run: bash .github/scripts/forward-merge/open-pr.sh
+          GH_TOKEN: ${{ steps.app-token.outputs.token || github.token }}
+          CAN_PUSH_WORKFLOWS: ${{ steps.app-token.outputs.token != '' }}
+        run: bash "$RUNNER_TEMP/forward-merge/open-pr.sh"
 
   # Waits for a reviewer to approve, in the forward-merge-claude environment,
   # before Claude spends tokens on a merge.
@@ -118,18 +139,35 @@ jobs:
       TARGET_BRANCH: ${{ matrix.hop.target }}
       PR_BRANCH: ${{ matrix.hop.pr_branch }}
       MERGING: ${{ matrix.hop.conflict_merging }}
-      GH_TOKEN: ${{ github.token }}
     steps:
       - name: Checkout
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           fetch-depth: 0
-          filter: blob:none
           persist-credentials: false
+
+      # The scripts run from a copy: the job checks out branches that may not
+      # have them yet.
+      - name: Copy the scripts
+        run: cp -r .github/scripts/forward-merge "$RUNNER_TEMP/forward-merge"
+
+      - name: Get a token from the forward-merge app
+        id: app-token
+        if: vars.FORWARD_MERGE_APP_CLIENT_ID != ''
+        uses: actions/create-github-app-token@64ab729a6294000f5aa4a4bc0b73d1f32bc45510 # v3.3.0
+        with:
+          client-id: ${{ vars.FORWARD_MERGE_APP_CLIENT_ID }}
+          private-key: ${{ secrets.FORWARD_MERGE_APP_PRIVATE_KEY }}
+          permission-contents: write
+          permission-pull-requests: write
+          permission-workflows: write
 
       - name: Start the merge of ${{ matrix.hop.conflict_merging }}
         id: merge
-        run: bash .github/scripts/forward-merge/resolve.sh start
+        env:
+          GH_TOKEN: ${{ steps.app-token.outputs.token || github.token }}
+          CAN_PUSH_WORKFLOWS: ${{ steps.app-token.outputs.token != '' }}
+        run: bash "$RUNNER_TEMP/forward-merge/resolve.sh" start
 
       - name: Resolve the conflicts with Claude
         if: steps.merge.outputs.needed == 'true' && steps.merge.outputs.conflicts != '[]'
@@ -170,4 +208,5 @@ jobs:
         env:
           CONFLICTS: ${{ steps.merge.outputs.conflicts }}
           RESOLUTION_FILE: ${{ runner.temp }}/resolution.md
-        run: bash .github/scripts/forward-merge/resolve.sh finish
+          GH_TOKEN: ${{ steps.app-token.outputs.token || github.token }}
+        run: bash "$RUNNER_TEMP/forward-merge/resolve.sh" finish

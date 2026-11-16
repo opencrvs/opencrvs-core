@@ -14,7 +14,8 @@
 #           and reports on the PR either way
 #
 # Needs SOURCE_BRANCH, TARGET_BRANCH, PR_BRANCH and MERGING (the branch being
-# merged in). `finish` also reads CONFLICTS (JSON) and RESOLUTION_FILE.
+# merged in). `start` reads CAN_PUSH_WORKFLOWS (true with the app's token);
+# `finish` reads CONFLICTS (JSON) and RESOLUTION_FILE.
 set -euo pipefail
 source "$(dirname "$0")/lib.sh"
 
@@ -41,12 +42,24 @@ start() {
     echo "needed=false" >> "$GITHUB_OUTPUT"
     return
   fi
-  echo "needed=true" >> "$GITHUB_OUTPUT"
 
   local conflicted_files='[]'
   if ! git merge --no-edit -m "Merge $MERGING into $PR_BRANCH" "origin/$MERGING"; then
     conflicted_files=$(git diff -z --name-only --diff-filter=U | jq -Rsc 'split("\u0000") | map(select(. != ""))')
   fi
+
+  # Without the app's token, a merge that changes workflow files can't be
+  # pushed, so stop before Claude spends tokens on it.
+  if [ "${CAN_PUSH_WORKFLOWS:-false}" != "true" ] \
+    && [ -n "$(git diff --name-only "origin/$PR_BRANCH" -- .github/workflows)" ]; then
+    git reset -q --hard "origin/$PR_BRANCH"
+    echo "::warning::Merging $MERGING changes files under .github/workflows/, which this workflow's token may not push. Merge it by hand, or set up the forward-merge app."
+    pr_comment "Merging \`$MERGING\` changes files under \`.github/workflows/\`, which this workflow's token may not push, so Claude Code did not run. Resolve the conflicts by hand with the commands in the description, or set up the forward-merge GitHub App (see the workflow's header) and re-run."
+    echo "needed=false" >> "$GITHUB_OUTPUT"
+    return
+  fi
+
+  echo "needed=true" >> "$GITHUB_OUTPUT"
   echo "conflicts=$conflicted_files" >> "$GITHUB_OUTPUT"
 }
 
