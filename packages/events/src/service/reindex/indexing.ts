@@ -17,10 +17,11 @@ import { logger } from '@opencrvs/commons'
 import {
   getEventAliasName,
   getEventIndexName,
+  getEventVersionIndexName,
   getTemporaryVersionIndexName,
   getOrCreateClient
 } from '@events/storage/elasticsearch'
-import { createIndex } from '../indexing/indexing'
+import { createIndex, getIndicesBehind } from '../indexing/indexing'
 
 /** Creates one temporary index per version of the event, each mapped from that version's fields. */
 export async function prepareTemporaryIndices(
@@ -47,93 +48,59 @@ export async function prepareTemporaryIndices(
   )
 }
 
-async function getIndicesBehindAlias(
-  esClient: ReturnType<typeof getOrCreateClient>,
-  alias: string
-): Promise<string[]> {
-  try {
-    return Object.keys(await esClient.indices.getAlias({ name: alias }))
-  } catch {
-    // Alias doesn't exist yet — first reindex
-    return []
-  }
+/** @returns the alias actions that make every name in `aliases` resolve to `index`. */
+function addAliasActions(index: string, aliases: string[]) {
+  return aliases.map((alias) => ({ add: { index, alias } }))
 }
 
-export async function finaliseReindexIndex(
-  eventType: string,
-  tempIndexName: string
+/**
+ * Makes the indices a reindex built for the event live. Each version's name, the event's
+ * name and the global alias move to them, and the indices they replace are deleted, in
+ * one atomic step.
+ */
+export async function finaliseReindexIndices(
+  eventConfiguration: VersionedEventConfig,
+  timestamp: number
 ) {
   const esClient = getOrCreateClient()
   const globalAliasName = getEventAliasName()
-  const writeAliasName = getEventIndexName(eventType)
-
-  let currentLiveIndex: string | undefined
-  try {
-    const aliasInfo = await getIndicesBehindAlias(esClient, globalAliasName)
-    const eventIndexPrefix = getEventIndexName(eventType)
-    currentLiveIndex = aliasInfo.find((idx) => idx.startsWith(eventIndexPrefix))
-  } catch {
-    // Alias doesn't exist yet — this is the first reindex
-  }
-
-  if (currentLiveIndex) {
-    const writeAliasConflictsWithConcreteIndex =
-      currentLiveIndex === writeAliasName
-
-    if (writeAliasConflictsWithConcreteIndex) {
-      logger.warn('First-time reindex')
-      await esClient.indices.updateAliases({
-        body: {
-          actions: [
-            { remove: { index: currentLiveIndex, alias: globalAliasName } },
-            { add: { index: tempIndexName, alias: globalAliasName } }
-          ]
-        }
-      })
-      logger.info(
-        `Global alias swapped. Deleting old concrete index ${currentLiveIndex}`
-      )
-      await esClient.indices.delete({ index: currentLiveIndex })
-      logger.info(
-        `Creating per-type write alias ${writeAliasName} → ${tempIndexName}`
-      )
-      await esClient.indices.putAlias({
-        index: tempIndexName,
-        name: writeAliasName
-      })
-    } else {
-      logger.info(
-        `Swapping aliases [${globalAliasName}, ${writeAliasName}] from ${currentLiveIndex} to ${tempIndexName}`
-      )
-      await esClient.indices.updateAliases({
-        body: {
-          actions: [
-            { remove: { index: currentLiveIndex, alias: globalAliasName } },
-            { add: { index: tempIndexName, alias: globalAliasName } },
-            { add: { index: tempIndexName, alias: writeAliasName } }
-          ]
-        }
-      })
-      logger.info(
-        `Aliases swapped atomically. Deleting old index ${currentLiveIndex}`
-      )
-      await esClient.indices.delete({ index: currentLiveIndex })
-    }
-  } else {
-    logger.info(
-      `No existing index for ${eventType}, creating aliases ${globalAliasName} and ${writeAliasName} → ${tempIndexName}`
+  const eventIndexName = getEventIndexName(eventConfiguration.id)
+  const versions = eventConfiguration.versions.map(({ id }) => ({
+    indexName: getEventVersionIndexName(eventConfiguration.id, id),
+    tempIndexName: getTemporaryVersionIndexName(
+      eventConfiguration.id,
+      id,
+      timestamp
     )
-    await esClient.indices.updateAliases({
-      body: {
-        actions: [
-          { add: { index: tempIndexName, alias: globalAliasName } },
-          { add: { index: tempIndexName, alias: writeAliasName } }
-        ]
-      }
-    })
-  }
+  }))
 
-  logger.info(`Reindex finalised: ${tempIndexName} is now live`)
+  const liveNames = [eventIndexName, ...versions.map((v) => v.indexName)]
+  const replacedIndices = new Set(
+    (await Promise.all(liveNames.map(getIndicesBehind))).flatMap((indices) =>
+      Object.keys(indices)
+    )
+  )
+
+  logger.info(
+    `Moving [${[...liveNames, globalAliasName].join(', ')}] to the reindexed indices, replacing [${[...replacedIndices].join(', ')}]`
+  )
+  await esClient.indices.updateAliases({
+    body: {
+      actions: [
+        ...versions.flatMap(({ indexName, tempIndexName }) =>
+          addAliasActions(tempIndexName, [
+            indexName,
+            eventIndexName,
+            globalAliasName
+          ])
+        ),
+        // Deleting a replaced index also frees its name, when a live name was an index.
+        ...[...replacedIndices].map((index) => ({ remove_index: { index } }))
+      ]
+    }
+  })
+
+  logger.info(`Reindex finalised for ${eventConfiguration.id}`)
 }
 
 export async function cleanupTemporaryIndex(tempIndexName: string) {

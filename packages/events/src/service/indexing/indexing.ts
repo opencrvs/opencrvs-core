@@ -408,7 +408,7 @@ export async function createVersionIndex(
 }
 
 /** @returns the indices behind `name`, an index or an alias, with their aliases. Empty when neither exists. */
-async function getIndicesBehind(name: string) {
+export async function getIndicesBehind(name: string) {
   const esClient = getOrCreateClient()
 
   if (!(await esClient.indices.exists({ index: name }))) {

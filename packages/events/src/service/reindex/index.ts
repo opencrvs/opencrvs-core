@@ -18,16 +18,13 @@ import {
   streamEventDocuments
 } from '@events/storage/postgres/events/events'
 import { getClient } from '@events/storage/postgres/events'
-import {
-  getTemporaryIndexName,
-  getTemporaryVersionIndexName
-} from '@events/storage/elasticsearch'
+import { getTemporaryVersionIndexName } from '@events/storage/elasticsearch'
 import { getInMemoryVersionedEventConfigurations } from '../config/config'
 import { getConfigForRecord, indexEventsInBulk } from '../indexing/indexing'
 import {
   cleanupOrphanedIndices,
   cleanupTemporaryIndex,
-  finaliseReindexIndex,
+  finaliseReindexIndices,
   prepareTemporaryIndices
 } from './indexing'
 import {
@@ -324,10 +321,7 @@ export async function runReindex(token: TokenWithBearer) {
 
   await Promise.all(
     versionedConfigurations.map(async (config) =>
-      finaliseReindexIndex(
-        config.id,
-        getTemporaryIndexName(config.id, timestamp)
-      )
+      finaliseReindexIndices(config, timestamp)
     )
   )
 
