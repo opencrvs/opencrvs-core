@@ -1307,7 +1307,7 @@ describe('date comparisons against an action', () => {
   const onTimeIfDeclaredWithin30Days = field('child.dob')
     .isAfter()
     .days(30)
-    .before(event.firstAction(ActionType.DECLARE))
+    .beforeAction(event.firstAction(ActionType.DECLARE))
 
   it('compares against today until the action has happened', () => {
     expect(validate(onTimeIfDeclaredWithin30Days, params([]))).toBe(false)
@@ -1336,7 +1336,7 @@ describe('date comparisons against an action', () => {
     const lastDeclare = field('child.dob')
       .isAfter()
       .days(30)
-      .before(event.lastAction(ActionType.DECLARE))
+      .beforeAction(event.lastAction(ActionType.DECLARE))
     expect(
       validate(
         lastDeclare,
@@ -1349,7 +1349,7 @@ describe('date comparisons against an action', () => {
     const notifyOrDeclare = field('child.dob')
       .isAfter()
       .days(30)
-      .before(event.firstAction(ActionType.NOTIFY, ActionType.DECLARE))
+      .beforeAction(event.firstAction(ActionType.NOTIFY, ActionType.DECLARE))
     expect(
       validate(
         notifyOrDeclare,
@@ -1362,7 +1362,7 @@ describe('date comparisons against an action', () => {
     const received = field('child.dob')
       .isAfter()
       .days(30)
-      .before(
+      .beforeAction(
         event.firstAction({
           type: ActionType.CUSTOM,
           customActionType: 'RECEIVE'
@@ -1408,11 +1408,11 @@ describe('date comparisons against an action', () => {
     ).toBe(false)
   })
 
-  it('compares after the action with .after()', () => {
+  it('compares after the action with .afterAction()', () => {
     const declaredWithin = field('child.dob')
       .isBefore()
       .days(30)
-      .after(event.firstAction(ActionType.DECLARE))
+      .afterAction(event.firstAction(ActionType.DECLARE))
     // dob is before declaration + 30 days: always true for a past dob
     expect(
       validate(declaredWithin, params([action(ActionType.DECLARE, 10)]))

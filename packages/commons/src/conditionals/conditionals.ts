@@ -572,9 +572,9 @@ export function createFieldConditionals(fieldId: string) {
           fromNow: () => {
             return defineFormConditional(getDayRange(this, days, 'after'))
           },
-          before: (action: ActionDateReference) =>
+          beforeAction: (action: ActionDateReference) =>
             defineFormConditional(getDayRange(this, -days, 'after', action)),
-          after: (action: ActionDateReference) =>
+          afterAction: (action: ActionDateReference) =>
             defineFormConditional(getDayRange(this, days, 'after', action))
         }),
         date: (date: string | FieldReference) => {
@@ -625,9 +625,9 @@ export function createFieldConditionals(fieldId: string) {
           fromNow: () => {
             return defineFormConditional(getDayRange(this, -days, 'before'))
           },
-          before: (action: ActionDateReference) =>
+          beforeAction: (action: ActionDateReference) =>
             defineFormConditional(getDayRange(this, -days, 'before', action)),
-          after: (action: ActionDateReference) =>
+          afterAction: (action: ActionDateReference) =>
             defineFormConditional(getDayRange(this, days, 'before', action))
         }),
         date: (date: `${string}-${string}-${string}` | FieldReference) => {

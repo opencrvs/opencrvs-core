@@ -496,7 +496,7 @@ const TENNIS_CLUB_DECLARATION_FORM = defineDeclarationForm({
       conditional: field('applicant.dob')
         .isBefore()
         .days(SENIOR_AGE_DAYS)
-        .before(MEMBERSHIP_AGE_ANCHOR),
+        .beforeAction(MEMBERSHIP_AGE_ANCHOR),
       title: {
         id: 'event.tennis-club-membership.action.declare.form.section.senior-pass.title',
         defaultMessage: 'Assign senior pass for applicant',
@@ -1389,7 +1389,7 @@ export const tennisClubMembershipEvent = defineConfig({
           conditional: field('applicant.dob')
             .isAfter()
             .days(JUNIOR_AGE_DAYS)
-            .before(MEMBERSHIP_AGE_ANCHOR)
+            .beforeAction(MEMBERSHIP_AGE_ANCHOR)
         }
       ]
     },
