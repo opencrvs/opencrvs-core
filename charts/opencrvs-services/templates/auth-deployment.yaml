@@ -30,7 +30,6 @@ spec:
           {{- include "render-otel-env-vars" (dict "Values" .Values "Release" .Release) }}
             - name: REDIS_HOST
               value: {{ .Values.redis.host | quote }}
-          {{- if eq .Values.redis.auth_mode "use_secret" }}
             - name: REDIS_PASSWORD
               valueFrom:
                 secretKeyRef:
@@ -41,7 +40,6 @@ spec:
                 secretKeyRef:
                   key: AUTH_REDIS_USERNAME
                   name: {{ .Values.redis.users_secret }}
-          {{- end }}
             - name: CERT_PRIVATE_KEY_PATH
               value: /secrets/private-key.pem
             - name: CERT_PUBLIC_KEY_PATH

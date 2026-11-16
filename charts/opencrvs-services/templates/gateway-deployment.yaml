@@ -69,7 +69,6 @@ spec:
               value: "0.0.0.0"
             - name: REDIS_HOST
               value: {{ .Values.redis.host | quote }}
-          {{- if eq .Values.redis.auth_mode "use_secret" }}
             - name: REDIS_PASSWORD
               valueFrom:
                 secretKeyRef:
@@ -80,7 +79,6 @@ spec:
                 secretKeyRef:
                   key: GATEWAY_REDIS_USERNAME
                   name: {{ .Values.redis.users_secret }}
-          {{- end }}
             - name: CLIENT_APP_URL
               value: {{ include "render-external-url" (dict "service_name" "register" "Values" .Values) }}
             - name: LOGIN_URL
