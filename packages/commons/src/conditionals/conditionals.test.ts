@@ -1396,16 +1396,50 @@ describe('date comparisons against an action', () => {
     event.firstAction({ type: ActionType.DECLARE, customActionType: 'X' })
   })
 
-  it('skips rejected actions', () => {
+  /** A request and the country config's reply to it, as the events service stores them. */
+  const confirmed = (
+    type: ActionType,
+    day: number,
+    status: typeof ActionStatus.Accepted | typeof ActionStatus.Rejected
+  ) => [
+    action(type, day, { status: ActionStatus.Requested }),
+    action(type, day, {
+      id: `${type}-${day}-${status}` as UUID,
+      status,
+      originalActionId: `${type}-${day}` as UUID
+    })
+  ]
+
+  it('skips an action that the country config rejected', () => {
     expect(
       validate(
         onTimeIfDeclaredWithin30Days,
         params([
-          action(ActionType.DECLARE, 10, { status: ActionStatus.Rejected }),
-          action(ActionType.DECLARE, 40)
+          ...confirmed(ActionType.DECLARE, 10, ActionStatus.Rejected),
+          ...confirmed(ActionType.DECLARE, 40, ActionStatus.Accepted)
         ])
       )
     ).toBe(false)
+  })
+
+  it('skips an action that the country config has not accepted yet', () => {
+    expect(
+      validate(
+        onTimeIfDeclaredWithin30Days,
+        params([
+          action(ActionType.DECLARE, 10, { status: ActionStatus.Requested })
+        ])
+      )
+    ).toBe(false)
+  })
+
+  it('uses an action once the country config accepts it', () => {
+    expect(
+      validate(
+        onTimeIfDeclaredWithin30Days,
+        params(confirmed(ActionType.DECLARE, 10, ActionStatus.Accepted))
+      )
+    ).toBe(true)
   })
 
   it('compares after the action with .afterAction()', () => {

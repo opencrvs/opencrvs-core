@@ -114,7 +114,7 @@ function resolveActionDate(
   { match, occurrence }: ActionDateReference['$action']
 ): string | undefined {
   const dates = (event?.actions ?? [])
-    .filter(({ status }) => status !== ActionStatus.Rejected)
+    .filter(({ status }) => status === ActionStatus.Accepted)
     .filter((action) =>
       match.some(
         ({ type, customActionType }) =>
