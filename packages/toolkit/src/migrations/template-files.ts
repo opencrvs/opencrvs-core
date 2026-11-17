@@ -33,7 +33,17 @@ const TEMPLATE_DIR_ENV = 'OPENCRVS_TEMPLATE_DIR'
  * set. If not, downloads the template from GitHub.
  */
 export async function findTemplateDir() {
-  const override = process.env[TEMPLATE_DIR_ENV]
+const localTemplatePath = process.env.OPENCRVS_TEMPLATE_DIR_PATH
+
+ if (localTemplatePath) {
+    const localTemplateDirectory = path.resolve(localTemplatePath)
+    if (!existsSync(path.join(localTemplateDirectory, 'Tiltfile'))) {
+      throw new Error(
+        `${OPENCRVS_TEMPLATE_DIR_PATH} is set to ${localTemplatePath}, but that is not a country config template: there is no Tiltfile in it.`
+      )
+    }
+    return localTemplateDirectory
+  }
   if (override) {
     const overrideDir = path.resolve(override)
     if (!existsSync(path.join(overrideDir, 'Tiltfile'))) {
