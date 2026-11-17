@@ -88,7 +88,7 @@ function report(relativePath: string, change: Change) {
 }
 
 /** The template Tiltfile, keeping the image name the country already uses. */
-export function renderTiltfile(template: string, existing?: string) {
+function renderTiltfile(template: string, existing?: string) {
   const imageName = existing?.match(IMAGE_NAME_PATTERN)?.[2]
 
   if (!imageName) {
@@ -103,7 +103,7 @@ export function renderTiltfile(template: string, existing?: string) {
 }
 
 /** `contents` with `line` appended, unless an equivalent entry is there already. */
-export function withIgnoreEntry(contents: string, line: string) {
+function withIgnoreEntry(contents: string, line: string) {
   const normalise = (entry: string) =>
     entry.trim().replace(/^\//, '').replace(/\/$/, '')
 
@@ -125,7 +125,7 @@ function ensureIgnored(cwd: string, file: string, line: string) {
   report(file, writeIfChanged(cwd, file, withIgnoreEntry(contents, line)))
 }
 
-export function upgradeTilt(cwd: string, templateDir: string) {
+function upgradeTilt(cwd: string, templateDir: string) {
   const tiltfilePath = path.join(cwd, 'Tiltfile')
   const existingTiltfile = existsSync(tiltfilePath)
     ? readFileSync(tiltfilePath, 'utf8')

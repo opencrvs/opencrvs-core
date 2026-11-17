@@ -26,7 +26,7 @@ let templateDir: string | undefined
  * of the pull request. It also lets a developer test template changes that are
  * not merged yet.
  */
-export const TEMPLATE_DIR_ENV = 'OPENCRVS_TEMPLATE_DIR'
+const TEMPLATE_DIR_ENV = 'OPENCRVS_TEMPLATE_DIR'
 
 /**
  * @returns template directory. The directory in OPENCRVS_TEMPLATE_DIR if it is
