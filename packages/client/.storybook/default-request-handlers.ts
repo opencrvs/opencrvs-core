@@ -99,7 +99,16 @@ export const handlers = {
     }),
     tRPCMsw.administrativeAreas.list.query(() => {
       return V2_DEFAULT_MOCK_ADMINISTRATIVE_AREAS
-    })
+    }),
+    // A refetch after the first load syncs. The mock data does not change.
+    tRPCMsw.locations.sync.query(() => ({
+      syncedAt: new Date().toISOString(),
+      locations: []
+    })),
+    tRPCMsw.administrativeAreas.sync.query(() => ({
+      syncedAt: new Date().toISOString(),
+      administrativeAreas: []
+    }))
   ],
   getUserRoles: [
     graphql.query('getUserRoles', () => {

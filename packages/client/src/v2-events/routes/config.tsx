@@ -82,28 +82,15 @@ function PrefetchQueries() {
   const { prefetch } = useWorkqueues()
 
   useEffect(() => {
-    {
-      const locationsQuery = trpcOptionsProxy.locations.list.queryOptions()
-
-      const administrativeAreasQuery =
-        trpcOptionsProxy.administrativeAreas.list.queryOptions()
-
-      // only fetch if we don't already have it cached
-      if (!queryClient.getQueryData(locationsQuery.queryKey)) {
-        void queryClient.prefetchQuery({
-          queryKey: locationsQuery.queryKey,
-          queryFn: locationsQuery.queryFn
-        })
-      }
-
-      // only fetch if we don't already have it cached
-      if (!queryClient.getQueryData(administrativeAreasQuery.queryKey)) {
-        void queryClient.prefetchQuery({
-          queryKey: administrativeAreasQuery.queryKey,
-          queryFn: administrativeAreasQuery.queryFn
-        })
-      }
-    }
+    // No `queryFn`: the defaults from `setQueryDefaults` build the cached Map
+    // and sync only the changed rows when a cache exists. A fresh cache is
+    // not fetched again.
+    void queryClient.prefetchQuery({
+      queryKey: trpcOptionsProxy.locations.list.queryKey()
+    })
+    void queryClient.prefetchQuery({
+      queryKey: trpcOptionsProxy.administrativeAreas.list.queryKey()
+    })
     void prefetch()
     // NOTE: Using anything else than prefetch will trigger load for each render. Destructure rather than passing entire object.
   }, [prefetch])
