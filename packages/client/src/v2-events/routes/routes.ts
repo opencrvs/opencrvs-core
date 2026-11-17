@@ -9,12 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import {
-  boolean,
-  hashValues,
-  route,
-  string
-} from 'react-router-typesafe-routes/dom'
+import { hashValues, route, string } from 'react-router-typesafe-routes/dom'
 import { zod } from 'react-router-typesafe-routes/zod'
 import * as z from 'zod'
 import {
@@ -191,23 +186,33 @@ export const ROUTES = {
                   from: string()
                 }
               }),
+              NEW: route(
+                'new',
+                {
+                  searchParams: {
+                    from: string()
+                  }
+                },
+                {
+                  REVIEW: route('review'),
+                  EDIT: route('edit/:pageId', {
+                    params: {
+                      pageId: string()
+                    }
+                  })
+                }
+              ),
               VIEW: route(':userId/view', {
                 params: {
                   userId: uuid().defined()
                 }
               }),
-              /*
-               * `newUser` marks a user that the server has not created yet. The
-               * user editor chooses the id of a new user, so the id alone cannot
-               * tell a new user from an existing one.
-               */
               REVIEW: route(':userId/review', {
                 params: {
                   userId: uuid().defined()
                 },
                 searchParams: {
-                  from: string(),
-                  newUser: boolean()
+                  from: string()
                 }
               }),
               EDIT: route(':userId/edit/:pageId', {
@@ -216,8 +221,7 @@ export const ROUTES = {
                   pageId: string()
                 },
                 searchParams: {
-                  from: string(),
-                  newUser: boolean()
+                  from: string()
                 }
               })
             }

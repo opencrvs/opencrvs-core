@@ -14,7 +14,7 @@ import React from 'react'
 import { createTRPCMsw, httpLink } from '@vafanassieff/msw-trpc'
 import superjson from 'superjson'
 import { within, expect, waitFor, userEvent } from 'storybook/test'
-import { getUUID, TestUserRole, UUID } from '@opencrvs/commons/client'
+import { TestUserRole, UUID } from '@opencrvs/commons/client'
 import { FormFieldGeneratorPropsWithoutRef } from '@client/v2-events/components/forms/FormFieldGenerator'
 import { AppRouter, TRPCProvider } from '@client/v2-events/trpc'
 import { testDataGenerator } from '@client/tests/test-data-generators'
@@ -93,8 +93,8 @@ const SULAKA_PROVINCIAL_OFFICE_ID =
   '2884f5b9-17b4-49ce-bf4d-f538228935df' as UUID
 const KLOW_VILLAGE_OFFICE_ID = '1f4a5b6c-7d8e-4312-8abc-345678901234' as UUID
 
-// The ID of an existing user, for the "edit user" stories. Without `newUser`
-// in the URL, the user editor treats the ID as an existing user.
+// The ID of an existing user, for the "edit user" stories. The user editor
+// treats the ID as an existing user, because the URL is not a `NEW` route.
 const RegistrationAgentId = generator.user.registrationAgent().v2.id
 
 const ibomboOfficeHierarchy: UUID[] = [
@@ -311,10 +311,9 @@ export const CreateUserOfOffice: Story = {
     userRole: TestUserRole.enum.NATIONAL_SYSTEM_ADMIN,
     reactRouter: {
       router: routesConfig,
-      initialPath: ROUTES.V2.SETTINGS.USER.EDIT.buildPath(
-        { userId: getUUID(), pageId: 'user.details' },
-        { newUser: true }
-      )
+      initialPath: ROUTES.V2.SETTINGS.USER.NEW.EDIT.buildPath({
+        pageId: 'user.details'
+      })
     },
     msw: {
       handlers: {
@@ -381,10 +380,9 @@ export const CreateUserOfLowerOffice: Story = {
     userRole: TestUserRole.enum.NATIONAL_SYSTEM_ADMIN,
     reactRouter: {
       router: routesConfig,
-      initialPath: ROUTES.V2.SETTINGS.USER.EDIT.buildPath(
-        { userId: getUUID(), pageId: 'user.details' },
-        { newUser: true }
-      )
+      initialPath: ROUTES.V2.SETTINGS.USER.NEW.EDIT.buildPath({
+        pageId: 'user.details'
+      })
     },
     msw: {
       handlers: {
@@ -446,10 +444,9 @@ export const CreateUserOfDifferentAdminArea: Story = {
     userRole: TestUserRole.enum.NATIONAL_SYSTEM_ADMIN,
     reactRouter: {
       router: routesConfig,
-      initialPath: ROUTES.V2.SETTINGS.USER.EDIT.buildPath(
-        { userId: getUUID(), pageId: 'user.details' },
-        { newUser: true }
-      )
+      initialPath: ROUTES.V2.SETTINGS.USER.NEW.EDIT.buildPath({
+        pageId: 'user.details'
+      })
     },
     msw: {
       handlers: {

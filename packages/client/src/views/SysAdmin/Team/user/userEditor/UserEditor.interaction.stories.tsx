@@ -175,10 +175,9 @@ export const CreateUserOfficePickerRestrictedByAdministrativeArea: StoryObj = {
     userRole: TestUserRole.enum.LOCAL_SYSTEM_ADMIN,
     reactRouter: {
       router: routesConfig,
-      initialPath: ROUTES.V2.SETTINGS.USER.EDIT.buildPath(
-        { userId: getUUID(), pageId: 'user.office' },
-        { newUser: true }
-      )
+      initialPath: ROUTES.V2.SETTINGS.USER.NEW.EDIT.buildPath({
+        pageId: 'user.office'
+      })
     },
     msw: {
       handlers: {
@@ -240,10 +239,9 @@ export const CreateUserOfficePickerUnrestrictedForNationalAdmin: StoryObj = {
     userRole: TestUserRole.enum.NATIONAL_SYSTEM_ADMIN,
     reactRouter: {
       router: routesConfig,
-      initialPath: ROUTES.V2.SETTINGS.USER.EDIT.buildPath(
-        { userId: getUUID(), pageId: 'user.office' },
-        { newUser: true }
-      )
+      initialPath: ROUTES.V2.SETTINGS.USER.NEW.EDIT.buildPath({
+        pageId: 'user.office'
+      })
     },
     msw: {
       handlers: {
@@ -292,10 +290,9 @@ export const RegistrationOfficeIncludesHospitals: StoryObj = {
   parameters: {
     reactRouter: {
       router: routesConfig,
-      initialPath: ROUTES.V2.SETTINGS.USER.EDIT.buildPath(
-        { userId: getUUID(), pageId: 'user.office' },
-        { newUser: true }
-      )
+      initialPath: ROUTES.V2.SETTINGS.USER.NEW.EDIT.buildPath({
+        pageId: 'user.office'
+      })
     }
   },
   play: async ({ canvasElement, step }) => {
@@ -332,10 +329,9 @@ export const InvalidPhoneNumberShowsValidationError: StoryObj = {
     chromatic: { disableSnapshot: true },
     reactRouter: {
       router: routesConfig,
-      initialPath: ROUTES.V2.SETTINGS.USER.EDIT.buildPath(
-        { userId: getUUID(), pageId: 'user.details' },
-        { newUser: true }
-      )
+      initialPath: ROUTES.V2.SETTINGS.USER.NEW.EDIT.buildPath({
+        pageId: 'user.details'
+      })
     }
   },
   beforeEach: () => {
@@ -376,10 +372,9 @@ export const EmptyNameAfterTouchingBlocksContinue: StoryObj = {
     chromatic: { disableSnapshot: true },
     reactRouter: {
       router: routesConfig,
-      initialPath: ROUTES.V2.SETTINGS.USER.EDIT.buildPath(
-        { userId: getUUID(), pageId: 'user.details' },
-        { newUser: true }
-      )
+      initialPath: ROUTES.V2.SETTINGS.USER.NEW.EDIT.buildPath({
+        pageId: 'user.details'
+      })
     }
   },
   beforeEach: () => {
@@ -447,10 +442,7 @@ export const ClearedEmailNormalisedToUndefined: StoryObj = {
     chromatic: { disableSnapshot: true },
     reactRouter: {
       router: routesConfig,
-      initialPath: ROUTES.V2.SETTINGS.USER.REVIEW.buildPath(
-        { userId: getUUID() },
-        { newUser: true }
-      )
+      initialPath: ROUTES.V2.SETTINGS.USER.NEW.REVIEW.buildPath({})
     },
     msw: {
       handlers: {
@@ -513,10 +505,7 @@ export const ClearedPhoneNumberNormalisedToUndefined: StoryObj = {
     chromatic: { disableSnapshot: true },
     reactRouter: {
       router: routesConfig,
-      initialPath: ROUTES.V2.SETTINGS.USER.REVIEW.buildPath(
-        { userId: getUUID() },
-        { newUser: true }
-      )
+      initialPath: ROUTES.V2.SETTINGS.USER.NEW.REVIEW.buildPath({})
     },
     msw: {
       handlers: {
@@ -564,8 +553,9 @@ export const ClearedPhoneNumberNormalisedToUndefined: StoryObj = {
 }
 
 /*
- * The id in the URL is the id of the new user. The editor uploads files of the
- * new user, for example the signature, under this id before the user exists.
+ * The id of the new user is in the user form store, not in the URL. The editor
+ * uploads files of the new user, for example the signature, under this id
+ * before the user exists.
  */
 const newUserId = getUUID()
 
@@ -574,10 +564,7 @@ export const AllFieldsAreIncludedInCreatePayload: StoryObj = {
     chromatic: { disableSnapshot: true },
     reactRouter: {
       router: routesConfig,
-      initialPath: ROUTES.V2.SETTINGS.USER.REVIEW.buildPath(
-        { userId: newUserId },
-        { newUser: true }
-      )
+      initialPath: ROUTES.V2.SETTINGS.USER.NEW.REVIEW.buildPath({})
     },
     msw: {
       handlers: {
@@ -593,6 +580,7 @@ export const AllFieldsAreIncludedInCreatePayload: StoryObj = {
   },
   beforeEach: () => {
     createUserSpy.mockReset()
+    useUserFormState.setState({ newUserId })
     useUserFormState.getState().setUserForm({
       phoneNumber: mockUser.mobile,
       signature: {
@@ -764,10 +752,9 @@ export const SignatureRequiredForRegistrar: StoryObj = {
     chromatic: { disableSnapshot: true },
     reactRouter: {
       router: routesConfig,
-      initialPath: ROUTES.V2.SETTINGS.USER.EDIT.buildPath(
-        { userId: getUUID(), pageId: 'user.details' },
-        { newUser: true }
-      )
+      initialPath: ROUTES.V2.SETTINGS.USER.NEW.EDIT.buildPath({
+        pageId: 'user.details'
+      })
     },
     msw: {
       handlers: {
@@ -838,10 +825,9 @@ export const SignaturePreviewRestoredAfterBackNavigation: StoryObj = {
     chromatic: { disableSnapshot: true },
     reactRouter: {
       router: routesConfig,
-      initialPath: ROUTES.V2.SETTINGS.USER.EDIT.buildPath(
-        { userId: getUUID(), pageId: 'user.details' },
-        { newUser: true }
-      )
+      initialPath: ROUTES.V2.SETTINGS.USER.NEW.EDIT.buildPath({
+        pageId: 'user.details'
+      })
     },
     msw: {
       handlers: {
@@ -909,10 +895,9 @@ export const SignatureNotRequiredForCommunityLeader: StoryObj = {
     chromatic: { disableSnapshot: true },
     reactRouter: {
       router: routesConfig,
-      initialPath: ROUTES.V2.SETTINGS.USER.EDIT.buildPath(
-        { userId: getUUID(), pageId: 'user.details' },
-        { newUser: true }
-      )
+      initialPath: ROUTES.V2.SETTINGS.USER.NEW.EDIT.buildPath({
+        pageId: 'user.details'
+      })
     },
     msw: {
       handlers: {
@@ -1058,10 +1043,9 @@ export const NewUserCreationAllowedInJurisdiction: StoryObj = {
     userRole: TestUserRole.enum.NATIONAL_SYSTEM_ADMIN,
     reactRouter: {
       router: routesConfig,
-      initialPath: ROUTES.V2.SETTINGS.USER.EDIT.buildPath(
-        { userId: getUUID(), pageId: 'user.details' },
-        { newUser: true }
-      )
+      initialPath: ROUTES.V2.SETTINGS.USER.NEW.EDIT.buildPath({
+        pageId: 'user.details'
+      })
     }
   },
   beforeEach: () => {
@@ -1099,10 +1083,9 @@ export const NewUserCreationBlockedWithoutScope: StoryObj = {
     userRole: TestUserRole.enum.REGISTRATION_AGENT,
     reactRouter: {
       router: routesConfig,
-      initialPath: ROUTES.V2.SETTINGS.USER.EDIT.buildPath(
-        { userId: getUUID(), pageId: 'user.details' },
-        { newUser: true }
-      )
+      initialPath: ROUTES.V2.SETTINGS.USER.NEW.EDIT.buildPath({
+        pageId: 'user.details'
+      })
     }
   },
   beforeEach: () => {
@@ -1148,10 +1131,9 @@ export const NewUserCreationBlockedOutsideJurisdiction: StoryObj = {
     userRole: TestUserRole.enum.LOCAL_SYSTEM_ADMIN,
     reactRouter: {
       router: routesConfig,
-      initialPath: ROUTES.V2.SETTINGS.USER.EDIT.buildPath(
-        { userId: getUUID(), pageId: 'user.details' },
-        { newUser: true }
-      )
+      initialPath: ROUTES.V2.SETTINGS.USER.NEW.EDIT.buildPath({
+        pageId: 'user.details'
+      })
     },
     msw: {
       handlers: {
@@ -1736,10 +1718,7 @@ export const CreateUserShowsSuccessToast: StoryObj = {
     chromatic: { disableSnapshot: true },
     reactRouter: {
       router: routesConfig,
-      initialPath: ROUTES.V2.SETTINGS.USER.REVIEW.buildPath(
-        { userId: getUUID() },
-        { newUser: true }
-      )
+      initialPath: ROUTES.V2.SETTINGS.USER.NEW.REVIEW.buildPath({})
     },
     msw: {
       handlers: {
@@ -1836,10 +1815,7 @@ export const CreateUserShowsErrorToastOnUnknownFailure: StoryObj = {
     chromatic: { disableSnapshot: true },
     reactRouter: {
       router: routesConfig,
-      initialPath: ROUTES.V2.SETTINGS.USER.REVIEW.buildPath(
-        { userId: getUUID() },
-        { newUser: true }
-      )
+      initialPath: ROUTES.V2.SETTINGS.USER.NEW.REVIEW.buildPath({})
     },
     msw: {
       handlers: {

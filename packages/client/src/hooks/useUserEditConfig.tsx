@@ -10,7 +10,6 @@
  */
 import { useIntl } from 'react-intl'
 import { useSelector } from 'react-redux'
-import { useTypedSearchParams } from 'react-router-typesafe-routes/dom'
 import {
   ActionType,
   always,
@@ -35,7 +34,7 @@ import { useRoles, formatUserRole } from '@client/v2-events/hooks/useRoles'
 import { getScope, getUserDetails } from '@client/profile/profileSelectors'
 import { useLocations } from '@client/v2-events/hooks/useLocations'
 import { emptyMessage } from '@client/v2-events/utils'
-import { ROUTES } from '@client/v2-events/routes/routes'
+import { useIsNewUser } from '@client/views/SysAdmin/Team/user/userEditor/useUserEditorRoutes'
 
 export function useUserEditConfig(
   locationId: UUID | undefined,
@@ -47,7 +46,7 @@ export function useUserEditConfig(
   const [roles] = listRoles.useSuspenseQuery()
 
   const { getLocationHierarchy } = useLocations()
-  const [{ newUser }] = useTypedSearchParams(ROUTES.V2.SETTINGS.USER.EDIT)
+  const isNewUser = useIsNewUser()
 
   const currentUser = useSelector(getUserDetails)
   const userScopes = useSelector(getScope) || []
@@ -59,8 +58,6 @@ export function useUserEditConfig(
   const locationHierarchy = getLocationHierarchy.useQuery(locationId as UUID, {
     enabled: !!locationId
   })
-
-  const isNewUser = newUser === true
 
   const acceptedScopes = getAcceptedScopesByType({
     acceptedScopes: [isNewUser ? 'user.create' : 'user.edit'],
