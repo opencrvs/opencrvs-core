@@ -43,10 +43,6 @@ export function getEventVersionIndexName(eventType: string, versionId: string) {
   return `${getEventIndexName(eventType)}_${getVersionIndexSegment(versionId)}`
 }
 
-export function getTemporaryIndexName(eventType: string, timestamp: number) {
-  return `${getEventIndexName(eventType)}_${timestamp}`
-}
-
 /** Name of the index a reindex builds for one version of an event, before it goes live. */
 export function getTemporaryVersionIndexName(
   eventType: string,

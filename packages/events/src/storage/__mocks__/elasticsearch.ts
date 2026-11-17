@@ -29,7 +29,4 @@ export function getOrCreateClient() {
 export const getReindexingStatusIndexName = vi.fn()
 
 /** @knipignore */
-export const getTemporaryIndexName = vi.fn()
-
-/** @knipignore */
 export const getTemporaryVersionIndexName = vi.fn()

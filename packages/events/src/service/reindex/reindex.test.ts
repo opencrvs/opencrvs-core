@@ -50,10 +50,7 @@ import { cleanupOrphanedIndices } from '@events/service/reindex/indexing'
 import { getLocations } from '@events/storage/postgres/administrative-hierarchy/locations'
 import { getClient } from '@events/storage/postgres/events'
 import * as elasticsearchMocks from '@events/storage/__mocks__/elasticsearch'
-import {
-  getEventIndexName as getEventIndexNameMock,
-  getTemporaryIndexName
-} from '@events/storage/__mocks__/elasticsearch'
+import { getEventIndexName as getEventIndexNameMock } from '@events/storage/__mocks__/elasticsearch'
 
 // Mock reindex endpoint so there are no side effects
 vi.mock('@events/service/reindex', async (importOriginal) => {
@@ -306,10 +303,13 @@ test('reindexing twice', async () => {
   )
 })
 
-test('reindex given original concrete index is replaced by a timestamped index', async () => {
+test('reindex given original concrete index of a version is replaced by a timestamped index', async () => {
   const esClient = getOrCreateClient()
 
-  const liveIndexName = getEventIndexName(TENNIS_CLUB_MEMBERSHIP)
+  const liveIndexName = getEventVersionIndexName(
+    TENNIS_CLUB_MEMBERSHIP,
+    INITIAL_EVENT_CONFIG_VERSION_ID
+  )
 
   const indicesPointingToAlias = Object.keys(
     await esClient.indices.getAlias({
@@ -318,10 +318,6 @@ test('reindex given original concrete index is replaced by a timestamped index',
   )
 
   expect(indicesPointingToAlias).toContain(liveIndexName)
-
-  getTemporaryIndexName.mockImplementation(
-    (eventType, time) => `${eventType}__new__${time}`
-  )
 
   await runReindex(reindexToken)
 
@@ -347,15 +343,17 @@ test('reindex given original concrete index is replaced by a timestamped index',
   })
 
   const indexesBehindAlias = Object.keys(aliasInfo)
-  expect(indexesBehindAlias.every((index) => index.includes('__new__'))).toBe(
-    true
-  )
+  expect(indexesBehindAlias).toHaveLength(1)
+  expect(indexesBehindAlias[0]).toMatch(new RegExp(`^${liveIndexName}_\\d+$`))
 })
 
-test('reindex given first-reindex and concrete index conflicts with alias name - write alias created after removing original concrete index to avoid conflicts', async () => {
+test('reindex given first-reindex and concrete index of a version conflicts with alias name - write alias created after removing original concrete index to avoid conflicts', async () => {
   const esClient = getOrCreateClient()
 
-  const writeAliasName = getEventIndexName(TENNIS_CLUB_MEMBERSHIP)
+  const writeAliasName = getEventVersionIndexName(
+    TENNIS_CLUB_MEMBERSHIP,
+    INITIAL_EVENT_CONFIG_VERSION_ID
+  )
 
   // Confirm we start with a bare concrete index (not yet an alias)
   const isConcreteBefore = await esClient.indices.exists({
@@ -545,12 +543,15 @@ test('runReindex records failed status when country config returns 500', async (
   expect(history[0].completed_at).not.toBeNull()
 })
 
-test('reindex per-type write alias is re-pointed on every subsequent reindex', async () => {
+test('reindex per-version write alias is re-pointed on every subsequent reindex', async () => {
   const esClient = getOrCreateClient()
 
   await runReindex(reindexToken)
 
-  const writeAliasName = getEventIndexName(TENNIS_CLUB_MEMBERSHIP)
+  const writeAliasName = getEventVersionIndexName(
+    TENNIS_CLUB_MEMBERSHIP,
+    INITIAL_EVENT_CONFIG_VERSION_ID
+  )
   const aliasAfterFirst = await esClient.indices.getAlias({
     name: writeAliasName
   })

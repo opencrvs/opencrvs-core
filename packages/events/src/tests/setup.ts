@@ -25,7 +25,6 @@ import {
 import { createVersionIndex } from '@events/service/indexing/indexing'
 import {
   getReindexingStatusIndexName,
-  getTemporaryIndexName,
   getTemporaryVersionIndexName
 } from '@events/storage/__mocks__/elasticsearch'
 import { getOrCreateClient } from '@events/storage/elasticsearch'
@@ -53,12 +52,6 @@ async function resetESServer() {
   )
   getEventAliasName.mockReturnValue('events_' + id)
   getReindexingStatusIndexName.mockReturnValue('reindexing_status_' + id)
-  getTemporaryIndexName.mockImplementation(
-    (eventType: string, timestamp: number) => {
-      return `${getEventIndexName(eventType)}_${timestamp}`
-    }
-  )
-
   getTemporaryVersionIndexName.mockImplementation(
     (eventType: string, versionId: string, timestamp: number) =>
       `${getEventVersionIndexName(eventType, versionId)}_${timestamp}`
