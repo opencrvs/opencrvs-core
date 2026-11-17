@@ -28,6 +28,7 @@ import * as V1_LEGACY_ROUTES from '@client/navigation/routes'
 import { Debug } from '@client/v2-events/features/debug/debug'
 import { router as correctionRequestRouter } from '@client/v2-events/features/events/actions/correct/request/router'
 import { router as correctionReviewRouter } from '@client/v2-events/features/events/actions/correct/review/router'
+import * as Notify from '@client/v2-events/features/events/actions/notify'
 import * as Declare from '@client/v2-events/features/events/actions/declare'
 import * as Edit from '@client/v2-events/features/events/actions/edit'
 import { DeleteEventIndex } from '@client/v2-events/features/events/actions/delete'
@@ -282,6 +283,28 @@ export const routesConfig = {
     {
       path: ROUTES.V2.EVENTS.DELETE.path,
       element: <DeleteEventIndex />
+    },
+    {
+      path: ROUTES.V2.EVENTS.NOTIFY.path,
+      element: (
+        <DeclarationAction actionType={ActionType.NOTIFY}>
+          <Outlet />
+        </DeclarationAction>
+      ),
+      children: [
+        {
+          index: true,
+          element: <Notify.Pages />
+        },
+        {
+          path: ROUTES.V2.EVENTS.NOTIFY.PAGES.path,
+          element: <Notify.Pages />
+        },
+        {
+          path: ROUTES.V2.EVENTS.NOTIFY.REVIEW.path,
+          element: <Notify.Review />
+        }
+      ]
     },
     {
       path: ROUTES.V2.EVENTS.DECLARE.path,

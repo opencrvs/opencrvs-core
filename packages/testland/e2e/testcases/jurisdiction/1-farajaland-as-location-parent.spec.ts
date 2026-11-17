@@ -14,8 +14,7 @@ import { trackAndDeleteCreatedEvents } from '@e2e/support/test-data/eventDeletio
 import { CREDENTIALS } from '@e2e/support/constants'
 import {
   createDeclaration,
-  getDeclaration,
-  getPlaceOfBirth
+  getNotificationDeclaration
 } from '@e2e/support/test-data/birth-declaration'
 import { ActionType } from '@opencrvs/toolkit/events'
 import { formatV2ChildName } from '@e2e/support/birth/helpers'
@@ -24,17 +23,9 @@ trackAndDeleteCreatedEvents()
 
 test('1.Farajaland as location parent', async ({ page }) => {
   let token = await getToken(CREDENTIALS.HOSPITAL_OFFICIAL)
-  const declaration: any = await getDeclaration({
-    partialDeclaration: {
-      'mother.nid': null,
-      'mother.dob': null,
-      ...(await getPlaceOfBirth(
-        'HEALTH_FACILITY',
-        token,
-        'Klow Village Hospital'
-      ))
-    },
-    token
+  const declaration = await getNotificationDeclaration({
+    token,
+    facility: 'Klow Village Hospital'
   })
 
   const name = formatV2ChildName(declaration)

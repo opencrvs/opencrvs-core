@@ -34,7 +34,7 @@
     "@eslint/eslintrc": "^3.3.1",
     "@inquirer/editor": "^1.2.13",
     "@octokit/core": "4.2.4",
-    "@playwright/test": "^1.48.0",
+    "@playwright/test": "^1.61.1",
     "@types/google-libphonenumber": "^7.4.23",
     "@types/handlebars": "^4.1.0",
     "@types/hapi__h2o2": "8.3.3",

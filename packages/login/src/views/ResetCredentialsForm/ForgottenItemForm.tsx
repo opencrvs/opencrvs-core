@@ -9,15 +9,18 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { ErrorText } from '@opencrvs/components/lib/ErrorText'
-import { Alert } from '@opencrvs/components/lib/Alert'
-import { Frame } from '@opencrvs/components/lib/Frame'
-import { Content, ContentSize } from '@opencrvs/components/lib/Content'
-import { AppBar } from '@opencrvs/components/lib/AppBar'
-import { Button } from '@opencrvs/components/lib/Button'
-import { Icon } from '@opencrvs/components/lib/Icon'
+import {
+  ErrorText,
+  Alert,
+  Frame,
+  Content,
+  ContentSize,
+  AppBar,
+  Button,
+  Icon,
+  RadioButton
+} from '@opencrvs/components'
 
-import { RadioButton } from '@opencrvs/components/lib/Radio'
 import React, { useState } from 'react'
 import { injectIntl, WrappedComponentProps } from 'react-intl'
 import styled from 'styled-components'

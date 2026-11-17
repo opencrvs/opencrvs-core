@@ -17,8 +17,6 @@ import {
   ActionType,
   EventDocument,
   getUUID,
-  getDeclaration,
-  getActionReview,
   getCurrentEventState,
   EventStatus,
   getActionConfig,
@@ -35,13 +33,10 @@ import {
   AttachmentPath,
   eventAttachmentPath
 } from '@opencrvs/commons/client'
-import { DropdownMenu } from '@opencrvs/components/lib/Dropdown'
-import { CaretDown } from '@opencrvs/components/lib/Icon/all-icons'
-import { Icon, Dialog, Stack, Button } from '@opencrvs/components'
+import { Dialog, Stack, Button } from '@opencrvs/components'
 import { FormFieldGenerator } from '@client/v2-events/components/forms/FormFieldGenerator'
 import { useDialogFormState } from '@client/v2-events/hooks/useDialogFormState'
 import { useEventFormNavigation } from '@client/v2-events/features/events/useEventFormNavigation'
-import { messages as actionMessages } from '@client/i18n/messages/views/action'
 import { ROUTES } from '@client/v2-events/routes'
 import { useModal } from '@client/v2-events/hooks/useModal'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
@@ -49,18 +44,18 @@ import { useUserAllowedActions } from '@client/v2-events/features/workqueues/Act
 import { useValidatorContext } from '@client/v2-events/hooks/useValidatorContext'
 import { validationErrorsInActionFormExist } from '@client/v2-events/components/forms/validation'
 import { actionIcons } from '@client/v2-events/features/workqueues/Actions/utils'
-import { getChangedDeclarationDiff } from '@client/v2-events/features/events/useEvents/procedures/actions/declarationDiff'
-import { useEventConfiguration } from '../../useEventConfiguration'
+import {
+  getChangedDeclarationDiff,
+  hasDeclarationFieldChanged,
+  hasFieldChanged
+} from '@client/v2-events/features/events/useEvents/procedures/actions/declarationDiff'
 import { useActionAnnotation } from '../../useActionAnnotation'
 import { useEventFormData } from '../../useEventFormData'
 import { TranslationTextWithFormatModifier } from '../../components/TranslationTextWithFormatModifier'
 import { useCanDirectlyRegister } from '../useCanDirectlyRegister'
-import {
-  aggregateAnnotations,
-  getReviewFormFields,
-  hasDeclarationFieldChanged,
-  hasFieldChanged
-} from '../correct/utils'
+import { ActionMenuDropdown } from '../ActionMenuDropdown'
+import { aggregateAnnotations, getReviewFormFields } from '../annotationUtils'
+import { useEditForm } from './useEditForm'
 
 export const commentLabel = {
   id: 'event.edit.comment.label',
@@ -194,7 +189,7 @@ function EditActionModal({
 }
 
 function useEditActions(event: EventDocument) {
-  const { eventConfiguration } = useEventConfiguration(event.type)
+  const { eventConfiguration, formConfig, reviewConfig } = useEditForm(event)
   const eventIndex = getCurrentEventState(event, eventConfiguration)
   const navigate = useNavigate()
   const { isActionAllowed } = useUserAllowedActions(eventIndex)
@@ -204,10 +199,8 @@ function useEditActions(event: EventDocument) {
   const { closeActionView } = useEventFormNavigation()
   const [modal, openModal] = useModal()
   const events = useEvents()
-  const formConfig = getDeclaration(eventConfiguration)
   const declaration = useEventFormData((state) => state.getFormValues())
   const validatorContext = useValidatorContext(event)
-  const reviewConfig = getActionReview(eventConfiguration, ActionType.DECLARE)
 
   const formFields = formConfig.pages.flatMap((page) => page.fields)
   const declarationDiff = getChangedDeclarationDiff(
@@ -223,7 +216,8 @@ function useEditActions(event: EventDocument) {
       declaration,
       eventIndex.declaration,
       eventConfiguration,
-      validatorContext
+      validatorContext,
+      formFields
     )
   )
 
@@ -238,10 +232,6 @@ function useEditActions(event: EventDocument) {
 
   const anyValuesHaveChanged =
     changedFields.length > 0 || changedAnnotationFields.length > 0
-
-  if (!reviewConfig) {
-    throw new Error('Review config not found')
-  }
 
   const actionConfig = getActionConfig({
     eventConfiguration,
@@ -391,7 +381,9 @@ function useEditActions(event: EventDocument) {
           }
         },
         disabled:
-          !anyValuesHaveChanged || !isTargetActionEnabled(ActionType.NOTIFY),
+          hasValidationErrors ||
+          !anyValuesHaveChanged ||
+          !isTargetActionEnabled(ActionType.NOTIFY),
         hidden:
           !isActionAllowed(ActionType.NOTIFY) ||
           eventIndex.status !== EventStatus.enum.NOTIFIED
@@ -412,35 +404,7 @@ function useEditActions(event: EventDocument) {
 
 /** Menu component available on the Edit-action review page. */
 export function EditActionMenu({ event }: { event: EventDocument }) {
-  const intl = useIntl()
   const { actions, modals } = useEditActions(event)
 
-  return (
-    <>
-      <DropdownMenu id="action">
-        <DropdownMenu.Trigger asChild>
-          <Button
-            data-testid="action-dropdownMenu"
-            size="medium"
-            type="primary"
-          >
-            {intl.formatMessage(actionMessages.action)} <CaretDown />
-          </Button>
-        </DropdownMenu.Trigger>
-        <DropdownMenu.Content>
-          {actions.map(({ onClick, icon, label, disabled }, index) => (
-            <DropdownMenu.Item
-              key={index}
-              disabled={disabled}
-              onClick={onClick}
-            >
-              <Icon color="currentColor" name={icon} size="small" />
-              {intl.formatMessage(label)}
-            </DropdownMenu.Item>
-          ))}
-        </DropdownMenu.Content>
-      </DropdownMenu>
-      {modals}
-    </>
-  )
+  return <ActionMenuDropdown actions={actions} modals={modals} />
 }

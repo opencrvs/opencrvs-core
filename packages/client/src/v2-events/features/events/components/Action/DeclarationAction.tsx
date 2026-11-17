@@ -40,7 +40,7 @@ import { ROUTES } from '@client/v2-events/routes'
 import { NavigationStack } from '@client/v2-events/components/NavigationStack'
 import { useUserAllowedActions } from '@client/v2-events/features/workqueues/Actions/useUserAllowedActions'
 import { useToastAndRedirect } from '@client/v2-events/features/events/useToastAndRedirect'
-import { useEventConfiguration } from '../../useEventConfiguration'
+import { useEventConfigurationForRecord } from '../../useEventConfiguration'
 import {
   AvailableActionTypes,
   getAnnotationForActionType,
@@ -134,15 +134,8 @@ function useActionGuard(
     )
   }
 
-  // In the declare flow, user is allowed if they have permission for either DECLARE or NOTIFY;
-  // otherwise strict permission by action type.
-  const isPermitted =
-    actionType === ActionType.DECLARE
-      ? isActionAllowed(ActionType.DECLARE) ||
-        isActionAllowed(ActionType.NOTIFY)
-      : isActionAllowed(actionType)
-
-  if (!isPermitted) {
+  // Notifiers have their own notify flow, so permission is strictly by action type.
+  if (!isActionAllowed(actionType)) {
     throw new Error(
       `User does not have permission to perform action ${actionType} on event ${event.id}`
     )
@@ -170,7 +163,7 @@ function DeclarationActionComponent({
   const { setLocalDraft, getLocalDraftOrDefault, useRemoteDraftByEventId } =
     useDrafts()
 
-  const { eventConfiguration } = useEventConfiguration(event.type)
+  const { eventConfiguration } = useEventConfigurationForRecord(event)
 
   useActionGuard(actionType, event, eventConfiguration)
 

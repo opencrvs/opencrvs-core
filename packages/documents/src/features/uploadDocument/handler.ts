@@ -8,8 +8,8 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { minioClient } from '@documents/minio/client'
-import { MINIO_BUCKET } from '@documents/minio/constants'
+import { putObject, statObjectIfExists } from '@documents/s3/client'
+import { env } from '@documents/s3/constants'
 import * as Hapi from '@hapi/hapi'
 import {
   DocumentPath,
@@ -17,21 +17,10 @@ import {
   joinUrlPaths,
   logger
 } from '@opencrvs/commons'
-import { fromBuffer } from 'file-type'
-import { v4 as uuid } from 'uuid'
 
 import { badRequest, forbidden } from '@hapi/boom'
 import { Readable } from 'stream'
 import { z } from 'zod'
-export interface IDocumentPayload {
-  fileData: string
-  metaData?: Record<string, string>
-}
-
-export type IFileInfo = {
-  ext: string
-  mime: string
-}
 
 const HapiSchema = z.object({
   filename: z.string().min(1, 'Filename is required'),
@@ -58,21 +47,6 @@ const Payload = z.object({
   transactionId: z.string(),
   path: z.string().optional().default('')
 })
-
-/**
- * @returns the object's metadata, or null when it does not exist.
- */
-async function statObjectIfExists(documentPath: DocumentPath) {
-  try {
-    return await minioClient.statObject(MINIO_BUCKET, documentPath)
-  } catch (error) {
-    if ((error as { code?: string }).code === 'NotFound') {
-      return null
-    }
-
-    throw error
-  }
-}
 
 /**
  * V2 version of the file upload handler.
@@ -102,18 +76,16 @@ export async function fileUploadHandler(
    */
   const existing = await statObjectIfExists(filePath)
 
-  if (existing && existing.metaData['created-by'] !== userId) {
+  if (existing && existing.metadata['created-by'] !== userId) {
     throw forbidden(
       `request failed: user with id ${userId} does not have permission to replace this document`
     )
   }
 
-  // Persist the content type the client reported for the file
-  const contentType = file.hapi.headers['content-type']
-
-  await minioClient.putObject(MINIO_BUCKET, filePath, file, {
-    'created-by': userId,
-    ...(contentType && { 'content-type': contentType })
+  await putObject(filePath, file, {
+    // Persist the content type the client reported for the file
+    contentType: file.hapi.headers['content-type'],
+    metadata: { 'created-by': userId }
   })
 
   return filePath
@@ -128,8 +100,8 @@ export async function fileExistsHandler(
     filePath = filePath.slice(1)
   }
 
-  if (filePath.startsWith(MINIO_BUCKET)) {
-    filePath = filePath.slice(MINIO_BUCKET.length + 1)
+  if (filePath.startsWith(env.S3_BUCKET)) {
+    filePath = filePath.slice(env.S3_BUCKET.length + 1)
   }
 
   const documentPath = DocumentPath.parse(filePath)
@@ -139,45 +111,10 @@ export async function fileExistsHandler(
   if (!stat) {
     return h
       .response(
-        `request failed: document ${documentPath} does not exist in bucket ${MINIO_BUCKET}`
+        `request failed: document ${documentPath} does not exist in bucket ${env.S3_BUCKET}`
       )
       .code(404)
   }
 
   return h.response().code(200)
-}
-
-export async function documentUploadHandler(
-  request: Hapi.Request,
-  h: Hapi.ResponseToolkit
-) {
-  const userId = getUserId(request.headers.authorization as `Bearer ${string}`)
-  if (!userId)
-    return Promise.reject(
-      new Error(
-        `request failed: Authorization token is missing or does not contain a valid user ID.`
-      )
-    )
-  const payload = request.payload as IDocumentPayload
-  const ref = uuid()
-  try {
-    const base64String = payload.fileData.split(',')[1]
-    const base64Decoded = Buffer.from(base64String, 'base64')
-    const fileType = (await fromBuffer(base64Decoded)) as IFileInfo
-    const generateFileName = `${ref}.${fileType.ext}`
-
-    await minioClient.putObject(MINIO_BUCKET, generateFileName, base64Decoded, {
-      ...payload.metaData,
-      'content-type': fileType.mime,
-      'created-by': userId
-    })
-
-    return h
-      .response({ refUrl: `/${MINIO_BUCKET}/${generateFileName}` })
-      .code(200)
-  } catch (error) {
-    return Promise.reject(
-      new Error(`request failed: ${(error as Error).message}`)
-    )
-  }
 }

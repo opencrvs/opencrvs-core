@@ -19,11 +19,11 @@ import {
 import getPlugins from '@documents/config/plugins'
 import { getRoutes } from '@documents/config/routes'
 import { readFileSync } from 'fs'
-import { MINIO_HOST, MINIO_PORT } from '@documents/minio/constants'
+import { env } from '@documents/s3/constants'
 import {
-  ensureDefaultMinioBucket,
-  ensureDefaultMinioBucketIsPrivate
-} from '@documents/minio/client'
+  ensureDefaultBucket,
+  ensureDefaultBucketIsPrivate
+} from '@documents/s3/client'
 
 const publicCert = readFileSync(CERT_PUBLIC_KEY_PATH)
 
@@ -58,15 +58,15 @@ export async function createServer() {
 
   async function start() {
     try {
-      await ensureDefaultMinioBucket()
-      await ensureDefaultMinioBucketIsPrivate()
-      server.log('info', `Minio started on ${MINIO_HOST}:${MINIO_PORT}`)
+      await ensureDefaultBucket()
+      await ensureDefaultBucketIsPrivate()
+      server.log('info', `Object storage ready on ${env.S3_ENDPOINT}`)
       await server.start()
       server.log('info', `Documents server started on ${HOST}:${PORT}`)
     } catch (error) {
       server.log(
         'error',
-        `Error preparing Minio bucket! ${(error as Error).stack}`
+        `Error preparing object storage bucket! ${(error as Error).stack}`
       )
       throw error
     }

@@ -25,7 +25,7 @@ import {
   userCanAccessEventWithScopes
 } from '@opencrvs/commons/events'
 import { TrpcUserContext } from '@events/context'
-import { getEventConfigurationById } from '@events/service/config/config'
+import { getEventConfigurationForRecord } from '@events/service/config/config'
 import { getEventById, processAction } from '@events/service/events/events'
 import { getEventIndexWithAdministrativeHierarchy } from '@events/service/indexing/utils'
 
@@ -39,9 +39,9 @@ export async function unassignRecord({
   token: TokenWithBearer
 }) {
   const event = await getEventById(input.eventId)
-  const configuration = await getEventConfigurationById({
-    token,
-    eventType: event.type
+  const configuration = await getEventConfigurationForRecord({
+    event: event,
+    token
   })
 
   const lastAssignmentAction = findLastAssignmentAction(event.actions)

@@ -29,8 +29,10 @@ import {
   generateEventDraftDocument,
   getCurrentEventState,
   generateActionDocument,
+  generateActionDocuments,
   getUUID,
-  user
+  user,
+  versionedTennisClubMembershipEvent
 } from '@opencrvs/commons/client'
 import { ROUTES, routesConfig } from '@client/v2-events/routes'
 import { useEventFormData } from '@client/v2-events/features/events/useEventFormData'
@@ -119,11 +121,11 @@ function declareReturningDuplicate() {
     ...eventDocument,
     actions: [
       ...eventDocument.actions,
-      generateActionDocument({
+      ...generateActionDocuments({
         configuration: tennisClubMembershipEvent,
         action: ActionType.EDIT
       }),
-      generateActionDocument({
+      ...generateActionDocuments({
         configuration: tennisClubMembershipEvent,
         action: ActionType.DECLARE
       }),
@@ -145,7 +147,7 @@ function editAccepted() {
     ...eventDocument,
     actions: [
       ...eventDocument.actions,
-      generateActionDocument({
+      ...generateActionDocuments({
         configuration: tennisClubMembershipEvent,
         action: ActionType.EDIT
       })
@@ -164,7 +166,7 @@ const meta: Meta<typeof ReviewIndex> = {
     // Clear any toast left over from a previous story so this test only asserts
     // on toasts raised by its own play function.
     toast.remove()
-    addLocalEventConfig(tennisClubMembershipEvent)
+    addLocalEventConfig(versionedTennisClubMembershipEvent)
     setEventData(eventId, eventDocument)
   }
 }
@@ -186,7 +188,7 @@ const duplicateHandlers = {
   ],
   events: [
     tRPCMsw.event.config.get.query(() => {
-      return [tennisClubMembershipEvent]
+      return [versionedTennisClubMembershipEvent]
     }),
     tRPCMsw.event.get.query(() => {
       return eventDocument
@@ -320,8 +322,8 @@ function eventWithActions(...types: ActionType[]) {
     ...eventDocument,
     actions: [
       ...eventDocument.actions,
-      ...types.map((type) =>
-        generateActionDocument({
+      ...types.flatMap((type) =>
+        generateActionDocuments({
           configuration: tennisClubMembershipEvent,
           action: type
         })
@@ -346,7 +348,9 @@ export const SendsEditedDeclarationWithDeclareOnEditAndRegister: Story = {
       handlers: {
         ...duplicateHandlers,
         events: [
-          tRPCMsw.event.config.get.query(() => [tennisClubMembershipEvent]),
+          tRPCMsw.event.config.get.query(() => [
+            versionedTennisClubMembershipEvent
+          ]),
           tRPCMsw.event.get.query(() => eventDocument),
           tRPCMsw.event.actions.edit.request.mutation(() => editAccepted()),
           tRPCMsw.event.actions.declare.request.mutation((payload) => {

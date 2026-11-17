@@ -11,7 +11,7 @@
 import * as React from 'react'
 import { ReactElement } from 'react'
 import styled from 'styled-components'
-import { colors } from '../colors'
+import { colors } from '../tokens'
 
 const Container = styled.div<{ size: ContentSize }>`
   position: relative;

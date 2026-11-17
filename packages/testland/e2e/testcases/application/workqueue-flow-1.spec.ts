@@ -15,7 +15,8 @@ import {
   getToken,
   login,
   triggerDeclarationAction,
-  waitForActionResponses
+  waitForActionResponses,
+  signReview
 } from '@e2e/support/helpers'
 import { CREDENTIALS } from '@e2e/support/constants'
 import { ensureAssignedToUser, selectAction } from '@e2e/support/utils'
@@ -176,6 +177,7 @@ test('1. Workqueue flow - 1', async ({ page }) => {
     })
 
     await test.step('1.2.6 Declare with edits', async () => {
+      await signReview(page)
       await triggerDeclarationAction(page, 'Declare with edits')
 
       await assertRecordInWorkqueue({

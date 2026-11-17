@@ -32,6 +32,7 @@ import {
   TEST_USER_PASSWORD
 } from '@e2e/support/constants'
 import { ASSETS_DIR } from '@e2e/support/paths'
+import { getExpectedUsername } from '@e2e/support/test-data/api-actions'
 
 export async function createRegistrarWithSignature(page: Page, office: string) {
   const firstName = faker.person.firstName('male')
@@ -39,7 +40,7 @@ export async function createRegistrarWithSignature(page: Page, office: string) {
   // user makes the server pick a different one - which the test then cannot
   // guess. The digits keep it unique.
   const surname = `${faker.person.lastName('male')}${faker.string.numeric(5)}`
-  const username = `${firstName[0]}.${surname}`.toLowerCase()
+  const username = getExpectedUsername({ firstname: firstName, surname })
 
   await login(page, CREDENTIALS.NATIONAL_SYSTEM_ADMIN)
 
@@ -147,7 +148,7 @@ async function repairSignaturePath(userId: string) {
   form.append('transactionId', uuidv4())
   form.append('path', `users/${userId}`)
 
-  const response = await fetch(new URL('/upload', GATEWAY_HOST), {
+  const response = await fetch(`${GATEWAY_HOST}/upload`, {
     method: 'POST',
     headers: { Authorization: `Bearer ${adminToken}` },
     body: form

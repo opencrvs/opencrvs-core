@@ -17,7 +17,6 @@ import {
 } from '@tanstack/react-query'
 import { useIntl } from 'react-intl'
 import { EventDocument, UUID } from '@opencrvs/commons/client'
-import { useEventConfigurations } from '@client/v2-events/features/events/useEventConfiguration'
 import { cacheFilesFromEventDocument } from '@client/v2-events/features/files/cache'
 import {
   useTRPC,
@@ -43,15 +42,8 @@ import { setQueryDefaults } from './utils'
 setQueryDefaults(trpcOptionsProxy.event.get, {
   queryFn: async (...params) => {
     const {
-      meta,
       queryKey: [, input]
     } = params[0]
-
-    if (!meta) {
-      throw new Error(
-        'api.event.get was called without passing mandatory event configuration'
-      )
-    }
 
     const queryOptions = trpcOptionsProxy.event.get.queryOptions(input.input)
 
@@ -91,7 +83,6 @@ async function fetchEventForViewing(id: UUID): Promise<EventDocument> {
 // Only the queryOptions passed to useSuspenseQuery differ per branch.
 function useGetOrDownloadEvent(id: UUID) {
   const trpc = useTRPC()
-  const eventConfig = useEventConfigurations()
   const cachedAssignedEvent = queryClient.getQueryData(
     trpc.event.get.queryKey({ eventId: id })
   )
@@ -118,7 +109,6 @@ function useGetOrDownloadEvent(id: UUID) {
           // Assigned & cached: read from cache without network
           ...assignedQueryOptions,
           queryKey: trpc.event.get.queryKey({ eventId: id }),
-          meta: { eventConfig },
           staleTime: Infinity,
           refetchOnMount: false,
           refetchOnReconnect: false,
@@ -148,13 +138,11 @@ export function useGetEvent() {
    * from the cache without making a network request.
    */
   const useFindEventFromCache = (id: string) => {
-    const eventConfig = useEventConfigurations()
     const { queryFn, ...options } = trpc.event.get.queryOptions({ eventId: id })
 
     return useQuery({
       ...options,
       queryKey: trpc.event.get.queryKey({ eventId: id }),
-      meta: { eventConfig },
       /*
        * We never want to refetch this query automatically
        * because it is the user's explicit (audit logged) action to fetch a record
@@ -172,7 +160,6 @@ export function useGetEvent() {
     useGetOrDownloadEvent,
     useGetEventFromCache: (id: UUID) => {
       const intl = useIntl()
-      const eventConfig = useEventConfigurations()
       const { queryFn, ...queryOptions } = trpc.event.get.queryOptions({
         eventId: id
       })
@@ -193,7 +180,6 @@ export function useGetEvent() {
       return useSuspenseQuery({
         ...queryOptions,
         queryKey: trpc.event.get.queryKey({ eventId: id }),
-        meta: { eventConfig },
         /*
          * We never want to refetch this query automatically
          * because it is the user's explicit (audit logged) action to fetch a record

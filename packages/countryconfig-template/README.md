@@ -41,8 +41,8 @@ One of the key dependencies and enablers for OpenCRVS is country configuration a
 
 - The [src](src) folder contains the code for the countryconfig service. Essentially this service could be re-written in another language as long as it provided the same API endpoints and served the same files as listed below.
   - [src/events](src/events) defines the configurable events (birth, death and an example tennis club membership), including their forms and actions.
-  - [src/data-seeding](src/data-seeding) contains the reference data used to seed a new environment: administrative areas, offices, health facilities, roles and employees.
-  - [src/api](src/api) contains most of the handlers for the endpoints below, e.g. action confirmation, registration numbers, certificates, notifications, workqueues and integrations. The `/config/roles`, `/config/locations` and `/config/users` handlers are in [src/data-seeding](src/data-seeding).
+  - [src/data-seeding](src/data-seeding) contains the reference data used to seed a new environment: administrative areas, offices, health facilities and employees.
+  - [src/api](src/api) contains most of the handlers for the endpoints below, e.g. action confirmation, registration numbers, certificates, notifications, workqueues, roles and integrations. The `/config/locations` and `/config/users` handlers are in [src/data-seeding](src/data-seeding).
   - [src/analytics](src/analytics) contains the code that loads events and locations into the analytics database. The database itself is set up by [assets/postgres/setup-analytics.sh](assets/postgres/setup-analytics.sh). See [ANALYTICS.md](ANALYTICS.md).
 - The [tilt](tilt) folder and [Tiltfile](Tiltfile) define the local Kubernetes development environment. Tilt is responsible for deploying OpenCRVS dependencies and Core services using Helm charts, building the local countryconfig image, configuring live updates and exposing operational tasks such as database cleanup and data seeding through the Tilt UI.
 

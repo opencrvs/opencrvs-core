@@ -66,6 +66,21 @@ describe('client Content-Security-Policy', () => {
    * wildcard loads handlebars.js from the country config. No third-party host belongs
    * here; the Sentry dialog was the only one that ever did, and it is gone (#13460).
    */
+  /*
+   * The S3 public origin is a connect-src source only. A store such as
+   * storage.googleapis.com is shared by other customers, and anyone can host a script there.
+   */
+  it('allows the S3 public origin to be fetched, but not to run scripts', () => {
+    expect(directives['connect-src']).toEqual([
+      "'self'",
+      '{{CONTENT_SECURITY_POLICY_WILDCARD}}',
+      '{{S3_PUBLIC_ORIGIN}}',
+      'data:'
+    ])
+    expect(directives['script-src']).not.toContain('{{S3_PUBLIC_ORIGIN}}')
+    expect(directives['default-src']).not.toContain('{{S3_PUBLIC_ORIGIN}}')
+  })
+
   it('loads scripts only from itself, the country config and eval', () => {
     expect(directives['script-src']).toEqual([
       "'self'",

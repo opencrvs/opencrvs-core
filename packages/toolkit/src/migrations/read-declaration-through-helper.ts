@@ -47,11 +47,11 @@ import {
   Type
 } from 'ts-morph'
 import path from 'path'
+import { addToolkitImport, findToolkitImportName } from './utils'
 
 const EVENT_CONFIG_TYPE_NAME = 'EventConfig'
 const DECLARATION_PROPERTY_NAME = 'declaration'
 const GET_DECLARATION_NAME = 'getDeclaration'
-const TOOLKIT_EVENTS_MODULE = '@opencrvs/toolkit/events'
 
 /**
  * Returns true if the type is the `EventConfig` type published by the toolkit,
@@ -155,86 +155,6 @@ function warnSpreadDeclarations(sourceFile: SourceFile) {
   }
 }
 
-/** Finds the value import of the toolkit's events module, if the file has one. */
-function findToolkitImport(sourceFile: SourceFile) {
-  // A type-only import cannot carry a function, and a namespace import cannot
-  // be given named imports, so neither is extended
-  return sourceFile.getImportDeclaration(
-    (declaration) =>
-      declaration.getModuleSpecifierValue() === TOOLKIT_EVENTS_MODULE &&
-      !declaration.isTypeOnly() &&
-      !declaration.getNamespaceImport()
-  )
-}
-
-/**
- * Returns the name `getDeclaration` is called by in the file: its local alias
- * when the file already imports it from the toolkit, `getDeclaration` when the
- * name is free, or undefined when the file binds `getDeclaration` to
- * something else.
- */
-function findGetDeclarationName(sourceFile: SourceFile) {
-  const imported = findToolkitImport(sourceFile)
-    ?.getNamedImports()
-    .find((namedImport) => namedImport.getName() === GET_DECLARATION_NAME)
-
-  if (imported) {
-    return imported.getAliasNode()?.getText() ?? GET_DECLARATION_NAME
-  }
-
-  if (sourceFile.getLocal(GET_DECLARATION_NAME)) {
-    return undefined
-  }
-
-  return GET_DECLARATION_NAME
-}
-
-function addGetDeclarationImport(sourceFile: SourceFile) {
-  const toolkitImport = findToolkitImport(sourceFile)
-
-  if (!toolkitImport) {
-    const imports = sourceFile.getImportDeclarations()
-    const lastImport = imports[imports.length - 1]
-
-    // Inserted as text so the import keeps the country config's style
-    // (single quotes, no semicolon) rather than ts-morph's defaults
-    sourceFile.insertStatements(
-      lastImport ? lastImport.getChildIndex() + 1 : 0,
-      `import { ${GET_DECLARATION_NAME} } from '${TOOLKIT_EVENTS_MODULE}'`
-    )
-    return
-  }
-
-  const alreadyImported = toolkitImport
-    .getNamedImports()
-    .some((namedImport) => namedImport.getName() === GET_DECLARATION_NAME)
-
-  if (alreadyImported) {
-    return
-  }
-
-  const namedImports = toolkitImport.getNamedImports()
-
-  // ts-morph's addNamedImport collapses a multi-line import onto one line, so
-  // the import is rewritten keeping one name per line when it had them
-  if (toolkitImport.getDefaultImport() || namedImports.length === 0) {
-    toolkitImport.addNamedImport(GET_DECLARATION_NAME)
-    return
-  }
-
-  const names = [
-    ...namedImports.map((namedImport) => namedImport.getText()),
-    GET_DECLARATION_NAME
-  ]
-  const specifiers = toolkitImport.getText().includes('\n')
-    ? `{\n  ${names.join(',\n  ')}\n}`
-    : `{ ${names.join(', ')} }`
-
-  toolkitImport.replaceWithText(
-    `import ${specifiers} from '${TOOLKIT_EVENTS_MODULE}'`
-  )
-}
-
 /**
  * Rewrites every `x.declaration` read on an `EventConfig` in the file to
  * `getDeclaration(x)`.
@@ -273,7 +193,10 @@ export function rewriteDeclarationReads(sourceFile: SourceFile): number {
     return 0
   }
 
-  const getDeclarationName = findGetDeclarationName(sourceFile)
+  const getDeclarationName = findToolkitImportName(
+    sourceFile,
+    GET_DECLARATION_NAME
+  )
 
   if (!getDeclarationName) {
     console.warn(
@@ -291,7 +214,7 @@ export function rewriteDeclarationReads(sourceFile: SourceFile): number {
     )
   }
 
-  addGetDeclarationImport(sourceFile)
+  addToolkitImport(sourceFile, GET_DECLARATION_NAME)
 
   return reads.length
 }

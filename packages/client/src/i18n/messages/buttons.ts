@@ -213,11 +213,6 @@ export const buttonMessages = defineMessages({
     description: 'Save & exit Button Text',
     id: 'buttons.saveAndExit'
   },
-  deleteDeclaration: {
-    defaultMessage: 'Delete declaration',
-    description: 'Delete declaration button text',
-    id: 'buttons.deleteDeclaration'
-  },
   printDeclaration: {
     id: 'buttons.printDeclaration',
     defaultMessage: 'Print declaration',

@@ -23,7 +23,7 @@ test('Can Open Draft offline', async ({ page }) => {
   }
 
   await test.step('Login', async () => {
-    await login(page, CREDENTIALS.HOSPITAL_OFFICIAL_OTHER)
+    await login(page, CREDENTIALS.FIELD_AGENT)
     await expect(page.getByText('Farajaland CRS')).toBeVisible({
       timeout: 30000
     })

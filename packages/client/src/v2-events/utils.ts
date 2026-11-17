@@ -34,8 +34,10 @@ import {
   getAdministrativeAreaHierarchy,
   resolveVersion,
   ZodDate,
-  isUUID
+  isUUID,
+  ClientSpecificAction
 } from '@opencrvs/commons/client'
+import { WorkqueueCtaType } from '@client/v2-events/features/workqueues/Actions/utils'
 import {
   findSelectedVersion,
   parseVersionedLocation,
@@ -313,13 +315,16 @@ export const WORKQUEUE_OUTBOX: WorkqueueConfigWithoutQuery = {
   icon: 'PaperPlaneTilt'
 }
 
-export const WORKQUEUE_DRAFT: WorkqueueConfigWithoutQuery = {
+/** A core workqueue, so its CTA can be one that country config can't use */
+export const WORKQUEUE_DRAFT: Omit<WorkqueueConfigWithoutQuery, 'action'> & {
+  action: { type: WorkqueueCtaType }
+} = {
   name: {
     id: 'workqueues.draft.title',
     defaultMessage: 'Drafts',
     description: 'Title of draft workqueue'
   },
-  action: { type: ActionType.DECLARE },
+  action: { type: ClientSpecificAction.CONTINUE_DRAFT },
   slug: CoreWorkqueues.DRAFT,
   icon: 'FileDotted'
 }

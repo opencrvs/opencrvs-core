@@ -70,9 +70,8 @@ helm_resource(
 traefik_deps = [
   'client',
   'countryconfig',
-  'gateway',
   'login',
-  'minio'
+  'rustfs'
 ]
 
 k8s_resource("traefik", labels=[traefik_tilt_label])
@@ -98,7 +97,7 @@ k8s_resource(
 tilt_label = '4.Dependencies'
 dependencies = [
   'elasticsearch',
-  'minio',
+  'rustfs',
   'redis',
   'postgres',
 ]

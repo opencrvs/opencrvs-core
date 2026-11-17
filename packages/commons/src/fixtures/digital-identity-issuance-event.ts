@@ -8,6 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
+import { resolveEventConfig } from '../events/EventConfig'
 import { defineConfig } from '../events/defineConfig'
 import { ActionType } from '../events/ActionType'
 import { PageTypes } from '../events/PageConfig'
@@ -216,7 +217,7 @@ const digitalIdentityForm = defineDeclarationForm({
 /**
  * @knipignore
  */
-export const digitalIdentityEvent = defineConfig({
+export const versionedDigitalIdentityEvent = defineConfig({
   id: 'digital-identity',
   label: {
     defaultMessage: 'Digital identity issuance',
@@ -260,3 +261,8 @@ export const digitalIdentityEvent = defineConfig({
   ],
   declaration: digitalIdentityForm
 })
+
+/** The configuration of the first version of `versionedDigitalIdentityEvent`. */
+export const digitalIdentityEvent = resolveEventConfig(
+  versionedDigitalIdentityEvent
+)

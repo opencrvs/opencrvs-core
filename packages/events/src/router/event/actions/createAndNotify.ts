@@ -20,11 +20,15 @@ import {
 import {
   ActionType,
   EventDocument,
+  getEventConfigForRecord,
   getEventValidatorContext,
   NotifyActionInput
 } from '@opencrvs/commons/events'
 import { systemOnlyProcedure } from '@events/router/trpc'
-import { getInMemoryEventConfigurations } from '@events/service/config/config'
+import {
+  getCountryTimeZone,
+  getInMemoryVersionedEventConfigurations
+} from '@events/service/config/config'
 import { createEvent } from '@events/service/events/events'
 import { locationExists } from '@events/storage/postgres/administrative-hierarchy/locations'
 import { writeAuditLog } from '@events/storage/postgres/events/auditLog'
@@ -105,11 +109,12 @@ export function createAndNotifyProcedure() {
         } = input
 
         // Authorization
-        const eventConfigs = await getInMemoryEventConfigurations(token)
+        const eventConfigs =
+          await getInMemoryVersionedEventConfigurations(token)
         const tokenScopes = getScopes(token)
 
-        const eventConfig = eventConfigs.find((c) => c.id === eventType)
-        if (!eventConfig) {
+        const versionedConfig = eventConfigs.find((c) => c.id === eventType)
+        if (!versionedConfig) {
           throw new TRPCError({
             code: 'BAD_REQUEST',
             message: `No configuration found for event type: ${eventType}`
@@ -170,8 +175,10 @@ export function createAndNotifyProcedure() {
           user,
           transactionId: createTransactionId,
           createdAtLocation,
-          config: eventConfig
+          config: versionedConfig,
+          timeZone: await getCountryTimeZone(token)
         })
+        const eventConfig = getEventConfigForRecord(versionedConfig, event)
 
         // Step 2: Idempotency guard.
         // If we are replaying a request the event already exists and already has a NOTIFY

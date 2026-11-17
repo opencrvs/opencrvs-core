@@ -29,7 +29,8 @@ import {
   field as conditionalField,
   not,
   encodeScope,
-  EventStatus
+  EventStatus,
+  toVersionedEventConfig
 } from '@opencrvs/commons'
 import {
   tennisClubMembershipEvent,
@@ -249,7 +250,9 @@ describe('Declare action', () => {
   test('Skips required review field validation when review field is conditionally hidden', async () => {
     mswServer.use(
       http.get(`${env.COUNTRY_CONFIG_URL}/config/events`, () => {
-        return HttpResponse.json([eventWithConditionalSignature])
+        return HttpResponse.json([
+          toVersionedEventConfig(eventWithConditionalSignature)
+        ])
       })
     )
 
@@ -283,7 +286,9 @@ describe('Declare action', () => {
   test('Accepts a review field whose visibility depends on the declaration', async () => {
     mswServer.use(
       http.get(`${env.COUNTRY_CONFIG_URL}/config/events`, () => {
-        return HttpResponse.json([eventWithConditionalSignature])
+        return HttpResponse.json([
+          toVersionedEventConfig(eventWithConditionalSignature)
+        ])
       })
     )
 
@@ -548,7 +553,9 @@ test('deduplication and annotation check is performed after declaration', async 
   mswServer.use(
     http.get(`${env.COUNTRY_CONFIG_URL}/config/events`, () => {
       return HttpResponse.json([
-        tennisClubMembershipEventWithDedupCheck(ActionType.DECLARE)
+        toVersionedEventConfig(
+          tennisClubMembershipEventWithDedupCheck(ActionType.DECLARE)
+        )
       ])
     })
   )

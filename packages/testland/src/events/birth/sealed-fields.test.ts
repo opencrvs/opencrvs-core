@@ -14,7 +14,8 @@ import {
   eventQueryDataGenerator,
   getDeclarationFields,
   isFieldSecured,
-  isNonInteractiveFieldType
+  isNonInteractiveFieldType,
+  resolveEventConfig
 } from '@opencrvs/toolkit/events'
 import { birthEvent } from './index'
 
@@ -30,9 +31,9 @@ import { birthEvent } from './index'
  *
  */
 describe('sealed birth records', () => {
-  const declarationFields = getDeclarationFields(birthEvent).filter(
-    (field) => !isNonInteractiveFieldType(field)
-  )
+  const declarationFields = getDeclarationFields(
+    resolveEventConfig(birthEvent)
+  ).filter((field) => !isNonInteractiveFieldType(field))
 
   test('every declaration field is secured once the record is sealed', () => {
     const sealedEvent = eventQueryDataGenerator({

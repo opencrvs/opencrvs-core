@@ -17,12 +17,14 @@ import {
   createPrng,
   EventDocument,
   generateActionDocument,
+  generateActionDocuments,
   generateTrackingId,
   getCurrentEventState,
   getUUID,
   TENNIS_CLUB_MEMBERSHIP,
   tennisClubMembershipEvent,
-  TestUserRole
+  TestUserRole,
+  INITIAL_EVENT_CONFIG_VERSION_ID
 } from '@opencrvs/commons/client'
 import { AppRouter } from '@client/v2-events/trpc'
 import { ROUTES, routesConfig } from '@client/v2-events/routes'
@@ -48,7 +50,7 @@ const createAction = generateActionDocument({
   defaults: { createdBy: registrationAgent.v2.id }
 })
 
-const declareAction = generateActionDocument({
+const declareActionPair = generateActionDocuments({
   configuration: tennisClubMembershipEvent,
   action: ActionType.DECLARE,
   defaults: { createdBy: registrationAgent.v2.id }
@@ -79,9 +81,15 @@ const eventUnderReview: EventDocument = {
   type: TENNIS_CLUB_MEMBERSHIP,
   id: eventId,
   trackingId,
+  configVersionId: INITIAL_EVENT_CONFIG_VERSION_ID,
   createdAt: new Date(Date.now() - 1000).toISOString(),
   updatedAt: new Date(Date.now() - 1000).toISOString(),
-  actions: [createAction, declareAction, duplicateDetectedAction, assignAction]
+  actions: [
+    createAction,
+    ...declareActionPair,
+    duplicateDetectedAction,
+    assignAction
+  ]
 }
 
 const tRPCMsw = createTRPCMsw<AppRouter>({

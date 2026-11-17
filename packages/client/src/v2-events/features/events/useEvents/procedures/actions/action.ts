@@ -27,7 +27,7 @@ import {
   getEventValidatorContext,
   getActionConfig
 } from '@opencrvs/commons/client'
-import { useEventConfigurations } from '@client/v2-events/features/events/useEventConfiguration'
+import { useEventConfigurationResolver } from '@client/v2-events/features/events/useEventConfiguration'
 import {
   cleanUpOnUnassign,
   findLocalEventDocument,
@@ -36,7 +36,10 @@ import {
   deleteLocalEvent,
   onMarkNotDuplicate
 } from '@client/v2-events/features/events/useEvents/api'
-import { getCleanedDeclarationDiff } from '@client/v2-events/features/events/useEvents/procedures/actions/declarationDiff'
+import {
+  getCleanedDeclarationDiff,
+  getSubmissionForm
+} from '@client/v2-events/features/events/useEvents/procedures/actions/declarationDiff'
 import { updateEventOptimistically } from '@client/v2-events/features/events/useEvents/procedures/actions/utils'
 import {
   createEventActionMutationFn,
@@ -283,7 +286,7 @@ interface Options extends Params {
 export function useEventAction<P extends DecorateMutationProcedure<any>>(
   trpcProcedure: P
 ) {
-  const eventConfigurations = useEventConfigurations()
+  const findEventConfiguration = useEventConfigurationResolver()
 
   const validatorContext = useValidatorContext()
 
@@ -326,13 +329,11 @@ export function useEventAction<P extends DecorateMutationProcedure<any>>(
        */
       findLocalEventDocument(eventId) || findLocalEventIndex(eventId)
 
-    const eventConfiguration = eventConfigurations.find(
-      (e) => e.id === localEvent?.type
-    )
+    const eventConfiguration = localEvent && findEventConfiguration(localEvent)
 
     if (!eventConfiguration) {
       throw new Error(
-        `Event configuration not found for event: ${localEvent?.type}`
+        `Event configuration not found for event: ${localEvent?.type}, version: ${localEvent?.configVersionId}`
       )
     }
 
@@ -386,6 +387,7 @@ export function useEventAction<P extends DecorateMutationProcedure<any>>(
       eventId,
       declaration: getCleanedDeclarationDiff({
         eventConfiguration,
+        form: getSubmissionForm(eventConfiguration, actionType),
         originalDeclaration,
         declarationDiff: params.declaration,
         validatorContext: {

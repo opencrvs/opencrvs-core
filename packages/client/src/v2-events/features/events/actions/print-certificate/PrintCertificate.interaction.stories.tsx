@@ -29,6 +29,7 @@ import {
   never,
   generateActionDocument,
   EventDocumentOnlyLastAction,
+  versionedTennisClubMembershipEvent,
   FieldType,
   PageTypes,
   generateTranslationConfig
@@ -122,7 +123,7 @@ export const NoTemplateAvailable: Story = {
         ],
         events: [
           tRPCMsw.event.config.get.query(() => {
-            return [tennisClubMembershipEvent]
+            return [versionedTennisClubMembershipEvent]
           }),
           tRPCMsw.event.get.query(() => {
             return tennisClubMembershipEventDocument
@@ -165,7 +166,7 @@ export const ContinuingAndGoingBack: Story = {
       handlers: {
         events: [
           tRPCMsw.event.config.get.query(() => {
-            return [tennisClubMembershipEvent]
+            return [versionedTennisClubMembershipEvent]
           }),
           tRPCMsw.event.get.query(() => {
             return tennisClubMembershipEventDocument

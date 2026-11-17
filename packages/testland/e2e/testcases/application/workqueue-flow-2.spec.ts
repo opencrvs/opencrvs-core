@@ -15,7 +15,8 @@ import {
   getToken,
   goToSection,
   login,
-  triggerDeclarationAction
+  triggerDeclarationAction,
+  signReview
 } from '@e2e/support/helpers'
 import { CREDENTIALS } from '@e2e/support/constants'
 import { ensureAssignedToUser, selectAction } from '@e2e/support/utils'
@@ -179,6 +180,7 @@ test('2. Workqueue flow - 2', async ({ page }) => {
 
     await test.step('2.2.6 Register with edits', async () => {
       await goToSection(page, 'review')
+      await signReview(page)
       await triggerDeclarationAction(page, 'Register with edits')
 
       await assertRecordInWorkqueue({

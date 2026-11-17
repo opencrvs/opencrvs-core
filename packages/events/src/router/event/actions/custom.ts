@@ -22,7 +22,7 @@ import {
   defaultRequestHandler,
   getDefaultActionProcedures
 } from '@events/router/event/actions'
-import { getInMemoryEventConfigurations } from '@events/service/config/config'
+import { getEventConfigurationForRecord } from '@events/service/config/config'
 import { writeAuditLog } from '@events/storage/postgres/events/auditLog'
 
 export function customActionProcedures() {
@@ -50,16 +50,8 @@ export function customActionProcedures() {
           return ctx.event
         }
 
-        const configs = await getInMemoryEventConfigurations(token)
         const event = await getEventById(input.eventId)
-        const config = configs.find((c) => c.id === event.type)
-
-        if (!config) {
-          throw new TRPCError({
-            code: 'BAD_REQUEST',
-            message: `Event configuration not found with type: ${event.type}`
-          })
-        }
+        const config = await getEventConfigurationForRecord({ event, token })
 
         const actionConfig = config.actions.find(
           (a) =>

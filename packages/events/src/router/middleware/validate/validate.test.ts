@@ -460,12 +460,35 @@ describe('core action dialog form validation', () => {
   it('rejects NOTIFY annotation values not present in any configured field', () => {
     const errors = validateNotifyAction({
       eventConfig: eventConfigWithNotifyForm,
-      annotation: { 'unknown.field': 'boom' },
+      annotation: {
+        'notify.dialog.comments': 'reported at facility',
+        'unknown.field': 'boom'
+      },
       declaration: {},
       context: testContext
     })
 
     expect(errors).toHaveLength(1)
+  })
+
+  it('reports an unknown annotation key together with a missing required dialog field', () => {
+    const errors = validateNotifyAction({
+      eventConfig: eventConfigWithNotifyForm,
+      annotation: { 'unknown.field': 'boom' },
+      declaration: {},
+      context: testContext
+    })
+
+    expect(errors).toEqual([
+      expect.objectContaining({
+        message: errorMessages.unexpectedField.defaultMessage,
+        id: 'unknown.field'
+      }),
+      expect.objectContaining({
+        message: errorMessages.requiredField.defaultMessage,
+        id: 'notify.dialog.comments'
+      })
+    ])
   })
 })
 
@@ -484,7 +507,7 @@ function getApplicantField(id: string): FieldConfig {
   return applicantField
 }
 
-/** Tennis club config whose NOTIFY action uses the given notification form fields (none when omitted) and review fields. */
+/** Tennis club config whose NOTIFY action uses the given notification form fields and review fields, or the default ones when not given. */
 function configWithNotify({
   notificationFields,
   reviewFields
@@ -629,53 +652,6 @@ describe('NOTIFY review field validation', () => {
     })
   })
 
-  describe('without a notification form', () => {
-    it('accepts a partial name', () => {
-      const errors = validateNotifyAction({
-        eventConfig: configWithNotify({}),
-        declaration: { 'applicant.name': { firstname: 'John' } },
-        context: testContext
-      })
-
-      expect(errors).toEqual([])
-    })
-
-    it('accepts a value for a field hidden by a conditional', () => {
-      // applicant.age is only shown when applicant.dobUnknown is true
-      const errors = validateNotifyAction({
-        eventConfig: configWithNotify({}),
-        declaration: { 'applicant.age': 25 },
-        context: testContext
-      })
-
-      expect(errors).toEqual([])
-    })
-
-    it('does not require a missing review field', () => {
-      const errors = validateNotifyAction({
-        eventConfig: configWithNotify({ reviewFields: [reviewField] }),
-        annotation: {},
-        declaration,
-        context: testContext
-      })
-
-      expect(errors).toEqual([])
-    })
-
-    it('validates a review field value shown by a declaration value', () => {
-      const errors = validateNotifyAction({
-        eventConfig: configWithNotify({ reviewFields: [reviewField] }),
-        annotation: { 'notifier.comment': 123 },
-        declaration,
-        context: testContext
-      })
-
-      expect(errors).toContainEqual(
-        expect.objectContaining({ id: 'notifier.comment' })
-      )
-    })
-  })
-
   it('requires a review field shown by a saved declaration value when notifying with edits', () => {
     const eventConfig = configWithNotify({
       notificationFields: [
@@ -735,6 +711,53 @@ describe('NOTIFY review field validation', () => {
     expect(errors).toContainEqual(
       expect.objectContaining({ id: 'notifier.comment' })
     )
+  })
+
+  it('accepts an EDIT annotation value of a NOTIFY review field', () => {
+    const errors = validateNotifyAction({
+      eventConfig: configWithNotify({ reviewFields: [reviewField] }),
+      annotation: { 'notifier.comment': 'Seen at the clinic' },
+      declaration,
+      context: testContext,
+      actionType: ActionType.EDIT
+    })
+
+    expect(errors).toEqual([])
+  })
+})
+
+describe('event without a NOTIFY action', () => {
+  const eventConfig = {
+    ...tennisClubMembershipEvent,
+    actions: tennisClubMembershipEvent.actions.filter(
+      (action) => action.type !== ActionType.NOTIFY
+    )
+  }
+
+  it('rejects NOTIFY with a bad request', () => {
+    expect(() =>
+      validateNotifyAction({
+        eventConfig,
+        declaration: { 'applicant.email': 'notifier@example.com' },
+        context: testContext
+      })
+    ).toThrow(
+      expect.objectContaining({
+        code: 'BAD_REQUEST',
+        message: `Event '${tennisClubMembershipEvent.id}' has no NOTIFY action.`
+      })
+    )
+  })
+
+  it('validates EDIT', () => {
+    const errors = validateNotifyAction({
+      eventConfig,
+      declaration: { 'applicant.email': 'notifier@example.com' },
+      context: testContext,
+      actionType: ActionType.EDIT
+    })
+
+    expect(errors).toEqual([])
   })
 })
 

@@ -12,8 +12,7 @@
 import React from 'react'
 import { useIntl } from 'react-intl'
 import { useTypedSearchParams } from 'react-router-typesafe-routes/dom'
-import { CaretDown } from '@opencrvs/components/lib/Icon/all-icons'
-import { Button, DropdownMenu, Icon } from '@opencrvs/components'
+import { Icons, Button, DropdownMenu, Icon } from '@opencrvs/components'
 import {
   EventConfig,
   EventIndex,
@@ -33,7 +32,7 @@ import {
 } from '@client/v2-events/utils'
 import { useLocations } from '@client/v2-events/hooks/useLocations'
 import { ROUTES } from '@client/v2-events/routes'
-import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
+import { useEventConfigurationForRecord } from '@client/v2-events/features/events/useEventConfiguration'
 import { useIntlFormatMessageWithFlattenedParams } from '@client/v2-events/messages/utils'
 import { useAllowedActionConfigurations } from '../../Actions/useAllowedActionConfigurations'
 import { ActionMenuItem } from '../../Actions/utils'
@@ -42,7 +41,7 @@ import { ActionMenuItem } from '../../Actions/utils'
 const DEFAULT_ACTION_ORDER = [
   ActionType.ASSIGN,
   ActionType.REGISTER,
-  ActionType.DECLARE,
+  ClientSpecificAction.CONTINUE_DRAFT,
   ActionType.EDIT,
   ActionType.REJECT,
   ActionType.ARCHIVE,
@@ -81,6 +80,11 @@ export function sortActions(
     // at the same time, sort it at the same position as `REQUEST_CORRECTION`.
     if (item.type === ClientSpecificAction.REVIEW_CORRECTION_REQUEST) {
       return actionOrder.indexOf(ActionType.REQUEST_CORRECTION)
+    }
+
+    // `CONTINUE_DRAFT` stands in for `DECLARE` in the menu, so it takes its configured position
+    if (item.type === ClientSpecificAction.CONTINUE_DRAFT) {
+      return actionOrder.indexOf(ActionType.DECLARE)
     }
 
     if ('customActionType' in item && item.customActionType) {
@@ -190,7 +194,7 @@ export function ActionMenu({
 
   const [modals, actionMenuItems] = useAllowedActionConfigurations(eventIndex)
 
-  const { eventConfiguration } = useEventConfiguration(eventIndex.type)
+  const { eventConfiguration } = useEventConfigurationForRecord(eventIndex)
 
   const assignedToOther =
     eventIndex.assignedTo && eventIndex.assignedTo !== auth.sub
@@ -204,7 +208,7 @@ export function ActionMenu({
             size="medium"
             type="primary"
           >
-            {intl.formatMessage(messages.action)} <CaretDown />
+            {intl.formatMessage(messages.action)} <Icons.CaretDown />
           </Button>
         </DropdownMenu.Trigger>
         <DropdownMenu.Content>

@@ -106,7 +106,7 @@ export const WithConfigurableSummaryFieldHavingEventMetadataValue: Story = {
             return [
               generateEventDraftDocument({
                 eventId: tennisClubMembershipEventDocument.id,
-                actionType: ActionType.REGISTER,
+                actionType: ActionType.DECLARE,
                 declaration: {
                   'applicant.name': {
                     firstname: 'Riku',
@@ -152,6 +152,56 @@ export const WithConfigurableSummaryFieldHavingEventMetadataValue: Story = {
 
       await expect(await canvas.findByText('Logged out')).toBeInTheDocument()
     })
+  }
+}
+
+const tennisClubMembershipEventWithConfigVersionInSummary: EventConfig = {
+  ...tennisClubMembershipEvent,
+  summary: {
+    ...tennisClubMembershipEvent.summary,
+    fields: [
+      ...tennisClubMembershipEvent.summary.fields,
+      {
+        id: 'configVersion',
+        label: {
+          defaultMessage: 'Form version',
+          description: 'This is the label for the configuration version',
+          id: 'event.tennis-club-membership.summary.configVersion.label'
+        },
+        value: {
+          defaultMessage: '{event.configVersionLabel}',
+          description:
+            'This is the label of the configuration version that the record was created under',
+          id: 'event.tennis-club-membership.summary.configVersion.value'
+        }
+      }
+    ]
+  }
+}
+
+export const WithConfigVersionLabelInSummary: Story = {
+  parameters: {
+    offline: {
+      events: [tennisClubMembershipEventDocument],
+      configs: [tennisClubMembershipEventWithConfigVersionInSummary]
+    },
+    reactRouter: {
+      router: routesConfig,
+      initialPath: ROUTES.V2.EVENTS.EVENT.buildPath({
+        eventId: tennisClubMembershipEventDocument.id
+      })
+    }
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+    const configVersionRow = await canvas.findByTestId('configVersion')
+
+    // An event without versions gives its single version the label of the event
+    await expect(
+      await within(configVersionRow).findByText(
+        'Tennis club membership application'
+      )
+    ).toBeInTheDocument()
   }
 }
 

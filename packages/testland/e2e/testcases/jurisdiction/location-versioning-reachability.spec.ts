@@ -38,7 +38,10 @@ import {
   assertRecordInWorkqueue
 } from '@e2e/support/birth/helpers'
 import { fetchClientAPI } from '@e2e/support/events-rest-api/helpers'
-import { activateUserViaApi } from '@e2e/support/test-data/api-actions'
+import {
+  activateUserViaApi,
+  getExpectedUsername
+} from '@e2e/support/test-data/api-actions'
 
 /**
  * Verifies jurisdiction/routing predicates as locations are renamed,
@@ -107,7 +110,7 @@ async function provisionUserInOffice(
 ) {
   const firstname = faker.person.firstName('female')
   const surname = faker.person.lastName('female')
-  const username = `${firstname[0]}.${surname}`.toLowerCase()
+  const username = getExpectedUsername({ firstname, surname })
   const fullname = `${firstname} ${surname}`
 
   const client = createClient(
@@ -426,12 +429,12 @@ test.describe('Jurisdiction & routing under location versioning', () => {
       officeName
     )
 
-    // Community Leader lacks record.declare, so it has no bucket to review
+    // Hospital Official (the only notifier role) lacks record.declare, so it has no bucket to review
     // its own notification in — the reachability check comes from a registrar.
     const { username } = await provisionUserInOffice(
       systemAdminToken,
       office.id,
-      'COMMUNITY_LEADER'
+      'HOSPITAL_CLERK'
     )
 
     await activateUserViaApi(username)

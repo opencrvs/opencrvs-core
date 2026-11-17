@@ -22,7 +22,8 @@ import {
   UUID,
   withDeclaration,
   getDeclaration,
-  getDeclarationPages
+  getDeclarationPages,
+  toVersionedEventConfig
 } from '@opencrvs/commons/client'
 import * as selectEvent from '@client/v2-events/select-event'
 import { localDraftStore } from '@client/v2-events/features/drafts/useDrafts'
@@ -127,7 +128,11 @@ function buildStoryParams(eventConfig: EventConfig) {
 
   const mswConfig = {
     handlers: {
-      events: [tRPCMsw.event.config.get.query(() => [eventConfig])],
+      events: [
+        tRPCMsw.event.config.get.query(() => [
+          toVersionedEventConfig(eventConfig)
+        ])
+      ],
       event: [
         tRPCMsw.event.get.query(() => freshDraftEvent),
         tRPCMsw.event.search.query(() => ({ results: [], total: 0 }))

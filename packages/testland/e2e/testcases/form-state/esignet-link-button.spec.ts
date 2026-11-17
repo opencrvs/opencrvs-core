@@ -17,9 +17,9 @@ async function authenticateInformantWithESignet(page: Page) {
   await page.locator('#informant____verify').click()
 
   // Only tested with mosip-mock so far
-  // https://github.com/opencrvs/mosip/blob/release-v1.8.0/packages/esignet-mock/src/index.ts#L166
+  // See the `/authorize` route in packages/esignet-mock/src/index.ts
   await page.waitForURL(/authorize/)
-  // https://github.com/opencrvs/mosip/blob/release-v1.8.0/docs/mock-identities.json#L24
+  // Identity of John Dino Doe in packages/mosip-api/docs/mock-identities.json
   await page.locator('#id-input').fill('1234567892')
   await page.locator('#authenticate').click()
 

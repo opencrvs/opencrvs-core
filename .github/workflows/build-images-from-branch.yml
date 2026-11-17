@@ -93,6 +93,9 @@ jobs:
           echo "from branch $ESCAPED_BRANCH"
           echo "branch=$ESCAPED_BRANCH" >> $GITHUB_OUTPUT
 
+          # Makes the base image install new Debian security fixes once a day
+          echo "apt-cache-date=$(date -u +%F)" >> $GITHUB_OUTPUT
+
       - name: Set architecture label
         id: arch_label
         run: |
@@ -136,6 +139,8 @@ jobs:
           action: docker/build-push-action@v7
           with: |
             file: packages/Dockerfile.base
+            build-args: |
+              APT_CACHE_DATE=${{ steps.set-version-and-branch.outputs.apt-cache-date }}
             provenance: false
             push: true
             context: .
@@ -482,3 +487,24 @@ jobs:
               }
             })
             console.log(result);
+  trigger-perf-test:
+    name: Trigger performance tests in perftest environment
+    needs: [base, merge-services-manifest, merge-testland-assets-manifest]
+    if: success() && (github.event_name == 'workflow_dispatch' || (github.event_name == 'push' && github.ref_name == 'develop'))
+    runs-on: ubuntu-26.04
+    permissions: {}
+    steps:
+      - uses: actions/github-script@v9
+        with:
+          github-token: ${{ secrets.PERF_TEST_INFRA_WORKFLOW_TOKEN }}
+          script: |
+            await github.rest.repos.createDispatchEvent({
+              owner: 'opencrvs',
+              repo: 'opencrvs-countryconfig-perf-test-infra',
+              event_type: 'run_perf_test',
+              client_payload: {
+                actor: '${{ github.actor }}',
+                'core-image-tag': '${{ needs.base.outputs.version }}',
+                'core-commit': '${{ github.sha }}'
+              }
+            })

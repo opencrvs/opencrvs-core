@@ -56,7 +56,7 @@ done
 # List of directories
 dirs=(
   "data/elasticsearch"
-  "data/minio"
+  "data/rustfs"
   "data/backups"
   "data/postgres"
   # mosip-api keeps its record-only tokens in SQLite. Its dev default path

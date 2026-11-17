@@ -26,7 +26,8 @@ import {
   UUID,
   withDeclaration,
   getDeclaration,
-  getDeclarationPages
+  getDeclarationPages,
+  toVersionedEventConfig
 } from '@opencrvs/commons/client'
 import { testDataGenerator } from '@client/tests/test-data-generators'
 import { ROUTES } from '@client/v2-events/routes'
@@ -175,7 +176,9 @@ const mockUserFull = generator.user.registrationAgent().v2
 const mswConfig = {
   handlers: {
     events: [
-      tRPCMsw.event.config.get.query(() => [correctableChildOnboardingEvent])
+      tRPCMsw.event.config.get.query(() => [
+        toVersionedEventConfig(correctableChildOnboardingEvent)
+      ])
     ],
     event: [tRPCMsw.event.get.query(() => birthEventDocument)],
     eventLocations: [
@@ -272,7 +275,9 @@ const birthEventDocumentPostRename = generateEventDocument({
 const mswConfigPostRename = {
   handlers: {
     events: [
-      tRPCMsw.event.config.get.query(() => [correctableChildOnboardingEvent])
+      tRPCMsw.event.config.get.query(() => [
+        toVersionedEventConfig(correctableChildOnboardingEvent)
+      ])
     ],
     event: [tRPCMsw.event.get.query(() => birthEventDocumentPostRename)],
     eventLocations: [

@@ -24,9 +24,9 @@ import {
   ActionType,
   AssignActionInput,
   DeleteActionInput,
-  Draft,
+  RemoteDraft,
   DraftInput,
-  EventConfig,
+  VersionedEventConfig,
   EventDocument,
   EventIndex,
   EventInput,
@@ -46,12 +46,19 @@ import {
   userAndSystemProcedure
 } from '@events/router/trpc'
 import {
-  getEventConfigurationById,
-  getInMemoryEventConfigurations
+  getCountryTimeZone,
+  getEventConfigurationForRecord,
+  getVersionedEventConfigurationById,
+  getInMemoryEventConfigurations,
+  getInMemoryVersionedEventConfigurations
 } from '@events/service/config/config'
 import { assignRecord } from '@events/service/events/actions/assign'
 import { unassignRecord } from '@events/service/events/actions/unassign'
-import { createDraft, getDraftsByUserId } from '@events/service/events/drafts'
+import {
+  createDraft,
+  getDraftsByUserId,
+  throwConflictIfDraftNotAllowed
+} from '@events/service/events/drafts'
 import {
   processAction,
   createEvent,
@@ -148,9 +155,9 @@ export const eventRouter = router({
       })
       .input(z.void())
       .use(middleware.reuseEventConfigResponse)
-      .output(z.array(EventConfig))
+      .output(z.array(VersionedEventConfig))
       .query(async (options) =>
-        getInMemoryEventConfigurations(options.ctx.token)
+        getInMemoryVersionedEventConfigurations(options.ctx.token)
       )
   }),
   create: userAndSystemProcedure
@@ -169,9 +176,9 @@ export const eventRouter = router({
 
     .output(EventDocument)
     .mutation(async ({ input, ctx }) => {
-      const config = await getEventConfigurationById({
-        token: ctx.token,
-        eventType: input.type
+      const config = await getVersionedEventConfigurationById({
+        eventType: input.type,
+        token: ctx.token
       })
 
       const result = await createEvent({
@@ -179,7 +186,8 @@ export const eventRouter = router({
         eventInput: input,
         user: ctx.user,
         createdAtLocation: input.createdAtLocation,
-        config
+        config,
+        timeZone: await getCountryTimeZone(ctx.token)
       })
 
       await writeAuditLog({
@@ -213,10 +221,10 @@ export const eventRouter = router({
     .output(EventDocument)
     .use(middleware.canAccessEventWithScopes(['record.read']))
     .query(async ({ ctx }) => {
-      const { eventId, eventType } = ctx
-      const configuration = await getEventConfigurationById({
-        token: ctx.token,
-        eventType
+      const { eventId, eventType, configVersionId } = ctx
+      const configuration = await getEventConfigurationForRecord({
+        event: { type: eventType, configVersionId },
+        token: ctx.token
       })
 
       const updatedEvent = await processAction(
@@ -282,12 +290,16 @@ export const eventRouter = router({
     }),
   draft: router({
     list: userOnlyProcedure
-      .output(z.array(Draft))
+      .output(z.array(RemoteDraft))
       .query(async (options) => getDraftsByUserId(options.ctx.user.id)),
     create: userOnlyProcedure
+      // A draft is saved by a user who can perform its action
+      .use(
+        middleware.canAccessEventWithActionScopes(DraftInput.shape.type.options)
+      )
       .input(DraftInput)
       .use(middleware.requireAssignment)
-      .output(Draft)
+      .output(RemoteDraft)
       .mutation(async ({ input, ctx }) => {
         const { eventId, type } = input
 
@@ -301,6 +313,10 @@ export const eventRouter = router({
           undefined,
           ctx.event
         )
+
+        // Checked against the event loaded before the upsert, like throwConflictIfActionNotAllowed above.
+        // An action committed in between leaves a stale draft, which the record's next action deletes.
+        throwConflictIfDraftNotAllowed(ctx.event)
 
         const previousDraft = await draftsRepo.findLatestDraftForAction(
           eventId,
@@ -467,16 +483,12 @@ export const eventRouter = router({
 
           await assertCanReviewDuplicatesOf(event, options.ctx)
 
-          const configuration = await getEventConfigurationById({
-            token,
-            eventType: event.type
-          })
           const result = await markAsDuplicate(
             event,
             options.input,
             user,
             token,
-            configuration
+            await getEventConfigurationForRecord({ event, token })
           )
           await writeAuditLog({
             clientId: user.id,
@@ -503,16 +515,12 @@ export const eventRouter = router({
 
           await assertCanReviewDuplicatesOf(event, options.ctx)
 
-          const configuration = await getEventConfigurationById({
-            token,
-            eventType: event.type
-          })
           const result = await markNotDuplicate(
             event,
             options.input,
             user,
             token,
-            configuration
+            await getEventConfigurationForRecord({ event, token })
           )
           await writeAuditLog({
             clientId: user.id,
@@ -548,11 +556,15 @@ export const eventRouter = router({
       })
     )
     .query(async ({ input, ctx }) => {
-      const eventConfigs = await getInMemoryEventConfigurations(ctx.token)
+      const [eventConfigs, versionedEventConfigs] = await Promise.all([
+        getInMemoryEventConfigurations(ctx.token),
+        getInMemoryVersionedEventConfigurations(ctx.token)
+      ])
 
       const result = await findRecordsByQuery({
         search: input,
         eventConfigs,
+        versionedEventConfigs,
         user: ctx.user,
         acceptedScopes: ctx.acceptedScopes,
         token: ctx.token

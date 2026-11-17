@@ -53,7 +53,7 @@ pnpm install
 pnpm dev
 ```
 
-`pnpm dev` starts the dependencies (databases, Elasticsearch, MinIO etc.) with Docker Compose and all Core services, including Testland on port 3040. It asks for confirmation first, then stops all running Docker containers on your machine.
+`pnpm dev` starts the dependencies (databases, Elasticsearch, S3 etc.) with Docker Compose and all Core services, including Testland on port 3040. It asks for confirmation first, then stops all running Docker containers on your machine.
 
 You can also start them separately:
 
@@ -84,8 +84,8 @@ The environments (QA, QA hotfix, e2e, migration staging and migration production
 
 - The [src](src) folder contains the code for the countryconfig service.
   - [src/events](src/events) defines the configurable events (birth, death, adoption and an example tennis club membership), including their forms and actions.
-  - [src/data-seeding](src/data-seeding) contains the reference data used to seed a new environment: administrative areas, offices, health facilities, roles, employees and other reference data.
-  - [src/api](src/api) contains most of the handlers for the endpoints below, e.g. action confirmation, registration numbers, certificates, notifications, workqueues and integrations. The `/config/roles`, `/config/locations` and `/config/users` handlers are in [src/data-seeding](src/data-seeding).
+  - [src/data-seeding](src/data-seeding) contains the reference data used to seed a new environment: administrative areas, offices, health facilities, employees and other reference data.
+  - [src/api](src/api) contains most of the handlers for the endpoints below, e.g. action confirmation, registration numbers, certificates, notifications, workqueues, roles and integrations. The `/config/locations` and `/config/users` handlers are in [src/data-seeding](src/data-seeding).
   - [src/analytics](src/analytics) contains the code that loads events and locations into the analytics database. The database itself is set up by [assets/postgres/setup-analytics.sh](assets/postgres/setup-analytics.sh). See [ANALYTICS.md](ANALYTICS.md).
   - [src/verifiable-credentials](src/verifiable-credentials) and [src/qa-tools](src/qa-tools) contain the Testland-only integrations and tools.
 - The [e2e](e2e) folder contains the Playwright end-to-end tests.

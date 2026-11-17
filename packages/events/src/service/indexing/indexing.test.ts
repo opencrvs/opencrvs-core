@@ -35,7 +35,7 @@ import {
   getDeclaration,
   getDeclarationPages
 } from '@opencrvs/commons/events'
-import { encodeScope } from '@opencrvs/commons'
+import { encodeScope, toVersionedEventConfig } from '@opencrvs/commons'
 import {
   createEvent,
   createSystemTestClient,
@@ -1405,7 +1405,7 @@ describe('placeOfEvent location hierarchy handling', () => {
     )
     mswServer.use(
       http.get(`${env.COUNTRY_CONFIG_URL}/config/events`, () => {
-        return HttpResponse.json([modifiedEventConfig])
+        return HttpResponse.json([toVersionedEventConfig(modifiedEventConfig)])
       })
     )
 
@@ -1802,7 +1802,10 @@ describe('placeOfEvent location hierarchy handling', () => {
     mswServer.use(
       http.get(`${env.COUNTRY_CONFIG_URL}/config/events`, () => {
         return HttpResponse.json([
-          { ...modifiedEventConfig, placeOfEvent: undefined }
+          toVersionedEventConfig({
+            ...modifiedEventConfig,
+            placeOfEvent: undefined
+          })
         ])
       })
     )

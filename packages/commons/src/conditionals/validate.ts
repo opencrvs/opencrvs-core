@@ -31,13 +31,14 @@ import {
   AgeValue
 } from '../events/FieldValue'
 import { TranslationConfig } from '../events/TranslationConfig'
-import { EncodedScope, ITokenPayload, TokenUserType } from '../authentication'
+import { EncodedScope, ITokenPayload, TokenUserType } from '../users/authentication'
 import { UUID } from '../uuid'
 import {
   ageToDate,
   buildFormState,
   flattenFormState,
-  FormState
+  FormState,
+  getEventWithCompleteAcceptedActions
 } from '../events/utils'
 import { ActionConfig } from '../events/ActionConfig'
 import { ActionType } from '../events/ActionType'
@@ -176,7 +177,11 @@ export function buildClientFunctionContext(input: {
     // eslint-disable-next-line @typescript-eslint/no-use-before-define
     $online: isOnline(),
     $user: input.validatorContext?.user,
-    $event: input.validatorContext?.event?.document,
+    $event: input.validatorContext?.event?.document
+      ? getEventWithCompleteAcceptedActions(
+          input.validatorContext.event.document
+        )
+      : undefined,
     $leafAdminStructureLocationIds:
       input.validatorContext?.leafAdminStructureLocationIds ?? [],
     user: input.systemVariables?.user,

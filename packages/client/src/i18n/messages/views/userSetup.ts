@@ -143,10 +143,10 @@ export const messages = defineMessages({
     description: 'Text for audit list',
     id: 'user.profile.audit.list.noDataFound'
   },
-  inProgressAuditAction: {
-    defaultMessage: 'Sent incomplete',
-    description: 'Description for incomplete declaration',
-    id: 'user.profile.audit.description.inProgress'
+  notifiedAuditAction: {
+    defaultMessage: 'Notified',
+    description: 'Description for notified record',
+    id: 'user.profile.audit.description.notified'
   },
   declaredAuditAction: {
     defaultMessage: 'Declaration started',

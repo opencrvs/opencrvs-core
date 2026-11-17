@@ -85,11 +85,11 @@ const ReadActionConfig = ActionConfigBase.extend(
 const NotifyConfig = ActionConfigBase.extend(
   z.object({
     type: z.literal(ActionType.NOTIFY),
-    notificationForm: DeclarationFormConfig.optional().describe(
-      "Notification form configuration. Its fields must be a subset of the declaration form fields, with matching types. The values submitted on the notification form pre-fill the declaration. If not defined, the declare action's declaration is used (with all fields optional)."
+    notificationForm: DeclarationFormConfig.describe(
+      'Notification form configuration. Its fields must be a subset of the declaration form fields, with matching types. The values submitted on the notification form pre-fill the declaration.'
     ),
     review: DeclarationReviewConfig.describe(
-      "Review page configuration for the notify action. Values of its fields are stored as the NOTIFY action annotation. If not defined, defineConfig generates it from the declare action's review (with all fields optional)."
+      'Review page configuration for the notify action. Values of its fields are stored as the NOTIFY action annotation.'
     ),
     form: actionConfirmationForm
   }).shape
@@ -319,7 +319,7 @@ export const ActionConfig = z
     NotifyConfig.meta({
       id: 'NotifyActionConfig',
       description:
-        'Configuration for the notify action, including the notification form and its review page. When undefined, it is generated using the DeclareActionConfig.'
+        'Configuration for the notify action: the notification form and its review page. An event without a NOTIFY action cannot be notified.'
     }),
     DeclareConfig.meta({
       id: 'DeclareActionConfig',

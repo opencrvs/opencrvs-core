@@ -15,10 +15,7 @@ import {
   useTypedParams,
   useTypedSearchParams
 } from 'react-router-typesafe-routes/dom'
-import {
-  eventAttachmentPath,
-  getDeclarationPages
-} from '@opencrvs/commons/client'
+import { eventAttachmentPath } from '@opencrvs/commons/client'
 import { Pages as PagesComponent } from '@client/v2-events/features/events/components/Pages'
 import { getFormBackAction } from '@client/v2-events/layouts/form/FormBackAction'
 import { useEventFormData } from '@client/v2-events/features/events/useEventFormData'
@@ -26,9 +23,9 @@ import { useEventFormNavigation } from '@client/v2-events/features/events/useEve
 import { FormLayout } from '@client/v2-events/layouts'
 import { ROUTES } from '@client/v2-events/routes'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
-import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
 import { useValidatorContext } from '@client/v2-events/hooks/useValidatorContext'
 import { EditPageBanner } from './EditPageBanner'
+import { useEditForm } from './useEditForm'
 
 export function Pages() {
   const { eventId, pageId } = useTypedParams(ROUTES.V2.EVENTS.EDIT.PAGES)
@@ -41,10 +38,8 @@ export function Pages() {
   const event = events.getEvent.useGetEventFromCache(eventId)
 
   const validatorContext = useValidatorContext(event)
-  const { eventConfiguration: configuration } = useEventConfiguration(
-    event.type
-  )
-  const declarationPages = getDeclarationPages(configuration)
+  const { eventConfiguration: configuration, formConfig } = useEditForm(event)
+  const declarationPages = formConfig.pages
 
   const currentPageId =
     declarationPages.find((p) => p.id === pageId)?.id || declarationPages[0]?.id

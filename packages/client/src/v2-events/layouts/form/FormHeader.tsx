@@ -22,7 +22,7 @@ import {
 import { AppBar, Button, Icon, ToggleMenu } from '@opencrvs/components'
 import { useEvents } from '@client/v2-events//features/events/useEvents/useEvents'
 import { useEventFormNavigation } from '@client/v2-events//features/events/useEventFormNavigation'
-import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
+import { useEventConfigurationForRecord } from '@client/v2-events/features/events/useEventConfiguration'
 import { AllowedRouteWithEventId } from './utils'
 
 export const messages = defineMessages({
@@ -36,10 +36,10 @@ export const messages = defineMessages({
     defaultMessage: 'Exit',
     description: 'The label for the exit button'
   },
-  deleteDeclaration: {
-    id: 'buttons.deleteDeclaration',
-    defaultMessage: 'Delete declaration',
-    description: 'The label for the delete declaration button'
+  deleteDraft: {
+    id: 'buttons.deleteDraft',
+    defaultMessage: 'Delete draft',
+    description: 'The label for the delete draft button'
   },
   back: {
     id: 'buttons.back',
@@ -73,9 +73,8 @@ export function FormHeader({
     throw new Error('Event id is required')
   }
   const event = events.getEvent.useGetEventFromCache(eventId)
-  const { eventConfiguration: configuration } = useEventConfiguration(
-    event.type
-  )
+  const { eventConfiguration: configuration } =
+    useEventConfigurationForRecord(event)
   const eventIndex = getCurrentEventState(event, configuration)
 
   const onExit = useCallback(async () => {
@@ -97,7 +96,7 @@ export function FormHeader({
   const menuItems = isUndeclaredDraft(eventIndex.status)
     ? [
         {
-          label: 'Delete declaration',
+          label: intl.formatMessage(messages.deleteDraft),
           icon: <Icon name="Trash" />,
           handler: onDelete
         }
@@ -199,7 +198,7 @@ export function FormHeader({
                   id={'event-menu'}
                   menuItems={[
                     {
-                      label: 'Delete declaration',
+                      label: intl.formatMessage(messages.deleteDraft),
                       icon: <Icon name="Trash" />,
                       handler: onDelete
                     }

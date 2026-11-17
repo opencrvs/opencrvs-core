@@ -11,7 +11,12 @@
 import { http, HttpResponse, PathParams } from 'msw'
 import { setupServer } from 'msw/node'
 import { tennisClubMembershipEvent } from '@opencrvs/commons/fixtures'
-import { ActionType, ConditionalType, field } from '@opencrvs/commons'
+import {
+  ActionType,
+  ConditionalType,
+  field,
+  toVersionedEventConfig
+} from '@opencrvs/commons'
 import { env } from '@events/environment'
 
 export const tennisClubMembershipEventWithCustomAction = {
@@ -96,11 +101,11 @@ const handlers = [
   ),
   http.get(`${env.COUNTRY_CONFIG_URL}/config/events`, () => {
     return HttpResponse.json([
-      tennisClubMembershipEventWithCustomAction,
-      {
+      toVersionedEventConfig(tennisClubMembershipEventWithCustomAction),
+      toVersionedEventConfig({
         ...tennisClubMembershipEventWithCustomAction,
         id: 'tennis-club-membership_premium'
-      }
+      })
     ])
   }),
   // event.delete.test.ts

@@ -64,6 +64,21 @@ export const ROUTES = {
               backTo: string()
             }
           }),
+          NOTIFY: route(
+            'notify/:eventId',
+            {
+              params: { eventId: uuid().defined() },
+              searchParams: { backTo: string() }
+            },
+            {
+              REVIEW: route('review', { searchParams: { backTo: string() } }),
+              PAGES: route('pages/:pageId', {
+                params: { pageId: string() },
+                searchParams: { from: string(), backTo: string() },
+                hash: hashValues()
+              })
+            }
+          ),
           DECLARE: route(
             'declare/:eventId',
             {

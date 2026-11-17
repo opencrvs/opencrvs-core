@@ -19,7 +19,8 @@ import {
   generateTrackingId,
   getCurrentEventState,
   tennisClubMembershipEvent,
-  TestUserRole
+  TestUserRole,
+  versionedTennisClubMembershipEvent
 } from '@opencrvs/commons/client'
 import { ROUTES, routesConfig } from '@client/v2-events/routes'
 import { AppRouter } from '@client/v2-events/trpc'
@@ -99,7 +100,7 @@ export const deletedScenariosForRegistrationAgent: StoryObj<typeof ActionMenu> =
       /*
        * Ensure record is "downloaded offline" in the user's browser
        */
-      addLocalEventConfig(tennisClubMembershipEvent)
+      addLocalEventConfig(versionedTennisClubMembershipEvent)
       setEventData(createdEventDocument.id, createdEventDocument)
       updateLocalEventIndex(createdEventDocument.id, createdEventDocument)
     },
@@ -112,24 +113,11 @@ export const deletedScenariosForRegistrationAgent: StoryObj<typeof ActionMenu> =
           await new Promise((resolve) => setTimeout(resolve, 5000))
           void canvas.getByTestId('action-dropdownMenu').click()
 
-          // wait for the list to appear
-          const list = await waitFor(() =>
-            document.querySelector('#action-Dropdown-Content')
-          )
-
-          // click the 2nd <li>
-          const items = list?.querySelectorAll('li')
-          if (!items || items.length < 2) {
-            throw new Error('Menu items not found')
-          }
-
-          await userEvent.click(items[1])
+          await userEvent.click(await canvas.findByText('Delete'))
 
           await expect(canvas.getByText('Delete draft?')).toBeInTheDocument()
           await expect(
-            canvas.getByText(
-              "Are you certain you want to delete this draft declaration form? Please note, this action can't be undone."
-            )
+            canvas.getByText('Are you sure you want to delete this draft?')
           ).toBeInTheDocument()
 
           const cancelDelete = await waitFor(() =>
