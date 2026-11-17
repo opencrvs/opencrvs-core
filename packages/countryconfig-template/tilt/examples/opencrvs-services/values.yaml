@@ -11,11 +11,11 @@ ingress:
   ssl_enabled: false
 
 env:
-  OPENCRVS_ENVIRONMENT: development
+  # The chart accepts `use_default_credentials: true` (see below) only when this value is `local`.
+  OPENCRVS_ENVIRONMENT: local
 
 credentials:
   super_user_password: password
-
 
 # Horizontal Pod Autoscaler (HPA) configuration:
 # Disabled by default for local environment.
