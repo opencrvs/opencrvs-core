@@ -107,7 +107,7 @@ helm upgrade --install opencrvs oci://ghcr.io/opencrvs/opencrvs-services \
         <tr>
             <td>elasticsearch.use_default_credentials</td>
             <td>false</td>
-            <td>Used when the chart creates the users secret and the URLs secret. <code>true</code>: the password of each user is the same as its username, for example <code>search</code>. <code>false</code>: random passwords. Use <code>true</code> for local development only, and always with Tilt: <code>helm template</code> renders random passwords again on each run. See <a href="#authentication-configuration">Authentication configuration</a>.</td>
+            <td><strong>UNSAFE for production.</strong> Used when the chart creates the users secret and the URLs secret. <code>true</code>: the password of each user is the same as its username, for example <code>search</code>. <code>false</code>: random passwords. Use <code>true</code> for local development only, and always with Tilt: <code>helm template</code> renders random passwords again on each run. The chart accepts <code>true</code> only when <code>env.OPENCRVS_ENVIRONMENT</code> is <code>local</code>. See <a href="#authentication-configuration">Authentication configuration</a>.</td>
         </tr>
         <tr>
             <td>elasticsearch.urls_secret</td>
@@ -182,7 +182,7 @@ helm upgrade --install opencrvs oci://ghcr.io/opencrvs/opencrvs-services \
         <tr>
             <td>postgres.use_default_credentials</td>
             <td>false</td>
-            <td>Used when the chart creates the users secret and the URLs secret. <code>true</code>: the password of each user is the same as its username, for example <code>events_app</code>. <code>false</code>: random passwords. Use <code>true</code> for local development only, and always with Tilt: <code>helm template</code> renders random passwords again on each run. See <a href="#authentication-configuration">Authentication configuration</a>.</td>
+            <td><strong>UNSAFE for production.</strong> Used when the chart creates the users secret and the URLs secret. <code>true</code>: the password of each user is the same as its username, for example <code>events_app</code>. <code>false</code>: random passwords. Use <code>true</code> for local development only, and always with Tilt: <code>helm template</code> renders random passwords again on each run. The chart accepts <code>true</code> only when <code>env.OPENCRVS_ENVIRONMENT</code> is <code>local</code>. See <a href="#authentication-configuration">Authentication configuration</a>.</td>
         </tr>
         <tr>
             <td>postgres.urls_secret</td>
@@ -728,6 +728,10 @@ Authentication is always enabled. The `auth_mode` value is removed from `postgre
 | Elasticsearch | `elasticsearch.admin_user_secret_name`          | The chart creates it from `elasticsearch.admin_password`, or fails.                                |
 | Elasticsearch | `elasticsearch.users_secret`, `urls_secret`     | The chart creates both secrets, with random passwords or default ones (`use_default_credentials`). |
 | Redis         | `redis.users_secret`                            | The chart does not create it. Copy it from the dependencies chart.                                 |
+
+> [!WARNING]
+>
+> **`use_default_credentials: true` is UNSAFE. Never use it in production.** The password of each user is the same as its username, so anyone can guess it. Use it for local development with Tilt only. The chart accepts `postgres.use_default_credentials: true` and `elasticsearch.use_default_credentials: true` only when `env.OPENCRVS_ENVIRONMENT` is `local`. In any other environment, `helm template`, `helm install` and `helm upgrade` fail. The default is `false`.
 
 The chart never changes an existing secret. For Postgres and Elasticsearch, the on-deploy jobs use the admin secret to create or update the users of OpenCRVS. The migration jobs also need it. `helm install` and `helm upgrade` fail if the admin secret and the `admin_*` values are missing. `helm template` cannot read the cluster, so it does not fail: it renders the secrets only when you give the values.
 
