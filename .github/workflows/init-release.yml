@@ -64,26 +64,46 @@ jobs:
           git config user.email "github-actions[bot]@users.noreply.github.com"
 
       # Each commit is skipped when it is already there, so a re-run is safe.
+      # Only the "version" fields of the package.json files on the line's
+      # current version and the CHANGELOG change: charts, image tags and the
+      # Tiltfile keep pointing at the published release until it ships.
       - name: Bump the version and add a CHANGELOG section
         env:
           LINE_BRANCH: ${{ steps.line.outputs.branch }}
         run: |
-          if [ "$(jq -r .version package.json)" = "$VERSION" ]; then
+          current=$(jq -r .version package.json)
+          if [ "$current" = "$VERSION" ]; then
             echo "package.json is already on $VERSION."
           else
-            npx lerna exec "yarn version --new-version $VERSION --no-git-tag-version"
-            yarn version --new-version "$VERSION" --no-git-tag-version
-            git add .
+            # A sed on the "version" line, not yarn/npm version, so no lifecycle
+            # script runs and the rest of each file stays byte for byte the same.
+            git ls-files '*package.json' | while read -r file; do
+              if [ "$(jq -r '.version // ""' "$file")" = "$current" ]; then
+                sed -i "0,/\"version\": \"$current\"/s//\"version\": \"$VERSION\"/" "$file"
+                git add -- "$file"
+              fi
+            done
             git commit -m "chore: update version to $VERSION"
           fi
 
-          if grep -qx "## $VERSION" CHANGELOG.md; then
+          # A section left over from the old flow may still say "Release Candidate".
+          if grep -qxE "## ${VERSION//./\\.}( Release Candidate)?" CHANGELOG.md; then
             echo "CHANGELOG.md already has a $VERSION section."
           else
             # Insert "## <version>" right below the "# Changelog" header.
             sed -i "0,/^# Changelog$/s//# Changelog\n\n## $VERSION/" CHANGELOG.md
             git add CHANGELOG.md
             git commit -m "docs: add $VERSION to the changelog"
+          fi
+
+          # Refuse to push anything beyond the version fields and the CHANGELOG.
+          unexpected=$(git diff --name-only "origin/$LINE_BRANCH" HEAD | grep -Ev '(^|/)package\.json$|^CHANGELOG\.md$' || true)
+          extra=$(git diff -U0 "origin/$LINE_BRANCH" HEAD -- '*package.json' | grep -E '^[-+] ' | grep -v '"version": ' || true)
+          if [ -n "$unexpected" ] || [ -n "$extra" ]; then
+            echo "::error::The release bump changed more than the version fields and the CHANGELOG:"
+            echo "$unexpected"
+            echo "$extra"
+            exit 1
           fi
 
           git push origin "$LINE_BRANCH"
