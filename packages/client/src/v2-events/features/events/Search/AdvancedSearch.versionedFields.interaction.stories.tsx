@@ -10,7 +10,7 @@
  */
 import React from 'react'
 import { Meta, StoryObj } from '@storybook/react-vite'
-import { userEvent, within } from 'storybook/test'
+import { expect, userEvent, within } from 'storybook/test'
 import { createTRPCMsw, httpLink } from '@vafanassieff/msw-trpc'
 import superjson from 'superjson'
 import {
@@ -24,6 +24,7 @@ import {
 import { serializeSearchParams } from '@client/v2-events/features/events/Search/utils'
 import { TRPCProvider, AppRouter } from '@client/v2-events/trpc'
 import { ROUTES, routesConfig } from '@client/v2-events/routes'
+import { UNFIT_SEARCH_CRITERIA_TOAST_ID } from './useUnfitSearchCriteriaNotice'
 import { AdvancedSearch } from './index'
 
 const NICKNAME_FIELD_ID = 'applicant.nickname'
@@ -144,6 +145,43 @@ export const CriteriaPanelShowsFieldOfOlderVersion: Story = {
 
     await step('The criteria pill names the field of v1', async () => {
       await canvas.findByText('Nickname: Ace', {}, { timeout: 5000 })
+    })
+  }
+}
+
+export const LinkValueThatNoLongerFitsIsDropped: Story = {
+  parameters: {
+    reactRouter: {
+      router: routesConfig,
+      // A name, e.g. from a link saved while the field was a NAME. It is a TEXT field now.
+      initialPath: `${ROUTES.V2.SEARCH_RESULT.buildPath({
+        eventType: tennisClubMembershipEvent.id
+      })}?${serializeSearchParams({
+        [NICKNAME_FIELD_ID]: { firstname: 'Ace', surname: 'Smith' },
+        eventType: tennisClubMembershipEvent.id
+      })}`
+    },
+    chromatic: { disableSnapshot: true },
+    offline: { configs: [], events: [] },
+    msw
+  },
+  play: async ({ canvasElement, step }) => {
+    // The toast renders outside the story's root element.
+    const page = within(canvasElement.ownerDocument.body)
+
+    await step(
+      'A warning says that some criteria no longer apply',
+      async () => {
+        await page.findByTestId(
+          UNFIT_SEARCH_CRITERIA_TOAST_ID,
+          {},
+          { timeout: 5000 }
+        )
+      }
+    )
+
+    await step('The value is left out of the criteria', async () => {
+      await expect(page.queryByText(/Nickname/)).not.toBeInTheDocument()
     })
   }
 }

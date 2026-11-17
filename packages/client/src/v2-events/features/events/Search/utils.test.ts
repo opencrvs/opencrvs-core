@@ -42,7 +42,8 @@ import {
   resolveAdvancedSearchConfig,
   getAdvancedSearchFieldErrors,
   toAdvancedSearchQueryType,
-  withSearchLocationBehaviour
+  withSearchLocationBehaviour,
+  splitSearchParamsByFit
 } from './utils'
 
 /** Farajaland's default admin levels, as the offline config supplies them. */
@@ -317,6 +318,44 @@ describe('buildQuickSearchQuery', () => {
         }
       ]
     })
+  })
+})
+
+describe('splitSearchParamsByFit', () => {
+  const label = {
+    id: 'label',
+    defaultMessage: 'Label',
+    description: 'Label of a test field'
+  }
+  const fields: FieldConfig[] = [
+    { id: 'applicant.nickname', type: FieldType.TEXT, label },
+    { id: 'applicant.height', type: FieldType.NUMBER, label }
+  ]
+
+  it('keeps a value that fits its field', () => {
+    expect(
+      splitSearchParamsByFit(fields, { 'applicant.nickname': 'Ace' })
+    ).toEqual({ values: { 'applicant.nickname': 'Ace' }, unfitFieldIds: [] })
+  })
+
+  it('reads the text of a number back as a number', () => {
+    expect(
+      splitSearchParamsByFit(fields, { 'applicant.height': '180' })
+    ).toEqual({ values: { 'applicant.height': 180 }, unfitFieldIds: [] })
+  })
+
+  it('leaves out and reports a value that no longer fits its field', () => {
+    expect(
+      splitSearchParamsByFit(fields, {
+        'applicant.nickname': { firstname: 'Ace', surname: 'Smith' }
+      })
+    ).toEqual({ values: {}, unfitFieldIds: ['applicant.nickname'] })
+  })
+
+  it('leaves out, without reporting, a param that names no field', () => {
+    expect(
+      splitSearchParamsByFit(fields, { eventType: 'tennis-club-membership' })
+    ).toEqual({ values: {}, unfitFieldIds: [] })
   })
 })
 

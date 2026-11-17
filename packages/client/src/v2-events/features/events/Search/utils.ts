@@ -45,7 +45,9 @@ import {
   getAcceptedScopesByType,
   scopeUsesFullOptions,
   user,
-  EncodedScope
+  EncodedScope,
+  FieldUpdateValue,
+  validateFieldInput
 } from '@opencrvs/commons/client'
 import { getAllUniqueFields } from '@opencrvs/commons/client'
 import { isVersionedLocation } from '@client/v2-events/VersionedLocation'
@@ -927,24 +929,6 @@ export function getSearchParamsFieldConfigs({
 }
 
 /**
- * @returns A filtered object of search parameters that include only fields in the event configuration.
- *
- */
-export function parseFieldSearchParams(input: SearchParamsInput) {
-  const { searchParams } = input
-  const searchFieldConfigs = getSearchParamsFieldConfigs(input)
-
-  // filter out any unrelated search parameters
-  const filteredSearchParams = Object.fromEntries(
-    Object.entries(searchParams).filter(([key]) =>
-      searchFieldConfigs.some((config) => config.id === key)
-    )
-  )
-
-  return filteredSearchParams
-}
-
-/**
  * Builds a data condition object based on the provided event state and configuration.
  *
  * This function:
@@ -1183,6 +1167,68 @@ function tryParse(value: unknown): unknown {
 
   return value
 }
+function fitsField(field: FieldConfig, value: unknown) {
+  return (
+    validateFieldInput({ field, value: value as FieldUpdateValue }).length === 0
+  )
+}
+
+/**
+ * A link holds every value as text, and `deserializeSearchParams` turns back only
+ * objects and arrays. So a NUMBER field's `5` comes back as `"5"`, and a boolean as
+ * `"true"`. When the text does not fit the field, it is read as JSON, and kept as that
+ * value if it fits. Without this, a valid number filter would be dropped as not fitting.
+ */
+function toFieldValue(field: FieldConfig, value: unknown) {
+  if (!isString(value) || fitsField(field, value)) {
+    return value
+  }
+  try {
+    const parsed: unknown = JSON.parse(value)
+    return fitsField(field, parsed) ? parsed : value
+  } catch {
+    return value
+  }
+}
+
+/**
+ * Splits the search params of a link into the values that fit their field, and the ids
+ * of the fields whose value no longer fits, e.g. after the field's type changed.
+ * Params that name none of `fields` are left out.
+ */
+export function splitSearchParamsByFit(
+  fields: FieldConfig[],
+  params: Record<string, unknown>
+): { values: EventState; unfitFieldIds: string[] } {
+  const values: EventState = {}
+  const unfitFieldIds: string[] = []
+
+  for (const field of fields) {
+    if (!(field.id in params)) {
+      continue
+    }
+    const value = toFieldValue(field, params[field.id])
+    if (fitsField(field, value)) {
+      values[field.id] = value as FieldValue
+    } else {
+      unfitFieldIds.push(field.id)
+    }
+  }
+
+  return { values, unfitFieldIds }
+}
+
+/**
+ * @returns the search parameters that are fields of the event and fit them, and the ids
+ * of the fields whose value no longer fits (see `splitSearchParamsByFit`).
+ */
+export function parseFieldSearchParams(input: SearchParamsInput) {
+  return splitSearchParamsByFit(
+    getSearchParamsFieldConfigs(input),
+    input.searchParams
+  )
+}
+
 export function deserializeSearchParams(
   queryParams: string
 ): Record<string, unknown> {

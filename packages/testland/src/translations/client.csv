@@ -1005,6 +1005,7 @@ review.signature.open,Label for button that opens the signature input,Sign,Signe
 saveAndExit.desc.saveDeclarationConfirm,Description for save declaration confirmation modal,All inputted data will be kept secure for future editing. Are you ready to save any changes to this declaration form?,Toutes les données saisies seront conservées en toute sécurité pour de futures modifications. Êtes-vous prêt à enregistrer les modifications apportées à ce formulaire de déclaration?
 saveAndExit.title.saveDeclarationConfirm,Title for save declaration confirmation modal,Save & exit?,Enregistrer et quitter?
 search.advancedSearch.result.title,Advanced search result title,Search results ({count}),résultat de la recherche pour ({count})
+search.criteria.noLongerApply,"Shown when values in a search link no longer fit their field, e.g. after the field changed, and were left out of the search",Some search criteria no longer apply,Certains critères de recherche ne s'appliquent plus
 search.noRecord,The no record text,"No records {slug, select, draft {in drafts} outbox {require processing} other {{title}}}","Aucun enregistrement {slug, select, draft {dans brouillons} outbox {à traiter} other {{title}}}"
 search.noResult,The no result text,No result,Pas de résultats”
 search.noResultFor,The no result text,No results for ”{param}”,Aucun résultat pour “{param}”

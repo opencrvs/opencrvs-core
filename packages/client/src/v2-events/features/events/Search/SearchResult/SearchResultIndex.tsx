@@ -33,8 +33,10 @@ import {
   buildSearchQuery,
   toAdvancedSearchQueryType,
   deserializeSearchParams,
-  resolveAdvancedSearchConfig
+  resolveAdvancedSearchConfig,
+  splitSearchParamsByFit
 } from '../utils'
+import { useUnfitSearchCriteriaNotice } from '../useUnfitSearchCriteriaNotice'
 import { SearchResultComponent } from './SearchResult'
 
 export const SearchResultIndex = () => {
@@ -61,25 +63,23 @@ export const SearchResultIndex = () => {
    * SelectDateRangeValue's are converted to DateTime values which would
    * return a new value on every render, hence we need to memoize.
    */
-  const formValues = useMemo(() => {
+  const { values: formValues, unfitFieldIds } = useMemo(() => {
     /*
      * Deliberately not parsed with `SearchQueryParams`. Its catchall is a plain
      * union of every field-value shape, and some members are objects whose keys
      * are all optional. Those match any object and strip it to `{}`. An address
      * filter is held as a FIELD_GROUP value, so it would not survive.
      *
-     * Safe to skip: the filter below drops any key that is not a known field,
-     * and every value that reaches a query is checked by the branch that
-     * consumes it.
+     * Safe to skip: `splitSearchParamsByFit` drops any key that is not a known
+     * field, and any value that does not fit its field.
      */
     const searchParams = deserializeSearchParams(location.search)
 
-    return Object.fromEntries(
-      Object.entries(searchParams).filter(([key]) =>
-        fields.some((field) => field.id === key)
-      )
-    ) as EventState
+    return splitSearchParamsByFit(fields, searchParams)
   }, [location.search, fields])
+
+  // Warns when values of the link were left out because they no longer fit their field.
+  useUnfitSearchCriteriaNotice(unfitFieldIds)
 
   const searchQuery = useMemo(
     () =>
