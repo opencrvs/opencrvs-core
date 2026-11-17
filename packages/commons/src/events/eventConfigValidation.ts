@@ -45,26 +45,26 @@ const SEARCH_DEFAULT_VALUE_FIELD_TYPES = [
   FieldType.DATE
 ]
 
-export function validateAdvancedSearchConfig(
-  event: EventConfig,
-  ctx: z.RefinementCtx<EventConfig>
+/**
+ * Rejects advanced search fields that match a field of none of the `versions`, nor a
+ * metadata field. A field that only some versions have can still be searched.
+ */
+export function validateAdvancedSearchFieldIds(
+  event: Pick<EventConfig, 'id' | 'advancedSearch'>,
+  versions: EventConfig[],
+  ctx: Pick<z.RefinementCtx<unknown>, 'addIssue'>
 ) {
-  const allFields = findAllFields(event)
-  const fieldIds = allFields.map((field) => field.id)
-
-  const advancedSearchFields = event.advancedSearch.flatMap((section) =>
-    section.fields.flatMap((field) => field.fieldId)
-  )
-
-  const advancedSearchFieldsSet = new Set(advancedSearchFields)
-
-  if (advancedSearchFieldsSet.size !== advancedSearchFields.length) {
-    ctx.addIssue({
-      code: 'custom',
-      message: 'Advanced search field ids must be unique',
-      path: ['advancedSearch']
-    })
+  // The fields of a version are not known without its one DECLARE action, which is reported elsewhere
+  const hasOneDeclareAction = (version: EventConfig) =>
+    version.actions.filter(({ type }) => type === ActionType.DECLARE).length ===
+    1
+  if (!versions.every(hasOneDeclareAction)) {
+    return
   }
+
+  const fieldIds = versions.flatMap((version) =>
+    findAllFields(version).map((field) => field.id)
+  )
 
   const invalidFields = event.advancedSearch.flatMap((section) =>
     // Check if the fieldId is not in the fieldIds array
@@ -88,6 +88,27 @@ export function validateAdvancedSearchConfig(
   Invalid AdvancedSearch field IDs for event ${event.id}: ${invalidFields
     .map((f) => f.fieldId)
     .join(', ')}`,
+      path: ['advancedSearch']
+    })
+  }
+}
+
+export function validateAdvancedSearchConfig(
+  event: EventConfig,
+  ctx: z.RefinementCtx<EventConfig>
+) {
+  const allFields = findAllFields(event)
+
+  const advancedSearchFields = event.advancedSearch.flatMap((section) =>
+    section.fields.flatMap((field) => field.fieldId)
+  )
+
+  const advancedSearchFieldsSet = new Set(advancedSearchFields)
+
+  if (advancedSearchFieldsSet.size !== advancedSearchFields.length) {
+    ctx.addIssue({
+      code: 'custom',
+      message: 'Advanced search field ids must be unique',
       path: ['advancedSearch']
     })
   }
@@ -128,7 +149,7 @@ export function validateAdvancedSearchConfig(
 
       const formField = allFields.find(({ id }) => id === searchField.fieldId)
 
-      // An unknown field id is already reported above
+      // An unknown field id is reported by validateAdvancedSearchFieldIds
       if (!formField) {
         return
       }

@@ -16,6 +16,8 @@ import {
   VersionedEventConfig
 } from './EventConfig'
 import { ActionType } from './ActionType'
+import { FieldType } from './FieldType'
+import { field } from './field'
 import { getActionConfig, getDeclaration } from './utils'
 import { tennisClubMembershipEvent } from '../fixtures'
 
@@ -430,6 +432,77 @@ describe('defineConfig()', () => {
 
       expect(resolveEventConfig(config).label).toEqual(label)
       expect(resolveEventConfig(refetched).label).toEqual(refetched.label)
+    })
+
+    describe('advanced search', () => {
+      const V2_ONLY_FIELD_ID = 'applicant.nickname'
+
+      /** v2, with a declaration field that v1 does not have. */
+      const v2WithExtraField = {
+        ...v2,
+        actions: v2.actions.map((action) => {
+          if (action.type !== ActionType.DECLARE) {
+            return action
+          }
+          const [firstPage, ...otherPages] = action.declaration.pages
+          return {
+            ...action,
+            declaration: {
+              ...action.declaration,
+              pages: [
+                {
+                  ...firstPage,
+                  fields: [
+                    ...firstPage.fields,
+                    {
+                      id: V2_ONLY_FIELD_ID,
+                      type: FieldType.TEXT,
+                      label: {
+                        id: 'v2.nickname.label',
+                        defaultMessage: 'Nickname',
+                        description: 'Field only v2 has'
+                      }
+                    }
+                  ]
+                },
+                ...otherPages
+              ]
+            }
+          }
+        })
+      }
+
+      const advancedSearchWithExtraField = [
+        ...advancedSearch,
+        {
+          title: advancedSearch[1].title,
+          fields: [field(V2_ONLY_FIELD_ID).exact()]
+        }
+      ]
+
+      it('should accept a search field that only one version has', () => {
+        expect(() =>
+          defineConfig({
+            id: eventId,
+            label,
+            advancedSearch: advancedSearchWithExtraField,
+            versions: [v1, v2WithExtraField]
+          })
+        ).not.toThrow()
+      })
+
+      it('should reject a search field that no version has, naming the field', () => {
+        expect(() =>
+          defineConfig({
+            id: eventId,
+            label,
+            advancedSearch: advancedSearchWithExtraField,
+            versions: [v1, v2]
+          })
+        ).toThrow(
+          `Invalid AdvancedSearch field IDs for event ${eventId}: ${V2_ONLY_FIELD_ID}`
+        )
+      })
     })
 
     it('should reject a version field (e.g. actions) at the top level of an event with versions', () => {

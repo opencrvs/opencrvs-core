@@ -29,6 +29,7 @@ import {
   validatePlaceOfEvent,
   validateDateOfEvent,
   validateAdvancedSearchConfig,
+  validateAdvancedSearchFieldIds,
   validateExactlyOneDeclareAction,
   validateNotificationForm,
   validateVersionList
@@ -225,11 +226,16 @@ export function validateEventConfig(
 }
 
 export const EventConfig: z.ZodType<EventConfig, EventConfigSchemaInput> =
-  _EventConfigBase.superRefine(validateEventConfig).meta({
-    id: 'EventConfig',
-    description:
-      'Configuration defining an event type registered in OpenCRVS (for example birth or death).'
-  })
+  _EventConfigBase
+    .superRefine((event, ctx) => {
+      validateEventConfig(event, ctx)
+      validateAdvancedSearchFieldIds(event, [event], ctx)
+    })
+    .meta({
+      id: 'EventConfig',
+      description:
+        'Configuration defining an event type registered in OpenCRVS (for example birth or death).'
+    })
 
 type EventLevelField = keyof typeof eventLevelFields
 
@@ -539,12 +545,12 @@ export const VersionedEventConfig: z.ZodType<
       )
   })
   .superRefine((config, ctx) => {
-    validateVersionList(config, ctx)
-    validateEachVersion(
-      ctx,
-      config.versions.map((version) => toEventConfig(config, version)),
-      validateEventConfig
+    const versionConfigs = config.versions.map((version) =>
+      toEventConfig(config, version)
     )
+    validateVersionList(config, ctx)
+    validateEachVersion(ctx, versionConfigs, validateEventConfig)
+    validateAdvancedSearchFieldIds(config, versionConfigs, ctx)
   })
   .meta({
     id: 'VersionedEventConfig',
