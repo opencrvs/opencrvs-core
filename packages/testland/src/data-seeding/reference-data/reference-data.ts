@@ -40,6 +40,14 @@ export async function syncReferenceData() {
             id: l.id,
             label: l.label,
             code: l.code,
+            ucLabel: l.uc_label,
+            chapterNo: l.chapter_no,
+            chapterRange: l.chapter_range,
+            chapterName: l.chapter_name,
+            subchapterCode: l.subchapter_code,
+            subchapterName: l.subchapter_name,
+            ncdCdInjuries: l.ncd_cd_injuries,
+            illDefined: l.ill_defined,
             validUntil: l.validUntil
           }))
         )
@@ -54,6 +62,46 @@ export async function syncReferenceData() {
               WHEN excluded.code IS NOT NULL
               THEN excluded.code
               ELSE reference_data.icd10.code
+            END`,
+            ucLabel: () => sql`CASE
+              WHEN excluded.uc_label IS NOT NULL
+              THEN excluded.uc_label
+              ELSE reference_data.icd10.uc_label
+            END`,
+            chapterNo: () => sql`CASE
+              WHEN excluded.chapter_no IS NOT NULL
+              THEN excluded.chapter_no
+              ELSE reference_data.icd10.chapter_no
+            END`,
+            chapterRange: () => sql`CASE
+              WHEN excluded.chapter_range IS NOT NULL
+              THEN excluded.chapter_range
+              ELSE reference_data.icd10.chapter_range
+            END`,
+            chapterName: () => sql`CASE
+              WHEN excluded.chapter_name IS NOT NULL
+              THEN excluded.chapter_name
+              ELSE reference_data.icd10.chapter_name
+            END`,
+            subchapterCode: () => sql`CASE
+              WHEN excluded.subchapter_code IS NOT NULL
+              THEN excluded.subchapter_code
+              ELSE reference_data.icd10.subchapter_code
+            END`,
+            subchapterName: () => sql`CASE
+              WHEN excluded.subchapter_name IS NOT NULL
+              THEN excluded.subchapter_name
+              ELSE reference_data.icd10.subchapter_name
+            END`,
+            ncdCdInjuries: () => sql`CASE
+              WHEN excluded.ncd_cd_injuries IS NOT NULL
+              THEN excluded.ncd_cd_injuries
+              ELSE reference_data.icd10.ncd_cd_injuries
+            END`,
+            illDefined: () => sql`CASE
+              WHEN excluded.ill_defined IS NOT NULL
+              THEN excluded.ill_defined
+              ELSE reference_data.icd10.ill_defined
             END`,
             validUntil: () =>
               sql`CASE
