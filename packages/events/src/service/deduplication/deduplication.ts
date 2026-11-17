@@ -285,7 +285,11 @@ export async function searchForDuplicates({
     }
     return {
       score: hit._score || 0,
-      event: decodeEventIndex(eventConfig, hit._source)
+      // A duplicate may be of another version, with fields that this record's version does not have.
+      event: decodeEventIndex(
+        getEventConfigForRecord(versionedConfig, hit._source),
+        hit._source
+      )
     }
   })
 }

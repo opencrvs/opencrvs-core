@@ -18,8 +18,10 @@ import {
   Clause,
   getDeclarationFields,
   FieldType,
+  getEventConfigOfVersion,
   PlainDate,
   toVersionedEventConfig,
+  VersionedEventConfig,
   withDeclarationField
 } from '@opencrvs/commons'
 import { ChildOnboardingEvent } from '@opencrvs/commons/fixtures'
@@ -627,8 +629,7 @@ describe('deduplication tests', () => {
 describe('deduplication across versions', () => {
   const OLDER_FIELD_ID = 'mother.previousDob'
 
-  // Another version of the event, with a field that the record's own version does not have.
-  const otherVersion = withDeclarationField(ChildOnboardingEvent, {
+  const olderField = {
     id: OLDER_FIELD_ID,
     type: FieldType.DATE,
     label: {
@@ -636,7 +637,10 @@ describe('deduplication across versions', () => {
       defaultMessage: 'Previous date of birth',
       description: 'Field that only another version has'
     }
-  })
+  }
+
+  // Another version of the event, with a field that the record's own version does not have.
+  const otherVersion = withDeclarationField(ChildOnboardingEvent, olderField)
 
   const clause = Clause.parse(
     field('mother.dob').dateRangeMatches({
@@ -670,5 +674,65 @@ describe('deduplication across versions', () => {
         ChildOnboardingEvent
       ])
     ).toThrow(`Field with id ${OLDER_FIELD_ID} not found in any version`)
+  })
+
+  it('reads a duplicate with the configuration of its own version', async () => {
+    const { versions, ...eventLevel } =
+      toVersionedEventConfig(ChildOnboardingEvent)
+    const [base] = versions
+    // v1 has the field, and v2, in effect since 2020, does not.
+    const versionedConfig: VersionedEventConfig = {
+      ...eventLevel,
+      versions: [
+        withDeclarationField({ ...base, id: 'v1' }, olderField),
+        { ...base, id: 'v2', effectiveFrom: '2020-01-01' }
+      ]
+    }
+    const declaration = {
+      'child.name': { firstname: 'John', surname: 'Smith' },
+      'child.dob': '2011-11-11',
+      'mother.name': { firstname: 'Mother', surname: 'Smith' },
+      'mother.dob': '2000-11-11',
+      'mother.nid': '23412387'
+    }
+
+    const recordOfV1 = eventQueryDataGenerator({
+      // Without an id, both records get the same one, and a record is never its own duplicate.
+      id: getUUID(),
+      type: ChildOnboardingEvent.id,
+      configVersionId: 'v1',
+      declaration: { ...declaration, [OLDER_FIELD_ID]: '1999-01-01' }
+    })
+    await getOrCreateClient().update({
+      index: getEventIndexName(ChildOnboardingEvent.id),
+      id: recordOfV1.id,
+      body: {
+        doc: encodeEventIndex(
+          recordOfV1,
+          getEventConfigOfVersion(versionedConfig, 'v1')
+        ),
+        doc_as_upsert: true
+      },
+      refresh: 'wait_for'
+    })
+
+    const recordOfV2 = eventQueryDataGenerator({
+      type: ChildOnboardingEvent.id,
+      configVersionId: 'v2',
+      declaration
+    })
+
+    const duplicates = await searchForDuplicates({
+      eventIndex: recordOfV2,
+      deduplication: DeduplicationConfig.parse(
+        LEGACY_BIRTH_DEDUPLICATION_RULES
+      ),
+      versionedConfig,
+      today: '2025-01-01' as PlainDate
+    })
+
+    expect(duplicates.map(({ event }) => event.declaration)).toEqual([
+      expect.objectContaining({ [OLDER_FIELD_ID]: '1999-01-01' })
+    ])
   })
 })
