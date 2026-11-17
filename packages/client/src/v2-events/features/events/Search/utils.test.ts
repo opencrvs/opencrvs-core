@@ -105,12 +105,12 @@ describe('buildDataCondition', () => {
   )
   it('should return anyOf condition for status=ALL', () => {
     const state = { 'event.status': 'ALL' }
-    const result = buildSearchQuery(
-      state,
-      fields,
-      searchConfigs,
-      tennisClubMembershipEvent
-    )
+    const result = buildSearchQuery({
+      formValues: state,
+      resolvedFieldConfigs: fields,
+      searchFieldConfigs: searchConfigs,
+      eventConfig: tennisClubMembershipEvent
+    })
     //@ts-ignore
     expect(result['event.status']).toEqual({
       type: 'anyOf',
@@ -129,12 +129,12 @@ describe('buildDataCondition', () => {
     const state = {
       'event.legalStatuses.REGISTERED.createdAtLocation': 'ABC123'
     }
-    const result = buildSearchQuery(
-      state,
-      fields,
-      searchConfigs,
-      tennisClubMembershipEvent
-    )
+    const result = buildSearchQuery({
+      formValues: state,
+      resolvedFieldConfigs: fields,
+      searchFieldConfigs: searchConfigs,
+      eventConfig: tennisClubMembershipEvent
+    })
     expect(
       //@ts-ignore
       result['event.legalStatuses.REGISTERED.createdAtLocation']
@@ -151,12 +151,12 @@ describe('buildDataCondition', () => {
         end: PlainDate.parse('1996-12-31')
       }
     }
-    const result = buildSearchQuery(
-      state,
-      fields,
-      searchConfigs,
-      tennisClubMembershipEvent
-    )
+    const result = buildSearchQuery({
+      formValues: state,
+      resolvedFieldConfigs: fields,
+      searchFieldConfigs: searchConfigs,
+      eventConfig: tennisClubMembershipEvent
+    })
     expect(
       //@ts-ignore
       result['applicant.dob']
@@ -171,12 +171,12 @@ describe('buildDataCondition', () => {
     const state = {
       'applicant.dob': '1996-01-01'
     }
-    const result = buildSearchQuery(
-      state,
-      fields,
-      searchConfigs,
-      tennisClubMembershipEvent
-    )
+    const result = buildSearchQuery({
+      formValues: state,
+      resolvedFieldConfigs: fields,
+      searchFieldConfigs: searchConfigs,
+      eventConfig: tennisClubMembershipEvent
+    })
     expect(
       //@ts-ignore
       result['applicant.dob']
@@ -886,14 +886,14 @@ describe('buildSearchQuery with version-pinned locations', () => {
   ] as unknown as AdvancedSearchField[]
 
   it('queries a pinned location by its id, never by the version', () => {
-    const result = buildSearchQuery(
-      {
+    const result = buildSearchQuery({
+      formValues: {
         'applicant.office': toVersionedLocation(OFFICE_ID, OFFICE_VERSION_ID)
       },
-      [locationField],
-      searchConfigs,
+      resolvedFieldConfigs: [locationField],
+      searchFieldConfigs: searchConfigs,
       eventConfig
-    )
+    })
 
     expect(result).toEqual({
       'applicant.office': { type: 'exact', term: OFFICE_ID }
@@ -906,18 +906,18 @@ describe('buildSearchQuery with version-pinned locations', () => {
   const HOME_COUNTRY = window.config.COUNTRY
 
   it('folds a pinned address group into the leaf area id, never the versions', () => {
-    const result = buildSearchQuery(
-      {
+    const result = buildSearchQuery({
+      formValues: {
         'applicant.address': {
           country: HOME_COUNTRY,
           province: toVersionedLocation(PROVINCE_ID, PROVINCE_VERSION_ID),
           district: toVersionedLocation(DISTRICT_ID, DISTRICT_VERSION_ID)
         }
       },
-      [addressGroup],
-      searchConfigs,
+      resolvedFieldConfigs: [addressGroup],
+      searchFieldConfigs: searchConfigs,
       eventConfig
-    )
+    })
 
     expect(result).toEqual({
       'applicant.address': {
@@ -935,17 +935,17 @@ describe('buildSearchQuery with version-pinned locations', () => {
   })
 
   it('takes the deepest level filled in as the leaf', () => {
-    const result = buildSearchQuery(
-      {
+    const result = buildSearchQuery({
+      formValues: {
         'applicant.address': {
           country: HOME_COUNTRY,
           province: toVersionedLocation(PROVINCE_ID, PROVINCE_VERSION_ID)
         }
       },
-      [addressGroup],
-      searchConfigs,
+      resolvedFieldConfigs: [addressGroup],
+      searchFieldConfigs: searchConfigs,
       eventConfig
-    )
+    })
 
     expect(result).toEqual({
       'applicant.address': {
@@ -961,18 +961,18 @@ describe('buildSearchQuery with version-pinned locations', () => {
   })
 
   it('queries an unpinned address group exactly as a declaration address would', () => {
-    const result = buildSearchQuery(
-      {
+    const result = buildSearchQuery({
+      formValues: {
         'applicant.address': {
           country: HOME_COUNTRY,
           province: PROVINCE_ID,
           district: DISTRICT_ID
         }
       },
-      [addressGroup],
-      searchConfigs,
+      resolvedFieldConfigs: [addressGroup],
+      searchFieldConfigs: searchConfigs,
       eventConfig
-    )
+    })
 
     expect(result).toEqual({
       'applicant.address': {
@@ -988,8 +988,8 @@ describe('buildSearchQuery with version-pinned locations', () => {
   })
 
   it('keeps a foreign address international, dropping admin levels but not street details', () => {
-    const result = buildSearchQuery(
-      {
+    const result = buildSearchQuery({
+      formValues: {
         'applicant.address': {
           country: 'NZL',
           // An admin level is meaningless abroad, a street detail is not.
@@ -997,10 +997,10 @@ describe('buildSearchQuery with version-pinned locations', () => {
           addressLine1: '12 Cuba Street'
         }
       },
-      [addressGroup],
-      searchConfigs,
+      resolvedFieldConfigs: [addressGroup],
+      searchFieldConfigs: searchConfigs,
       eventConfig
-    )
+    })
 
     expect(result).toEqual({
       'applicant.address': {

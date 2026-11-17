@@ -21,7 +21,10 @@ import {
   ActionType,
   getEventConfigById
 } from '@opencrvs/commons/client'
-import { useEventConfigurations } from '@client/v2-events/features/events/useEventConfiguration'
+import {
+  useEventConfigurations,
+  useSearchableFields
+} from '@client/v2-events/features/events/useEventConfiguration'
 import { ROUTES } from '@client/v2-events/routes'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
 import { SearchCriteriaPanel } from '@client/v2-events/features/events/Search/SearchCriteriaPanel'
@@ -40,14 +43,19 @@ export const SearchResultIndex = () => {
   const { searchEvent } = useEvents()
   const { eventType } = useTypedParams(ROUTES.V2.SEARCH_RESULT)
   const location = useLocation()
-  // Search spans every version, and its form is the same in each: use today's.
+  // The search sections are shared by every version, so today's config gives them. Their fields come from every version.
   const eventConfig = getEventConfigById(useEventConfigurations(), eventType)
+  const searchableFields = useSearchableFields()(eventType)
   const adminStructure = useAdminStructure()
 
   const fields = useMemo(() => {
-    const sections = resolveAdvancedSearchConfig(eventConfig, adminStructure)
+    const sections = resolveAdvancedSearchConfig(
+      eventConfig,
+      adminStructure,
+      searchableFields
+    )
     return sections.flatMap((section) => section.fields)
-  }, [eventConfig, adminStructure])
+  }, [eventConfig, adminStructure, searchableFields])
 
   /*
    * SelectDateRangeValue's are converted to DateTime values which would
@@ -75,13 +83,16 @@ export const SearchResultIndex = () => {
 
   const searchQuery = useMemo(
     () =>
-      buildSearchQuery(
+      buildSearchQuery({
         formValues,
-        fields,
-        eventConfig.advancedSearch.flatMap((section) => section.fields),
-        eventConfig
-      ),
-    [formValues, eventConfig, fields]
+        resolvedFieldConfigs: fields,
+        searchFieldConfigs: eventConfig.advancedSearch.flatMap(
+          (section) => section.fields
+        ),
+        eventConfig,
+        fields: searchableFields
+      }),
+    [formValues, eventConfig, fields, searchableFields]
   )
 
   /*

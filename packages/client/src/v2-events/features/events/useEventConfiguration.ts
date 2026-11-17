@@ -11,11 +11,16 @@
 import { useCallback, useMemo } from 'react'
 import { useSuspenseQuery } from '@tanstack/react-query'
 import { useIntl } from 'react-intl'
+import { uniqBy } from 'lodash'
 import {
   EventConfig,
+  FieldConfig,
   findEventConfigForRecord,
+  getAllUniqueFields,
   getConfigVersion,
   getEventConfigById,
+  getEventConfigsInLookupOrder,
+  getOrThrow,
   resolveEventConfigOnDate,
   VersionedEventConfig
 } from '@opencrvs/commons/client'
@@ -70,6 +75,41 @@ export function useEventConfigurations() {
     () =>
       versionedConfigs.map((config) => resolveEventConfigOnDate(config, today)),
     [versionedConfigs, today]
+  )
+}
+
+/**
+ * @returns a function giving the fields that a search on an event can use: the fields of
+ * every version. A field that several versions have is read from the newest version in
+ * effect, as the events service does.
+ */
+export function useSearchableFields() {
+  const versionedConfigs = useVersionedEventConfigurations()
+  const today = useCountryToday()
+
+  const fieldsByEvent = useMemo(
+    () =>
+      new Map(
+        versionedConfigs.map((config) => [
+          config.id,
+          uniqBy(
+            getEventConfigsInLookupOrder(config, today).flatMap(
+              getAllUniqueFields
+            ),
+            'id'
+          )
+        ])
+      ),
+    [versionedConfigs, today]
+  )
+
+  return useCallback(
+    (eventType: string): FieldConfig[] =>
+      getOrThrow(
+        fieldsByEvent.get(eventType),
+        `No configuration found for event type ${eventType}`
+      ),
+    [fieldsByEvent]
   )
 }
 

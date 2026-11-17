@@ -430,15 +430,14 @@ export function resolveEffectiveVersion(
 
 /**
  * @returns the configuration of each version, in the order to look up a field in: the
- * version in effect at `now` first, then older versions, newest first. Versions that
- * take effect later come last, earliest first.
+ * version in effect on `date`, a date in the country's time zone, first. Then older
+ * versions, newest first. Versions that take effect later come last, earliest first.
  */
 export function getEventConfigsInLookupOrder(
   config: VersionedEventConfig,
-  timeZone: string,
-  now: Date = new Date()
+  date: PlainDate
 ): EventConfig[] {
-  const inEffect = getVersionsInEffect(config, now, timeZone)
+  const inEffect = getVersionsInEffectOn(config, date)
   const later = config.versions
     .filter((version) => !inEffect.includes(version))
     .sort(byEffectiveFrom)

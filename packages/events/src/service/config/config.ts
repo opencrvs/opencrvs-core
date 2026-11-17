@@ -20,6 +20,7 @@ import {
   logger,
   resolveEventConfigInTimeZone,
   Role,
+  toPlainDateInTimeZone,
   TokenWithBearer,
   validateRoles,
   VersionedEventConfig,
@@ -167,8 +168,9 @@ export async function getInMemoryEventConfigurationsInLookupOrder(
     getInMemoryVersionedEventConfigurations(token),
     getCountryTimeZone(token)
   ])
+  const today = toPlainDateInTimeZone(new Date(), timeZone)
   return configurations.flatMap((config) =>
-    getEventConfigsInLookupOrder(config, timeZone)
+    getEventConfigsInLookupOrder(config, today)
   )
 }
 
