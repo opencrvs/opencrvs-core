@@ -46,6 +46,18 @@ const SEARCH_DEFAULT_VALUE_FIELD_TYPES = [
 ]
 
 /**
+ * The fields of a version are not known without its one DECLARE action. A missing or
+ * extra DECLARE action is reported by `validateExactlyOneDeclareAction`.
+ */
+function everyVersionHasOneDeclareAction(versions: EventConfig[]) {
+  return versions.every(
+    (version) =>
+      version.actions.filter(({ type }) => type === ActionType.DECLARE)
+        .length === 1
+  )
+}
+
+/**
  * Rejects advanced search fields that match a field of none of the `versions`, nor a
  * metadata field. A field that only some versions have can still be searched.
  */
@@ -54,11 +66,7 @@ export function validateAdvancedSearchFieldIds(
   versions: EventConfig[],
   ctx: Pick<z.RefinementCtx<unknown>, 'addIssue'>
 ) {
-  // The fields of a version are not known without its one DECLARE action, which is reported elsewhere
-  const hasOneDeclareAction = (version: EventConfig) =>
-    version.actions.filter(({ type }) => type === ActionType.DECLARE).length ===
-    1
-  if (!versions.every(hasOneDeclareAction)) {
+  if (!everyVersionHasOneDeclareAction(versions)) {
     return
   }
 
@@ -97,8 +105,6 @@ export function validateAdvancedSearchConfig(
   event: EventConfig,
   ctx: z.RefinementCtx<EventConfig>
 ) {
-  const allFields = findAllFields(event)
-
   const advancedSearchFields = event.advancedSearch.flatMap((section) =>
     section.fields.flatMap((field) => field.fieldId)
   )
@@ -112,8 +118,25 @@ export function validateAdvancedSearchConfig(
       path: ['advancedSearch']
     })
   }
+}
 
-  // Rejects search field default values that can't be filled into the field
+/**
+ * Rejects search field default values that can't be filled into the field. Each field is
+ * read from the newest of the `versions` that has it.
+ *
+ * @param versions newest first
+ */
+export function validateAdvancedSearchDefaultValues(
+  event: Pick<EventConfig, 'advancedSearch'>,
+  versions: EventConfig[],
+  ctx: Pick<z.RefinementCtx<unknown>, 'addIssue'>
+) {
+  if (!everyVersionHasOneDeclareAction(versions)) {
+    return
+  }
+
+  const fieldsOfEachVersion = versions.map(findAllFields)
+
   event.advancedSearch.forEach((section, sectionIndex) => {
     section.fields.forEach((searchField, fieldIndex) => {
       if (
@@ -147,7 +170,9 @@ export function validateAdvancedSearchConfig(
         return
       }
 
-      const formField = allFields.find(({ id }) => id === searchField.fieldId)
+      const formField = fieldsOfEachVersion
+        .map((fields) => fields.find(({ id }) => id === searchField.fieldId))
+        .find((found) => found !== undefined)
 
       // An unknown field id is reported by validateAdvancedSearchFieldIds
       if (!formField) {

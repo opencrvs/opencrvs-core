@@ -29,6 +29,7 @@ import {
   validatePlaceOfEvent,
   validateDateOfEvent,
   validateAdvancedSearchConfig,
+  validateAdvancedSearchDefaultValues,
   validateAdvancedSearchFieldIds,
   validateExactlyOneDeclareAction,
   validateNotificationForm,
@@ -230,6 +231,7 @@ export const EventConfig: z.ZodType<EventConfig, EventConfigSchemaInput> =
     .superRefine((event, ctx) => {
       validateEventConfig(event, ctx)
       validateAdvancedSearchFieldIds(event, [event], ctx)
+      validateAdvancedSearchDefaultValues(event, [event], ctx)
     })
     .meta({
       id: 'EventConfig',
@@ -551,6 +553,14 @@ export const VersionedEventConfig: z.ZodType<
     validateVersionList(config, ctx)
     validateEachVersion(ctx, versionConfigs, validateEventConfig)
     validateAdvancedSearchFieldIds(config, versionConfigs, ctx)
+    validateAdvancedSearchDefaultValues(
+      config,
+      [...config.versions]
+        .sort(byEffectiveFrom)
+        .reverse()
+        .map((version) => toEventConfig(config, version)),
+      ctx
+    )
   })
   .meta({
     id: 'VersionedEventConfig',

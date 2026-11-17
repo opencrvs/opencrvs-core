@@ -435,50 +435,61 @@ describe('defineConfig()', () => {
     })
 
     describe('advanced search', () => {
-      const V2_ONLY_FIELD_ID = 'applicant.nickname'
+      const NICKNAME_FIELD_ID = 'applicant.nickname'
 
-      /** v2, with a declaration field that v1 does not have. */
-      const v2WithExtraField = {
-        ...v2,
-        actions: v2.actions.map((action) => {
-          if (action.type !== ActionType.DECLARE) {
-            return action
+      function nicknameField(
+        type: typeof FieldType.TEXT | typeof FieldType.NUMBER
+      ) {
+        return {
+          id: NICKNAME_FIELD_ID,
+          type,
+          label: {
+            id: 'nickname.label',
+            defaultMessage: 'Nickname',
+            description: 'Field that the fixture does not have'
           }
-          const [firstPage, ...otherPages] = action.declaration.pages
-          return {
-            ...action,
-            declaration: {
-              ...action.declaration,
-              pages: [
-                {
-                  ...firstPage,
-                  fields: [
-                    ...firstPage.fields,
-                    {
-                      id: V2_ONLY_FIELD_ID,
-                      type: FieldType.TEXT,
-                      label: {
-                        id: 'v2.nickname.label',
-                        defaultMessage: 'Nickname',
-                        description: 'Field only v2 has'
-                      }
-                    }
-                  ]
-                },
-                ...otherPages
-              ]
-            }
-          }
-        })
+        }
       }
 
-      const advancedSearchWithExtraField = [
-        ...advancedSearch,
-        {
-          title: advancedSearch[1].title,
-          fields: [field(V2_ONLY_FIELD_ID).exact()]
+      /** `version`, with `extraField` added to its declaration. */
+      function withField<V extends typeof v1>(
+        version: V,
+        extraField: ReturnType<typeof nicknameField>
+      ): V {
+        return {
+          ...version,
+          actions: version.actions.map((action) => {
+            if (action.type !== ActionType.DECLARE) {
+              return action
+            }
+            const [firstPage, ...otherPages] = action.declaration.pages
+            return {
+              ...action,
+              declaration: {
+                ...action.declaration,
+                pages: [
+                  { ...firstPage, fields: [...firstPage.fields, extraField] },
+                  ...otherPages
+                ]
+              }
+            }
+          })
         }
-      ]
+      }
+
+      const v2WithExtraField = withField(v2, nicknameField(FieldType.TEXT))
+
+      function searchingNickname(defaultValue?: string) {
+        return [
+          ...advancedSearch,
+          {
+            title: advancedSearch[1].title,
+            fields: [{ ...field(NICKNAME_FIELD_ID).exact(), defaultValue }]
+          }
+        ]
+      }
+
+      const advancedSearchWithExtraField = searchingNickname()
 
       it('should accept a search field that only one version has', () => {
         expect(() =>
@@ -500,7 +511,33 @@ describe('defineConfig()', () => {
             versions: [v1, v2]
           })
         ).toThrow(
-          `Invalid AdvancedSearch field IDs for event ${eventId}: ${V2_ONLY_FIELD_ID}`
+          `Invalid AdvancedSearch field IDs for event ${eventId}: ${NICKNAME_FIELD_ID}`
+        )
+      })
+
+      it('should check a defaultValue against the newest version that has the field', () => {
+        const textInV1 = withField(v1, nicknameField(FieldType.TEXT))
+        const numberInV1 = withField(v1, nicknameField(FieldType.NUMBER))
+        const numberInV2 = withField(v2, nicknameField(FieldType.NUMBER))
+
+        expect(() =>
+          defineConfig({
+            id: eventId,
+            label,
+            advancedSearch: searchingNickname('Ace'),
+            versions: [numberInV1, v2WithExtraField]
+          })
+        ).not.toThrow()
+
+        expect(() =>
+          defineConfig({
+            id: eventId,
+            label,
+            advancedSearch: searchingNickname('Ace'),
+            versions: [textInV1, numberInV2]
+          })
+        ).toThrow(
+          `Advanced search field ${NICKNAME_FIELD_ID} has defaultValue "Ace", which is not a valid NUMBER value.`
         )
       })
     })
