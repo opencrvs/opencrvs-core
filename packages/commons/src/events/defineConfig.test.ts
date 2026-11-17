@@ -19,6 +19,7 @@ import { ActionType } from './ActionType'
 import { FieldType } from './FieldType'
 import { field } from './field'
 import { getActionConfig, getDeclaration } from './utils'
+import { withDeclarationField } from './test.utils'
 import { tennisClubMembershipEvent } from '../fixtures'
 
 const declaration = getDeclaration(tennisClubMembershipEvent)
@@ -451,33 +452,10 @@ describe('defineConfig()', () => {
         }
       }
 
-      /** `version`, with `extraField` added to its declaration. */
-      function withField<V extends typeof v1>(
-        version: V,
-        extraField: ReturnType<typeof nicknameField>
-      ): V {
-        return {
-          ...version,
-          actions: version.actions.map((action) => {
-            if (action.type !== ActionType.DECLARE) {
-              return action
-            }
-            const [firstPage, ...otherPages] = action.declaration.pages
-            return {
-              ...action,
-              declaration: {
-                ...action.declaration,
-                pages: [
-                  { ...firstPage, fields: [...firstPage.fields, extraField] },
-                  ...otherPages
-                ]
-              }
-            }
-          })
-        }
-      }
-
-      const v2WithExtraField = withField(v2, nicknameField(FieldType.TEXT))
+      const v2WithExtraField = withDeclarationField(
+        v2,
+        nicknameField(FieldType.TEXT)
+      )
 
       function searchingNickname(defaultValue?: string) {
         return [
@@ -516,9 +494,15 @@ describe('defineConfig()', () => {
       })
 
       it('should check a defaultValue against the newest version that has the field', () => {
-        const textInV1 = withField(v1, nicknameField(FieldType.TEXT))
-        const numberInV1 = withField(v1, nicknameField(FieldType.NUMBER))
-        const numberInV2 = withField(v2, nicknameField(FieldType.NUMBER))
+        const textInV1 = withDeclarationField(v1, nicknameField(FieldType.TEXT))
+        const numberInV1 = withDeclarationField(
+          v1,
+          nicknameField(FieldType.NUMBER)
+        )
+        const numberInV2 = withDeclarationField(
+          v2,
+          nicknameField(FieldType.NUMBER)
+        )
 
         expect(() =>
           defineConfig({

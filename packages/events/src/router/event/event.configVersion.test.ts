@@ -20,7 +20,8 @@ import {
   INITIAL_EVENT_CONFIG_VERSION_ID,
   TENNIS_CLUB_MEMBERSHIP,
   toVersionedEventConfig,
-  VersionedEventConfig
+  VersionedEventConfig,
+  withDeclarationField
 } from '@opencrvs/commons'
 import { tennisClubMembershipEvent } from '@opencrvs/commons/fixtures'
 import {
@@ -102,40 +103,16 @@ function versionRequiringExtraField(
   id: string,
   effectiveFrom?: string
 ): EventConfigVersion {
-  return {
-    ...version(id, effectiveFrom),
-    actions: base.actions.map((action) => {
-      if (action.type !== ActionType.DECLARE) {
-        return action
-      }
-      const [firstPage, ...otherPages] = action.declaration.pages
-      return {
-        ...action,
-        declaration: {
-          ...action.declaration,
-          pages: [
-            {
-              ...firstPage,
-              fields: [
-                ...firstPage.fields,
-                {
-                  id: EXTRA_FIELD_ID,
-                  type: FieldType.TEXT,
-                  required: true,
-                  label: {
-                    id: 'event.tennis-club-membership.action.declare.form.section.who.field.extra.label',
-                    defaultMessage: 'Extra',
-                    description: 'Field added by a newer version'
-                  }
-                }
-              ]
-            },
-            ...otherPages
-          ]
-        }
-      }
-    })
-  }
+  return withDeclarationField(version(id, effectiveFrom), {
+    id: EXTRA_FIELD_ID,
+    type: FieldType.TEXT,
+    required: true,
+    label: {
+      id: 'event.tennis-club-membership.action.declare.form.section.who.field.extra.label',
+      defaultMessage: 'Extra',
+      description: 'Field added by a newer version'
+    }
+  })
 }
 
 /** A version that updates secured field with `secured: false`. */

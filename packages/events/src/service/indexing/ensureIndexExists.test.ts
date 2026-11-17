@@ -9,14 +9,14 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import {
-  ActionType,
   DEFAULT_EFFECTIVE_FROM,
   EventConfigVersion,
   FieldType,
   getDeclarationFields,
   INITIAL_EVENT_CONFIG_VERSION_ID,
   toVersionedEventConfig,
-  VersionedEventConfig
+  VersionedEventConfig,
+  withDeclarationField
 } from '@opencrvs/commons/events'
 import { tennisClubMembershipEvent } from '@opencrvs/commons/fixtures'
 import {
@@ -46,39 +46,15 @@ function version(
 
 /** A version whose declaration has a field the base version does not. */
 function withExtraField(configured: EventConfigVersion): EventConfigVersion {
-  return {
-    ...configured,
-    actions: configured.actions.map((action) => {
-      if (action.type !== ActionType.DECLARE) {
-        return action
-      }
-      const [firstPage, ...otherPages] = action.declaration.pages
-      return {
-        ...action,
-        declaration: {
-          ...action.declaration,
-          pages: [
-            {
-              ...firstPage,
-              fields: [
-                ...firstPage.fields,
-                {
-                  id: EXTRA_FIELD_ID,
-                  type: FieldType.TEXT,
-                  label: {
-                    id: 'event.startup-event.field.extra.label',
-                    defaultMessage: 'Extra',
-                    description: 'Field only one version has'
-                  }
-                }
-              ]
-            },
-            ...otherPages
-          ]
-        }
-      }
-    })
-  }
+  return withDeclarationField(configured, {
+    id: EXTRA_FIELD_ID,
+    type: FieldType.TEXT,
+    label: {
+      id: 'event.startup-event.field.extra.label',
+      defaultMessage: 'Extra',
+      description: 'Field only one version has'
+    }
+  })
 }
 
 function configOf(...configured: EventConfigVersion[]): VersionedEventConfig {
