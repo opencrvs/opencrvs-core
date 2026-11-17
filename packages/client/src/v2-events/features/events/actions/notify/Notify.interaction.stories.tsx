@@ -34,7 +34,7 @@ const tRPCMsw = createTRPCMsw<AppRouter>({
 
 /*
  * A variation of the tennis club membership event that has a dedicated NOTIFY
- * action config with its own supportingCopy and label — separate from DECLARE.
+ * action config with its own dialogCopy and label — separate from DECLARE.
  * Used to verify that NotifyActionConfig is picked up independently.
  */
 const eventConfigWithNotifyConfig = {
@@ -48,11 +48,11 @@ const eventConfigWithNotifyConfig = {
           defaultMessage: 'Notify health worker',
           description: 'Label for the notify action'
         },
-        supportingCopy: {
-          id: 'event.tennis-club-membership.action.notify.supportingCopy',
+        dialogCopy: {
+          id: 'event.tennis-club-membership.action.notify.dialogCopy',
           defaultMessage:
             'This will notify the health worker responsible for this record.',
-          description: 'Supporting copy shown in the notify confirmation dialog'
+          description: 'Copy shown in the notify confirmation dialog'
         }
       }
     }
@@ -113,10 +113,10 @@ const msw = {
 
 /*
  * Verifies that when a NOTIFY action config is present:
- * - The NOTIFY-specific supportingCopy appears in the confirmation dialog
+ * - The NOTIFY-specific dialogCopy appears in the confirmation dialog
  * - The notify mutation is called (not declare)
  */
-export const NotifyConfigSupportingCopyIsShownInDialog: Story = {
+export const NotifyConfigDialogCopyIsShownInDialog: Story = {
   loaders: [
     () => {
       declarationTrpcMsw.events.reset()

@@ -13,7 +13,6 @@ import React from 'react'
 import { v4 as uuid } from 'uuid'
 import {
   EventIndex,
-  getActionConfig,
   getActionFormFields,
   ActionType,
   eventAttachmentPath
@@ -26,18 +25,16 @@ import {
   RejectActionModalResult
 } from '@client/v2-events/features/events/components/Review'
 import { useEventConfigurationForRecord } from '@client/v2-events/features/events/useEventConfiguration'
+import { getDialogCopy } from '../dialogCopy'
 
 export function useRejectionModal(event: EventIndex) {
   const eventId = event.id
   const [modal, openModal] = useModal()
   const events = useEvents()
   const { eventConfiguration } = useEventConfigurationForRecord(event)
-  const rejectActionConfig = getActionConfig({
-    eventConfiguration,
-    actionType: ActionType.REJECT
+  const dialogCopy = getDialogCopy(eventConfiguration, {
+    submits: ActionType.REJECT
   })
-
-  const supportingCopy = rejectActionConfig?.supportingCopy
   const fields = getActionFormFields(eventConfiguration, ActionType.REJECT)
 
   async function handleRejection(onClose: () => void) {
@@ -46,10 +43,10 @@ export function useRejectionModal(event: EventIndex) {
         <ReviewComponent.ActionModal.Reject
           attachmentPath={eventAttachmentPath(eventId)}
           close={close}
+          dialogCopy={dialogCopy}
           event={findLocalEventDocument(eventId)}
           eventConfiguration={eventConfiguration}
           fields={fields}
-          supportingCopy={supportingCopy}
         />
       )
     )

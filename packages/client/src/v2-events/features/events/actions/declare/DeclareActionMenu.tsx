@@ -13,8 +13,7 @@ import { v4 as uuid } from 'uuid'
 import {
   ActionType,
   EventDocument,
-  getActionFormFields,
-  getActionConfig
+  getActionFormFields
 } from '@opencrvs/commons/client'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
 import {
@@ -24,6 +23,7 @@ import {
 import { useCanDirectlyRegister } from '../useCanDirectlyRegister'
 import { ActionMenuItem } from '../ActionMenuDropdown'
 import { ReviewPageActionMenu, ReviewPageState } from '../ReviewPageActionMenu'
+import { getDialogCopy } from '../dialogCopy'
 
 /**
  * Declaration actions contain actions available on the review page of the declare flow. This can include:
@@ -45,16 +45,6 @@ function getDeclarationActions(
     confirmAction
   }: ReviewPageState
 ): ActionMenuItem[] {
-  const actionConfig = getActionConfig({
-    eventConfiguration,
-    actionType: ActionType.DECLARE
-  })
-
-  const dialogCopy =
-    actionConfig && 'dialogCopy' in actionConfig
-      ? actionConfig.dialogCopy
-      : null
-
   const eventId = event.id
 
   const actions = [
@@ -64,7 +54,10 @@ function getDeclarationActions(
       onClick: async () =>
         confirmAction({
           confirmLabel: actionLabels[ActionType.REGISTER],
-          supportingCopy: dialogCopy?.register,
+          dialogCopy: getDialogCopy(eventConfiguration, {
+            openedBy: ActionType.DECLARE,
+            submits: ActionType.REGISTER
+          }),
           // Combined declare+register shows only REGISTER's dialog fields
           fields: getActionFormFields(eventConfiguration, ActionType.REGISTER),
           title: {
@@ -91,7 +84,9 @@ function getDeclarationActions(
       onClick: async () =>
         confirmAction({
           confirmLabel: actionLabels[ActionType.DECLARE],
-          supportingCopy: dialogCopy?.declare,
+          dialogCopy: getDialogCopy(eventConfiguration, {
+            submits: ActionType.DECLARE
+          }),
           fields: getActionFormFields(eventConfiguration, ActionType.DECLARE),
           title: {
             id: 'review.declare.confirmModal.title',

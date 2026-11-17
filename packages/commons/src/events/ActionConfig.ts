@@ -35,9 +35,6 @@ export const ActionConfigBase = z.object({
     .optional()
     .default([])
     .describe('Flag actions which are executed when the action is performed.'),
-  supportingCopy: TranslationConfig.optional().describe(
-    'Text displayed on the confirmation dialog'
-  ),
   /**
    * Icon representing the action.
    *
@@ -55,6 +52,11 @@ export const ActionConfigBase = z.object({
 const DeclarationActionBase = ActionConfigBase.extend({
   deduplication: DeduplicationConfig.optional()
 })
+
+/** Copy of an action that opens one confirmation dialog. */
+const dialogCopy = TranslationConfig.optional().describe(
+  'Text shown at the top of the confirmation dialog of the action.'
+)
 
 const actionConfirmationForm = z
   .array(FieldConfig)
@@ -91,7 +93,8 @@ const NotifyConfig = ActionConfigBase.extend(
     review: DeclarationReviewConfig.describe(
       'Review page configuration for the notify action. Values of its fields are stored as the NOTIFY action annotation.'
     ),
-    form: actionConfirmationForm
+    form: actionConfirmationForm,
+    dialogCopy
   }).shape
 )
 
@@ -104,7 +107,6 @@ const DuplicateDetectedConfig = ActionConfigBase.extend(
       .describe(
         'DUPLICATE_DETECTED is system-generated and never shown as a button, so it has no label.'
       ),
-    supportingCopy: z.never().optional(),
     icon: z
       .never()
       .optional()
@@ -174,75 +176,84 @@ const DeclareConfig = DeclarationActionBase.extend(
     form: actionConfirmationForm,
     dialogCopy: z
       .object({
-        notify: TranslationConfig.describe(
-          'Confirmation text for the notify action'
+        declare: TranslationConfig.optional().describe(
+          'Text shown at the top of the dialog that confirms the declare action.'
         ),
-        declare: TranslationConfig.describe(
-          'Confirmation text for the declare action'
-        ),
-        register: TranslationConfig.describe(
-          'Confirmation text for the register action'
+        register: TranslationConfig.optional().describe(
+          'Text shown at the top of the dialog that confirms registration from the declaration review page. Without it, the dialog shows the `dialogCopy` of the REGISTER action.'
         )
       })
       .optional()
+      .describe(
+        'Copy of the confirmation dialogs that the declaration review page opens.'
+      )
   }).shape
 )
 
 const ArchiveConfig = ActionConfigBase.extend(
   z.object({
     type: z.literal(ActionType.ARCHIVE),
-    form: actionConfirmationForm
+    form: actionConfirmationForm,
+    dialogCopy
   }).shape
 )
 
 const UnarchiveConfig = ActionConfigBase.extend(
   z.object({
-    type: z.literal(ActionType.UNARCHIVE)
+    type: z.literal(ActionType.UNARCHIVE),
+    dialogCopy
   }).shape
 )
 
 const RevokeRegistrationConfig = ActionConfigBase.extend(
   z.object({
     type: z.literal(ActionType.REVOKE_REGISTRATION),
-    form: actionConfirmationForm
+    form: actionConfirmationForm,
+    dialogCopy
   }).shape
 )
 
 const ReinstateRegistrationConfig = ActionConfigBase.extend(
   z.object({
     type: z.literal(ActionType.REINSTATE_REGISTRATION),
-    form: actionConfirmationForm
+    form: actionConfirmationForm,
+    dialogCopy
   }).shape
 )
 
 const EditActionConfig = ActionConfigBase.extend(
   z.object({
     type: z.literal(ActionType.EDIT),
-    dialogCopy: z.object({
-      notify: TranslationConfig.describe(
-        'Confirmation text for the notify with edits action'
-      ),
-      declare: TranslationConfig.describe(
-        'Confirmation text for the declare with edits action'
-      ),
-      register: TranslationConfig.describe(
-        'Confirmation text for the register with edits action'
-      )
-    })
+    dialogCopy: z
+      .object({
+        notify: TranslationConfig.optional().describe(
+          'Text shown at the top of the dialog that confirms notify with edits. Without it, the dialog shows the `dialogCopy` of the NOTIFY action.'
+        ),
+        declare: TranslationConfig.optional().describe(
+          'Text shown at the top of the dialog that confirms declare with edits. Without it, the dialog shows the `dialogCopy.declare` of the DECLARE action.'
+        ),
+        register: TranslationConfig.optional().describe(
+          'Text shown at the top of the dialog that confirms register with edits. Without it, the dialog shows the `dialogCopy` of the REGISTER action.'
+        )
+      })
+      .optional()
+      .describe('Copy of the confirmation dialogs that the edit page opens.')
   }).shape
 )
 
 const RejectConfig = ActionConfigBase.extend(
   z.object({
     type: z.literal(ActionType.REJECT),
-    form: actionConfirmationForm
+    form: actionConfirmationForm,
+    dialogCopy
   }).shape
 )
 
 const RegisterConfig = DeclarationActionBase.extend(
   z.object({
     type: z.literal(ActionType.REGISTER),
-    form: actionConfirmationForm
+    form: actionConfirmationForm,
+    dialogCopy
   }).shape
 )
 
@@ -286,7 +297,8 @@ const CustomActionConfig = ActionConfigBase.extend(
       ),
     auditHistoryLabel: TranslationConfig.describe(
       'The label to show in audit history for this action. For example "Approved".'
-    )
+    ),
+    dialogCopy
   }).shape
 )
 

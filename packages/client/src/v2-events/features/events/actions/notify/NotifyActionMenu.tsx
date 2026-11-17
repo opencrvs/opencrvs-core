@@ -24,6 +24,7 @@ import {
 } from '@client/v2-events/features/workqueues/Actions/utils'
 import { ActionMenuItem } from '../ActionMenuDropdown'
 import { ReviewPageActionMenu, ReviewPageState } from '../ReviewPageActionMenu'
+import { getDialogCopy } from '../dialogCopy'
 
 /**
  * Notify actions contain actions available on the review page of the notify flow. This can include:
@@ -44,20 +45,10 @@ function getNotificationActions(
     confirmAction
   }: ReviewPageState
 ): ActionMenuItem[] {
-  const declareActionConfig = getActionConfig({
-    eventConfiguration,
-    actionType: ActionType.DECLARE
-  })
-
   const notifyActionConfig = getActionConfig({
     eventConfiguration,
     actionType: ActionType.NOTIFY
   })
-
-  const dialogCopy =
-    declareActionConfig && 'dialogCopy' in declareActionConfig
-      ? declareActionConfig.dialogCopy
-      : null
 
   const canNotify =
     availableActions.includes(ActionType.NOTIFY) &&
@@ -71,8 +62,9 @@ function getNotificationActions(
     onClick: async () =>
       confirmAction({
         confirmLabel: actionLabels[ActionType.NOTIFY],
-        supportingCopy:
-          notifyActionConfig?.supportingCopy ?? dialogCopy?.notify,
+        dialogCopy: getDialogCopy(eventConfiguration, {
+          submits: ActionType.NOTIFY
+        }),
         fields: getActionFormFields(eventConfiguration, ActionType.NOTIFY),
         title: {
           id: 'review.notify.confirmModal.title',

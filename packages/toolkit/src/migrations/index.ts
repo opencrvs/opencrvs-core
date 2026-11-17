@@ -15,6 +15,7 @@ import { main as readDeclarationThroughHelper } from './read-declaration-through
 import { main as resolveVersionedEventConfig } from './resolve-versioned-event-config'
 import { main as updateToolkitDependency } from './persistent/update-toolkit-dependency'
 import { main as replaceIncompleteFlag } from './replace-incomplete-flag'
+import { main as moveSupportingCopyToDialogCopy } from './move-supporting-copy-to-dialog-copy'
 
 /**
  * Run the upgrade process for the country config in the current working
@@ -29,6 +30,7 @@ export async function runUpgrade(toolkitVersion: string) {
   await moveDeclarationToDeclareAction()
   // After moving `declaration` onto DECLARE, where it copies it from
   await addNotifyConfig()
+  await moveSupportingCopyToDialogCopy()
   // Before readDeclarationThroughHelper, which rewrites the declaration reads it
   // routes through resolveEventConfig
   await resolveVersionedEventConfig()

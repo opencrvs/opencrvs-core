@@ -85,7 +85,7 @@ Below, "your revoked flag" means the flag your custom revoke adds. The examples 
 
 **Do not delete the custom revoke action or your revoked flag.** Flags are recalculated from the current config, so removing them un-revokes every record revoked with them. Keep both, and stop new custom revocations instead:
 
-1. **Event config.** Add the core actions next to the custom ones. Copy the custom actions' `label`, `icon`, `supportingCopy`, `form` and `flags`, leaving out every operation on your revoked flag: the `REVOKED` status replaces it. Hide the core revoke on records revoked the old way:
+1. **Event config.** Add the core actions next to the custom ones. Copy the custom actions' `label`, `icon`, `dialogCopy` (`supportingCopy` before 2.2), `form` and `flags`, leaving out every operation on your revoked flag: the `REVOKED` status replaces it. Hide the core revoke on records revoked the old way:
 
    ```ts
    {
@@ -299,6 +299,32 @@ Check conditionals that rely on the old counting:
 - `not(event.hasAction(DECLARE))` is now true while a `DECLARE` awaits confirmation, so actions hidden by it show again until the declaration is accepted.
 
 [#10876](https://github.com/opencrvs/opencrvs-core/issues/10876)
+
+### Deprecations
+
+#### `supportingCopy` and `dialogCopy.notify` are replaced by `dialogCopy`
+
+The copy of a confirmation dialog now has one key, `dialogCopy`. The action that opens a dialog gives its copy:
+
+- An action that opens one dialog gives one message: `NOTIFY`, `REGISTER`, `REJECT`, `ARCHIVE`, `UNARCHIVE`, `REVOKE_REGISTRATION`, `REINSTATE_REGISTRATION` and custom actions.
+- The `DECLARE` action gives `dialogCopy.declare` and `dialogCopy.register` for the dialogs of the declaration review page.
+- The `EDIT` action gives `dialogCopy.notify`, `dialogCopy.declare` and `dialogCopy.register` for the dialogs of the edit page.
+
+```diff
+ {
+   type: ActionType.REGISTER,
+   label: { ... },
+-  supportingCopy: { id: 'event.birth.action.register.supportingCopy', ... },
++  dialogCopy: { id: 'event.birth.action.register.supportingCopy', ... },
+   form: [ ... ]
+ }
+```
+
+When `DECLARE` or `EDIT` gives no copy for one of its dialogs, the dialog shows the copy of the action that it submits. For example, registration from the declaration review page shows the `dialogCopy` of the `REGISTER` action when `DECLARE` has no `dialogCopy.register`. Before, that dialog showed no copy.
+
+`supportingCopy`, and `dialogCopy.notify` on the `DECLARE` action, still work, and `defineConfig` logs a deprecation warning for each. v2.3 removes them. `opencrvs upgrade` changes them for you: the `move-supporting-copy-to-dialog-copy` codemod renames `supportingCopy` to `dialogCopy`, moves `dialogCopy.notify` of the `DECLARE` action to `dialogCopy` of the `NOTIFY` action, and removes the copy that no dialog showed. It lists every place that it could not change, for you to change by hand. The translation keys do not change.
+
+[#13697](https://github.com/opencrvs/opencrvs-core/issues/13697)
 
 ### New features
 

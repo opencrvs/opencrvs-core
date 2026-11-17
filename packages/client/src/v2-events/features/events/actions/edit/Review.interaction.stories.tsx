@@ -15,6 +15,7 @@ import superjson from 'superjson'
 import { userEvent, within, screen, expect, waitFor } from 'storybook/test'
 import { toast } from 'react-hot-toast'
 import {
+  ActionConfig,
   ActionType,
   and,
   ConditionalType,
@@ -31,6 +32,7 @@ import {
   generateActionDocument,
   generateActionDocuments,
   getUUID,
+  toVersionedEventConfig,
   user,
   versionedTennisClubMembershipEvent
 } from '@opencrvs/commons/client'
@@ -392,3 +394,104 @@ export const SendsEditedDeclarationWithDeclareOnEditAndRegister: Story = {
     })
   }
 }
+
+const registerCopy = {
+  id: 'event.tennis-club-membership.action.register.copy',
+  defaultMessage: 'Registering creates the membership record.',
+  description: 'Copy of the register dialog'
+}
+
+const editAndRegisterCopy = {
+  id: 'event.tennis-club-membership.action.edit.register.copy',
+  defaultMessage: 'You are about to register this application with your edits.',
+  description: 'Copy of the register with edits dialog'
+}
+
+/** The tennis club event, where REGISTER has dialog copy and `editAction` is added. */
+function configWithDialogCopy(...editAction: ActionConfig[]): EventConfig {
+  return {
+    ...tennisClubMembershipEvent,
+    actions: [
+      ...tennisClubMembershipEvent.actions.map((action) =>
+        action.type === ActionType.REGISTER
+          ? { ...action, dialogCopy: registerCopy }
+          : action
+      ),
+      ...editAction
+    ]
+  }
+}
+
+function dialogCopyStory(config: EventConfig): Story {
+  return {
+    parameters: {
+      reactRouter: {
+        router: routesConfig,
+        initialPath: ROUTES.V2.EVENTS.EDIT.REVIEW.buildPath({ eventId })
+      },
+      chromatic: { disableSnapshot: true },
+      offline: { events: [eventDocument], configs: [config] },
+      msw: {
+        handlers: {
+          ...duplicateHandlers,
+          events: [
+            tRPCMsw.event.config.get.query(() => [
+              toVersionedEventConfig(config)
+            ]),
+            tRPCMsw.event.get.query(() => eventDocument)
+          ]
+        }
+      }
+    },
+    // Runs after the `beforeEach` of the meta, which adds the default config
+    beforeEach: () => {
+      addLocalEventConfig(toVersionedEventConfig(config))
+    }
+  }
+}
+
+async function openRegisterWithEditsDialog(canvasElement: HTMLElement) {
+  const canvas = within(canvasElement)
+  const actionButton = await canvas.findByRole('button', { name: 'Action' })
+  useEventFormData.setState({ formValues: editedDeclaration })
+  await userEvent.click(actionButton)
+  await userEvent.click(await canvas.findByText('Register with edits'))
+  return within(await screen.findByRole('dialog'))
+}
+
+export const RegisterWithEditsDialogShowsCopyOfEditAction: Story = {
+  ...dialogCopyStory(
+    configWithDialogCopy({
+      type: ActionType.EDIT,
+      label: {
+        id: 'event.tennis-club-membership.action.edit.label',
+        defaultMessage: 'Edit',
+        description: 'Label of the edit action'
+      },
+      flags: [],
+      dialogCopy: { register: editAndRegisterCopy }
+    })
+  ),
+  play: async ({ canvasElement }) => {
+    const dialog = await openRegisterWithEditsDialog(canvasElement)
+
+    await expect(
+      await dialog.findByText(editAndRegisterCopy.defaultMessage)
+    ).toBeVisible()
+    await expect(
+      dialog.queryByText(registerCopy.defaultMessage)
+    ).not.toBeInTheDocument()
+  }
+}
+
+export const RegisterWithEditsDialogShowsCopyOfRegisterWhenEditGivesNone: Story =
+  {
+    ...dialogCopyStory(configWithDialogCopy()),
+    play: async ({ canvasElement }) => {
+      const dialog = await openRegisterWithEditsDialog(canvasElement)
+
+      await expect(
+        await dialog.findByText(registerCopy.defaultMessage)
+      ).toBeVisible()
+    }
+  }

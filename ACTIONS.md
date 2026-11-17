@@ -63,7 +63,7 @@ All custom actions and certain core actions are configurable.
 
 Actions are configured on a per–event-type basis, meaning different event types do not share action configurations.
 
-Below we describe two configuration options: flag configurations and action conditionals. It is important to note that additional configuration options are available and that many core actions have configuration options specific to their action type.
+Below we describe three configuration options: flag configurations, action conditionals and dialog copy. It is important to note that additional configuration options are available and that many core actions have configuration options specific to their action type.
 
 ### Flag configurations
 
@@ -98,4 +98,29 @@ conditionals: [
     conditional: flag('approval-required-for-late-registration')
   }
 ]
+```
+
+### Dialog copy
+
+`dialogCopy` is the text at the top of a confirmation dialog. The action that opens the dialog gives its copy. The action that the dialog submits gives the fields of the dialog, in its `form`.
+
+- `NOTIFY`, `REGISTER`, `REJECT`, `ARCHIVE`, `UNARCHIVE`, `REVOKE_REGISTRATION`, `REINSTATE_REGISTRATION` and custom actions open one dialog each. Their `dialogCopy` is one message.
+- The declaration review page of `DECLARE` opens a dialog to declare and a dialog to register. `DECLARE` gives `dialogCopy.declare` and `dialogCopy.register`.
+- The edit page of `EDIT` opens a dialog to notify, to declare and to register with edits. `EDIT` gives `dialogCopy.notify`, `dialogCopy.declare` and `dialogCopy.register`.
+
+When `DECLARE` or `EDIT` gives no copy for one of its dialogs, the dialog shows the copy of the action that it submits.
+
+**Example:** Different copy for registration from the edit page:
+
+```js
+{
+  type: ActionType.REGISTER,
+  dialogCopy: { id: 'event.birth.action.register.copy', ... }
+},
+{
+  type: ActionType.EDIT,
+  dialogCopy: {
+    register: { id: 'event.birth.action.edit.register.copy', ... }
+  }
+}
 ```

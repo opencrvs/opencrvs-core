@@ -49,7 +49,7 @@ interface ConfirmableAction {
   /** Label of the modal's confirm button */
   confirmLabel: MessageDescriptor
   title: MessageDescriptor
-  supportingCopy?: MessageDescriptor
+  dialogCopy?: MessageDescriptor
   /** Fields shown in the modal */
   fields: FieldConfig[]
   onConfirm: (values: AcceptActionModalResult['values']) => void
@@ -128,7 +128,7 @@ function useReviewPageActions(
           attachmentPath={eventAttachmentPath(eventId)}
           close={close}
           copy={{
-            supportingCopy: action.supportingCopy,
+            dialogCopy: action.dialogCopy,
             title: action.title,
             onConfirm: action.confirmLabel
           }}

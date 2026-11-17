@@ -237,6 +237,12 @@ export const deathEvent = defineConfig({
           'This is shown as the action name anywhere the user can trigger the action from',
         id: 'event.death.action.notify.label'
       },
+      dialogCopy: {
+        id: 'event.death.action.declare.notify.copy',
+        defaultMessage:
+          'You are about to formally notify the relevant Registration Office that a death event has occurred. Please confirm that the information provided is accurate before proceeding.',
+        description: 'Confirmation text for the notify action'
+      },
       notificationForm: toNotificationForm(DEATH_DECLARATION_FORM),
       review: toNotificationReview(DEATH_DECLARATION_REVIEW),
       form: [
@@ -307,12 +313,6 @@ export const deathEvent = defineConfig({
         }
       ],
       dialogCopy: {
-        notify: {
-          id: 'event.death.action.declare.notify.copy',
-          defaultMessage:
-            'You are about to formally notify the relevant Registration Office that a death event has occurred. Please confirm that the information provided is accurate before proceeding.',
-          description: 'Confirmation text for the notify action'
-        },
         declare: {
           id: 'event.death.action.declare.declare.copy',
           defaultMessage:
@@ -377,7 +377,7 @@ export const deathEvent = defineConfig({
           'This is shown as the action name anywhere the user can trigger the action from',
         id: 'event.death.custom.action.validate-declaration.label'
       },
-      supportingCopy: {
+      dialogCopy: {
         defaultMessage:
           'Approving this declaration confirms it as legally accepted and eligible for registration.',
         description:
@@ -427,7 +427,7 @@ export const deathEvent = defineConfig({
           'This is shown as the action name anywhere the user can trigger the action from',
         id: 'event.death.custom.action.attest.label'
       },
-      supportingCopy: {
+      dialogCopy: {
         defaultMessage:
           'Attesting confirms this death was reported at your health facility. Once attested, the notification proceeds to the registration office.',
         description: 'This is the supporting copy for the Attest action',
@@ -469,7 +469,7 @@ export const deathEvent = defineConfig({
           'This is shown as the action name anywhere the user can trigger the action from',
         id: 'event.death.action.reject.label'
       },
-      supportingCopy: {
+      dialogCopy: {
         id: 'rejectModal.description',
         defaultMessage:
           'Rejecting this declaration will return it to the submitter for updates. Please ensure a valid reason for rejection has been recorded.',
@@ -485,7 +485,7 @@ export const deathEvent = defineConfig({
           'This is shown as the action name anywhere the user can trigger the action from',
         id: 'event.death.action.register.label'
       },
-      supportingCopy: {
+      dialogCopy: {
         id: 'event.death.action.register.supportingCopy',
         description: 'Confirmation text for the register action',
         defaultMessage:
@@ -555,7 +555,7 @@ export const deathEvent = defineConfig({
           'This is shown as the action name anywhere the user can trigger the action from',
         id: 'event.death.action.archive.label'
       },
-      supportingCopy: {
+      dialogCopy: {
         id: 'recordAudit.archive.confirmation.body',
         defaultMessage:
           'This will remove the declaration from the workqueue and change the status to Archive. To revert this change you will need to search for the declaration.',
@@ -570,7 +570,7 @@ export const deathEvent = defineConfig({
           'This is shown as the action name anywhere the user can trigger the action from',
         id: 'event.birth.action.unarchive.label'
       },
-      supportingCopy: {
+      dialogCopy: {
         id: 'recordAudit.unarchive.confirmation.body',
         defaultMessage:
           'This record will become active again and will be able to progress through registration.',

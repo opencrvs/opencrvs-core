@@ -14,7 +14,7 @@ import { QuickActionConfig } from './useQuickActionModal'
 
 export const reinstate: QuickActionConfig = {
   modal: {
-    supportingCopy: {
+    dialogCopy: {
       id: 'event.action.reinstateRegistration.modal.supportingCopy',
       defaultMessage:
         'This will restore a previously revoked registration to active status.',

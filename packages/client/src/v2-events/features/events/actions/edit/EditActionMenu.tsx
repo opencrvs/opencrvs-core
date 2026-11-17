@@ -55,6 +55,7 @@ import { TranslationTextWithFormatModifier } from '../../components/TranslationT
 import { useCanDirectlyRegister } from '../useCanDirectlyRegister'
 import { ActionMenuDropdown } from '../ActionMenuDropdown'
 import { aggregateAnnotations, getReviewFormFields } from '../annotationUtils'
+import { getDialogCopy } from '../dialogCopy'
 import { useEditForm } from './useEditForm'
 
 export const commentLabel = {
@@ -98,7 +99,7 @@ interface EditActionModalResult {
 
 function EditActionModal({
   title,
-  supportingCopy,
+  dialogCopy,
   close,
   fields = [],
   eventConfiguration,
@@ -110,7 +111,7 @@ function EditActionModal({
   /** Record the action is taken on, for fields that act on it, e.g. a print button. */
   event?: EventDocument
   title: MessageDescriptor
-  supportingCopy?: MessageDescriptor
+  dialogCopy?: MessageDescriptor
   close: (result: EditActionModalResult) => void
   fields?: FieldConfig[]
   eventConfiguration: EventConfig
@@ -164,12 +165,12 @@ function EditActionModal({
       width={800}
       onClose={() => close({ confirmed: false })}
     >
-      {supportingCopy && (
+      {dialogCopy && (
         <Stack>
           <TranslationTextWithFormatModifier
             color="grey500"
             element="p"
-            message={supportingCopy}
+            message={dialogCopy}
             variant="reg16"
           />
         </Stack>
@@ -233,11 +234,6 @@ function useEditActions(event: EventDocument) {
   const anyValuesHaveChanged =
     changedFields.length > 0 || changedAnnotationFields.length > 0
 
-  const actionConfig = getActionConfig({
-    eventConfiguration,
-    actionType: ActionType.EDIT
-  })
-
   // Ensure that the target action (Notify, Declare, Register) conditions are met
   const isTargetActionEnabled = (actionType: ActionType) => {
     const targetConfig = getActionConfig({ eventConfiguration, actionType })
@@ -254,11 +250,6 @@ function useEditActions(event: EventDocument) {
     reviewFields: reviewConfig.fields
   })
 
-  const dialogCopy =
-    actionConfig && 'dialogCopy' in actionConfig
-      ? actionConfig.dialogCopy
-      : null
-
   return {
     modals: [modal],
     actions: [
@@ -273,13 +264,16 @@ function useEditActions(event: EventDocument) {
                   attachmentPath={eventAttachmentPath(event.id)}
                   close={close}
                   declaration={declaration}
+                  dialogCopy={getDialogCopy(eventConfiguration, {
+                    openedBy: ActionType.EDIT,
+                    submits: ActionType.REGISTER
+                  })}
                   event={event}
                   eventConfiguration={eventConfiguration}
                   fields={getActionFormFields(
                     eventConfiguration,
                     ActionType.REGISTER
                   )}
-                  supportingCopy={dialogCopy?.register}
                   title={messages.editAndRegisterLabel}
                 />
               )
@@ -313,13 +307,16 @@ function useEditActions(event: EventDocument) {
                   attachmentPath={eventAttachmentPath(event.id)}
                   close={close}
                   declaration={declaration}
+                  dialogCopy={getDialogCopy(eventConfiguration, {
+                    openedBy: ActionType.EDIT,
+                    submits: ActionType.DECLARE
+                  })}
                   event={event}
                   eventConfiguration={eventConfiguration}
                   fields={getActionFormFields(
                     eventConfiguration,
                     ActionType.DECLARE
                   )}
-                  supportingCopy={dialogCopy?.declare}
                   title={messages.editAndDeclareLabel}
                 />
               )
@@ -355,13 +352,16 @@ function useEditActions(event: EventDocument) {
                   attachmentPath={eventAttachmentPath(event.id)}
                   close={close}
                   declaration={declaration}
+                  dialogCopy={getDialogCopy(eventConfiguration, {
+                    openedBy: ActionType.EDIT,
+                    submits: ActionType.NOTIFY
+                  })}
                   event={event}
                   eventConfiguration={eventConfiguration}
                   fields={getActionFormFields(
                     eventConfiguration,
                     ActionType.NOTIFY
                   )}
-                  supportingCopy={dialogCopy?.notify}
                   title={messages.editAndNotifyLabel}
                 />
               )
