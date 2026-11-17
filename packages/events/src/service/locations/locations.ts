@@ -68,6 +68,24 @@ export async function getLocations(params?: {
   return locations
 }
 
+/**
+ * Returns the locations that changed since the client last synced, and
+ * `syncedAt`: the time of this sync. On its next sync, the client sends
+ * `syncedAt` back as `since`.
+ *
+ * Why `syncedAt` is read before the locations: an edit that is still in
+ * progress is not visible to this read. When that edit finishes, its
+ * timestamp is the time it started, which is before `syncedAt`. An edit
+ * takes much less than one minute, and the next sync looks back one minute,
+ * so the next sync returns that location. See more: {@link INCREMENTAL_SYNC_WINDOW}.
+ */
+export async function syncLocations(since: string) {
+  const syncedAt = await locationsRepo.getDatabaseTime()
+  const locations = await locationsRepo.getLocations({ writtenSince: since })
+
+  return { syncedAt, locations }
+}
+
 export async function getLocationById(locationId: UUID) {
   const location = await locationsRepo.getLocationById(locationId)
 

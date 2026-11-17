@@ -34,6 +34,46 @@ const INSERT_MAX_CHUNK_SIZE = 1000
 const administrativeHierarchyByIdCache = new Map<string, Promise<UUID[]>>()
 let leafLevelAdministrativeAreaIdsCache: Promise<{ id: UUID }[]> | null = null
 
+/**
+ * How far before `since` an incremental sync reaches back.
+ *
+ * A read does not wait for a write that is still in progress. It returns the
+ * last committed data, without that write. This can happen:
+ *
+ * 1. A write starts. Its `updated_at` is `now()`, the time that the write
+ *    started, not the time that it commits.
+ * 2. A sync reads the rows before the write commits, so the row is not in
+ *    the response. The sync returns `syncedAt`, which is later than the
+ *    `updated_at` of the write.
+ * 3. The write commits.
+ * 4. The next sync asks for rows after `syncedAt`. The row of the write has
+ *    an earlier `updated_at`, so it is not returned on this sync or later.
+ *
+ * To prevent this, a sync also returns the rows written in this window before
+ * `since`. A write takes much less than this window. Rows that come back again
+ * are harmless, because each returned row replaces the cached entry.
+ */
+const INCREMENTAL_SYNC_WINDOW = '1 minute'
+
+/**
+ * SQL condition for rows written after `since`, minus
+ * {@link INCREMENTAL_SYNC_WINDOW}.
+ */
+export function writtenSinceCondition(since: string) {
+  return sql<boolean>`updated_at > ${since}::timestamptz - ${INCREMENTAL_SYNC_WINDOW}::interval`
+}
+
+/**
+ * Returns the current time of the database, as an ISO string in milliseconds.
+ * It is the same clock that sets `updated_at`.
+ */
+export async function getDatabaseTime() {
+  const { rows } = await sql<{ now: string }>`select now() as now`.execute(
+    getClient()
+  )
+  return rows[0].now
+}
+
 export function clearAdministrativeHierarchyCache() {
   administrativeHierarchyByIdCache.clear()
   leafLevelAdministrativeAreaIdsCache = null
@@ -352,19 +392,32 @@ export async function getLocations({
   locationType,
   locationIds,
   isActive,
-  externalId
+  externalId,
+  writtenSince
 }: {
   locationType?: string
   locationIds?: UUID[]
   isActive?: boolean
   externalId?: string
+  /** See {@link writtenSinceCondition}. */
+  writtenSince?: string
 } = {}) {
   const db = getClient()
 
   let query = db
     .selectFrom('locations')
-    .select(['id', 'locationType', 'administrativeAreaId', 'versions'])
+    .select([
+      'id',
+      'locationType',
+      'administrativeAreaId',
+      'versions',
+      'updatedAt'
+    ])
     .where('deletedAt', 'is', null)
+
+  if (writtenSince) {
+    query = query.where(writtenSinceCondition(writtenSince))
+  }
 
   if (locationType) {
     query = query.where('locationType', '=', locationType)
@@ -447,7 +500,13 @@ export async function getLocationById(locationId: UUID) {
 
   const row = await db
     .selectFrom('locations')
-    .select(['id', 'locationType', 'administrativeAreaId', 'versions'])
+    .select([
+      'id',
+      'locationType',
+      'administrativeAreaId',
+      'versions',
+      'updatedAt'
+    ])
     .where('id', '=', locationId)
     .where('deletedAt', 'is', null)
     .executeTakeFirst()

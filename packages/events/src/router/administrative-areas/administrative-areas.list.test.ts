@@ -11,7 +11,9 @@
 import { sql } from 'kysely'
 import {
   SetAdministrativeAreaPayload,
+  UUID,
   createPrng,
+  encodeScope,
   generateUuid
 } from '@opencrvs/commons'
 import {
@@ -21,6 +23,27 @@ import {
   systemInitialisationTestSetup
 } from '@events/tests/utils'
 import { getClient } from '@events/storage/postgres/events'
+
+const locationEditScope = encodeScope({ type: 'location.edit' })
+
+/** Moves every administrative area's last write far into the past. */
+async function ageAllAdministrativeAreas() {
+  await getClient()
+    .updateTable('administrativeAreas')
+    .set({ updatedAt: '2020-01-01T00:00:00.000Z' })
+    .execute()
+}
+
+/** A `since` outside the sync window of the rows aged by {@link ageAllAdministrativeAreas}. */
+const CURSOR_AFTER_AGED_ROWS = '2020-01-01T00:02:00.000Z'
+
+async function setUpdatedAt(id: UUID, updatedAt: string) {
+  await getClient()
+    .updateTable('administrativeAreas')
+    .set({ updatedAt: sql`${updatedAt}::timestamptz` })
+    .where('id', '=', id)
+    .execute()
+}
 
 test('Returns new administrative area after it has been added', async () => {
   const { user } = await setupTestCase()
@@ -171,4 +194,134 @@ test('Filters administrative areas by active status', async () => {
   expect(
     administrativeAreas.find((aa) => aa.id === administrativeAreaIdToUpdate)
   ).toBeUndefined()
+})
+
+describe('sync', () => {
+  test('Returns updatedAt at millisecond precision on every administrative area', async () => {
+    const { user } = await setupTestCase()
+    const client = createTestClient(user, [])
+
+    const administrativeAreas = await client.administrativeAreas.list()
+
+    expect(administrativeAreas.length).toBeGreaterThan(0)
+    for (const area of administrativeAreas) {
+      expect(area.updatedAt).toMatch(
+        /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/
+      )
+    }
+  })
+
+  test('Returns only administrative areas written less than one minute before `since`, or later', async () => {
+    const { user } = await setupTestCase()
+    const client = createTestClient(user, [])
+    const [older, atWindowStart, insideWindow] = (
+      await client.administrativeAreas.list()
+    ).map((a) => a.id)
+
+    await ageAllAdministrativeAreas()
+    await setUpdatedAt(older, '2020-06-01T11:58:59.999Z')
+    await setUpdatedAt(atWindowStart, '2020-06-01T11:59:00.000Z')
+    await setUpdatedAt(insideWindow, '2020-06-01T11:59:00.001Z')
+
+    const { administrativeAreas } = await client.administrativeAreas.sync({
+      since: '2020-06-01T12:00:00.000Z'
+    })
+
+    expect(administrativeAreas.map((a) => a.id)).toEqual([insideWindow])
+  })
+
+  test('Returns seeded rows once, and not again when `since` is the previous `syncedAt`', async () => {
+    const { user } = await setupTestCase()
+    const client = createTestClient(user, [])
+    await ageAllAdministrativeAreas()
+
+    const first = await client.administrativeAreas.sync({
+      since: '2020-01-01T00:00:00.000Z'
+    })
+    expect(first.administrativeAreas.length).toBeGreaterThan(0)
+
+    const second = await client.administrativeAreas.sync({
+      since: first.syncedAt
+    })
+    expect(second.administrativeAreas).toEqual([])
+  })
+
+  test('Returns a newly created administrative area', async () => {
+    const { user } = await setupTestCase()
+    const client = createTestClient(user, [locationEditScope])
+    await ageAllAdministrativeAreas()
+
+    const created = await client.administrativeAreas.create({
+      name: 'New District',
+      externalId: 'sync-created-area-pcode',
+      parentId: null,
+      effectiveFrom: '2024-01-01',
+      status: 'active'
+    })
+
+    await expect(
+      client.administrativeAreas.sync({ since: CURSOR_AFTER_AGED_ROWS })
+    ).resolves.toMatchObject({ administrativeAreas: [created] })
+  })
+
+  test('Returns an administrative area with a new version and its whole history', async () => {
+    const { user } = await setupTestCase()
+    const client = createTestClient(user, [locationEditScope])
+    const created = await client.administrativeAreas.create({
+      name: 'Old District',
+      externalId: 'sync-updated-area-pcode',
+      parentId: null,
+      effectiveFrom: '2024-01-01',
+      status: 'active'
+    })
+    await ageAllAdministrativeAreas()
+
+    await client.administrativeAreas.update({
+      id: created.id,
+      name: 'Renamed District',
+      externalId: 'sync-updated-area-pcode',
+      status: 'active',
+      effectiveFrom: '2025-01-01',
+      lastVersionId: created.versions[0].versionId
+    })
+
+    const { administrativeAreas } = await client.administrativeAreas.sync({
+      since: CURSOR_AFTER_AGED_ROWS
+    })
+
+    expect(administrativeAreas).toHaveLength(1)
+    expect(administrativeAreas[0].versions.map((v) => v.name)).toEqual([
+      'Old District',
+      'Renamed District'
+    ])
+  })
+
+  test('Returns a reseeded administrative area', async () => {
+    const { user } = await setupTestCase()
+    const client = createTestClient(user, [])
+    await systemInitialisationTestSetup()
+    const seeder = createInitialisationTestClient()
+
+    const id = generateUuid()
+    await seeder.administrativeAreas.set([
+      { id, parentId: null, name: 'First seed', externalId: 'sync-reseed-area' }
+    ])
+    await ageAllAdministrativeAreas()
+
+    await seeder.administrativeAreas.set([
+      {
+        id,
+        parentId: null,
+        name: 'Second seed',
+        externalId: 'sync-reseed-area'
+      }
+    ])
+
+    const { administrativeAreas } = await client.administrativeAreas.sync({
+      since: CURSOR_AFTER_AGED_ROWS
+    })
+
+    expect(administrativeAreas).toHaveLength(1)
+    expect(administrativeAreas[0]).toMatchObject({ id, name: 'Second seed' })
+  })
 })

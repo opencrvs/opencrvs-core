@@ -86,6 +86,7 @@ function renamedArea(
 
   return {
     id,
+    updatedAt: '2024-01-01T00:00:00.000Z',
     name: names[names.length - 1],
     externalId: null,
     parentId,

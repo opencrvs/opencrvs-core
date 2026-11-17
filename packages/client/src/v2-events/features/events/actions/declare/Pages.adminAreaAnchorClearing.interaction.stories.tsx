@@ -57,6 +57,7 @@ const tRPCMsw = createTRPCMsw<AppRouter>({
  */
 const RENAMED_AREA: AdministrativeArea = {
   id: 'c3c3c3c3-1111-4111-8111-111111111111' as UUID,
+  updatedAt: '2024-01-01T00:00:00.000Z',
   name: 'New Riverside District',
   externalId: null,
   parentId: null,
@@ -86,6 +87,7 @@ const RENAMED_AREA: AdministrativeArea = {
  */
 const RENAMED_BUT_ALWAYS_ACTIVE_AREA: AdministrativeArea = {
   id: 'd4d4d4d4-2222-4222-8222-222222222222' as UUID,
+  updatedAt: '2024-01-01T00:00:00.000Z',
   name: 'Greater Pangasinan',
   externalId: null,
   parentId: null,

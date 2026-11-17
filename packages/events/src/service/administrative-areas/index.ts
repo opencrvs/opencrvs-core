@@ -21,7 +21,10 @@ import {
   WithdrawAdministrativeAreaVersionPayload
 } from '@opencrvs/commons'
 import * as administrativeAreaRepo from '@events/storage/postgres/administrative-hierarchy/administrative-areas'
-import { clearAdministrativeHierarchyCache } from '@events/storage/postgres/administrative-hierarchy/locations'
+import {
+  clearAdministrativeHierarchyCache,
+  getDatabaseTime
+} from '@events/storage/postgres/administrative-hierarchy/locations'
 import { isUniqueViolation } from '@events/storage/postgres/unique-violation'
 import {
   appendVersionChecked,
@@ -39,6 +42,15 @@ export async function getAdministrativeAreas(params?: {
     await administrativeAreaRepo.getAdministrativeAreas(params)
 
   return administrativeAreas
+}
+
+/** See `syncLocations` in the locations service. */
+export async function syncAdministrativeAreas(since: string) {
+  const syncedAt = await getDatabaseTime()
+  const administrativeAreas =
+    await administrativeAreaRepo.getAdministrativeAreas({ writtenSince: since })
+
+  return { syncedAt, administrativeAreas }
 }
 
 async function getAdministrativeAreaById(administrativeAreaId: UUID) {

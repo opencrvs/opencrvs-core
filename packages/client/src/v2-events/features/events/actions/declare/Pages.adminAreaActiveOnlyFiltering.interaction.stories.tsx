@@ -58,6 +58,7 @@ const tRPCMsw = createTRPCMsw<AppRouter>({
  */
 const INACTIVATED_AREA: AdministrativeArea = {
   id: 'f6f6f6f6-1111-4111-8111-111111111111' as UUID,
+  updatedAt: '2024-01-01T00:00:00.000Z',
   name: 'Mercy District',
   externalId: null,
   parentId: null,
