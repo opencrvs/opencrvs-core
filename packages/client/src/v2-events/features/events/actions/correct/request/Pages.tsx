@@ -16,13 +16,15 @@ import {
   useTypedSearchParams
 } from 'react-router-typesafe-routes/dom'
 import {
+  eventAttachmentPath,
   getDeclarationPages,
   isNonInteractiveFieldType,
   PageConfig
 } from '@opencrvs/commons/client'
 import { useEvents } from '@client/v2-events//features/events/useEvents/useEvents'
 import { Pages as PagesComponent } from '@client/v2-events/features/events/components/Pages'
-import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
+import { getFormBackAction } from '@client/v2-events/layouts/form/FormBackAction'
+import { useEventConfigurationForRecord } from '@client/v2-events/features/events/useEventConfiguration'
 import { useEventFormData } from '@client/v2-events/features/events/useEventFormData'
 import { useEventFormNavigation } from '@client/v2-events/features/events/useEventFormNavigation'
 import { FormLayout } from '@client/v2-events/layouts'
@@ -40,20 +42,23 @@ function getCorrectablePages(formPages: PageConfig[]) {
 }
 
 export function Pages() {
-  const { eventId, pageId } = useTypedParams(ROUTES.V2.EVENTS.REGISTER.PAGES)
-  const [searchParams] = useTypedSearchParams(ROUTES.V2.EVENTS.REGISTER.PAGES)
+  const { eventId, pageId } = useTypedParams(
+    ROUTES.V2.EVENTS.REQUEST_CORRECTION.PAGES
+  )
+  const [searchParams] = useTypedSearchParams(
+    ROUTES.V2.EVENTS.REQUEST_CORRECTION.PAGES
+  )
   const setFormValues = useEventFormData((state) => state.setFormValues)
   const form = useEventFormData((state) => state.getFormValues())
   const navigate = useNavigate()
   const events = useEvents()
   const { modal } = useEventFormNavigation()
 
-  const event = events.getEvent.getFromCache(eventId)
+  const event = events.getEvent.useGetEventFromCache(eventId)
   const validatorContext = useValidatorContext(event)
 
-  const { eventConfiguration: configuration } = useEventConfiguration(
-    event.type
-  )
+  const { eventConfiguration: configuration } =
+    useEventConfigurationForRecord(event)
 
   const formPages = getDeclarationPages(configuration)
   const correctablePages = getCorrectablePages(formPages)
@@ -80,10 +85,30 @@ export function Pages() {
     }
   }, [pageId, currentPageId, navigate, eventId, searchParams])
 
+  const onPageChange = (nextPageId: string) =>
+    navigate(
+      ROUTES.V2.EVENTS.REQUEST_CORRECTION.PAGES.buildPath(
+        { eventId, pageId: nextPageId },
+        searchParams
+      )
+    )
+
+  const backAction = getFormBackAction({
+    formPages: correctablePages,
+    formData: form,
+    validatorContext,
+    pageId: currentPageId,
+    onNavigateToPage: onPageChange
+  })
+
   return (
-    <FormLayout route={ROUTES.V2.EVENTS.REQUEST_CORRECTION}>
+    <FormLayout
+      backAction={backAction}
+      route={ROUTES.V2.EVENTS.REQUEST_CORRECTION}
+    >
       {modal}
       <PagesComponent
+        attachmentPath={eventAttachmentPath(eventId)}
         eventConfig={configuration}
         formData={form}
         formPages={correctablePages}
@@ -91,22 +116,12 @@ export function Pages() {
         pageId={currentPageId}
         setFormData={(data) => setFormValues(data)}
         validatorContext={validatorContext}
-        onPageChange={(nextPageId: string) =>
-          navigate(
-            ROUTES.V2.EVENTS.REQUEST_CORRECTION.PAGES.buildPath(
-              {
-                eventId,
-                pageId: nextPageId
-              },
-              searchParams
-            )
-          )
-        }
+        onPageChange={onPageChange}
         onSubmit={() =>
           navigate(
             ROUTES.V2.EVENTS.REQUEST_CORRECTION.REVIEW.buildPath(
               { eventId },
-              { workqueue: searchParams.workqueue }
+              { backTo: searchParams.backTo }
             )
           )
         }

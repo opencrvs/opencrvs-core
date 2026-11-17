@@ -15,16 +15,16 @@ import { defineMessages, useIntl } from 'react-intl'
 import {
   DateField as DateFieldType,
   DatetimeValue,
-  PlainDate,
-  plainDateToLocalDate
+  plainDateToLocalDate,
+  isPlainDate
 } from '@opencrvs/commons/client'
 import {
   DateField as DateFieldComponent,
   IDateFieldProps as DateFieldProps
-} from '@opencrvs/components/lib/DateField'
+} from '@opencrvs/components'
 import { StringifierContext } from './RegisteredField'
 
-const messages = defineMessages({
+export const messages = defineMessages({
   dateFormat: {
     defaultMessage: 'd MMMM y',
     id: 'configuration.dateFormat',
@@ -77,11 +77,10 @@ function DateInput({
 
 function DateOutput({ value }: { value?: string }) {
   const intl = useIntl()
-  const parsed = PlainDate.safeParse(value)
 
-  if (parsed.success) {
+  if (isPlainDate(value)) {
     return format(
-      plainDateToLocalDate(parsed.data),
+      plainDateToLocalDate(value),
       intl.formatMessage(messages.dateFormat)
     )
   }
@@ -93,23 +92,23 @@ function stringify(
   value: string | undefined,
   context: StringifierContext<DateFieldType>
 ) {
-  const parsedDate = PlainDate.safeParse(value)
-  if (parsedDate.success) {
+  if (isPlainDate(value)) {
     return format(
-      plainDateToLocalDate(parsedDate.data),
+      plainDateToLocalDate(value),
       context.intl.formatMessage(messages.dateFormat)
     )
   }
 
   // DatetimeValue includes explicit timezone info, so new Date() is safe here.
-  const parsedDatetime = DatetimeValue.safeParse(value)
-  if (parsedDatetime.success) {
+  if (DatetimeValue.validate(value)) {
     return format(
-      new Date(parsedDatetime.data),
+      new Date(value),
       context.intl.formatMessage(messages.dateFormat)
     )
   }
 
+  // Technically it can be any other string
+  // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
   return String(value ?? '')
 }
 

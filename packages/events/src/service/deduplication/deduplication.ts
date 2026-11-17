@@ -9,6 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import * as elasticsearch from '@elastic/elasticsearch'
+import { TRPCError } from '@trpc/server'
 import { get } from 'lodash'
 import { DateTime } from 'luxon'
 import {
@@ -18,12 +19,17 @@ import {
   FieldValue,
   EventConfig,
   getDeclarationFieldById,
-  PlainDate,
   FieldType,
   extractPotentialDuplicatesFromActions,
   EventDocument
 } from '@opencrvs/commons/events'
-import { logger } from '@opencrvs/commons'
+import {
+  getAcceptedScopesFromToken,
+  getCurrentEventState,
+  isPlainDate,
+  logger,
+  userCanAccessEventWithScopes
+} from '@opencrvs/commons'
 import {
   getOrCreateClient,
   getEventIndexName
@@ -35,10 +41,13 @@ import {
   EncodedEventIndex,
   encodeEventIndex,
   encodeFieldId,
+  getEventIndexWithAdministrativeHierarchy,
   nameQueryKey
 } from '@events/service/indexing/utils'
 import { TrpcContext } from '../../context'
 import { getEventsAuditTrailed } from '../../storage/postgres/events/events'
+import { EventNotFoundError, getEventById } from '../events/events'
+import { getEventConfigurationForRecord } from '../config/config'
 
 /** `0` and `false` are values; an empty string means nothing was entered. */
 function isMissingQueryValue(value: unknown) {
@@ -178,14 +187,14 @@ export function generateElasticsearchQuery(
       }
     }
     case 'dateRange': {
-      const dateValue = PlainDate.safeParse(queryValue)
-      if (!dateValue.success) {
+      if (!isPlainDate(queryValue)) {
         logger.warn(
           queryValue,
           `Invalid query value for found for dateRange matching ${queryInput.fieldId}. Expected date in YYYY-MM-DD format`
         )
         return null
       }
+
       const pivot =
         queryInput.options.pivot ??
         Math.floor((queryInput.options.days * 2) / 3)
@@ -195,10 +204,10 @@ export function generateElasticsearchQuery(
             {
               range: {
                 [queryKey]: {
-                  gte: DateTime.fromISO(dateValue.data)
+                  gte: DateTime.fromISO(queryValue)
                     .minus({ days: queryInput.options.days })
                     .toISO(),
-                  lte: DateTime.fromISO(dateValue.data)
+                  lte: DateTime.fromISO(queryValue)
                     .plus({ days: queryInput.options.days })
                     .toISO()
                 }
@@ -210,7 +219,7 @@ export function generateElasticsearchQuery(
               distance_feature: {
                 field: queryKey,
                 pivot: `${pivot}d`,
-                origin: dateValue.data
+                origin: queryValue
               }
             }
           ]
@@ -265,6 +274,67 @@ export async function searchForDuplicates(
       event: decodeEventIndex(eventConfig, hit._source)
     }
   })
+}
+
+/**
+ * Ensures the user's duplicate review scopes grant access to every record that
+ * has been matched as a potential duplicate of `event`.
+ */
+export async function assertCanReviewDuplicatesOf(
+  event: EventDocument,
+  ctx: TrpcContext
+) {
+  const duplicateEventIds = extractPotentialDuplicatesFromActions(
+    event.actions
+  ).map(({ id }) => id)
+
+  if (duplicateEventIds.length === 0) {
+    return
+  }
+
+  const acceptedScopes = getAcceptedScopesFromToken(ctx.token, [
+    'record.review-duplicates'
+  ])
+  const access = await Promise.all(
+    duplicateEventIds.map(async (duplicateEventId) => {
+      // A duplicate that no longer exists holds nothing to review, see #13906
+      const duplicate = await getEventById(duplicateEventId).catch((error) => {
+        if (error instanceof EventNotFoundError) {
+          return null
+        }
+        throw error
+      })
+
+      if (!duplicate) {
+        return true
+      }
+
+      const eventConfig = await getEventConfigurationForRecord({
+        event: duplicate,
+        token: ctx.token
+      })
+
+      const eventIndexWithLocationHierarchy =
+        await getEventIndexWithAdministrativeHierarchy(
+          eventConfig,
+          getCurrentEventState(duplicate, eventConfig)
+        )
+
+      return userCanAccessEventWithScopes(
+        eventIndexWithLocationHierarchy,
+        acceptedScopes,
+        ctx.user
+      )
+    })
+  )
+
+  if (access.some((canAccess) => !canAccess)) {
+    throw new TRPCError({
+      code: 'FORBIDDEN',
+      message:
+        'You do not have access to every record matched as a potential duplicate'
+    })
+  }
 }
 
 /**

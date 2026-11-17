@@ -11,6 +11,7 @@
 import React, { useCallback, useState } from 'react'
 import { defineMessages, useIntl } from 'react-intl'
 import { useLocation } from 'react-router-dom'
+import { useSelector } from 'react-redux'
 import {
   Content,
   ContentSize,
@@ -23,6 +24,8 @@ import {
   SearchQueryParams
 } from '@opencrvs/commons/client'
 import { useEventConfigurations } from '@client/v2-events/features/events/useEventConfiguration'
+import { useAdminStructure } from '@client/v2-events/hooks/useAdminStructure'
+import { getScope } from '@client/profile/profileSelectors'
 import { TabSearch } from './TabSearch'
 import {
   checkScopeForEventSearch,
@@ -30,7 +33,7 @@ import {
   deserializeSearchParams
 } from './utils'
 
-export const advancedSearchMessages = {
+const advancedSearchMessages = {
   advancedSearch: {
     id: 'config.advanced.search',
     defaultMessage: 'Advanced Search',
@@ -50,16 +53,28 @@ export function AdvancedSearch() {
   const intl = useIntl()
   const allEvents = useEventConfigurations()
   const location = useLocation()
+  const scopes = useSelector(getScope)
 
-  const searchParams = SearchQueryParams.parse(
-    deserializeSearchParams(location.search)
-  )
+  /*
+   * Deliberately not parsed with `SearchQueryParams`. Its catchall is a plain
+   * union of every field-value shape, and some members are objects whose keys
+   * are all optional. Those match any object and strip it to `{}`. An address
+   * filter is held as a FIELD_GROUP value, so it would not survive.
+   *
+   * Safe to skip: `parseFieldSearchParams` below keeps only the keys that name
+   * a field of the event being searched.
+   */
+  const searchParams = deserializeSearchParams(
+    location.search
+  ) as SearchQueryParams
 
   const advancedSearchEvents = allEvents.filter(
     (event) =>
-      event.advancedSearch.length > 0 && checkScopeForEventSearch(event.id)
+      event.advancedSearch.length > 0 &&
+      checkScopeForEventSearch(event.id, scopes)
   )
 
+  const adminStructure = useAdminStructure()
   const [formValuesByTabId, setFormValuesByTabId] = useState<
     Record<string, EventState>
   >(() => {
@@ -69,7 +84,11 @@ export function AdvancedSearch() {
     )
     for (const event of advancedSearchEvents) {
       if (currentEvent && currentEvent.id === event.id) {
-        const parsedParams = parseFieldSearchParams(event, searchParams)
+        const parsedParams = parseFieldSearchParams(
+          event,
+          searchParams,
+          adminStructure
+        )
         initialState[event.id] = parsedParams
       } else {
         initialState[event.id] = {}
@@ -89,6 +108,16 @@ export function AdvancedSearch() {
 
   const [activeTabId, setActiveTabId] = useState<string>(selectedTabId)
 
+  const handleFormChange = useCallback(
+    (updatedForm: Record<string, FieldValue>) => {
+      setFormValuesByTabId((prev) => ({
+        ...prev,
+        [activeTabId]: updatedForm
+      }))
+    },
+    [activeTabId]
+  )
+
   const currentEvent = allEvents.find((e) => e.id === activeTabId)
   if (!currentEvent) {
     return null
@@ -100,16 +129,6 @@ export function AdvancedSearch() {
   const handleTabClick = (tabId: string) => {
     setActiveTabId(tabId)
   }
-
-  const handleFormChange = useCallback(
-    (updatedForm: Record<string, FieldValue>) => {
-      setFormValuesByTabId((prev) => ({
-        ...prev,
-        [activeTabId]: updatedForm
-      }))
-    },
-    [activeTabId]
-  )
 
   return (
     <Content

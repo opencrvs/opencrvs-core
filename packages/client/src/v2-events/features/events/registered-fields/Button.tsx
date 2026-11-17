@@ -11,13 +11,18 @@
 
 import React from 'react'
 import { useIntl } from 'react-intl'
-import { Icon, Button as UiButton } from '@opencrvs/components'
-import * as SupportedIcons from '@opencrvs/components/lib/Icon/all-icons'
-import { TranslationConfig } from '@opencrvs/commons/client'
+import {
+  Icon,
+  Button as UiButton,
+  Text,
+  IconName,
+  Icons
+} from '@opencrvs/components'
+import { ButtonConfiguration } from '@opencrvs/commons/client'
 
 export function throwIfUnsupportedIcon(icon: string) {
-  if (icon in SupportedIcons) {
-    return icon as keyof typeof SupportedIcons
+  if (icon in Icons) {
+    return icon as IconName
   }
 
   throw new Error(
@@ -27,23 +32,29 @@ export function throwIfUnsupportedIcon(icon: string) {
 
 function ButtonInput({
   id,
-  configuration: { icon, loading = false, text },
+  configuration,
   disabled,
   value = 0,
   onChange
 }: {
   id: string
-  configuration: {
-    icon?: string
-    loading?: boolean
-    text: TranslationConfig
-  }
+  configuration: ButtonConfiguration
   disabled?: boolean
   /** Represents the amount of times the button has been pressed */
   value?: number
   onChange: (amountOfClicks?: number) => void
 }) {
   const intl = useIntl()
+
+  const {
+    icon,
+    loading = false,
+    text,
+    buttonSize = 'medium',
+    buttonType = 'secondary',
+    textColor = 'copy',
+    textVariant = 'bold14'
+  } = configuration
 
   const handleClick = () => onChange(value + 1)
 
@@ -52,7 +63,8 @@ function ButtonInput({
       disabled={disabled}
       id={id}
       loading={loading}
-      type="secondary"
+      size={buttonSize}
+      type={buttonType}
       onClick={handleClick}
     >
       {icon && !loading && (
@@ -62,7 +74,9 @@ function ButtonInput({
           size="large"
         />
       )}
-      {intl.formatMessage(text)}
+      <Text color={textColor} element="span" variant={textVariant}>
+        {intl.formatMessage(text)}
+      </Text>
     </UiButton>
   )
 }

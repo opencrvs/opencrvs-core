@@ -1,0 +1,333 @@
+/*
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at https://mozilla.org/MPL/2.0/.
+ *
+ * OpenCRVS is also distributed under the terms of the Civil Registration
+ * & Healthcare Disclaimer located at http://opencrvs.org/license.
+ *
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
+ */
+import React from 'react'
+import { MessageDescriptor, useIntl } from 'react-intl'
+import { useNavigate } from 'react-router-dom'
+import { v4 as uuid } from 'uuid'
+import {
+  Stack,
+  Button,
+  Icon,
+  IconProps,
+  Dialog,
+  ButtonType
+} from '@opencrvs/components'
+import {
+  ActionType,
+  CustomActionConfig,
+  FieldConfig,
+  FieldUpdateValue,
+  getActionConfig,
+  runFieldValidations,
+  UUID,
+  getCurrentEventState,
+  EventConfig,
+  omitHiddenFields,
+  EventIndex,
+  isValidIcon,
+  flattenFormState,
+  eventAttachmentPath
+} from '@opencrvs/commons/client'
+import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
+import { buttonMessages } from '@client/i18n/messages'
+import { ROUTES } from '@client/v2-events/routes'
+import { FormFieldGenerator } from '@client/v2-events/components/forms/FormFieldGenerator'
+import { useDialogFormState } from '@client/v2-events/hooks/useDialogFormState'
+import { useValidatorContext } from '@client/v2-events/hooks/useValidatorContext'
+import { useUserAllowedActions } from '@client/v2-events/features/workqueues/Actions/useUserAllowedActions'
+import { TranslationTextWithFormatModifier } from '../../components/TranslationTextWithFormatModifier'
+import { useModal } from '../../../../hooks/useModal'
+import { actionLabels } from '../../../workqueues/Actions/utils'
+import { register } from './register'
+import { archive } from './archive'
+import { unarchive } from './unarchive'
+import { revoke } from './revoke'
+import { reinstate } from './reinstate'
+
+const quickActions = {
+  [ActionType.REGISTER]: register,
+  [ActionType.ARCHIVE]: archive,
+  [ActionType.UNARCHIVE]: unarchive,
+  [ActionType.REVOKE_REGISTRATION]: revoke,
+  [ActionType.REINSTATE_REGISTRATION]: reinstate
+} as const satisfies Partial<Record<ActionType, QuickActionConfig>>
+
+interface ModalConfig {
+  label?: MessageDescriptor
+  supportingCopy?: MessageDescriptor
+  confirmButtonType?: ButtonType
+  confirmButtonLabel?: MessageDescriptor
+  fields?: FieldConfig[]
+  actionType?: keyof typeof quickActions
+  icon?: IconProps['name']
+}
+
+export interface QuickActionConfig {
+  modal: ModalConfig
+  onConfirm: ({
+    eventId,
+    actions,
+    customActions,
+    isActionAllowed,
+    formValues
+  }: {
+    eventId: UUID
+    actions: ReturnType<typeof useEvents>['actions']
+    customActions: ReturnType<typeof useEvents>['customActions']
+    isActionAllowed: (action: ActionType) => boolean
+    formValues: Record<string, FieldUpdateValue>
+  }) => void | Promise<void>
+}
+
+interface ModalResult {
+  /** Whether the modal was confirmed/accepted or not */
+  result: boolean
+  /** The values entered in the modal form, if any */
+  values?: Record<string, FieldUpdateValue>
+}
+
+const DefaultIcons = {
+  [ActionType.REGISTER]: 'PencilLine',
+  [ActionType.ARCHIVE]: 'Archive',
+  [ActionType.UNARCHIVE]: 'ArchiveTray',
+  [ActionType.REVOKE_REGISTRATION]: 'XCircle',
+  [ActionType.REINSTATE_REGISTRATION]: 'ArrowCounterClockwise'
+} as const
+
+function QuickActionModal({
+  close,
+  config,
+  eventId,
+  eventConfiguration
+}: {
+  close: (result: ModalResult) => void
+  config: ModalConfig & { label: MessageDescriptor }
+  eventId: UUID
+  eventConfiguration: EventConfig
+}) {
+  const intl = useIntl()
+  const { getEvent } = useEvents()
+  const dialogForm = useDialogFormState()
+  const modalValues = dialogForm.formValues
+  const eventDocument = getEvent.useGetOrDownloadEvent(eventId)
+  const event = getCurrentEventState(eventDocument, eventConfiguration)
+  /*
+   * Pass the record itself, as every other form renderer does. Configured
+   * fields evaluate their conditionals against it, and the print button
+   * prints it.
+   */
+  const validatorContext = useValidatorContext(eventDocument)
+
+  const errorsOnField = (config.fields ?? []).flatMap((field) =>
+    flattenFormState(
+      runFieldValidations({
+        field,
+        form: modalValues,
+        value: modalValues[field.id],
+        context: validatorContext
+      })
+    ).flatMap(([, errs]) => errs)
+  )
+
+  const confirm = () => {
+    const visibleFields = omitHiddenFields(
+      config.fields ?? [],
+      modalValues,
+      validatorContext
+    )
+
+    close({ result: true, values: visibleFields })
+  }
+
+  return (
+    <Dialog
+      actions={[
+        <Button
+          key="cancel"
+          id="cancel-btn"
+          size="large"
+          type="tertiary"
+          onClick={() => close({ result: false })}
+        >
+          {intl.formatMessage(buttonMessages.cancel)}
+        </Button>,
+        <Button
+          key="confirm"
+          disabled={errorsOnField.length > 0}
+          id="confirm-btn"
+          size="large"
+          type={config.confirmButtonType ?? 'primary'}
+          onClick={confirm}
+        >
+          {intl.formatMessage(
+            config.confirmButtonLabel || buttonMessages.confirm
+          )}
+        </Button>
+      ]}
+      id={`quick-action-modal-${config.label.id}`}
+      isOpen={true}
+      title={intl.formatMessage(config.label) + '?'}
+      titleIcon={
+        <Icon
+          color="primary"
+          name={
+            config.icon ??
+            (config.actionType && DefaultIcons[config.actionType]) ??
+            'PencilLine'
+          }
+          size="large"
+        />
+      }
+      variant={'large'}
+      width={898}
+      onClose={() => close({ result: false })}
+    >
+      <Stack alignItems="left" direction="column" gap={16}>
+        {config.supportingCopy && (
+          <TranslationTextWithFormatModifier
+            color="supportingCopy"
+            element="p"
+            message={config.supportingCopy}
+            variant="reg16"
+          />
+        )}
+        <FormFieldGenerator
+          {...dialogForm}
+          attachmentPath={eventAttachmentPath(eventId)}
+          eventConfig={eventConfiguration}
+          fields={config.fields ?? []}
+          id={'quick-action-modal-form'}
+          // Pass in the complete declaration form values so that read-only declaration data is available for Data components or calculations.
+          validatorContext={{
+            ...validatorContext,
+            baseFormState: event.declaration
+          }}
+        />
+      </Stack>
+    </Dialog>
+  )
+}
+
+export function useQuickActionModal(
+  eventConfiguration: EventConfig,
+  eventIndex: EventIndex
+) {
+  const [quickActionModal, openModal] = useModal()
+  const navigate = useNavigate()
+  const { actions, customActions } = useEvents()
+  const { isActionAllowed } = useUserAllowedActions(eventIndex)
+
+  const onQuickAction = async (
+    actionType: keyof typeof quickActions,
+    backTo?: string
+  ) => {
+    const config = quickActions[actionType]
+    const label = actionLabels[actionType]
+    const actionConfig = getActionConfig({ actionType, eventConfiguration })
+    const supportingCopy = actionConfig?.supportingCopy
+
+    const { result, values } = await openModal<ModalResult>((close) => (
+      <QuickActionModal
+        close={close}
+        config={{
+          label,
+          actionType,
+          icon: isValidIcon(actionConfig?.icon) ? actionConfig.icon : undefined,
+          fields:
+            actionConfig && 'form' in actionConfig
+              ? actionConfig.form
+              : undefined,
+          ...config.modal,
+          supportingCopy: supportingCopy ?? config.modal.supportingCopy
+        }}
+        eventConfiguration={eventConfiguration}
+        eventId={eventIndex.id}
+      />
+    ))
+
+    // On confirmed modal, we will:
+    // - Execute the configured onConfirm() for the action
+    // - Redirect the user to the workqueue they arrived from if provided, or the home page if not
+    if (result) {
+      void config.onConfirm({
+        eventId: eventIndex.id,
+        actions,
+        customActions,
+        isActionAllowed,
+        formValues: values ?? {}
+      })
+
+      if (backTo) {
+        navigate(backTo)
+      } else {
+        navigate(ROUTES.V2.buildPath({}))
+      }
+    }
+  }
+
+  return { quickActionModal, onQuickAction }
+}
+
+const customActionConfigBase: Partial<ModalConfig> = {
+  confirmButtonType: 'primary',
+  confirmButtonLabel: {
+    id: 'buttons.confirm',
+    defaultMessage: 'Confirm',
+    description: 'Confirm button text'
+  }
+}
+
+export function useCustomActionModal(
+  eventId: UUID,
+  eventConfiguration: EventConfig
+) {
+  const [customActionModal, openModal] = useModal()
+  const navigate = useNavigate()
+  const { actions } = useEvents()
+
+  const onCustomAction = async (
+    actionConfig: CustomActionConfig,
+    backTo?: string
+  ) => {
+    const modalResult = await openModal<ModalResult>((close) => (
+      <QuickActionModal
+        close={close}
+        config={{
+          ...customActionConfigBase,
+          label: actionConfig.label,
+          supportingCopy: actionConfig.supportingCopy,
+          fields: actionConfig.form,
+          icon: isValidIcon(actionConfig.icon) ? actionConfig.icon : undefined
+        }}
+        eventConfiguration={eventConfiguration}
+        eventId={eventId}
+      />
+    ))
+
+    if (modalResult.result) {
+      void actions.custom.mutate({
+        eventId,
+        customActionType: actionConfig.customActionType,
+        declaration: {},
+        transactionId: uuid(),
+        annotation: modalResult.values
+      })
+
+      if (backTo) {
+        navigate(backTo)
+      } else {
+        navigate(ROUTES.V2.buildPath({}))
+      }
+    }
+  }
+
+  return { customActionModal, onCustomAction }
+}

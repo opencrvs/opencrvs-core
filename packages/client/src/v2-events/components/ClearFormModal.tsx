@@ -10,9 +10,7 @@
  */
 import React from 'react'
 import { defineMessages, useIntl } from 'react-intl'
-import { ResponsiveModal } from '@opencrvs/components/lib/ResponsiveModal'
-import { Button } from '@opencrvs/components/lib/Button'
-import { Stack, Text } from '@opencrvs/components'
+import { Dialog, Button, Stack, Text } from '@opencrvs/components'
 import { useModal } from '@client/v2-events/hooks/useModal'
 
 const clearFormModalMessages = defineMessages({
@@ -45,8 +43,8 @@ export function useClearFormModal() {
 
   async function openClearFormConfirmation(): Promise<boolean> {
     const confirmed = await openModal<boolean | null>((close) => (
-      <ResponsiveModal
-        autoHeight
+      <Dialog
+        isOpen
         actions={[
           <Button
             key="cancel_clear_form"
@@ -69,13 +67,11 @@ export function useClearFormModal() {
             {intl.formatMessage(clearFormModalMessages.clear)}
           </Button>
         ]}
-        handleClose={() => close(null)}
         id="clear_form_confirmation"
-        responsive={false}
-        show={true}
         title={intl.formatMessage(
           clearFormModalMessages.clearFormConfirmModalTitle
         )}
+        onClose={() => close(null)}
       >
         <Stack>
           <Text color="grey500" element="p" variant="reg16">
@@ -84,7 +80,7 @@ export function useClearFormModal() {
             )}
           </Text>
         </Stack>
-      </ResponsiveModal>
+      </Dialog>
     ))
 
     return Boolean(confirmed)

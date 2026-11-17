@@ -8,28 +8,45 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
+import { readFileSync } from 'fs'
 import { redis } from '@gateway/utils/redis'
-import { GraphQLResolveInfo, GraphQLError } from 'graphql'
-import { Context } from '@gateway/graphql/context'
-import { getUserId, hasScope } from '@gateway/features/user/utils'
-import { DISABLE_RATE_LIMIT } from './constants'
 import { Lifecycle, ReqRefDefaults } from '@hapi/hapi'
 import { get } from 'lodash'
-import { SCOPES } from '@opencrvs/commons/authentication'
+import jwt from 'jsonwebtoken'
+import { CERT_PUBLIC_KEY_PATH, DISABLE_RATE_LIMIT } from './constants'
+import { hasScope } from '@opencrvs/commons'
+
+const publicCert = readFileSync(CERT_PUBLIC_KEY_PATH)
 
 /**
- * Custom RateLimitError. This is being caught in Apollo & Hapi (`onPreResponse` in createServer)
+ * Routes wrapped by `rateLimitedRoute` are declared with `auth: false`, so
+ * Hapi's verified `jwt` strategy (see server.ts) never runs on them. Reading
+ * scopes off the token via `hasScope`/`jwt-decode` alone is therefore not
+ * safe here — `decode` only base64-decodes the payload without checking the
+ * signature, so anyone could forge a `{"scope":["bypassratelimit"]}` token
+ * and disable rate limiting on login/OTP endpoints. Verify the signature,
+ * issuer and audience ourselves before trusting the scope.
  */
-export class RateLimitError extends GraphQLError {
-  constructor(message = 'You are being rate limited') {
-    super(message, {
-      extensions: {
-        code: 'RATE_LIMIT_EXCEEDED',
-        http: {
-          status: 429
-        }
-      }
+const hasVerifiedBypassScope = (authorizationHeader: string): boolean => {
+  const token = authorizationHeader.replace(/^Bearer\s+/i, '')
+  try {
+    jwt.verify(token, publicCert, {
+      algorithms: ['RS256'],
+      issuer: 'opencrvs:auth-service',
+      audience: 'opencrvs:gateway-user'
     })
+  } catch {
+    return false
+  }
+  return hasScope(authorizationHeader, 'bypassratelimit')
+}
+
+/**
+ * Custom RateLimitError. This is being caught in Hapi (`onPreResponse` in createServer)
+ */
+export class RateLimitError extends Error {
+  constructor(message = 'You are being rate limited') {
+    super(message)
   }
 }
 
@@ -75,6 +92,7 @@ interface RateLimitedRouteOptions {
   /** e.g. "username" or "user.name" */
   pathForKey: string
   pathOptionsForKey?: never
+  staticKey?: never
 }
 
 interface RateLimitedRouteMultipleOptions {
@@ -82,6 +100,18 @@ interface RateLimitedRouteMultipleOptions {
   pathForKey?: never
   /** Works the same as `pathForKey` but uses the first value that gets resolved of the keys */
   pathOptionsForKey: string[]
+  staticKey?: never
+}
+
+interface RateLimitedRouteStaticKeyOptions {
+  requestsPerMinute: number
+  pathForKey?: never
+  pathOptionsForKey?: never
+  /**
+   * A constant key to rate limit on, used when the payload has no
+   * per-user field to key on (e.g. super user auth only sends a password).
+   */
+  staticKey: string
 }
 
 export const rateLimitedRoute =
@@ -94,23 +124,36 @@ export const rateLimitedRoute =
     {
       requestsPerMinute,
       pathForKey,
-      pathOptionsForKey
-    }: RateLimitedRouteOptions | RateLimitedRouteMultipleOptions,
+      pathOptionsForKey,
+      staticKey
+    }:
+      | RateLimitedRouteOptions
+      | RateLimitedRouteMultipleOptions
+      | RateLimitedRouteStaticKeyOptions,
     fn: (...args: A) => R
   ) =>
   (...args: A) => {
     if (
-      hasScope(
-        { Authorization: args[0].headers.authorization },
-        SCOPES.BYPASSRATELIMIT
-      )
+      args[0].headers.authorization &&
+      hasVerifiedBypassScope(args[0].headers.authorization as string)
     ) {
       return fn(...args)
     }
 
+    const route = args[1].request.path
+
+    if (staticKey) {
+      return withRateLimit(
+        {
+          key: `${staticKey}:${route}`,
+          requestsPerMinute
+        },
+        fn
+      )(...args)
+    }
+
     if (pathForKey) pathOptionsForKey = [pathForKey]
 
-    const route = args[1].request.path
     const payload = JSON.parse(args[0].payload.toString())
 
     const key = pathOptionsForKey!.find(
@@ -127,28 +170,6 @@ export const rateLimitedRoute =
     return withRateLimit(
       {
         key: `${value}:${route}`,
-        requestsPerMinute
-      },
-      fn
-    )(...args)
-  }
-
-export const rateLimitedResolver =
-  <A extends [any, any, Context, GraphQLResolveInfo], R>(
-    { requestsPerMinute }: { requestsPerMinute: number },
-    fn: (...args: A) => R
-  ) =>
-  (...args: A) => {
-    if (hasScope(args[2].headers, SCOPES.BYPASSRATELIMIT)) {
-      return fn(...args)
-    }
-
-    const route = args[3].fieldName // e.g. "getUser"
-    const userId = getUserId(args[2].headers)
-
-    return withRateLimit(
-      {
-        key: `${userId}:${route}`,
         requestsPerMinute
       },
       fn

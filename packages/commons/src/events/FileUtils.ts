@@ -9,20 +9,22 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { FullDocumentPath } from '../documents'
-import { ActionDocument, ActionStatus } from './ActionDocument'
-import { FileFieldValue, FileFieldWithOptionValue } from './CompositeFieldValue'
+import { DocumentPath } from '../documents'
+import { Action, ActionDocument } from './ActionDocument'
+import {
+  isFileFieldValue,
+  isFileFieldWithOptionValue
+} from './CompositeFieldValue'
 import { EventDocument } from './EventDocument'
 import { uniq } from 'lodash'
 
-export function getFilePathsFromEvent(
-  event: EventDocument
-): FullDocumentPath[] {
+function carriesFieldValues(action: Action): action is ActionDocument {
+  return 'declaration' in action
+}
+
+export function getFilePathsFromEvent(event: EventDocument): DocumentPath[] {
   const filepaths = event.actions
-    .filter(
-      (action): action is ActionDocument =>
-        action.status !== ActionStatus.Rejected
-    )
+    .filter(carriesFieldValues)
     .flatMap((action) => {
       const declarationValues = Object.values(action.declaration)
       const annotationValues = Object.values(action.annotation ?? {})
@@ -31,14 +33,12 @@ export function getFilePathsFromEvent(
         ...declarationValues,
         ...annotationValues
       ].flatMap((value) => {
-        const fileParsed = FileFieldValue.safeParse(value)
-        if (fileParsed.success) {
-          return [fileParsed.data.path]
+        if (isFileFieldValue(value)) {
+          return [value.path]
         }
 
-        const fileOptionParsed = FileFieldWithOptionValue.safeParse(value)
-        if (fileOptionParsed.success) {
-          return fileOptionParsed.data.map((val) => val.path)
+        if (isFileFieldWithOptionValue(value)) {
+          return value.map((val) => val.path)
         }
 
         return []

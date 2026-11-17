@@ -1,0 +1,43 @@
+{{ if and .Values.postgres.enabled (eq (include "postgres.backup_enabled" .) "true") }}
+{{- if eq .Values.postgres.backup.type "differential" }}
+---
+apiVersion: batch/v1
+{{ if .Values.backup.cronjob }}
+kind: CronJob
+{{- else }}
+kind: Job
+{{- end }}
+metadata:
+  name: postgres-backup-full
+  labels:
+    app: backup-runner
+    job-type: backup
+spec:
+  {{ if .Values.backup.cronjob }}
+  schedule: {{ .Values.postgres.backup.schedule.full }}
+  {{- if .Values.timezone }}
+  timeZone: {{ .Values.timezone }}
+  {{- end }}
+  jobTemplate:
+    spec:
+  {{- end }}
+      template:
+        metadata:
+          labels:
+            app: backup-runner
+            job-type: backup
+        spec:
+          {{- include "opencrvs.imagePullSecrets" (dict "root" . "service" .Values.postgres) | nindent 10 }}
+          serviceAccountName: backup-runner
+          containers:
+            - name: runner
+              image: {{ include "opencrvs.imageReference" .Values.utilities }}
+              command:
+                - /bin/sh
+                - -c
+                - |
+                  kubectl exec -n {{ .Release.Namespace }} postgres-0 -- \
+                    su postgres -c 'pgbackrest --stanza="{{ .Values.postgres.backup.stanza }}" backup --type=full'
+          restartPolicy: OnFailure
+{{- end }}
+{{- end }}

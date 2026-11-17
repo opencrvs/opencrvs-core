@@ -18,32 +18,58 @@ import {
   selectApplicationName
 } from '@login/login/selectors'
 import { useDispatch, useSelector } from 'react-redux'
-import { useIntl } from 'react-intl'
+import { IntlShape, useIntl } from 'react-intl'
 import { Field, Form } from 'react-final-form'
-import { Box, InputField, PasswordInput, TextInput } from '@opencrvs/components'
+import {
+  Box,
+  InputField,
+  PasswordInput,
+  TextInput,
+  Button,
+  Toast,
+  Text,
+  Stack
+} from '@opencrvs/components'
 import { messages } from '@login/i18n/messages/views/stepOneForm'
 import { stepOneFields } from '@login/views/StepOne/stepOneFields'
-import { CountryLogo } from '@opencrvs/components/lib/icons'
+import { CountryLogo } from '@opencrvs/components/icons'
 import {
   ERROR_CODE_FIELD_MISSING,
   ERROR_CODE_FORBIDDEN_CREDENTIALS,
   ERROR_CODE_INVALID_CREDENTIALS,
-  ERROR_CODE_PHONE_NUMBER_VALIDATE
+  ERROR_CODE_OFFICE_INACTIVE,
+  ERROR_CODE_PHONE_NUMBER_VALIDATE,
+  ERROR_CODE_RATE_LIMIT
 } from '@login/utils/authUtils'
 import { IAuthenticationData } from '@login/utils/authApi'
 import * as actions from '@login/login/actions'
 import { resetSubmissionError } from '@login/login/actions'
-import { Button } from '@opencrvs/components/lib/Button'
-import { Toast } from '@opencrvs/components/lib/Toast/Toast'
 import { usePersistentCountryLogo } from '@login/common/LoginBackgroundWrapper'
 import { Container, FormWrapper, LogoContainer } from '@login/views/Common'
-import { Text } from '@opencrvs/components/lib/Text/Text'
-import { Stack } from '@opencrvs/components/lib/Stack/Stack'
 import { Link, useNavigate } from 'react-router-dom'
 import { FORGOTTEN_ITEM, STEP_TWO } from '@login/navigation/routes'
 
 const userNameField = stepOneFields.username
 const passwordField = stepOneFields.password
+
+const getErrorMessage = (intl: IntlShape, errorCode: number) => {
+  switch (errorCode) {
+    case ERROR_CODE_FIELD_MISSING:
+      return intl.formatMessage(messages.fieldMissing)
+    case ERROR_CODE_INVALID_CREDENTIALS:
+      return intl.formatMessage(messages.submissionError)
+    case ERROR_CODE_FORBIDDEN_CREDENTIALS:
+      return intl.formatMessage(messages.forbiddenCredentialError)
+    case ERROR_CODE_OFFICE_INACTIVE:
+      return intl.formatMessage(messages.officeInactiveError)
+    case ERROR_CODE_PHONE_NUMBER_VALIDATE:
+      return intl.formatMessage(messages.phoneNumberFormat)
+    case ERROR_CODE_RATE_LIMIT:
+      return intl.formatMessage(messages.tooManyLoginAttemptError)
+    default:
+      return intl.formatMessage(messages.somethingWentWrong)
+  }
+}
 
 const UserNameInput = () => {
   const intl = useIntl()
@@ -172,14 +198,7 @@ export function StepOneContainer() {
 
       {submissionError && errorCode ? (
         <Toast type="error" onClose={() => dispatch(resetSubmissionError())}>
-          {errorCode === ERROR_CODE_FIELD_MISSING &&
-            intl.formatMessage(messages.fieldMissing)}
-          {errorCode === ERROR_CODE_INVALID_CREDENTIALS &&
-            intl.formatMessage(messages.submissionError)}
-          {errorCode === ERROR_CODE_FORBIDDEN_CREDENTIALS &&
-            intl.formatMessage(messages.forbiddenCredentialError)}
-          {errorCode === ERROR_CODE_PHONE_NUMBER_VALIDATE &&
-            intl.formatMessage(messages.phoneNumberFormat)}
+          {getErrorMessage(intl, errorCode)}
         </Toast>
       ) : (
         isOffline && (

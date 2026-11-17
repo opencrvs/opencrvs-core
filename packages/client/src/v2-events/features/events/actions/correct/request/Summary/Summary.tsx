@@ -24,24 +24,28 @@ import {
   getCurrentEventState,
   ActionType
 } from '@opencrvs/commons/client'
-import { ActionPageLight } from '@opencrvs/components/lib/ActionPageLight'
-import { Button } from '@opencrvs/components/lib/Button'
-import { Content } from '@opencrvs/components/lib/Content'
-import { Dialog } from '@opencrvs/components/lib/Dialog/Dialog'
-import { SecondaryButton } from '@opencrvs/components/lib/buttons'
-import { Check } from '@opencrvs/components/lib/icons'
-import { Text } from '@opencrvs/components/lib/Text'
+import {
+  Button,
+  Content,
+  Dialog,
+  Text,
+  AppBar,
+  Frame,
+  Icon
+} from '@opencrvs/components'
+import { Check } from '@opencrvs/components/icons'
 import { messages as registerMessages } from '@client/i18n/messages/views/register'
 import { messages as correctionMessages } from '@client/i18n/messages/views/correction'
-import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
+import { constantsMessages } from '@client/i18n/messages'
+import { useEventConfigurationForRecord } from '@client/v2-events/features/events/useEventConfiguration'
 import { useEventFormData } from '@client/v2-events/features/events/useEventFormData'
 import { useEventFormNavigation } from '@client/v2-events/features/events/useEventFormNavigation'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
 import { ROUTES } from '@client/v2-events/routes'
 import { useActionAnnotation } from '@client/v2-events/features/events/useActionAnnotation'
-import { useUserAllowedActions } from '@client/v2-events/features/workqueues/EventOverview/components/useAllowedActionConfigurations'
+import { useUserAllowedActions } from '@client/v2-events/features/workqueues/Actions/useUserAllowedActions'
 import { useValidatorContext } from '@client/v2-events/hooks/useValidatorContext'
-import { hasDeclarationFieldChanged } from '../../utils'
+import { getChangedDeclarationDiff } from '@client/v2-events/features/events/useEvents/procedures/actions/declarationDiff'
 import { CorrectionDetails } from './CorrectionDetails'
 
 const messages = defineMessages({
@@ -76,7 +80,7 @@ export function Summary() {
   const { eventId } = useTypedParams(
     ROUTES.V2.EVENTS.REQUEST_CORRECTION.SUMMARY
   )
-  const [{ workqueue }] = useTypedSearchParams(
+  const [{ backTo }] = useTypedSearchParams(
     ROUTES.V2.EVENTS.REQUEST_CORRECTION.SUMMARY
   )
 
@@ -86,9 +90,9 @@ export function Summary() {
   const intl = useIntl()
 
   const events = useEvents()
-  const event = events.getEvent.getFromCache(eventId)
+  const event = events.getEvent.useGetEventFromCache(eventId)
   const validatorContext = useValidatorContext(event)
-  const { eventConfiguration } = useEventConfiguration(event.type)
+  const { eventConfiguration } = useEventConfigurationForRecord(event)
   const eventIndex = getCurrentEventState(event, eventConfiguration)
   const togglePrompt = () => setShowPrompt(!showPrompt)
 
@@ -100,25 +104,16 @@ export function Summary() {
   const { getAnnotation } = useActionAnnotation()
   const annotation = getAnnotation()
 
-  const { isActionAllowed } = useUserAllowedActions(event.type)
+  const { isActionAllowed } = useUserAllowedActions(eventIndex)
   const userMayCorrect = isActionAllowed(ActionType.APPROVE_CORRECTION)
 
   const submitCorrection = React.useCallback(() => {
-    const formWithOnlyChangedValues = Object.fromEntries(
-      Object.entries(form).filter(([key]) => {
-        const field = fields.find((f) => f.id === key)
-        if (!field) {
-          return false
-        }
-
-        return hasDeclarationFieldChanged(
-          field,
-          form,
-          previousFormValues,
-          eventConfiguration,
-          validatorContext
-        )
-      })
+    const formWithOnlyChangedValues = getChangedDeclarationDiff(
+      fields,
+      form,
+      previousFormValues,
+      eventConfiguration,
+      validatorContext
     )
 
     const valuesThatGotHidden = fields.filter((field) => {
@@ -158,10 +153,10 @@ export function Summary() {
       events.actions.correction.request.mutate(mutationPayload)
     }
 
-    if (workqueue) {
-      navigate(ROUTES.V2.WORKQUEUES.WORKQUEUE.buildPath({ slug: workqueue }))
+    if (backTo) {
+      navigate(backTo)
     } else {
-      navigate(ROUTES.V2.EVENTS.OVERVIEW.buildPath({ eventId }))
+      navigate(ROUTES.V2.EVENTS.EVENT.buildPath({ eventId }))
     }
   }, [
     form,
@@ -176,17 +171,62 @@ export function Summary() {
     userMayCorrect,
     validatorContext,
     eventConfiguration,
-    workqueue
+    backTo
   ])
+
+  const title = intl.formatMessage(correctionMessages.title)
 
   return (
     <>
-      <ActionPageLight
-        hideBackground
-        goBack={() => navigate(-1)}
-        goHome={() => eventFormNavigation.closeActionView()}
+      <Frame
+        header={
+          <AppBar
+            desktopLeft={
+              <Button
+                aria-label="Go back"
+                size="medium"
+                type="icon"
+                onClick={() => navigate(-1)}
+              >
+                <Icon name="ArrowLeft" />
+              </Button>
+            }
+            desktopRight={
+              <Button
+                size="medium"
+                type="icon"
+                onClick={() => eventFormNavigation.closeActionView(backTo)}
+              >
+                <Icon color="primary" name="X" />
+              </Button>
+            }
+            desktopTitle={title}
+            mobileLeft={
+              <Button
+                aria-label="Go back"
+                size="medium"
+                type="icon"
+                onClick={() => navigate(-1)}
+              >
+                <Icon name="ArrowLeft" />
+              </Button>
+            }
+            mobileRight={
+              <Button
+                size="medium"
+                type="icon"
+                onClick={() => eventFormNavigation.closeActionView(backTo)}
+              >
+                <Icon color="primary" name="X" />
+              </Button>
+            }
+            mobileTitle={title}
+          />
+        }
         id="corrector_form"
-        title={intl.formatMessage(correctionMessages.title)}
+        skipToContentText={intl.formatMessage(
+          constantsMessages.skipToMainContent
+        )}
       >
         <Content
           bottomActionButtons={[
@@ -207,35 +247,36 @@ export function Summary() {
           showTitleOnMobile={true}
           title={intl.formatMessage(correctionMessages.correctionSummaryTitle)}
           topActionButtons={[
-            <SecondaryButton
+            <Button
               key="go-to-review"
               id="go-to-review"
+              type="secondary"
               onClick={() =>
                 navigate(
                   ROUTES.V2.EVENTS.REQUEST_CORRECTION.REVIEW.buildPath(
                     {
                       eventId
                     },
-                    { workqueue }
+                    { backTo }
                   )
                 )
               }
             >
               {intl.formatMessage(registerMessages.goToReviewButton)}
-            </SecondaryButton>
+            </Button>
           ]}
         >
           <CorrectionDetails
             annotation={annotation}
+            backTo={backTo}
             editable={true}
             event={event}
             form={form}
             requesting={!userMayCorrect}
             validatorContext={validatorContext}
-            workqueue={workqueue}
           />
         </Content>
-      </ActionPageLight>
+      </Frame>
       <Dialog
         actions={[
           <Button
@@ -253,7 +294,7 @@ export function Summary() {
             key="continue"
             id="send"
             size="medium"
-            type="positive"
+            type="primary"
             onClick={submitCorrection}
           >
             {intl.formatMessage(

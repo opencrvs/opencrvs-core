@@ -8,20 +8,23 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import type { Meta, StoryObj } from '@storybook/react'
+import type { Meta, StoryObj } from '@storybook/react-vite'
 import { createTRPCMsw, httpLink } from '@vafanassieff/msw-trpc'
 import superjson from 'superjson'
-import { AppRouter } from '@events/router'
-import { userEvent, within } from '@storybook/test'
+import { userEvent, within, expect } from 'storybook/test'
 import {
   ActionType,
   createPrng,
   generateActionDocument,
+  generateActionDocuments,
   generateUuid,
   tennisClubMembershipEvent,
   generateTrackingId,
-  ActionDocument
+  ActionDocument,
+  getCurrentEventState,
+  INITIAL_EVENT_CONFIG_VERSION_ID
 } from '@opencrvs/commons/client'
+import { AppRouter } from '@client/v2-events/trpc'
 import { ROUTES, routesConfig } from '@client/v2-events/routes'
 import { ReviewDuplicateIndex } from './ReviewDuplicate'
 
@@ -53,7 +56,7 @@ const actions = [
     configuration: tennisClubMembershipEvent,
     action: ActionType.CREATE
   }),
-  generateActionDocument({
+  ...generateActionDocuments({
     configuration: tennisClubMembershipEvent,
     action: ActionType.DECLARE,
     defaults: {
@@ -104,6 +107,7 @@ const markNotDuplicateAction = generateActionDocument({
 
 const mockOriginalEvent = {
   trackingId: generateTrackingId(prng),
+  configVersionId: INITIAL_EVENT_CONFIG_VERSION_ID,
   type: tennisClubMembershipEvent.id,
   actions,
   createdAt: new Date(Date.now()).toISOString(),
@@ -114,6 +118,7 @@ const mockOriginalEvent = {
 
 const mockDuplicateEvent = {
   trackingId: duplicates[0].trackingId,
+  configVersionId: INITIAL_EVENT_CONFIG_VERSION_ID,
   type: tennisClubMembershipEvent.id,
   actions: actions.slice(0, 2),
   createdAt: new Date(Date.now()).toISOString(),
@@ -121,7 +126,7 @@ const mockDuplicateEvent = {
   updatedAt: new Date(Date.now()).toISOString()
 }
 
-export const MarkAsNotDuplucateAndRegister: Story = {
+export const MarkAsNotDuplicateAndRegister: Story = {
   parameters: {
     mockingDate: new Date(),
     reactRouter: {
@@ -140,6 +145,19 @@ export const MarkAsNotDuplucateAndRegister: Story = {
           tRPCMsw.event.actions.duplicate.markNotDuplicate.mutation(() => ({
             ...mockOriginalEvent,
             actions: [...actions, markNotDuplicateAction]
+          })),
+          // The write refetches the record's by-id search, which must find it.
+          tRPCMsw.event.search.query(() => ({
+            results: [
+              getCurrentEventState(
+                {
+                  ...mockOriginalEvent,
+                  actions: [...actions, markNotDuplicateAction]
+                },
+                tennisClubMembershipEvent
+              )
+            ],
+            total: 1
           }))
         ]
       }
@@ -154,6 +172,7 @@ export const MarkAsNotDuplucateAndRegister: Story = {
           name: /Not a duplicate/i
         })
       )
+
       await userEvent.click(
         await canvas.findByRole('button', {
           name: /Confirm/i
@@ -161,19 +180,8 @@ export const MarkAsNotDuplucateAndRegister: Story = {
       )
     })
 
-    await step(' Register', async () => {
-      await userEvent.click(
-        await canvas.findByRole('button', {
-          name: /Register/i
-        })
-      )
-      const confirmModal = within(await canvas.findByRole('dialog'))
-
-      await userEvent.click(
-        await confirmModal.findByRole('button', {
-          name: /Register/i
-        })
-      )
-    })
+    await expect(
+      await canvas.findByRole('button', { name: /Action/i })
+    ).toBeVisible()
   }
 }

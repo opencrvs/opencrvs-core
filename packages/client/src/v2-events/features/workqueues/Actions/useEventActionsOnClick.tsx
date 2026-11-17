@@ -1,0 +1,269 @@
+/*
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at https://mozilla.org/MPL/2.0/.
+ *
+ * OpenCRVS is also distributed under the terms of the Civil Registration
+ * & Healthcare Disclaimer located at http://opencrvs.org/license.
+ *
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
+ */
+import { useNavigate } from 'react-router-dom'
+import React, { useCallback } from 'react'
+
+import {
+  ActionType,
+  EventIndex,
+  getUUID,
+  ClientSpecificAction,
+  getOrThrow,
+  RemoteDraft,
+  WorkqueueActionType,
+  AssignmentStatus,
+  getAssignmentStatus,
+  todayISO
+} from '@opencrvs/commons/client'
+import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
+import { ROUTES } from '@client/v2-events/routes'
+import { getUsersFullName, resolveLocationName } from '@client/v2-events/utils'
+import { useEventConfigurationForRecord } from '@client/v2-events/features/events/useEventConfiguration'
+import { useEventFormNavigation } from '@client/v2-events/features/events/useEventFormNavigation'
+import { useModal } from '@client/hooks/useModal'
+import { AssignModal } from '@client/v2-events/components/AssignModal'
+import { UnassignModal } from '@client/v2-events/components/UnassignModal'
+import { useUsers } from '@client/v2-events/hooks/useUsers'
+import { useLocations } from '@client/v2-events/hooks/useLocations'
+import { useQuickActionModal } from '@client/v2-events/features/events/actions/quick-actions/useQuickActionModal'
+import { useRejectionModal } from '@client/v2-events/features/events/actions/reject/useRejectionModal'
+import { useAuthentication } from '@client/utils/userUtils'
+
+/** Actions whose drafts can be saved to the server */
+export type DraftActionType = RemoteDraft['action']['type']
+
+/**
+ * Given an event,
+ * @returns onClick handlers for workqueue item actions, and any modals that should be rendered alongside.
+ *
+ * Note: If you need assignment actions @see useAssignmentActions.
+ * They are intentionally separated, since assignment actions are not used everywhere (e.g. in Workqueue CTA buttons) and have additional dependencies that can be costly to run.
+ *
+ */
+export function useEventActionsOnClick(event: EventIndex) {
+  const navigate = useNavigate()
+  const {
+    clearEphemeralFormState,
+    deleteDeclaration,
+    modal: deleteModal
+  } = useEventFormNavigation()
+  const { eventConfiguration } = useEventConfigurationForRecord(event)
+  const { handleRejection, rejectionModal } = useRejectionModal(event)
+  const { onQuickAction, quickActionModal } = useQuickActionModal(
+    eventConfiguration,
+    event
+  )
+
+  const eventId = event.id
+
+  /** Opens the user's draft of the event in the flow of the draft's action */
+  const continueDraft = useCallback(
+    (draftActionType: DraftActionType, backTo?: string) => {
+      clearEphemeralFormState()
+
+      const route =
+        draftActionType === ActionType.NOTIFY
+          ? ROUTES.V2.EVENTS.NOTIFY.REVIEW
+          : ROUTES.V2.EVENTS.DECLARE.REVIEW
+
+      return navigate(route.buildPath({ eventId }, { backTo }))
+    },
+    [eventId, clearEphemeralFormState, navigate]
+  )
+
+  const onClick = useCallback(
+    async (
+      actionType: Exclude<
+        WorkqueueActionType | ClientSpecificAction,
+        typeof ClientSpecificAction.CONTINUE_DRAFT
+      >,
+      backTo?: string
+    ) => {
+      switch (actionType) {
+        case ActionType.DELETE:
+          return deleteDeclaration(eventId, backTo)
+        case ActionType.DECLARE:
+          clearEphemeralFormState()
+          return navigate(
+            ROUTES.V2.EVENTS.DECLARE.REVIEW.buildPath({ eventId }, { backTo })
+          )
+        case ActionType.EDIT:
+          clearEphemeralFormState()
+          return navigate(
+            ROUTES.V2.EVENTS.EDIT.REVIEW.buildPath({ eventId }, { backTo })
+          )
+        case ActionType.REGISTER:
+          return onQuickAction(ActionType.REGISTER, backTo)
+        case ActionType.ARCHIVE:
+          return onQuickAction(ActionType.ARCHIVE, backTo)
+        case ActionType.UNARCHIVE:
+          return onQuickAction(ActionType.UNARCHIVE, backTo)
+        case ActionType.REVOKE_REGISTRATION:
+          return onQuickAction(ActionType.REVOKE_REGISTRATION, backTo)
+        case ActionType.REINSTATE_REGISTRATION:
+          return onQuickAction(ActionType.REINSTATE_REGISTRATION, backTo)
+        case ActionType.PRINT_CERTIFICATE:
+          clearEphemeralFormState()
+          return navigate(
+            ROUTES.V2.EVENTS.PRINT_CERTIFICATE.buildPath(
+              { eventId },
+              { backTo }
+            )
+          )
+        case ActionType.MARK_AS_DUPLICATE:
+          clearEphemeralFormState()
+          return navigate(
+            ROUTES.V2.EVENTS.REVIEW_POTENTIAL_DUPLICATE.buildPath(
+              { eventId },
+              { backTo }
+            )
+          )
+        case ActionType.REQUEST_CORRECTION: {
+          const correctionPages = eventConfiguration.actions.find(
+            (action) => action.type === ActionType.REQUEST_CORRECTION
+          )?.correctionForm.pages
+          if (!correctionPages) {
+            throw new Error('No page ID found for request correction')
+          }
+          clearEphemeralFormState()
+          if (correctionPages.length === 0) {
+            return navigate(
+              ROUTES.V2.EVENTS.REQUEST_CORRECTION.REVIEW.buildPath(
+                { eventId },
+                { backTo }
+              )
+            )
+          }
+          return navigate(
+            ROUTES.V2.EVENTS.REQUEST_CORRECTION.ONBOARDING.buildPath(
+              { eventId, pageId: correctionPages[0].id },
+              { backTo }
+            )
+          )
+        }
+        case ClientSpecificAction.REVIEW_CORRECTION_REQUEST:
+          clearEphemeralFormState()
+          return navigate(
+            ROUTES.V2.EVENTS.REVIEW_CORRECTION.REVIEW.buildPath(
+              { eventId },
+              { backTo }
+            )
+          )
+        case ActionType.REJECT:
+          return handleRejection(() =>
+            backTo ? navigate(backTo) : navigate(ROUTES.V2.buildPath({}))
+          )
+        case ActionType.READ:
+          return navigate(
+            ROUTES.V2.EVENTS.EVENT.RECORD.buildPath({ eventId }, { backTo })
+          )
+      }
+    },
+    [
+      eventId,
+      deleteDeclaration,
+      clearEphemeralFormState,
+      navigate,
+      onQuickAction,
+      eventConfiguration,
+      handleRejection
+    ]
+  )
+
+  return {
+    onClick,
+    continueDraft,
+    modals: [deleteModal, rejectionModal, quickActionModal]
+  }
+}
+
+/**
+ * Given an event,
+ * @returns handlers for assignment actions, and any modals that should be rendered alongside.
+ *
+ * Note: If you need event actions @see useEventActionsOnClick.
+ * They are intentionally separated, since assignment actions are not used everywhere (e.g. in Workqueue CTA buttons) and have additional dependencies that can be costly to run.
+ *
+ */
+export function useAssignmentActions(event: EventIndex) {
+  const maybeAuth = useAuthentication()
+  const authentication = getOrThrow(
+    maybeAuth,
+    'Authentication is not available but is required'
+  )
+  const events = useEvents()
+  const { useFindEventFromCache } = events.getEvent
+  const cachedEvent = useFindEventFromCache(event.id)
+  const { refetch: refetchEvent } = cachedEvent
+  const isDownloaded = Boolean(cachedEvent.data)
+  const assignmentStatus = getAssignmentStatus(event, authentication.sub)
+  const isDownloadedAndAssignedToUser =
+    assignmentStatus === AssignmentStatus.ASSIGNED_TO_SELF && isDownloaded
+
+  const { getUsers } = useUsers()
+  const { getLocations } = useLocations()
+  const locations = getLocations.useSuspenseQuery()
+  const assignedToUser = getUsers.useQueryById(event.assignedTo || '', {
+    enabled: !!event.assignedTo
+  })
+  const assignedUserFullName = assignedToUser.data
+    ? getUsersFullName(assignedToUser.data.name)
+    : null
+  const assignedOffice = assignedToUser.data?.primaryOfficeId
+  // Assigned office is a present-tense surface — today's name.
+  const assignedOfficeName = resolveLocationName(
+    assignedOffice ? locations.get(assignedOffice) : undefined,
+    todayISO()
+  )
+  const [modal, openModal] = useModal()
+
+  const onAssign = useCallback(async () => {
+    const assign = await openModal<boolean>((close) => (
+      <AssignModal close={close} />
+    ))
+    if (!assign) {
+      return
+    }
+    await events.actions.assignment.assign.mutate({
+      eventId: event.id,
+      assignedTo: authentication.sub,
+      refetchEvent
+    })
+  }, [openModal, events, event.id, authentication.sub, refetchEvent])
+
+  const onUnassign = useCallback(async () => {
+    const unassign = await openModal<boolean>((close) => (
+      <UnassignModal
+        assignedSelf={isDownloadedAndAssignedToUser}
+        close={close}
+        name={assignedUserFullName}
+        officeName={assignedOfficeName}
+      />
+    ))
+    if (!unassign) {
+      return
+    }
+    await events.actions.assignment.unassign.mutateAsync({
+      eventId: event.id,
+      transactionId: getUUID(),
+      assignedTo: null
+    })
+  }, [
+    openModal,
+    isDownloadedAndAssignedToUser,
+    assignedUserFullName,
+    assignedOfficeName,
+    events,
+    event.id
+  ])
+
+  return { onAssign, onUnassign, modal }
+}

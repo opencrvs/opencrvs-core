@@ -8,7 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { Mutation } from '@apollo/client/react/components'
+
 import {
   IProtectedAccountSetupData,
   ISecurityQuestionAnswer,
@@ -17,25 +17,32 @@ import {
 import {
   buttonMessages,
   constantsMessages,
-  errorMessages,
-  userMessages
+  errorMessages
 } from '@client/i18n/messages'
 import { messages } from '@client/i18n/messages/views/userSetup'
+import {
+  isSecurityQuestionKey,
+  securityQuestionMessages
+} from '@client/views/UserSetup/SecurityQuestionView'
 import { getUserDetails } from '@client/profile/profileSelectors'
 import { IStoreState } from '@client/store'
-import {
-  SubmitActivateUserMutation,
-  SubmitActivateUserMutationVariables
-} from '@client/utils/gateway'
 import { getUserName, UserDetails } from '@client/utils/userUtils'
-import { activateUserMutation } from '@client/views/UserSetup/queries'
-import { ErrorText } from '@opencrvs/components/lib/'
-import { ActionPageLight } from '@opencrvs/components/lib/ActionPageLight'
-import { Button } from '@opencrvs/components/lib/Button'
-import { Content } from '@opencrvs/components/lib/Content'
-import { Icon } from '@opencrvs/components/lib/Icon'
-import { Loader } from '@opencrvs/components/lib/Loader'
-import { DataRow, IDataProps } from '@opencrvs/components/lib/ViewData'
+import { useLocations } from '@client/v2-events/hooks/useLocations'
+import { formatUserRole } from '@client/v2-events/hooks/useRoles'
+import { useUsers } from '@client/v2-events/hooks/useUsers'
+import { getOrThrow, todayISO } from '@opencrvs/commons/client'
+import { resolveLocationName } from '@client/v2-events/utils'
+import {
+  ErrorText,
+  Button,
+  Content,
+  Icon,
+  AppBar,
+  Frame,
+  Loader,
+  DataRow,
+  IDataProps
+} from '@opencrvs/components'
 import * as React from 'react'
 import { useIntl } from 'react-intl'
 import { useSelector } from 'react-redux'
@@ -59,23 +66,44 @@ export function UserSetupReview({ setupData, goToStep }: IProps) {
   const userDetails = useSelector<IStoreState, UserDetails | null>(
     getUserDetails
   )
+
+  const primaryOfficeId = getOrThrow(
+    userDetails?.primaryOfficeId,
+    'User primary office ID is required'
+  )
+
+  const onCompleted = () => {
+    goToStep(ProtectedAccoutStep.CONFIRMATION, setupData)
+  }
+  const onError = () => {
+    setSubmitError(true)
+  }
+
+  const { getLocation } = useLocations()
+  const location = getLocation.useQuery(primaryOfficeId)
+  const { useActivateUser } = useUsers()
+
+  const activateUserUserMutation = useActivateUser({
+    onSuccess: onCompleted,
+    onError: onError
+  })
   const englishName = getUserName(userDetails)
   const mobile = (userDetails && (userDetails.mobile as string)) || ''
   const email = (userDetails && (userDetails.email as string)) || ''
-  const role = userDetails && intl.formatMessage(userDetails.role.label)
+  const role = formatUserRole(userDetails?.role, intl)
 
-  const primaryOffice =
-    (userDetails &&
-      userDetails.primaryOffice &&
-      userDetails.primaryOffice.name) ||
-    ''
+  // Present-tense surface — resolve the office's name as of today (the client
+  // cache strips the flattened `name`; see `toClientLocation`).
+  const primaryOffice = resolveLocationName(location.data, todayISO())
 
   const answeredQuestions: IDataProps[] = []
   setupData.securityQuestionAnswers &&
     setupData.securityQuestionAnswers.forEach((e) => {
       answeredQuestions.push({
         id: `Question_${e.questionKey}`,
-        label: intl.formatMessage(userMessages[e.questionKey]),
+        label: isSecurityQuestionKey(e.questionKey)
+          ? intl.formatMessage(securityQuestionMessages[e.questionKey])
+          : e.questionKey,
         value: e.answer,
         action: {
           id: `Question_Action_${e.questionKey}`,
@@ -126,74 +154,89 @@ export function UserSetupReview({ setupData, goToStep }: IProps) {
     ...answeredQuestions
   ]
 
-  const onCompleted = () => {
-    goToStep(ProtectedAccoutStep.CONFIRMATION, setupData)
-  }
-  const onError = () => {
-    setSubmitError(true)
-  }
+  const title = intl.formatMessage(messages.userSetupRevieTitle)
+
   return (
-    <Mutation<SubmitActivateUserMutation, SubmitActivateUserMutationVariables>
-      mutation={activateUserMutation}
-      variables={{
-        userId: String(setupData.userId),
-        password: String(setupData.password),
-        securityQuestionAnswers:
-          setupData.securityQuestionAnswers as ISecurityQuestionAnswer[]
-      }}
-      onCompleted={() => onCompleted()}
-      onError={() => onError()}
+    <Frame
+      skipToContentText={intl.formatMessage(
+        constantsMessages.skipToMainContent
+      )}
+      header={
+        <AppBar
+          desktopLeft={
+            <Button
+              aria-label="Go back"
+              size="medium"
+              type="icon"
+              onClick={() =>
+                goToStep(ProtectedAccoutStep.SECURITY_QUESTION, setupData)
+              }
+            >
+              <Icon name="ArrowLeft" />
+            </Button>
+          }
+          mobileLeft={
+            <Button
+              aria-label="Go back"
+              size="medium"
+              type="icon"
+              onClick={() =>
+                goToStep(ProtectedAccoutStep.SECURITY_QUESTION, setupData)
+              }
+            >
+              <Icon name="ArrowLeft" />
+            </Button>
+          }
+          desktopTitle={title}
+          mobileTitle={title}
+        />
+      }
     >
-      {(submitActivateUser, { loading }) => {
-        return (
-          <ActionPageLight
-            title={intl.formatMessage(messages.userSetupRevieTitle)}
-            hideBackground
-            goBack={() => {
-              goToStep(ProtectedAccoutStep.SECURITY_QUESTION, setupData)
-            }}
-          >
-            {loading ? (
-              <Content>
-                <Loader
-                  id="setup_submit_waiting"
-                  loadingText={intl.formatMessage(messages.waiting)}
-                />
-              </Content>
-            ) : (
-              <Content
-                title={intl.formatMessage(messages.userSetupReviewHeader)}
-                bottomActionButtons={[
-                  <Button
-                    key="confirm"
-                    id="Confirm"
-                    type="primary"
-                    size="large"
-                    fullWidth
-                    onClick={() => submitActivateUser()}
-                  >
-                    <Icon name="Check" />
-                    {intl.formatMessage(buttonMessages.confirm)}
-                  </Button>
-                ]}
-              >
-                <GlobalError id="GlobalError">
-                  {submitError && (
-                    <ErrorText>
-                      {intl.formatMessage(errorMessages.pleaseTryAgainError)}
-                    </ErrorText>
-                  )}
-                </GlobalError>
-                <div id="UserSetupData">
-                  {items.map((item: IDataProps, index: number) => (
-                    <DataRow key={index} {...item} />
-                  ))}
-                </div>
-              </Content>
+      {activateUserUserMutation.isPending ? (
+        <Content>
+          <Loader
+            id="setup_submit_waiting"
+            loadingText={intl.formatMessage(messages.waiting)}
+          />
+        </Content>
+      ) : (
+        <Content
+          title={intl.formatMessage(messages.userSetupReviewHeader)}
+          bottomActionButtons={[
+            <Button
+              key="confirm"
+              id="Confirm"
+              type="primary"
+              size="large"
+              fullWidth
+              onClick={() =>
+                activateUserUserMutation.mutate({
+                  userId: String(setupData.userId),
+                  password: String(setupData.password),
+                  securityQNAs:
+                    setupData.securityQuestionAnswers as ISecurityQuestionAnswer[]
+                })
+              }
+            >
+              <Icon name="Check" />
+              {intl.formatMessage(buttonMessages.confirm)}
+            </Button>
+          ]}
+        >
+          <GlobalError id="GlobalError">
+            {submitError && (
+              <ErrorText>
+                {intl.formatMessage(errorMessages.pleaseTryAgainError)}
+              </ErrorText>
             )}
-          </ActionPageLight>
-        )
-      }}
-    </Mutation>
+          </GlobalError>
+          <div id="UserSetupData">
+            {items.map((item: IDataProps, index: number) => (
+              <DataRow key={index} {...item} />
+            ))}
+          </div>
+        </Content>
+      )}
+    </Frame>
   )
 }

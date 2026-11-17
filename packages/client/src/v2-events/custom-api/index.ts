@@ -10,6 +10,7 @@
  */
 
 import {
+  ActionUpdate,
   EventState,
   getUUID,
   ActionType,
@@ -32,6 +33,13 @@ export interface CustomMutationParams {
   transactionId: string
   eventConfiguration: EventConfig
   annotation?: EventState
+  /**
+   * Values collected from the final action's confirmation dialog form
+   * (e.g. REGISTER's fields in a declare+register flow). Merged into the
+   * final action's annotation only, so intermediate actions don't store
+   * another action's dialog metadata.
+   */
+  targetActionAnnotation?: ActionUpdate
 }
 
 export interface CorrectionRequestParams extends CustomMutationParams {
@@ -40,7 +48,7 @@ export interface CorrectionRequestParams extends CustomMutationParams {
 }
 
 export interface ArchiveOnDuplicateParams extends CustomMutationParams {
-  content: ArchiveActionInput['content'] &
+  content: NonNullable<ArchiveActionInput['content']> &
     Partial<MarkAsDuplicateActionInput['content']>
 }
 
@@ -70,7 +78,8 @@ export async function registerOnDeclare({
   eventConfiguration,
   declaration,
   transactionId,
-  annotation
+  annotation,
+  targetActionAnnotation
 }: CustomMutationParams) {
   const declaredEvent = await trpcClient.event.actions.declare.request.mutate({
     declaration,
@@ -87,49 +96,34 @@ export async function registerOnDeclare({
     return declaredEvent
   }
 
-  // update is a patch, no need to send again.
-  const validatedEvent = await trpcClient.event.actions.validate.request.mutate(
-    {
-      declaration: {},
-      annotation,
-      eventId,
-      transactionId,
-      keepAssignmentIfAccepted: true
-    }
-  )
-
-  if (
-    hasPotentialDuplicates(validatedEvent, eventConfiguration) ||
-    wasRejected(validatedEvent, ActionType.VALIDATE)
-  ) {
-    return validatedEvent
-  }
-
-  const latestResponse = await trpcClient.event.actions.register.request.mutate(
-    {
-      declaration: {},
-      annotation,
-      eventId,
-      transactionId
-    }
-  )
-
-  return latestResponse
+  return trpcClient.event.actions.register.request.mutate({
+    declaration: {},
+    annotation: { ...annotation, ...targetActionAnnotation },
+    eventId,
+    transactionId
+  })
 }
 
-/**
- * Runs a sequence of actions from declare to validate.
- *
- * Defining the function here, statically allows offline support.
- * Moving the function to one level up will break offline support since the definition needs to be static.
- */
-export async function validateOnDeclare({
+export async function editAndRegister({
   eventId,
-  transactionId,
-  eventConfiguration,
   declaration,
-  annotation
+  transactionId,
+  annotation,
+  targetActionAnnotation,
+  eventConfiguration
 }: CustomMutationParams) {
+  const editedEvent = await trpcClient.event.actions.edit.request.mutate({
+    declaration,
+    annotation,
+    eventId,
+    transactionId,
+    keepAssignmentIfAccepted: true
+  })
+
+  if (wasRejected(editedEvent, ActionType.EDIT)) {
+    return editedEvent
+  }
+
   const declaredEvent = await trpcClient.event.actions.declare.request.mutate({
     declaration,
     annotation,
@@ -145,61 +139,68 @@ export async function validateOnDeclare({
     return declaredEvent
   }
 
-  const latestResponse = await trpcClient.event.actions.validate.request.mutate(
-    {
-      // update is a patch, no need to send again.
-      declaration: {},
-      annotation,
-      eventId,
-      transactionId
-    }
-  )
-
-  return latestResponse
+  return trpcClient.event.actions.register.request.mutate({
+    declaration: {},
+    annotation: { ...annotation, ...targetActionAnnotation },
+    eventId,
+    transactionId
+  })
 }
 
-/**
- * Runs a sequence of actions from  validate to register.
- *
- * Defining the function here, statically allows offline support.
- * Moving the function to one level up will break offline support since the definition needs to be static.
- */
-export async function registerOnValidate({
+export async function editAndDeclare({
   eventId,
-  transactionId,
-  eventConfiguration,
   declaration,
-  annotation
+  transactionId,
+  annotation,
+  targetActionAnnotation
 }: CustomMutationParams) {
-  const validatedEvent = await trpcClient.event.actions.validate.request.mutate(
-    {
-      declaration,
-      annotation,
-      eventId,
-      transactionId,
-      keepAssignmentIfAccepted: true
-    }
-  )
+  const editedEvent = await trpcClient.event.actions.edit.request.mutate({
+    declaration,
+    annotation,
+    eventId,
+    transactionId,
+    keepAssignmentIfAccepted: true
+  })
 
-  if (
-    hasPotentialDuplicates(validatedEvent, eventConfiguration) ||
-    wasRejected(validatedEvent, ActionType.VALIDATE)
-  ) {
-    return validatedEvent
+  if (wasRejected(editedEvent, ActionType.EDIT)) {
+    return editedEvent
   }
 
-  const latestResponse = await trpcClient.event.actions.register.request.mutate(
-    {
-      // update is a patch, no need to send again.
-      declaration: {},
-      annotation,
-      eventId,
-      transactionId
-    }
-  )
-
-  return latestResponse
+  return trpcClient.event.actions.declare.request.mutate({
+    declaration,
+    annotation: { ...annotation, ...targetActionAnnotation },
+    eventId,
+    transactionId
+  })
 }
+
+export async function editAndNotify({
+  eventId,
+  declaration,
+  transactionId,
+  annotation,
+  targetActionAnnotation
+}: CustomMutationParams) {
+  const editedEvent = await trpcClient.event.actions.edit.request.mutate({
+    declaration,
+    annotation,
+    eventId,
+    transactionId,
+    keepAssignmentIfAccepted: true
+  })
+
+  if (wasRejected(editedEvent, ActionType.EDIT)) {
+    return editedEvent
+  }
+
+  return trpcClient.event.actions.notify.request.mutate({
+    declaration,
+    annotation: { ...annotation, ...targetActionAnnotation },
+    eventId,
+    transactionId
+  })
+}
+
 /**
  * Runs markAsDuplicate and then archive on sequence.
  */
@@ -213,7 +214,7 @@ export async function archiveOnDuplicate({
     eventId,
     transactionId,
     declaration,
-    keepAssignment: true,
+    keepAssignmentIfAccepted: true,
     ...(content.duplicateOf
       ? { content: { duplicateOf: content.duplicateOf } }
       : {})
@@ -295,8 +296,7 @@ export async function makeCorrectionOnRequest({
     transactionId: getUUID(),
     eventId,
     requestId,
-    annotation: {
-      isImmediateCorrection: true
-    }
+    content: { immediateCorrection: true },
+    waitFor: true
   })
 }

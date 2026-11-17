@@ -10,7 +10,7 @@
  */
 
 import React, { useState } from 'react'
-import { StoryFn, Meta } from '@storybook/react'
+import { StoryFn, Meta } from '@storybook/react-vite'
 import { DateRangeFieldValue, PlainDate } from '@opencrvs/commons/client'
 import { DateRangeField } from './DateRangeField'
 

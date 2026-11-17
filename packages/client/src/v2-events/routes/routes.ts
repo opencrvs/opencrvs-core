@@ -28,95 +28,92 @@ export const ROUTES = {
         'events',
         {},
         {
-          VIEW: route('view/:eventId', {
-            params: { eventId: uuid().defined() },
-            searchParams: {
-              workqueue: string()
+          EVENT: route(
+            ':eventId',
+            {
+              params: { eventId: uuid().defined() },
+              searchParams: {
+                backTo: string()
+              }
+            },
+            {
+              RECORD: route('record', {
+                searchParams: {
+                  backTo: string()
+                }
+              }),
+              DOCUMENTS: route('documents', {
+                searchParams: {
+                  backTo: string()
+                }
+              }),
+              AUDIT: route('audit', {
+                searchParams: {
+                  backTo: string()
+                }
+              })
             }
-          }),
-          OVERVIEW: route('overview/:eventId', {
-            params: { eventId: uuid().defined() },
-            searchParams: {
-              workqueue: string()
-            }
-          }),
+          ),
           CREATE: route('create', {
             searchParams: {
-              workqueue: string()
+              backTo: string()
             }
           }),
           DELETE: route('delete/:eventId', {
             searchParams: {
-              workqueue: string()
+              backTo: string()
             }
           }),
+          NOTIFY: route(
+            'notify/:eventId',
+            {
+              params: { eventId: uuid().defined() },
+              searchParams: { backTo: string() }
+            },
+            {
+              REVIEW: route('review', { searchParams: { backTo: string() } }),
+              PAGES: route('pages/:pageId', {
+                params: { pageId: string() },
+                searchParams: { from: string(), backTo: string() },
+                hash: hashValues()
+              })
+            }
+          ),
           DECLARE: route(
             'declare/:eventId',
             {
               params: { eventId: uuid().defined() },
-              searchParams: {
-                workqueue: string()
-              }
+              searchParams: { backTo: string() }
             },
             {
               REVIEW: route('review', {
-                searchParams: {
-                  workqueue: string()
-                }
+                searchParams: { backTo: string() }
               }),
               PAGES: route('pages/:pageId', {
                 params: { pageId: string() },
                 searchParams: {
                   from: string(),
-                  workqueue: string()
+                  backTo: string()
                 },
                 hash: hashValues()
               })
             }
           ),
-          VALIDATE: route(
-            'validate/:eventId',
+          EDIT: route(
+            'edit/:eventId',
             {
               params: { eventId: uuid().defined() },
-              searchParams: {
-                workqueue: string()
-              }
+              searchParams: { backTo: string() }
             },
             {
               REVIEW: route('review', {
-                searchParams: {
-                  workqueue: string()
-                }
+                searchParams: { backTo: string() }
               }),
               PAGES: route('pages/:pageId', {
                 params: { pageId: string() },
                 searchParams: {
                   from: string(),
-                  workqueue: string()
-                },
-                hash: hashValues()
-              })
-            }
-          ),
-          REGISTER: route(
-            'register/:eventId',
-            {
-              params: { eventId: uuid().defined() },
-              searchParams: {
-                workqueue: string()
-              }
-            },
-            {
-              REVIEW: route('review', {
-                searchParams: {
-                  workqueue: string()
-                }
-              }),
-              PAGES: route('pages/:pageId', {
-                params: { pageId: string() },
-                searchParams: {
-                  from: string(),
-                  workqueue: string()
+                  backTo: string()
                 },
                 hash: hashValues()
               })
@@ -127,7 +124,7 @@ export const ROUTES = {
             {
               params: { eventId: uuid().defined() },
               searchParams: {
-                workqueue: string()
+                backTo: string()
               }
             },
             {
@@ -135,14 +132,14 @@ export const ROUTES = {
                 params: { pageId: string() },
                 searchParams: {
                   from: string(),
-                  workqueue: string()
+                  backTo: string()
                 },
                 hash: hashValues()
               }),
               REVIEW: route('review', {
                 searchParams: {
                   templateId: string(),
-                  workqueue: string()
+                  backTo: string()
                 }
               })
             }
@@ -150,7 +147,7 @@ export const ROUTES = {
           REVIEW_POTENTIAL_DUPLICATE: route('review-duplicate/:eventId', {
             params: { eventId: uuid().defined() },
             searchParams: {
-              workqueue: string()
+              backTo: string()
             }
           }),
           REQUEST_CORRECTION: correctionRequestRoutes,
@@ -175,7 +172,46 @@ export const ROUTES = {
           offset: zod(z.number().min(0)).default(0)
         }
       }),
-      SETTINGS: route('settings', {})
+      SETTINGS: route(
+        'settings',
+        {},
+        {
+          USER: route(
+            'users',
+            {},
+            {
+              CREATE: route('create', {
+                searchParams: {
+                  officeId: uuid().defined(),
+                  from: string()
+                }
+              }),
+              VIEW: route(':userId/view', {
+                params: {
+                  userId: uuid().defined()
+                }
+              }),
+              REVIEW: route(':userId/review', {
+                params: {
+                  userId: uuid().defined()
+                },
+                searchParams: {
+                  from: string()
+                }
+              }),
+              EDIT: route(':userId/edit/:pageId', {
+                params: {
+                  userId: uuid().defined(),
+                  pageId: string()
+                },
+                searchParams: {
+                  from: string()
+                }
+              })
+            }
+          )
+        }
+      )
     }
   )
 }

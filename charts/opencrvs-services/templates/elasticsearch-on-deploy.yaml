@@ -1,0 +1,50 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  annotations:
+    "helm.sh/hook": pre-install,pre-upgrade
+    "helm.sh/hook-weight": "1"
+  labels:
+    app: deployment-jobs
+  name: elasticsearch-on-deploy
+spec:
+  template:
+    metadata:
+      labels:
+        app: deployment-jobs
+    spec:
+      {{- include "opencrvs.imagePullSecrets" (dict "root" . "service" .Values.utilities) | nindent 6 }}
+      {{- include "pod-service-account-values-helper" (dict "service_name" "deployment-jobs" "Values" .Values) | nindent 6 }}
+      containers:
+        - name: elasticsearch-on-deploy
+          command: ["/scripts/setup.sh"]
+          image: {{ include "opencrvs.image" (dict "root" . "service" .Values.utilities) }}
+          imagePullPolicy: {{ .Values.utilities.image.pullPolicy | default .Values.platform.imagePullPolicy }}
+          env:
+            - name: ELASTICSEARCH_HOST
+              value: {{ .Values.elasticsearch.host }}
+            - name: ELASTIC_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.elasticsearch.admin_user_secret_name }}
+                  key: ELASTIC_PASSWORD
+            - name: SEARCH_ELASTIC_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.elasticsearch.users_secret }}
+                  key: SEARCH_ELASTIC_USERNAME
+            - name: SEARCH_ELASTIC_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.elasticsearch.users_secret }}
+                  key: SEARCH_ELASTIC_PASSWORD
+          volumeMounts:
+            - mountPath: /scripts
+              name: elasticsearch-on-update-script
+      volumes:
+        - name: elasticsearch-on-update-script
+          configMap:
+            name: elasticsearch-on-update-script
+            defaultMode: 0755
+      restartPolicy: "OnFailure"
+

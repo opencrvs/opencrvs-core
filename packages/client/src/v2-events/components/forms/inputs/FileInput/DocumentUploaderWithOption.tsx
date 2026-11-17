@@ -15,13 +15,15 @@ import { useField } from 'formik'
 import {
   FileFieldValueWithOption,
   FileFieldWithOptionValue,
-  FullDocumentPath,
+  DocumentPath,
   FileUploadWithOptions,
   MimeType,
-  SelectOption
+  SelectOption,
+  AttachmentPath
 } from '@opencrvs/commons/client'
 import { ErrorText } from '@opencrvs/components'
 import { useFileUpload } from '@client/v2-events/features/files/useFileUpload'
+import { toFileUrl } from '@client/v2-events/cache'
 import { Select } from '@client/v2-events/features/events/registered-fields/Select'
 import { buttonMessages, formMessages as messages } from '@client/i18n/messages'
 import { useIntlWithFormData } from '@client/v2-events/messages/utils'
@@ -77,6 +79,7 @@ function DocumentUploaderWithOption({
   acceptedFileTypes = [],
   options,
   error,
+  filePath,
   hideOnEmptyOption,
   autoSelectOnlyOption,
   maxFileSize,
@@ -87,9 +90,10 @@ function DocumentUploaderWithOption({
   disabled?: boolean
   acceptedFileTypes?: MimeType[]
   options: SelectOption[]
-  value: FileFieldWithOptionValue
+  value?: FileFieldWithOptionValue
   onChange: (file: FileFieldValueWithOption[]) => void
   error?: string
+  filePath: AttachmentPath
   hideOnEmptyOption?: boolean
   autoSelectOnlyOption?: boolean
   maxFileSize: number
@@ -101,7 +105,7 @@ function DocumentUploaderWithOption({
     DocumentTypeRequiredError
   )
 
-  const [files, setFiles] = useState(value)
+  const files = value || []
   const [filesBeingProcessed, setFilesBeingProcessed] = useState<
     Array<{ label: string }>
   >([])
@@ -118,7 +122,7 @@ function DocumentUploaderWithOption({
     useState<FileFieldValueWithOption | null>(null)
   const { processImageFile } = useImageProcessing()
 
-  const { uploadFile } = useFileUpload(name, {
+  const { uploadFile } = useFileUpload(filePath, name, {
     onSuccess: ({ type, originalFilename, path, id }) => {
       const newFile = {
         path,
@@ -129,7 +133,6 @@ function DocumentUploaderWithOption({
 
       setFilesBeingProcessed((prev) => prev.filter(({ label }) => label !== id))
 
-      setFiles((prevFiles) => getUpdatedFiles(prevFiles, newFile))
       onChange(getUpdatedFiles(files, newFile))
       setSelectedOption(undefined)
     }
@@ -171,14 +174,8 @@ function DocumentUploaderWithOption({
     maxFileSize
   })
 
-  const onDeleteFile = (path: FullDocumentPath) => {
-    setFiles((prevFiles) => {
-      const updatedFiles = prevFiles.filter((file) => file.path !== path)
-      onChange(updatedFiles)
-
-      return updatedFiles
-    })
-
+  const onDeleteFile = (path: DocumentPath) => {
+    onChange(files.filter((file) => file.path !== path))
     setPreviewImage(null)
   }
 
@@ -198,6 +195,7 @@ function DocumentUploaderWithOption({
         description={description}
         disabled={disabled}
         error={error}
+        filePath={filePath}
         label={
           typeof onlyOption.label === 'string'
             ? onlyOption.label
@@ -205,7 +203,7 @@ function DocumentUploaderWithOption({
         }
         maxFileSize={maxFileSize}
         name={name}
-        value={value[0]}
+        value={value?.[0]}
         width={'full'}
         onChange={(file) => {
           if (file) {
@@ -340,13 +338,11 @@ function DocumentWithOptionOutput({
 }
 
 function toCertificateVariables(value: FileFieldWithOptionValue | undefined) {
-  const parsed = FileFieldWithOptionValue.safeParse(value)
-
-  if (parsed.success) {
-    return parsed.data.reduce(
+  if (FileFieldWithOptionValue.validate(value)) {
+    return value.reduce(
       (acc, file) => ({
         ...acc,
-        [file.option]: new URL(file.path, window.config.MINIO_BASE_URL).href
+        [file.option]: toFileUrl(file.path)
       }),
       {}
     )

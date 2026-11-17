@@ -8,26 +8,44 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import fetch from 'node-fetch'
-import { JWT_ISSUER } from '@auth/constants'
-import { resolve } from 'url'
+import { JWT_ISSUER, REFRESH_TOKEN_AUDIENCE } from '@auth/constants'
 import { readFileSync } from 'fs'
 import { promisify } from 'util'
 import * as jwt from 'jsonwebtoken'
 import { redis } from '@auth/database'
 import * as t from 'io-ts'
 import {
+  createTRPCClient,
+  httpBatchLink,
+  HTTPHeaders,
+  httpLink
+} from '@trpc/client'
+import superjson from 'superjson'
+import {
   NotificationEvent,
   generateVerificationCode,
   sendVerificationCode,
   storeVerificationCode
 } from '@auth/features/verifyCode/service'
-import { logger, UUID, IUserName } from '@opencrvs/commons'
+import {
+  logger,
+  UUID,
+  UserName,
+  fetchJSON,
+  joinUrl,
+  Roles,
+  InactiveOfficeError,
+  isSelectableAtAnchor,
+  Location
+} from '@opencrvs/commons'
+import { UserAuditLog } from '@opencrvs/commons/events'
 import * as F from 'fp-ts'
-import { Scope, TokenUserType } from '@opencrvs/commons/authentication'
+import { EncodedScope, TokenUserType } from '@opencrvs/commons/authentication'
 const { chainW, tryCatch } = F.either
 const { pipe } = F.function
 import { env } from '@auth/environment'
+import { AppRouter, InternalRouter } from '@opencrvs/events/src/router'
+import { createFamily } from '@auth/features/refresh/family'
 
 const cert = readFileSync(env.CERT_PRIVATE_KEY_PATH)
 const publicCert = readFileSync(env.CERT_PUBLIC_KEY_PATH)
@@ -39,19 +57,78 @@ const sign = promisify<
   string
 >(jwt.sign)
 
+/**
+ * @returns token for internal service authentication, which has no scopes and a short expiry time.
+ * Used for authenticating internal requests between services.
+ */
+/** @knipignore */
+export async function createInternalServiceToken() {
+  return sign({}, cert, {
+    subject: 'opencrvs:auth-service',
+    algorithm: 'RS256',
+    expiresIn: env.CONFIG_SYSTEM_TOKEN_EXPIRY_SECONDS,
+    audience: ['opencrvs:events-user'],
+    issuer: JWT_ISSUER
+  })
+}
+
+/**
+ * @returns token for initialisation methods authentication, which has no scopes and a short expiry time.
+ */
+export async function createInitialisationToken() {
+  return sign({}, cert, {
+    subject: 'opencrvs:data-seeder-service',
+    algorithm: 'RS256',
+    expiresIn: env.CONFIG_SYSTEM_TOKEN_EXPIRY_SECONDS,
+    audience: [
+      'opencrvs:events-user',
+      'opencrvs:countryconfig-user',
+      'opencrvs:gateway-user'
+    ],
+    issuer: JWT_ISSUER
+  })
+}
+
+export const internalClient = createTRPCClient<InternalRouter>({
+  links: [
+    httpLink({
+      url: new URL('/internal', env.EVENTS_URL).href,
+      transformer: superjson,
+      async headers() {
+        const token = await createInternalServiceToken()
+        return { authorization: `Bearer ${token}` }
+      }
+    })
+  ]
+})
+
+const eventsClient = createTRPCClient<AppRouter>({
+  links: [
+    httpBatchLink({
+      url: env.EVENTS_URL,
+      transformer: superjson,
+      headers({ opList }) {
+        const headers = opList[0].context?.headers
+        return (headers as HTTPHeaders) ?? {}
+      }
+    })
+  ]
+})
+
 export interface IAuthentication {
-  name: IUserName[]
+  name: UserName
   mobile?: string
   userId: string
   status: string
   email?: string
   role: string
+  primaryOfficeId: string
 }
 
 export interface ISystemAuthentication {
   systemId: string
   status: string
-  scope: Scope[]
+  scope: EncodedScope[]
 }
 
 export class UserInfoNotFoundError extends Error {}
@@ -64,19 +141,10 @@ export async function authenticate(
   username: string,
   password: string
 ): Promise<IAuthentication> {
-  const url = resolve(env.USER_MANAGEMENT_URL, '/verifyPassword')
-
-  const res = await fetch(url, {
-    method: 'POST',
-    body: JSON.stringify({ username, password }),
-    headers: { 'Content-Type': 'application/json' }
+  const body = await internalClient.user.verifyPassword.mutate({
+    username,
+    password
   })
-
-  if (res.status !== 200) {
-    throw Error(res.statusText)
-  }
-
-  const body = await res.json()
 
   return {
     name: body.name,
@@ -84,27 +152,47 @@ export async function authenticate(
     role: body.role,
     status: body.status,
     mobile: body.mobile,
-    email: body.email
+    email: body.email,
+    primaryOfficeId: body.primaryOfficeId
   }
+}
+
+/**
+ * Throws {@link InactiveOfficeError} if the given office is inactive.
+ */
+function isOfficeActiveToday(location: Pick<Location, 'versions'>) {
+  const today = new Date().toISOString().slice(0, 10)
+  return isSelectableAtAnchor(location.versions, today)
+}
+
+export async function assertOfficeIsActive(officeId: string) {
+  const location = await internalClient.locations.getById.query(
+    officeId as UUID
+  )
+
+  if (!isOfficeActiveToday(location)) {
+    throw new InactiveOfficeError()
+  }
+}
+
+export async function authenticateSuperuser(
+  password: string
+): Promise<boolean> {
+  const auth = await internalClient.user.initialisation.authenticate.mutate({
+    password
+  })
+
+  return auth.valid
 }
 
 export async function authenticateSystem(
   client_id: string,
   client_secret: string
 ): Promise<ISystemAuthentication> {
-  const url = resolve(env.USER_MANAGEMENT_URL, '/verifySystem')
-
-  const res = await fetch(url, {
-    method: 'POST',
-    body: JSON.stringify({ client_id, client_secret }),
-    headers: { 'Content-Type': 'application/json' }
+  const body = await eventsClient.integrations.authenticate.mutate({
+    client_id,
+    client_secret
   })
-
-  if (res.status !== 200) {
-    throw Error(res.statusText)
-  }
-
-  const body = await res.json()
   return {
     systemId: body.id,
     scope: body.scope,
@@ -114,11 +202,10 @@ export async function authenticateSystem(
 
 export async function createToken(
   userId: string,
-  scope: string[],
+  scope: EncodedScope[],
   audience: string[],
   issuer: string,
   role?: string | number | undefined,
-  temporary = false,
   userType: TokenUserType = TokenUserType.enum.user,
   expiresInSeconds?: number
 ): Promise<string> {
@@ -127,7 +214,7 @@ export async function createToken(
     algorithm: 'RS256',
     expiresIn:
       expiresInSeconds ??
-      (temporary
+      (userType === TokenUserType.enum.system
         ? env.CONFIG_SYSTEM_TOKEN_EXPIRY_SECONDS
         : env.CONFIG_TOKEN_EXPIRY_SECONDS),
     audience,
@@ -135,61 +222,32 @@ export async function createToken(
   })
 }
 
-type ActionConfirmationInput = {
-  eventId: UUID
-  actionId: UUID
+export async function signRefreshToken(
+  userId: string,
+  userType: TokenUserType,
+  familyId: string,
+  jti: string
+): Promise<string> {
+  return sign({ userType, familyId, jti }, cert, {
+    subject: userId,
+    algorithm: 'RS256',
+    expiresIn: env.CONFIG_REFRESH_TOKEN_EXPIRY_SECONDS,
+    audience: REFRESH_TOKEN_AUDIENCE,
+    issuer: JWT_ISSUER
+  })
 }
 
-type LegacyRecordValidationInput = {
-  recordId: UUID
-}
-
-export async function createTokenForActionConfirmation(
-  input: ActionConfirmationInput | LegacyRecordValidationInput,
-  userId: UUID,
-  extraScopes: string[] = [],
+export async function createRefreshToken(
+  userId: string,
   userType: TokenUserType = TokenUserType.enum.user
-) {
-  return sign(
-    {
-      scope: [
-        'record.confirm-registration',
-        'record.reject-registration',
-        ...extraScopes
-      ],
-      eventId: 'eventId' in input ? input.eventId : undefined,
-      actionId: 'actionId' in input ? input.actionId : undefined,
-      recordId: 'recordId' in input ? input.recordId : undefined,
-      userType
-    },
-    cert,
-    {
-      subject: userId,
-      algorithm: 'RS256',
-      expiresIn: env.CONFIG_ACTION_CONFIRMATION_TOKEN_EXPIRY_SECONDS,
-      audience: [
-        'opencrvs:gateway-user',
-        'opencrvs:user-mgnt-user',
-        'opencrvs:auth-user',
-        'opencrvs:hearth-user',
-        'opencrvs:notification-user',
-        'opencrvs:workflow-user',
-        'opencrvs:search-user',
-        'opencrvs:metrics-user',
-        'opencrvs:countryconfig-user',
-        'opencrvs:webhooks-user',
-        'opencrvs:config-user',
-        'opencrvs:documents-user',
-        'opencrvs:notification-api-user'
-      ],
-      issuer: JWT_ISSUER
-    }
-  )
+): Promise<string> {
+  const { familyId, jti } = await createFamily(userId)
+  return signRefreshToken(userId, userType, familyId, jti)
 }
 
 export async function storeUserInformation(
   nonce: string,
-  userFullName: IUserName[],
+  userFullName: UserName,
   userId: string,
   scope: string[],
   mobile?: string,
@@ -215,17 +273,17 @@ export async function generateAndSendVerificationCode(
   nonce: string,
   scope: string[],
   notificationEvent: NotificationEvent,
-  userFullName: IUserName[],
+  userFullName: UserName,
   mobile?: string,
   email?: string,
   role?: string | number
 ) {
-  const isDemoUser = scope.indexOf('demo') > -1 || env.QA_ENV
+  const isTwoFADisabled = !env.TWO_FA_ENABLED
   logger.info(
-    `Is demo user: ${isDemoUser}. Scopes: ${scope.join(', ')} Role: ${role}`
+    `2FA disabled: ${isTwoFADisabled}. Scopes: ${scope.join(', ')} Role: ${role}`
   )
   let verificationCode
-  if (isDemoUser) {
+  if (isTwoFADisabled) {
     verificationCode = '000000'
     await storeVerificationCode(nonce, verificationCode)
   } else {
@@ -263,7 +321,9 @@ const tokenPayload = t.intersection([
   })
 ])
 
-export type ITokenPayload = t.TypeOf<typeof tokenPayload>
+export type ITokenPayload = t.TypeOf<typeof tokenPayload> & {
+  scope: EncodedScope[]
+}
 
 function safeVerifyJwt(token: string) {
   return tryCatch(
@@ -280,6 +340,66 @@ export function verifyToken(token: string) {
   return pipe(token, safeVerifyJwt, chainW(tokenPayload.decode))
 }
 
+const refreshTokenPayload = t.type({
+  sub: t.string,
+  iat: t.number,
+  exp: t.number,
+  aud: t.array(t.string),
+  userType: t.string,
+  familyId: t.string,
+  jti: t.string
+})
+
+function safeVerifyRefreshJwt(token: string) {
+  return tryCatch(
+    () =>
+      jwt.verify(token, publicCert, {
+        issuer: JWT_ISSUER,
+        audience: 'opencrvs:auth-refresh'
+      }),
+    (e) => (e instanceof Error ? e : new Error('Unknown error'))
+  )
+}
+
+export function verifyRefreshToken(token: string) {
+  return pipe(token, safeVerifyRefreshJwt, chainW(refreshTokenPayload.decode))
+}
+
+export async function getUserRoleScopeMapping() {
+  const roles = await fetchJSON<Roles>(
+    joinUrl(env.COUNTRY_CONFIG_URL_INTERNAL, '/config/roles')
+  )
+
+  return roles.reduce<Record<string, EncodedScope[]>>((acc, { id, scopes }) => {
+    acc[id] = scopes
+    return acc
+  }, {})
+}
+
 export function getPublicKey() {
   return publicCert
+}
+
+export async function recordUserAuditEvent(
+  userId: string,
+  entry: UserAuditLog
+): Promise<void> {
+  try {
+    await internalClient.user.audit.record.mutate({ clientId: userId, entry })
+  } catch (err) {
+    logger.error('Failed to record user audit event', err)
+  }
+}
+
+export async function recordAnonymousUserAuditEvent(
+  entry: UserAuditLog
+): Promise<void> {
+  try {
+    await internalClient.user.audit.record.mutate({
+      clientId: entry.requestData.subjectId,
+      entry
+    })
+  } catch (err) {
+    logger.error('Failed to record anonymous user audit event', err)
+  }
 }

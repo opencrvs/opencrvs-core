@@ -54,9 +54,13 @@ export function getClient() {
   return db.withSchema('app')
 }
 
-export function resetServer() {
+export async function resetServer() {
+  const previousPool = pool
   db = undefined
   pool = undefined
+  if (previousPool) {
+    await previousPool.end()
+  }
 }
 
 export async function ensureConnection() {

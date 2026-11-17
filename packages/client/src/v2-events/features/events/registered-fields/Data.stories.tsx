@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import type { Meta, StoryObj } from '@storybook/react'
+import type { Meta, StoryObj } from '@storybook/react-vite'
 import React from 'react'
 import styled from 'styled-components'
 import {
@@ -112,7 +112,7 @@ export const DataDisplay: Story = {
 export const DataDisplayWithConditionallyHiddenFields: Story = {
   parameters: {
     layout: 'centered',
-    userRole: TestUserRole.Enum.REGISTRATION_AGENT
+    userRole: TestUserRole.enum.REGISTRATION_AGENT
   },
   render: (args) => {
     return (
@@ -174,7 +174,7 @@ export const DataDisplayWithConditionallyHiddenFields: Story = {
 export const DataDisplayWithConditionallyShownFields: Story = {
   parameters: {
     layout: 'centered',
-    userRole: TestUserRole.Enum.FIELD_AGENT
+    userRole: TestUserRole.enum.FIELD_AGENT
   },
   render: (args) => {
     return (

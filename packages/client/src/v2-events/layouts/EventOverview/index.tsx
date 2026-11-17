@@ -11,101 +11,295 @@
 
 import React from 'react'
 import { defineMessages, useIntl } from 'react-intl'
-import { useNavigate } from 'react-router-dom'
-import { useTypedParams } from 'react-router-typesafe-routes/dom'
-import { applyDraftToEventIndex, deepDropNulls } from '@opencrvs/commons/client'
-import { AppBar, Button, Frame, Stack } from '@opencrvs/components'
-import { BackArrow } from '@opencrvs/components/lib/icons'
-import { Plus } from '@opencrvs/components/src/icons'
-import { ProfileMenu } from '@client/components/ProfileMenu'
+import {
+  useLocation,
+  useNavigate,
+  useNavigationType,
+  matchPath,
+  NavigationType
+} from 'react-router-dom'
+import {
+  useTypedParams,
+  useTypedSearchParams
+} from 'react-router-typesafe-routes/dom'
+import styled from 'styled-components'
+import {
+  ActionType,
+  applyDraftToEventIndex,
+  deepDropNulls,
+  EventStatus
+} from '@opencrvs/commons/client'
+import {
+  AppBar,
+  Button,
+  Frame,
+  Stack,
+  Icon,
+  DividerVertical
+} from '@opencrvs/components'
 import { useDrafts } from '@client/v2-events/features/drafts/useDrafts'
-import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
+import { useEventConfigurationForRecord } from '@client/v2-events/features/events/useEventConfiguration'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
 import { ActionMenu } from '@client/v2-events/features/workqueues/EventOverview/components/ActionMenu'
 import { useIntlFormatMessageWithFlattenedParams } from '@client/v2-events/messages/utils'
 import { ROUTES } from '@client/v2-events/routes'
-import { CoreWorkqueues, flattenEventIndex } from '@client/v2-events/utils'
-import { SearchToolbar } from '@client/v2-events/features/events/components/SearchToolbar'
+import { flattenEventIndex } from '@client/v2-events/utils'
 import { DownloadButton } from '@client/v2-events/components/DownloadButton'
-import { recordAuditMessages } from '@client/i18n/messages/views/recordAudit'
-import { Sidebar } from '../sidebar/Sidebar'
-/**
- * Basic frame for the workqueues. Includes the left navigation and the app bar.
- */
+import { EventIcon } from '@client/v2-events/components/EventIcon'
+import { useUsers } from '@client/v2-events/hooks/useUsers'
+import { EventOverviewProvider } from '@client/v2-events/features/workqueues/EventOverview/EventOverviewContext'
+import { constantsMessages } from '@client/i18n/messages/constants'
+import { useLocations } from '@client/v2-events/hooks/useLocations'
+import { useCanAccessEventWithScopes } from '@client/v2-events/hooks/useCanAccessEventWithScopes'
+import { useEventActionConfigurationResolver } from '@client/v2-events/features/workqueues/Actions/useActionConfigurationResolver'
+
+const Tab = styled.button`
+  border: none;
+  background: none;
+  color: ${({ theme }) => theme.colors.grey500};
+  ${({ theme }) => theme.fonts.bold16};
+  cursor: pointer;
+  height: 100%;
+  box-sizing: border-box;
+
+  &:hover {
+    color: ${({ theme }) => theme.colors.primary};
+    border-bottom: 3px solid ${({ theme }) => theme.colors.grey300};
+    border-top: 3px solid transparent;
+  }
+
+  &.active {
+    color: ${({ theme }) => theme.colors.primary};
+    border-bottom: 3px solid ${({ theme }) => theme.colors.primary};
+    border-top: 3px solid transparent;
+  }
+`
+
+const TabContainer = styled(Stack)`
+  height: 56px;
+  width: 100%;
+`
+
+export const messages = defineMessages({
+  summary: {
+    id: 'events.overview.tabs.summary',
+    defaultMessage: 'Summary'
+  },
+  record: {
+    id: 'events.overview.tabs.record',
+    defaultMessage: 'Record'
+  },
+  documents: {
+    id: 'events.overview.tabs.documents',
+    defaultMessage: 'Documents'
+  },
+  audit: {
+    id: 'events.overview.tabs.audit',
+    defaultMessage: 'Audit'
+  }
+})
+
+function EventOverviewTabs() {
+  const intl = useIntl()
+  const navigate = useNavigate()
+  const location = useLocation()
+  const { eventId } = useTypedParams(ROUTES.V2.EVENTS.EVENT)
+  const [{ backTo }] = useTypedSearchParams(ROUTES.V2.EVENTS.EVENT)
+  const { canAccessEventWithScopes } = useCanAccessEventWithScopes(eventId, [
+    'record.read'
+  ])
+
+  const isActive = (pattern: string) => {
+    return !!matchPath({ path: pattern, end: true }, location.pathname)
+  }
+
+  const tabs = [
+    {
+      label: messages.summary,
+      route: ROUTES.V2.EVENTS.EVENT,
+      display: true
+    },
+    {
+      label: messages.record,
+      route: ROUTES.V2.EVENTS.EVENT.RECORD,
+      display: canAccessEventWithScopes()
+    },
+    {
+      label: messages.documents,
+      route: ROUTES.V2.EVENTS.EVENT.DOCUMENTS,
+      display: canAccessEventWithScopes()
+    },
+    {
+      label: messages.audit,
+      route: ROUTES.V2.EVENTS.EVENT.AUDIT,
+      display: true
+    }
+  ] as const
+
+  return (
+    <TabContainer gap={16}>
+      {tabs
+        .filter((tab) => tab.display)
+        .map((tab) => (
+          <Tab
+            key={tab.route.path}
+            className={isActive(tab.route.path) ? 'active' : ''}
+            onClick={() => {
+              navigate(tab.route.buildPath({ eventId }, { backTo }), {
+                replace: true
+              })
+            }}
+          >
+            {intl.formatMessage(tab.label)}
+          </Tab>
+        ))}
+    </TabContainer>
+  )
+}
+
+const noNameMessage = {
+  id: 'recordAudit.noName',
+  defaultMessage: 'No name provided',
+  description: 'Label for name not available'
+}
 
 export function EventOverviewLayout({
   children
 }: {
   children: React.ReactNode
 }) {
-  const { eventId } = useTypedParams(ROUTES.V2.EVENTS.OVERVIEW)
+  const { eventId } = useTypedParams(ROUTES.V2.EVENTS.EVENT)
+  const [{ backTo }] = useTypedSearchParams(ROUTES.V2.EVENTS.EVENT)
   const { searchEventById } = useEvents()
-  const { getRemoteDraftByEventId } = useDrafts()
-  const draft = getRemoteDraftByEventId(eventId)
+  const { useRemoteDraftByEventId } = useDrafts()
+  const draft = useRemoteDraftByEventId(eventId)
+  const { getUsers } = useUsers()
+  const users = getUsers.getAllCached()
+  const { getLocations } = useLocations()
+  const locations = getLocations.useSuspenseQuery()
 
   const eventResults = searchEventById.useSuspenseQuery(eventId)
 
   const navigate = useNavigate()
+  const navigationType = useNavigationType()
   const intl = useIntl()
   const flattenedIntl = useIntlFormatMessageWithFlattenedParams()
-  const { slug } = useTypedParams(ROUTES.V2.WORKQUEUES.WORKQUEUE)
-
   if (eventResults.total === 0) {
     throw new Error(`Event details with id ${eventId} not found`)
   }
 
-  const eventIndex = eventResults.results[0]
+  const event = eventResults.results[0]
+  const { resolveAction } = useEventActionConfigurationResolver(event)
+  const readActionStatus = resolveAction(ActionType.READ)
 
-  const { eventConfiguration } = useEventConfiguration(eventIndex.type)
+  const { eventConfiguration } = useEventConfigurationForRecord(event)
   const eventIndexWithDraftApplied = draft
-    ? applyDraftToEventIndex(eventIndex, draft, eventConfiguration)
-    : eventIndex
+    ? applyDraftToEventIndex(event, draft, eventConfiguration)
+    : event
+
+  const isDraft = event.status === EventStatus.enum.CREATED
+
+  const exit = () => {
+    // If backTo is set and we navigated via push (from a list), pop history to go back to the list.
+    // Otherwise, replace or go home as appropriate.
+    if (backTo && navigationType === NavigationType.Push) {
+      navigate(-1)
+      return
+    }
+
+    if (backTo) {
+      navigate(backTo, { replace: true })
+      return
+    }
+
+    navigate(ROUTES.V2.buildPath({}))
+  }
 
   return (
     <Frame
       header={
         <AppBar
-          desktopCenter={
-            <Stack gap={16}>
+          appBarRowTwo={<EventOverviewTabs />}
+          desktopCenter={<EventOverviewTabs />}
+          desktopLeft={
+            <EventIcon
+              event={eventIndexWithDraftApplied}
+              eventConfig={eventConfiguration}
+              name={null}
+            />
+          }
+          desktopRight={
+            <Stack>
+              {!readActionStatus.hidden && (
+                <DownloadButton
+                  key={`DownloadButton-${eventId}`}
+                  event={eventIndexWithDraftApplied}
+                  isDraft={isDraft}
+                />
+              )}
+              <ActionMenu eventId={eventId} />
+              <DividerVertical />
               <Button
-                type="iconPrimary"
-                onClick={() => {
-                  navigate(ROUTES.V2.EVENTS.CREATE.path)
-                }}
+                data-testid="exit-event"
+                size="small"
+                type="icon"
+                onClick={exit}
               >
-                <Plus />
+                <Icon name="X" />
               </Button>
-              <SearchToolbar />
             </Stack>
           }
-          desktopRight={<ProfileMenu key="profileMenu" />}
+          desktopTitle={
+            flattenedIntl.formatMessage(
+              eventConfiguration.title,
+              flattenEventIndex(deepDropNulls(eventIndexWithDraftApplied))
+            ) || intl.formatMessage(noNameMessage)
+          }
           mobileLeft={
-            <Button type={'icon'} onClick={() => navigate(-1)}>
-              <BackArrow />
-            </Button>
+            <EventIcon
+              event={eventIndexWithDraftApplied}
+              eventConfig={eventConfiguration}
+              name={null}
+            />
           }
           mobileRight={
             <>
-              <ActionMenu eventId={eventId} />
-              <DownloadButton
-                key={`DownloadButton-${eventId}`}
-                event={eventIndexWithDraftApplied}
-                isDraft={slug === CoreWorkqueues.DRAFT}
-              />
+              <Stack>
+                {!readActionStatus.hidden && (
+                  <DownloadButton
+                    key={`DownloadButton-${eventId}`}
+                    event={eventIndexWithDraftApplied}
+                    isDraft={isDraft}
+                  />
+                )}
+                <ActionMenu eventId={eventId} />
+                <DividerVertical />
+                <Button
+                  data-testid="exit-event"
+                  size="small"
+                  type="icon"
+                  onClick={exit}
+                >
+                  <Icon name="X" />
+                </Button>
+              </Stack>
             </>
           }
           mobileTitle={
             flattenedIntl.formatMessage(
               eventConfiguration.title,
               flattenEventIndex(deepDropNulls(eventIndexWithDraftApplied))
-            ) || intl.formatMessage(recordAuditMessages.noName)
+            ) || intl.formatMessage(noNameMessage)
           }
         />
       }
-      navigation={<Sidebar />}
-      skipToContentText="skip"
+      skipToContentText={intl.formatMessage(
+        constantsMessages.skipToMainContent
+      )}
     >
-      {children}
+      <EventOverviewProvider locations={locations} users={users}>
+        {children}
+      </EventOverviewProvider>
     </Frame>
   )
 }

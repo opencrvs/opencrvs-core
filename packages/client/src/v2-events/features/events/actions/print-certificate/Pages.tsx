@@ -16,17 +16,18 @@ import {
   useTypedSearchParams
 } from 'react-router-typesafe-routes/dom'
 import {
+  eventAttachmentPath,
   getCurrentEventState,
   getPrintCertificatePages
 } from '@opencrvs/commons/client'
-import { Print } from '@opencrvs/components/lib/icons'
 import { Pages as PagesComponent } from '@client/v2-events/features/events/components/Pages'
+import { getFormBackAction } from '@client/v2-events/layouts/form/FormBackAction'
 import { useActionAnnotation } from '@client/v2-events/features/events/useActionAnnotation'
 import {
   CERT_TEMPLATE_ID,
   useCertificateTemplateSelectorFieldConfig
 } from '@client/v2-events/features/events/useCertificateTemplateSelectorFieldConfig'
-import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
+import { useEventConfigurationForRecord } from '@client/v2-events/features/events/useEventConfiguration'
 import { useEventFormNavigation } from '@client/v2-events/features/events/useEventFormNavigation'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
 import { FormLayout } from '@client/v2-events/layouts'
@@ -45,10 +46,9 @@ export function Pages() {
   const { setAnnotation, getAnnotation } = useActionAnnotation()
   const annotation = getAnnotation()
   const events = useEvents()
-  const event = events.getEvent.getFromCache(eventId)
-  const { eventConfiguration: configuration } = useEventConfiguration(
-    event.type
-  )
+  const event = events.getEvent.useGetEventFromCache(eventId)
+  const { eventConfiguration: configuration } =
+    useEventConfigurationForRecord(event)
   const validatorContext = useValidatorContext(event)
   const eventIndex = getCurrentEventState(event, configuration)
   const certTemplateFieldConfig = useCertificateTemplateSelectorFieldConfig(
@@ -81,14 +81,38 @@ export function Pages() {
     }
   }, [pageId, currentPageId, navigate, eventId, searchParams])
 
+  const pagesValidatorContext = {
+    ...validatorContext,
+    baseFormState: eventIndex.declaration
+  }
+
+  const onPageChange = (nextPageId: string) =>
+    navigate(
+      ROUTES.V2.EVENTS.PRINT_CERTIFICATE.PAGES.buildPath(
+        { eventId, pageId: nextPageId },
+        { backTo: searchParams.backTo }
+      )
+    )
+
+  const backAction = getFormBackAction({
+    formPages,
+    formData: annotation,
+    validatorContext: pagesValidatorContext,
+    pageId: currentPageId,
+    onNavigateToPage: onPageChange
+  })
+
   return (
     <FormLayout
-      appbarIcon={<Print />}
+      backAction={backAction}
       route={ROUTES.V2.EVENTS.PRINT_CERTIFICATE}
     >
       {modal}
       <PagesComponent
+        // Fresh form per page: late async field callbacks can't write into another page
+        key={currentPageId}
         hideBackToReview
+        attachmentPath={eventAttachmentPath(eventId)}
         eventConfig={configuration}
         formData={annotation}
         formPages={formPages.map((page) => {
@@ -106,28 +130,15 @@ export function Pages() {
         })}
         pageId={currentPageId}
         setFormData={(data) => setAnnotation(data)}
-        validatorContext={{
-          ...validatorContext,
-          baseFormState: eventIndex.declaration
-        }}
-        onPageChange={(nextPageId: string) => {
-          return navigate(
-            ROUTES.V2.EVENTS.PRINT_CERTIFICATE.PAGES.buildPath(
-              {
-                eventId,
-                pageId: nextPageId
-              },
-              { workqueue: searchParams.workqueue }
-            )
-          )
-        }}
+        validatorContext={pagesValidatorContext}
+        onPageChange={onPageChange}
         onSubmit={() => {
           navigate(
             ROUTES.V2.EVENTS.PRINT_CERTIFICATE.REVIEW.buildPath(
               { eventId },
               {
                 templateId: String(annotation[CERT_TEMPLATE_ID]),
-                workqueue: searchParams.workqueue
+                backTo: searchParams.backTo
               }
             )
           )

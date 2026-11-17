@@ -10,7 +10,12 @@
  */
 import * as React from 'react'
 import styled from 'styled-components'
-import { IActionObject, ColumnContentAlignment, IAction, IColumn } from '..'
+import {
+  IActionObject,
+  ColumnContentAlignment,
+  IAction,
+  IColumn
+} from '../types'
 
 export interface IWorkqueueRow {
   displayItems: Array<Record<string, unknown>>
@@ -84,7 +89,11 @@ export const WorkqueueRowDesktop = (props: IWorkqueueRow) => {
       {props.displayItems.map((item, index) => {
         const clickable = props.clickable || Boolean(item.rowClickable)
         return (
-          <StyledBox key={index} hideLastBorder={props.hideLastBorder}>
+          <StyledBox
+            key={index}
+            hideLastBorder={props.hideLastBorder}
+            data-testid="row-item"
+          >
             <RowWrapper
               id={'row_' + index}
               clickable={clickable}

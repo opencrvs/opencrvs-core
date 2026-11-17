@@ -16,11 +16,11 @@ import {
   Button,
   Icon,
   Pill,
-  ResponsiveModal,
+  Dialog,
   Stack,
-  Text
+  Text,
+  IconName
 } from '@opencrvs/components'
-import * as SupportedIcons from '@opencrvs/components/lib/Icon/all-icons'
 import {
   VerificationStatus as VerificationStatusField,
   VerificationStatusValue
@@ -33,21 +33,12 @@ const StyledIcon = styled(Icon)`
   margin-right: 4px;
 `
 
-const IconWrapper = styled.div<{
-  type: VerificationStatusValue
-}>`
-  --background-color: ${({ theme, type }) => `
-    ${type === 'verified' ? theme.colors.primaryLight : ''}
-    ${type === 'authenticated' ? theme.colors.greenLight : ''}
-    ${type === 'failed' ? theme.colors.redLight : ''}
-  `};
-  height: 24px;
-  width: 24px;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background-color: var(--background-color);
+const HeaderTitle = styled.span`
+  ${({ theme }) => theme.fonts.h4};
+`
+
+const RequiredAsterisk = styled.span`
+  color: ${({ theme }) => theme.colors.negative};
 `
 
 const PILL_FOR_STATUS = {
@@ -62,7 +53,7 @@ const ICON_FOR_STATUS = {
   authenticated: 'Fingerprint',
   failed: 'X',
   pending: 'CircleWavyQuestion'
-} as const satisfies Record<string, keyof typeof SupportedIcons>
+} as const satisfies Record<string, IconName>
 
 const messages = {
   verified: idVerificationMessages.verified,
@@ -76,11 +67,15 @@ function Input({
   id,
   configuration,
   value,
+  label,
+  required,
   onReset
 }: {
   id: string
   configuration: VerificationStatusField['configuration']
   value: VerificationStatusValue | undefined
+  label?: string
+  required?: boolean
   onReset: () => void
 }) {
   const intl = useIntl()
@@ -91,10 +86,8 @@ function Input({
 
   const handleReset = async () => {
     const confirm = await openModal((close) => (
-      <ResponsiveModal
-        autoHeight
-        preventClickOnParent
-        show
+      <Dialog
+        isOpen
         actions={[
           <Button
             key="cancel-btn"
@@ -113,13 +106,12 @@ function Input({
             {intl.formatMessage(buttonMessages.continueButton)}
           </Button>
         ]}
-        handleClose={() => close(false)}
         id="assignment"
-        responsive={false}
         title={intl.formatMessage(messages[value].resetConfirmation.title)}
+        onClose={() => close(false)}
       >
         {intl.formatMessage(messages[value].resetConfirmation.description)}
-      </ResponsiveModal>
+      </Dialog>
     ))
     if (confirm) {
       onReset()
@@ -127,8 +119,15 @@ function Input({
   }
 
   return (
-    <Banner.Container>
-      <Banner.Header type={PILL_FOR_STATUS[value]}>
+    <Banner.Container variant={PILL_FOR_STATUS[value]}>
+      <Banner.Header>
+        {label && (
+          <HeaderTitle>
+            {label}
+            {required && <RequiredAsterisk>{` *`}</RequiredAsterisk>}
+          </HeaderTitle>
+        )}
+
         <Pill
           data-testid={`${id}__${value}`}
           label={
@@ -141,18 +140,6 @@ function Input({
           size="small"
           type={PILL_FOR_STATUS[value]}
         />
-
-        <IconWrapper type={value}>
-          {value === 'verified' && (
-            <Icon color="greenDarker" name="Check" size="small" weight="bold" />
-          )}
-          {value === 'authenticated' && (
-            <Icon color="primaryDark" name="Check" size="small" weight="bold" />
-          )}
-          {value === 'failed' && (
-            <Icon color="redDarker" name="X" size="small" weight="bold" />
-          )}
-        </IconWrapper>
       </Banner.Header>
       <Banner.Body>
         <Text element="span" variant="reg16">

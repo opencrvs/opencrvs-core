@@ -9,9 +9,15 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { omit } from 'lodash'
-import { EventDocument, getUUID, TokenWithBearer } from '@opencrvs/commons'
+import { TRPCError } from '@trpc/server'
+import {
+  EventDocument,
+  getUUID,
+  TokenWithBearer,
+  VersionedEventConfig
+} from '@opencrvs/commons'
 import { upsertEventWithActions } from '@events/storage/postgres/events/import'
-import { getInMemoryEventConfigurations } from '../config/config'
+import { getInMemoryVersionedEventConfigurations } from '../config/config'
 import { indexEventsInBulk, type BulkResponse } from '../indexing/indexing'
 
 function mapEventActions(actions: EventDocument['actions']) {
@@ -28,12 +34,39 @@ function mapEventActions(actions: EventDocument['actions']) {
     registrationNumber: (action as any).registrationNumber ?? undefined,
     assignedTo: (action as any).assignedTo ?? undefined,
     requestId: (action as any).requestId ?? undefined,
-    /* eslint-enable @typescript-eslint/no-explicit-any */
     createdAtLocation: action.createdAtLocation ?? null,
     originalActionId: action.originalActionId ?? null,
+    createdByRole: action.createdByRole ?? null,
     createdBySignature: action.createdBySignature ?? null,
-    createdByRole: action.createdByRole ?? null
+    customActionType: (action as any).customActionType ?? null
+    /* eslint-enable @typescript-eslint/no-explicit-any */
   }))
+}
+
+/**
+ * Every record must name a configured event type and version, checked before any
+ * record is written, so a rejected import leaves nothing behind.
+ * @throws {TRPCError} HTTP 400 naming the first record's event type or version that is not configured
+ */
+function assertEventsConfigured(
+  events: EventDocument[],
+  configs: VersionedEventConfig[]
+) {
+  for (const { type, configVersionId } of events) {
+    const config = configs.find(({ id }) => id === type)
+    if (!config) {
+      throw new TRPCError({
+        code: 'BAD_REQUEST',
+        message: `No configuration found for event type: ${type}`
+      })
+    }
+    if (!config.versions.some(({ id }) => id === configVersionId)) {
+      throw new TRPCError({
+        code: 'BAD_REQUEST',
+        message: `Event '${type}' has no version '${configVersionId}'`
+      })
+    }
+  }
 }
 
 export async function bulkImportEvents(
@@ -42,7 +75,8 @@ export async function bulkImportEvents(
 ): Promise<BulkResponse> {
   const toIndex = []
 
-  const eventConfigs = await getInMemoryEventConfigurations(token)
+  const eventConfigs = await getInMemoryVersionedEventConfigurations(token)
+  assertEventsConfigured(events, eventConfigs)
 
   for (const eventDocument of events) {
     const transactionId = getUUID()
@@ -52,7 +86,11 @@ export async function bulkImportEvents(
     const eventActions = mapEventActions(actions)
 
     const createdEvent = await upsertEventWithActions(
-      { ...omit(event, 'type'), eventType, transactionId },
+      {
+        ...omit(event, 'type'),
+        eventType,
+        transactionId
+      },
       eventActions
     )
 

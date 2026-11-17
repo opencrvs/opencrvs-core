@@ -13,12 +13,27 @@ import { FieldConfig } from '../events/FieldConfig'
 import { FieldType } from '../events/FieldType'
 import { FieldUpdateValue } from '../events/FieldValue'
 import { TranslationConfig } from '../events/TranslationConfig'
+import { ConditionalType } from '../events/Conditional'
+import { ActionType } from '../events/ActionType'
+import { tennisClubMembershipEvent } from '../fixtures'
+import {
+  eventQueryDataGenerator,
+  generateEventDocument,
+  generateTestValidatorContext
+} from '../events/test.utils'
 import {
   errorMessages,
+  areConditionsMet,
+  isActionVisible,
+  isFieldSecured,
+  isFieldVisible,
   runFieldValidations,
   validateFieldInput
 } from './validate'
 import { field } from '../events/field'
+import { flag, status } from './conditionals'
+import { ActionConfig } from '../events/ActionConfig'
+import { getCurrentEventState } from '../events/state'
 /**
  * Goal of testing is to ensure right error messages are returned, and our custom logic holds.
  * We should be able to trust zod validation for the rest.
@@ -368,5 +383,165 @@ describe('runFieldValidations on a cleared (null) value', () => {
         context: {}
       })
     ).not.toEqual([])
+  })
+})
+
+describe('areConditionsMet', () => {
+  const flagConditional = {
+    type: ConditionalType.SHOW,
+    conditional: flag('sealed')
+  }
+
+  it('is met when the event carries the flag', () => {
+    const eventIndex = eventQueryDataGenerator({ flags: ['sealed'] })
+
+    expect(areConditionsMet([flagConditional], {}, {}, eventIndex)).toBe(true)
+  })
+
+  it('is not met when the event does not carry the flag', () => {
+    const eventIndex = eventQueryDataGenerator({ flags: [] })
+
+    expect(areConditionsMet([flagConditional], {}, {}, eventIndex)).toBe(false)
+  })
+})
+
+describe('isFieldVisible', () => {
+  // Unlike `areConditionsMet` / `isActionEnabled`, this path takes no `EventIndex`
+  // argument, so `flag(...)` can only resolve through `context.event.state`.
+  const flaggedField = {
+    id: 'sealedOnly',
+    type: FieldType.TEXT,
+    label: { id: '', defaultMessage: '', description: '' },
+    conditionals: [{ type: ConditionalType.SHOW, conditional: flag('sealed') }]
+  } satisfies FieldConfig
+
+  const document = generateEventDocument({
+    configuration: tennisClubMembershipEvent,
+    actions: [ActionType.CREATE, ActionType.DECLARE].map((type) => ({ type }))
+  })
+
+  it('resolves flag() against the event state carried on the context', () => {
+    expect(
+      isFieldVisible(
+        flaggedField,
+        {},
+        {
+          event: {
+            document,
+            state: eventQueryDataGenerator({ flags: ['sealed'] })
+          }
+        }
+      )
+    ).toBe(true)
+
+    expect(
+      isFieldVisible(
+        flaggedField,
+        {},
+        { event: { document, state: eventQueryDataGenerator({ flags: [] }) } }
+      )
+    ).toBe(false)
+  })
+
+  it('treats flags as empty when the context carries no event', () => {
+    expect(isFieldVisible(flaggedField, {}, {})).toBe(false)
+  })
+})
+
+describe('isFieldSecured', () => {
+  it('returns true for a field secured with a plain boolean', () => {
+    const eventIndex = eventQueryDataGenerator({ flags: [] })
+
+    expect(
+      isFieldSecured(
+        { secured: true },
+        eventIndex,
+        generateTestValidatorContext()
+      )
+    ).toBe(true)
+  })
+
+  it('returns false for a field not secured (boolean or unset)', () => {
+    const eventIndex = eventQueryDataGenerator({ flags: [] })
+
+    expect(
+      isFieldSecured(
+        { secured: false },
+        eventIndex,
+        generateTestValidatorContext()
+      )
+    ).toBe(false)
+    expect(
+      isFieldSecured(
+        { secured: undefined },
+        eventIndex,
+        generateTestValidatorContext()
+      )
+    ).toBe(false)
+  })
+
+  it("resolves a conditional secured value against the event, e.g. flag('sealed')", () => {
+    const securedField = { secured: flag('sealed') }
+
+    expect(
+      isFieldSecured(
+        securedField,
+        eventQueryDataGenerator({ flags: ['sealed'] }),
+        generateTestValidatorContext()
+      )
+    ).toBe(true)
+    expect(
+      isFieldSecured(
+        securedField,
+        eventQueryDataGenerator({ flags: [] }),
+        generateTestValidatorContext()
+      )
+    ).toBe(false)
+  })
+})
+
+describe('isActionVisible with status()', () => {
+  const reinstateConfig = {
+    type: ActionType.REINSTATE_REGISTRATION,
+    label: {
+      id: 'event.action.reinstate-registration.label',
+      defaultMessage: 'Reinstate registration',
+      description: 'Label for the reinstate registration action'
+    },
+    conditionals: [
+      { type: ConditionalType.SHOW, conditional: status('REVOKED') }
+    ]
+  } as ActionConfig
+
+  const stateAfter = (actions: ActionType[]) =>
+    getCurrentEventState(
+      generateEventDocument({
+        configuration: tennisClubMembershipEvent,
+        actions: actions.map((type) => ({ type }))
+      }),
+      tennisClubMembershipEvent
+    )
+
+  it('is visible once the record is revoked', () => {
+    const state = stateAfter([
+      ActionType.CREATE,
+      ActionType.DECLARE,
+      ActionType.REGISTER,
+      ActionType.REVOKE_REGISTRATION
+    ])
+
+    expect(isActionVisible(reinstateConfig, state, {})).toBe(true)
+  })
+
+  it('is hidden again after the record is reinstated', () => {
+    const state = stateAfter([
+      ActionType.CREATE,
+      ActionType.DECLARE,
+      ActionType.REGISTER,
+      ActionType.REVOKE_REGISTRATION,
+      ActionType.REINSTATE_REGISTRATION
+    ])
+
+    expect(isActionVisible(reinstateConfig, state, {})).toBe(false)
   })
 })

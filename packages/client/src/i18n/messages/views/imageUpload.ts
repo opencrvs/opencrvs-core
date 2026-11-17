@@ -12,19 +12,12 @@ import { defineMessages, MessageDescriptor } from 'react-intl'
 
 interface IImageUploadMessages
   extends Record<string | number | symbol, MessageDescriptor> {
-  uploadError: MessageDescriptor
   documentTypeRequired: MessageDescriptor
   overSized: MessageDescriptor
   imageFormat: MessageDescriptor
 }
 
 const messagesToDefine: IImageUploadMessages = {
-  uploadError: {
-    id: 'imageUploadOption.upload.error',
-    defaultMessage:
-      'File format not supported. Please attach a png, jpg or pdf (max {maxSize}mb)',
-    description: 'Show error messages while uploading'
-  },
   imageFormat: {
     id: 'imageUploadOption.upload.imageFormat',
     defaultMessage:

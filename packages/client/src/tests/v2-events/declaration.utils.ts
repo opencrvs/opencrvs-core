@@ -14,8 +14,9 @@ import {
   tennisClubMembershipEvent,
   generateEventDocument,
   generateEventDraftDocument,
-  footballClubMembershipEvent,
-  EventDocument
+  EventDocument,
+  versionedTennisClubMembershipEvent,
+  versionedFootballClubMembershipEvent
 } from '@opencrvs/commons/client'
 import { AppRouter } from '@client/v2-events/trpc'
 import { tennisClubMembershipEventIndex } from '@client/v2-events/features/events/fixtures'
@@ -107,7 +108,7 @@ const eventDocument = generateEventDocument({
 const eventId = eventDocument.id
 const draft = generateEventDraftDocument({
   eventId,
-  actionType: ActionType.REGISTER
+  actionType: ActionType.DECLARE
 })
 
 /**
@@ -124,7 +125,10 @@ export const createDeclarationTrpcMsw = (
       {
         name: 'event.config.get',
         procedure: trpcMsw.event.config.get.query,
-        handler: () => [tennisClubMembershipEvent, footballClubMembershipEvent]
+        handler: () => [
+          versionedTennisClubMembershipEvent,
+          versionedFootballClubMembershipEvent
+        ]
       },
       {
         name: 'event.get',
@@ -159,19 +163,6 @@ export const createDeclarationTrpcMsw = (
           })
       },
       {
-        name: 'event.actions.validate.request',
-        procedure: trpcMsw.event.actions.validate.request.mutation,
-        handler: () =>
-          generateEventDocument({
-            configuration: tennisClubMembershipEvent,
-            actions: [
-              { type: ActionType.CREATE },
-              { type: ActionType.DECLARE },
-              { type: ActionType.VALIDATE }
-            ]
-          })
-      },
-      {
         name: 'event.actions.register.request',
         procedure: trpcMsw.event.actions.register.request.mutation,
         handler: () =>
@@ -180,7 +171,6 @@ export const createDeclarationTrpcMsw = (
             actions: [
               { type: ActionType.CREATE },
               { type: ActionType.DECLARE },
-              { type: ActionType.VALIDATE },
               { type: ActionType.REGISTER }
             ]
           })
@@ -194,7 +184,6 @@ export const createDeclarationTrpcMsw = (
             actions: [
               { type: ActionType.CREATE },
               { type: ActionType.DECLARE },
-              { type: ActionType.VALIDATE },
               { type: ActionType.ARCHIVE }
             ]
           })
@@ -208,7 +197,6 @@ export const createDeclarationTrpcMsw = (
             actions: [
               { type: ActionType.CREATE },
               { type: ActionType.DECLARE },
-              { type: ActionType.VALIDATE },
               { type: ActionType.MARK_AS_DUPLICATE }
             ]
           })
@@ -222,7 +210,6 @@ export const createDeclarationTrpcMsw = (
             actions: [
               { type: ActionType.CREATE },
               { type: ActionType.DECLARE },
-              { type: ActionType.VALIDATE },
               { type: ActionType.REJECT }
             ]
           })

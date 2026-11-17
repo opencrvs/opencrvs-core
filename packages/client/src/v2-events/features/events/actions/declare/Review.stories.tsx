@@ -8,25 +8,21 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import type { Meta, StoryObj } from '@storybook/react'
+import type { Meta, StoryObj } from '@storybook/react-vite'
 import { createTRPCMsw, httpLink } from '@vafanassieff/msw-trpc'
-import { graphql, http, HttpResponse } from 'msw'
+import { http, HttpResponse } from 'msw'
 import superjson from 'superjson'
 import {
   ActionType,
-  FullDocumentPath,
   generateEventDocument,
   generateEventDraftDocument,
   tennisClubMembershipEvent,
-  UUID
+  versionedTennisClubMembershipEvent
 } from '@opencrvs/commons/client'
-import { AppRouter, trpcOptionsProxy } from '@client/v2-events/trpc'
+import { AppRouter } from '@client/v2-events/trpc'
 import { ROUTES, routesConfig } from '@client/v2-events/routes'
 import { testDataGenerator } from '@client/tests/test-data-generators'
-import {
-  tennisClubMembershipEventIndex,
-  TestImage
-} from '@client/v2-events/features/events/fixtures'
+import { TestImage } from '@client/v2-events/features/events/fixtures'
 
 import { ReviewIndex } from './Review'
 
@@ -90,10 +86,11 @@ const tRPCMsw = createTRPCMsw<AppRouter>({
 
 const draft = generateEventDraftDocument({
   eventId,
-  actionType: ActionType.REGISTER
+  actionType: ActionType.DECLARE
 })
 
-const mockUser = generator.user.fieldAgent().v2
+const mockUser = generator.user.fieldAgent().summary
+const mockUserFull = generator.user.fieldAgent().v2
 
 export const ReviewForLocalRegistrarComplete: Story = {
   parameters: {
@@ -115,22 +112,15 @@ export const ReviewForLocalRegistrarComplete: Story = {
         ],
         events: [
           tRPCMsw.event.config.get.query(() => {
-            return [tennisClubMembershipEvent]
+            return [versionedTennisClubMembershipEvent]
           })
         ],
         user: [
-          graphql.query('fetchUser', () => {
-            return HttpResponse.json({
-              data: {
-                getUser: generator.user.localRegistrar().v1
-              }
-            })
-          }),
           tRPCMsw.user.list.query(() => {
             return [mockUser]
           }),
           tRPCMsw.user.get.query(() => {
-            return mockUser
+            return mockUserFull
           })
         ]
       }
@@ -150,25 +140,18 @@ export const ReviewForLocalRegistrarIncomplete: Story = {
       handlers: {
         events: [
           tRPCMsw.event.config.get.query(() => {
-            return [tennisClubMembershipEvent]
+            return [versionedTennisClubMembershipEvent]
           }),
           tRPCMsw.event.get.query(() => {
             return eventDocument
           })
         ],
         user: [
-          graphql.query('fetchUser', () => {
-            return HttpResponse.json({
-              data: {
-                getUser: generator.user.localRegistrar().v1
-              }
-            })
-          }),
           tRPCMsw.user.list.query(([id]) => {
             return [mockUser]
           }),
           tRPCMsw.user.get.query((id) => {
-            return mockUser
+            return mockUserFull
           })
         ]
       }
@@ -207,25 +190,18 @@ export const ReviewForRegistrationAgentComplete: Story = {
         ],
         events: [
           tRPCMsw.event.config.get.query(() => {
-            return [tennisClubMembershipEvent]
+            return [versionedTennisClubMembershipEvent]
           }),
           tRPCMsw.event.get.query(() => {
             return eventDocument
           })
         ],
         user: [
-          graphql.query('fetchUser', () => {
-            return HttpResponse.json({
-              data: {
-                getUser: generator.user.registrationAgent().v1
-              }
-            })
-          }),
           tRPCMsw.user.list.query(([id]) => {
             return [mockUser]
           }),
           tRPCMsw.user.get.query((id) => {
-            return mockUser
+            return mockUserFull
           })
         ]
       }
@@ -256,25 +232,18 @@ export const ReviewForRegistrationAgentIncomplete: Story = {
       handlers: {
         events: [
           tRPCMsw.event.config.get.query(() => {
-            return [tennisClubMembershipEvent]
+            return [versionedTennisClubMembershipEvent]
           }),
           tRPCMsw.event.get.query(() => {
             return eventDocument
           })
         ],
         user: [
-          graphql.query('fetchUser', () => {
-            return HttpResponse.json({
-              data: {
-                getUser: generator.user.registrationAgent().v1
-              }
-            })
-          }),
           tRPCMsw.user.list.query(([id]) => {
             return [mockUser]
           }),
           tRPCMsw.user.get.query((id) => {
-            return mockUser
+            return mockUserFull
           })
         ]
       }
@@ -309,22 +278,15 @@ export const ReviewForFieldAgentComplete: Story = {
         ],
         events: [
           tRPCMsw.event.config.get.query(() => {
-            return [tennisClubMembershipEvent]
+            return [versionedTennisClubMembershipEvent]
           })
         ],
         user: [
-          graphql.query('fetchUser', () => {
-            return HttpResponse.json({
-              data: {
-                getUser: generator.user.fieldAgent().v1
-              }
-            })
-          }),
           tRPCMsw.user.list.query(([id]) => {
             return [mockUser]
           }),
           tRPCMsw.user.get.query((id) => {
-            return mockUser
+            return mockUserFull
           })
         ]
       }
@@ -355,22 +317,15 @@ export const ReviewForFieldAgentIncomplete: Story = {
       handlers: {
         events: [
           tRPCMsw.event.config.get.query(() => {
-            return [tennisClubMembershipEvent]
+            return [versionedTennisClubMembershipEvent]
           })
         ],
         user: [
-          graphql.query('fetchUser', () => {
-            return HttpResponse.json({
-              data: {
-                getUser: generator.user.fieldAgent().v1
-              }
-            })
-          }),
           tRPCMsw.user.list.query(([id]) => {
             return [mockUser]
           }),
           tRPCMsw.user.get.query((id) => {
-            return mockUser
+            return mockUserFull
           })
         ]
       }
@@ -411,132 +366,18 @@ export const ReviewShowsFilesFromDraft: Story = {
           })
         ],
         files: [
-          http.get('/api/presigned-url/:filePath*', (req) => {
-            return HttpResponse.json({
-              presignedURL: `http://localhost:3535/ocrvs/${req.params.filePath}`
-            })
+          tRPCMsw.event.file.getPresignedUrl.query(({ filePath }) => {
+            return {
+              presignedURL: `http://localhost:3535/ocrvs/${filePath}`
+            }
           }),
-          http.get('http://localhost:3535/ocrvs/:id', () => {
+          http.get('/:id', () => {
             return new HttpResponse(TestImage.Fish, {
               headers: {
                 'Content-Type': 'image/svg+xml',
                 'Cache-Control': 'no-cache'
               }
             })
-          })
-        ]
-      }
-    }
-  }
-}
-
-export const Notified: Story = {
-  parameters: {
-    reactRouter: {
-      router: routesConfig,
-      initialPath: ROUTES.V2.EVENTS.DECLARE.REVIEW.buildPath({
-        eventId: notifiedEventDocument.id
-      })
-    },
-    msw: {
-      handlers: {
-        events: [
-          tRPCMsw.event.config.get.query(() => {
-            return [tennisClubMembershipEvent]
-          }),
-          tRPCMsw.event.get.query(() => {
-            return notifiedEventDocument
-          })
-        ],
-        user: [
-          graphql.query('fetchUser', () => {
-            return HttpResponse.json({
-              data: {
-                getUser: generator.user.localRegistrar().v1
-              }
-            })
-          }),
-          tRPCMsw.user.list.query(([id]) => {
-            return [mockUser]
-          }),
-          tRPCMsw.user.get.query((id) => {
-            return mockUser
-          })
-        ]
-      }
-    }
-  }
-}
-
-export const RejectedNotified: Story = {
-  parameters: {
-    reactRouter: {
-      router: routesConfig,
-      initialPath: ROUTES.V2.EVENTS.DECLARE.REVIEW.buildPath({
-        eventId: rejectedNotifiedEventDocument.id
-      })
-    },
-    msw: {
-      handlers: {
-        events: [
-          tRPCMsw.event.config.get.query(() => {
-            return [tennisClubMembershipEvent]
-          }),
-          tRPCMsw.event.get.query(() => {
-            return rejectedNotifiedEventDocument
-          })
-        ],
-        user: [
-          graphql.query('fetchUser', () => {
-            return HttpResponse.json({
-              data: {
-                getUser: generator.user.localRegistrar().v1
-              }
-            })
-          }),
-          tRPCMsw.user.list.query(([id]) => {
-            return [mockUser]
-          }),
-          tRPCMsw.user.get.query((id) => {
-            return mockUser
-          })
-        ]
-      }
-    }
-  }
-}
-
-export const RejectedDeclared: Story = {
-  parameters: {
-    reactRouter: {
-      router: routesConfig,
-      initialPath: ROUTES.V2.EVENTS.DECLARE.REVIEW.buildPath({
-        eventId: rejectedDeclaerdEventDocument.id
-      })
-    },
-    msw: {
-      handlers: {
-        events: [
-          tRPCMsw.event.config.get.query(() => {
-            return [tennisClubMembershipEvent]
-          }),
-          tRPCMsw.event.get.query(() => {
-            return rejectedDeclaerdEventDocument
-          })
-        ],
-        user: [
-          graphql.query('fetchUser', () => {
-            return HttpResponse.json({
-              data: {
-                getUser: generator.user.localRegistrar().v1
-              }
-            })
-          }),
-          tRPCMsw.user.list.query(([id]) => {
-            return [mockUser]
-          }),
-          tRPCMsw.user.get.query((id) => {
-            return mockUser
           })
         ]
       }

@@ -9,20 +9,21 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import React from 'react'
-import type { Decorator } from '@storybook/react'
+import type { Decorator } from '@storybook/react-vite'
 import {
+  EventConfig,
   EventDocument,
+  getEventValidatorContext,
   getOrThrow,
   getTokenPayload,
-  LocationType,
   TestUserRole,
-  ValidatorContext
+  ValidatorContext,
+  V2_DEFAULT_MOCK_ADMINISTRATIVE_AREAS_MAP
 } from '@opencrvs/commons/client'
 import { testDataGenerator } from '@client/tests/test-data-generators'
-import { getLeafLocationIds } from '@client/v2-events/hooks/useLocations'
-import { V2_DEFAULT_MOCK_LOCATIONS } from '../.storybook/default-request-handlers'
+import { getLeafAdministrativeAreaIds } from '@client/v2-events/hooks/useAdministrativeAreas'
 
-const generator = testDataGenerator()
+const generator = testDataGenerator(1337)
 
 /**
  *
@@ -42,7 +43,7 @@ export const DataDisplayWithConditionallyHiddenFields: StoryObj<
 > = {
       parameters: {
         layout: 'centered',
-        userRole: TestUserRole.Enum.REGISTRATION_AGENT
+        userRole: TestUserRole.enum.REGISTRATION_AGENT
       }
     }
  */
@@ -60,16 +61,20 @@ export const withValidatorContext: Decorator = (Story, context) => {
 }
 export function getTestValidatorContext(
   userRole?: TestUserRole,
-  event?: EventDocument
-) {
+  eventWithConfig?: { event: EventDocument; eventConfig: EventConfig }
+): ValidatorContext {
   let token
 
-  if (userRole === TestUserRole.Enum.FIELD_AGENT) {
+  if (userRole === TestUserRole.enum.FIELD_AGENT) {
     token = generator.user.token.fieldAgent
-  } else if (userRole === TestUserRole.Enum.LOCAL_SYSTEM_ADMIN) {
+  } else if (userRole === TestUserRole.enum.LOCAL_SYSTEM_ADMIN) {
     token = generator.user.token.localSystemAdmin
-  } else if (userRole === TestUserRole.Enum.REGISTRATION_AGENT) {
+  } else if (userRole === TestUserRole.enum.REGISTRATION_AGENT) {
     token = generator.user.token.registrationAgent
+  } else if (userRole === TestUserRole.enum.COMMUNITY_LEADER) {
+    token = generator.user.token.communityLeader
+  } else if (userRole === TestUserRole.enum.PROVINCIAL_REGISTRAR) {
+    token = generator.user.token.provincialRegistrar
   } else {
     token = generator.user.token.localRegistrar
   }
@@ -79,14 +84,19 @@ export function getTestValidatorContext(
     'Token payload missing. User is not logged in'
   )
 
-  const leafAdminStructureLocationIds = getLeafLocationIds(
-    V2_DEFAULT_MOCK_LOCATIONS,
-    [LocationType.enum.ADMIN_STRUCTURE]
+  const leafAdminStructureLocationIds = getLeafAdministrativeAreaIds(
+    V2_DEFAULT_MOCK_ADMINISTRATIVE_AREAS_MAP
   )
+
+  if (!eventWithConfig) {
+    return { user, leafAdminStructureLocationIds }
+  }
+
+  const { event, eventConfig } = eventWithConfig
 
   return {
     user,
     leafAdminStructureLocationIds,
-    event
+    event: getEventValidatorContext(event, eventConfig)
   }
 }

@@ -9,10 +9,6 @@
 volumes:
   metricbeat:
 services:
-  mongo1:
-    image: mongo:4.4
-    restart: unless-stopped
-
   redis:
     image: redis:8
     restart: unless-stopped
@@ -23,22 +19,13 @@ services:
     environment:
       - discovery.type=single-node
 
-  influxdb:
-    image: influxdb:1.8.10
+  rustfs:
+    image: rustfs/rustfs:1.0.1
     restart: unless-stopped
-
-  hearth:
-    image: opencrvs/hearth:1.1.0
     environment:
-      - mongodb__url=mongodb://mongo1/hearth-dev
-      - logger__level=warn
-      - authentication__type=disabled
-      - idGenerator=uuidv4
-      - server__fhirVersion=stu3
-    depends_on:
-      - mongo1
-    restart: unless-stopped
-
-  minio:
-    image: ghcr.io/opencrvs/minio:release.2025-06-13t11-33-47z
-    restart: unless-stopped
+      - RUSTFS_ADDRESS=:3535
+      - RUSTFS_CONSOLE_ENABLE=true
+      - RUSTFS_CONSOLE_ADDRESS=:3536
+      - RUSTFS_CORS_ALLOWED_ORIGINS=*
+      - RUSTFS_ACCESS_KEY=rustfsadmin
+      - RUSTFS_SECRET_KEY=rustfsadmin

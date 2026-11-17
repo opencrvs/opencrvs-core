@@ -10,7 +10,7 @@
  */
 import * as React from 'react'
 import * as Recharts from 'recharts'
-import { ITheme } from '../theme'
+import { ITheme } from '../tokens'
 import styled, { withTheme } from 'styled-components'
 import { CategoricalChartFunc } from 'recharts/types/chart/generateCategoricalChart'
 
@@ -54,7 +54,7 @@ interface IProps {
   legendLayout: Recharts.LegendProps['layout']
 }
 
-interface ILineDataPoint {
+export interface ILineDataPoint {
   label: React.ReactNode
   registeredInTargetDays: number
   totalRegistered: number
@@ -203,15 +203,20 @@ class LineChartComponent extends React.Component<IProps> {
               dataKey={dataKeys[2]}
               stroke={theme.colors.teal}
               dot={false}
-              activeDot={(dotProps: ICustomisedDot) => (
-                <CustomizedDot {...dotProps} theme={theme} />
+              activeDot={(dotProps: unknown) => (
+                <CustomizedDot
+                  {...(dotProps as ICustomisedDot)}
+                  theme={theme}
+                />
               )}
               strokeWidth={3}
             />
 
             <Tooltip
               cursor={{ stroke: theme.colors.yellow }}
-              content={tooltipContent}
+              content={(tooltipProps) =>
+                tooltipContent(tooltipProps as unknown as IDataPoint)
+              }
             />
 
             <Legend
@@ -228,3 +233,5 @@ class LineChartComponent extends React.Component<IProps> {
 }
 
 export const LineChart = withTheme(LineChartComponent)
+
+export type { IProps as ILineChartProps }

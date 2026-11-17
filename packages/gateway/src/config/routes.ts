@@ -8,21 +8,16 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import healthCheckHandler from '@gateway/features/healthCheck/handler'
-import {
-  eventNotificationHandler,
-  fhirBundleSchema,
-  validationFailedAction
-} from '@gateway/features/eventNotification/eventNotificationHandler'
-import { ServerRoute } from '@hapi/hapi'
-import { authProxy, catchAllProxy, rateLimitedAuthProxy } from './proxies'
-import { SCOPES } from '@opencrvs/commons/authentication'
-import sendVerifyCodeHandler, {
-  requestSchema,
-  responseSchema
-} from '@gateway/routes/verifyCode/handler'
-import { trpcProxy } from '@gateway/v2-events/event-config/routes'
 import { DOCUMENTS_URL } from '@gateway/constants'
+import {
+  configHandler,
+  publicConfigHandler
+} from '@gateway/features/config/configHandler'
+import { formsHandler } from '@gateway/features/config/formsHandler'
+import healthCheckHandler from '@gateway/features/healthCheck/handler'
+import { trpcProxy } from '@gateway/v2-events/event-config/routes'
+import { ServerRoute } from '@hapi/hapi'
+import { authProxy, rateLimitedAuthProxy } from './proxies'
 
 export const getRoutes = () => {
   const routes: ServerRoute[] = [
@@ -45,45 +40,6 @@ export const getRoutes = () => {
         notes: 'Pass the service as a query param: service'
       }
     },
-    // create event notification
-    {
-      method: 'POST',
-      path: '/notification',
-      handler: eventNotificationHandler,
-      options: {
-        tags: ['api'],
-        description: 'Create a health notification',
-        auth: {
-          scope: [
-            SCOPES.RECORD_DECLARE_BIRTH,
-            SCOPES.RECORD_DECLARE_DEATH,
-            SCOPES.RECORD_DECLARE_MARRIAGE,
-            SCOPES.NOTIFICATION_API
-          ]
-        },
-        validate: {
-          payload: fhirBundleSchema,
-          failAction: validationFailedAction
-        }
-      }
-    },
-    {
-      method: 'POST',
-      path: '/sendVerifyCode',
-      handler: sendVerifyCodeHandler,
-      options: {
-        description: 'Send verify code to user contact',
-        notes:
-          'Generate a 6 digit verification code.' +
-          'Sends an SMS/email to the user with verification code.',
-        validate: {
-          payload: requestSchema
-        },
-        response: {
-          schema: responseSchema
-        }
-      }
-    },
     {
       method: 'POST',
       path: '/upload',
@@ -100,54 +56,47 @@ export const getRoutes = () => {
         }
       }
     },
+    // application config routes (moved from config service)
     {
       method: 'GET',
-      path: '/presigned-url/{filePath*}',
-      handler: async (req, h) => {
-        return h.proxy({
-          uri: `${DOCUMENTS_URL}/presigned-url/${req.params.filePath}`,
-          passThrough: true
-        })
+      path: '/config',
+      handler: configHandler,
+      options: {
+        tags: ['api'],
+        description: 'Retrieve all configuration'
       }
     },
     {
-      method: 'DELETE',
-      path: '/files/{filePath*}',
-      handler: async (req, h) => {
-        return h.proxy({
-          uri: `${DOCUMENTS_URL}/files/${req.params.filePath}`,
-          passThrough: true
-        })
-      },
+      method: 'GET',
+      path: '/publicConfig',
+      handler: publicConfigHandler,
       options: {
-        payload: {
-          output: 'data',
-          parse: false
-        }
+        auth: false,
+        tags: ['api'],
+        description: 'Retrieve application configuration'
       }
     },
-    catchAllProxy.getLocations,
-    catchAllProxy.updateLocations,
-    catchAllProxy.createLocations,
-    catchAllProxy.locationsSuffix,
-
-    catchAllProxy.location,
-    catchAllProxy.locationId,
-
-    // Only these auth endpoints are reachable through the gateway; any other
-    // /auth/* path is a 404. A new public auth endpoint needs its own route here.
+    {
+      method: 'GET',
+      path: '/forms',
+      handler: formsHandler,
+      options: {
+        tags: ['api'],
+        description: 'Retrieve forms'
+      }
+    },
     authProxy.token,
-    authProxy.resendAuthenticationCode,
-    authProxy.verifyCode,
-    authProxy.verifyNumber,
-    authProxy.verifySecurityAnswer,
-    authProxy.changePassword,
-    authProxy.sendUserName,
     authProxy.refreshToken,
     authProxy.invalidateToken,
     rateLimitedAuthProxy.authenticate,
     rateLimitedAuthProxy.authenticateSuperUser,
     rateLimitedAuthProxy.verifyUser,
+    rateLimitedAuthProxy.verifyCode,
+    rateLimitedAuthProxy.resendAuthenticationCode,
+    rateLimitedAuthProxy.verifyRecoveryToken,
+    rateLimitedAuthProxy.verifySecurityAnswer,
+    rateLimitedAuthProxy.sendUserName,
+    rateLimitedAuthProxy.changePassword,
     ...trpcProxy
   ]
 

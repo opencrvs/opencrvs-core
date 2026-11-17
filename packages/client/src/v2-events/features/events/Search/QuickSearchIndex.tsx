@@ -12,8 +12,8 @@ import React from 'react'
 import { useLocation } from 'react-router-dom'
 import { useIntl } from 'react-intl'
 import { useTypedSearchParams } from 'react-router-typesafe-routes/dom'
-import { mandatoryColumns } from '@opencrvs/commons/client'
-import { SearchResultComponent } from '@client/v2-events/features/events/Search/SearchResult'
+import { mandatoryColumns, ActionType } from '@opencrvs/commons/client'
+import { SearchResultComponent } from '@client/v2-events/features/events/Search/SearchResult/SearchResult'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
 import { useEventConfigurations } from '@client/v2-events/features/events/useEventConfiguration'
 import { withSuspense } from '@client/v2-events/components/withSuspense'
@@ -27,16 +27,18 @@ function QuickSearchComponent({ term }: { term: string }) {
   const eventConfigurations = useEventConfigurations()
 
   const query = buildQuickSearchQuery(term, eventConfigurations)
-  const queryData = searchEvent.useSuspenseQuery({
-    query,
-    ...typedSearchParams
-  })
+  const queryData = searchEvent.useSuspenseQuery(
+    {
+      query,
+      ...typedSearchParams
+    },
+    ['adhoc']
+  )
 
   return (
     <SearchResultComponent
-      actions={['DEFAULT']}
+      action={{ type: ActionType.READ }}
       columns={mandatoryColumns}
-      eventConfigs={eventConfigurations}
       queryData={queryData.results}
       title={intl.formatMessage(
         {

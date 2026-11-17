@@ -14,18 +14,21 @@ import { cloneDeep } from 'lodash'
 import {
   ActionDocument,
   ActionType,
+  ClientAdministrativeArea,
+  ClientLocation,
   CertificateTemplateConfig,
   EventConfig,
   EventDocument,
   EventState,
   FieldType,
   getAcceptedActions,
+  getCompleteActionContent,
   getCurrentEventState,
-  isMinioUrl,
+  getDeclarationFields,
+  isS3Url,
   LanguageConfig,
-  Location,
-  PrintCertificateAction,
-  UserOrSystem
+  UserOrSystemSummary,
+  UUID
 } from '@opencrvs/commons/client'
 import {
   addFontsToSvg,
@@ -35,25 +38,24 @@ import {
 } from '@client/v2-events/features/events/actions/print-certificate/pdfUtils'
 import { fetchImageAsBase64 } from '@client/utils/imageUtils'
 import { getOfflineData } from '@client/offline/selectors'
-import { useEventConfiguration } from '../features/events/useEventConfiguration'
+import { useEventConfigurationForRecord } from '../features/events/useEventConfiguration'
 import { hasStringFilename } from '../utils'
 
-async function replaceMinioUrlWithBase64(
+async function replaceS3UrlWithBase64(
   declaration: EventState,
   config: EventConfig
 ) {
   // Clone to avoid mutating the original declaration
   const declarationClone = cloneDeep(declaration)
 
-  const fileFieldIds = config.declaration.pages
-    .flatMap((page) => page.fields)
+  const fileFieldIds = getDeclarationFields(config)
     .filter((field) => field.type === FieldType.FILE)
     .map((field) => field.id)
 
   for (const fieldId of fileFieldIds) {
     const field = declarationClone[fieldId]
 
-    if (hasStringFilename(field) && isMinioUrl(field.filename)) {
+    if (hasStringFilename(field) && isS3Url(field.filename)) {
       // TypeScript now knows `field` has a `filename` property of type string
       field.filename = await fetchImageAsBase64(field.filename)
     }
@@ -62,33 +64,51 @@ async function replaceMinioUrlWithBase64(
   return declarationClone
 }
 
+/**
+ * Counts the confirmed prints of a certificate template. Only Accepted prints
+ * count: a print confirmed synchronously is stored as a Requested and an
+ * Accepted action, and a pending or rejected print was not printed. The
+ * template is read from the request, since a print accepted asynchronously
+ * carries no content of its own.
+ */
+export function countPrintsOfTemplate(
+  event: EventDocument,
+  templateId: string | undefined
+) {
+  return getAcceptedActions(event).filter(
+    (action) =>
+      action.type === ActionType.PRINT_CERTIFICATE &&
+      getCompleteActionContent(event, action)?.templateId === templateId
+  ).length
+}
+
 export const usePrintableCertificate = ({
   event,
   config,
   locations,
+  administrativeAreas,
   users,
   certificateConfig,
   language
 }: {
   event: EventDocument
   config: EventConfig
-  locations: Location[]
-  users: UserOrSystem[]
+  locations: Map<UUID, ClientLocation>
+  administrativeAreas: Map<UUID, ClientAdministrativeArea>
+  users: UserOrSystemSummary[]
   certificateConfig?: CertificateTemplateConfig
   language?: LanguageConfig
 }) => {
-  const { eventConfiguration } = useEventConfiguration(event.type)
+  const { eventConfiguration } = useEventConfigurationForRecord(event)
   const { config: appConfig } = useSelector(getOfflineData)
   const { declaration, ...metadata } = getCurrentEventState(
     event,
     eventConfiguration
   )
-  const copiesPrintedForTemplate = event.actions.filter(
-    (action) =>
-      action.type === ActionType.PRINT_CERTIFICATE &&
-      (action as PrintCertificateAction).content?.templateId ===
-        certificateConfig?.id
-  ).length
+  const copiesPrintedForTemplate = countPrintsOfTemplate(
+    event,
+    certificateConfig?.id
+  )
 
   const modifiedMetadata = {
     ...metadata,
@@ -115,6 +135,7 @@ export const usePrintableCertificate = ({
     $actions: getAcceptedActions(event),
     review: true,
     locations,
+    administrativeAreas,
     users,
     language,
     config,
@@ -133,7 +154,7 @@ export const usePrintableCertificate = ({
   const preparePdfCertificate = async (updatedEvent: EventDocument) => {
     const { declaration: updatedDeclaration, ...updatedMetadata } =
       getCurrentEventState(updatedEvent, eventConfiguration)
-    const declarationWithResolvedImages = await replaceMinioUrlWithBase64(
+    const declarationWithResolvedImages = await replaceS3UrlWithBase64(
       updatedDeclaration,
       config
     )
@@ -150,6 +171,7 @@ export const usePrintableCertificate = ({
       $declaration: declarationWithResolvedImages,
       $actions: getAcceptedActions(event),
       locations,
+      administrativeAreas,
       review: false,
       users,
       language,

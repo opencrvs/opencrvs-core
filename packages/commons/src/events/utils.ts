@@ -27,10 +27,15 @@ import {
 import {
   ActionType,
   DeclarationActionType,
-  DeclarationActions,
+  DisplayableAction,
   writeActions
 } from './ActionType'
-import { EventConfig } from './EventConfig'
+import {
+  byEffectiveFrom,
+  EventConfig,
+  toEventConfig,
+  VersionedEventConfig
+} from './EventConfig'
 import { FieldConfig, FieldReference } from './FieldConfig'
 import {
   Action,
@@ -42,16 +47,22 @@ import {
 import { PageConfig, PageTypes, VerificationPageConfig } from './PageConfig'
 import {
   isConditionMet,
+  isFieldSecured,
   isFieldVisible,
   ValidatorContext
 } from '../conditionals/validate'
 import { Draft } from './Draft'
 import { EventDocument } from './EventDocument'
 import { getUUID, UUID } from '../uuid'
-import { ActionConfig, DeclarationActionConfig } from './ActionConfig'
-import { FormConfig } from './FormConfig'
+import {
+  ActionConfig,
+  actionConfigTypes,
+  ActionConfigTypes,
+  DeclareActionConfig
+} from './ActionConfig'
+import { DeclarationFormConfig, FormConfig } from './FormConfig'
 import { getOrThrow } from '../utils'
-import { TokenUserType } from '../authentication'
+import { TokenUserType } from '../users/authentication'
 import {
   PlainDate,
   plainDateToLocalDate,
@@ -59,6 +70,7 @@ import {
 } from './FieldValue'
 import { subDays, subYears, format } from 'date-fns'
 import { FieldType } from './FieldType'
+import { EventIndex } from './EventIndex'
 
 /* eslint-disable max-lines */
 
@@ -67,24 +79,173 @@ export function ageToDate(age: number, asOfDate: PlainDate) {
   return PlainDate.parse(format(subYears(date, age), 'yyyy-MM-dd'))
 }
 
-function isDeclarationActionConfig(
-  action: ActionConfig
-): action is DeclarationActionConfig {
-  return DeclarationActions.safeParse(action.type).success
+export function getDeclaration(configuration: EventConfig) {
+  const declareAction = configuration.actions.find(
+    (action): action is DeclareActionConfig =>
+      action.type === ActionType.DECLARE
+  )
+
+  if (!declareAction) {
+    throw new Error(
+      `Event '${configuration.id}' has no ${ActionType.DECLARE} action to read the declaration from`
+    )
+  }
+
+  return declareAction.declaration
+}
+
+export function getDeclarationPages(configuration: EventConfig) {
+  return getDeclaration(configuration).pages
 }
 
 export function getDeclarationFields(
   configuration: EventConfig
 ): FieldConfig[] {
-  return configuration.declaration.pages.flatMap(({ fields }) => fields)
+  return getDeclarationPages(configuration).flatMap(({ fields }) => fields)
 }
 
-export function getDeclarationPages(configuration: EventConfig) {
-  return configuration.declaration.pages
+/**
+ * @returns the declaration fields of every version of the event, one per id: what any
+ * record of the event can hold, whichever version it was created under. Where versions
+ * define an id differently, the newest version's field is kept.
+ *
+ * Used to build the search index mapping: records of every version share one index per
+ * event, so its mapping must hold the fields of all of them. Goes away once each version
+ * gets its own index (#14335).
+ * Known limitation: a field id must keep its type in every version until #14335.
+ */
+export function getDeclarationFieldsOfAllVersions(
+  config: VersionedEventConfig
+): FieldConfig[] {
+  const oldestFirst = [...config.versions].sort(byEffectiveFrom)
+  const fieldsById = new Map(
+    oldestFirst.flatMap((version) =>
+      getDeclarationFields(toEventConfig(config, version)).map(
+        (field) => [field.id, field] as const
+      )
+    )
+  )
+  return [...fieldsById.values()]
 }
 
-export function getDeclaration(configuration: EventConfig) {
-  return configuration.declaration
+/**
+ * @returns the notification form of the NOTIFY action, or undefined when the event has no NOTIFY action.
+ */
+function findNotificationForm(configuration: EventConfig) {
+  const notifyAction = configuration.actions.find(
+    (action) => action.type === ActionType.NOTIFY
+  )
+
+  return notifyAction?.type === ActionType.NOTIFY
+    ? notifyAction.notificationForm
+    : undefined
+}
+
+/**
+ * @returns the notification form configured on the NOTIFY action.
+ * @throws when the event has no NOTIFY action.
+ */
+export function getNotificationForm(
+  configuration: EventConfig
+): DeclarationFormConfig {
+  const notificationForm = findNotificationForm(configuration)
+  if (!notificationForm) {
+    throw new Error(
+      `Event '${configuration.id}' has no ${ActionType.NOTIFY} action.`
+    )
+  }
+
+  return notificationForm
+}
+
+export function getNotificationFields(
+  configuration: EventConfig
+): FieldConfig[] {
+  return getNotificationForm(configuration).pages.flatMap(
+    ({ fields }) => fields
+  )
+}
+
+/**
+ * Form a user fills in to submit the given action:
+ * the notification form for NOTIFY, the declaration form for DECLARE.
+ */
+export function getActionForm(
+  configuration: EventConfig,
+  actionType: typeof ActionType.NOTIFY | typeof ActionType.DECLARE
+) {
+  return actionType === ActionType.NOTIFY
+    ? getNotificationForm(configuration)
+    : getDeclaration(configuration)
+}
+
+export function isActionConfigType(
+  type: ActionType
+): type is ActionConfigTypes {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  return actionConfigTypes.has(type as any)
+}
+
+// @TODO: see if we can make this function generic so it returns a typed ActionConfig based on the given actionType (e.g. `Extract<ActionConfig, { type: T }>`),
+// instead of the current wide `ActionConfig | undefined`.
+// Perhaps this function should also throw an error if the action config is not found.
+export function getActionConfig({
+  eventConfiguration,
+  actionType,
+  customActionType
+}: {
+  eventConfiguration: EventConfig
+  actionType: DisplayableAction
+  customActionType?: string
+}): ActionConfig | undefined {
+  return eventConfiguration.actions.find((a) => {
+    // We can have multiple custom actions configured, we specify the custom action with 'customActionType'
+    if (a.type === ActionType.CUSTOM && customActionType) {
+      return a.customActionType === customActionType
+    }
+
+    return a.type === actionType
+  })
+}
+
+export function getCustomActionFields(
+  eventConfiguration: EventConfig,
+  customActionType: string
+): FieldConfig[] {
+  const actionConfig = getActionConfig({
+    eventConfiguration,
+    customActionType,
+    actionType: ActionType.CUSTOM
+  })
+
+  if (!actionConfig || actionConfig.type !== ActionType.CUSTOM) {
+    return []
+  }
+
+  return actionConfig.form
+}
+
+/**
+ * Returns the fields configured for an action's confirmation dialog.
+ */
+export function getActionFormFields(
+  eventConfiguration: EventConfig,
+  actionType: ActionType,
+  customActionType?: string
+): FieldConfig[] {
+  const actionConfig = eventConfiguration.actions.find((a) => {
+    if (a.type === ActionType.CUSTOM && customActionType) {
+      return a.customActionType === customActionType
+    }
+
+    return a.type === actionType
+  })
+
+  if (!actionConfig || !('form' in actionConfig) || actionConfig.form == null) {
+    return []
+  }
+
+  return actionConfig.form
 }
 
 export function getPrintCertificatePages(configuration: EventConfig) {
@@ -107,11 +268,15 @@ export const getActionAnnotationFields = (actionConfig: ActionConfig) => {
     return actionConfig.printForm.pages.flatMap(({ fields }) => fields)
   }
 
-  if (isDeclarationActionConfig(actionConfig)) {
-    return actionConfig.review.fields
-  }
+  const reviewFields =
+    'review' in actionConfig && actionConfig.review != null
+      ? actionConfig.review.fields
+      : []
 
-  return []
+  const formFields =
+    'form' in actionConfig && actionConfig.form != null ? actionConfig.form : []
+
+  return [...reviewFields, ...formFields]
 }
 
 function getAllAnnotationFields(config: EventConfig): FieldConfig[] {
@@ -155,21 +320,31 @@ export function getActionReview(
   configuration: EventConfig,
   actionType: ActionType
 ) {
-  const [actionConfig] = configuration.actions.filter(
-    (a): a is DeclarationActionConfig => a.type === actionType
-  )
+  const actionConfig = getActionConfig({
+    eventConfiguration: configuration,
+    actionType
+  })
 
-  return getOrThrow(
-    actionConfig.review,
-    `No review config found for ${actionType}`
-  )
+  if (!actionConfig) {
+    throw 'Tried to get action review for an action that is not a declaration action'
+  }
+
+  if ('review' in actionConfig) {
+    return actionConfig.review
+  }
+
+  return undefined
 }
 
 export function getActionReviewFields(
   configuration: EventConfig,
   actionType: DeclarationActionType
 ) {
-  return getActionReview(configuration, actionType).fields
+  const review = getActionReview(configuration, actionType)
+  if (!review) {
+    return []
+  }
+  return review.fields
 }
 
 export function isPageVisible(
@@ -304,7 +479,7 @@ export function createEmptyDraft(
       declaration: {},
       annotation: {},
       createdAt: new Date().toISOString(),
-      createdByUserType: TokenUserType.Enum.user,
+      createdByUserType: TokenUserType.enum.user,
       createdBy: '@todo',
       status: ActionStatus.Accepted,
       transactionId: '@todo',
@@ -359,9 +534,8 @@ export function deepMerge<
   /**
    * Cloning is essential since mergeWith mutates the first argument.
    */
-  const currentDocumentClone = cloneDeep(currentDocument)
   return mergeWith(
-    cloneDeep(currentDocumentClone),
+    cloneDeep(currentDocument),
     actionDocument,
     (previousValue, incomingValue) => {
       if (incomingValue === undefined) {
@@ -546,7 +720,7 @@ export function flattenFieldReference(ref: FieldReference) {
 }
 
 export function isWriteAction(actionType: ActionType): boolean {
-  return writeActions.safeParse(actionType).success
+  return writeActions.validate(actionType)
 }
 
 /**
@@ -555,6 +729,8 @@ export function isWriteAction(actionType: ActionType): boolean {
 export const findAllFields = (config: EventConfig): FieldConfig[] => {
   return flattenDeep([
     ...getDeclarationFields(config),
+    ...(findNotificationForm(config)?.pages.flatMap(({ fields }) => fields) ??
+      []),
     ...getAllAnnotationFields(config)
   ])
 }
@@ -598,11 +774,14 @@ export function getMixedPath<T = unknown>(
   return isNil(result) ? defaultValue : result
 }
 
-export function getEventConfigById(eventConfigs: EventConfig[], id: string) {
-  const eventConfig = eventConfigs.find(
-    (eventConfiguration) => eventConfiguration.id === id
+export function getEventConfigById<T extends { id: string }>(
+  eventConfigs: T[],
+  id: string
+): T {
+  return getOrThrow(
+    eventConfigs.find((eventConfiguration) => eventConfiguration.id === id),
+    `No configuration found for event type: ${id}`
   )
-  return getOrThrow(eventConfig, `Event config for ${id} not found`)
 }
 
 export function timePeriodToDateRange(value: SelectDateRangeValue) {
@@ -675,7 +854,7 @@ export function getPendingAction(actions: Action[]): ActionDocument {
 
   if (pendingActions.length !== 1) {
     throw new Error(
-      `Expected exactly one pending action, but found ${pendingActions.map(({ id }) => id).join(', ')}`
+      `Expected exactly one pending action, but found ${pendingActions.length ? pendingActions.map(({ id }) => id).join(', ') : 'none'}`
     )
   }
 
@@ -709,6 +888,40 @@ export function getCompleteActionAnnotation(
   return action.annotation ?? {}
 }
 
+/**
+ * Resolves the complete content for an action, inheriting from its original
+ * Requested action when the Accepted action carries no content of its own.
+ *
+ * Mirrors the same "originalActionId → merge from Requested" pattern used by
+ * getCompleteActionAnnotation and getCompleteActionDeclaration.
+ */
+export function getCompleteActionContent(
+  event: EventDocument,
+  action: ActionDocument
+): Record<string, unknown> | null | undefined {
+  const currentContent = ('content' in action ? action.content : undefined) as
+    | Record<string, unknown>
+    | null
+    | undefined
+
+  if (!action.originalActionId) {
+    return currentContent
+  }
+
+  const originalAction = event.actions.find(
+    ({ id }) => id === action.originalActionId
+  )
+
+  if (originalAction && 'content' in originalAction && originalAction.content) {
+    return {
+      ...(originalAction.content as Record<string, unknown>),
+      ...(currentContent ?? {})
+    }
+  }
+
+  return currentContent
+}
+
 export function getCompleteActionDeclaration<
   T extends EventState | ActionUpdate
 >(declaration: T, event: EventDocument, action: ActionDocument): T {
@@ -740,12 +953,68 @@ export function getCompleteActionDeclaration<
   return deepMerge(declaration, action.declaration)
 }
 
-export function getAcceptedActions(event: EventDocument): ActionDocument[] {
-  return event.actions.filter(isAcceptedAction).map((action) => ({
+/**
+ * Completes an Accepted action's declaration and annotation with those of its
+ * original Requested action (the Accepted action's own values win).
+ */
+function completeAcceptedAction(
+  event: EventDocument,
+  action: ActionDocument
+): ActionDocument {
+  return {
     ...action,
     declaration: getCompleteActionDeclaration({}, event, action),
     annotation: getCompleteActionAnnotation(event, action)
-  }))
+  }
+}
+
+export function getAcceptedActions(event: EventDocument): ActionDocument[] {
+  return event.actions
+    .filter(isAcceptedAction)
+    .map((action) => completeAcceptedAction(event, action))
+}
+
+/**
+ * Returns the event with each Accepted action completed with the details of
+ * its original Requested action: who requested it, where, and the request's
+ * declaration, annotation and content (the Accepted action's own values win).
+ *
+ * `$event` conditionals match Accepted actions only, but an Accepted action
+ * does not carry everything its request did. A synchronous confirmation drops
+ * the request's annotation; an asynchronous `accept` is created by the system
+ * user and carries only what the country configuration sent. Without this,
+ * `event.hasAction(...).withTemplate(...)` / `.withFields(...)` would stop
+ * matching fields that matched the Requested action.
+ */
+export function getEventWithCompleteAcceptedActions(
+  event: EventDocument
+): EventDocument {
+  return {
+    ...event,
+    actions: event.actions.map((action) => {
+      if (!isAcceptedAction(action) || !action.originalActionId) {
+        return action
+      }
+      const requestedAction = event.actions.find(
+        ({ id }) => id === action.originalActionId
+      )
+      if (requestedAction?.status !== ActionStatus.Requested) {
+        return action
+      }
+      const content = getCompleteActionContent(event, action)
+      // Request and acceptance are the same action type, so the merged
+      // content keeps the action's shape.
+      return {
+        ...completeAcceptedAction(event, action),
+        // Who requested the action, as getActionUpdateMetadata resolves it.
+        createdBy: requestedAction.createdBy,
+        createdByRole: requestedAction.createdByRole,
+        createdByUserType: requestedAction.createdByUserType,
+        createdAtLocation: requestedAction.createdAtLocation,
+        ...(content ? { content } : {})
+      } as ActionDocument
+    })
+  }
 }
 
 // Action types that are not taken into the aggregate values
@@ -755,30 +1024,174 @@ const EXCLUDED_ACTIONS = [
   ActionType.REJECT_CORRECTION
 ]
 
+/**
+ * Applies a single action's declaration on top of the running declaration,
+ * following the correction-specific merge rules.
+ *
+ * Shared by `aggregateActionDeclarations` (folding accepted actions) and
+ * `getDeclarationWithPendingAction` (applying the pending action), so both use
+ * identical correction-aware logic.
+ *
+ * @param acceptedActions - The event's accepted actions, used to resolve the
+ *   correction request an APPROVE_CORRECTION refers to via `requestId`.
+ */
+function applyActionDeclaration(
+  declaration: EventState,
+  event: EventDocument,
+  action: ActionDocument,
+  acceptedActions: ActionDocument[]
+): EventState {
+  /*
+   * If the action encountered is "APPROVE_CORRECTION", we want to apply the changed
+   * details in the correction. To do this, we find the original request that this
+   * approval is for and merge its details with the current data of the record.
+   */
+  if (action.type === ActionType.APPROVE_CORRECTION) {
+    const requestAction = acceptedActions.find(
+      ({ id }) => id === action.requestId
+    )
+
+    if (!requestAction) {
+      return declaration
+    }
+
+    const declarationWithApprovedCorrection = getCompleteActionDeclaration(
+      declaration,
+      event,
+      requestAction
+    )
+
+    // Apply async confirmation payload after the approved request so external
+    // integrations can finalize fields (e.g. child.nid) at approve time.
+    return getCompleteActionDeclaration(
+      declarationWithApprovedCorrection,
+      event,
+      action
+    )
+  }
+
+  return getCompleteActionDeclaration(declaration, event, action)
+}
+
 export function aggregateActionDeclarations(event: EventDocument): EventState {
   const allAcceptedActions = getAcceptedActions(event)
   const aggregatedActions = allAcceptedActions
     .filter((a) => !EXCLUDED_ACTIONS.some((type) => type === a.type))
     .sort((a, b) => a.createdAt.localeCompare(b.createdAt))
 
-  return aggregatedActions.reduce((declaration, action) => {
-    /*
-     * If the action encountered is "APPROVE_CORRECTION", we want to apply the changed
-     * details in the correction. To do this, we find the original request that this
-     * approval is for and merge its details with the current data of the record.
-     */
-    if (action.type === ActionType.APPROVE_CORRECTION) {
-      const requestAction = allAcceptedActions.find(
-        ({ id }) => id === action.requestId
-      )
+  return aggregatedActions.reduce<EventState>(
+    (declaration, action) =>
+      applyActionDeclaration(declaration, event, action, allAcceptedActions),
+    {}
+  )
+}
 
-      if (!requestAction) {
-        return declaration
-      }
+/**
+ * Returns the declaration after each of `event.actions`, which must be in chronological order.
+ * Index `i` equals `aggregateActionDeclarations` of the first `i + 1` actions, in linear time.
+ */
+export function getDeclarationAfterEachAction(
+  event: EventDocument
+): EventState[] {
+  const acceptedActions: ActionDocument[] = []
+  let declaration: EventState = {}
 
-      return getCompleteActionDeclaration(declaration, event, requestAction)
+  return event.actions.map((action, index) => {
+    if (!isAcceptedAction(action)) {
+      return declaration
     }
 
-    return getCompleteActionDeclaration(declaration, event, action)
-  }, {})
+    // Linked actions resolve against the prefix, as they do when aggregating it
+    const eventUntilAction = {
+      ...event,
+      actions: event.actions.slice(0, index + 1)
+    }
+    const acceptedAction = {
+      ...action,
+      declaration: getCompleteActionDeclaration({}, eventUntilAction, action)
+    }
+    acceptedActions.push(acceptedAction)
+
+    if (!EXCLUDED_ACTIONS.some((type) => type === action.type)) {
+      declaration = applyActionDeclaration(
+        declaration,
+        eventUntilAction,
+        acceptedAction,
+        acceptedActions
+      )
+    }
+
+    return declaration
+  })
+}
+
+/**
+ * Returns the event's declaration state as it will be once the single pending
+ * action is accepted — i.e. the aggregate of all accepted declarations with the
+ * pending action's changes applied on top.
+ *
+ * Country configuration confirmation handlers (and notifications) need the
+ * up-to-date declaration at confirmation time, before core has accepted the
+ * action. Reaching for `aggregateActionDeclarations` alone is not enough for
+ * corrections: when confirming an APPROVE_CORRECTION the changed fields live on
+ * the linked REQUEST_CORRECTION, not on the pending action's own (empty)
+ * declaration. This helper applies the same correction-aware merge that
+ * `aggregateActionDeclarations` uses for already-accepted approvals, so callers
+ * do not have to reimplement the `requestId`/`originalActionId` resolution.
+ */
+export function getDeclarationWithPendingAction(
+  event: EventDocument
+): EventState {
+  const pendingAction = getPendingAction(event.actions)
+  return applyActionDeclaration(
+    aggregateActionDeclarations(event),
+    event,
+    pendingAction,
+    getAcceptedActions(event)
+  )
+}
+
+export function aggregateActionAnnotations(event: EventDocument): EventState {
+  return event.actions.reduce((ann, sortedAction) => {
+    if (!('annotation' in sortedAction) || !sortedAction.annotation) {
+      return ann
+    }
+
+    return deepMerge(ann, sortedAction.annotation)
+  }, {} as EventState)
+}
+
+/**
+ * 2.1. onwards secured fields have accepted conditionals.
+ * Secured fields are not present in EventIndex payload.
+ * When we derive @see EventIndex from @see EventDocument, we will have all the fields present.
+ *
+ * To keep the views consistent, and not to change if event.get gets triggered, we need to clean out the secured fields.
+ *
+ * @returns EventIndex without values that evaluate to secured: true.
+ */
+export function dropSecuredDeclarationFields(
+  eventConfig: EventConfig,
+  eventIndex: EventIndex,
+  validatorContext: ValidatorContext
+): EventIndex {
+  const declarationFields = getDeclarationFields(eventConfig)
+  const securedFieldIds = new Set(
+    declarationFields
+      .filter((declarationField) =>
+        isFieldSecured(declarationField, eventIndex, validatorContext)
+      )
+      .map((declarationField) => declarationField.id)
+  )
+
+  const declaration = Object.fromEntries(
+    Object.entries(eventIndex.declaration).filter(
+      ([fieldId]) => !securedFieldIds.has(fieldId)
+    )
+  )
+
+  return {
+    ...eventIndex,
+    declaration
+  }
 }

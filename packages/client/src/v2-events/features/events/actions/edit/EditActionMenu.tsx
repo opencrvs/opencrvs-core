@@ -1,0 +1,410 @@
+/*
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at https://mozilla.org/MPL/2.0/.
+ *
+ * OpenCRVS is also distributed under the terms of the Civil Registration
+ * & Healthcare Disclaimer located at http://opencrvs.org/license.
+ *
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
+ */
+import React from 'react'
+import { useIntl, MessageDescriptor } from 'react-intl'
+import { useTypedSearchParams } from 'react-router-typesafe-routes/dom'
+import styled from 'styled-components'
+import { useNavigate } from 'react-router-dom'
+import {
+  ActionType,
+  EventDocument,
+  getUUID,
+  getCurrentEventState,
+  EventStatus,
+  getActionConfig,
+  getAcceptedActions,
+  getActionFormFields,
+  runFieldValidations,
+  flattenFormState,
+  omitHiddenFields,
+  FieldConfig,
+  FieldUpdateValue,
+  EventState,
+  EventConfig,
+  isActionEnabled,
+  AttachmentPath,
+  eventAttachmentPath
+} from '@opencrvs/commons/client'
+import { Dialog, Stack, Button } from '@opencrvs/components'
+import { FormFieldGenerator } from '@client/v2-events/components/forms/FormFieldGenerator'
+import { useDialogFormState } from '@client/v2-events/hooks/useDialogFormState'
+import { useEventFormNavigation } from '@client/v2-events/features/events/useEventFormNavigation'
+import { ROUTES } from '@client/v2-events/routes'
+import { useModal } from '@client/v2-events/hooks/useModal'
+import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
+import { useUserAllowedActions } from '@client/v2-events/features/workqueues/Actions/useUserAllowedActions'
+import { useValidatorContext } from '@client/v2-events/hooks/useValidatorContext'
+import { validationErrorsInActionFormExist } from '@client/v2-events/components/forms/validation'
+import { actionIcons } from '@client/v2-events/features/workqueues/Actions/utils'
+import {
+  getChangedDeclarationDiff,
+  hasDeclarationFieldChanged,
+  hasFieldChanged
+} from '@client/v2-events/features/events/useEvents/procedures/actions/declarationDiff'
+import { useActionAnnotation } from '../../useActionAnnotation'
+import { useEventFormData } from '../../useEventFormData'
+import { TranslationTextWithFormatModifier } from '../../components/TranslationTextWithFormatModifier'
+import { useCanDirectlyRegister } from '../useCanDirectlyRegister'
+import { ActionMenuDropdown } from '../ActionMenuDropdown'
+import { aggregateAnnotations, getReviewFormFields } from '../annotationUtils'
+import { useEditForm } from './useEditForm'
+
+export const commentLabel = {
+  id: 'event.edit.comment.label',
+  defaultMessage: 'Comments',
+  description: 'The label for the comment'
+}
+
+const messages = {
+  cancel: {
+    id: 'actionModal.cancel',
+    defaultMessage: 'Cancel',
+    description: 'The label for cancel button of action modal'
+  },
+  confirm: {
+    id: 'actionModal.confirm',
+    defaultMessage: 'Confirm',
+    description: 'The label for confirm button of action modal'
+  },
+  editAndRegisterLabel: {
+    defaultMessage: 'Register with edits',
+    description: 'Label for Register with edits in edit action menu',
+    id: 'event.edit.registerWithEdits.label'
+  },
+  editAndDeclareLabel: {
+    defaultMessage: 'Declare with edits',
+    description: 'Label for Declare with edits in edit action menu',
+    id: 'event.edit.declareWithEdits.label'
+  },
+  editAndNotifyLabel: {
+    defaultMessage: 'Notify with edits',
+    description: 'Label for "Notify with edits" in edit action menu',
+    id: 'event.edit.notifyWithEdits.label'
+  }
+}
+
+interface EditActionModalResult {
+  confirmed: boolean
+  values?: Record<string, FieldUpdateValue>
+}
+
+function EditActionModal({
+  title,
+  supportingCopy,
+  close,
+  fields = [],
+  eventConfiguration,
+  declaration,
+  attachmentPath,
+  event
+}: {
+  attachmentPath: AttachmentPath
+  /** Record the action is taken on, for fields that act on it, e.g. a print button. */
+  event?: EventDocument
+  title: MessageDescriptor
+  supportingCopy?: MessageDescriptor
+  close: (result: EditActionModalResult) => void
+  fields?: FieldConfig[]
+  eventConfiguration: EventConfig
+  declaration: EventState
+}) {
+  const intl = useIntl()
+  const validatorContext = useValidatorContext(event)
+  const dialogForm = useDialogFormState()
+  const modalValues = dialogForm.formValues
+
+  const errorsOnField = fields.flatMap((field) =>
+    flattenFormState(
+      runFieldValidations({
+        field,
+        form: modalValues,
+        value: modalValues[field.id],
+        context: validatorContext
+      })
+    ).flatMap(([, errs]) => errs)
+  )
+
+  return (
+    <Dialog
+      isOpen
+      actions={[
+        <Button
+          key={'cancel_edit'}
+          id={'cancel_edit'}
+          type="tertiary"
+          onClick={() => close({ confirmed: false })}
+        >
+          {intl.formatMessage(messages.cancel)}
+        </Button>,
+        <Button
+          key={'confirm_edit'}
+          disabled={errorsOnField.length > 0}
+          id={'confirm_edit'}
+          type="primary"
+          onClick={() =>
+            close({
+              confirmed: true,
+              values: omitHiddenFields(fields, modalValues, validatorContext)
+            })
+          }
+        >
+          {intl.formatMessage(messages.confirm)}
+        </Button>
+      ]}
+      title={intl.formatMessage(title)}
+      variant="large"
+      width={800}
+      onClose={() => close({ confirmed: false })}
+    >
+      {supportingCopy && (
+        <Stack>
+          <TranslationTextWithFormatModifier
+            color="grey500"
+            element="p"
+            message={supportingCopy}
+            variant="reg16"
+          />
+        </Stack>
+      )}
+      {fields.length > 0 && (
+        <FormFieldGenerator
+          {...dialogForm}
+          attachmentPath={attachmentPath}
+          eventConfig={eventConfiguration}
+          fields={fields}
+          id="edit-action-modal-form"
+          validatorContext={{ ...validatorContext, baseFormState: declaration }}
+        />
+      )}
+    </Dialog>
+  )
+}
+
+function useEditActions(event: EventDocument) {
+  const { eventConfiguration, formConfig, reviewConfig } = useEditForm(event)
+  const eventIndex = getCurrentEventState(event, eventConfiguration)
+  const navigate = useNavigate()
+  const { isActionAllowed } = useUserAllowedActions(eventIndex)
+  const [{ backTo }] = useTypedSearchParams(ROUTES.V2.EVENTS.EDIT.REVIEW)
+  const { getAnnotation } = useActionAnnotation()
+  const canDirectlyRegister = useCanDirectlyRegister(event)
+  const { closeActionView } = useEventFormNavigation()
+  const [modal, openModal] = useModal()
+  const events = useEvents()
+  const declaration = useEventFormData((state) => state.getFormValues())
+  const validatorContext = useValidatorContext(event)
+
+  const formFields = formConfig.pages.flatMap((page) => page.fields)
+  const declarationDiff = getChangedDeclarationDiff(
+    formFields,
+    declaration,
+    eventIndex.declaration,
+    eventConfiguration,
+    validatorContext
+  )
+  const changedFields = formFields.filter((f) =>
+    hasDeclarationFieldChanged(
+      f,
+      declaration,
+      eventIndex.declaration,
+      eventConfiguration,
+      validatorContext,
+      formFields
+    )
+  )
+
+  const annotation = getAnnotation()
+  const acceptedActions = getAcceptedActions(event)
+  const originalAnnotation = aggregateAnnotations(acceptedActions)
+  const reviewFormFields = getReviewFormFields(eventConfiguration)
+
+  const changedAnnotationFields = reviewFormFields.filter((f) =>
+    hasFieldChanged(f, originalAnnotation, annotation, validatorContext)
+  )
+
+  const anyValuesHaveChanged =
+    changedFields.length > 0 || changedAnnotationFields.length > 0
+
+  const actionConfig = getActionConfig({
+    eventConfiguration,
+    actionType: ActionType.EDIT
+  })
+
+  // Ensure that the target action (Notify, Declare, Register) conditions are met
+  const isTargetActionEnabled = (actionType: ActionType) => {
+    const targetConfig = getActionConfig({ eventConfiguration, actionType })
+    return targetConfig
+      ? isActionEnabled(targetConfig, eventIndex, validatorContext)
+      : true
+  }
+
+  const hasValidationErrors = validationErrorsInActionFormExist({
+    formConfig,
+    form: declaration,
+    annotation,
+    context: validatorContext,
+    reviewFields: reviewConfig.fields
+  })
+
+  const dialogCopy =
+    actionConfig && 'dialogCopy' in actionConfig
+      ? actionConfig.dialogCopy
+      : null
+
+  return {
+    modals: [modal],
+    actions: [
+      {
+        icon: actionIcons[ActionType.EDIT],
+        label: messages.editAndRegisterLabel,
+        onClick: async () => {
+          const { confirmed, values } = await openModal<EditActionModalResult>(
+            (close) => {
+              return (
+                <EditActionModal
+                  attachmentPath={eventAttachmentPath(event.id)}
+                  close={close}
+                  declaration={declaration}
+                  event={event}
+                  eventConfiguration={eventConfiguration}
+                  fields={getActionFormFields(
+                    eventConfiguration,
+                    ActionType.REGISTER
+                  )}
+                  supportingCopy={dialogCopy?.register}
+                  title={messages.editAndRegisterLabel}
+                />
+              )
+            }
+          )
+
+          if (confirmed) {
+            events.customActions.editAndRegister.mutate({
+              eventId: event.id,
+              transactionId: getUUID(),
+              declaration: declarationDiff,
+              annotation,
+              targetActionAnnotation: values
+            })
+
+            closeActionView(backTo)
+          }
+        },
+        disabled:
+          hasValidationErrors || !anyValuesHaveChanged || !canDirectlyRegister,
+        hidden: !isActionAllowed(ActionType.REGISTER)
+      },
+      {
+        icon: actionIcons[ActionType.EDIT],
+        label: messages.editAndDeclareLabel,
+        onClick: async () => {
+          const { confirmed, values } = await openModal<EditActionModalResult>(
+            (close) => {
+              return (
+                <EditActionModal
+                  attachmentPath={eventAttachmentPath(event.id)}
+                  close={close}
+                  declaration={declaration}
+                  event={event}
+                  eventConfiguration={eventConfiguration}
+                  fields={getActionFormFields(
+                    eventConfiguration,
+                    ActionType.DECLARE
+                  )}
+                  supportingCopy={dialogCopy?.declare}
+                  title={messages.editAndDeclareLabel}
+                />
+              )
+            }
+          )
+
+          if (confirmed) {
+            events.customActions.editAndDeclare.mutate({
+              eventId: event.id,
+              transactionId: getUUID(),
+              declaration: declarationDiff,
+              annotation,
+              targetActionAnnotation: values
+            })
+
+            closeActionView(backTo)
+          }
+        },
+        disabled:
+          hasValidationErrors ||
+          !anyValuesHaveChanged ||
+          !isTargetActionEnabled(ActionType.DECLARE),
+        hidden: !isActionAllowed(ActionType.DECLARE)
+      },
+      {
+        icon: actionIcons[ActionType.EDIT],
+        label: messages.editAndNotifyLabel,
+        onClick: async () => {
+          const { confirmed, values } = await openModal<EditActionModalResult>(
+            (close) => {
+              return (
+                <EditActionModal
+                  attachmentPath={eventAttachmentPath(event.id)}
+                  close={close}
+                  declaration={declaration}
+                  event={event}
+                  eventConfiguration={eventConfiguration}
+                  fields={getActionFormFields(
+                    eventConfiguration,
+                    ActionType.NOTIFY
+                  )}
+                  supportingCopy={dialogCopy?.notify}
+                  title={messages.editAndNotifyLabel}
+                />
+              )
+            }
+          )
+
+          if (confirmed) {
+            events.customActions.editAndNotify.mutate({
+              eventId: event.id,
+              transactionId: getUUID(),
+              declaration: declarationDiff,
+              annotation,
+              targetActionAnnotation: values
+            })
+
+            closeActionView(backTo)
+          }
+        },
+        disabled:
+          hasValidationErrors ||
+          !anyValuesHaveChanged ||
+          !isTargetActionEnabled(ActionType.NOTIFY),
+        hidden:
+          !isActionAllowed(ActionType.NOTIFY) ||
+          eventIndex.status !== EventStatus.enum.NOTIFIED
+      },
+      {
+        icon: 'ArchiveBox' as const,
+        label: {
+          defaultMessage: 'Cancel edits',
+          description: 'Label for "Cancel edits" in edit action menu',
+          id: 'event.edit.cancelEdits'
+        },
+        onClick: () =>
+          navigate(ROUTES.V2.EVENTS.EVENT.buildPath({ eventId: event.id }))
+      }
+    ].filter((a) => !a.hidden)
+  }
+}
+
+/** Menu component available on the Edit-action review page. */
+export function EditActionMenu({ event }: { event: EventDocument }) {
+  const { actions, modals } = useEditActions(event)
+
+  return <ActionMenuDropdown actions={actions} modals={modals} />
+}

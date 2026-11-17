@@ -9,24 +9,38 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import type { Meta, StoryObj } from '@storybook/react'
+/* eslint-disable max-lines */
+
+import type { Meta, StoryObj } from '@storybook/react-vite'
 import { createTRPCMsw, httpLink } from '@vafanassieff/msw-trpc'
 import superjson from 'superjson'
-import { graphql, HttpResponse } from 'msw'
-import { userEvent, within, expect, waitFor } from '@storybook/test'
+import { userEvent, within, expect, waitFor, screen } from 'storybook/test'
+import { toast } from 'react-hot-toast'
 import {
   ActionType,
   tennisClubMembershipEvent,
   generateEventDocument,
   generateEventDraftDocument,
-  getCurrentEventState
+  getCurrentEventState,
+  generateActionDocument,
+  generateActionDocuments,
+  getUUID,
+  EventDocument,
+  ActionInput,
+  versionedTennisClubMembershipEvent
 } from '@opencrvs/commons/client'
 import { ROUTES, routesConfig } from '@client/v2-events/routes'
 import { useEventFormData } from '@client/v2-events/features/events/useEventFormData'
 import { AppRouter } from '@client/v2-events/trpc'
 import { testDataGenerator } from '@client/tests/test-data-generators'
 import { createDeclarationTrpcMsw } from '@client/tests/v2-events/declaration.utils'
-import { setEventData, addLocalEventConfig } from '../../useEvents/api'
+import { eventConfigWithPrintButton } from '../edit/Review.interaction.stories'
+import {
+  setEventData,
+  addLocalEventConfig,
+  updateLocalEventIndex
+} from '../../useEvents/api'
+import { ActionDocument } from '../../../../../../../commons/build/dist/common/client'
 import { ReviewIndex } from './Review'
 
 const generator = testDataGenerator()
@@ -74,7 +88,8 @@ export default meta
 
 type Story = StoryObj<typeof ReviewIndex>
 
-const mockUser = generator.user.fieldAgent().v2
+const mockUser = generator.user.fieldAgent().summary
+const mockUserFull = generator.user.fieldAgent().v2
 
 export const ReviewForLocalRegistrarCompleteInteraction: Story = {
   beforeEach: () => {
@@ -119,26 +134,27 @@ export const ReviewForLocalRegistrarCompleteInteraction: Story = {
         drafts: declarationTrpcMsw.drafts.handlers,
         events: [
           tRPCMsw.event.search.query((input) => {
+            const declared = {
+              ...declarationTrpcMsw.eventDocument,
+              actions: [
+                ...declarationTrpcMsw.eventDocument.actions,
+                ...generateActionDocuments({
+                  configuration: tennisClubMembershipEvent,
+                  action: ActionType.DECLARE
+                })
+              ]
+            }
+
             return {
               total: 1,
               results: [
-                getCurrentEventState(
-                  declarationTrpcMsw.eventDocument,
-                  tennisClubMembershipEvent
-                )
+                getCurrentEventState(declared, tennisClubMembershipEvent)
               ]
             }
           }),
           ...declarationTrpcMsw.events.handlers
         ],
         user: [
-          graphql.query('fetchUser', () => {
-            return HttpResponse.json({
-              data: {
-                getUser: generator.user.localRegistrar().v1
-              }
-            })
-          }),
           tRPCMsw.user.list.query(([id]) => {
             return [mockUser]
           }),
@@ -154,7 +170,7 @@ export const ReviewForLocalRegistrarCompleteInteraction: Story = {
             }
           }),
           tRPCMsw.user.get.query((id) => {
-            return mockUser
+            return mockUserFull
           })
         ]
       }
@@ -165,20 +181,18 @@ export const ReviewForLocalRegistrarCompleteInteraction: Story = {
       const canvas = within(canvasElement)
 
       await waitFor(async () => {
-        const registerButton = await canvas.findByRole('button', {
-          name: 'Register'
-        })
-
-        await expect(registerButton).toBeEnabled()
-        await userEvent.click(registerButton)
+        await userEvent.click(
+          await canvas.findByRole('button', { name: 'Action' })
+        )
+        await userEvent.click(await canvas.findByText('Register'))
       })
 
-      const modal = within(await canvas.findByRole('dialog'))
+      await canvas.findByRole('button', { name: 'Cancel' })
 
-      await modal.findByText('Register the tennis club membership application?')
-      await modal.findByRole('button', { name: 'Cancel' })
       await userEvent.click(
-        await modal.findByRole('button', { name: 'Register' })
+        await canvas.findByRole('button', {
+          name: 'Register'
+        })
       )
     })
 
@@ -192,7 +206,6 @@ export const ReviewForLocalRegistrarCompleteInteraction: Story = {
           'event.create': false,
           'event.actions.notify.request': false,
           'event.actions.declare.request': true,
-          'event.actions.validate.request': true,
           'event.actions.register.request': true
         })
       })
@@ -218,18 +231,11 @@ const msw = {
       ...declarationTrpcMsw.events.handlers
     ],
     user: [
-      graphql.query('fetchUser', () => {
-        return HttpResponse.json({
-          data: {
-            getUser: generator.user.registrationAgent().v1
-          }
-        })
-      }),
       tRPCMsw.user.list.query(([id]) => {
         return [mockUser]
       }),
       tRPCMsw.user.get.query((id) => {
-        return mockUser
+        return mockUserFull
       })
     ]
   }
@@ -262,24 +268,27 @@ export const ReviewForRegistrationAgentCompleteInteraction: Story = {
     msw
   },
   play: async ({ canvasElement, step }) => {
-    await step('Modal has scope based content', async () => {
-      const canvas = within(canvasElement)
+    const canvas = within(canvasElement)
+
+    await step('User can declare', async () => {
       await userEvent.click(
-        await canvas.findByRole('button', { name: 'Send for approval' })
+        await canvas.findByRole('button', { name: 'Action' })
       )
+      await userEvent.click(await canvas.findByText('Declare'))
 
-      const modal = within(await canvas.findByRole('dialog'))
+      await canvas.findByRole('button', { name: 'Cancel' })
 
-      await modal.findByText('Send for approval?')
-      await modal.findByRole('button', { name: 'Cancel' })
       await userEvent.click(
-        await modal.findByRole('button', { name: 'Confirm' })
+        await canvas.findByRole('button', {
+          name: 'Declare'
+        })
       )
     })
 
     await step('Confirm action triggers scope based actions', async () => {
       const searchResult =
         await within(canvasElement).findByTestId('search-result')
+
       await within(searchResult).findAllByText('All events')
 
       await waitFor(async () => {
@@ -287,10 +296,20 @@ export const ReviewForRegistrationAgentCompleteInteraction: Story = {
           'event.create': false,
           'event.actions.notify.request': false,
           'event.actions.declare.request': true,
-          'event.actions.validate.request': true,
           'event.actions.register.request': false
         })
       })
+
+      await waitFor(
+        async () => {
+          await expect(
+            canvas.queryByText(
+              '111111 is a potential duplicate. Record is ready for review.'
+            )
+          ).toBeNull()
+        },
+        { timeout: 3000 } // We are testing negative, so intentional await to ensure we do not assert too fast.
+      )
     })
   }
 }
@@ -319,19 +338,19 @@ export const ReviewForFieldAgentCompleteInteraction: Story = {
     msw
   },
   play: async ({ canvasElement, step }) => {
-    await step('Modal has scope based content', async () => {
+    await step('User can perform declare action', async () => {
       const canvas = within(canvasElement)
       await userEvent.click(
-        await canvas.findByRole('button', { name: 'Send for review' })
+        await canvas.findByRole('button', { name: 'Action' })
       )
+      await userEvent.click(await canvas.findByText('Declare'))
 
-      const modal = within(await canvas.findByRole('dialog'))
+      await canvas.findByRole('button', { name: 'Cancel' })
 
-      await modal.findByText('Send for review?')
-      await modal.findByText('This declaration will be sent for review')
-      await modal.findByRole('button', { name: 'Cancel' })
       await userEvent.click(
-        await modal.findByRole('button', { name: 'Confirm' })
+        await canvas.findByRole('button', {
+          name: 'Declare'
+        })
       )
     })
 
@@ -345,7 +364,6 @@ export const ReviewForFieldAgentCompleteInteraction: Story = {
           'event.create': false,
           'event.actions.notify.request': false,
           'event.actions.declare.request': true,
-          'event.actions.validate.request': false,
           'event.actions.register.request': false
         })
       })
@@ -359,113 +377,6 @@ const eventDocument = generateEventDocument({
 })
 
 const eventId = eventDocument.id
-
-export const ReviewForFieldAgentIncompleteInteraction: Story = {
-  beforeEach: () => {
-    // For this test, we want to have empty form values in zustand state
-    useEventFormData.setState({ formValues: {} })
-  },
-  loaders: [
-    () => {
-      declarationTrpcMsw.events.reset()
-      declarationTrpcMsw.drafts.reset()
-    },
-    async () => {
-      window.localStorage.setItem('opencrvs', generator.user.token.fieldAgent)
-      //  Intermittent failures starts to happen when global state gets out of whack.
-      // // This is a workaround to ensure that the state is reset when similar tests are run in parallel.
-      await new Promise((resolve) => setTimeout(resolve, 50))
-    }
-  ],
-  parameters: {
-    reactRouter: {
-      router: routesConfig,
-      initialPath: ROUTES.V2.EVENTS.DECLARE.REVIEW.buildPath({
-        eventId
-      })
-    },
-    offline: {
-      /*
-       * Ensure record is "downloaded offline" in the user's browser
-       */
-      events: [eventDocument]
-    },
-    chromatic: { disableSnapshot: true },
-    msw: {
-      handlers: {
-        drafts: [
-          tRPCMsw.event.draft.list.query(() => {
-            return []
-          })
-        ],
-        events: [
-          tRPCMsw.event.search.query((input) => {
-            return {
-              results: [
-                getCurrentEventState(
-                  declarationTrpcMsw.eventDocument,
-                  tennisClubMembershipEvent
-                )
-              ],
-              total: 1
-            }
-          }),
-          ...declarationTrpcMsw.events.handlers
-        ],
-        user: [
-          graphql.query('fetchUser', () => {
-            return HttpResponse.json({
-              data: {
-                getUser: generator.user.fieldAgent().v1
-              }
-            })
-          }),
-          tRPCMsw.user.list.query(([id]) => {
-            return [mockUser]
-          }),
-          tRPCMsw.user.get.query((id) => {
-            return mockUser
-          })
-        ]
-      }
-    }
-  },
-  play: async ({ canvasElement, step }) => {
-    await step('Modal has scope based content', async () => {
-      const canvas = within(canvasElement)
-      await userEvent.click(
-        await canvas.findByRole('button', { name: 'Send for review' })
-      )
-
-      const modal = within(await canvas.findByRole('dialog'))
-
-      await modal.findByText('Send for review?')
-      await modal.findByRole('button', { name: 'Cancel' })
-      await modal.findByText(
-        'This incomplete declaration will be sent for review.'
-      )
-      await userEvent.click(
-        await modal.findByRole('button', { name: 'Confirm' })
-      )
-    })
-
-    await step('Confirm action triggers scope based actions', async () => {
-      const searchResult =
-        await within(canvasElement).findByTestId('search-result')
-      await within(searchResult).findAllByText('All events')
-
-      await waitFor(async () => {
-        await expect(declarationTrpcMsw.events.getSpyCalls()).toMatchObject({
-          'event.create': false,
-          'event.actions.notify.request': true,
-          'event.actions.declare.request': false,
-          'event.actions.validate.request': false,
-          'event.actions.register.request': false
-        })
-      })
-    })
-  }
-}
 
 export const ReviewForIncompleteNameInteraction: Story = {
   name: 'Declaration shows as incomplete when surname is left out',
@@ -500,20 +411,20 @@ export const ReviewForIncompleteNameInteraction: Story = {
         { timeout: 5000 }
       )
       await userEvent.click(changeButton)
-      const modal = within(await canvas.findByRole('dialog'))
-
-      const confirmEditButton = await modal.findByRole('button', {
-        name: 'Continue'
-      })
-
-      await userEvent.click(confirmEditButton)
 
       const surnameInput = await canvas.findByTestId('text__surname')
       await userEvent.clear(surnameInput)
 
       const goToReviewButton = await canvas.findByText('Go to review')
       await userEvent.click(goToReviewButton)
-      await canvas.findByText('Declaration incomplete')
+
+      await userEvent.click(
+        await canvas.findByRole('button', { name: 'Action' })
+      )
+
+      await expect(
+        canvas.getByText('Declare', { selector: 'li[disabled]' })
+      ).toBeInTheDocument()
     })
   }
 }
@@ -523,8 +434,9 @@ export const ChangeFieldInReview: Story = {
     /*
      * Ensure record is "downloaded offline" in the user's browser
      */
-    addLocalEventConfig(tennisClubMembershipEvent)
+    addLocalEventConfig(versionedTennisClubMembershipEvent)
     setEventData(createdEventDocument.id, createdEventDocument)
+    updateLocalEventIndex(createdEventDocument.id, createdEventDocument)
   },
   parameters: {
     reactRouter: {
@@ -548,7 +460,7 @@ export const ChangeFieldInReview: Story = {
         ],
         events: [
           tRPCMsw.event.config.get.query(() => {
-            return [tennisClubMembershipEvent]
+            return [versionedTennisClubMembershipEvent]
           }),
           tRPCMsw.event.get.query(() => {
             return eventDocument
@@ -565,9 +477,6 @@ export const ChangeFieldInReview: Story = {
       )
 
       await userEvent.click(surnameChangeButton)
-
-      const continueButton = await canvas.findByText('Continue')
-      await userEvent.click(continueButton)
     })
 
     await step('Change input field value', async () => {
@@ -585,5 +494,282 @@ export const ChangeFieldInReview: Story = {
         await expect(canvas.getByText('John Nileem-Rowa')).toBeInTheDocument()
       })
     })
+  }
+}
+
+export const MobileReviewShowsActionMenuAndExitsUndeclaredDraft: Story = {
+  name: 'Mobile: action menu visible and X-button exits undeclared draft',
+  loaders: [
+    () => {
+      declarationTrpcMsw.events.reset()
+      declarationTrpcMsw.drafts.reset()
+    },
+    async () => {
+      window.localStorage.setItem('opencrvs', generator.user.token.fieldAgent)
+      await new Promise((resolve) => setTimeout(resolve, 50))
+    }
+  ],
+  parameters: {
+    reactRouter: {
+      router: routesConfig,
+      initialPath: ROUTES.V2.EVENTS.DECLARE.REVIEW.buildPath({
+        eventId: createdEventDocument.id
+      })
+    },
+    chromatic: { disableSnapshot: true },
+    msw
+  },
+
+  play: async ({ canvasElement, step }) => {
+    const canvas = within(canvasElement)
+
+    await step('Action menu is rendered in mobile AppBar', async () => {
+      await expect(
+        await canvas.findByRole('button', { name: 'Action' })
+      ).toBeInTheDocument()
+    })
+
+    await step(
+      'Mobile X-button opens exit-without-saving modal for undeclared draft',
+      async () => {
+        const exitButton = await canvas.findByTestId('exit-button')
+        await userEvent.click(exitButton)
+
+        await expect(
+          await canvas.findByText('Exit without saving changes?')
+        ).toBeInTheDocument()
+      }
+    )
+  },
+  globals: { viewport: { value: 'mobile' } }
+}
+
+let currentDocument: EventDocument = eventDocument
+
+export const ShowToastOnDuplicateDetectedOnDeclare: Story = {
+  beforeEach: () => {
+    // Clear any toast left over from a previous story so this test only
+    // asserts on toasts raised by its own play function.
+    toast.remove()
+    /*
+     * Ensure record is "downloaded offline" in the user's browser
+     */
+    currentDocument = eventDocument
+    addLocalEventConfig(versionedTennisClubMembershipEvent)
+    setEventData(currentDocument.id, currentDocument)
+    updateLocalEventIndex(currentDocument.id, currentDocument)
+  },
+  parameters: {
+    reactRouter: {
+      router: routesConfig,
+      initialPath: ROUTES.V2.EVENTS.DECLARE.REVIEW.buildPath({
+        eventId: currentDocument.id
+      })
+    },
+    chromatic: { disableSnapshot: true },
+    msw: {
+      handlers: {
+        drafts: [
+          tRPCMsw.event.draft.list.query(() => {
+            return [
+              generateEventDraftDocument({
+                eventId,
+                actionType: ActionType.DECLARE
+              })
+            ]
+          })
+        ],
+        events: [
+          tRPCMsw.event.config.get.query(() => {
+            return [versionedTennisClubMembershipEvent]
+          }),
+          tRPCMsw.event.get.query(() => {
+            return currentDocument
+          }),
+          tRPCMsw.event.actions.declare.request.mutation((action) => {
+            currentDocument = {
+              ...currentDocument,
+              actions: [
+                ...currentDocument.actions,
+                ...generateActionDocuments({
+                  configuration: tennisClubMembershipEvent,
+                  declarationOverrides: {
+                    ...(ActionInput.safeParse(action).data?.declaration ?? {})
+                  },
+                  action: ActionType.DECLARE
+                }),
+                generateActionDocument({
+                  configuration: tennisClubMembershipEvent,
+                  action: ActionType.DUPLICATE_DETECTED,
+                  defaults: {
+                    content: {
+                      duplicates: [{ id: getUUID(), trackingId: '0R1G1NAL' }]
+                    }
+                  }
+                })
+              ] as ActionDocument[]
+            }
+
+            return currentDocument
+          }),
+          tRPCMsw.event.search.query(() => {
+            return {
+              results: [
+                getCurrentEventState(currentDocument, tennisClubMembershipEvent)
+              ],
+              total: 1
+            }
+          })
+        ]
+      }
+    }
+  },
+  play: async ({ canvasElement, step }) => {
+    const canvas = within(canvasElement)
+
+    await step('Declare duplicate', async () => {
+      await userEvent.click(
+        await canvas.findByRole('button', { name: 'Action' })
+      )
+      await userEvent.click(await canvas.findByText('Declare'))
+      await userEvent.click(
+        await canvas.findByRole('button', { name: 'Declare' })
+      )
+    })
+
+    await step('Toast is shown with duplicate detected message', async () => {
+      // The toast renders via the global Toaster, which may live outside the
+      // story canvas (e.g. after the register flow navigates), so query the
+      // whole document rather than the canvas.
+      await screen.findByText(
+        '111111 is a potential duplicate. Record is ready for review.',
+        undefined,
+        { timeout: 10000 }
+      )
+    })
+  }
+}
+
+export const ShowToastOnDuplicateDetectedOnRegister: Story = {
+  beforeEach: () => {
+    // Clear any toast left over from a previous story so this test only
+    // asserts on toasts raised by its own play function.
+    toast.remove()
+    /*
+     * Ensure record is "downloaded offline" in the user's browser
+     */
+    addLocalEventConfig(versionedTennisClubMembershipEvent)
+    setEventData(createdEventDocument.id, createdEventDocument)
+    updateLocalEventIndex(createdEventDocument.id, createdEventDocument)
+  },
+  parameters: {
+    reactRouter: {
+      router: routesConfig,
+      initialPath: ROUTES.V2.EVENTS.DECLARE.REVIEW.buildPath({
+        eventId: createdEventDocument.id
+      })
+    },
+    chromatic: { disableSnapshot: true },
+    msw: {
+      handlers: {
+        drafts: [
+          tRPCMsw.event.draft.list.query(() => {
+            return [
+              generateEventDraftDocument({
+                eventId,
+                actionType: ActionType.DECLARE
+              })
+            ]
+          })
+        ],
+        events: [
+          tRPCMsw.event.config.get.query(() => {
+            return [versionedTennisClubMembershipEvent]
+          }),
+          tRPCMsw.event.get.query(() => {
+            return eventDocument
+          }),
+          tRPCMsw.event.actions.declare.request.mutation(() => {
+            return {
+              ...eventDocument,
+              actions: [
+                ...eventDocument.actions,
+                ...generateActionDocuments({
+                  configuration: tennisClubMembershipEvent,
+                  action: ActionType.DECLARE
+                }),
+                generateActionDocument({
+                  configuration: tennisClubMembershipEvent,
+                  action: ActionType.DUPLICATE_DETECTED,
+                  defaults: {
+                    content: {
+                      duplicates: [{ id: getUUID(), trackingId: '0R1G1NAL' }]
+                    }
+                  }
+                })
+              ] as ActionDocument[]
+            }
+          })
+        ]
+      }
+    }
+  },
+  play: async ({ canvasElement, step }) => {
+    const canvas = within(canvasElement)
+
+    await step('Declare duplicate', async () => {
+      await userEvent.click(
+        await canvas.findByRole('button', { name: 'Action' })
+      )
+      await userEvent.click(await canvas.findByText('Register'))
+      await userEvent.click(
+        await canvas.findByRole('button', { name: 'Register' })
+      )
+    })
+
+    await step('Toast is shown with duplicate detected message', async () => {
+      // The toast renders via the global Toaster, which may live outside the
+      // story canvas (e.g. after the register flow navigates), so query the
+      // whole document rather than the canvas.
+      await screen.findByText(
+        '111111 is a potential duplicate. Record is ready for review.',
+        undefined,
+        { timeout: 10000 }
+      )
+    })
+  }
+}
+
+export const AlphaPrintButtonShownWhenDeclaringFromScratch: Story = {
+  parameters: {
+    reactRouter: {
+      router: routesConfig,
+      initialPath: ROUTES.V2.EVENTS.DECLARE.REVIEW.buildPath({
+        eventId: createdEventDocument.id
+      })
+    },
+    chromatic: { disableSnapshot: true },
+    test: {
+      dangerouslyIgnoreUnhandledErrors: true
+    },
+    offline: {
+      events: [createdEventDocument],
+      configs: [eventConfigWithPrintButton]
+    },
+    msw: {
+      handlers: {
+        drafts: declarationTrpcMsw.drafts.handlers,
+        events: declarationTrpcMsw.events.handlers
+      }
+    }
+  },
+  play: async ({ canvasElement, step }) => {
+    await step(
+      'Print button is visible when a registrar creates a declaration from scratch',
+      async () => {
+        const canvas = within(canvasElement)
+        await canvas.findByText('Print')
+      }
+    )
   }
 }

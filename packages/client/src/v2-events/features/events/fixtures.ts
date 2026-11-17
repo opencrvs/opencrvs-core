@@ -9,25 +9,38 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
+import { http, HttpResponse } from 'msw'
 import {
   Action,
   ActionDocument,
   ActionStatus,
   ActionType,
+  DocumentPath,
   EventDocument,
   EventIndex,
   EventStatus,
   TENNIS_CLUB_MEMBERSHIP,
   UUID,
-  getUUID
+  getUUID,
+  INITIAL_EVENT_CONFIG_VERSION_ID
 } from '@opencrvs/commons/client'
 import { testDataGenerator } from '@client/tests/test-data-generators'
+import { CACHE_NAME } from '@client/v2-events/cache'
 
 const localRegistrarId = testDataGenerator().user.id.localRegistrar
+
+/*
+ * The record a story's uploads belong to. A story renders a form outside any
+ * real record, but a file field still has to name the prefix it writes to.
+ */
+export const storybookEventId = UUID.parse(
+  '9e1d2f48-3b4a-4c5d-8e6f-7a8b9c0d1e2f'
+)
 
 export const tennisClubMembershipEventIndex: EventIndex = {
   id: getUUID(),
   type: TENNIS_CLUB_MEMBERSHIP,
+  configVersionId: INITIAL_EVENT_CONFIG_VERSION_ID,
   trackingId: 'TEST12',
   status: EventStatus.enum.CREATED,
   createdAt: '2023-03-01T00:00:00.000Z',
@@ -51,10 +64,19 @@ export const tennisClubMembershipEventIndex: EventIndex = {
   }
 }
 
+/**
+ * @deprecated
+ *
+ * Prefer test data generators instead of static fixtures.
+ * @see packages/client/src/tests/test-data-generators.ts
+ * @see packages/commons/src/events/test.utils.ts
+ *
+ */
 export const tennisClubMembershipEventDocument: EventDocument = {
   type: TENNIS_CLUB_MEMBERSHIP,
   id: 'c5d9d901-00bf-4631-89dc-89ca5060cb52' as UUID,
   trackingId: 'TEST12',
+  configVersionId: INITIAL_EVENT_CONFIG_VERSION_ID,
   createdAt: '2025-01-23T05:30:02.615Z',
   updatedAt: '2025-01-23T05:35:27.689Z',
   actions: [
@@ -66,7 +88,7 @@ export const tennisClubMembershipEventDocument: EventDocument = {
       createdByUserType: 'user',
       createdBy: localRegistrarId,
       createdByRole: 'LOCAL_REGISTRAR',
-      createdAtLocation: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c' as UUID,
+      createdAtLocation: '028d2c85-ca31-426d-b5d1-2cef545a4902' as UUID,
       declaration: {},
       transactionId: 'a0f1b2c3-d4e5-6f7g-8h9i-j0k1l2m3n4o5'
     },
@@ -96,30 +118,8 @@ export const tennisClubMembershipEventDocument: EventDocument = {
       createdByUserType: 'user',
       createdByRole: 'LOCAL_REGISTRAR',
       createdAt: '2025-01-23T05:30:08.847Z',
-      createdAtLocation: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c' as UUID,
+      createdAtLocation: '028d2c85-ca31-426d-b5d1-2cef545a4902' as UUID,
       transactionId: 'aasdk342-asdkj3423-kn234k23'
-    },
-    {
-      id: '9e048856-8c4d-4f85-8b7f-5f13885d2374' as UUID,
-      status: ActionStatus.Accepted,
-      declaration: {
-        'applicant.name': {
-          firstname: 'Riku',
-          surname: 'Rouvila'
-        },
-        'applicant.dob': '2025-01-23',
-        'recommender.name': {
-          firstname: 'Euan',
-          surname: 'Millar'
-        }
-      },
-      type: 'VALIDATE',
-      createdBy: localRegistrarId,
-      createdByRole: 'LOCAL_REGISTRAR',
-      createdByUserType: 'user',
-      createdAt: '2025-01-23T05:35:27.689Z',
-      createdAtLocation: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c' as UUID,
-      transactionId: 'aasdk342-asdkj3423-kn234k24'
     },
     {
       id: '9e048856-8c4d-4f85-8b7f-5f13885d2374' as UUID,
@@ -140,7 +140,8 @@ export const tennisClubMembershipEventDocument: EventDocument = {
       createdByRole: 'LOCAL_REGISTRAR',
       createdAt: '2025-01-23T05:35:27.689Z',
       createdByUserType: 'user',
-      createdAtLocation: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c' as UUID,
+      createdAtLocation: '028d2c85-ca31-426d-b5d1-2cef545a4902' as UUID,
+      createdBySignature: `${localRegistrarId}/signature.png` as DocumentPath,
       registrationNumber: 'TEST12121212',
       transactionId: 'aasdk342-asdkj3423-kn234k25'
     },
@@ -153,7 +154,8 @@ export const tennisClubMembershipEventDocument: EventDocument = {
       createdByRole: 'LOCAL_REGISTRAR',
       createdByUserType: 'user',
       createdAt: '2025-01-23T05:35:27.689Z',
-      createdAtLocation: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c' as UUID,
+      createdAtLocation: '028d2c85-ca31-426d-b5d1-2cef545a4902' as UUID,
+      createdBySignature: `${localRegistrarId}/signature.png` as DocumentPath,
       assignedTo: testDataGenerator().user.id.localRegistrar,
       transactionId: 'aasdk342-asdkj3423-kn234k26'
     }
@@ -179,7 +181,7 @@ const correctionRequestAction: Action = {
   createdByRole: 'some-user-role',
   createdByUserType: 'user' as const,
   createdAt: '2025-01-23T05:35:27.689Z',
-  createdAtLocation: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c' as UUID,
+  createdAtLocation: '028d2c85-ca31-426d-b5d1-2cef545a4902' as UUID,
   transactionId: 'aasdk342-asdkj3423-kn234k26'
 }
 
@@ -190,6 +192,107 @@ export const tennisClubMembershipEventWithCorrectionRequest: EventDocument = {
     ...tennisClubMembershipEventDocument.actions,
     correctionRequestAction
   ]
+}
+
+const archiveAction: ActionDocument = {
+  id: '3f1b2c3d-4e5f-4a1b-8c9d-0e1f2a3b4c5d' as UUID,
+  status: ActionStatus.Accepted,
+  declaration: {},
+  type: ActionType.ARCHIVE,
+  createdBy: localRegistrarId,
+  createdByRole: 'LOCAL_REGISTRAR',
+  createdByUserType: 'user',
+  createdAt: '2025-01-24T05:35:27.689Z',
+  createdAtLocation: '028d2c85-ca31-426d-b5d1-2cef545a4902' as UUID,
+  transactionId: 'aasdk342-asdkj3423-kn234k27'
+}
+
+const unarchiveAction: ActionDocument = {
+  id: '4a2c3d4e-5f6a-4b1c-9d0e-1f2a3b4c5d6e' as UUID,
+  status: ActionStatus.Accepted,
+  declaration: {},
+  type: ActionType.UNARCHIVE,
+  createdBy: localRegistrarId,
+  createdByRole: 'LOCAL_REGISTRAR',
+  createdByUserType: 'user',
+  createdAt: '2025-01-25T05:35:27.689Z',
+  createdAtLocation: '028d2c85-ca31-426d-b5d1-2cef545a4902' as UUID,
+  transactionId: 'aasdk342-asdkj3423-kn234k28'
+}
+
+export const tennisClubMembershipEventWithArchiveAndUnarchive: EventDocument = {
+  ...tennisClubMembershipEventDocument,
+  id: 'a3b4c5d6-00bf-4631-89dc-89ca506c5d9d' as UUID,
+  actions: [
+    ...tennisClubMembershipEventDocument.actions,
+    archiveAction,
+    unarchiveAction
+  ]
+}
+
+const revokeRegistrationAction: ActionDocument = {
+  id: '5b3d4e5f-6a7b-4c2d-8e1f-2a3b4c5d6e7f' as UUID,
+  status: ActionStatus.Accepted,
+  declaration: {},
+  type: ActionType.REVOKE_REGISTRATION,
+  createdBy: localRegistrarId,
+  createdByRole: 'LOCAL_REGISTRAR',
+  createdByUserType: 'user',
+  createdAt: '2025-01-26T05:35:27.689Z',
+  createdAtLocation: '028d2c85-ca31-426d-b5d1-2cef545a4902' as UUID,
+  transactionId: 'aasdk342-asdkj3423-kn234k29'
+}
+
+const reinstateRegistrationAction: ActionDocument = {
+  id: '6c4e5f6a-7b8c-4d3e-9f2a-3b4c5d6e7f8a' as UUID,
+  status: ActionStatus.Accepted,
+  declaration: {},
+  type: ActionType.REINSTATE_REGISTRATION,
+  createdBy: localRegistrarId,
+  createdByRole: 'LOCAL_REGISTRAR',
+  createdByUserType: 'user',
+  createdAt: '2025-01-27T05:35:27.689Z',
+  createdAtLocation: '028d2c85-ca31-426d-b5d1-2cef545a4902' as UUID,
+  transactionId: 'aasdk342-asdkj3423-kn234k30'
+}
+
+export const tennisClubMembershipEventWithRevokeAndReinstate: EventDocument = {
+  ...tennisClubMembershipEventDocument,
+  id: 'b4c5d6e7-00bf-4631-89dc-89ca506c5d9e' as UUID,
+  actions: [
+    ...tennisClubMembershipEventDocument.actions,
+    revokeRegistrationAction,
+    reinstateRegistrationAction
+  ]
+}
+
+const eventWithPrintCertificateId = 'c5d6e7f8-00bf-4631-89dc-89ca506c5d9f' as UUID
+
+const printCertificateAction: ActionDocument = {
+  id: '7d5f6a7b-8c9d-4e4f-8a3b-4c5d6e7f8a9b' as UUID,
+  status: ActionStatus.Accepted,
+  declaration: {},
+  annotation: {
+    'collector.requesterId': 'OTHER',
+    'collector.OTHER.signedAffidavit': {
+      path: `events/${eventWithPrintCertificateId}/affidavit.png` as DocumentPath,
+      originalFilename: 'affidavit.png',
+      type: 'image/png'
+    }
+  },
+  type: ActionType.PRINT_CERTIFICATE,
+  createdBy: localRegistrarId,
+  createdByRole: 'LOCAL_REGISTRAR',
+  createdByUserType: 'user',
+  createdAt: '2025-01-28T05:35:27.689Z',
+  createdAtLocation: '028d2c85-ca31-426d-b5d1-2cef545a4902' as UUID,
+  transactionId: 'aasdk342-asdkj3423-kn234k31'
+}
+
+export const tennisClubMembershipEventWithPrintCertificate: EventDocument = {
+  ...tennisClubMembershipEventDocument,
+  id: eventWithPrintCertificateId,
+  actions: [...tennisClubMembershipEventDocument.actions, printCertificateAction]
 }
 
 export const TestImage = {
@@ -223,3 +326,37 @@ export const TestImage = {
           <circle cx="30" cy="30" r="20" fill="#FFD700" />
           </svg>`
 } as const
+
+/** Minimal valid PDF pdf.js can actually parse and render a page from. */
+export const TestPdf = `%PDF-1.0
+1 0 obj<</Type/Catalog/Pages 2 0 R>>endobj
+2 0 obj<</Type/Pages/Kids[3 0 R]/Count 1>>endobj
+3 0 obj<</Type/Page/MediaBox[0 0 200 50]/Parent 2 0 R/Resources<</Font<</F1<</Type/Font/Subtype/Type1/BaseFont/Helvetica>>>>>>/Contents 4 0 R>>endobj
+4 0 obj<</Length 44>>
+stream
+BT /F1 12 Tf 10 20 Td (pdf loaded) Tj ET
+endstream
+endobj
+xref
+0 5
+0000000000 65535 f
+0000000009 00000 n
+0000000058 00000 n
+0000000115 00000 n
+0000000266 00000 n
+trailer<</Size 5/Root 1 0 R>>
+startxref
+360
+%%EOF`
+
+// Storybook has no real service worker, so file requests would otherwise
+// just fail. This stands in for it: serve the file from Cache Storage if
+// it's there, otherwise 404 — mirroring what the real app would do.
+export const passiveFileRoute = http.get(
+  '/events/:eventId/:filename',
+  async ({ request }) => {
+    const cache = await caches.open(CACHE_NAME)
+    const cached = await cache.match(request)
+    return cached ?? new HttpResponse(null, { status: 404 })
+  }
+)

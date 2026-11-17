@@ -11,10 +11,7 @@
 import * as React from 'react'
 import styled from 'styled-components'
 import { FieldValue, FileFieldValue } from '@opencrvs/commons/client'
-import { Button } from '@opencrvs/components/lib/Button/Button'
-import { Icon } from '@opencrvs/components/lib/Icon/Icon'
-import { Link } from '@opencrvs/components/lib/Link/Link'
-import { ISelectOption } from '@opencrvs/components/lib/Select'
+import { Button, Icon, Link, ISelectOption } from '@opencrvs/components'
 
 const Wrapper = styled.div`
   max-width: 100%;
@@ -32,9 +29,7 @@ const Label = styled.div`
   align-items: center;
   justify-content: flex-start;
   gap: 8px;
-  text-overflow: ellipsis;
-  overflow: hidden;
-  white-space: nowrap;
+  overflow-wrap: anywhere;
   svg {
     flex-shrink: 0;
   }

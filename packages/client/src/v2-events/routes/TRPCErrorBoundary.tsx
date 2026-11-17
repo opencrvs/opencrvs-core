@@ -14,9 +14,7 @@ import styled from 'styled-components'
 import { TRPCClientError } from '@trpc/client'
 import { connect } from 'react-redux'
 import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
-import { PageWrapper } from '@opencrvs/components/lib/PageWrapper'
-import { TertiaryButton } from '@opencrvs/components/lib/buttons'
-import { Box } from '@opencrvs/components/lib/Box'
+import { Button, Box, PageWrapper } from '@opencrvs/components'
 import { errorMessages, buttonMessages } from '@client/i18n/messages'
 import { redirectToAuthentication } from '@client/profile/profileActions'
 
@@ -40,20 +38,96 @@ const ErrorMessage = styled.div`
   text-align: center;
 `
 
+const NoticeContainer = styled.div`
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 48px 64px;
+  gap: 12px;
+  width: 442px;
+  min-width: 320px;
+  height: 246px;
+  background: ${({ theme }) => theme.colors.white};
+  border: 1px solid ${({ theme }) => theme.colors.grey300};
+  box-shadow:
+    0px 4px 8px -2px rgba(0, 0, 0, 0.1),
+    0px 1px 2px rgba(0, 0, 0, 0.06);
+  border-radius: 8px;
+  margin-top: -80px;
+`
+
+const NoticeTextGroup = styled.div`
+  width: 314px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+`
+
+const NoticeTitle = styled.h1`
+  ${({ theme }) => theme.fonts.h4};
+  text-align: center;
+  color: ${({ theme }) => theme.colors.copy};
+`
+
+const NoticeMessage = styled.div`
+  ${({ theme }) => theme.fonts.reg16};
+  text-align: center;
+  color: ${({ theme }) => theme.colors.supportingCopy};
+`
+
+const NoticeButton = styled(Button)`
+  padding: 12px 16px;
+`
+
 const StructuredError = z.object({
   message: z.string(),
   redirection: z.object({
     label: z.string(),
     path: z.string()
-  })
+  }),
+  title: z.string().optional(),
+  variant: z.enum(['notice']).optional()
 })
 
 export const throwStructuredError = ({
   message,
-  redirection
+  redirection,
+  title,
+  variant
 }: z.infer<typeof StructuredError>) => {
-  const error = JSON.stringify({ message, redirection })
+  const error = JSON.stringify({ message, redirection, title, variant })
   throw new Error(error)
+}
+
+async function clearIndexedDB(dbName: string): Promise<void> {
+  return new Promise((resolve, reject) => {
+    const openReq: IDBOpenDBRequest = indexedDB.open(dbName)
+
+    openReq.onsuccess = () => {
+      const db: IDBDatabase = openReq.result
+      db.close()
+
+      const deleteReq: IDBOpenDBRequest = indexedDB.deleteDatabase(dbName)
+      deleteReq.onsuccess = () => resolve()
+      deleteReq.onerror = () => reject(deleteReq.error)
+      deleteReq.onblocked = () =>
+        reject(
+          new Error(
+            `Deletion of application data is blocked. Please close all other tabs of this application and try again.`
+          )
+        )
+    }
+
+    openReq.onerror = () => reject(openReq.error)
+  })
+}
+async function clearAllIndexedDB() {
+  const databases = await indexedDB.databases()
+  return Promise.all(
+    databases.map(async (db) => db.name && clearIndexedDB(db.name))
+  )
 }
 
 function decodeStructuredError(
@@ -61,9 +135,9 @@ function decodeStructuredError(
 ): z.infer<typeof StructuredError> | string {
   try {
     const parsed = JSON.parse(message)
-    const result = StructuredError.safeParse(parsed)
-    if (result.success) {
-      return result.data
+
+    if (StructuredError.validate(parsed)) {
+      return parsed
     }
     return message
   } catch {
@@ -78,12 +152,13 @@ interface Props extends IntlShapeProps {
 
 interface State {
   error: Error | null
+  titleClickedTimes: number
 }
 
 class ErrorBoundary extends Component<Props, State> {
   constructor(props: Props) {
     super(props)
-    this.state = { error: null }
+    this.state = { error: null, titleClickedTimes: 0 }
   }
 
   static getDerivedStateFromError(error: Error) {
@@ -94,7 +169,31 @@ class ErrorBoundary extends Component<Props, State> {
     // eslint-disable-next-line no-console
     console.error('TRPC Error Caught:', error)
   }
+  onTitleClick = () => {
+    if (this.state.titleClickedTimes >= 5) {
+      if (
+        !confirm(
+          'Do you want to clear locally stored data and reload the page?'
+        )
+      ) {
+        return
+      }
 
+      clearAllIndexedDB().catch((err) => {
+        // eslint-disable-next-line no-console
+        console.error('Failed to clear IndexedDB:', err)
+        alert(
+          'Failed to clear locally stored data. Please try clearing site data from your browser settings manually.'
+        )
+        return
+      })
+      alert('Data stored locally cleared. The page will now reload.')
+      window.location.reload()
+    }
+    this.setState((prevState) => ({
+      titleClickedTimes: prevState.titleClickedTimes + 1
+    }))
+  }
   render() {
     // eslint-disable-next-line no-shadow
     const { intl, redirectToAuthentication } = this.props
@@ -104,6 +203,8 @@ class ErrorBoundary extends Component<Props, State> {
       let message = error.message
       let buttonLabel = intl.formatMessage(buttonMessages.goToHomepage)
       let buttonPath = '/'
+      let title: string | undefined
+      let variant: 'notice' | undefined
 
       if (error instanceof TRPCClientError) {
         if (
@@ -125,6 +226,8 @@ class ErrorBoundary extends Component<Props, State> {
         message = structuredMessage.message
         buttonLabel = structuredMessage.redirection.label
         buttonPath = structuredMessage.redirection.path
+        title = structuredMessage.title
+        variant = structuredMessage.variant
       } else {
         message = structuredMessage
       }
@@ -133,39 +236,69 @@ class ErrorBoundary extends Component<Props, State> {
        * TODO: Improve the error message design once the probable errors are defined
        * and the design/ux is ready.
        */
+      let content
+      if (httpCode === 401) {
+        content = (
+          <>
+            <ErrorTitle>
+              {intl.formatMessage(errorMessages.errorTitleUnauthorized)}
+            </ErrorTitle>
+            <ErrorMessage>
+              {intl.formatMessage(errorMessages.errorCodeUnauthorized)}
+            </ErrorMessage>
+            <Button
+              id="GoToLoginPage"
+              size="large"
+              type="tertiary"
+              onClick={() => redirectToAuthentication(true)}
+            >
+              {intl.formatMessage(buttonMessages.login)}
+            </Button>
+          </>
+        )
+      } else if (variant === 'notice') {
+        content = (
+          <>
+            <NoticeTextGroup>
+              <NoticeTitle>{title}</NoticeTitle>
+              <NoticeMessage>{message}</NoticeMessage>
+            </NoticeTextGroup>
+            <NoticeButton
+              id="BackToLogin"
+              size="medium"
+              type="tertiary"
+              onClick={() => (window.location.href = buttonPath)}
+            >
+              {buttonLabel}
+            </NoticeButton>
+          </>
+        )
+      } else {
+        content = (
+          <>
+            <ErrorTitle onClick={this.onTitleClick}>
+              {intl.formatMessage(errorMessages.errorTitle)}
+            </ErrorTitle>
+            <ErrorMessage>{message}</ErrorMessage>
+            <Button
+              id="GoToHomepage"
+              size="large"
+              type="tertiary"
+              onClick={() => (window.location.href = buttonPath)}
+            >
+              {buttonLabel}
+            </Button>
+          </>
+        )
+      }
+
       return (
         <PageWrapper>
-          <ErrorContainer>
-            {httpCode === 401 ? (
-              <>
-                <ErrorTitle>
-                  {intl.formatMessage(errorMessages.errorTitleUnauthorized)}
-                </ErrorTitle>
-                <ErrorMessage>
-                  {intl.formatMessage(errorMessages.errorCodeUnauthorized)}
-                </ErrorMessage>
-                <TertiaryButton
-                  id="GoToLoginPage"
-                  onClick={() => redirectToAuthentication(true)}
-                >
-                  {intl.formatMessage(buttonMessages.login)}
-                </TertiaryButton>
-              </>
-            ) : (
-              <>
-                <ErrorTitle>
-                  {intl.formatMessage(errorMessages.errorTitle)}
-                </ErrorTitle>
-                <ErrorMessage>{message}</ErrorMessage>
-                <TertiaryButton
-                  id="GoToHomepage"
-                  onClick={() => (window.location.href = buttonPath)}
-                >
-                  {buttonLabel}
-                </TertiaryButton>
-              </>
-            )}
-          </ErrorContainer>
+          {variant === 'notice' ? (
+            <NoticeContainer>{content}</NoticeContainer>
+          ) : (
+            <ErrorContainer>{content}</ErrorContainer>
+          )}
         </PageWrapper>
       )
     }

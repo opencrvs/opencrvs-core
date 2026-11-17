@@ -8,6 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
+import { resolveEventConfig } from '../events/EventConfig'
 import { defineConfig } from '../events/defineConfig'
 import { ActionType } from '../events/ActionType'
 import { PageTypes } from '../events/PageConfig'
@@ -23,7 +24,7 @@ import {
 /**
  * @knipignore
  */
-export const footballClubMembershipEvent = defineConfig({
+export const versionedFootballClubMembershipEvent = defineConfig({
   id: 'FOOTBALL_CLUB_MEMBERSHIP',
   label: {
     defaultMessage: 'Football club membership application',
@@ -89,24 +90,13 @@ export const footballClubMembershipEvent = defineConfig({
       review: TENNIS_CLUB_DECLARATION_REVIEW
     },
     {
-      type: ActionType.VALIDATE,
-      label: {
-        defaultMessage: 'Validate',
-        description:
-          'This is shown as the action name anywhere the user can trigger the action from',
-        id: 'event.football-club-membership.action.validate.label'
-      },
-      review: TENNIS_CLUB_DECLARATION_REVIEW
-    },
-    {
       type: ActionType.REGISTER,
       label: {
         defaultMessage: 'Register',
         description:
           'This is shown as the action name anywhere the user can trigger the action from',
         id: 'event.football-club-membership.action.register.label'
-      },
-      review: TENNIS_CLUB_DECLARATION_REVIEW
+      }
     },
     {
       type: ActionType.REQUEST_CORRECTION,
@@ -325,15 +315,6 @@ export const footballClubMembershipEvent = defineConfig({
       }
     },
     {
-      type: ActionType.APPROVE_CORRECTION,
-      label: {
-        defaultMessage: 'Approve correction',
-        description:
-          'This is shown as the action name anywhere the user can trigger the action from',
-        id: 'event.football-club-membership.action.correction.approve.label'
-      }
-    },
-    {
       type: ActionType.PRINT_CERTIFICATE,
       label: {
         id: 'event.football-club-membership.action.collect-certificate.label',
@@ -342,24 +323,6 @@ export const footballClubMembershipEvent = defineConfig({
           'This is shown as the action name anywhere the user can trigger the action from'
       },
       printForm: PRINT_CERTIFICATE_FORM
-    },
-    {
-      type: ActionType.ARCHIVE,
-      label: {
-        id: 'event.football-club-membership.action.archive.label',
-        defaultMessage: 'Archive',
-        description:
-          'This is shown as the action name anywhere the user can trigger the action from'
-      }
-    },
-    {
-      type: ActionType.REJECT,
-      label: {
-        id: 'event.football-club-membership.action.reject.label',
-        defaultMessage: 'Reject',
-        description:
-          'This is shown as the action name anywhere the user can trigger the action from'
-      }
     }
   ],
   advancedSearch: [
@@ -399,3 +362,8 @@ export const footballClubMembershipEvent = defineConfig({
   ],
   declaration: TENNIS_CLUB_DECLARATION_FORM
 })
+
+/** The configuration of the first version of `versionedFootballClubMembershipEvent`. */
+export const footballClubMembershipEvent = resolveEventConfig(
+  versionedFootballClubMembershipEvent
+)

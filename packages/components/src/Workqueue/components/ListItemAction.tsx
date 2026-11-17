@@ -10,11 +10,9 @@
  */
 import * as React from 'react'
 import styled from 'styled-components'
-import { ExpansionButton } from '../../buttons/ExpansionButton'
-import { ArrowExpansionButton } from '../../buttons/ArrowExpansionButton'
+import { ExpansionButton, ArrowExpansionButton } from '../../buttons'
 import { Button } from '../../Button'
-import { ColumnContentAlignment, IAction } from '../../common-types'
-import { IActionComponent } from '..'
+import { ColumnContentAlignment, IAction, IActionComponent } from '../types'
 const Container = styled.div`
   background: ${({ theme }) => theme.colors.white};
   display: flex;
@@ -85,6 +83,13 @@ function isActionComponent(action: IAction): action is IActionComponent {
   return (action as IActionComponent).actionComponent !== undefined
 }
 
+function getActionComponent(action: IActionComponent): React.ReactElement {
+  if (typeof action.actionComponent === 'function') {
+    return action.actionComponent()
+  }
+  return action.actionComponent
+}
+
 export function ListItemAction(props: IListItemActionProps) {
   const {
     actions,
@@ -103,7 +108,7 @@ export function ListItemAction(props: IListItemActionProps) {
             isActionComponent(action) ? (
               <ActionButtonContainer key={`ActionButtonContainer-${index}`}>
                 <ActionButton>
-                  {React.cloneElement(action.actionComponent, { id })}
+                  {React.cloneElement(getActionComponent(action), { id })}
                 </ActionButton>
               </ActionButtonContainer>
             ) : (
@@ -117,7 +122,7 @@ export function ListItemAction(props: IListItemActionProps) {
                 disabled={action.disabled}
               >
                 <>
-                  {action.icon} {action.label}
+                  {action.icon?.()} {action.label}
                 </>
               </ListItemSingleAction>
             )

@@ -12,8 +12,12 @@ import * as Hapi from '@hapi/hapi'
 import * as Joi from 'joi'
 import { internal } from '@hapi/boom'
 import { invalidateToken } from '@auth/features/invalidateToken/service'
-import { postUserActionToMetrics } from '@auth/metrics'
-import { logger } from '@opencrvs/commons'
+import {
+  recordUserAuditEvent,
+  verifyRefreshToken
+} from '@auth/features/authenticate/service'
+import { getUserIdFromToken, logger } from '@opencrvs/commons'
+import { revokeFamily } from '@auth/features/refresh/family'
 
 interface IInvalidateTokenPayload {
   token: string
@@ -24,15 +28,21 @@ export default async function invalidateTokenHandler(
   h: Hapi.ResponseToolkit
 ) {
   const { token } = request.payload as IInvalidateTokenPayload
-  const remoteAddress =
-    request.headers['x-real-ip'] || request.info.remoteAddress
-  const userAgent =
-    request.headers['x-real-user-agent'] || request.headers['user-agent']
+  const userId = getUserIdFromToken(token)
+  if (userId) {
+    void recordUserAuditEvent(userId, {
+      operation: 'user.logged_out',
+      requestData: { subjectId: userId }
+    })
+  }
 
-  try {
-    await postUserActionToMetrics('LOGGED_OUT', token, remoteAddress, userAgent)
-  } catch (err) {
-    logger.error(err.message)
+  const refreshDecoded = verifyRefreshToken(token)
+  if (refreshDecoded._tag === 'Right') {
+    try {
+      await revokeFamily(refreshDecoded.right.familyId)
+    } catch (err) {
+      logger.error(`Failed to revoke refresh token family on logout: ${err}`)
+    }
   }
 
   try {

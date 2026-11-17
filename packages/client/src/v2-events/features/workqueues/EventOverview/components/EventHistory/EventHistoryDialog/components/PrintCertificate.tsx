@@ -10,7 +10,7 @@
  */
 import React from 'react'
 import { useIntl } from 'react-intl'
-import { Table } from '@opencrvs/components/lib/Table'
+import { Table, ColumnContentAlignment } from '@opencrvs/components'
 import {
   PrintCertificateAction,
   deepMerge,
@@ -19,17 +19,17 @@ import {
   PageTypes,
   getPrintCertificatePages,
   getCurrentEventState,
-  isFieldVisible,
+  isFieldDisplayedOnReview,
   ValidatorContext
 } from '@opencrvs/commons/client'
-import { ColumnContentAlignment } from '@opencrvs/components'
-import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
+import { useEventConfigurationForRecord } from '@client/v2-events/features/events/useEventConfiguration'
 import {
   isEmptyValue,
   Output
 } from '@client/v2-events/features/events/components/Output'
 import { useCertificateTemplateSelectorFieldConfig } from '@client/v2-events/features/events/useCertificateTemplateSelectorFieldConfig'
 import { useAppConfig } from '@client/v2-events/hooks/useAppConfig'
+import { recordAnchorDate } from '@client/v2-events/utils'
 
 const verifiedMessage = {
   id: 'verified',
@@ -46,12 +46,15 @@ export function PrintCertificate({
   action: PrintCertificateAction
   validatorContext: ValidatorContext
 }) {
-  const { eventConfiguration } = useEventConfiguration(event.type)
+  const { eventConfiguration } = useEventConfigurationForRecord(event)
   const formPages = getPrintCertificatePages(eventConfiguration)
   const intl = useIntl()
 
   const { certificateTemplates } = useAppConfig()
   const eventIndex = getCurrentEventState(event, eventConfiguration)
+  // These are form values, so their locations resolve at the record's form
+  // anchor (date of event, falling back to creation) — not the action date.
+  const anchor = recordAnchorDate(eventIndex)
   const annotation = deepMerge(eventIndex.declaration, action.annotation ?? {})
   const templateId = action.content?.templateId
   const certTemplateFieldConfig = useCertificateTemplateSelectorFieldConfig(
@@ -71,11 +74,12 @@ export function PrintCertificate({
 
   const content = formPages.flatMap((page) => {
     const fields = page.fields
-      .filter((f) => isFieldVisible(f, annotation, validatorContext))
+      .filter((f) => isFieldDisplayedOnReview(f, annotation, validatorContext))
       .filter((f) => !isEmptyValue(f, annotation[f.id]))
       .map((field) => {
         const valueDisplay = (
           <Output
+            anchor={anchor}
             eventConfig={eventConfiguration}
             field={field}
             value={annotation[field.id]}
@@ -91,6 +95,7 @@ export function PrintCertificate({
     if (page.type === PageTypes.enum.VERIFICATION) {
       const value = (
         <Output
+          anchor={anchor}
           eventConfig={eventConfiguration}
           field={{
             id: page.id,

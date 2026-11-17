@@ -18,11 +18,18 @@ export interface IDialogProps {
   id?: string
   titleIcon?: React.ReactNode
   title: string
-  isOpen: boolean
+  isOpen?: boolean
   children?: React.ReactNode
   actions: JSX.Element[]
   onClose?: () => void
+  subtitle?: React.ReactNode
+  /**
+   * Width of the dialog in pixels (for large variant).
+   */
+  width?: number
   variant?: 'small' | 'large'
+  /** Banner element displayed at the top of the dialog */
+  banner?: React.ReactNode
 }
 
 const DialogWrapper = styled.div`
@@ -38,17 +45,21 @@ const DialogWrapper = styled.div`
   z-index: 100;
 `
 
-const DialogContainer = styled.div<{ variant?: 'small' | 'large' }>`
+const DialogContainer = styled.div<{
+  variant?: 'small' | 'large'
+  width?: number
+}>`
   position: relative;
-  ${({ variant }) =>
+  ${({ variant, width }) =>
     variant === 'small'
       ? `
         width: 480px;
         max-width: 90%;
       `
       : `
-        height: 80vh;
-        width: 80%;
+        min-height: 118px;
+        height: auto;
+        width: ${width ? `${width}px` : '80%'};
             @media (max-width: 768px) and (orientation: portrait) {
              width: 100%;
              height: 100%;
@@ -66,24 +77,47 @@ const DialogContainer = styled.div<{ variant?: 'small' | 'large' }>`
 `
 const DialogHeader = styled.div`
   display: flex;
-  padding: 10px 32px;
+  padding: 12px 32px;
   border-bottom: 1px solid ${({ theme }) => theme.colors.grey200};
   justify-content: space-between;
-`
-const DialogTitle = styled.div`
-  display: flex;
   align-items: center;
+  gap: 16px;
+  min-height: 40px;
+  flex-shrink: 0;
+`
+const DialogHeaderContent = styled.div`
+  display: flex;
+  align-items: flex-start;
   gap: 12px;
+  flex: 1;
+  min-width: 0;
+`
+const DialogTitleBlock = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+`
+const DialogSubtitle = styled.div`
+  ${({ theme }) => theme.fonts.reg16};
+  color: ${({ theme }) => theme.colors.supportingCopy};
 `
 
 const DialogContent = styled.div`
+  ${({ theme }) => theme.fonts.reg16};
+  color: ${({ theme }) => theme.colors.supportingCopy};
   padding: 24px 32px;
   flex-grow: 1;
   overflow-y: auto;
+  text-align: left;
+  text-wrap: wrap;
+  display: flex;
+  flex-direction: column;
 `
 
 const DialogFooter = styled.div`
-  padding: 24px 32px;
+  padding: 18px 32px;
+  align-items: center;
   display: flex;
   gap: 8px;
   justify-content: flex-end;
@@ -93,12 +127,15 @@ const DialogFooter = styled.div`
 export function Dialog({
   id,
   title,
+  subtitle,
   onClose,
-  isOpen,
+  isOpen = true,
   children,
   actions,
   variant = 'small',
-  titleIcon
+  width,
+  titleIcon,
+  banner
 }: IDialogProps) {
   const dialogRef = useRef<HTMLDivElement>(null)
   const handleClose = () => {
@@ -124,22 +161,36 @@ export function Dialog({
     <>
       {isOpen && (
         <DialogWrapper onClick={handleClickOutside}>
-          <DialogContainer id={id} variant={variant} ref={dialogRef}>
+          <DialogContainer
+            id={id}
+            width={width}
+            variant={variant}
+            ref={dialogRef}
+            role="dialog"
+            data-testid={id}
+          >
+            {banner}
             <DialogHeader>
-              <DialogTitle>
+              <DialogHeaderContent>
                 {titleIcon}
-                <Text variant="h2" element="h2" color="grey600">
-                  {title}
-                </Text>
-              </DialogTitle>
-              <Button
-                data-testid="close-dialog"
-                type="icon"
-                size="medium"
-                onClick={handleClose}
-              >
-                <Icon name="X" size="large" weight="bold" />
-              </Button>
+                <DialogTitleBlock>
+                  <Text variant="h2" element="h2" color="grey600">
+                    {title}
+                  </Text>
+                  {subtitle && <DialogSubtitle>{subtitle}</DialogSubtitle>}
+                </DialogTitleBlock>
+              </DialogHeaderContent>
+              {onClose && (
+                <Button
+                  id="close-dialog"
+                  data-testid="close-dialog"
+                  type="icon"
+                  size="medium"
+                  onClick={handleClose}
+                >
+                  <Icon name="X" size="large" weight="bold" />
+                </Button>
+              )}
             </DialogHeader>
             <DialogContent>{children}</DialogContent>
             {hasActions && <DialogFooter>{actions}</DialogFooter>}

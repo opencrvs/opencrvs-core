@@ -10,15 +10,15 @@
  */
 
 import React from 'react'
-import { Meta, StoryObj } from '@storybook/react'
-import { userEvent, within, expect } from '@storybook/test'
-import { waitFor } from '@testing-library/dom'
+import { Meta, StoryObj } from '@storybook/react-vite'
+import { userEvent, within, expect, waitFor } from 'storybook/test'
 import {
   ActionType,
   eventQueryDataGenerator,
   EventStatus,
   generateEventDocument,
-  tennisClubMembershipEvent
+  tennisClubMembershipEvent,
+  versionedTennisClubMembershipEvent
 } from '@opencrvs/commons/client'
 import { TRPCProvider } from '@client/v2-events/trpc'
 import { ROUTES } from '@client/v2-events/routes'
@@ -71,7 +71,7 @@ export const DirectsCreatedToDeclare: Story = {
     /*
      * Ensure record is "downloaded offline" in the user's browser
      */
-    addLocalEventConfig(tennisClubMembershipEvent)
+    addLocalEventConfig(versionedTennisClubMembershipEvent)
     setEventData(createdEvent.event.id, createdEvent.event)
   },
 
@@ -91,7 +91,7 @@ export const DirectsCreatedToDeclare: Story = {
               return (
                 <div>
                   <ActionCta
-                    actionType={'DEFAULT'}
+                    actionType={ActionType.DECLARE}
                     event={createdEvent.eventQueryData}
                   />
                 </div>
@@ -118,7 +118,7 @@ export const DirectsCreatedToDeclare: Story = {
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement)
     const actionButton = await canvas.findByRole('button', {
-      name: 'Declare'
+      name: 'Send an application'
     })
 
     await userEvent.click(actionButton)
@@ -137,12 +137,12 @@ export const DirectsCreatedToDeclare: Story = {
 }
 
 const notifiedEvent = createEventByStatus(EventStatus.enum.NOTIFIED)
-export const DirectsNotifiedToDeclare: Story = {
+export const DirectsNotifiedToEdit: Story = {
   beforeEach: () => {
     /*
      * Ensure record is "downloaded offline" in the user's browser
      */
-    addLocalEventConfig(tennisClubMembershipEvent)
+    addLocalEventConfig(versionedTennisClubMembershipEvent)
     setEventData(notifiedEvent.event.id, notifiedEvent.event)
   },
 
@@ -162,7 +162,7 @@ export const DirectsNotifiedToDeclare: Story = {
               return (
                 <div>
                   <ActionCta
-                    actionType={'DEFAULT'}
+                    actionType={ActionType.EDIT}
                     event={notifiedEvent.eventQueryData}
                   />
                 </div>
@@ -170,11 +170,11 @@ export const DirectsNotifiedToDeclare: Story = {
             }
           },
           {
-            path: ROUTES.V2.EVENTS.DECLARE.REVIEW.path,
+            path: ROUTES.V2.EVENTS.EDIT.REVIEW.path,
             Component: () => {
               return (
                 <div>
-                  {ROUTES.V2.EVENTS.DECLARE.REVIEW.buildPath({
+                  {ROUTES.V2.EVENTS.EDIT.REVIEW.buildPath({
                     eventId: notifiedEvent.event.id
                   })}
                 </div>
@@ -189,7 +189,7 @@ export const DirectsNotifiedToDeclare: Story = {
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement)
     const actionButton = await canvas.findByRole('button', {
-      name: 'Review'
+      name: 'Edit'
     })
 
     await userEvent.click(actionButton)
@@ -198,152 +198,8 @@ export const DirectsNotifiedToDeclare: Story = {
     await waitFor(async () => {
       await expect(
         canvas.getByText(
-          ROUTES.V2.EVENTS.DECLARE.REVIEW.buildPath({
+          ROUTES.V2.EVENTS.EDIT.REVIEW.buildPath({
             eventId: notifiedEvent.event.id
-          })
-        )
-      ).toBeInTheDocument()
-    })
-  }
-}
-
-const declaredEvent = createEventByStatus(EventStatus.enum.DECLARED)
-
-export const DirectsDeclaredToValidate: Story = {
-  beforeEach: () => {
-    /*
-     * Ensure record is "downloaded offline" in the user's browser
-     */
-    addLocalEventConfig(tennisClubMembershipEvent)
-    setEventData(declaredEvent.event.id, declaredEvent.event)
-  },
-
-  args: {
-    event: declaredEvent.eventQueryData
-  },
-  parameters: {
-    layout: 'centered',
-    chromatic: { disableSnapshot: true },
-    reactRouter: {
-      router: {
-        path: '/',
-        children: [
-          {
-            path: 'start',
-            Component: () => {
-              return (
-                <div>
-                  <ActionCta
-                    actionType={'DEFAULT'}
-                    event={declaredEvent.eventQueryData}
-                  />
-                </div>
-              )
-            }
-          },
-          {
-            path: ROUTES.V2.EVENTS.VALIDATE.REVIEW.path,
-            Component: () => {
-              return (
-                <div>
-                  {ROUTES.V2.EVENTS.VALIDATE.REVIEW.buildPath({
-                    eventId: declaredEvent.event.id
-                  })}
-                </div>
-              )
-            }
-          }
-        ]
-      },
-      initialPath: '/start'
-    }
-  },
-  play: async ({ canvasElement }) => {
-    const canvas = within(canvasElement)
-    const actionButton = await canvas.findByRole('button', {
-      name: 'Review'
-    })
-
-    await userEvent.click(actionButton)
-
-    // Ensure the user is redirected to the declaration review page
-    await waitFor(async () => {
-      await expect(
-        canvas.getByText(
-          ROUTES.V2.EVENTS.VALIDATE.REVIEW.buildPath({
-            eventId: declaredEvent.event.id
-          })
-        )
-      ).toBeInTheDocument()
-    })
-  }
-}
-
-const validatedEvent = createEventByStatus(EventStatus.enum.VALIDATED)
-
-export const directsValidatedToRegister: Story = {
-  beforeEach: () => {
-    /*
-     * Ensure record is "downloaded offline" in the user's browser
-     */
-    addLocalEventConfig(tennisClubMembershipEvent)
-    setEventData(validatedEvent.event.id, validatedEvent.event)
-  },
-
-  args: {
-    event: validatedEvent.eventQueryData
-  },
-  parameters: {
-    layout: 'centered',
-    chromatic: { disableSnapshot: true },
-    reactRouter: {
-      router: {
-        path: '/',
-        children: [
-          {
-            path: 'start',
-            Component: () => {
-              return (
-                <div>
-                  <ActionCta
-                    actionType={'DEFAULT'}
-                    event={validatedEvent.eventQueryData}
-                  />
-                </div>
-              )
-            }
-          },
-          {
-            path: ROUTES.V2.EVENTS.REGISTER.REVIEW.path,
-            Component: () => {
-              return (
-                <div>
-                  {ROUTES.V2.EVENTS.REGISTER.REVIEW.buildPath({
-                    eventId: validatedEvent.event.id
-                  })}
-                </div>
-              )
-            }
-          }
-        ]
-      },
-      initialPath: '/start'
-    }
-  },
-  play: async ({ canvasElement }) => {
-    const canvas = within(canvasElement)
-    const actionButton = await canvas.findByRole('button', {
-      name: 'Review'
-    })
-
-    await userEvent.click(actionButton)
-
-    // Ensure the user is redirected to the declaration review page
-    await waitFor(async () => {
-      await expect(
-        canvas.getByText(
-          ROUTES.V2.EVENTS.REGISTER.REVIEW.buildPath({
-            eventId: validatedEvent.event.id
           })
         )
       ).toBeInTheDocument()
@@ -358,7 +214,7 @@ export const directsRegisteredToPrint: Story = {
     /*
      * Ensure record is "downloaded offline" in the user's browser
      */
-    addLocalEventConfig(tennisClubMembershipEvent)
+    addLocalEventConfig(versionedTennisClubMembershipEvent)
     setEventData(registeredEvent.event.id, registeredEvent.event)
   },
 
@@ -378,7 +234,7 @@ export const directsRegisteredToPrint: Story = {
               return (
                 <div>
                   <ActionCta
-                    actionType={'DEFAULT'}
+                    actionType={ActionType.PRINT_CERTIFICATE}
                     event={registeredEvent.eventQueryData}
                   />
                 </div>
@@ -405,7 +261,7 @@ export const directsRegisteredToPrint: Story = {
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement)
     const actionButton = await canvas.findByRole('button', {
-      name: 'Print'
+      name: 'Print certificate'
     })
 
     await userEvent.click(actionButton)

@@ -1,0 +1,75 @@
+/*
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at https://mozilla.org/MPL/2.0/.
+ *
+ * OpenCRVS is also distributed under the terms of the Civil Registration
+ * & Healthcare Disclaimer located at http://opencrvs.org/license.
+ *
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
+ */
+import { test, expect } from '@playwright/test'
+import {
+  createDeclaration,
+  Declaration
+} from '@e2e/support/test-data/birth-declaration'
+import { getToken, login, switchEventTab } from '@e2e/support/helpers'
+import { CREDENTIALS } from '@e2e/support/constants'
+import { ensureAssignedToUser } from '@e2e/support/utils'
+import { openRecordByTitle } from '@e2e/support/print-certificate/birth/helpers'
+import { formatV2ChildName } from '@e2e/support/birth/helpers'
+
+test('History rows when Registrar registers a birth from scratch', async ({
+  page
+}) => {
+  const token = await getToken(CREDENTIALS.REGISTRAR)
+  const res = await createDeclaration(token)
+  const declaration = res.declaration
+
+  await test.step('Login', async () => {
+    await login(page)
+  })
+  await test.step('Assign', async () => {
+    await page.getByText('Pending certification').click()
+
+    await openRecordByTitle(page, formatV2ChildName(declaration))
+
+    await ensureAssignedToUser(page, CREDENTIALS.REGISTRAR)
+    await expect(page.getByTestId('assignedTo-value')).toHaveText(
+      'Kennedy Mweene'
+    )
+  })
+  await test.step('validate Actions in history', async () => {
+    await switchEventTab(page, 'Audit')
+    const rows = page.locator('#listTable-task-history [id^="row_"]')
+
+    const expectedActions = [
+      'Assigned',
+      'Viewed',
+      'Unassigned',
+      'Registered',
+      'Declared',
+      'Assigned'
+    ]
+
+    await expect(rows).toHaveCount(expectedActions.length)
+
+    for (let i = 0; i < expectedActions.length; i++) {
+      const actionButton = rows
+        .nth(i)
+        .getByRole('button', { name: expectedActions[i], exact: true })
+      await expect(actionButton).toBeVisible()
+
+      await actionButton.click()
+
+      const modal = page.getByTestId('event-history-modal')
+
+      await expect(modal.getByRole('heading')).toHaveText(expectedActions[i])
+      await modal.locator('#close-dialog').click()
+    }
+  })
+  await test.step('Documents tab shows no documents', async () => {
+    await switchEventTab(page, 'Documents')
+    await expect(page.getByText('No documents found')).toBeVisible()
+  })
+})

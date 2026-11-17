@@ -11,8 +11,7 @@
 import * as React from 'react'
 import { useIntl } from 'react-intl'
 import { useSelector } from 'react-redux'
-import { PrimaryButton } from '@opencrvs/components/lib/buttons'
-import { ResponsiveModal } from '@opencrvs/components/lib/ResponsiveModal'
+import { Button, Dialog } from '@opencrvs/components'
 import { IStoreState } from '@client/store'
 import { storage } from '@client/storage'
 import { removeToken } from '@client/utils/authUtils'
@@ -22,8 +21,9 @@ import { messages as reloadModalMessages } from '@client/i18n/messages/views/rel
 const SCREEN_LOCK = 'screenLock'
 
 export function buildLoginUrl(lang: string | null) {
-  const loginUrl = window.config.LOGIN_URL ?? '/login'
-  const url = new URL(loginUrl, window.location.origin)
+  const url = window.config.LOGIN_URL
+    ? new URL(window.config.LOGIN_URL)
+    : new URL('/login', window.location.origin)
   url.searchParams.set('lang', lang ?? 'en')
   url.searchParams.set('redirectTo', window.location.pathname)
   return url.toString()
@@ -50,20 +50,22 @@ export function VersionMismatchModal({ show }: { show: boolean }) {
   }
 
   return (
-    <ResponsiveModal
+    <Dialog
       title={intl.formatMessage(reloadModalMessages.title)}
-      responsive={false}
-      showCloseButton={false}
-      autoHeight={true}
-      titleHeightAuto={true}
       actions={[
-        <PrimaryButton key="login" id="login" onClick={handleReLogin}>
+        <Button
+          size="large"
+          type="primary"
+          key="login"
+          id="login"
+          onClick={handleReLogin}
+        >
           {intl.formatMessage(reloadModalMessages.loginAgain)}
-        </PrimaryButton>
+        </Button>
       ]}
-      show={show}
+      isOpen={show}
     >
       {intl.formatMessage(reloadModalMessages.body, { app_name: appName })}
-    </ResponsiveModal>
+    </Dialog>
   )
 }

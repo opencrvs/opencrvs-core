@@ -8,50 +8,28 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
+import { pick } from 'lodash'
 import {
   Action,
   ActionType,
   DeclarationUpdateActionType,
   Draft,
-  UUID
+  EventConfig,
+  EventDocument,
+  EventState,
+  getActionAnnotation,
+  getActionReviewFields
 } from '@opencrvs/commons/client'
-
-export function getEventDrafts(
-  eventId: UUID,
-  localDraft: Draft,
-  drafts: Draft[]
-) {
-  return drafts
-    .filter((d) => d.eventId === eventId)
-    .concat({
-      ...localDraft,
-      /*
-       * Force the local draft always to be the latest
-       * This is to prevent a situation where the local draft gets created,
-       * then a CREATE action request finishes in the background and is stored with a later
-       * timestamp
-       */
-      createdAt: new Date().toISOString(),
-      /*
-       * If params.eventId changes (from tmp id to concrete id) then change the local draft id
-       */
-      eventId,
-      action: {
-        ...localDraft.action,
-        createdAt: new Date().toISOString()
-      }
-    })
-}
 
 export type AvailableActionTypes = Extract<
   ActionType,
   | 'NOTIFY'
   | 'DECLARE'
-  | 'VALIDATE'
   | 'REGISTER'
   | 'REQUEST_CORRECTION'
   | 'APPROVE_CORRECTION'
   | 'REJECT_CORRECTION'
+  | 'EDIT'
 >
 
 /**
@@ -78,12 +56,12 @@ export function getPreviousDeclarationActionType(
       actionTypes = [ActionType.DECLARE, ActionType.NOTIFY]
       break
     }
-    case ActionType.VALIDATE: {
-      actionTypes = [ActionType.VALIDATE, ActionType.DECLARE]
+    case ActionType.EDIT: {
+      actionTypes = [ActionType.DECLARE, ActionType.NOTIFY]
       break
     }
     case ActionType.REGISTER: {
-      actionTypes = [ActionType.VALIDATE]
+      actionTypes = [ActionType.DECLARE]
       break
     }
     case ActionType.REQUEST_CORRECTION: {
@@ -108,4 +86,51 @@ export function getPreviousDeclarationActionType(
   }
 
   return
+}
+
+/**
+ * Returns the annotation for a given action type from an event.
+ *
+ * When resolving DECLARE annotation, the NOTIFY annotation values of fields that
+ * DECLARE's review also has are merged in. Notify-only fields stay on the NOTIFY action.
+ * For all other action types, if no annotation exists the NOTIFY annotation is
+ * returned as a fallback (NOTIFY is the earliest action that can capture annotation).
+ */
+export function getAnnotationForActionType({
+  event,
+  eventConfiguration,
+  actionType,
+  draft
+}: {
+  event: EventDocument
+  eventConfiguration: EventConfig
+  actionType: ActionType
+  draft?: Draft
+}): EventState {
+  const annotation = getActionAnnotation({ event, actionType, draft })
+
+  if (actionType === ActionType.DECLARE) {
+    const declareReviewFieldIds = getActionReviewFields(
+      eventConfiguration,
+      ActionType.DECLARE
+    ).map((field) => field.id)
+
+    const notifyAnnotation = pick(
+      getActionAnnotation({
+        event,
+        actionType: ActionType.NOTIFY,
+        draft
+      }),
+      declareReviewFieldIds
+    )
+
+    return { ...notifyAnnotation, ...annotation }
+  }
+
+  if (Object.keys(annotation).length === 0) {
+    // Fall back to NOTIFY as the earliest annotation source
+    return getActionAnnotation({ event, actionType: ActionType.NOTIFY, draft })
+  }
+
+  return annotation
 }

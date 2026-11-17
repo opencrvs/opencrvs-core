@@ -1,0 +1,45 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  # FIXME:
+  # - https://github.com/opencrvs/opencrvs-core/issues/6268
+  # - https://github.com/opencrvs/opencrvs-core/issues/7451
+  # - https://opencrvsworkspace.slack.com/archives/C02LU432JGK/p1757940561135439
+  annotations:
+    "helm.sh/hook": pre-install,pre-upgrade
+    "helm.sh/hook-weight": "2"
+  labels:
+    app: deployment-jobs
+  name: {{ .Values.data_migration.job_name | default "data-migration" }}
+spec:
+  template:
+    metadata:
+      labels:
+        app: deployment-jobs
+    spec:
+      {{- include "opencrvs.imagePullSecrets" (dict "root" . "service" .Values.data_migration) | nindent 6 }}
+      {{- include "pod-service-account-values-helper" (dict "service_name" "deployment-jobs" "Values" .Values) | nindent 6 }}
+      containers:
+        - name: migration
+          image: {{ include "opencrvs.image" (dict "root" . "service" .Values.data_migration) }}
+          imagePullPolicy: {{ .Values.data_migration.image.pullPolicy | default .Values.platform.imagePullPolicy }}
+          env:
+            - name: SUPER_USER_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  key: SUPER_USER_PASSWORD
+                  name: opencrvs-superuser
+            - name: EVENTS_POSTGRES_URL
+              valueFrom:
+                secretKeyRef:
+                  key: events_migrator_db_url
+                  name: {{ .Values.postgres.urls_secret }}
+            - name: EVENTS_DB_USER
+              valueFrom:
+                secretKeyRef:
+                  key: EVENTS_APP_POSTGRES_USER
+                  name: {{ .Values.postgres.users_secret }}
+            - name: WAIT_HOSTS
+              value: "{{ .Values.postgres.host }}:{{ .Values.postgres.port }}"
+          {{- include "render-env-vars" (dict "service_name" "data_migration" "Values" .Values) }}
+      restartPolicy: "OnFailure"

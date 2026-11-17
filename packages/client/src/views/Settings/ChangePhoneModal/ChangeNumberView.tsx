@@ -8,47 +8,48 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { Toast } from '@opencrvs/components/lib/Toast'
-import { ResponsiveModal } from '@opencrvs/components/lib/ResponsiveModal'
 import * as React from 'react'
-import { TertiaryButton, PrimaryButton } from '@opencrvs/components/lib/buttons'
+import {
+  Button,
+  Toast,
+  Dialog,
+  InputField,
+  TextInput
+} from '@opencrvs/components'
 import { userMessages as messages, buttonMessages } from '@client/i18n/messages'
-import { InputField } from '@opencrvs/components/lib/InputField'
-import { TextInput } from '@opencrvs/components/lib/TextInput'
 import { useIntl } from 'react-intl'
+import { useOnlineStatus } from '@client/utils'
 import { EMPTY_STRING } from '@client/utils/constants'
-import { isAValidPhoneNumberFormat } from '@client/utils/validate'
-import { convertToMSISDN } from '@client/forms/utils'
-import { GET_USER_BY_MOBILE } from '@client/views/Settings/queries'
-import { useDispatch, useSelector } from 'react-redux'
-import { sendVerifyCode } from '@client/profile/profileActions'
-import { getUserDetails } from '@client/profile/profileSelectors'
 import { errorMessages } from '@client/i18n/messages/errors'
-import { getLanguage } from '@client/i18n/selectors'
-import { useLazyQuery } from '@apollo/client'
-import { GetUserByMobileQuery } from '@client/utils/gateway'
-import { TriggerEvent } from '@opencrvs/commons/client'
+import { useUsers } from '@client/v2-events/hooks/useUsers'
+import { useCurrentUser } from '@client/v2-events/hooks/useCurrentUser'
 
 interface IProps {
   show: boolean
-  onSuccess: (phoneNumber: string) => void
+  onSuccess: (phoneNumber: string, nonce: string) => void
   onClose: () => void
 }
 
+const isAValidPhoneNumberFormat = (value: string): boolean => {
+  const pattern = window.config.PHONE_NUMBER_PATTERN
+
+  return new RegExp(pattern).test(value)
+}
+
 export function ChangeNumberView({ show, onSuccess, onClose }: IProps) {
-  const [fetchUserDetailsByMobile] =
-    useLazyQuery<GetUserByMobileQuery>(GET_USER_BY_MOBILE)
   const intl = useIntl()
   const [phoneNumber, setPhoneNumber] = React.useState(EMPTY_STRING)
   const [unknownError, setUnknownError] = React.useState(false)
   const [isInvalidPhoneNumber, setIsInvalidPhoneNumber] = React.useState(false)
-  const userDetails = useSelector(getUserDetails)
-  const language = useSelector(getLanguage)
+  const { currentUser } = useCurrentUser()
+  const isOnline = useOnlineStatus()
   const [
     showDuplicateMobileErrorNotification,
     setShowDuplicateMobileErrorNotification
   ] = React.useState(false)
-  const dispatch = useDispatch()
+  const { requestPhoneChange } = useUsers()
+  const isMobileNumberUnchanged =
+    Boolean(phoneNumber) && phoneNumber === currentUser?.mobile
   const onChangePhoneNumber = (event: React.ChangeEvent<HTMLInputElement>) => {
     const phoneNumber = event.target.value
     setPhoneNumber(phoneNumber)
@@ -57,6 +58,7 @@ export function ChangeNumberView({ show, onSuccess, onClose }: IProps) {
       setShowDuplicateMobileErrorNotification(false)
     }
   }
+
   const restoreState = () => {
     setPhoneNumber(EMPTY_STRING)
     setIsInvalidPhoneNumber(false)
@@ -70,38 +72,22 @@ export function ChangeNumberView({ show, onSuccess, onClose }: IProps) {
     setUnknownError((prevValue) => !prevValue)
   }
   const continueButtonHandler = async (phoneNumber: string) => {
-    const formattedNumber = convertToMSISDN(phoneNumber, window.config.COUNTRY)
-    const { data: userData, error } = await fetchUserDetailsByMobile({
-      variables: { mobile: formattedNumber }
-    })
-    if (error) {
-      setUnknownError(true)
-      return
-    }
-    const mobileNumberExist = userData?.getUserByMobile
-
-    if (!mobileNumberExist) {
-      const notificationEvent = TriggerEvent.CHANGE_PHONE_NUMBER
-
-      dispatch(
-        sendVerifyCode(
-          [
-            {
-              use: language,
-              family: String(userDetails?.name?.[0].familyName),
-              given: [String(userDetails?.name?.[0].firstNames)]
-            }
-          ],
-          notificationEvent,
-          convertToMSISDN(phoneNumber, window.config.COUNTRY),
-          String(userDetails?.email)
-        )
-      )
-      onSuccess(phoneNumber)
-    } else {
-      toggleDuplicateMobileErrorNotification()
-      setUnknownError(false)
-    }
+    if (!currentUser) return
+    requestPhoneChange.mutate(
+      { phoneNumber },
+      {
+        onSuccess: (data) => {
+          onSuccess(phoneNumber, data.nonce)
+        },
+        onError: (error) => {
+          if (error.data?.code === 'CONFLICT') {
+            setShowDuplicateMobileErrorNotification(true)
+          } else {
+            setUnknownError(true)
+          }
+        }
+      }
+    )
   }
   React.useEffect(() => {
     if (!show) {
@@ -110,28 +96,40 @@ export function ChangeNumberView({ show, onSuccess, onClose }: IProps) {
   }, [show])
 
   return (
-    <ResponsiveModal
+    <Dialog
       id="ChangePhoneNumberModal"
-      show={show}
+      isOpen={show}
       title={intl.formatMessage(messages.changePhoneLabel)}
       actions={[
-        <TertiaryButton key="cancel" id="modal_cancel" onClick={onClose}>
+        <Button
+          size="large"
+          type="tertiary"
+          key="cancel"
+          id="modal_cancel"
+          onClick={onClose}
+        >
           {intl.formatMessage(buttonMessages.cancel)}
-        </TertiaryButton>,
-        <PrimaryButton
+        </Button>,
+        <Button
+          type="primary"
           id="continue-button"
+          size="large"
           key="continue"
           onClick={() => {
             continueButtonHandler(phoneNumber)
           }}
-          disabled={!Boolean(phoneNumber.length) || isInvalidPhoneNumber}
+          disabled={
+            !isOnline ||
+            requestPhoneChange.isPending ||
+            !Boolean(phoneNumber.length) ||
+            isInvalidPhoneNumber ||
+            isMobileNumberUnchanged
+          }
         >
           {intl.formatMessage(buttonMessages.continueButton)}
-        </PrimaryButton>
+        </Button>
       ]}
-      handleClose={onClose}
-      contentHeight={150}
-      contentScrollableY={true}
+      onClose={onClose}
     >
       <InputField
         id="phoneNumber"
@@ -151,7 +149,9 @@ export function ChangeNumberView({ show, onSuccess, onClose }: IProps) {
                   id: 'phone.start'
                 })
               })
-            : ''
+            : isMobileNumberUnchanged
+              ? intl.formatMessage(messages.mobileNumberUnchangedErrorMessege)
+              : ''
         }
       >
         <TextInput
@@ -183,6 +183,6 @@ export function ChangeNumberView({ show, onSuccess, onClose }: IProps) {
           {intl.formatMessage(errorMessages.unknownErrorTitle)}
         </Toast>
       )}
-    </ResponsiveModal>
+    </Dialog>
   )
 }

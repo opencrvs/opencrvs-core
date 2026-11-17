@@ -9,14 +9,17 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { defineConditional } from '../conditionals/conditionals'
+import { defineConditional, flag, status } from '../conditionals/conditionals'
 import {
   createEventFieldConfig,
   NonSearchableEventMetadataTimeFieldIdInput,
   AdvancedSearchConfig
 } from '../event-config/event-configuration'
+import { ActionStatus } from './ActionStatus'
 import { ActionType } from './ActionType'
 import { EventFieldIdInput } from './AdvancedSearchConfig'
+import { EventStatus } from './EventMetadata'
+import { Flag } from './Flag'
 import {
   WorkqueueColumnKeys,
   WorkqueueColumnValue
@@ -44,7 +47,10 @@ function eventFn(
 // Attach conditional helpers directly to the function
 const event = Object.assign(eventFn, {
   /**
-   * Checks if the event contains a specific action type.
+   * Checks if the event contains a specific accepted action type.
+   * Only Accepted actions are matched: a confirmable action is stored as a
+   * Requested and an Accepted action, and a pending or rejected request must
+   * not count as the action having happened.
    * Can be used directly as a conditional or chained with additional methods.
    * @param action - The action type to check for.
    */
@@ -62,9 +68,12 @@ const event = Object.assign(eventFn, {
                 properties: {
                   type: {
                     const: action
+                  },
+                  status: {
+                    const: ActionStatus.Accepted
                   }
                 },
-                required: ['type']
+                required: ['type', 'status']
               }
             }
           },
@@ -78,9 +87,10 @@ const event = Object.assign(eventFn, {
       additionalFields?: Record<string, unknown>
     ) => {
       const actionProperties: Record<string, unknown> = {
-        type: { const: action }
+        type: { const: action },
+        status: { const: ActionStatus.Accepted }
       }
-      const requiredFields = ['type']
+      const requiredFields = ['type', 'status']
 
       if (additionalFields) {
         Object.entries(additionalFields).forEach(([key, value]) => {
@@ -170,7 +180,17 @@ const event = Object.assign(eventFn, {
     return {
       $event: field
     }
-  }
+  },
+  /**
+   * Checks if the event currently has the given status.
+   * @param eventStatus - The status to check for.
+   */
+  hasStatus: (eventStatus: EventStatus) => status(eventStatus),
+  /**
+   * Checks if the event currently carries the given flag.
+   * @param flagValue - The flag to check for.
+   */
+  hasFlag: (flagValue: Flag) => flag(flagValue)
 })
 
 export { event }

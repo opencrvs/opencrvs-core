@@ -10,13 +10,23 @@
  */
 
 import { TRPCError } from '@trpc/server'
-import { ActionType, generateEventDocument, SCOPES } from '@opencrvs/commons'
+import {
+  ActionType,
+  createPrng,
+  encodeScope,
+  generateEventDocument
+} from '@opencrvs/commons'
 import { tennisClubMembershipEvent } from '@opencrvs/commons/fixtures'
-import { createSystemTestClient, setupTestCase } from '@events/tests/utils'
+import {
+  createSystemTestClient,
+  setupTestCase,
+  TEST_SYSTEM_ID
+} from '@events/tests/utils'
+import { getClient } from '@events/storage/postgres/events'
 
 describe('bulkImport', () => {
   test('prevents forbidden access if missing required scope', async () => {
-    const client = createSystemTestClient('test-system', [])
+    const client = createSystemTestClient(TEST_SYSTEM_ID, [])
 
     await expect(
       client.event.bulkImport([
@@ -30,7 +40,9 @@ describe('bulkImport', () => {
 
   test('allows access with import scope', async () => {
     const { user } = await setupTestCase()
-    const client = createSystemTestClient('test-system', [SCOPES.RECORD_IMPORT])
+    const client = createSystemTestClient(TEST_SYSTEM_ID, [
+      encodeScope({ type: 'record.import' })
+    ])
 
     await expect(
       client.event.bulkImport([
@@ -47,17 +59,23 @@ describe('bulkImport', () => {
 
   test('importing events indexes them into Elasticsearch at the next refresh', async () => {
     const { user } = await setupTestCase()
-    const client = createSystemTestClient('test-system', [
-      SCOPES.RECORD_IMPORT,
-      SCOPES.RECORD_READ,
-      `search[event=${tennisClubMembershipEvent.id},access=all]`
+    const client = createSystemTestClient(TEST_SYSTEM_ID, [
+      encodeScope({ type: 'record.import' }),
+      encodeScope({ type: 'record.read' }),
+      encodeScope({
+        type: 'record.search',
+        options: {
+          event: [tennisClubMembershipEvent.id]
+        }
+      })
     ])
     const event1 = generateEventDocument({
       configuration: tennisClubMembershipEvent,
       actions: [
         { type: ActionType.CREATE, user },
         { type: ActionType.DECLARE, user }
-      ]
+      ],
+      rng: createPrng(871)
     })
 
     const event2 = generateEventDocument({
@@ -65,7 +83,8 @@ describe('bulkImport', () => {
       actions: [
         { type: ActionType.CREATE, user },
         { type: ActionType.DECLARE, user }
-      ]
+      ],
+      rng: createPrng(872)
     })
     await client.event.bulkImport([event1, event2])
 
@@ -87,5 +106,40 @@ describe('bulkImport', () => {
     expect([events[0].id, events[1].id].sort()).toEqual(
       [event1.id, event2.id].sort()
     )
+  })
+  test('rejects the whole import when a record names a version that is not configured', async () => {
+    const { user } = await setupTestCase()
+    const client = createSystemTestClient(TEST_SYSTEM_ID, [
+      encodeScope({ type: 'record.import' })
+    ])
+    const actions = [
+      { type: ActionType.CREATE, user },
+      { type: ActionType.DECLARE, user }
+    ]
+    const configured = generateEventDocument({
+      configuration: tennisClubMembershipEvent,
+      actions,
+      rng: createPrng(873)
+    })
+    const unconfigured = {
+      ...generateEventDocument({
+        configuration: tennisClubMembershipEvent,
+        actions,
+        rng: createPrng(874)
+      }),
+      configVersionId: 'v9'
+    }
+
+    await expect(
+      client.event.bulkImport([configured, unconfigured])
+    ).rejects.toMatchObject({
+      code: 'BAD_REQUEST',
+      message: `Event '${tennisClubMembershipEvent.id}' has no version 'v9'`
+    })
+
+    // Not even the records before it are written.
+    await expect(
+      getClient().selectFrom('events').select('id').execute()
+    ).resolves.toHaveLength(0)
   })
 })

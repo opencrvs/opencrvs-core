@@ -13,9 +13,7 @@ import styled from 'styled-components'
 import { useIntl, defineMessages } from 'react-intl'
 import { useNavigate } from 'react-router-dom'
 import { useEffect, useRef, useState } from 'react'
-import { Accordion } from '@opencrvs/components'
-import { Icon } from '@opencrvs/components/lib/Icon'
-import { Button } from '@opencrvs/components/lib/Button'
+import { Accordion, Icon, Button } from '@opencrvs/components'
 import {
   EventConfig,
   FieldConfig,
@@ -35,6 +33,7 @@ import { filterEmptyValues } from '@client/v2-events/utils'
 import { ROUTES } from '@client/v2-events/routes'
 import { useValidatorContext } from '@client/v2-events/hooks/useValidatorContext'
 import { useDefaultValue } from '@client/v2-events/hooks/useDefaultValue'
+import { useAdminStructure } from '@client/v2-events/hooks/useAdminStructure'
 import {
   getAdvancedSearchFieldErrors,
   resolveAdvancedSearchConfig,
@@ -70,7 +69,8 @@ function SearchSectionForm({
   section,
   handleFieldChange,
   fieldValues,
-  validatorContext
+  validatorContext,
+  eventConfig
 }: {
   section: {
     title: TranslationConfig
@@ -80,6 +80,7 @@ function SearchSectionForm({
   handleFieldChange: (fieldId: string, value: FieldValue) => void
   fieldValues?: EventState
   validatorContext: ValidatorContext
+  eventConfig: EventConfig
 }) {
   const intl = useIntl()
 
@@ -93,9 +94,12 @@ function SearchSectionForm({
       name={section.title.id}
     >
       <FormFieldGenerator
+        attachmentPath={null}
+        eventConfig={eventConfig}
         fields={section.fields}
         formValues={fieldValues}
         id={section.title.id}
+        searchMode={true}
         validatorContext={validatorContext}
         onFormChange={(updatedValues) => {
           Object.entries(updatedValues).forEach(([fieldId, value]) =>
@@ -146,8 +150,11 @@ export function TabSearch({
   const navigate = useNavigate()
   const validatorContext = useValidatorContext()
   const getDefaultValues = useDefaultValue()
-
-  const advancedSearchSections = resolveAdvancedSearchConfig(currentEvent)
+  const adminStructure = useAdminStructure()
+  const advancedSearchSections = resolveAdvancedSearchConfig(
+    currentEvent,
+    adminStructure
+  )
 
   const sections = advancedSearchSections.map((section) => ({
     ...section,
@@ -257,6 +264,7 @@ export function TabSearch({
       {sections.map((section) => (
         <SearchSectionForm
           key={section.title.id}
+          eventConfig={currentEvent}
           fieldValues={fieldValues}
           handleFieldChange={handleFieldChange}
           section={section}

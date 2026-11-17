@@ -22,7 +22,10 @@ cp index.html $WORK_DIR/build/countryconfig/index.html
 # Build OpenAPI docs for Events service
 EVENTS_YML="$WORK_DIR/build/events/openapi.yml"
 touch $EVENTS_YML
-(cd $WORK_DIR/../events && NODE_ENV=develop npx tsx src/openapi.ts) > $EVENTS_YML
+# Create file for public key to avoid error when generating OpenAPI docs. Empty is fine.
+touch $WORK_DIR/public-key.pem
+
+(cd $WORK_DIR/../events && NODE_ENV=develop CERT_PUBLIC_KEY_PATH=$WORK_DIR/public-key.pem   npx tsx src/openapi.ts) > $EVENTS_YML
 
 # Build OpenAPI docs for country config
 COUNTRYCONFIG_YML="$WORK_DIR/build/countryconfig/openapi.yml"

@@ -8,51 +8,44 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { minioClient } from '@documents/minio/client'
-import { MINIO_BUCKET } from '@documents/minio/constants'
+import { putObject, statObjectIfExists } from '@documents/s3/client'
+import { env } from '@documents/s3/constants'
 import * as Hapi from '@hapi/hapi'
-import { v4 as uuid } from 'uuid'
-import { fromBuffer } from 'file-type'
 import {
-  FullDocumentPath,
+  DocumentPath,
   getUserId,
-  joinValues,
-  logger,
-  toDocumentPath
+  joinUrlPaths,
+  logger
 } from '@opencrvs/commons'
 
-import { z } from 'zod'
+import { badRequest, forbidden } from '@hapi/boom'
 import { Readable } from 'stream'
-import { badRequest, notFound } from '@hapi/boom'
-export interface IDocumentPayload {
-  fileData: string
-  metaData?: Record<string, string>
-}
-
-export type IFileInfo = {
-  ext: string
-  mime: string
-}
+import { z } from 'zod'
 
 const HapiSchema = z.object({
   filename: z.string().min(1, 'Filename is required'),
-  headers: z.record(z.string()),
+  headers: z.record(z.string(), z.string()),
   bytes: z.number().optional()
 })
 
 const FileSchema = z
   .custom<Readable & { hapi: z.infer<typeof HapiSchema> }>((val) => {
-    return '_readableState' in val && 'hapi' in val
+    return (
+      typeof val === 'object' &&
+      val !== null &&
+      '_readableState' in val &&
+      'hapi' in val
+    )
   }, 'Not a readable stream or missing hapi field')
   .refine(
-    (val) => HapiSchema.safeParse(val.hapi).success,
+    (val) => HapiSchema.validate(val.hapi),
     'hapi does not match the required structure'
   )
 
 const Payload = z.object({
   file: FileSchema,
   transactionId: z.string(),
-  path: z.string().min(1).optional()
+  path: z.string().optional().default('')
 })
 
 /**
@@ -62,87 +55,66 @@ export async function fileUploadHandler(
   request: Hapi.Request,
   h: Hapi.ResponseToolkit
 ) {
-  const userId = getUserId(request.headers.authorization)
+  const userId = getUserId(request.headers.authorization as `Bearer ${string}`)
   const payload = await Payload.parseAsync(request.payload).catch((error) => {
     logger.error(error)
     throw badRequest('Invalid payload')
   })
-
   const { file, transactionId, path } = payload
 
   const extension = file.hapi.filename.split('.').pop()
   const filename = `${transactionId}.${extension}`
+  const filePath = (
+    path ? joinUrlPaths(path, filename) : filename
+  ) as DocumentPath
 
-  const filePath = joinValues([path, filename], '/')
+  /*
+   * The caller chooses the path, so an upload to a key that already exists
+   * would replace its contents and take over `created-by` — which then also
+   * satisfies the ownership check in deleteDocument. Replacing a file requires
+   * the same ownership that deleting one does.
+   */
+  const existing = await statObjectIfExists(filePath)
 
-  await minioClient.putObject(MINIO_BUCKET, filePath, file, {
-    'created-by': userId,
-    ...(filename.endsWith('.pdf') && { 'content-type': 'application/pdf' })
+  if (existing && existing.metadata['created-by'] !== userId) {
+    throw forbidden(
+      `request failed: user with id ${userId} does not have permission to replace this document`
+    )
+  }
+
+  await putObject(filePath, file, {
+    // Persist the content type the client reported for the file
+    contentType: file.hapi.headers['content-type'],
+    metadata: { 'created-by': userId }
   })
 
-  return `/${MINIO_BUCKET}/${filePath}` as FullDocumentPath
+  return filePath
 }
 
 export async function fileExistsHandler(
   request: Hapi.Request,
   h: Hapi.ResponseToolkit
 ) {
-  // Ensure file is still in the desired format. forwarding url from gateway,
-  // '/files/{filePath*}' --> files//ocrvs/filename.jpg and the double slash is removed.
-  const filePath = FullDocumentPath.parse(request.params.filePath)
-
-  let stat
-
-  const documentPath = toDocumentPath(filePath)
-  try {
-    stat = await minioClient.statObject(MINIO_BUCKET, documentPath)
-  } catch (error) {
-    if (error.code === 'NotFound') {
-      return h
-        .response(
-          `request failed: document ${documentPath} does not exist in bucket ${MINIO_BUCKET}`
-        )
-        .code(404)
-    }
-
-    throw error
+  let filePath = request.params.filePath
+  if (filePath.startsWith('/')) {
+    filePath = filePath.slice(1)
   }
+
+  if (filePath.startsWith(env.S3_BUCKET)) {
+    filePath = filePath.slice(env.S3_BUCKET.length + 1)
+  }
+
+  const documentPath = DocumentPath.parse(filePath)
+
+  const stat = await statObjectIfExists(documentPath)
 
   if (!stat) {
-    return notFound('File not found')
-  }
-  return h.response().code(200)
-}
-
-export async function documentUploadHandler(
-  request: Hapi.Request,
-  h: Hapi.ResponseToolkit
-) {
-  const userId = getUserId(request.headers.authorization)
-  if (!userId)
-    return Promise.reject(
-      new Error(
-        `request failed: Authorization token is missing or does not contain a valid user ID.`
-      )
-    )
-  const payload = request.payload as IDocumentPayload
-  const ref = uuid()
-  try {
-    const base64String = payload.fileData.split(',')[1]
-    const base64Decoded = Buffer.from(base64String, 'base64')
-    const fileType = (await fromBuffer(base64Decoded)) as IFileInfo
-    const generateFileName = `${ref}.${fileType.ext}`
-
-    await minioClient.putObject(MINIO_BUCKET, generateFileName, base64Decoded, {
-      ...payload.metaData,
-      'content-type': fileType.mime,
-      'created-by': userId
-    })
-
     return h
-      .response({ refUrl: `/${MINIO_BUCKET}/${generateFileName}` })
-      .code(200)
-  } catch (error) {
-    return Promise.reject(new Error(`request failed: ${error.message}`))
+      .response(
+        `request failed: document ${documentPath} does not exist in bucket ${env.S3_BUCKET}`
+      )
+      .code(404)
   }
+
+  return h.response().code(200)
 }

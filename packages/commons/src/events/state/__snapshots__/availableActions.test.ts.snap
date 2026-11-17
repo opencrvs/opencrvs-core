@@ -1,26 +1,40 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`getAvailableActions returns the correct actions for "DECLARED" status with a "declared:requested" flag 1`] = `
+exports[`getAvailableActionsForEvent() returns the correct actions for "DECLARED" status with a "declared:requested" flag 1`] = `
 [
   "READ",
 ]
 `;
 
-exports[`getAvailableActions returns the correct actions for "REGISTERED" status with a "registered:requested" flag 1`] = `
+exports[`getAvailableActionsForEvent() returns the correct actions for "REGISTERED" status with a "registered:requested" flag 1`] = `
 [
   "READ",
 ]
 `;
 
-exports[`getAvailableActions should return the correct actions for "ARCHIVED" status with no flags 1`] = `
+exports[`getAvailableActionsForEvent() should not allow ARCHIVE or EDIT for "ARCHIVED" status with rejected flag 1`] = `
 [
   "READ",
-  "ASSIGN",
-  "UNASSIGN",
+  "CUSTOM",
+  "UNARCHIVE",
 ]
 `;
 
-exports[`getAvailableActions should return the correct actions for "CREATED" status with no flags 1`] = `
+exports[`getAvailableActionsForEvent() should not allow UNARCHIVE for "ARCHIVED" status while an unarchive request is pending 1`] = `
+[
+  "READ",
+]
+`;
+
+exports[`getAvailableActionsForEvent() should return the correct actions for "ARCHIVED" status with no flags 1`] = `
+[
+  "READ",
+  "CUSTOM",
+  "UNARCHIVE",
+]
+`;
+
+exports[`getAvailableActionsForEvent() should return the correct actions for "CREATED" status with no flags 1`] = `
 [
   "READ",
   "DECLARE",
@@ -29,78 +43,76 @@ exports[`getAvailableActions should return the correct actions for "CREATED" sta
 ]
 `;
 
-exports[`getAvailableActions should return the correct actions for "DECLARED" status with no flags 1`] = `
-[
-  "READ",
-  "VALIDATE",
-  "ARCHIVE",
-  "REJECT",
-]
-`;
-
-exports[`getAvailableActions should return the correct actions for "DECLARED" status with rejected flag 1`] = `
-[
-  "READ",
-  "DECLARE",
-  "NOTIFY",
-  "ARCHIVE",
-]
-`;
-
-exports[`getAvailableActions should return the correct actions for "NOTIFIED" status with no flags 1`] = `
-[
-  "READ",
-  "DECLARE",
-  "ARCHIVE",
-  "REJECT",
-]
-`;
-
-exports[`getAvailableActions should return the correct actions for "NOTIFIED" status with rejected flag 1`] = `
-[
-  "READ",
-  "DECLARE",
-  "NOTIFY",
-  "ARCHIVE",
-]
-`;
-
-exports[`getAvailableActions should return the correct actions for "REGISTERED" status with "registered:requested" correction-requested flag 1`] = `
-[
-  "READ",
-]
-`;
-
-exports[`getAvailableActions should return the correct actions for "REGISTERED" status with correction-requested flag 1`] = `
-[
-  "READ",
-  "APPROVE_CORRECTION",
-  "REJECT_CORRECTION",
-  "REVIEW_CORRECTION_REQUEST",
-]
-`;
-
-exports[`getAvailableActions should return the correct actions for "REGISTERED" status with no flags 1`] = `
-[
-  "READ",
-  "PRINT_CERTIFICATE",
-  "REQUEST_CORRECTION",
-]
-`;
-
-exports[`getAvailableActions should return the correct actions for "VALIDATED" status with no flags 1`] = `
+exports[`getAvailableActionsForEvent() should return the correct actions for "DECLARED" status with no flags 1`] = `
 [
   "READ",
   "REGISTER",
   "ARCHIVE",
   "REJECT",
+  "CUSTOM",
+  "EDIT",
 ]
 `;
 
-exports[`getAvailableActions should return the correct actions for "VALIDATED" status with rejected flag 1`] = `
+exports[`getAvailableActionsForEvent() should return the correct actions for "DECLARED" status with rejected flag 1`] = `
 [
   "READ",
-  "VALIDATE",
+  "NOTIFY",
+  "CUSTOM",
+  "EDIT",
   "ARCHIVE",
+]
+`;
+
+exports[`getAvailableActionsForEvent() should return the correct actions for "NOTIFIED" status with no flags 1`] = `
+[
+  "READ",
+  "EDIT",
+  "ARCHIVE",
+  "REJECT",
+  "CUSTOM",
+]
+`;
+
+exports[`getAvailableActionsForEvent() should return the correct actions for "NOTIFIED" status with rejected flag 1`] = `
+[
+  "READ",
+  "NOTIFY",
+  "CUSTOM",
+  "EDIT",
+  "ARCHIVE",
+]
+`;
+
+exports[`getAvailableActionsForEvent() should return the correct actions for "REGISTERED" status with "registered:requested" correction-requested flag 1`] = `
+[
+  "READ",
+]
+`;
+
+exports[`getAvailableActionsForEvent() should return the correct actions for "REGISTERED" status with correction-requested flag 1`] = `
+[
+  "READ",
+  "APPROVE_CORRECTION",
+  "REJECT_CORRECTION",
+  "CUSTOM",
+  "REVIEW_CORRECTION_REQUEST",
+]
+`;
+
+exports[`getAvailableActionsForEvent() should return the correct actions for "REGISTERED" status with no flags 1`] = `
+[
+  "READ",
+  "PRINT_CERTIFICATE",
+  "REQUEST_CORRECTION",
+  "CUSTOM",
+  "REVOKE_REGISTRATION",
+]
+`;
+
+exports[`getAvailableActionsForEvent() should return the correct actions for "REVOKED" status with no flags 1`] = `
+[
+  "READ",
+  "REINSTATE_REGISTRATION",
 ]
 `;

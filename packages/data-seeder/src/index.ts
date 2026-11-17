@@ -10,19 +10,39 @@
  */
 import { env } from './environment'
 import fetch from 'node-fetch'
-import { seedLocations } from './locations'
-import { seedUsers } from './users'
-import { parseGQLResponse, raise } from './utils'
-import { print } from 'graphql'
-import gql from 'graphql-tag'
-import decode from 'jwt-decode'
+import { readApplicationConfig } from './application-config'
+import {
+  LocationPayload,
+  toLocationPayload,
+  readLocations,
+  seedLocations
+} from './locations'
+import { readRoles } from './roles'
+import { UserPayload, readUsers, seedUsers, toUserPayloads } from './users'
+import { raise } from './utils'
+import { createInitialisationClient } from './initialisation-client'
+import {
+  AFTER_WRITING_BEGAN,
+  PartialSeedError,
+  describeError,
+  formatSeedFailure,
+  formatUnwrittenFailure
+} from './seed-failure'
+import { SeedSources } from './seed-data'
+import { validateSeedData } from './validate-seed-data'
+import {
+  formatValidationReport,
+  formatValidationSummary
+} from './validation-report'
 
 async function getToken(): Promise<string> {
-  const authUrl = new URL('authenticate-super-user', env.AUTH_HOST).toString()
+  const authUrl = new URL(
+    '/auth/authenticate-super-user',
+    env.GATEWAY_HOST
+  ).toString()
   const res = await fetch(authUrl, {
     method: 'POST',
     body: JSON.stringify({
-      username: 'o.admin',
       password: env.SUPER_USER_PASSWORD
     }),
     headers: {
@@ -40,69 +60,79 @@ async function getToken(): Promise<string> {
   return body.token
 }
 
-const deactivateUserMutation = print(gql`
-  mutation deactivateUser(
-    $userId: String!
-    $action: String!
-    $reason: String!
-    $comment: String
-  ) {
-    auditUser(
-      userId: $userId
-      action: $action
-      reason: $reason
-      comment: $comment
-    )
-  }
-`)
-
-interface TokenPayload {
-  sub: string
-  exp: string
-  algorithm: string
-  scope: string[]
-}
-
-function getTokenPayload(token: string): TokenPayload {
-  try {
-    return decode<TokenPayload>(token)
-  } catch (err) {
-    raise(`getTokenPayload: Error occurred during token decode : ${err}`)
-  }
-}
-
 async function deactivateSuperuser(token: string) {
-  const { sub } = getTokenPayload(token)
-  const res = await fetch(`${env.GATEWAY_HOST}/graphql`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      Authorization: `Bearer ${token}`
-    },
-    body: JSON.stringify({
-      query: deactivateUserMutation,
-      variables: {
-        userId: sub,
-        action: 'DEACTIVATE',
-        reason: 'Remove super user'
-      }
-    })
-  })
-
-  parseGQLResponse(await res.json())
+  const client = createInitialisationClient(token)
+  await client.complete.mutate()
 }
 
+/** Fetch all of the seed-data, validate all of it, and only then write any of
+ * it: validation precedes the first write — the hierarchy included — so that
+ * rejected seed-data leaves the database untouched.
+ */
 async function main() {
   const token = await getToken()
 
-  // eslint-disable-next-line no-console
-  console.log('Seeding locations')
-  await seedLocations(token)
+  const sources: SeedSources = {
+    users: await readUsers(token),
+    roles: await readRoles(token),
+    locations: await readLocations(),
+    applicationConfig: await readApplicationConfig()
+  }
+
+  const problems = validateSeedData(sources)
+
+  if (problems.length > 0) {
+    raise(formatValidationReport(problems))
+  }
 
   // eslint-disable-next-line no-console
-  console.log('Seeding users')
-  await seedUsers(token)
-  await deactivateSuperuser(token)
+  console.log(formatValidationSummary(sources))
+
+  await write(
+    token,
+    toLocationPayload(sources.locations),
+    toUserPayloads(sources.users)
+  )
 }
 
-main()
+/** Every error leaving here is a `PartialSeedError`, which is
+ * what lets the handler below pick between the two failure
+ * reports without tracking state.
+ */
+async function write(
+  token: string,
+  locations: LocationPayload,
+  users: UserPayload[]
+) {
+  try {
+    // eslint-disable-next-line no-console
+    console.log('Seeding locations')
+    await seedLocations(token, locations)
+
+    // eslint-disable-next-line no-console
+    console.log('Seeding users')
+    await seedUsers(token, users)
+
+    await deactivateSuperuser(token)
+  } catch (error) {
+    // `seedUsers` knows which record failed, so its report stands.
+    throw error instanceof PartialSeedError
+      ? error
+      : new PartialSeedError(
+          formatSeedFailure({
+            headline: AFTER_WRITING_BEGAN,
+            reason: describeError(error)
+          })
+        )
+  }
+}
+
+/** A failure found rather than thrown before the first write never reaches
+ * here: the fetch and validation paths call `raise()` themselves. */
+main().catch((error: unknown) => {
+  raise(
+    error instanceof PartialSeedError
+      ? error.message
+      : formatUnwrittenFailure(describeError(error))
+  )
+})

@@ -11,13 +11,16 @@
 
 import { useMemo } from 'react'
 import {
+  EventConfig,
   EventDocument,
+  EventValidatorContext,
+  getEventValidatorContext,
   getOrThrow,
   ValidatorContext
 } from '@opencrvs/commons/client'
-import { getToken, getTokenPayload } from '@client/utils/authUtils'
 import { useAuthentication } from '../../utils/userUtils'
-import { useSuspenseAdminLeafLevelLocations } from './useLocations'
+import { useEventConfigurationResolver } from '../features/events/useEventConfiguration'
+import { useSuspenseGetLeafAdministrativeAreaIds } from './useAdministrativeAreas'
 
 /**
  * Private hook for reading user details. Since the user is authenticated, we can assume the token is valid, and some other process throws an error when it becomes invalid.
@@ -33,13 +36,41 @@ function useUser() {
   )
 }
 
+/**
+ * @param findEventConfiguration gives the configuration of the version `event` was
+ * created under.
+ */
+export function resolveEventValidatorContext(
+  findEventConfiguration: (record: EventDocument) => EventConfig | undefined,
+  event?: EventDocument
+): EventValidatorContext | undefined {
+  const eventConfig = event && findEventConfiguration(event)
+
+  if (!event || !eventConfig) {
+    return undefined
+  }
+
+  return getEventValidatorContext(event, eventConfig)
+}
+
 export function useValidatorContext(event?: EventDocument): ValidatorContext {
-  const leafAdminStructureLocationIds = useSuspenseAdminLeafLevelLocations()
+  const leafAdminStructureLocationIds =
+    useSuspenseGetLeafAdministrativeAreaIds()
   const user = useUser()
+  const findEventConfiguration = useEventConfigurationResolver()
+
+  /**
+   * Aggregating the action history is expensive and conditionals are evaluated
+   * per field, per conditional type — so compute it once per (event, config).
+   */
+  const eventContext = useMemo(
+    () => resolveEventValidatorContext(findEventConfiguration, event),
+    [event, findEventConfiguration]
+  )
 
   return {
     user,
     leafAdminStructureLocationIds,
-    event
+    event: eventContext
   }
 }

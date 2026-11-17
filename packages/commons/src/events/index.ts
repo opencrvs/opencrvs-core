@@ -9,6 +9,10 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
+// eslint-disable-next-line import/no-unassigned-import
+import 'zod/compile' // enables compile-by-default. Perf boost.
+
+export * from './AuditLog'
 export * from './Constants'
 export * from './ActionConfig'
 export * from './offline'
@@ -32,8 +36,10 @@ export * from './FieldValue'
 export * from './FormConfig'
 export * from './CompositeFieldValue'
 export * from './state'
+export * from './state/flags'
 export * from './utils'
 export * from './defineConfig'
+export * from './toNotificationForm'
 export * from './DeduplicationConfig'
 export * from './transactions'
 export * from './FieldType'
@@ -47,12 +53,16 @@ export * from './scopes'
 export * from './serializer'
 export * from './state/availableActions'
 export * from './FileUtils'
+export * from './mocks.test.utils'
 // In order to infer types, we need to export the following types along with events
 export * from '../conditionals/conditionals'
 export * from '../conditionals/validate'
 // This is a workaround for the fact that field is not exported from events
 export * from './field'
+export * from './Flag'
 export * from './event'
 export * from './locations'
-
+export * from './locationPayloads'
+export * from './PlainDate'
 export { UUID } from '../uuid'
+export { DocumentPath } from '../documents'

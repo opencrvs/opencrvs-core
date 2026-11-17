@@ -12,7 +12,8 @@
 
 import Ajv from 'ajv/dist/2019'
 import addFormats from 'ajv-formats'
-import { ErrorMapCtx, z, ZodIssueOptionalMessage } from 'zod'
+import * as z from 'zod/v4'
+import { $ZodIssue } from 'zod/v4/core'
 import { formatISO, isAfter, isBefore } from 'date-fns'
 
 import { ConditionalParameters, JSONSchema } from './conditionals'
@@ -30,18 +31,24 @@ import {
   AgeValue
 } from '../events/FieldValue'
 import { TranslationConfig } from '../events/TranslationConfig'
-import { ITokenPayload } from '../authentication'
+import { EncodedScope, ITokenPayload, TokenUserType } from '../users/authentication'
 import { UUID } from '../uuid'
 import {
   ageToDate,
   buildFormState,
   flattenFormState,
-  FormState
+  FormState,
+  getEventWithCompleteAcceptedActions
 } from '../events/utils'
+import { ActionConfig } from '../events/ActionConfig'
 import { ActionType } from '../events/ActionType'
+import { EventConfig } from '../events/EventConfig'
 import { EventDocument } from '../events/EventDocument'
+import { EventIndex } from '../events/EventIndex'
 import { Location } from '../events/locations'
 import { SystemVariables } from '../events/TemplateConfig'
+import { getCurrentEventState } from '../events/state'
+import { isPlainDate } from '../events/PlainDate'
 
 const ajv = new Ajv({
   $data: true,
@@ -95,9 +102,9 @@ function resolveDataPath(
   return current
 }
 
-/** Returns today's date as an ISO date string (YYYY-MM-DD). */
-export function todayISO(): string {
-  return formatISO(new Date(), { representation: 'date' })
+/** Returns today's date as a {@link PlainDate} (YYYY-MM-DD), device-local. */
+export function todayISO(): PlainDate {
+  return formatISO(new Date(), { representation: 'date' }) as PlainDate
 }
 
 /**
@@ -111,13 +118,15 @@ export type ClientFunctionContext = {
   $form: EventState | ActionUpdate
   $now: string
   $online: boolean
-  $user?: ITokenPayload
+  $user?: UserValidatorContext
   $event?: EventDocument
   $leafAdminStructureLocationIds: Array<{ id: UUID }>
   user?: SystemVariables['user']
   $window?: SystemVariables['$window']
   locations?: Location[]
   adminLevelIds?: string[]
+  $flags?: string[]
+  $status?: string
 }
 
 // `data` is `FieldValue | undefined` because validators receive the field
@@ -152,16 +161,27 @@ export function buildClientFunctionContext(input: {
   form: EventState | ActionUpdate
   validatorContext?: ValidatorContext
   systemVariables?: SystemVariables
+  /**
+   * In real use cases, there can be hundreds of thousands of locations.
+   * Make sure that the context contains only the locations that are needed for validation.
+   * E.g. if the user is a leaf admin, only the leaf locations under their admin structure are needed.
+   * Loading few megabytes of locations to memory just for validation is not efficient and will choke the application.
+   */
   locations?: Location[]
   adminLevelIds?: string[]
 }): ClientFunctionContext {
   return {
     $form: input.form,
+    $flags: input.validatorContext?.event?.state.flags ?? [],
     $now: todayISO(),
     // eslint-disable-next-line @typescript-eslint/no-use-before-define
     $online: isOnline(),
     $user: input.validatorContext?.user,
-    $event: input.validatorContext?.event,
+    $event: input.validatorContext?.event?.document
+      ? getEventWithCompleteAcceptedActions(
+          input.validatorContext.event.document
+        )
+      : undefined,
     $leafAdminStructureLocationIds:
       input.validatorContext?.leafAdminStructureLocationIds ?? [],
     user: input.systemVariables?.user,
@@ -287,6 +307,37 @@ ajv.addKeyword({
   }
 })
 
+let schemasCompiled = false
+
+/**
+ * Precompiles action conditional schemas from the event configurations to improve performance of condition validation later on.
+ * Best called once on application startup before any condition validation is done.
+ */
+export function precompileActionSchemas(eventConfigurations: EventConfig[]) {
+  if (schemasCompiled) {
+    return
+  }
+
+  schemasCompiled = true
+
+  for (const config of eventConfigurations) {
+    for (const action of config.actions) {
+      if (action.conditionals) {
+        for (const conditional of action.conditionals) {
+          const schema = conditional.conditional
+          if (schema.$id && !ajv.getSchema(schema.$id)) {
+            ajv.compile(schema)
+          }
+        }
+      }
+    }
+  }
+}
+
+function isAgeValue(value: unknown): value is AgeValue {
+  return AgeValue.validate(value)
+}
+
 function mergeWithBaseFormState(
   values: EventState | ActionUpdate,
   context: ValidatorContext
@@ -321,32 +372,28 @@ ajv.addKeyword({
 
 export function validate(schema: JSONSchema, data: ConditionalParameters) {
   const validator = ajv.getSchema(schema.$id) || ajv.compile(schema)
-  if ('$form' in data) {
-    data.$form = Object.fromEntries(
-      Object.entries(data.$form).map(([key, value]) => {
-        const maybeAgeValue = AgeValue.safeParse(value)
-        if (maybeAgeValue.success) {
-          const age = maybeAgeValue.data.age
-          const maybeAsOfDate = PlainDate.safeParse(
-            data.$form[maybeAgeValue.data.asOfDateRef]
-          )
 
-          return [
-            key,
-            {
-              age,
-              dob: ageToDate(
-                age,
-                maybeAsOfDate.success
-                  ? maybeAsOfDate.data
-                  : PlainDate.parse(data.$now)
-              )
-            }
-          ]
-        }
+  if ('$form' in data) {
+    const entries = Object.entries(data.$form).map(([key, value]) => {
+      if (!isAgeValue(value)) {
         return [key, value]
-      })
-    )
+      }
+
+      const age = value.age
+
+      const asOf: unknown = data.$form[value.asOfDateRef]
+      const asOfDate = isPlainDate(asOf) ? asOf : PlainDate.parse(data.$now)
+
+      return [
+        key,
+        {
+          age,
+          dob: ageToDate(age, asOfDate)
+        }
+      ]
+    })
+
+    data.$form = Object.fromEntries(entries)
   }
 
   const result = validator(data) as boolean
@@ -402,18 +449,83 @@ function getConditionalActionsForField(
 export function areConditionsMet(
   conditions: FieldConditional[],
   values: Record<string, FieldValue>,
-  context: ValidatorContext
+  context: ValidatorContext,
+  event: EventIndex
 ) {
+  // Overrides `$flags`/`$status` with the real event data (same as `isActionConditionMet`)
+  // so `flag(...)`/`status(...)` conditionals work for data-display fields, e.g. in EventSummary.
+  const clientFunctionContext = {
+    ...buildClientFunctionContext({
+      form: mergeWithBaseFormState(values, context),
+      validatorContext: context
+    }),
+    $flags: event.flags,
+    $status: event.status
+  }
+
   return conditions.every((condition) =>
-    isConditionMet(condition.conditional, values, context)
+    validate(condition.conditional, clientFunctionContext)
   )
 }
 
+/**
+ * Given a field's `secured` property (a boolean, or a JSONSchema conditional
+ * evaluated against the event, e.g. `flag('sealed')`), returns whether the
+ * field is currently secured for the given event.
+ */
+export function isFieldSecured(
+  field: Pick<FieldConfig, 'secured'>,
+  event: EventIndex,
+  context: ValidatorContext
+): boolean {
+  if (typeof field.secured !== 'object' || field.secured === null) {
+    return Boolean(field.secured)
+  }
+
+  const clientFunctionContext = {
+    ...buildClientFunctionContext({
+      form: mergeWithBaseFormState(event.declaration, context),
+      validatorContext: context
+    }),
+    $flags: event.flags,
+    $status: event.status
+  }
+
+  return validate(field.secured as JSONSchema, clientFunctionContext)
+}
+
+export type EventValidatorContext = {
+  document: EventDocument
+  state: EventIndex
+}
+
+export function getEventValidatorContext(
+  document: EventDocument,
+  config: EventConfig
+): EventValidatorContext {
+  return { document, state: getCurrentEventState(document, config) }
+}
+
+export type UserValidatorContext = {
+  // In system-wide context internal service tokens do not have UUID.
+  sub: string
+  scope: EncodedScope[]
+  role?: string
+  userType: TokenUserType
+}
+/** deprecated */
 export type ValidatorContext = {
-  user?: ITokenPayload
+  user?: UserValidatorContext
   leafAdminStructureLocationIds?: Array<{ id: UUID }>
-  event?: EventDocument
   baseFormState?: EventState
+  event?: EventValidatorContext
+}
+
+export type StrictValidatorContext = {
+  user: UserValidatorContext
+  leafAdminStructureLocationIds: Array<{ id: UUID }>
+  baseFormState?: EventState
+  event: EventValidatorContext
 }
 
 function isFieldConditionMet(
@@ -482,6 +594,71 @@ export function isFieldDisplayedOnReview(
   )
 }
 
+function isActionConditionMet(
+  actionConfig: ActionConfig,
+  event: EventIndex,
+  context: ValidatorContext,
+  conditionalType: ConditionalType
+) {
+  if (!actionConfig.conditionals) {
+    return true
+  }
+
+  const rule = actionConfig.conditionals.find(
+    (conditional) => conditional.type === conditionalType
+  )
+
+  if (!rule) {
+    return true
+  }
+
+  return validate(rule.conditional, {
+    ...buildClientFunctionContext({
+      form: mergeWithBaseFormState(event.declaration, context),
+      validatorContext: context
+    }),
+    $flags: event.flags,
+    $status: event.status
+  })
+}
+
+export function isActionEnabled(
+  actionConfig: ActionConfig,
+  event: EventIndex,
+  context: ValidatorContext
+) {
+  return isActionConditionMet(
+    actionConfig,
+    event,
+    context,
+    ConditionalType.ENABLE
+  )
+}
+
+export function isActionVisible(
+  actionConfig: ActionConfig,
+  event: EventIndex,
+  context: ValidatorContext
+) {
+  return isActionConditionMet(
+    actionConfig,
+    event,
+    context,
+    ConditionalType.SHOW
+  )
+}
+
+export function isActionAvailable(
+  actionConfig: ActionConfig,
+  event: EventIndex,
+  context: ValidatorContext
+) {
+  return (
+    isActionVisible(actionConfig, event, context) &&
+    isActionEnabled(actionConfig, event, context)
+  )
+}
+
 export const errorMessages = {
   hiddenField: {
     id: 'error.hidden',
@@ -514,6 +691,13 @@ export const errorMessages = {
     description: 'Error message when field is not expected',
     id: 'error.unexpectedField'
   },
+  notInNotifyForm: {
+    defaultMessage:
+      'Field is not part of the notify form. Notify-only data belongs in annotation',
+    description:
+      'Error message when a notify declaration contains a field outside the notify form',
+    id: 'error.notInNotifyForm'
+  },
   correctionNotAllowed: {
     defaultMessage: 'Correction not allowed for field',
     description: 'Error message when correction is not allowed for field',
@@ -533,43 +717,18 @@ function createIntlError(message: TranslationConfig) {
  * Form error message definitions for Zod validation errors.
  * Overrides zod internal type error messages (string) to match the OpenCRVS error messages (TranslationConfig).
  */
+// In modern Zod, the `issue` parameter is always `z.ZodIssue`.
 function zodToIntlErrorMap(
-  issue: ZodIssueOptionalMessage,
-  _ctx: ErrorMapCtx,
+  issue: $ZodIssue,
+  value: unknown,
   field: FieldConfig
 ) {
   const requiredMessage: TranslationConfig =
     field.required && typeof field.required === 'object'
       ? field.required.message
       : errorMessages.requiredField
-  // eslint-disable-next-line @typescript-eslint/switch-exhaustiveness-check
+
   switch (issue.code) {
-    case 'invalid_string': {
-      if (_ctx.data === '') {
-        return createIntlError(requiredMessage)
-      }
-
-      if (issue.validation === 'date') {
-        return createIntlError(errorMessages.invalidDate)
-      }
-
-      if (issue.validation === 'email') {
-        return createIntlError(errorMessages.invalidEmail)
-      }
-
-      break
-    }
-
-    case 'invalid_type': {
-      if (
-        issue.expected !== issue.received &&
-        (issue.received === 'undefined' || issue.received === 'null')
-      ) {
-        return createIntlError(requiredMessage)
-      }
-
-      break
-    }
     case 'too_small': {
       if (issue.message === undefined) {
         return createIntlError(requiredMessage)
@@ -577,19 +736,47 @@ function zodToIntlErrorMap(
 
       break
     }
+
+    case 'invalid_type': {
+      if (
+        issue.hasOwnProperty('input') &&
+        (issue.input === undefined || issue.input === null)
+      ) {
+        return createIntlError(requiredMessage)
+      }
+      return createIntlError(errorMessages.invalidInput)
+    }
+
     case 'invalid_union': {
-      for (const { issues } of issue.unionErrors) {
-        for (const e of issues) {
-          if (
-            zodToIntlErrorMap(e, _ctx, field).message.message.id !==
-            'error.required'
-          ) {
+      for (const unionError of issue.errors) {
+        for (const e of unionError) {
+          const intlErr = zodToIntlErrorMap(e, value, field)
+          if (intlErr.message.message.id !== 'error.required') {
             return createIntlError(errorMessages.invalidInput)
           }
         }
       }
       return createIntlError(requiredMessage)
     }
+    case 'invalid_format':
+      if (value === '') {
+        return createIntlError(requiredMessage)
+      }
+      if (issue.format === 'date-time' || issue.format === 'date') {
+        return createIntlError(errorMessages.invalidDate)
+      }
+      if (issue.format === 'email') {
+        return createIntlError(errorMessages.invalidEmail)
+      }
+      return createIntlError(errorMessages.invalidInput)
+    case 'custom':
+    case 'unrecognized_keys':
+    case 'invalid_value':
+    case 'invalid_key':
+    case 'too_big':
+    case 'not_multiple_of':
+    case 'invalid_element':
+      return createIntlError(errorMessages.invalidInput)
   }
 
   return createIntlError(errorMessages.invalidInput)
@@ -645,11 +832,11 @@ export function validateFieldInput({
 
   const rawError = zodType.safeParse(value, {
     // @ts-expect-error
-    errorMap: (issue, _ctx) => zodToIntlErrorMap(issue, _ctx, field)
+    error: (issue) => zodToIntlErrorMap(issue, value, field)
   })
 
   // We have overridden the standard error messages
-  return (rawError.error?.issues.map((issue) => issue.message) ??
+  return (rawError.error?.issues.map((issue: $ZodIssue) => issue.message) ??
     []) as unknown as {
     message: TranslationConfig
   }[]
@@ -754,80 +941,127 @@ export function runFieldValidations({
   return [...fieldValidationResult, ...customValidationResults]
 }
 
+/**
+ * Narrows a single validator JSON schema down to the part that applies to
+ * `fieldId`, or returns `null` when the schema says nothing about that field.
+ */
+function extractFieldSchema(
+  fieldId: FieldConfig['id'],
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  jsonSchema: any
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+): any | null {
+  if (!jsonSchema.properties) {
+    /*
+     * `and(...)` compiles to `{ type: 'object', allOf: [...] }` with no
+     * top-level `properties`. Every member of an `allOf` has to hold on its
+     * own, so dropping the ones that do not mention `fieldId` leaves the
+     * meaning of the rest intact.
+     *
+     * `or(...)` (`anyOf`) and `not(...)` are deliberately NOT narrowed:
+     * `or(firstnameValid, surnameValid)` passes as a whole while firstname
+     * alone fails, so narrowing it would invent an error on a valid form.
+     */
+    if (Array.isArray(jsonSchema.allOf)) {
+      const members = jsonSchema.allOf
+        .map((member: unknown) => extractFieldSchema(fieldId, member))
+        .filter((member: unknown) => member !== null)
+        // The plain branch below stamps an `$id` on every member, but only the
+        // outermost schema is allowed to carry one.
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        .map(({ $id, ...member }: any) => member)
+
+      if (members.length === 0) {
+        return null
+      }
+
+      return {
+        ...jsonSchema,
+        /*
+         * `validate()` looks schemas up from Ajv's cache by `$id`, so a
+         * narrowed schema must not reuse the id its un-narrowed parent was
+         * compiled under.
+         */
+        ...(typeof jsonSchema.$id === 'string'
+          ? { $id: `${jsonSchema.$id}.${fieldId}` }
+          : {}),
+        allOf: members
+      }
+    }
+
+    return null
+  }
+
+  const $form = jsonSchema.properties.$form
+
+  /*
+   * Not every schema with `properties` is a `$form` conditional: members of an
+   * `and(...)` built from `user.hasScope(...)`, `user.isOnline()` or an
+   * `$event` conditional have `properties` without a `$form` under it. Those
+   * say nothing about `fieldId`.
+   */
+  if (!$form?.properties) {
+    return null
+  }
+
+  /*
+   * If you are working with nested "composite fields" like address or name,
+   * It is useful to change the validation to only include the specific fields without the parent layer
+   * for the full form field so
+   *
+   * {'some.field.id': {'properties': {a: Validator, b: Validator}}} will be transformed to
+   * {a: Validator, b: Validator}
+   */
+  if ($form.properties?.[fieldId]?.type === 'object') {
+    return {
+      ...jsonSchema,
+      // See the `$id` note in the `allOf` branch above: Ajv caches by `$id`,
+      // so a narrowed schema must not reuse its parent's id.
+      ...(typeof jsonSchema.$id === 'string'
+        ? { $id: `${jsonSchema.$id}.${fieldId}` }
+        : {}),
+      properties: {
+        $form: {
+          type: 'object',
+          properties: $form.properties?.[fieldId]?.properties || {},
+          required: $form.properties?.[fieldId]?.required || []
+        }
+      }
+    }
+  }
+
+  if (!$form.properties?.[fieldId]) {
+    return null
+  }
+
+  return {
+    ...jsonSchema,
+    $id: jsonSchema.$id + '.' + fieldId,
+    properties: {
+      $form: {
+        type: 'object',
+        properties: {
+          [fieldId]: $form.properties?.[fieldId]
+        },
+        required: $form.required?.includes(fieldId) ? [fieldId] : []
+      }
+    }
+  }
+}
+
 export function getValidatorsForField(
   fieldId: FieldConfig['id'],
   validations: NonNullable<FieldConfig['validation']>
 ): NonNullable<FieldConfig['validation']> {
   return validations
     .map(({ validator, message }) => {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const jsonSchema = validator as any
+      const narrowed = extractFieldSchema(fieldId, validator)
 
-      /*
-       * It’s possible the validator is an or(...) / and(...) / similar combinator.
-       * From these it's tricky to extract field-specific validation:
-       *
-       * Currently we assume a plain object validator:
-       *   { firstname: aValidator, middlename: bValidator, lastname: cValidator }
-       * so "lastname" → cValidator directly.
-       *
-       * But with something like:
-       *   (firstname: aValidator) OR (middlename: bValidator) OR (lastname: cValidator)
-       * or even more nested logical combinations, there’s no clear properties structure
-       * (similar to JSON Schema `anyOf` not exposing `properties`).
-       *
-       * Handling all those cases is left unimplemented for now due to complexity/time.
-       */
-      if (!jsonSchema.properties) {
+      if (narrowed === null) {
         return null
       }
 
-      const $form = jsonSchema.properties.$form
-
-      /*
-       * If you are working with nested "composite fields" like address or name,
-       * It is useful to change the validation to only include the specific fields without the parent layer
-       * for the full form field so
-       *
-       * {'some.field.id': {'properties': {a: Validator, b: Validator}}} will be transformed to
-       * {a: Validator, b: Validator}
-       */
-      if ($form.properties?.[fieldId]?.type === 'object') {
-        return {
-          message,
-          validator: {
-            ...jsonSchema,
-            properties: {
-              $form: {
-                type: 'object',
-                properties: $form.properties?.[fieldId]?.properties || {},
-                required: $form.properties?.[fieldId]?.required || []
-              }
-            }
-          }
-        }
-      }
-
-      if (!$form.properties?.[fieldId]) {
-        return null
-      }
-
-      return {
-        message,
-        validator: {
-          ...jsonSchema,
-          $id: jsonSchema.$id + '.' + fieldId,
-          properties: {
-            $form: {
-              type: 'object',
-              properties: {
-                [fieldId]: $form.properties?.[fieldId]
-              },
-              required: $form.required?.includes(fieldId) ? [fieldId] : []
-            }
-          }
-        }
-      }
+      return { message, validator: narrowed }
     })
     .filter((x) => x !== null) as NonNullable<FieldConfig['validation']>
 }

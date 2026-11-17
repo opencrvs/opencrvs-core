@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { z } from 'zod'
+import * as z from 'zod/v4'
 import { ActionBase, ActionStatus } from './ActionDocument'
 import { BaseActionInput } from './ActionInput'
 import { ActionTypes } from './ActionType'
@@ -27,15 +27,21 @@ export const Draft = z
     transactionId: z.string(),
     createdAt: z.string().datetime(),
     action: ActionBase.extend({
-      type: ActionTypes.exclude([ActionTypes.Enum.DELETE])
+      type: ActionTypes.exclude([ActionTypes.enum.DELETE])
     }).omit({ id: true, createdAtLocation: true })
   })
   .describe(
     'A temporary storage for an action. Stored with details of the event, creator and creation time.'
   )
 
-export const DraftInput = BaseActionInput.extend({
-  type: ActionTypes.exclude([ActionTypes.Enum.DELETE]),
+export const DraftInput = BaseActionInput.omit({ waitFor: true }).extend({
+  /*
+   * A draft can name a file that no action references. Such a file stays until
+   * the record is deleted or the record's next action sweeps its prefix.
+   * Drafts are therefore saved only on a created record, which can still be deleted.
+   * The server refuses them on any other record.
+   */
+  type: z.enum([ActionTypes.enum.DECLARE, ActionTypes.enum.NOTIFY]),
   status: z.enum([
     ActionStatus.Requested,
     ActionStatus.Accepted,
@@ -43,5 +49,14 @@ export const DraftInput = BaseActionInput.extend({
   ])
 })
 
+/*
+ * A draft saved on the server. Unlike a local draft, which also holds the state of
+ * the edit, print and correction views, it can only be a declare or notify draft.
+ */
+export const RemoteDraft = Draft.extend({
+  action: Draft.shape.action.extend({ type: DraftInput.shape.type })
+})
+
 export type Draft = z.infer<typeof Draft>
 export type DraftInput = z.infer<typeof DraftInput>
+export type RemoteDraft = z.infer<typeof RemoteDraft>

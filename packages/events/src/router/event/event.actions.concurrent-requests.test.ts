@@ -43,7 +43,6 @@ function mockConfirmations(
           status === 200 && action === ActionType.REGISTER
             ? { registrationNumber: `ABC${Date.now()}` }
             : {}
-        // @ts-expect-error - msw types complain about numeric status
         return HttpResponse.json(body, { status })
       }
     )
@@ -59,11 +58,6 @@ async function setup(actions: Parameters<typeof createEvent>[2] = []) {
   const declare = async (transactionId = getUUID()) =>
     client.event.actions.declare.request({
       ...generator.event.actions.declare(event.id, { keepAssignment: true }),
-      transactionId
-    })
-  const validate = async (transactionId = getUUID()) =>
-    client.event.actions.validate.request({
-      ...generator.event.actions.validate(event.id, { keepAssignment: true }),
       transactionId
     })
   const register = async (transactionId = getUUID()) =>
@@ -85,7 +79,6 @@ async function setup(actions: Parameters<typeof createEvent>[2] = []) {
     generator,
     event,
     declare,
-    validate,
     register,
     reject,
     archive
@@ -140,7 +133,7 @@ describe('An event has at most one requested action', () => {
     expect(calls[ActionType.DECLARE]).toBe(1)
     expectOneRefusedAsRequested(results)
 
-    const stored = await client.event.get(event.id)
+    const stored = await client.event.get({ eventId: event.id })
     expect(statuses(stored.actions, ActionType.DECLARE)).toEqual([
       ActionStatus.Requested,
       ActionStatus.Accepted
@@ -148,10 +141,16 @@ describe('An event has at most one requested action', () => {
   })
 
   test('a DECLARE waiting for its asynchronous confirmation refuses another DECLARE', async () => {
-    const { declare } = await setup()
+    const { client, generator, event, declare } = await setup()
     const calls = mockConfirmations(() => 202)
 
-    await declare()
+    // Asynchronous confirmations are only accepted when the assignment is released
+    await client.event.actions.declare.request(
+      generator.event.actions.declare(event.id)
+    )
+    await client.event.actions.assignment.assign(
+      generator.event.actions.assign(event.id)
+    )
     await expect(declare()).rejects.toMatchObject({
       code: 'CONFLICT',
       message: expect.stringContaining('declare:requested')
@@ -184,7 +183,7 @@ describe('An event has at most one requested action', () => {
     }
 
     expect(calls[ActionType.DECLARE]).toBe(1)
-    const stored = await client.event.get(event.id)
+    const stored = await client.event.get({ eventId: event.id })
     expect(statuses(stored.actions, ActionType.DECLARE)).toEqual([
       ActionStatus.Requested,
       ActionStatus.Accepted
@@ -220,7 +219,7 @@ describe('An event has at most one requested action', () => {
     const declaring = declare()
     await delay(200)
     const startedAt = Date.now()
-    await client.event.get(event.id)
+    await client.event.get({ eventId: event.id })
     expect(Date.now() - startedAt).toBeLessThan(800)
 
     await expect(declaring).resolves.toBeDefined()
@@ -248,65 +247,43 @@ describe('A requested action left without an outcome', () => {
       ActionStatus.Accepted
     ])
 
-    const stored = await client.event.get(event.id)
+    const stored = await client.event.get({ eventId: event.id })
     const state = getCurrentEventState(stored, tennisClubMembershipEvent)
     expect(state.status).toBe('DECLARED')
     expect(state.flags).not.toContain('declare:requested')
   })
 
-  test('a failed VALIDATE is completed by its retry', async () => {
-    const { client, event, validate } = await setup([ActionType.DECLARE])
+  test('a failed REGISTER is completed by its retry', async () => {
+    const { client, event, register } = await setup([ActionType.DECLARE])
     const failed = getUUID()
 
     mockConfirmations(() => 500)
-    await expect(validate(failed)).rejects.toThrow()
+    await expect(register(failed)).rejects.toThrow()
 
     const calls = mockConfirmations()
-    await validate(failed)
-    expect(calls[ActionType.VALIDATE]).toBe(1)
+    await register(failed)
+    expect(calls[ActionType.REGISTER]).toBe(1)
 
-    const stored = await client.event.get(event.id)
+    const stored = await client.event.get({ eventId: event.id })
     const state = getCurrentEventState(stored, tennisClubMembershipEvent)
-    expect(state.status).toBe('VALIDATED')
-    expect(state.flags).not.toContain('validate:requested')
+    expect(state.status).toBe('REGISTERED')
+    expect(state.flags).not.toContain('register:requested')
   })
 
   test('an action with an outcome is not sent again on a retry', async () => {
-    const { validate } = await setup([ActionType.DECLARE])
+    const { register } = await setup([ActionType.DECLARE])
     const transactionId = getUUID()
     const calls = mockConfirmations()
 
-    await validate(transactionId)
-    await validate(transactionId)
-    expect(calls[ActionType.VALIDATE]).toBe(1)
+    await register(transactionId)
+    await register(transactionId)
+    expect(calls[ActionType.REGISTER]).toBe(1)
   })
 })
 
-describe('Concurrent VALIDATE and REGISTER requests', () => {
-  test('two concurrent VALIDATEs: one reaches the country config, the other is refused', async () => {
-    const { client, event, validate } = await setup([ActionType.DECLARE])
-    const calls = mockConfirmations(() => 200, { delayMs: 500 })
-
-    const results = await Promise.allSettled([validate(), validate()])
-
-    expect(calls[ActionType.VALIDATE]).toBe(1)
-    expectOneRefusedAsRequested(results)
-
-    const stored = await client.event.get(event.id)
-    expect(statuses(stored.actions, ActionType.VALIDATE)).toEqual([
-      ActionStatus.Requested,
-      ActionStatus.Accepted
-    ])
-    const state = getCurrentEventState(stored, tennisClubMembershipEvent)
-    expect(state.status).toBe('VALIDATED')
-    expect(state.flags).not.toContain('validate:requested')
-  })
-
+describe('Concurrent requests on a declared record', () => {
   test('two concurrent REGISTERs: one reaches the country config, the other is refused', async () => {
-    const { client, event, register } = await setup([
-      ActionType.DECLARE,
-      ActionType.VALIDATE
-    ])
+    const { client, event, register } = await setup([ActionType.DECLARE])
     const calls = mockConfirmations(() => 200, { delayMs: 500 })
 
     const results = await Promise.allSettled([register(), register()])
@@ -314,7 +291,7 @@ describe('Concurrent VALIDATE and REGISTER requests', () => {
     expect(calls[ActionType.REGISTER]).toBe(1)
     expectOneRefusedAsRequested(results)
 
-    const stored = await client.event.get(event.id)
+    const stored = await client.event.get({ eventId: event.id })
     expect(statuses(stored.actions, ActionType.REGISTER)).toEqual([
       ActionStatus.Requested,
       ActionStatus.Accepted
@@ -324,23 +301,20 @@ describe('Concurrent VALIDATE and REGISTER requests', () => {
     expect(state.flags).not.toContain('register:requested')
   })
 
-  test('VALIDATE and REJECT at once on a declared record: only one runs', async () => {
-    const { validate, reject } = await setup([ActionType.DECLARE])
+  test('REGISTER and REJECT at once: only one runs', async () => {
+    const { register, reject } = await setup([ActionType.DECLARE])
     const calls = mockConfirmations(() => 200, { delayMs: 500 })
 
-    const results = await Promise.allSettled([validate(), reject()])
+    const results = await Promise.allSettled([register(), reject()])
 
     expect(
-      (calls[ActionType.VALIDATE] ?? 0) + (calls[ActionType.REJECT] ?? 0)
+      (calls[ActionType.REGISTER] ?? 0) + (calls[ActionType.REJECT] ?? 0)
     ).toBe(1)
     expectOneRefusedAsRequested(results)
   })
 
-  test('REGISTER and ARCHIVE at once on a validated record: only one runs', async () => {
-    const { register, archive } = await setup([
-      ActionType.DECLARE,
-      ActionType.VALIDATE
-    ])
+  test('REGISTER and ARCHIVE at once: only one runs', async () => {
+    const { register, archive } = await setup([ActionType.DECLARE])
     const calls = mockConfirmations(() => 200, { delayMs: 500 })
 
     const results = await Promise.allSettled([register(), archive()])
@@ -351,11 +325,11 @@ describe('Concurrent VALIDATE and REGISTER requests', () => {
     expectOneRefusedAsRequested(results)
   })
 
-  test('a REGISTER after a concurrent VALIDATE pair completes normally', async () => {
-    const { validate, register } = await setup([ActionType.DECLARE])
+  test('a REGISTER after a concurrent DECLARE pair completes normally', async () => {
+    const { declare, register } = await setup()
     mockConfirmations(() => 200, { delayMs: 300 })
 
-    await Promise.allSettled([validate(), validate()])
+    await Promise.allSettled([declare(), declare()])
 
     const registered = await register()
     expect(

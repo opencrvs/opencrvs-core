@@ -1,6 +1,6 @@
 import { TRPCError } from '@trpc/server'
 import _ from 'lodash'
-import { WorkqueueCountInput } from '@opencrvs/commons'
+import { encodeScope, WorkqueueCountInput } from '@opencrvs/commons'
 import {
   createTestClient,
   setupTestCase,
@@ -59,9 +59,14 @@ test('Slugs in response matches input', async () => {
   const { user } = await setupTestCase()
   const client = createTestClient(user, [
     ...TEST_USER_DEFAULT_SCOPES,
-    'search[event=birth,access=all]',
-    'search[event=tennis-club-membership,access=all]'
+    encodeScope({
+      type: 'record.search',
+      options: {
+        event: ['birth', 'tennis-club-membership']
+      }
+    })
   ])
+
   const input: WorkqueueCountInput = [
     {
       slug: 'recent',
@@ -92,6 +97,7 @@ test('Slugs in response matches input', async () => {
       }
     }
   ]
+
   const counts = await client.workqueue.count(input)
   const response_slugs = Object.keys(counts)
   const input_slugs = input.map(({ slug }) => slug)

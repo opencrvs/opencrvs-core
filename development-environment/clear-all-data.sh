@@ -14,33 +14,20 @@ print_usage_and_exit () {
 
 DIR=$(pwd)
 
-# It's fine if these fail as it might be that the databases do not exist at this point
-docker run --rm --network=opencrvs_default mongo:4.4 mongo --host mongo1 --eval "\
-db.getSiblingDB('hearth-dev').dropDatabase();\
-db.getSiblingDB('events').dropDatabase();\
-db.getSiblingDB('openhim-dev').dropDatabase();\
-db.getSiblingDB('user-mgnt').dropDatabase();\
-db.getSiblingDB('application-config').dropDatabase();\
-db.getSiblingDB('metrics').dropDatabase();\
-db.getSiblingDB('config').dropDatabase();\
-db.getSiblingDB('performance').dropDatabase();\
-db.getSiblingDB('webhooks').dropDatabase();"
-
 curl -s "http://localhost:9200/_cat/indices?h=index" | while read -r index; do
   echo "Deleting index: $index"
   docker run --rm --network=opencrvs_default appropriate/curl \
     curl -XDELETE "http://elasticsearch:9200/$index" -v
 done
 
-docker run --rm --network=opencrvs_default appropriate/curl curl -X POST 'http://influxdb:8086/query?db=ocrvs' --data-urlencode "q=DROP SERIES FROM /.*/" -v
-PATH_TO_MINIO_DIR="$DIR/data/minio/ocrvs"
-# Clear Minio Data
-if [ -d $PATH_TO_MINIO_DIR ] ; then
+PATH_TO_S3_DIR="$DIR/data/rustfs/ocrvs"
+# Clear S3 object store data
+if [ -d $PATH_TO_S3_DIR ] ; then
  # Locally, as this script is called from the country config repo, the path to core is unknown
  # So we delete the data from the running shared volume location
-  docker exec `docker ps --format "{{.Names}}" | grep minio` sh -c 'rm -rf /data/ocrvs/*'
-  docker exec `docker ps --format "{{.Names}}" | grep minio` mkdir -p /data/ocrvs
-  echo "**** Removed minio data ****"
+  docker exec `docker ps --format "{{.Names}}" | grep rustfs` sh -c 'rm -rf /data/ocrvs/*'
+  docker exec `docker ps --format "{{.Names}}" | grep rustfs` mkdir -p /data/ocrvs
+  echo "**** Removed S3 object store data ****"
 fi
 
 ####################
@@ -64,7 +51,7 @@ echo "Schema 'app' dropped and recreated."
 echo "Running migrations"
 echo
 
-yarn --cwd="$DIR/packages/migration" start
+pnpm --dir "$DIR/packages/migration" start
 echo
-yarn reindex
+pnpm reindex
 echo

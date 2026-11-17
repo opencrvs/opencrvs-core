@@ -1,0 +1,109 @@
+/*
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at https://mozilla.org/MPL/2.0/.
+ *
+ * OpenCRVS is also distributed under the terms of the Civil Registration
+ * & Healthcare Disclaimer located at http://opencrvs.org/license.
+ *
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
+ */
+import { expect, test } from '@playwright/test'
+
+import { formatName, login } from '@e2e/support/helpers'
+import { CREDENTIALS } from '@e2e/support/constants'
+import { faker } from '@faker-js/faker'
+
+test('Validate draft with partial name', async ({ page }) => {
+  const name1 = {
+    firstNames: faker.person.firstName('male')
+  }
+  const name2 = {
+    familyName: faker.person.lastName('male')
+  }
+
+  await test.step('Record does not appear in draft', async () => {
+    await login(page, CREDENTIALS.FIELD_AGENT)
+    await page.getByRole('button', { name: 'Drafts' }).click()
+
+    await expect(page.getByTestId('search-result')).not.toContainText(
+      formatName(name1)
+    )
+    await expect(page.getByTestId('search-result')).not.toContainText(
+      formatName(name2)
+    )
+  })
+
+  await test.step('Create a draft with only firstname', async () => {
+    await page.click('#header-new-event')
+    await page.getByLabel('Birth').click()
+    await page.getByRole('button', { name: 'Continue' }).click()
+    await page.getByRole('button', { name: 'Continue' }).click()
+
+    await page.locator('#firstname').fill(name1.firstNames)
+
+    const draftResponse = page.waitForResponse(
+      (res) => res.url().includes('event.draft.create') && res.ok()
+    )
+    await page.getByRole('button', { name: 'Save & Exit' }).click()
+    await page.getByRole('button', { name: 'Confirm' }).click()
+
+    await draftResponse
+  })
+
+  await test.step('Create a draft with only lastname', async () => {
+    await page.click('#header-new-event')
+    await page.getByLabel('Birth').click()
+    await page.getByRole('button', { name: 'Continue' }).click()
+    await page.getByRole('button', { name: 'Continue' }).click()
+
+    await page.locator('#surname').fill(name2.familyName)
+
+    const draftResponse = page.waitForResponse(
+      (res) => res.url().includes('event.draft.create') && res.ok()
+    )
+    await page.getByRole('button', { name: 'Save & Exit' }).click()
+    await page.getByRole('button', { name: 'Confirm' }).click()
+
+    await draftResponse
+  })
+
+  await test.step('Records appear in draft', async () => {
+    await page.getByRole('button', { name: 'Drafts' }).click()
+
+    // 5s (Playwright's default) wasn't always enough for the drafts
+    // workqueue query to reflect a just-created draft under CI load.
+    await expect(page.getByTestId('search-result')).toContainText(
+      formatName(name1),
+      { timeout: 15000 }
+    )
+    await expect(page.getByTestId('search-result')).toContainText(
+      formatName(name2),
+      { timeout: 15000 }
+    )
+  })
+
+  await test.step('Records do not appear in draft for other user: RO', async () => {
+    await login(page, CREDENTIALS.REGISTRATION_OFFICER)
+    await page.getByRole('button', { name: 'Drafts' }).click()
+
+    await expect(page.getByTestId('search-result')).not.toContainText(
+      formatName(name1)
+    )
+    await expect(page.getByTestId('search-result')).not.toContainText(
+      formatName(name2)
+    )
+  })
+
+  await test.step('Records do not appear in draft for other user: LR', async () => {
+    await login(page, CREDENTIALS.REGISTRAR)
+    await page.getByRole('button', { name: 'Drafts' }).click()
+
+    await expect(page.getByTestId('search-result')).not.toContainText(
+      formatName(name1)
+    )
+    await expect(page.getByTestId('search-result')).not.toContainText(
+      formatName(name2)
+    )
+  })
+})

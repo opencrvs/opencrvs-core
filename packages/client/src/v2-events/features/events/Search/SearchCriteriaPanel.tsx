@@ -13,16 +13,18 @@ import { defineMessages, useIntl } from 'react-intl'
 import { useNavigate } from 'react-router-dom'
 import styled from 'styled-components'
 import { capitalize } from 'lodash'
-import { Pill, Link as StyledLink } from '@opencrvs/components/lib'
+import { Pill, Link as StyledLink } from '@opencrvs/components'
 import {
   EventConfig,
   EventState,
   FieldValue,
-  FieldConfig
+  FieldConfig,
+  todayISO
 } from '@opencrvs/commons/client'
 import { ROUTES } from '@client/v2-events/routes'
 import { filterEmptyValues } from '@client/v2-events/utils'
 import { ValueOutput } from '@client/v2-events/features/events/components/Output'
+import { useAdminStructure } from '@client/v2-events/hooks/useAdminStructure'
 import { getSearchParamsFieldConfigs, serializeSearchParams } from './utils'
 
 const messagesToDefine = {
@@ -41,16 +43,12 @@ const messagesToDefine = {
 const messages = defineMessages(messagesToDefine)
 
 const SearchParamContainer = styled.div`
-  margin: 16px 0px;
+  margin: 16px 16px 16px 0;
   display: flex;
   gap: 10px;
   flex-wrap: wrap;
   align-items: center;
   color: ${({ theme }) => theme.colors.primaryDark};
-  @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
-    max-height: 200px;
-    overflow-y: scroll;
-  }
 `
 
 function convertPathToLabel(path?: string): string {
@@ -88,7 +86,13 @@ function SearchParamLabel({
     : undefined
 
   const label = intl.formatMessage(field.label)
-  const valueOutput = ValueOutput({ config: field, value, searchMode: true })
+  const valueOutput = ValueOutput({
+    // Search criteria are a present-tense surface — today's names.
+    anchor: todayISO(),
+    config: field,
+    value,
+    searchMode: true
+  })
   const output = (
     <>
       {prefix}
@@ -109,9 +113,11 @@ export function SearchCriteriaPanel({
   const navigate = useNavigate()
   const intl = useIntl()
 
+  const adminStructure = useAdminStructure()
   const searchFieldConfigs = getSearchParamsFieldConfigs(
     eventConfig,
-    formValues
+    formValues,
+    adminStructure
   )
   return (
     <>

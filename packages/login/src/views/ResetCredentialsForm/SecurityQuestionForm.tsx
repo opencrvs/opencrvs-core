@@ -14,17 +14,20 @@ import {
   IVerifySecurityAnswerResponse,
   QUESTION_KEYS
 } from '@login/utils/authApi'
-import { InputField } from '@opencrvs/components/lib/InputField'
-import { TextInput } from '@opencrvs/components/lib/TextInput'
+import {
+  InputField,
+  TextInput,
+  Frame,
+  Content,
+  ContentSize,
+  AppBar,
+  Button,
+  Icon
+} from '@opencrvs/components'
 import React, { useState } from 'react'
 import { injectIntl, WrappedComponentProps } from 'react-intl'
 import styled from 'styled-components'
 import { messages as sharedMessages } from '@login/i18n/messages/views/resetCredentialsForm'
-import { Frame } from '@opencrvs/components/lib/Frame'
-import { Content, ContentSize } from '@opencrvs/components/lib/Content'
-import { AppBar } from '@opencrvs/components/lib/AppBar'
-import { Button } from '@opencrvs/components/lib/Button'
-import { Icon } from '@opencrvs/components/lib/Icon'
 import { constantsMessages } from '@login/i18n/messages/constants'
 import { useLocation, useNavigate } from 'react-router-dom'
 import * as routes from '@login/navigation/routes'
@@ -81,9 +84,9 @@ const messages = {
 type Props = WrappedComponentProps
 
 const SecurityQuestionComponent = ({ intl }: Props) => {
-  const [answer, setAnswer] = useState<string>('')
-  const [touched, setTouched] = useState<boolean>(false)
-  const [error, setError] = useState<boolean>(false)
+  const [answer, setAnswer] = useState('')
+  const [touched, setTouched] = useState(false)
+  const [error, setError] = useState(false)
 
   const location = useLocation()
   const navigate = useNavigate()
@@ -105,7 +108,9 @@ const SecurityQuestionComponent = ({ intl }: Props) => {
       return setError(true)
     }
 
-    if (error) return
+    if (error) {
+      return
+    }
 
     let result: IVerifySecurityAnswerResponse
 
@@ -113,6 +118,10 @@ const SecurityQuestionComponent = ({ intl }: Props) => {
       result = await authApi.verifySecurityAnswer(location.state.nonce, answer)
 
       if (!result.matched) {
+        // Clear the input
+        setAnswer('')
+        setTouched(false)
+        setError(false)
         return setQuestionKey(result.securityQuestionKey)
       }
       if (location.state.forgottenItem === FORGOTTEN_ITEMS.USERNAME) {
@@ -166,15 +175,11 @@ const SecurityQuestionComponent = ({ intl }: Props) => {
             }
             mobileTitle={intl.formatMessage(
               sharedMessages.credentialsResetFormTitle,
-              {
-                forgottenItem
-              }
+              { forgottenItem }
             )}
             desktopTitle={intl.formatMessage(
               sharedMessages.credentialsResetFormTitle,
-              {
-                forgottenItem
-              }
+              { forgottenItem }
             )}
           />
         }

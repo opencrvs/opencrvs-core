@@ -8,8 +8,13 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { ColumnContentAlignment } from './Workqueue'
 import * as React from 'react'
+
+export enum ColumnContentAlignment {
+  LEFT = 'left',
+  RIGHT = 'right',
+  CENTER = 'center'
+}
 
 enum GQLRegStatus {
   DECLARED = 'DECLARED',
@@ -62,6 +67,7 @@ export interface IDynamicValues {
     | null
     | undefined
     | Record<string, unknown>
+    | ((event: React.MouseEvent) => void)
 }
 
 export interface IActionObject {
@@ -72,6 +78,6 @@ export interface IActionObject {
 }
 
 export interface IActionComponent {
-  actionComponent: JSX.Element
+  actionComponent: JSX.Element | (() => React.ReactElement)
 }
 export type IAction = IActionObject | IActionComponent

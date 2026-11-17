@@ -12,36 +12,37 @@ import * as React from 'react'
 import styled from 'styled-components'
 import { defineMessages, IntlShape, useIntl } from 'react-intl'
 import { useNavigate } from 'react-router-dom'
-import { useSelector } from 'react-redux'
 import format from 'date-fns/format'
-import { Table } from '@opencrvs/components/lib/Table'
-import { Text } from '@opencrvs/components/lib/Text'
+import { Table, Text, ColumnContentAlignment, Link } from '@opencrvs/components'
 import {
   Action,
   ActionType,
+  ClientLocation,
   EventDocument,
   EventState,
+  getCurrentEventState,
   isFieldVisible,
   isPageVisible,
   PageConfig,
   PageTypes,
   RequestedCorrectionAction,
   TranslationConfig,
-  User,
-  ValidatorContext
+  UUID,
+  ValidatorContext,
+  PlainDate,
+  toPlainDate
 } from '@opencrvs/commons/client'
-import { ColumnContentAlignment, Link } from '@opencrvs/components'
 import { makeFormFieldIdFormikCompatible } from '@client/v2-events/components/forms/utils'
 import { messages as correctionMessages } from '@client/i18n/messages/views/correction'
-import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
+import { useEventConfigurationForRecord } from '@client/v2-events/features/events/useEventConfiguration'
 import {
   isEmptyValue,
   Output
 } from '@client/v2-events/features/events/components/Output'
 import { ROUTES } from '@client/v2-events/routes'
-import { useUsers } from '@client/v2-events/hooks/useUsers'
-import { getUsersFullName } from '@client/v2-events/utils'
-import { getLocations } from '@client/offline/selectors'
+import { useUserDetails } from '@client/v2-events/hooks/useUserDetails'
+import { useLocations } from '@client/v2-events/hooks/useLocations'
+import { recordAnchorDate, resolveLocationName } from '@client/v2-events/utils'
 import { DeclarationComparisonTable } from './DeclarationComparisonTable'
 
 const messages = defineMessages({
@@ -79,25 +80,28 @@ const Label = styled.label`
  */
 function getRequestActionDetails(
   correctionRequestAction: Action,
-  users: User[],
-  locations: ReturnType<typeof getLocations>,
-  intl: IntlShape
+  submitterName: string,
+  locations: Map<UUID, ClientLocation>
 ): CorrectionDetail[] {
-  const user = users.find((u) => u.id === correctionRequestAction.createdBy)
   const location =
     correctionRequestAction.createdAtLocation &&
-    locations[correctionRequestAction.createdAtLocation]
-
+    locations.get(correctionRequestAction.createdAtLocation)
+  // The requester's office renders under the name it carried on the date the
+  // correction was requested.
+  const locationName = resolveLocationName(
+    location || undefined,
+    toPlainDate(correctionRequestAction.createdAt)
+  )
   return [
     {
       label: messages.correctionSubmittedBy,
       id: 'correction.submitter',
-      valueDisplay: user ? getUsersFullName(user.name, intl.locale) : ''
+      valueDisplay: submitterName
     },
     {
       label: messages.correctionRequesterOffice,
       id: 'correction.requesterOffice',
-      valueDisplay: location?.name || ''
+      valueDisplay: locationName
     },
     {
       label: messages.correctionSubmittedOn,
@@ -115,9 +119,10 @@ function buildCorrectionDetails(
   annotation: EventState,
   form: EventState,
   intl: IntlShape,
-  users: User[],
-  locations: ReturnType<typeof getLocations>,
+  submitterName: string,
+  locations: Map<UUID, ClientLocation>,
   validatorContext: ValidatorContext,
+  anchor: PlainDate,
   correctionRequestAction?: Action
 ): CorrectionDetail[] {
   const details: CorrectionDetail[] = correctionFormPages
@@ -149,7 +154,13 @@ function buildCorrectionDetails(
         .map((field) => ({
           label: field.label,
           id: field.id,
-          valueDisplay: <Output field={field} value={annotation[field.id]} />,
+          valueDisplay: (
+            <Output
+              anchor={anchor}
+              field={field}
+              value={annotation[field.id]}
+            />
+          ),
           pageId: page.id
         }))
     })
@@ -158,9 +169,8 @@ function buildCorrectionDetails(
     details.unshift(
       ...getRequestActionDetails(
         correctionRequestAction,
-        users,
-        locations,
-        intl
+        submitterName,
+        locations
       )
     )
   }
@@ -190,12 +200,12 @@ interface CorrectionDetail {
  * a table with the corrected fields.
  */
 export function CorrectionDetails({
+  backTo,
   event,
   form,
   annotation,
   requesting,
   editable = false,
-  workqueue,
   correctionRequestAction,
   validatorContext
 }: {
@@ -205,30 +215,45 @@ export function CorrectionDetails({
   requesting: boolean
   correctionRequestAction?: RequestedCorrectionAction
   editable?: boolean
-  workqueue?: string
+  backTo?: string
   validatorContext: ValidatorContext
 }) {
   const intl = useIntl()
-  const { eventConfiguration } = useEventConfiguration(event.type)
+  const { eventConfiguration } = useEventConfigurationForRecord(event)
 
   const navigate = useNavigate()
-  const { getUser } = useUsers()
-  const users = getUser.getAllCached()
-  const locations = useSelector(getLocations)
+  const { getUserDetails } = useUserDetails()
+
+  const { getLocations } = useLocations()
+  const locations = getLocations.useSuspenseQuery()
 
   const correctionFormPages =
     eventConfiguration.actions.find(
       (action) => action.type === ActionType.REQUEST_CORRECTION
     )?.correctionForm.pages || []
 
+  const submitterName = correctionRequestAction
+    ? getUserDetails({
+        createdByUserType: correctionRequestAction.createdByUserType,
+        createdBy: correctionRequestAction.createdBy,
+        type: correctionRequestAction.type,
+        createdByRole: correctionRequestAction.createdByRole
+      }).name
+    : ''
+
+  const anchor = recordAnchorDate(
+    getCurrentEventState(event, eventConfiguration)
+  )
+
   const correctionDetails = buildCorrectionDetails(
     correctionFormPages,
     annotation,
     form,
     intl,
-    users,
+    submitterName,
     locations,
     validatorContext,
+    anchor,
     correctionRequestAction
   )
 
@@ -274,7 +299,7 @@ export function CorrectionDetails({
                         pageId,
                         eventId: event.id
                       },
-                      { workqueue },
+                      { backTo },
                       id ? makeFormFieldIdFormikCompatible(id) : undefined
                     )
                   )

@@ -12,28 +12,84 @@
 import fetch from 'node-fetch'
 import { array } from 'zod'
 import {
-  EventConfig,
-  getOrThrow,
-  Location,
-  LocationType,
+  ApplicationConfig,
+  EventDocument,
+  getEventConfigById,
+  getEventConfigForRecord,
   logger,
+  resolveEventConfigInTimeZone,
+  Role,
   TokenWithBearer,
+  validateRoles,
+  VersionedEventConfig,
   WorkqueueConfig
 } from '@opencrvs/commons'
-import { Bundle, SavedLocation } from '@opencrvs/commons/types'
 import { env } from '@events/environment'
 
 /**
- * During 1.9.0 we support only docker swarm configuration.
- * In docker swarm deployment process updates all the containers.
- * There shouldn't be a situation where countryconfig changes and events do not restart.
+ * Configuration is served from countryconfig, which can be deployed
+ * independently of the events service (e.g. a Kubernetes rollout that updates
+ * countryconfig but not events). A time-boxed cache keeps configuration off the
+ * hot path (it is read on nearly every request, including auth middleware)
+ * while bounding how stale it can be to `EVENT_CONFIG_CACHE_TTL_MS` — no events
+ * restart is required to pick up a config change.
  */
+function createTtlConfigCache<T>(
+  label: string,
+  fetcher: (token: TokenWithBearer) => Promise<T>
+) {
+  let value: T | null = null
+  let fetchedAt = 0
+  let inFlight: Promise<T> | null = null
 
-let inMemoryEventConfigurations: EventConfig[] | null = null
-let inMemoryWorkqueueConfigurations: WorkqueueConfig[] | null = null
+  return async function getCached(token: TokenWithBearer): Promise<T> {
+    // In development always fetch, so config changes are picked up immediately.
+    if (!env.isProduction) {
+      return fetcher(token)
+    }
 
-export async function getEventConfigurations(token: TokenWithBearer) {
-  const res = await fetch(new URL('/events', env.COUNTRY_CONFIG_URL), {
+    if (
+      value !== null &&
+      Date.now() - fetchedAt < env.EVENT_CONFIG_CACHE_TTL_MS
+    ) {
+      return value
+    }
+
+    // Coalesce concurrent refetches into a single request so an expiry doesn't
+    // stampede countryconfig from the many call sites.
+    if (!inFlight) {
+      logger.info(`Refetching ${label} from countryconfig`)
+      inFlight = fetcher(token)
+        .then((fetched) => {
+          value = fetched
+          fetchedAt = Date.now()
+          return fetched
+        })
+        .finally(() => {
+          inFlight = null
+        })
+    }
+
+    try {
+      return await inFlight
+    } catch (error) {
+      // Serve the last good value if a refetch fails, so a transient
+      // countryconfig outage doesn't break event operations.
+      if (value !== null) {
+        logger.error(
+          `Failed to refetch ${label}; serving previously cached value. ${String(
+            error
+          )}`
+        )
+        return value
+      }
+      throw error
+    }
+  }
+}
+
+async function getEventConfigurations(token: TokenWithBearer) {
+  const res = await fetch(new URL('/config/events', env.COUNTRY_CONFIG_URL), {
     headers: {
       'Content-Type': 'application/json',
       Authorization: token
@@ -41,67 +97,104 @@ export async function getEventConfigurations(token: TokenWithBearer) {
   })
 
   if (!res.ok) {
-    throw new Error('Failed to fetch events config')
+    throw new Error(
+      `Failed to fetch events config: ${res.status} ${res.statusText}.`
+    )
   }
 
-  return array(EventConfig).parse(await res.json())
+  return array(VersionedEventConfig).parse(await res.json())
 }
 
 /**
- * @returns in-memory event configurations when running in production-like environment.
+ * @returns event configurations with every version, cached in production for up to
+ * `EVENT_CONFIG_CACHE_TTL_MS` (always fresh in development).
+ */
+export const getInMemoryVersionedEventConfigurations = createTtlConfigCache(
+  'event configurations',
+  getEventConfigurations
+)
+
+export async function getApplicationConfig() {
+  const res = await fetch(
+    new URL('/config/application', env.COUNTRY_CONFIG_URL),
+    { headers: { 'Content-Type': 'application/json' } }
+  )
+
+  if (!res.ok) {
+    throw new Error(`Failed to fetch application config: ${res.status}`)
+  }
+
+  return ApplicationConfig.parse(await res.json())
+}
+
+/**
+ * @returns application configuration, cached in production for up to
+ * `EVENT_CONFIG_CACHE_TTL_MS` (always fresh in development).
+ */
+const getInMemoryApplicationConfig = createTtlConfigCache(
+  'application configuration',
+  async () => getApplicationConfig()
+)
+
+/** @returns the country's time zone (IANA), in which configuration versions take effect. */
+export async function getCountryTimeZone(token: TokenWithBearer) {
+  return (await getInMemoryApplicationConfig(token)).SYSTEM_IANA_TIMEZONE
+}
+
+/**
+ * @returns the configuration of each event, at the version in effect today in the
+ * country's time zone. For a record, use `getEventConfigurationForRecord` instead.
  */
 export async function getInMemoryEventConfigurations(token: TokenWithBearer) {
-  if (!env.isProduction) {
-    logger.info(
-      `Running in ${process.env.NODE_ENV} mode. Fetching event configurations from API`
-    )
-    // In development, we should always fetch the latest configurations
-    return getEventConfigurations(token)
-  }
-
-  if (inMemoryEventConfigurations) {
-    logger.info('Returning in-memory event configurations')
-    return inMemoryEventConfigurations
-  }
-
-  inMemoryEventConfigurations = await getEventConfigurations(token)
-  return inMemoryEventConfigurations
+  const [configurations, timeZone] = await Promise.all([
+    getInMemoryVersionedEventConfigurations(token),
+    getCountryTimeZone(token)
+  ])
+  return configurations.map((config) =>
+    resolveEventConfigInTimeZone(config, timeZone)
+  )
 }
 
-async function findEventConfigurationById({
+export async function getVersionedEventConfigurationById({
   eventType,
   token
 }: {
   eventType: string
   token: TokenWithBearer
 }) {
-  const configurations = await getInMemoryEventConfigurations(token)
-  return configurations.find((config) => config.id === eventType)
+  return getEventConfigById(
+    await getInMemoryVersionedEventConfigurations(token),
+    eventType
+  )
 }
 
-export async function getEventConfigurationById({
-  eventType,
+/**
+ * @returns the configuration of the version `event` is stamped with: every action on
+ * a record uses the version it was created under.
+ */
+export async function getEventConfigurationForRecord({
+  event,
   token
 }: {
-  eventType: string
+  event: Pick<EventDocument, 'type' | 'configVersionId'>
   token: TokenWithBearer
 }) {
-  return getOrThrow(
-    await findEventConfigurationById({
-      eventType,
-      token
-    }),
-    `No configuration found for event type: ${eventType}`
+  return getEventConfigForRecord(
+    await getVersionedEventConfigurationById({ eventType: event.type, token }),
+    event
   )
 }
 
 async function getWorkqueueConfigurations(token: TokenWithBearer) {
-  const res = await fetch(new URL('/workqueue', env.COUNTRY_CONFIG_URL), {
-    headers: {
-      'Content-Type': 'application/json',
-      Authorization: `Bearer ${token}`
+  const res = await fetch(
+    new URL('/config/workqueues', env.COUNTRY_CONFIG_URL),
+    {
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`
+      }
     }
-  })
+  )
 
   if (!res.ok) {
     throw new Error('Failed to fetch workqueue config')
@@ -111,77 +204,32 @@ async function getWorkqueueConfigurations(token: TokenWithBearer) {
 }
 
 /**
- * @returns in-memory workqueue configurations when running in production-like environment.
+ * @returns workqueue configurations, cached in production for up to
+ * `EVENT_CONFIG_CACHE_TTL_MS` (always fresh in development).
  */
-export async function getInMemoryWorkqueueConfigurations(
-  token: TokenWithBearer
-) {
-  if (!env.isProduction) {
-    logger.info(
-      `Running in ${process.env.NODE_ENV} mode. Fetching workqueue configurations from API`
-    )
-    // In production, we should always fetch the latest configurations
-    return getWorkqueueConfigurations(token)
-  }
+export const getInMemoryWorkqueueConfigurations = createTtlConfigCache(
+  'workqueue configurations',
+  getWorkqueueConfigurations
+)
 
-  if (inMemoryWorkqueueConfigurations) {
-    logger.info('Returning in-memory workqueue configurations')
-    return inMemoryWorkqueueConfigurations
-  }
-
-  inMemoryWorkqueueConfigurations = await getWorkqueueConfigurations(token)
-  return inMemoryWorkqueueConfigurations
-}
-
-function parsePartOf(partOf: string | undefined): string | null {
-  if (!partOf) {
-    return null
-  }
-  return partOf === 'Location/0' ? null : partOf.split('/')[1]
-}
-
-export async function getLocations() {
-  const requests = [
-    // Even though these are defined in the same order in the commons, we want to be explicit here.
-    // Admin structures must be seeded first in order for the parent-child relationships to be valid.
-    LocationType.enum.ADMIN_STRUCTURE,
-    LocationType.enum.CRVS_OFFICE,
-    LocationType.enum.HEALTH_FACILITY
-  ].map(async (type) => {
-    const url = new URL('/locations', env.CONFIG_URL)
-    url.searchParams.set('type', type)
-    url.searchParams.set('_count', '0')
-
-    return fetch(url, {
-      headers: {
-        'Content-Type': 'application/json'
-      }
-    })
+async function getRoles(token: TokenWithBearer) {
+  const res = await fetch(new URL('/config/roles', env.COUNTRY_CONFIG_URL), {
+    headers: {
+      'Content-Type': 'application/json'
+    }
   })
 
-  const responses = await Promise.all(requests)
-
-  for (const res of responses) {
-    if (!res.ok) {
-      throw new Error('Failed to fetch locations')
-    }
+  if (!res.ok) {
+    throw new Error('Failed to fetch roles config')
   }
 
-  const results = await Promise.all(
-    responses.map(async (res) => res.json() as Promise<Bundle<SavedLocation>>)
-  )
-  const locations = results
-    .flatMap((result) => result.entry.map(({ resource }) => resource))
-    .map((entry) => {
-      return {
-        id: entry.id,
-        name: entry.name,
-        parentId: parsePartOf(entry.partOf?.reference),
-        validUntil:
-          entry.status === 'inactive' ? new Date().toISOString() : null,
-        locationType: entry.type?.coding ? entry.type.coding[0]?.code : null
-      }
-    })
+  const eventConfigurations =
+    await getInMemoryVersionedEventConfigurations(token)
+  const roles = array(Role).parse(await res.json())
 
-  return array(Location).parse(locations)
+  validateRoles(roles, eventConfigurations)
+
+  return roles
 }
+
+export const getInMemoryRoles = createTtlConfigCache('roles', getRoles)

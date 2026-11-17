@@ -41,4 +41,3 @@ export const NotificationError = (props: React.HTMLAttributes<SVGElement>) => (
     />
   </svg>
 )
-export default NotificationError

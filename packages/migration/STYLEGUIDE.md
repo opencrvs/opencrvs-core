@@ -6,14 +6,14 @@ This document defines the conventions for naming database migration files in thi
 
 ## 📅 1. Use Timestamp Prefixes
 
-Prefix each migration with a UTC timestamp in `YYYYMMDDHHMMSS` format. This guarantees correct ordering and avoids name collisions.
+Prefix each migration with a millisecond Unix timestamp. This guarantees correct ordering and avoids name collisions. `pnpm create:events description-of-change` adds it for you.
 
-**Format:** `YYYYMMDDHHMMSS_description_of_change.sql`
-**Example:** `20250520131500_add_status_column_to_orders.sql`
+**Format:** `<timestamp>_description-of-change.sql`
+**Example:** `1786060800000_allow-null-system-clients-created-by.sql`
 
 ## 🔤 2. Use Descriptive, Verb-Based Names
 
-Migration names should describe what the migration does using active, lowercase, underscore-separated words.
+Migration names should describe what the migration does using active, lowercase, dash-separated words.
 
 **Preferred Verbs:**
 
@@ -21,16 +21,17 @@ Migration names should describe what the migration does using active, lowercase,
 
 **Examples:**
 
-- `add_email_to_users`
-- `remove_price_from_products`
-- `rename_username_to_user_name_in_profiles`
-- `create_orders_table`
+- `add-email-to-users`
+- `remove-price-from-products`
+- `rename-username-to-user-name-in-profiles`
+- `create-orders-table`
 
 ---
 
 ## 🧼 3. Naming Rules
 
-- Use **snake_case** (`underscores_between_words`)
+- Use **kebab-case** (`dashes-between-words`). This happens automatically when creating migrations through `node-pg-migrate`.
+- Never rename an existing migration. Deployed databases record migrations by file name, so a renamed file runs again. Some older migrations use underscores and keep their names.
 - Avoid camelCase or spaces
-- Be specific, avoid vague names like `update_schema`
-- Use named constraints for clarity and traceability (e.g. event_actions_check)
+- Be specific, avoid vague names like `update-schema`
+- Use named constraints for clarity and traceability (e.g. event-actions-check)

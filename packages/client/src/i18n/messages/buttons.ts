@@ -36,6 +36,11 @@ export const buttonMessages = defineMessages({
     description: 'Back button',
     id: 'buttons.back'
   },
+  backToLogin: {
+    defaultMessage: 'Back to login',
+    description: 'Button label to navigate back to the login page',
+    id: 'buttons.backToLogin'
+  },
   cancel: {
     defaultMessage: 'Cancel',
     description: 'Cancel button text in the modal',
@@ -207,11 +212,6 @@ export const buttonMessages = defineMessages({
     defaultMessage: 'Save & exit',
     description: 'Save & exit Button Text',
     id: 'buttons.saveAndExit'
-  },
-  deleteDeclaration: {
-    defaultMessage: 'Delete declaration',
-    description: 'Delete declaration button text',
-    id: 'buttons.deleteDeclaration'
   },
   printDeclaration: {
     id: 'buttons.printDeclaration',

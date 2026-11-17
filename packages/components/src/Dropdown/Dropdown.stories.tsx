@@ -8,7 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { Meta } from '@storybook/react'
+import { Meta } from '@storybook/react-vite'
 import { DropdownMenu, IDropdownPosition } from './Dropdown'
 import React from 'react'
 import { Button } from '../Button'

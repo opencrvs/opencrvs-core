@@ -19,7 +19,15 @@ import { IStoreState } from '@client/store'
 import { SECURITY_PIN_EXPIRED_AT } from '@client/utils/constants'
 import { getUserName, UserDetails } from '@client/utils/userUtils'
 import { pinValidator } from '@client/views/Unlock/ComparePINs'
-import { PINKeypad } from '@opencrvs/components/lib/PINKeypad'
+import {
+  PINKeypad,
+  Button,
+  Box,
+  Stack,
+  Text,
+  Toast,
+  Icon
+} from '@opencrvs/components'
 import {
   injectIntl,
   useIntl,
@@ -28,10 +36,7 @@ import {
 import { connect } from 'react-redux'
 import { buttonMessages, userMessages } from '@client/i18n/messages'
 import differenceInMinutes from 'date-fns/differenceInMinutes'
-import { AvatarLarge } from '@client/components/Avatar'
-import { Button } from '@opencrvs/components/lib/Button'
-import { Box, Stack, Text, Toast } from '@opencrvs/components'
-import { Icon } from '@opencrvs/components/lib/Icon'
+import { Avatar } from '@client/components/Avatar'
 
 import { BackgroundWrapper } from '@client/views/common/Common'
 
@@ -200,9 +205,10 @@ class UnlockView extends React.Component<IFullProps, IFullState> {
           </LogoutButton>
 
           <Content direction="column" gap={16} justifyContent="flex-start">
-            <AvatarLarge
+            <Avatar
               name={getUserName(userDetails)}
-              avatar={userDetails?.avatar}
+              size="xl"
+              src={userDetails?.avatar}
             />
             <EnterPinLabel />
             <PINKeypad

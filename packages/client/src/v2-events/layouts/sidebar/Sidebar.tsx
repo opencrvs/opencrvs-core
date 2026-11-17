@@ -15,17 +15,17 @@ import { useTypedParams } from 'react-router-typesafe-routes/dom'
 import { useIntl } from 'react-intl'
 import { useSelector } from 'react-redux'
 import { onlineManager } from '@tanstack/react-query'
-import { Icon } from '@opencrvs/components/lib/Icon'
-import { LogoutNavigation } from '@opencrvs/components/lib/icons/LogoutNavigation'
-import { SettingsNavigation } from '@opencrvs/components/lib/icons/SettingsNavigation'
-import { LeftNavigation } from '@opencrvs/components/lib/SideNavigation/LeftNavigation'
-import { NavigationGroup } from '@opencrvs/components/lib/SideNavigation/NavigationGroup'
-import { NavigationItem } from '@opencrvs/components/lib/SideNavigation/NavigationItem'
 import {
-  ActionDocument,
-  joinValues,
-  WorkqueueConfig
-} from '@opencrvs/commons/client'
+  Icon,
+  LeftNavigation,
+  NavigationGroup,
+  NavigationItem
+} from '@opencrvs/components'
+import {
+  LogoutNavigation,
+  SettingsNavigation
+} from '@opencrvs/components/icons'
+import { todayISO, WorkqueueConfig } from '@opencrvs/commons/client'
 import { buttonMessages } from '@client/i18n/messages'
 import { storage } from '@client/storage'
 import { WORKQUEUE_TABS } from '@client/components/interface/WorkQueueTabs'
@@ -33,19 +33,22 @@ import { useCountryConfigWorkqueueConfigurations } from '@client/v2-events/featu
 import { ROUTES } from '@client/v2-events/routes'
 import { removeToken } from '@client/utils/authUtils'
 import * as routes from '@client/navigation/routes'
-import {
-  getIndividualNameObj,
-  removeUserDetails
-} from '@client/utils/userUtils'
+import { removeUserDetails } from '@client/utils/userUtils'
 import { getOfflineData } from '@client/offline/selectors'
 import { useWorkqueue } from '@client/v2-events/hooks/useWorkqueue'
 import { getScope, getUserDetails } from '@client/profile/profileSelectors'
 import { getLanguage } from '@client/i18n/selectors'
 import { Avatar } from '@client/components/Avatar'
-import { hasDraftWorkqueue, WORKQUEUE_DRAFT } from '@client/v2-events/utils'
+import {
+  getUsersFullName,
+  hasDraftWorkqueue,
+  resolveLocationName,
+  WORKQUEUE_DRAFT
+} from '@client/v2-events/utils'
 import { hasOutboxWorkqueue, WORKQUEUE_OUTBOX } from '@client/v2-events/utils'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
 import { useDrafts } from '@client/v2-events/features/drafts/useDrafts'
+import { useLocations } from '@client/v2-events/hooks/useLocations'
 import { withSuspense } from '../../components/withSuspense'
 import { OrganisationNavigationGroup } from './OrganisationNavigationGroup'
 import { PerformanceNavigationGroup } from './PerformanceNavigationGroup'
@@ -72,6 +75,7 @@ function Workqueues({
   const intl = useIntl()
   const navigate = useNavigate()
   const { getCount } = useWorkqueue(currentWorkqueueSlug ?? '')
+
   const counts = getCount.useSuspenseQuery()
 
   return workqueues.map(({ name: label, slug, icon }) => (
@@ -91,7 +95,15 @@ function Workqueues({
   ))
 }
 
-export const SidebarComponent = ({
+export async function logout(language?: string) {
+  await storage.removeItem(SCREEN_LOCK)
+  await removeToken()
+  await removeUserDetails()
+  // redirect is handled at nginx level.
+  window.location.assign(`/login?lang=${language ?? ''}`)
+}
+
+function SidebarComponent({
   menuCollapse,
   navigationWidth,
   isMobileView = false
@@ -99,16 +111,17 @@ export const SidebarComponent = ({
   menuCollapse?: () => void // Only relevant for mobile view
   navigationWidth?: number
   isMobileView?: boolean
-}) => {
+}) {
   const { slug: workqueueSlug } = useTypedParams(ROUTES.V2.WORKQUEUES.WORKQUEUE)
   const intl = useIntl()
   const scopes = useSelector(getScope)
+  const { getLocation } = useLocations()
 
-  const { getOutbox } = useEvents()
-  const outbox = getOutbox()
+  const { useOutbox } = useEvents()
+  const outbox = useOutbox()
 
-  const { getAllRemoteDrafts } = useDrafts()
-  const drafts = getAllRemoteDrafts()
+  const { useDisplayableDrafts } = useDrafts()
+  const drafts = useDisplayableDrafts()
 
   const workqueues = useCountryConfigWorkqueueConfigurations()
 
@@ -127,34 +140,42 @@ export const SidebarComponent = ({
 
   let name = ''
   if (userDetails?.name) {
-    const nameObj = getIndividualNameObj(userDetails.name, language)
-    if (nameObj) {
-      const { firstNames, familyName } = nameObj
-      name = joinValues([firstNames, familyName], ' ')
-    }
+    name = getUsersFullName(userDetails.name)
   }
 
   const role =
-    (userDetails?.role && intl.formatMessage(userDetails.role.label)) ?? ''
+    (userDetails?.role &&
+      intl.formatMessage(
+        {
+          id: 'event.history.role',
+          defaultMessage: 'Unknown'
+        },
+        {
+          role: userDetails.role
+        }
+      )) ??
+    ''
+  // The sidebar shows the current user's current office — a present-tense
+  // surface, so resolve today's name rather than reading the flattened field
+  // (which the client cache strips; see `toClientLocation`).
+  const primaryOffice = userDetails?.primaryOfficeId
+    ? resolveLocationName(
+        getLocation.useQuery(userDetails.primaryOfficeId).data,
+        todayISO()
+      )
+    : undefined
 
-  const avatar = <Avatar avatar={userDetails?.avatar} name={name} />
+  const avatar = (
+    <Avatar aria-hidden name={name} size="lg" src={userDetails?.avatar} />
+  )
 
   const runningVer = String(localStorage.getItem('running-version'))
-
-  const logout = async () => {
-    await storage.removeItem(SCREEN_LOCK)
-    await removeToken()
-    await removeUserDetails()
-    window.location.assign(
-      `${window.config.LOGIN_URL}?lang=${await storage.getItem('language')}&redirectTo=${window.location.origin}${ROUTES.V2.buildPath({})}`
-    )
-  }
 
   return (
     <LeftNavigation
       applicationName={offlineCountryConfig.config.APPLICATION_NAME}
       applicationVersion={runningVer}
-      assignedOffice={userDetails?.primaryOffice.name}
+      assignedOffice={primaryOffice}
       avatar={() => avatar}
       isOnline={isOnline}
       name={name}
@@ -211,7 +232,8 @@ export const SidebarComponent = ({
       </NavigationGroup>
       <OrganisationNavigationGroup
         currentWorkqueueSlug={workqueueSlug}
-        primaryOfficeId={userDetails?.primaryOffice.id}
+        menuCollapse={menuCollapse}
+        primaryOfficeId={userDetails?.primaryOfficeId}
       />
       <PerformanceNavigationGroup currentWorkqueueSlug={workqueueSlug} />
       {isMobileView && (
@@ -230,7 +252,7 @@ export const SidebarComponent = ({
             icon={() => <LogoutNavigation />}
             id={`navigation_${WORKQUEUE_TABS.logout}`}
             label={intl.formatMessage(buttonMessages[WORKQUEUE_TABS.logout])}
-            onClick={logout}
+            onClick={async () => logout(language)}
           />
         </NavigationGroup>
       )}

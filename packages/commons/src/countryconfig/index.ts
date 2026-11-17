@@ -9,12 +9,12 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { z } from 'zod'
-import { ActionTypes, EventConfig, EventDocument } from '../events'
+import * as z from 'zod/v4'
+import { ActionTypes, EventDocument, VersionedEventConfig } from '../events'
 import { ZodOpenApiPathsObject } from 'zod-openapi'
 
 export const countryConfigApi: ZodOpenApiPathsObject = {
-  '/events': {
+  '/config/events': {
     get: {
       tags: ['Events'],
       description: 'Get event configurations',
@@ -23,7 +23,7 @@ export const countryConfigApi: ZodOpenApiPathsObject = {
           description: '200 OK',
           content: {
             'application/json': {
-              schema: z.array(EventConfig)
+              schema: z.array(VersionedEventConfig)
             }
           }
         }

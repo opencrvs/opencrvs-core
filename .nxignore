@@ -1,0 +1,9 @@
+# countryconfig-template lives under packages/ but is not a workspace
+# package — it is a fork-me template that installs its own node_modules
+# with --ignore-workspace and consumes @opencrvs/toolkit from npm, not
+# from the workspace. pnpm-workspace.yaml already excludes it; nx globs
+# for package.json files regardless, so exclude it here too.
+#
+# Consequence: it never appears in `nx affected`, so CI covers it in a
+# dedicated job (see .github/workflows/lint-and-test.yml).
+packages/countryconfig-template

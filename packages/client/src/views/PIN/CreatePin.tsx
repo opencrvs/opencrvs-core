@@ -9,10 +9,10 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import React, { useState } from 'react'
-import { PINKeypad } from '@opencrvs/components/lib/PINKeypad'
-import { CountryLogo } from '@opencrvs/components/lib/icons'
+import { PINKeypad, Stack, Box, Text, Toast } from '@opencrvs/components'
+import { CountryLogo } from '@opencrvs/components/icons'
 import * as bcrypt from 'bcryptjs'
-import { storage } from '@opencrvs/client/src/storage'
+import { storage } from '@client/storage'
 import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
 import { messages } from '@client/i18n/messages/views/pin'
 import { getCurrentUserID, IUserData } from '@client/declarations'
@@ -20,7 +20,6 @@ import { IOfflineData } from '@client/offline/reducer'
 import { connect } from 'react-redux'
 import { IStoreState } from '@client/store'
 import { getOfflineData } from '@client/offline/selectors'
-import { Stack, Box, Text, Toast } from '@opencrvs/components'
 import { BackgroundWrapper, LogoContainer } from '@client/views/common/Common'
 import styled from 'styled-components'
 
@@ -87,8 +86,7 @@ const CreatePinComponent = ({
     } else {
       allUserData.push({
         userID: currentUserID,
-        userPIN: hash,
-        declarations: []
+        userPIN: hash
       })
     }
     await storage.setItem('USER_DATA', JSON.stringify(allUserData))

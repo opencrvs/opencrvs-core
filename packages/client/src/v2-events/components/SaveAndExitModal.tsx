@@ -10,9 +10,7 @@
  */
 import React from 'react'
 import { defineMessages, useIntl } from 'react-intl'
-import { ResponsiveModal } from '@opencrvs/components/lib/ResponsiveModal'
-import { Button } from '@opencrvs/components/lib/Button'
-import { Stack, Text } from '@opencrvs/components'
+import { Dialog, Button, Stack, Text } from '@opencrvs/components'
 import { useModal } from '@client/v2-events/hooks/useModal'
 
 const saveAndExitModalMessages = defineMessages({
@@ -45,37 +43,31 @@ export function useSaveAndExitModal() {
 
   async function handleSaveAndExit(onSaveAndExit: () => void) {
     const saveAndExitConfirm = await openModal<boolean | null>((close) => (
-      <ResponsiveModal
-        autoHeight
+      <Dialog
+        isOpen
         actions={[
           <Button
             key="cancel_save_exit"
             id="cancel_save_exit"
             type="tertiary"
-            onClick={() => {
-              close(null)
-            }}
+            onClick={() => close(null)}
           >
             {intl.formatMessage(saveAndExitModalMessages.cancel)}
           </Button>,
           <Button
             key="confirm_save_exit"
             id="confirm_save_exit"
-            type="positive"
-            onClick={() => {
-              close(true)
-            }}
+            type="primary"
+            onClick={() => close(true)}
           >
             {intl.formatMessage(saveAndExitModalMessages.confirm)}
           </Button>
         ]}
-        handleClose={() => close(null)}
         id="save_declaration_confirmation"
-        responsive={false}
-        show={true}
         title={intl.formatMessage(
           saveAndExitModalMessages.saveDeclarationConfirmModalTitle
         )}
+        onClose={() => close(null)}
       >
         <Stack>
           <Text color="grey500" element="p" variant="reg16">
@@ -84,7 +76,7 @@ export function useSaveAndExitModal() {
             )}
           </Text>
         </Stack>
-      </ResponsiveModal>
+      </Dialog>
     ))
 
     if (saveAndExitConfirm) {

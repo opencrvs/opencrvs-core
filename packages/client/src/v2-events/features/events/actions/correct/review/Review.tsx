@@ -18,13 +18,16 @@ import {
   deepMerge,
   ActionDocument,
   getAcceptedActions,
-  getCurrentEventState
+  getCurrentEventState,
+  findPendingCorrectionAction,
+  eventAttachmentPath
 } from '@opencrvs/commons/client'
 import { Review as ReviewComponent } from '@client/v2-events/features/events/components/Review'
-import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
+import { useEventConfigurationForRecord } from '@client/v2-events/features/events/useEventConfiguration'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
 import { useIntlFormatMessageWithFlattenedParams } from '@client/v2-events/messages/utils'
 import { FormLayout } from '@client/v2-events/layouts'
+import { recordAnchorDate } from '@client/v2-events/utils'
 import { ROUTES } from '@client/v2-events/routes'
 import { useValidatorContext } from '@client/v2-events/hooks/useValidatorContext'
 import { ReviewCorrection } from './ReviewCorrection'
@@ -33,12 +36,11 @@ export function Review() {
   const { eventId } = useTypedParams(ROUTES.V2.EVENTS.REVIEW_CORRECTION.REVIEW)
   const events = useEvents()
 
-  const event = events.getEvent.getFromCache(eventId)
+  const event = events.getEvent.useGetEventFromCache(eventId)
   const validatorContext = useValidatorContext(event)
 
-  const { eventConfiguration: configuration } = useEventConfiguration(
-    event.type
-  )
+  const { eventConfiguration: configuration } =
+    useEventConfigurationForRecord(event)
   const eventIndex = getCurrentEventState(event, configuration)
 
   const formConfig = getDeclaration(configuration)
@@ -56,13 +58,14 @@ export function Review() {
       `Action config for ${ActionType.REQUEST_CORRECTION} was not found. This should never happen`
     )
   }
-  const writeActions: ActionDocument[] = getAcceptedActions(event).filter(
+  const writeActions = getAcceptedActions(event).filter(
     (a) => !isMetaAction(a.type)
   )
-  const correctionRequestAction = writeActions[writeActions.length - 1]
-
-  if (correctionRequestAction.type !== ActionType.REQUEST_CORRECTION) {
-    throw new Error('Expected last write action to be REQUEST_CORRECTION')
+  const correctionRequestAction = findPendingCorrectionAction(writeActions)
+  if (!correctionRequestAction) {
+    throw new Error(
+      'Pending REQUEST_CORRECTION action was not found. This should never happen'
+    )
   }
 
   const formValuesAfterCorrection = deepMerge(
@@ -73,6 +76,8 @@ export function Review() {
   return (
     <FormLayout route={ROUTES.V2.EVENTS.REVIEW_CORRECTION}>
       <ReviewComponent.Body
+        anchor={recordAnchorDate(eventIndex)}
+        attachmentPath={eventAttachmentPath(eventId)}
         banner={
           <ReviewCorrection
             correctionRequestAction={correctionRequestAction}

@@ -9,6 +9,9 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { createTestApp } from '@login/tests/util'
+import { rest } from 'msw'
+import { setupServer } from 'msw/node'
+import { act } from 'react'
 
 describe('Login app step one', () => {
   let app: any
@@ -16,14 +19,13 @@ describe('Login app step one', () => {
     const appBundle = await createTestApp()
     app = appBundle.app
     window.config = {
-      AUTH_API_URL: 'http://localhost:4040/',
-      CONFIG_API_URL: 'http://localhost:2021/',
       COUNTRY: 'far',
-      LANGUAGES: 'en,fr',
-      CLIENT_APP_URL: 'http://localhost:3000/',
+      LANGUAGES: ['en', 'fr'],
       USER_NOTIFICATION_DELIVERY_METHOD: 'sms',
-      COUNTRY_CONFIG_URL: 'http://localhost:3040',
       PHONE_NUMBER_PATTERN: /^0(7|9)[0-9]{1}[0-9]{7}$/,
+      LOGIN_BACKGROUND: {
+        backgroundColor: '#000000'
+      },
       INFORMANT_NOTIFICATION_DELIVERY_METHOD: 'sms'
     }
   })
@@ -43,5 +45,53 @@ describe('Login app step one', () => {
       .simulate('change', { target: { value: 'kennedy.mweene' } })
 
     app.find('input#password').simulate('change', { target: { value: 'test' } })
+  })
+})
+
+describe('Login error', () => {
+  it('shows rate limit error', async () => {
+    const server = setupServer(
+      rest.post('/api/auth/authenticate', (_, res, ctx) => {
+        return res(
+          ctx.status(429),
+          ctx.json({
+            statusCode: 429,
+            error: 'RATE_LIMIT_ERROR',
+            message: 'Rate limited'
+          })
+        )
+      })
+    )
+    server.listen()
+
+    try {
+      const { app } = await createTestApp()
+
+      app
+        .find('input#username')
+        .simulate('change', { target: { value: 'kennedy.mweene' } })
+      app
+        .find('input#password')
+        .simulate('change', { target: { value: 'test' } })
+
+      await act(async () => {
+        app.find('form#STEP_ONE').simulate('submit')
+        await new Promise((resolve) => setTimeout(resolve, 0))
+      })
+      app.update()
+
+      const toast = app.findWhere(
+        (node) =>
+          node.type() !== undefined &&
+          node
+            .text()
+            .includes(
+              'Too many login attempts. You can try again after one minute.'
+            )
+      )
+      expect(toast.exists()).toBe(true)
+    } finally {
+      server.close()
+    }
   })
 })

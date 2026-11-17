@@ -1,0 +1,246 @@
+/*
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at https://mozilla.org/MPL/2.0/.
+ *
+ * OpenCRVS is also distributed under the terms of the Civil Registration
+ * & Healthcare Disclaimer located at http://opencrvs.org/license.
+ *
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
+ */
+/* eslint-disable no-console */
+import fs from 'fs'
+import path from 'path'
+import { runUpgrade } from './migrations'
+import {
+  checkUpgradePath,
+  findCountryConfigToolkitVersion
+} from './migrations/persistent/check-upgrade-path'
+import {
+  runEnvironmentInit,
+  runEnvironmentSwarmToK8s,
+  runEnvironmentUpdateWorkflows,
+  runEnvironmentUpgrade,
+  runEnvironmentUsers
+} from './environment'
+import { runVerifyEndpoints } from './verify/endpoints'
+
+const args = process.argv.slice(2)
+
+const USAGE = `
+Usage: opencrvs <command>
+
+Commands:
+  environment            Manage deployment environments
+  upgrade                Upgrade an existing environment
+  verify-endpoints       Verify the locally-running country config exposes the
+                         expected endpoints, keeps secured ones locked down and
+                         serves the translations core requires
+
+Run 'opencrvs <command> --help' for more information on a command.
+`.trim()
+
+const VERIFY_ENDPOINTS_USAGE = `
+Usage: opencrvs verify-endpoints [country-config-url]
+
+Run this after 'opencrvs upgrade', with the upgraded country config running
+locally, to confirm it still behaves correctly. It checks over HTTP that:
+  - required public endpoints exist (respond 2xx),
+  - user-notification trigger endpoints are either absent or reject
+    unauthenticated requests (never processed without a token), and
+  - '/content/client' and '/content/login' serve every message id the country
+    config template of this version carries.
+
+Checking the translations reads the template off GitHub. When GitHub cannot be
+reached the other checks still run and that one is skipped with a warning.
+
+Arguments:
+  [country-config-url]   Optional. Domain or URL of the country config
+                         service. Defaults to 'http://localhost:3040', the
+                         port country config listens on locally. A bare
+                         domain is assumed to use https.
+
+Options:
+  -h, --help             Show this message.
+
+Exits with a non-zero status if any check fails.
+`.trim()
+
+const UPGRADE_USAGE = `
+Usage: opencrvs upgrade [options]
+
+Upgrade the country config in the current working directory to this toolkit's
+version of OpenCRVS. Upgrade one minor version at a time: toolkit 2.2 upgrades
+a country config on 2.1.
+
+The upgrade tells which version the country config is on by its
+@opencrvs/toolkit dependency, and updates that dependency itself once done.
+Run it without changing the dependency first, e.g.
+
+  npx @opencrvs/toolkit@2.2 upgrade
+
+Options:
+  -h, --help       Show this message.
+`.trim()
+
+function main() {
+  const command = args[0]
+
+  if (!command || command === '--help' || command === '-h') {
+    console.log(USAGE)
+    process.exit(0)
+  }
+
+  switch (command) {
+    case 'environment':
+      return handleEnvironment()
+    case 'upgrade':
+      return handleUpgrade()
+    case 'verify-endpoints':
+      return handleVerifyEndpoints()
+    default:
+      console.error(`Unknown command: ${command}\n`)
+      console.log(USAGE)
+      process.exit(1)
+  }
+}
+
+async function handleEnvironment() {
+  const subcommand = args[1]
+
+  if (!subcommand || subcommand === '--help' || subcommand === '-h') {
+    console.log(
+      `
+Usage: opencrvs environment <subcommand>
+
+Subcommands:
+  init              Initialise a new environment
+  upgrade           Upgrade existing environment configuration
+  update-workflows  Update workflow environment options
+  users             Manage environment users
+  swarm-to-k8s      Migrate Docker Swarm configuration to Kubernetes
+    `.trim()
+    )
+    process.exit(0)
+  }
+
+  switch (subcommand) {
+    case 'init':
+      return runEnvironmentCommand('initialisation', runEnvironmentInit)
+    case 'upgrade':
+      return runEnvironmentCommand('environment upgrade', runEnvironmentUpgrade)
+    case 'update-workflows':
+      return runEnvironmentCommand(
+        'workflow update',
+        runEnvironmentUpdateWorkflows
+      )
+    case 'users':
+      return runEnvironmentCommand('user management', runEnvironmentUsers)
+    case 'swarm-to-k8s':
+      return runEnvironmentCommand(
+        'Swarm to Kubernetes migration',
+        runEnvironmentSwarmToK8s
+      )
+    default:
+      console.error(`Unknown subcommand: environment ${subcommand}`)
+      process.exit(1)
+  }
+}
+
+async function runEnvironmentCommand(
+  operation: string,
+  command: () => Promise<void>
+) {
+  try {
+    await command()
+  } catch (error) {
+    console.error(
+      `Environment ${operation} failed:`,
+      error instanceof Error ? error.message : error
+    )
+    process.exit(1)
+  }
+}
+
+/**
+ * Returns the toolkit's own version, e.g. `2.2.0`. Both `src/cli.ts` and the
+ * bundled `dist/cli.js` sit one level below the toolkit's `package.json`.
+ */
+function readToolkitVersion(): string {
+  const packageJson = JSON.parse(
+    fs.readFileSync(path.join(__dirname, '..', 'package.json'), 'utf-8')
+  )
+  return packageJson.version
+}
+
+async function handleUpgrade() {
+  const upgradeArgs = args.slice(1)
+
+  if (upgradeArgs.includes('--help') || upgradeArgs.includes('-h')) {
+    console.log(UPGRADE_USAGE)
+    process.exit(0)
+  }
+
+  const unknownFlags = upgradeArgs.filter((arg) => arg.startsWith('-'))
+  if (unknownFlags.length > 0) {
+    console.error(`Unknown option(s): ${unknownFlags.join(', ')}\n`)
+    console.log(UPGRADE_USAGE)
+    process.exit(1)
+  }
+
+  const toolkitVersion = readToolkitVersion()
+  const upgradePath = checkUpgradePath(
+    findCountryConfigToolkitVersion(process.cwd()),
+    toolkitVersion
+  )
+
+  if (upgradePath.status === 'unknown') {
+    console.warn(`⚠️  ${upgradePath.message}\n`)
+  }
+
+  if (upgradePath.status === 'blocked') {
+    console.error(upgradePath.message)
+    process.exit(1)
+  }
+
+  console.log('Initiating upgrade...')
+  try {
+    await runUpgrade(toolkitVersion)
+    console.log('Upgrade completed successfully!')
+  } catch (error) {
+    console.error('Upgrade failed:', error)
+    process.exit(1)
+  }
+}
+
+async function handleVerifyEndpoints() {
+  const verifyArgs = args.slice(1)
+
+  if (verifyArgs.includes('--help') || verifyArgs.includes('-h')) {
+    console.log(VERIFY_ENDPOINTS_USAGE)
+    process.exit(0)
+  }
+
+  const positional = verifyArgs.filter((arg) => !arg.startsWith('-'))
+
+  if (positional.length > 1) {
+    console.error(
+      `Unexpected extra argument(s): ${positional.slice(1).join(', ')}\n`
+    )
+    console.log(VERIFY_ENDPOINTS_USAGE)
+    process.exit(1)
+  }
+
+  try {
+    // Defaults to http://localhost:3040 when no target is given.
+    await runVerifyEndpoints(positional[0])
+  } catch (error) {
+    console.error(
+      'Endpoint verification failed:',
+      error instanceof Error ? error.message : error
+    )
+    process.exit(1)
+  }
+}
+
+main()

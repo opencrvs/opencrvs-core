@@ -8,12 +8,12 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { Meta, StoryObj } from '@storybook/react'
+import { Meta, StoryObj } from '@storybook/react-vite'
 import React from 'react'
 import { createTRPCMsw, httpLink } from '@vafanassieff/msw-trpc'
 import superjson from 'superjson'
-import { screen, userEvent } from '@storybook/test'
-import { tennisClubMembershipEvent } from '@opencrvs/commons/client'
+import { screen, userEvent } from 'storybook/test'
+import { versionedTennisClubMembershipEvent } from '@opencrvs/commons/client'
 import { TRPCProvider, AppRouter } from '@client/v2-events/trpc'
 import { ROUTES } from '@client/v2-events/routes'
 import { AdvancedSearch } from './index'
@@ -55,7 +55,7 @@ export const AdvancedSearchStory: Story = {
       handlers: {
         event: [
           tRPCMsw.event.config.get.query(() => {
-            return [tennisClubMembershipEvent]
+            return [versionedTennisClubMembershipEvent]
           })
         ]
       }

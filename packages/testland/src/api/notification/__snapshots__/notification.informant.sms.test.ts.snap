@@ -1,0 +1,17 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`User notification - sms > birth - DECLARE 1`] = `"{"messages":[{"destinations":[{"recipient":"0734231245"}],"from":"mock_sender","text":"Birth registration tracking ID for Ace is PRZIB7. You will get an SMS within 2 days with progress and next steps."}]}"`;
+
+exports[`User notification - sms > birth - NOTIFY 1`] = `"{"messages":[{"destinations":[{"recipient":"0734231245"}],"from":"mock_sender","text":"Birth registration tracking ID is PRZIB7. You must visit Windmill village registrar office to complete the declaration"}]}"`;
+
+exports[`User notification - sms > birth - REGISTER 1`] = `"{"messages":[{"destinations":[{"recipient":"0734231245"}],"from":"mock_sender","text":"Congratulations, the birth of Ace has been registered. Visit your local registration office in 5 days with your ID to collect the certificate. Your tracking ID is PRZIB7."}]}"`;
+
+exports[`User notification - sms > birth - REJECT 1`] = `"{"messages":[{"destinations":[{"recipient":"0734231245"}],"from":"mock_sender","text":"Birth registration declaration for Ace ( Tracking ID: PRZIB7 ) has been rejected. Please visit your local registration office for more information."}]}"`;
+
+exports[`User notification - sms > death - DECLARE 1`] = `"{"messages":[{"destinations":[{"recipient":"0734231245"}],"from":"mock_sender","text":"Death registration tracking ID for Oden is PRZIB7. You will get an SMS within 2 days with progress and next steps."}]}"`;
+
+exports[`User notification - sms > death - NOTIFY 1`] = `"{"messages":[{"destinations":[{"recipient":"0734231245"}],"from":"mock_sender","text":"Death registration tracking ID is PRZIB7. You must visit Windmill village registrar office to complete the declaration"}]}"`;
+
+exports[`User notification - sms > death - REGISTER 1`] = `"{"messages":[{"destinations":[{"recipient":"0734231245"}],"from":"mock_sender","text":"The death of Oden has been registered. Visit your local registration office in 5 days with your ID to collect the certificate. Your tracking ID is PRZIB7."}]}"`;
+
+exports[`User notification - sms > death - REJECT 1`] = `"{"messages":[{"destinations":[{"recipient":"0734231245"}],"from":"mock_sender","text":"Death registration declaration for Oden ( Tracking ID: PRZIB7 ) has been rejected. Please visit your local registration office for more information."}]}"`;

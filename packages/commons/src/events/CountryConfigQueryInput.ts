@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { z } from 'zod'
+import * as z from 'zod/v4'
 import { SerializedUserField } from './serializers/user/serializer'
 import {
   AnyOfStatus,
@@ -17,9 +17,10 @@ import {
   DateCondition,
   Exact,
   ExactStatus,
+  NoneOfStatus,
   QueryInput,
-  Within,
-  ExactUserType
+  ExactUserType,
+  AnyOf
 } from './EventIndex'
 
 const SerializableExact = z.object({
@@ -27,22 +28,29 @@ const SerializableExact = z.object({
   term: z.union([z.string(), SerializedUserField])
 })
 
+export type SerializableExact = z.infer<typeof SerializableExact>
+
 const SerializableWithin = z.object({
   type: z.literal('within'),
   location: z.union([z.string(), SerializedUserField])
 })
 
+export type SerializableWithin = z.infer<typeof SerializableWithin>
+
 export const SerializedQueryExpression = z
   .object({
     eventType: z.string(),
-    status: z.optional(z.union([AnyOfStatus, ExactStatus])),
+    status: z.optional(z.union([AnyOfStatus, NoneOfStatus, ExactStatus])),
     createdAt: z.optional(DateCondition),
     updatedAt: z.optional(DateCondition),
+    'legalStatuses.DECLARED.createdAtLocation': z.optional(SerializableWithin),
+    'legalStatuses.DECLARED.createdByRole': z.optional(AnyOf),
     'legalStatuses.REGISTERED.createdAt': z.optional(DateCondition),
-    'legalStatuses.REGISTERED.createdAtLocation': z.optional(
-      z.union([Within, Exact])
-    ),
+    'legalStatuses.REGISTERED.createdAtLocation':
+      z.optional(SerializableWithin),
+    'legalStatuses.REGISTERED.createdByRole': z.optional(AnyOf),
     'legalStatuses.REGISTERED.registrationNumber': z.optional(Exact),
+    'legalStatuses.REVOKED.createdAtLocation': z.optional(SerializableWithin),
     createdAtLocation: z.optional(
       z.union([SerializableWithin, SerializableExact])
     ),

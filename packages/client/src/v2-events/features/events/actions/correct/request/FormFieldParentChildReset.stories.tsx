@@ -9,11 +9,11 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import React from 'react'
-import type { Meta, StoryObj } from '@storybook/react'
+import type { Meta, StoryObj } from '@storybook/react-vite'
 import { createTRPCMsw, httpLink } from '@vafanassieff/msw-trpc'
 import { Outlet } from 'react-router-dom'
 import superjson from 'superjson'
-import { expect, waitFor, within, userEvent } from '@storybook/test'
+import { expect, waitFor, within, userEvent } from 'storybook/test'
 import {
   ActionType,
   and,
@@ -26,7 +26,13 @@ import {
   defineDeclarationForm,
   generateUuid,
   generateActionDocument,
-  generateTranslationConfig
+  generateActionDocuments,
+  generateTranslationConfig,
+  FieldUpdateValue,
+  withDeclaration,
+  getDeclaration,
+  toVersionedEventConfig,
+  INITIAL_EVENT_CONFIG_VERSION_ID
 } from '@opencrvs/commons/client'
 import { ROUTES } from '@client/v2-events/routes'
 import { AppRouter } from '@client/v2-events/trpc'
@@ -92,11 +98,13 @@ const recommenderOtherThanClubMembers = and(
   not(field('recommender.relation').isFalsy())
 )
 
-const overriddenEventConfig = {
-  ...tennisClubMembershipEvent,
-  id: 'death', // use an existing event id, so that permissions to it are in scopes
-  declaration: defineDeclarationForm({
-    ...tennisClubMembershipEvent.declaration,
+const overriddenEventConfig = withDeclaration(
+  {
+    ...tennisClubMembershipEvent,
+    id: 'death' // use an existing event id, so that permissions to it are in scopes
+  },
+  defineDeclarationForm({
+    ...getDeclaration(tennisClubMembershipEvent),
     pages: [
       {
         id: 'recommender',
@@ -182,14 +190,14 @@ const overriddenEventConfig = {
       }
     ]
   })
-}
+)
 
 const overridenActions = [
   generateActionDocument({
     configuration: overriddenEventConfig,
     action: ActionType.CREATE
   }),
-  generateActionDocument({
+  ...generateActionDocuments({
     configuration: overriddenEventConfig,
     action: ActionType.DECLARE,
     defaults: {
@@ -201,12 +209,7 @@ const overridenActions = [
       }
     }
   }),
-  generateActionDocument({
-    configuration: overriddenEventConfig,
-    action: ActionType.VALIDATE,
-    defaults: { declaration: {} }
-  }),
-  generateActionDocument({
+  ...generateActionDocuments({
     configuration: overriddenEventConfig,
     action: ActionType.REGISTER,
     defaults: { declaration: {} }
@@ -214,6 +217,7 @@ const overridenActions = [
 ]
 const overridenEvent = {
   trackingId: generateUuid(),
+  configVersionId: INITIAL_EVENT_CONFIG_VERSION_ID,
   type: overriddenEventConfig.id,
   actions: overridenActions,
   createdAt: new Date(Date.now()).toISOString(),
@@ -225,7 +229,7 @@ export const FormFieldParentChildReset: Story = {
     /*
      * Ensure record is "downloaded offline" in the user's browser
      */
-    addLocalEventConfig(overriddenEventConfig)
+    addLocalEventConfig(toVersionedEventConfig(overriddenEventConfig))
     setEventData(overridenEvent.id, overridenEvent)
   },
   parameters: {
@@ -236,7 +240,7 @@ export const FormFieldParentChildReset: Story = {
         children: [
           router,
           {
-            path: ROUTES.V2.EVENTS.OVERVIEW.path,
+            path: ROUTES.V2.EVENTS.EVENT.path,
             element: (
               <EventOverviewLayout>
                 <EventOverviewIndex />
@@ -253,7 +257,7 @@ export const FormFieldParentChildReset: Story = {
       handlers: {
         events: [
           tRPCMsw.event.config.get.query(() => {
-            return [overriddenEventConfig]
+            return [toVersionedEventConfig(overriddenEventConfig)]
           })
         ],
         event: [
@@ -278,12 +282,18 @@ export const FormFieldParentChildReset: Story = {
                 ...overridenEvent,
                 actions: [
                   ...overridenEvent.actions,
-                  generateActionDocument({
+                  ...generateActionDocuments({
                     configuration: overriddenEventConfig,
                     action: ActionType.REQUEST_CORRECTION,
                     defaults: {
-                      annotation: payload.annotation,
-                      declaration: payload.declaration
+                      annotation: payload.annotation as Record<
+                        string,
+                        FieldUpdateValue
+                      >,
+                      declaration: payload.declaration as Record<
+                        string,
+                        FieldUpdateValue
+                      >
                     }
                   })
                 ]
@@ -307,15 +317,23 @@ export const FormFieldParentChildReset: Story = {
       await userEvent.click(
         canvas.getByTestId('change-button-recommender.relation')
       )
+
+      await canvas.findByText('Who is recommending the applicant?')
+
       await expect(canvas.getByTestId('text__firstname')).toHaveValue(
         'Mohammed'
       )
       await expect(canvas.getByTestId('text__surname')).toHaveValue('Rahim')
-      await expect(canvas.getByTestId('recommender____dob-dd')).toHaveValue(12)
-      await expect(canvas.getByTestId('recommender____dob-mm')).toHaveValue(5)
-      await expect(canvas.getByTestId('recommender____dob-yyyy')).toHaveValue(
-        1978
-      )
+      await waitFor(async () => {
+        await expect(canvas.getByTestId('recommender____dob-dd')).toHaveValue(
+          12
+        )
+
+        await expect(canvas.getByTestId('recommender____dob-mm')).toHaveValue(5)
+        await expect(canvas.getByTestId('recommender____dob-yyyy')).toHaveValue(
+          1978
+        )
+      })
 
       await userEvent.click(
         canvas.getByTestId('select__recommender____relation')
@@ -347,32 +365,32 @@ export const FormFieldParentChildReset: Story = {
       )
 
       await expect(
-        within(canvas.getByTestId('row-value-recommender.relation')).getByText(
+        within(canvas.getByTestId('recommender.relation-value')).getByText(
           'Coach',
           { selector: 'del' }
         )
       ).toHaveTextContent('Coach')
       await expect(
-        canvas.getByTestId('row-value-recommender.relation')
+        canvas.getByTestId('recommender.relation-value')
       ).toHaveTextContent('Friend')
 
       await expect(
-        within(canvas.getByTestId('row-value-recommender.name')).getByText(
+        within(canvas.getByTestId('recommender.name-value')).getByText(
           'Mohammed Rahim',
           { selector: 'del' }
         )
       ).toHaveTextContent('Mohammed Rahim')
       await expect(
-        canvas.getByTestId('row-value-recommender.name')
+        canvas.getByTestId('recommender.name-value')
       ).toHaveTextContent('John Doe')
 
       await expect(
-        within(canvas.getByTestId('row-value-recommender.age')).getByText('-', {
+        within(canvas.getByTestId('recommender.age-value')).getByText('-', {
           selector: 'del'
         })
       ).toHaveTextContent('-')
       await expect(
-        canvas.getByTestId('row-value-recommender.age')
+        canvas.getByTestId('recommender.age-value')
       ).toHaveTextContent('36')
 
       await waitFor(async () => {

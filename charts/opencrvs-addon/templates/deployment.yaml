@@ -1,0 +1,62 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Values.app_name }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: {{ .Values.app_name }}
+  template:
+    metadata:
+      labels:
+        app: {{ .Values.app_name }}
+    spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- if and (eq .Values.persistence.storage_type "host_path") .Values.node_selector }}
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+            - matchExpressions:
+              {{- range $k, $v := .Values.node_selector }}
+              - key: {{ $k }}
+                operator: In
+                values:
+                - {{ $v }}
+              {{- end }}
+      {{- end }}
+      containers:
+        - name: {{ .Values.app_name }}
+          image: {{ .Values.image.name }}:{{ .Values.image.tag }}
+          env:
+            - name: ALLOWED_HOSTS
+              value: {{ default .Values.hostname .Values.allowed_hosts }}
+          {{- include "render-env-vars" .Values }}
+          ports:
+            - containerPort: {{ .Values.service.container_port }}
+              protocol: TCP
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+          {{- include "probes-helper" .Values | indent 10 }}
+          {{- if .Values.persistence.enabled }}
+          volumeMounts:
+            - name: data
+              mountPath: {{ .Values.persistence.mountPath }}
+          {{- end }}
+      {{- if .Values.persistence.enabled }}
+      volumes:
+        - name: data
+          {{- if eq .Values.persistence.storage_type "host_path" }}
+          hostPath:
+            path: {{ .Values.persistence.host_data_path }}
+            type: DirectoryOrCreate
+          {{- else }}
+          persistentVolumeClaim:
+            claimName: {{ .Values.persistence.pvc.existing_claim | default .Values.app_name }}
+          {{- end }}
+      {{- end }}

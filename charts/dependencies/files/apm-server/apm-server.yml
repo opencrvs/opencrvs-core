@@ -1,0 +1,61 @@
+apm-server:
+  host: '0.0.0.0:8200'
+  rum:
+    enabled: false
+  kibana:
+    enabled: false
+    host: "${KIBANA_HOST}"
+  ilm:
+    enabled: 'auto'
+    setup:
+      enabled: true
+      overwrite: true # allow overwriting the policy on redeploy
+      require_policy: true
+      mapping:
+        - event_type: 'error'
+          policy_name: 'apm-rollover-7-days'
+          index_suffix: ''
+        - event_type: 'span'
+          policy_name: 'apm-rollover-7-days'
+          index_suffix: ''
+        - event_type: 'transaction'
+          policy_name: 'apm-rollover-7-days'
+          index_suffix: ''
+        - event_type: 'metric'
+          policy_name: 'apm-rollover-7-days'
+          index_suffix: ''
+        - event_type: 'profile'
+          policy_name: 'apm-rollover-7-days'
+          index_suffix: ''
+      policies:
+        - name: 'apm-rollover-7-days'
+          policy:
+            phases:
+              hot:
+                actions:
+                  rollover:
+                    max_size: '200mb'
+                    max_age: '1d'
+                  set_priority:
+                    priority: 100
+              warm:
+                min_age: '2d'
+                actions:
+                  set_priority:
+                    priority: 50
+                  readonly: {}
+              delete:
+                min_age: '2d'
+                actions:
+                  delete: {}
+queue:
+  mem:
+    events: 12096
+index:
+  number_of_replicas: 0
+output.elasticsearch:
+  hosts: ["${ELASTICSEARCH_HOST}"]
+  username: "${ELASTICSEARCH_USERNAME}"
+  password: "${ELASTICSEARCH_PASSWORD}"
+  bulk_max_size: 12120
+logging.level: warning

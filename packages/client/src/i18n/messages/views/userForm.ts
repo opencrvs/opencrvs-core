@@ -14,11 +14,6 @@ export const messages = {
     description: 'The name of the user form',
     id: 'constants.user'
   },
-  username: {
-    defaultMessage: 'Username',
-    description: 'The name of the user name form',
-    id: 'constants.username'
-  },
   userFormTitle: {
     defaultMessage: 'Create new user',
     description: 'The title of user form',
@@ -28,16 +23,6 @@ export const messages = {
     defaultMessage: 'Please review the new users details',
     description: 'The title of the review page of the user form',
     id: 'form.section.user.preview.title'
-  },
-  assignedRegistrationOffice: {
-    defaultMessage: 'Assigned Registration Office',
-    description: 'Assigned Registration Office section',
-    id: 'form.section.assignedRegistrationOffice'
-  },
-  assignedRegistrationOfficeGroupTitle: {
-    defaultMessage: 'Assigned registration office',
-    description: 'Assigned Registration Office section',
-    id: 'form.section.assignedRegistrationOfficeGroupTitle'
   },
   registrationOffice: {
     defaultMessage: 'Registration Office',
@@ -59,6 +44,11 @@ export const messages = {
     description: "User's English surname",
     id: 'form.field.label.userSurname'
   },
+  fullName: {
+    defaultMessage: "User's full name",
+    description: "User's full English name",
+    id: 'form.field.label.userFullName'
+  },
   phoneNumber: {
     defaultMessage: 'Phone number',
     description: 'Input label for phone input',
@@ -73,11 +63,6 @@ export const messages = {
     defaultMessage: 'Full Honorific Name',
     description: 'Input label for full honorific name',
     id: 'form.field.label.fullHonorificName'
-  },
-  accountDetails: {
-    defaultMessage: 'Account details',
-    description: 'Account details section',
-    id: 'form.section.accountDetails'
   },
   labelRole: {
     defaultMessage: 'Role',
@@ -109,17 +94,6 @@ export const messages = {
     description: 'Input label for user signature attachment',
     id: 'form.field.label.userSignatureAttachment'
   },
-  userSignatureAttachmentDesc: {
-    defaultMessage:
-      'Ask the user to sign a piece of paper and then scan or take a photo.',
-    description: 'Description for user signature attachment',
-    id: 'form.field.label.userSignatureAttachmentDesc'
-  },
-  userAttachmentSection: {
-    defaultMessage: 'Attachments',
-    description: 'label for user signature attachment',
-    id: 'form.field.label.userAttachmentSection'
-  },
   creatingNewUser: {
     defaultMessage: 'Creating new user',
     description: 'label for creating new user',
@@ -129,5 +103,24 @@ export const messages = {
     defaultMessage: 'Updating user',
     description: 'label for updating user',
     id: 'form.field.label.updatingUser'
+  },
+  removeDraftsWarningTitle: {
+    defaultMessage: 'Change role or office?',
+    description:
+      'Title for the confirmation dialog when a change removes a user in-progress drafts',
+    id: 'form.field.label.removeDraftsWarningTitle'
+  },
+  removeDraftsWarningBody: {
+    defaultMessage:
+      "Changing this user's role or office will remove their in-progress drafts. Do you want to continue?",
+    description:
+      'Body for the confirmation dialog when a change removes a user in-progress drafts',
+    id: 'form.field.label.removeDraftsWarningBody'
+  },
+  phoneNumberFormat: {
+    id: 'validations.phoneNumberFormat',
+    defaultMessage: 'Must be a valid 10 digit number that starts with 0(7|9)',
+    description:
+      'The error message that appears on phone numbers where the first character must be a 0'
   }
 }

@@ -13,9 +13,13 @@ import { useMutation, useSuspenseQuery } from '@tanstack/react-query'
 import { create } from 'zustand'
 import { createJSONStorage, persist } from 'zustand/middleware'
 import {
-  ActionDocument,
+  ActionType,
   deepDropNulls,
   Draft,
+  EventDocument,
+  EventStatus,
+  getStatusFromActions,
+  RemoteDraft,
   UUID
 } from '@opencrvs/commons/client'
 import { storage } from '@client/storage'
@@ -23,10 +27,11 @@ import {
   clearPendingDraftCreationRequests,
   findLocalEventDocument,
   refetchDraftsList,
-  refetchAllSearchQueries,
-  setDraftData,
-  updateLocalEventIndex
+  seedLocalEventIndex,
+  setDraftData
 } from '@client/v2-events/features/events/useEvents/api'
+import { usePendingDeleteEventIds } from '@client/v2-events/features/events/useEvents/procedures/delete'
+import { retryUnlessConflict } from '@client/v2-events/features/events/useEvents/procedures/actions/mutationHandlers'
 import {
   createEventActionMutationFn,
   QueryOptions,
@@ -35,8 +40,8 @@ import {
 } from '@client/v2-events/features/events/useEvents/procedures/utils'
 import { queryClient, trpcOptionsProxy, useTRPC } from '@client/v2-events/trpc'
 import { createTemporaryId, isTemporaryId } from '@client/v2-events/utils'
+import { precacheFiles } from '@client/v2-events/cache'
 import { getFilepathsFromActionDocument } from '../files/cache'
-import { precacheFile } from '../files/useFileUpload'
 
 /*
  * Overrides the default behaviour of "api.event.draft.list"
@@ -52,26 +57,44 @@ setQueryDefaults(trpcOptionsProxy.event.draft.list, {
       throw new Error('queryFn is not a function')
     }
 
-    const response = await queryOptions.queryFn(...params)
-    const drafts = response.map((draft) => Draft.parse(draft))
+    const drafts = await queryOptions.queryFn(...params)
 
-    const filenames = drafts.flatMap((draft) =>
-      getFilepathsFromActionDocument([draft.action])
+    await Promise.all(
+      drafts.map(async (draft) => {
+        if (!findLocalEventDocument(draft.eventId)) {
+          await queryClient.prefetchQuery({
+            queryKey: trpcOptionsProxy.event.get.queryKey({
+              eventId: draft.eventId
+            }),
+            queryFn: trpcOptionsProxy.event.get.queryOptions({
+              eventId: draft.eventId
+            }).queryFn
+          })
+        }
+
+        const event = findLocalEventDocument(draft.eventId)
+
+        /*
+         * The document alone is not enough to open the record: the event
+         * overview resolves it through `event.search`, which offline cannot run.
+         */
+        if (event) {
+          seedLocalEventIndex(draft.eventId, event)
+        }
+
+        /*
+         * A draft whose event never loaded won't appear in the workqueue,
+         * so there's no reason to fetch its documents either.
+         */
+        if (!event) {
+          return
+        }
+
+        const filenames = getFilepathsFromActionDocument([draft.action])
+
+        await precacheFiles(filenames)
+      })
     )
-
-    await Promise.all(filenames.map(async (filename) => precacheFile(filename)))
-
-    const missingEventsToDownload = drafts
-      .filter((event) => !findLocalEventDocument(event.eventId))
-      .map(async (draft) =>
-        queryClient.prefetchQuery({
-          queryKey: trpcOptionsProxy.event.get.queryKey(draft.eventId),
-          queryFn: trpcOptionsProxy.event.get.queryOptions(draft.eventId)
-            .queryFn
-        })
-      )
-
-    await Promise.all(missingEventsToDownload)
 
     return drafts
   }
@@ -117,11 +140,16 @@ export const localDraftStore = create<DraftStore>()(
   )
 )
 
+/** Drafts are saved only on a created record. The server refuses them on any other. */
+export function canSaveDraft(event: EventDocument) {
+  return getStatusFromActions(event.actions) === EventStatus.enum.CREATED
+}
+
 setMutationDefaults(trpcOptionsProxy.event.draft.create, {
-  retry: true,
+  retry: retryUnlessConflict,
   mutationFn: createEventActionMutationFn(trpcOptionsProxy.event.draft.create),
   onMutate: (variables) => {
-    const optimisticDraft: Draft = {
+    const optimisticDraft: RemoteDraft = {
       id: createTemporaryId(),
       eventId: variables.eventId as UUID,
       transactionId: variables.transactionId as UUID,
@@ -154,7 +182,7 @@ setMutationDefaults(trpcOptionsProxy.event.draft.create, {
     return optimisticDraft
   },
   onSuccess: async () => {
-    await refetchAllSearchQueries()
+    // Drafts are never indexed, so no search can change.
     await refetchDraftsList()
   },
   retryDelay: 10000
@@ -182,9 +210,11 @@ export function useDrafts() {
   const localDraft = localDraftStore((drafts) => drafts.draft)
   const createDraft = useCreateDraft()
 
-  function getAllRemoteDrafts(
+  const pendingDeleteEventIds = usePendingDeleteEventIds()
+
+  function useDisplayableDrafts(
     additionalOptions: QueryOptions<typeof trpc.event.draft.list> = {}
-  ): Draft[] {
+  ): RemoteDraft[] {
     // Skip the queryFn defined by tRPC and use the one defined above
     const { queryFn, ...options } = trpc.event.draft.list.queryOptions()
 
@@ -195,8 +225,9 @@ export function useDrafts() {
       queryKey: trpc.event.draft.list.queryKey(),
       select: (currentDraftState) => {
         const locallyStoredDrafts =
-          queryClient.getQueryData<Draft[]>(trpc.event.draft.list.queryKey()) ??
-          []
+          queryClient.getQueryData<RemoteDraft[]>(
+            trpc.event.draft.list.queryKey()
+          ) ?? []
         const serverStoredDrafts = currentDraftState.filter(
           (draft) => !isTemporaryId(draft.id)
         )
@@ -217,15 +248,45 @@ export function useDrafts() {
       }
     })
 
-    return drafts.data
+    /**
+     * Filter out drafts whose backing event does not resolve locally.
+     *
+     * The workqueue needs a draft's event to render its row, so the list and the
+     * sidebar badge both derive from this set to stay in lockstep (otherwise the
+     * badge could read "1" while the list shows "No records in drafts"). Missing
+     * events are normally prefetched by the `event.draft.list` queryFn, so a
+     * cleared cache self-heals; a draft is only dropped when its event genuinely
+     * can't be resolved (e.g. access lost after an office change) — where it isn't
+     * actionable anyway.
+     */
+    return drafts.data.filter(
+      ({ eventId }) =>
+        Boolean(findLocalEventDocument(eventId)) &&
+        // The server keeps serving a draft until its delete lands.
+        !pendingDeleteEventIds.includes(eventId)
+    )
   }
 
   return {
     setLocalDraft: localDraftStore((drafts) => drafts.setDraft),
     getLocalDraftOrDefault,
+    /**
+     * Only the declare and notify views save a draft to the server. The store it reads
+     * from is shared with the edit, print and correction views, whose drafts
+     * stay local, so the type has to be narrowed before submitting.
+     */
     submitLocalDraft: () => {
       if (!localDraft) {
         throw new Error('No draft to submit')
+      }
+
+      if (
+        localDraft.action.type !== ActionType.DECLARE &&
+        localDraft.action.type !== ActionType.NOTIFY
+      ) {
+        throw new Error(
+          `Only ${ActionType.DECLARE} and ${ActionType.NOTIFY} drafts can be saved to the server, this one is ${localDraft.action.type}`
+        )
       }
 
       createDraft.mutate({
@@ -238,12 +299,12 @@ export function useDrafts() {
       })
     },
     isLocalDraftSubmitted: createDraft.isSuccess,
-    getAllRemoteDrafts,
-    getRemoteDraftByEventId: function useDraftList(
+    useDisplayableDrafts,
+    useRemoteDraftByEventId: (
       eventId: string,
       additionalOptions: QueryOptions<typeof trpc.event.draft.list> = {}
-    ): Draft | undefined {
-      const eventDrafts = getAllRemoteDrafts(additionalOptions).filter(
+    ): RemoteDraft | undefined => {
+      const eventDrafts = useDisplayableDrafts(additionalOptions).filter(
         (draft) => draft.eventId === eventId
       )
 

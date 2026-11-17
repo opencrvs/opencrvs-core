@@ -10,28 +10,33 @@
  */
 
 import React from 'react'
-import { Summary } from '@opencrvs/components/lib/Summary'
+import { List } from '@opencrvs/components'
 import {
   EventConfig,
   getDeclarationFields,
   areConditionsMet,
   getMixedPath,
-  Flag,
-  ActionFlag,
-  InherentFlags,
-  TranslationConfig,
-  EventDocument
+  EventIndex,
+  EventDocument,
+  isFieldSecured,
+  FieldValue
 } from '@opencrvs/commons/client'
-import { FieldValue, FieldConfig, FieldType } from '@opencrvs/commons/client'
 import { useIntlFormatMessageWithFlattenedParams } from '@client/v2-events/messages/utils'
 import { Output } from '@client/v2-events/features/events/components/Output'
 import { useValidatorContext } from '@client/v2-events/hooks/useValidatorContext'
+import { recordAnchorDate } from '@client/v2-events/utils'
 import { convertDateFieldsToUnixTimestamps } from '@client/v2-events/utils'
-/**
- * Based on packages/client/src/views/RecordAudit/DeclarationInfo.tsx
- */
+import { useFlagLabelsString } from '@client/v2-events/messages/flags'
+import { useConfigVersionLabel } from '@client/v2-events/features/events/useEventConfiguration'
+import { InfoBox } from './InfoBox'
 
 const messages = {
+  /** Names the bar shown in place of a value the reader may not see. */
+  redacted: {
+    id: 'event.summary.redacted',
+    defaultMessage: 'Hidden',
+    description: 'Accessible name for a value the user is not permitted to see'
+  },
   assignedTo: {
     label: {
       id: 'event.summary.assignedTo.label',
@@ -58,7 +63,7 @@ const messages = {
     value: {
       id: 'event.summary.status.value',
       defaultMessage:
-        '{event.status, select, CREATED {Draft} NOTIFIED {Notified} VALIDATED {Validated} DRAFT {Draft} DECLARED {Declared} REGISTERED {Registered} CERTIFIED {Certified} REJECTED {Requires update} ARCHIVED {Archived} MARK_AS_DUPLICATE {Marked as a duplicate} other {Unknown}}',
+        '{event.status, select, CREATED {Draft} NOTIFIED {Notified} VALIDATED {Validated} DRAFT {Draft} DECLARED {Declared} REGISTERED {Registered} REVOKED {Revoked} CERTIFIED {Certified} REJECTED {Requires update} ARCHIVED {Archived} MARK_AS_DUPLICATE {Marked as a duplicate} other {Unknown}}',
       description: 'Status of the event'
     }
   },
@@ -119,66 +124,50 @@ const messages = {
 
 export const summaryMessages = messages
 
-const flagMessages = {
-  [InherentFlags.CORRECTION_REQUESTED]: {
-    id: 'flags.builtin.correction-requested.label',
-    defaultMessage: 'Correction requested',
-    description: 'Flag label for correction requested'
-  },
-  [InherentFlags.POTENTIAL_DUPLICATE]: {
-    id: 'flags.builtin.potential-duplicate.label',
-    defaultMessage: 'Potential duplicate',
-    description: 'Flag label for potential duplicate'
-  },
-  [InherentFlags.REJECTED]: {
-    id: 'flags.builtin.rejected.label',
-    defaultMessage: 'Rejected',
-    description: 'Flag label for rejected'
-  },
-  [InherentFlags.INCOMPLETE]: {
-    id: 'flags.builtin.incomplete.label',
-    defaultMessage: 'Incomplete',
-    description: 'Flag label for incomplete'
-  },
-  [InherentFlags.PENDING_CERTIFICATION]: {
-    id: 'flags.builtin.pending-certification.label',
-    defaultMessage: 'Pending certification',
-    description: 'Flag label for pending certification'
-  }
-} satisfies Record<InherentFlags, TranslationConfig>
-
 export function EventSummary({
   event,
-  eventIndex,
   eventConfiguration,
-  flags,
-  hideSecuredFields = false
+  eventIndex,
+  hideSecuredFields = false,
+  eventDocument
 }: {
-  event?: EventDocument
-  eventIndex: Record<string, FieldValue>
+  event: Record<string, FieldValue>
   eventConfiguration: EventConfig
-  flags: Flag[]
+  eventIndex: EventIndex
   hideSecuredFields?: boolean
+  eventDocument?: EventDocument
 }) {
   const intl = useIntlFormatMessageWithFlattenedParams()
-  const validationContext = useValidatorContext(event)
+  const validatorContext = useValidatorContext(eventDocument)
+  const flagLabels = useFlagLabelsString(eventConfiguration, eventIndex.flags)
+  const configVersionLabel = intl.formatMessage(
+    useConfigVersionLabel(eventIndex)
+  )
   const { summary, label: eventLabelMessage } = eventConfiguration
   const declarationFields = getDeclarationFields(eventConfiguration)
   const securedFields = declarationFields
-    .filter(({ secured }) => secured)
+    .filter((declarationField) =>
+      isFieldSecured(declarationField, eventIndex, validatorContext)
+    )
     .map(({ id }) => id)
 
+  const visibleBanners = (summary.banners ?? []).filter(
+    (banner) =>
+      !banner.conditionals ||
+      banner.conditionals.length === 0 ||
+      areConditionsMet(banner.conditionals, event, validatorContext, eventIndex)
+  )
   const configuredFields = summary.fields.map((field) => {
     if (
       field.conditionals &&
-      !areConditionsMet(field.conditionals, eventIndex, validationContext)
+      !areConditionsMet(field.conditionals, event, validatorContext, eventIndex)
     ) {
       return null
     }
 
     if ('fieldId' in field) {
       const config = declarationFields.find((f) => f.id === field.fieldId)
-      const value = getMixedPath(eventIndex, field.fieldId, '')
+      const value = getMixedPath(event, field.fieldId, '')
 
       if (!config) {
         return null
@@ -189,9 +178,10 @@ export function EventSummary({
         // If a custom label is configured, use it. Otherwise, by default, use the label from the original form field.
         label: field.label ?? config.label,
         emptyValueMessage: field.emptyValueMessage,
-        secured: config.secured ?? false,
+        secured: isFieldSecured(config, eventIndex, validatorContext),
         value: (
           <Output
+            anchor={recordAnchorDate(eventIndex)}
             eventConfig={eventConfiguration}
             field={config}
             value={value}
@@ -217,87 +207,92 @@ export function EventSummary({
          * i.e. if the message is something like `{event.updatedAt, date, ::dd MM YYYY}`, then the value of `event.updatedAt`
          * needs to be a unix timestamp for it to be formatted correctly by `intl.formatMessage`.
          */
-        convertDateFieldsToUnixTimestamps(eventIndex)
+        {
+          ...convertDateFieldsToUnixTimestamps(event),
+          'event.configVersionLabel': configVersionLabel
+        }
       )
     }
   })
 
-  const flattenedFlags = flags
-    .filter((flag) => !ActionFlag.safeParse(flag).success)
-    .filter((flag) => flag !== InherentFlags.INCOMPLETE)
-    .map((flag) => {
-      return intl.formatMessage(flagMessages[flag as InherentFlags])
-    })
-    .join(', ')
-
   return (
     <>
-      <Summary id="summary">
-        <Summary.Row
+      {visibleBanners.map((banner, index) => (
+        <InfoBox
+          key={index}
+          background={banner.background}
+          data-testid={`summary-info-box-${index}`}
+          description={
+            banner.description && intl.formatMessage(banner.description)
+          }
+          heading={intl.formatMessage(banner.heading)}
+          icon={banner.icon}
+          type={banner.type}
+        />
+      ))}
+      <List id="summary" redactedLabel={intl.formatMessage(messages.redacted)}>
+        <List.Item
           key="assignedTo"
           data-testid="assignedTo"
           label={intl.formatMessage(messages.assignedTo.label)}
           placeholder={intl.formatMessage(
             messages.assignedTo.emptyValueMessage
           )}
-          value={intl.formatMessage(messages.assignedTo.value, eventIndex)}
+          value={intl.formatMessage(messages.assignedTo.value, event)}
         />
-        <Summary.Row
+        <List.Item
           key="status"
           data-testid="status"
           label={intl.formatMessage(messages.status.label)}
-          value={intl.formatMessage(messages.status.value, eventIndex)}
+          value={intl.formatMessage(messages.status.value, event)}
         />
-        <Summary.Row
+        <List.Item
           key="flags"
           data-testid="flags"
           label={intl.formatMessage(messages.flags.label)}
           placeholder={intl.formatMessage(messages.flags.placeholder)}
-          value={flattenedFlags}
+          value={flagLabels}
         />
-        <Summary.Row
+        <List.Item
           key="event"
           data-testid="event"
           label={intl.formatMessage(messages.event.label)}
           value={intl.formatMessage(eventLabelMessage)}
         />
-        <Summary.Row
+        <List.Item
           key="tracking-id"
           data-testid="tracking-id"
           label={intl.formatMessage(messages.trackingId.label)}
           placeholder={intl.formatMessage(
             messages.trackingId.emptyValueMessage
           )}
-          value={intl.formatMessage(messages.trackingId.value, eventIndex)}
+          value={intl.formatMessage(messages.trackingId.value, event)}
         />
-        <Summary.Row
+        <List.Item
           key="registrationNumber"
           data-testid="registrationNumber"
           label={intl.formatMessage(messages.registrationNumber.label)}
           placeholder={intl.formatMessage(
             messages.registrationNumber.emptyValueMessage
           )}
-          value={intl.formatMessage(
-            messages.registrationNumber.value,
-            eventIndex
-          )}
+          value={intl.formatMessage(messages.registrationNumber.value, event)}
         />
         {configuredFields
           .filter((f): f is NonNullable<typeof f> => f !== null)
           .map((field) => (
-            <Summary.Row
+            <List.Item
               key={field.id}
               data-testid={field.id}
               label={intl.formatMessage(field.label)}
-              locked={field.secured && hideSecuredFields}
               placeholder={
                 field.emptyValueMessage &&
                 intl.formatMessage(field.emptyValueMessage)
               }
+              redacted={field.secured && hideSecuredFields}
               value={field.value}
             />
           ))}
-      </Summary>
+      </List>
     </>
   )
 }

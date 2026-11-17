@@ -1,0 +1,163 @@
+/*
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at https://mozilla.org/MPL/2.0/.
+ *
+ * OpenCRVS is also distributed under the terms of the Civil Registration
+ * & Healthcare Disclaimer located at http://opencrvs.org/license.
+ *
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
+ */
+import { expect, test } from '@playwright/test'
+import { getToken, login } from '@e2e/support/helpers'
+import { faker } from '@faker-js/faker'
+import {
+  createDeclaration as createDeclarationV2,
+  Declaration as DeclarationV2
+} from '@e2e/support/test-data/birth-declaration-with-mother-father'
+import { format, subDays, subYears } from 'date-fns'
+import { CREDENTIALS } from '@e2e/support/constants'
+import { formatV2ChildName } from '@e2e/support/birth/helpers'
+import {
+  ensureAssignedToUser,
+  expectInUrl,
+  selectAction,
+  type
+} from '@e2e/support/utils'
+import { openRecordByTitle } from '@e2e/support/print-certificate/birth/helpers'
+import { requestCorrectionViaApi } from '@e2e/support/test-data/api-actions'
+
+test('Request and accept correction (offline)', async ({ page }) => {
+  let declaration: DeclarationV2
+  let trackingId = ''
+  let eventId: string
+
+  const updatedChildDetails = {
+    firstname: faker.person.firstName(),
+    surname: faker.person.lastName()
+  }
+
+  await test.step('Shortcut declaration', async () => {
+    const token = await getToken(CREDENTIALS.REGISTRAR)
+
+    const res = await createDeclarationV2(
+      token,
+      {
+        'child.name': {
+          firstname: faker.person.firstName('male'),
+          surname: faker.person.lastName()
+        },
+        'child.gender': 'male',
+        'child.dob': format(subDays(new Date(), 1), 'yyyy-MM-dd'),
+        'child.placeOfBirth': 'PRIVATE_HOME',
+        'child.attendantAtBirth': 'PHYSICIAN',
+        'child.birthType': 'SINGLE',
+        'child.weightAtBirth': 3,
+        'informant.relation': 'MOTHER',
+        'informant.phoneNo': '0911725897',
+        'mother.name': {
+          firstname: faker.person.firstName('female'),
+          surname: faker.person.lastName('female')
+        },
+        'mother.dob': format(subYears(new Date(), 29), 'yyyy-MM-dd'),
+        'mother.nationality': 'FAR',
+        'mother.idType': 'NATIONAL_ID',
+        'mother.nid': faker.string.numeric(10),
+        'mother.maritalStatus': 'SINGLE',
+        'mother.educationalAttainment': 'NO_SCHOOLING',
+        'mother.occupation': 'Housewife',
+        'mother.previousBirths': 0,
+        'father.name': {
+          firstname: faker.person.firstName('male'),
+          surname: faker.person.lastName('male')
+        },
+        'father.detailsNotAvailable': false,
+        'father.dob': format(subYears(new Date(), 31), 'yyyy-MM-dd'),
+        'father.idType': 'NATIONAL_ID',
+        'father.nid': faker.string.numeric(10),
+        'father.nationality': 'FAR',
+        'father.maritalStatus': 'SINGLE',
+        'father.educationalAttainment': 'NO_SCHOOLING',
+        'father.occupation': 'Unemployed',
+        'father.addressSameAs': 'YES'
+      },
+      'REGISTER',
+      'PRIVATE_HOME'
+    )
+    expect(res).toEqual(
+      expect.objectContaining({
+        trackingId: expect.any(String)
+      })
+    )
+    trackingId = res.trackingId!
+    eventId = res.eventId
+    declaration = res.declaration
+  })
+
+  await test.step('Request correction as RO via API', async () => {
+    await requestCorrectionViaApi({
+      token: await getToken(CREDENTIALS.REGISTRATION_OFFICER),
+      eventId,
+      declaration: { 'child.name': updatedChildDetails },
+      annotation: {
+        'requester.type': 'LEGAL_GUARDIAN',
+        'reason.option': 'MATERIAL_ERROR',
+        'requester.identity.verify': true,
+        'fees.amount': faker.number.int({ min: 1, max: 1000 })
+      }
+    })
+  })
+
+  await test.step('Accept correction as Registrar (offline)', async () => {
+    await test.step('Login as Registrar', async () => {
+      await login(page, CREDENTIALS.REGISTRAR)
+    })
+
+    await test.step('Navigate to correction review', async () => {
+      await type(page, '#searchText', trackingId)
+      await page.locator('#searchIconButton').click()
+
+      await openRecordByTitle(page, formatV2ChildName(declaration))
+
+      await ensureAssignedToUser(page, CREDENTIALS.REGISTRAR)
+      await selectAction(page, 'Review correction request')
+    })
+
+    await test.step('Accept correction offline', async () => {
+      // Go offline
+      await page.context().setOffline(true)
+
+      await page.getByRole('button', { name: 'Approve', exact: true }).click()
+      await page.getByRole('button', { name: 'Confirm', exact: true }).click()
+
+      await expectInUrl(page, `events/${eventId}`)
+
+      // We expect to see the optimistically updated new child name instead of the old one
+      await expect(
+        page.locator('#content-name', {
+          hasText: formatV2ChildName({ 'child.name': updatedChildDetails })
+        })
+      ).toBeVisible()
+
+      await page.getByTestId('exit-event').click()
+
+      await page.getByRole('button', { name: 'Outbox' }).click()
+      await expect(page.getByText('Offline')).toBeVisible()
+    })
+
+    await test.step('Go back online', async () => {
+      // Go back online
+
+      const acceptResponse = page.waitForResponse(
+        (response) =>
+          response.url().includes('event.actions.correction.approve') &&
+          response.ok()
+      )
+
+      await page.context().setOffline(false)
+      await acceptResponse
+
+      await expect(page.getByText('Offline')).not.toBeVisible()
+    })
+  })
+})

@@ -8,27 +8,66 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
+/* eslint-disable max-lines */
 import { readFileSync } from 'fs'
+import { IncomingMessage } from 'http'
 import { join } from 'path'
 import * as jwt from 'jsonwebtoken'
+import fc from 'fast-check'
+import { genSaltSync, hashSync } from 'bcryptjs'
 import {
+  ActionStatus,
   ActionType,
+  ActionTypes,
+  SetAdministrativeAreaPayload,
   createPrng,
+  DeclarationActionType,
+  encodeScope,
   EventConfig,
   EventDocument,
+  EventIndex,
+  generateActionDeclarationInput,
+  generateRandomDatetime,
   generateRandomSignature,
-  Scope,
-  SCOPES,
-  SystemRole,
+  generateRegistrationNumber,
+  generateUuid,
+  getCurrentEventState,
+  getUUID,
+  JurisdictionFilter,
+  SERVICE_USER_ID,
+  SetLocationPayload,
+  TENNIS_CLUB_MEMBERSHIP,
   TokenUserType,
-  TokenWithBearer
+  TokenWithBearer,
+  User,
+  UserFilter,
+  UUID,
+  INITIAL_EVENT_CONFIG_VERSION_ID
 } from '@opencrvs/commons'
-import { t } from '@events/router/trpc'
+import { tennisClubMembershipEvent } from '@opencrvs/commons/fixtures'
+import { SystemContext, UserContext } from '@opencrvs/commons'
+import { t, tService } from '@events/router/trpc'
+import { createContext } from '@events/context'
 import { appRouter } from '@events/router/router'
-import { SystemContext } from '@events/context'
 import { getClient } from '@events/storage/postgres/events'
+import { EventNotFoundError } from '@events/service/events/events'
+import { internalRouter } from '@events/router/internalRouter'
+import { initialisationRouter } from '@events/router/initialisation'
 import { getLocations } from '../service/locations/locations'
-import { CreatedUser, payloadGenerator, seeder } from './generators'
+import { NewEventActions } from '../storage/postgres/events/schema/app/EventActions'
+import {
+  CreatedUser,
+  payloadGenerator,
+  seeder,
+  setupHierarchyWithUsers
+} from './generators'
+
+export const UUID_REGEX =
+  /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
+
+export const TEST_SYSTEM_ID = '9f3c6b7e-2a91-4f6d-b8d2-5c0e3a4f1b72' as UUID
+export const TEST_SYSTEM_ID_2 = '4d1a8c90-7e5b-4a3f-9c2d-1f6b8e7a2c55' as UUID
+export const REINDEX_SYSTEM_ID = 'e2b7f6a1-3d94-4c8e-a5f9-6b2d0c1a9e33' as UUID
 
 /**
  * Known unstable fields in events that should be sanitized for snapshot testing.
@@ -49,8 +88,10 @@ export const UNSTABLE_EVENT_FIELDS = [
   'updatedBy',
   'acceptedAt',
   'dateOfEvent',
+  'placeOfEvent',
   'registrationNumber',
-  'originalActionId'
+  'originalActionId',
+  'createdBySignature'
 ]
 /**u
  * Cleans up unstable fields in data for snapshot testing.
@@ -92,39 +133,123 @@ export function sanitizeForSnapshot(data: unknown, fields: string[]) {
 const { createCallerFactory } = t
 
 export const TEST_USER_DEFAULT_SCOPES = [
-  SCOPES.RECORD_READ, // @TODO: this can be removed after unnecessary .list endpoint is removed
-  SCOPES.SEARCH_BIRTH,
-  'workqueue[id=assigned-to-you|recent|requires-updates|sent-for-review]',
-  `record.create[event=birth|death|tennis-club-membership]`,
-  'record.read[event=birth|death|tennis-club-membership]',
-  'record.notify[event=birth|death|tennis-club-membership]',
-  'record.create[event=birth|death|tennis-club-membership]',
-  'record.declare[event=birth|death|tennis-club-membership]',
-  'record.declared.validate[event=birth|death|tennis-club-membership]',
-  'record.declared.reject[event=birth|death|tennis-club-membership]',
-  'record.declared.archive[event=birth|death|tennis-club-membership]',
-  'record.register[event=birth|death|tennis-club-membership]',
-  'record.registered.print-certified-copies[event=birth|death|tennis-club-membership]',
-  'record.registered.request-correction[event=birth|death|tennis-club-membership]',
-  'record.registered.correct[event=birth|death|tennis-club-membership]',
-  'record.unassign-others[event=birth|death|tennis-club-membership]'
+  encodeScope({
+    type: 'workqueue',
+    options: {
+      ids: ['assigned-to-you', 'recent', 'requires-updates', 'sent-for-review']
+    }
+  }),
+  encodeScope({
+    type: 'record.read',
+    options: {
+      event: ['birth', 'death', 'tennis-club-membership', 'child-onboarding']
+    }
+  }),
+  encodeScope({
+    type: 'record.create',
+    options: {
+      event: ['birth', 'death', 'tennis-club-membership', 'child-onboarding']
+    }
+  }),
+  encodeScope({
+    type: 'record.notify',
+    options: {
+      event: ['birth', 'death', 'tennis-club-membership', 'child-onboarding']
+    }
+  }),
+  encodeScope({
+    type: 'record.declare',
+    options: {
+      event: ['birth', 'death', 'tennis-club-membership', 'child-onboarding']
+    }
+  }),
+  encodeScope({
+    type: 'record.edit',
+    options: {
+      event: ['birth', 'death', 'tennis-club-membership', 'child-onboarding']
+    }
+  }),
+  encodeScope({
+    type: 'record.reject',
+    options: {
+      event: ['birth', 'death', 'tennis-club-membership', 'child-onboarding']
+    }
+  }),
+  encodeScope({
+    type: 'record.archive',
+    options: {
+      event: ['birth', 'death', 'tennis-club-membership', 'child-onboarding']
+    }
+  }),
+  encodeScope({
+    type: 'record.unarchive',
+    options: {
+      event: ['birth', 'death', 'tennis-club-membership', 'child-onboarding']
+    }
+  }),
+  encodeScope({
+    type: 'record.revoke-registration',
+    options: {
+      event: ['birth', 'death', 'tennis-club-membership', 'child-onboarding']
+    }
+  }),
+  encodeScope({
+    type: 'record.reinstate-registration',
+    options: {
+      event: ['birth', 'death', 'tennis-club-membership', 'child-onboarding']
+    }
+  }),
+  encodeScope({
+    type: 'record.register',
+    options: {
+      event: ['birth', 'death', 'tennis-club-membership', 'child-onboarding']
+    }
+  }),
+  encodeScope({
+    type: 'record.print-certified-copies',
+    options: {
+      event: ['birth', 'death', 'tennis-club-membership', 'child-onboarding']
+    }
+  }),
+  encodeScope({
+    type: 'record.request-correction',
+    options: {
+      event: ['birth', 'death', 'tennis-club-membership', 'child-onboarding']
+    }
+  }),
+  encodeScope({
+    type: 'record.correct',
+    options: {
+      event: ['birth', 'death', 'tennis-club-membership', 'child-onboarding']
+    }
+  }),
+  encodeScope({
+    type: 'record.unassign-others',
+    options: {
+      event: ['birth', 'death', 'tennis-club-membership', 'child-onboarding']
+    }
+  }),
+  encodeScope({
+    type: 'record.review-duplicates',
+    options: {
+      event: ['birth', 'death', 'tennis-club-membership', 'child-onboarding']
+    }
+  })
 ]
 
 export function createTestToken({
   userId,
   scopes,
-  eventId,
   userType,
   role
 }: {
-  userId: string
-  scopes: Scope[]
+  userId: UUID
+  scopes: string[]
   userType?: TokenUserType
-  eventId?: string
-  role: string
+  role?: string
 }): TokenWithBearer {
   const token = jwt.sign(
-    { scope: scopes, sub: userId, userType, role, eventId },
+    { scope: scopes, sub: userId, userType, role },
     readFileSync(join(__dirname, './cert.key')),
     {
       algorithm: 'RS256',
@@ -136,49 +261,48 @@ export function createTestToken({
   return `Bearer ${token}`
 }
 
-function createTokenExchangeTestToken(
-  userId: string,
-  eventId: string,
-  actionId: string
+export function createInternalServiceToken(
+  overrides: jwt.SignOptions = {}
 ): TokenWithBearer {
-  const token = jwt.sign(
-    {
-      scope: [
-        SCOPES.RECORD_CONFIRM_REGISTRATION,
-        SCOPES.RECORD_REJECT_REGISTRATION
-      ],
-      sub: userId,
-      userType: TokenUserType.enum.user,
-      eventId,
-      actionId
-    },
-    readFileSync(join(__dirname, './cert.key')),
-    {
-      algorithm: 'RS256',
-      issuer: 'opencrvs:auth-service',
-      audience: 'opencrvs:events-user'
-    }
-  )
+  const token = jwt.sign({}, readFileSync(join(__dirname, './cert.key')), {
+    subject: 'opencrvs:auth-service',
+    algorithm: 'RS256',
+    expiresIn: '604800',
+    audience: ['opencrvs:events-user'],
+    issuer: 'opencrvs:auth-service',
+    ...overrides
+  })
+  return `Bearer ${token}`
+}
 
+export function createInitialisationToken(
+  overrides: jwt.SignOptions = {}
+): TokenWithBearer {
+  const token = jwt.sign({}, readFileSync(join(__dirname, './cert.key')), {
+    subject: 'opencrvs:data-seeder-service',
+    algorithm: 'RS256',
+    expiresIn: '604800',
+    audience: ['opencrvs:events-user'],
+    issuer: 'opencrvs:auth-service',
+    ...overrides
+  })
   return `Bearer ${token}`
 }
 
 export function createSystemTestClient(
-  systemId: string,
+  systemId: UUID,
   scopes: string[] = TEST_USER_DEFAULT_SCOPES
 ) {
   const createCaller = createCallerFactory(appRouter)
   const token = createTestToken({
     userId: systemId,
     scopes,
-    role: 'TEST_SYSTEM_ROLE',
     userType: TokenUserType.enum.system
   })
 
   const caller = createCaller({
     user: SystemContext.parse({
       id: systemId,
-      role: SystemRole.enum.HEALTH,
       primaryOfficeId: undefined,
       type: TokenUserType.enum.system
     }),
@@ -186,6 +310,20 @@ export function createSystemTestClient(
   })
 
   return caller
+}
+
+export async function createServiceTokenTestClient() {
+  const token = createTestToken({
+    userId: SERVICE_USER_ID as UUID,
+    scopes: [],
+    userType: TokenUserType.enum.system
+  })
+
+  const ctx = await createContext({
+    req: { headers: { authorization: token } } as unknown as IncomingMessage
+  })
+
+  return createCallerFactory(appRouter)(ctx)
 }
 
 export function createTestClient(
@@ -210,26 +348,39 @@ export function createTestClient(
   return caller
 }
 
-/**
- * The token that is passed to country config needs to have been exchanged for the specific eventId and actionId.
- */
-export function createCountryConfigClient(
-  user: CreatedUser,
-  eventId: string,
-  actionId: string
-) {
-  const createCaller = createCallerFactory(appRouter)
-  const token = createTokenExchangeTestToken(user.id, eventId, actionId)
+export function createInternalTestClient(tokenWithBearer?: TokenWithBearer) {
+  const createCaller = tService.createCallerFactory(internalRouter)
 
+  const token = tokenWithBearer ?? createInternalServiceToken()
   const caller = createCaller({
-    user: {
-      ...user,
-      type: TokenUserType.enum.user
-    },
     token
   })
+
   return caller
 }
+
+export function createInitialisationTestClient(
+  tokenWithBearer?: TokenWithBearer
+) {
+  const createCaller = tService.createCallerFactory(initialisationRouter)
+
+  const token = tokenWithBearer ?? createInitialisationToken()
+  const caller = createCaller({
+    token
+  })
+
+  return caller
+}
+
+/**
+ * The scopes an integration confirming an action holds, such as mosip-api
+ * calling back once MOSIP has answered. Confirmation is a system client's job:
+ * no user is involved, and the token is not tied to an event.
+ */
+export const CONFIRMATION_SCOPES = [
+  encodeScope({ type: 'record.action.accept' }),
+  encodeScope({ type: 'record.action.reject' })
+]
 
 /**
  *  Setup for test cases. Creates a user and locations in the database, and provides relevant client instances and seeders.
@@ -244,20 +395,37 @@ export const setupTestCase = async (
 
   const seed = seeder()
   const locationRng = createPrng(10123)
-  await seed.locations(generator.locations.set(5, locationRng))
+
+  const administrativeAreaPayload = generator.administrativeAreas.set(
+    5,
+    locationRng
+  )
+  await seed.administrativeAreas(administrativeAreaPayload)
+  await seed.locations(
+    generator.locations.set(
+      administrativeAreaPayload.map((area) => ({
+        administrativeAreaId: area.id
+      })),
+      locationRng
+    )
+  )
 
   const locations = await getLocations()
 
-  const defaultUser = seed.user(
-    generator.user.create({
-      primaryOfficeId: locations[0].id
-    })
-  )
-  const secondaryUser = seed.user(
-    generator.user.create({
-      primaryOfficeId: locations[1].id
-    })
-  )
+  const [defaultUser, secondaryUser] = await Promise.all([
+    seed.user(
+      generator.user.create({
+        primaryOfficeId: locations[0].id,
+        administrativeAreaId: locations[0].administrativeAreaId
+      })
+    ),
+    seed.user(
+      generator.user.create({
+        primaryOfficeId: locations[1].id,
+        administrativeAreaId: locations[1].administrativeAreaId
+      })
+    )
+  ])
 
   const users = [defaultUser, secondaryUser]
 
@@ -285,17 +453,20 @@ export const setupTestCase = async (
 function actionToClientAction(
   client: ReturnType<typeof createTestClient>,
   generator: ReturnType<typeof payloadGenerator>,
-  action: Extract<ActionType, 'CREATE'>
+  action: Extract<ActionType, 'CREATE'>,
+  waitFor?: boolean
 ): () => Promise<EventDocument>
 function actionToClientAction(
   client: ReturnType<typeof createTestClient>,
   generator: ReturnType<typeof payloadGenerator>,
-  action: Exclude<ActionType, 'CREATE'>
+  action: Exclude<ActionType, 'CREATE'>,
+  waitFor?: boolean
 ): (eventId: string) => Promise<EventDocument>
 function actionToClientAction(
   client: ReturnType<typeof createTestClient>,
   generator: ReturnType<typeof payloadGenerator>,
-  action: ActionType
+  action: ActionType,
+  waitFor?: boolean
 ):
   | (() => Promise<EventDocument>)
   | ((eventId: string) => Promise<EventDocument>) {
@@ -305,42 +476,73 @@ function actionToClientAction(
     case ActionType.DECLARE:
       return async (eventId: string) =>
         client.event.actions.declare.request(
-          generator.event.actions.declare(eventId, { keepAssignment: true })
-        )
-    case ActionType.VALIDATE:
-      return async (eventId: string) =>
-        client.event.actions.validate.request(
-          generator.event.actions.validate(eventId, { keepAssignment: true })
+          generator.event.actions.declare(eventId, {
+            keepAssignment: true,
+            waitFor
+          })
         )
     case ActionType.REJECT:
       return async (eventId: string) =>
         client.event.actions.reject.request(
-          generator.event.actions.reject(eventId, { keepAssignment: true })
+          generator.event.actions.reject(eventId, {
+            keepAssignment: true,
+            waitFor
+          })
         )
     case ActionType.ARCHIVE:
       return async (eventId: string) =>
         client.event.actions.archive.request(
-          generator.event.actions.archive(eventId, { keepAssignment: true })
+          generator.event.actions.archive(eventId, {
+            keepAssignment: true,
+            waitFor
+          })
+        )
+    case ActionType.UNARCHIVE:
+      return async (eventId: string) =>
+        client.event.actions.unarchive.request(
+          generator.event.actions.unarchive(eventId, {
+            keepAssignment: true,
+            waitFor
+          })
         )
     case ActionType.REGISTER:
       return async (eventId: string) =>
         client.event.actions.register.request(
           generator.event.actions.register(eventId, {
-            keepAssignment: true
+            keepAssignment: true,
+            waitFor
           })
         )
     case ActionType.PRINT_CERTIFICATE:
       return async (eventId: string) =>
         client.event.actions.printCertificate.request(
           generator.event.actions.printCertificate(eventId, {
-            keepAssignment: true
+            keepAssignment: true,
+            waitFor
           })
         )
     case ActionType.REQUEST_CORRECTION:
       return async (eventId: string) =>
         client.event.actions.correction.request.request(
           generator.event.actions.correction.request(eventId, {
-            keepAssignment: true
+            keepAssignment: true,
+            waitFor
+          })
+        )
+    case ActionType.REVOKE_REGISTRATION:
+      return async (eventId: string) =>
+        client.event.actions.revocation.revoke.request(
+          generator.event.actions.revokeRegistration(eventId, {
+            keepAssignment: true,
+            waitFor
+          })
+        )
+    case ActionType.REINSTATE_REGISTRATION:
+      return async (eventId: string) =>
+        client.event.actions.revocation.reinstate.request(
+          generator.event.actions.reinstateRegistration(eventId, {
+            keepAssignment: true,
+            waitFor
           })
         )
 
@@ -353,7 +555,9 @@ function actionToClientAction(
     case ActionType.MARK_AS_DUPLICATE:
     case ActionType.REJECT_CORRECTION:
     case ActionType.DELETE:
+    case ActionType.CUSTOM:
     case ActionType.READ:
+    case ActionType.EDIT:
     default:
       throw new Error(
         `Unsupported action type: ${action}. Create a case for it if you need it.`
@@ -371,7 +575,12 @@ function actionToClientAction(
 export async function createEvent(
   client: ReturnType<typeof createTestClient>,
   generator: ReturnType<typeof payloadGenerator>,
-  actions: Exclude<ActionType, typeof ActionType.CREATE>[]
+  actions: Exclude<ActionType, typeof ActionType.CREATE>[],
+  /**
+   * Whether the setup actions wait for indexing. Leave it out unless the test
+   * reads the event back from Elasticsearch, `false` is a lot faster.
+   */
+  waitFor?: boolean
 ): Promise<ReturnType<typeof client.event.create>> {
   let createdEvent: EventDocument | undefined
 
@@ -379,15 +588,728 @@ export async function createEvent(
   const createAction = actionToClientAction(
     client,
     generator,
-    ActionType.CREATE
+    ActionType.CREATE,
+    waitFor
   )
 
   createdEvent = await createAction()
 
   for (const action of actions) {
-    const clientAction = actionToClientAction(client, generator, action)
+    const clientAction = actionToClientAction(
+      client,
+      generator,
+      action,
+      waitFor
+    )
     createdEvent = await clientAction(createdEvent.id)
   }
 
   return createdEvent
+}
+
+type SeedAction =
+  | DeclarationActionType
+  | typeof ActionType.UNASSIGN
+  | typeof ActionType.REQUEST_CORRECTION
+  | typeof ActionType.ARCHIVE
+  | typeof ActionType.REVOKE_REGISTRATION
+
+/**
+ * Seeds an event with the specified actions directly into the database.
+ * Given set of action types, will create requested and accepted actions for each action type with CREATE and ASSIGN actions to resemble realistic event history.
+ *
+ * Useful for setting up test data quickly without going through the full API flow. NOTE: When testing search endpoints, remember to reindex after seeding.
+ */
+export async function seedEvent(
+  dbClient: ReturnType<typeof getClient>,
+  {
+    eventConfig,
+    actions,
+    user,
+    rng,
+    administrativeHierarchy
+  }: {
+    eventConfig: EventConfig
+    actions: (SeedAction | { type: SeedAction; status: ActionStatus })[]
+    user: Omit<UserContext, 'type'>
+    rng: () => number
+    administrativeHierarchy?: {
+      administrativeAreas: SetAdministrativeAreaPayload[]
+      locations: SetLocationPayload[]
+    }
+  }
+) {
+  // Setup arbitrary timestamps for actions in the past to ensure consistent ordering.
+  const SEED_START = new Date('2020-01-01')
+  const SEED_END = new Date('2023-01-01')
+
+  const baseTime = new Date(
+    generateRandomDatetime(rng, SEED_START, SEED_END)
+  ).getTime()
+  /** offset variable for timestamps, ensures the array order is maintained. */
+  let offset = 0
+
+  /** Ids of the requested actions, keyed by action type. Needed to call .accept / .reject against them. */
+  const requestedActionIds: Partial<Record<ActionType, UUID>> = {}
+
+  return dbClient.transaction().execute(async (trx) => {
+    const event = await trx
+      .insertInto('events')
+      .values({
+        eventType: eventConfig.id,
+        transactionId: getUUID(),
+        trackingId: getUUID(),
+        configVersionId: INITIAL_EVENT_CONFIG_VERSION_ID
+      })
+      .returning(['id'])
+      .executeTakeFirstOrThrow()
+
+    const baseAction: Omit<
+      NewEventActions,
+      'transactionId' | 'status' | 'actionType'
+    > = {
+      eventId: event.id,
+      createdByUserType: TokenUserType.enum.user,
+      createdAtLocation: user.primaryOfficeId,
+      createdBy: user.id,
+      createdByRole: user.role,
+      annotation: null
+    }
+
+    const createAction: NewEventActions = {
+      ...baseAction,
+      actionType: ActionTypes.enum.CREATE,
+      transactionId: generateUuid(rng),
+      status: ActionStatus.Accepted,
+      createdAt: new Date(baseTime + ++offset).toISOString()
+    }
+
+    const assignAction: NewEventActions = {
+      ...baseAction,
+      actionType: ActionTypes.enum.ASSIGN,
+      assignedTo: user.id,
+      transactionId: generateUuid(rng),
+      status: ActionStatus.Accepted,
+      createdAt: new Date(baseTime + ++offset).toISOString()
+    }
+
+    const generatedActions: NewEventActions[] = actions.flatMap(
+      (action): NewEventActions[] => {
+        const { type: actionType, status } =
+          typeof action === 'string'
+            ? { type: action, status: ActionStatus.Accepted }
+            : action
+
+        if (actionType === ActionType.UNASSIGN) {
+          return [
+            {
+              ...baseAction,
+              actionType,
+              transactionId: generateUuid(rng),
+              status: ActionStatus.Accepted,
+              declaration: {},
+              createdAt: new Date(baseTime + ++offset).toISOString()
+            }
+          ]
+        }
+
+        // Without setting the originalActionId, the accepted action will not be linked to the requested action and will not update the event state, which is important for testing scopes based on event state.
+        const originalActionId = getUUID()
+        requestedActionIds[actionType] = originalActionId
+
+        // correction, partial declaration which changes a value without uncorrectable: true is enough.
+        const declaration =
+          actionType === ActionType.REQUEST_CORRECTION
+            ? { 'applicant.age': 16 }
+            : generateActionDeclarationInput(
+                eventConfig,
+                actionType,
+                rng,
+                undefined,
+                administrativeHierarchy
+              )
+
+        const requestedAction = {
+          ...baseAction,
+          actionType,
+          id: originalActionId,
+          transactionId: generateUuid(rng),
+          status: ActionStatus.Requested,
+          createdAt: new Date(baseTime + ++offset).toISOString(),
+          declaration
+        }
+
+        if (status === ActionStatus.Requested) {
+          return [requestedAction]
+        }
+
+        return [
+          requestedAction,
+          {
+            ...baseAction,
+            actionType,
+            transactionId: generateUuid(rng),
+            originalActionId,
+            status:
+              status === ActionStatus.Accepted
+                ? ActionStatus.Accepted
+                : ActionStatus.Rejected,
+            createdAt: new Date(baseTime + ++offset).toISOString(),
+            registrationNumber:
+              actionType === ActionTypes.enum.REGISTER &&
+              status === ActionStatus.Accepted
+                ? generateRegistrationNumber(rng)
+                : null,
+            declaration: {}
+          }
+        ]
+      }
+    )
+
+    await trx
+      .insertInto('eventActions')
+      .values([createAction, assignAction, ...generatedActions])
+      .onConflict((oc) =>
+        oc.columns(['transactionId', 'actionType', 'status']).doNothing()
+      )
+      .execute()
+
+    return { eventId: event.id, requestedActionIds }
+  })
+}
+
+/** Determine if an event index matches the provided scope filters. */
+function eventMatchesScope({
+  eventIndex,
+  user,
+  placeOfEvent,
+  notifiedBy,
+  notifiedIn,
+  createdBy,
+  createdIn,
+  declaredBy,
+  registeredBy,
+  declaredIn,
+  registeredIn,
+  event,
+  isUnderAdministrativeArea
+}: {
+  eventIndex: EventIndex
+  user:
+    | { id: UUID; primaryOfficeId: UUID; administrativeAreaId: UUID | null }
+    | CreatedUser
+  placeOfEvent?: JurisdictionFilter
+  createdBy?: UserFilter
+  createdIn?: JurisdictionFilter
+  notifiedBy?: UserFilter
+  notifiedIn?: JurisdictionFilter
+  declaredBy?: UserFilter
+  registeredBy?: UserFilter
+  declaredIn?: JurisdictionFilter
+  registeredIn?: JurisdictionFilter
+  event?: string[]
+  isUnderAdministrativeArea: (
+    locationId: UUID,
+    adminAreaId: UUID | null
+  ) => boolean
+}): boolean {
+  if (notifiedBy === UserFilter.enum.user) {
+    if (eventIndex.legalStatuses.NOTIFIED?.createdBy !== user.id) {
+      return false
+    }
+  }
+
+  if (notifiedIn === JurisdictionFilter.enum.location) {
+    if (
+      eventIndex.legalStatuses.NOTIFIED?.createdAtLocation !==
+      user.primaryOfficeId
+    ) {
+      return false
+    }
+  }
+
+  if (notifiedIn === JurisdictionFilter.enum.administrativeArea) {
+    const notifiedLocation =
+      eventIndex.legalStatuses.NOTIFIED?.createdAtLocation
+    if (!notifiedLocation) {
+      return false
+    }
+    if (
+      !isUnderAdministrativeArea(
+        UUID.parse(notifiedLocation),
+        user.administrativeAreaId || null
+      )
+    ) {
+      return false
+    }
+  }
+
+  if (createdBy === UserFilter.enum.user) {
+    if (eventIndex.createdBy !== user.id) {
+      return false
+    }
+  }
+
+  if (createdIn === JurisdictionFilter.enum.location) {
+    if (eventIndex.createdAtLocation !== user.primaryOfficeId) {
+      return false
+    }
+  }
+
+  if (createdIn === JurisdictionFilter.enum.administrativeArea) {
+    if (!eventIndex.createdAtLocation) {
+      return false
+    }
+
+    if (
+      !isUnderAdministrativeArea(
+        UUID.parse(eventIndex.createdAtLocation),
+        user.administrativeAreaId || null
+      )
+    ) {
+      return false
+    }
+  }
+
+  if (declaredBy === UserFilter.enum.user) {
+    if (eventIndex.legalStatuses.DECLARED?.createdBy !== user.id) {
+      return false
+    }
+  }
+
+  if (registeredBy === UserFilter.enum.user) {
+    if (eventIndex.legalStatuses.REGISTERED?.createdBy !== user.id) {
+      return false
+    }
+  }
+
+  if (declaredIn === JurisdictionFilter.enum.location) {
+    if (
+      eventIndex.legalStatuses.DECLARED?.createdAtLocation !==
+      user.primaryOfficeId
+    ) {
+      return false
+    }
+  }
+
+  if (placeOfEvent === JurisdictionFilter.enum.location) {
+    if (eventIndex.placeOfEvent !== user.primaryOfficeId) {
+      return false
+    }
+  }
+
+  if (placeOfEvent === JurisdictionFilter.enum.administrativeArea) {
+    if (
+      !isUnderAdministrativeArea(
+        UUID.parse(eventIndex.placeOfEvent),
+        user.administrativeAreaId || null
+      )
+    ) {
+      return false
+    }
+  }
+
+  if (declaredIn === JurisdictionFilter.enum.administrativeArea) {
+    const declaredLocation =
+      eventIndex.legalStatuses.DECLARED?.createdAtLocation
+
+    if (!declaredLocation) {
+      return false
+    }
+
+    if (
+      !isUnderAdministrativeArea(
+        UUID.parse(eventIndex.legalStatuses.DECLARED?.createdAtLocation),
+        user.administrativeAreaId || null
+      )
+    ) {
+      return false
+    }
+  }
+
+  if (registeredIn === JurisdictionFilter.enum.location) {
+    if (
+      eventIndex.legalStatuses.REGISTERED?.createdAtLocation !==
+      user.primaryOfficeId
+    ) {
+      return false
+    }
+  }
+
+  if (registeredIn === JurisdictionFilter.enum.administrativeArea) {
+    const registeredLocation =
+      eventIndex.legalStatuses.REGISTERED?.createdAtLocation
+
+    if (!registeredLocation) {
+      return false
+    }
+
+    if (
+      !isUnderAdministrativeArea(
+        UUID.parse(eventIndex.legalStatuses.REGISTERED?.createdAtLocation),
+        user.administrativeAreaId || null
+      )
+    ) {
+      return false
+    }
+  }
+
+  if (event) {
+    if (!event.includes(eventIndex.type)) {
+      return false
+    }
+  }
+
+  return true
+}
+
+function userMatchesScope({
+  userRequesting,
+  userTargeted,
+  role,
+  accessLevel,
+  isUnderAdministrativeArea
+}: {
+  userRequesting: CreatedUser
+  userTargeted: CreatedUser | User
+  role: string[] | undefined
+  accessLevel: JurisdictionFilter | undefined
+  isUnderAdministrativeArea: (
+    locationId: UUID,
+    adminAreaId: UUID | null
+  ) => boolean
+}): boolean {
+  if (role && !role.includes(userTargeted.role)) {
+    return false
+  }
+
+  if (accessLevel === JurisdictionFilter.enum.location) {
+    if (userTargeted.primaryOfficeId !== userRequesting.primaryOfficeId) {
+      return false
+    }
+  }
+
+  if (accessLevel === JurisdictionFilter.enum.administrativeArea) {
+    const hasSameOffice =
+      userTargeted.primaryOfficeId === userRequesting.primaryOfficeId
+    const isRequesterLocationDirectlyUnderCountry =
+      userRequesting.administrativeAreaId === null
+
+    if (
+      !hasSameOffice &&
+      !isRequesterLocationDirectlyUnderCountry &&
+      !isUnderAdministrativeArea(
+        userTargeted.primaryOfficeId,
+        userRequesting.administrativeAreaId ?? null
+      )
+    ) {
+      return false
+    }
+  }
+
+  return true
+}
+
+function userCanUpdateToRole({
+  userRequesting,
+  userTargeted,
+  roleOption,
+  roleToUpdateTo,
+  accessLevel,
+  isUnderAdministrativeArea
+}: {
+  userRequesting: CreatedUser
+  userTargeted: CreatedUser | User
+  roleOption: string[] | undefined
+  accessLevel: JurisdictionFilter | undefined
+  roleToUpdateTo: string | undefined
+  isUnderAdministrativeArea: (
+    locationId: UUID,
+    adminAreaId: UUID | null
+  ) => boolean
+}): boolean {
+  const isUpdatingWithRoleOptionScope =
+    roleOption !== undefined && roleToUpdateTo !== undefined
+
+  if (isUpdatingWithRoleOptionScope) {
+    if (accessLevel === JurisdictionFilter.enum.location) {
+      if (userTargeted.primaryOfficeId !== userRequesting.primaryOfficeId) {
+        return false
+      }
+    }
+
+    if (accessLevel === JurisdictionFilter.enum.administrativeArea) {
+      const hasSameOffice =
+        userTargeted.primaryOfficeId === userRequesting.primaryOfficeId
+      const isRequesterLocationDirectlyUnderCountry =
+        userRequesting.administrativeAreaId === null
+
+      if (
+        !hasSameOffice &&
+        !isRequesterLocationDirectlyUnderCountry &&
+        !isUnderAdministrativeArea(
+          userTargeted.primaryOfficeId,
+          userRequesting.administrativeAreaId ?? null
+        )
+      ) {
+        return false
+      }
+    }
+
+    const hasRoleInScopeOptions = roleOption.some(
+      (role) => role === roleToUpdateTo
+    )
+
+    if (!hasRoleInScopeOptions) {
+      return false
+    }
+  }
+
+  return true
+}
+
+/**
+ *
+ * @param rngSeed random seed
+ * @param seedActions actions to be performed on the seeded events.
+ *
+ * Setups test fixtures for scope testing. Seeds users and location hiearchy, with sample of events with given actions performed on them.
+ * Provides utility client with all scopes to be used in tests and helper functions to attempt actions with specific scopes and assert results.
+ *
+ */
+export async function setupScopeTestFixture(
+  rngSeed: number,
+  seedActions:
+    | (
+        | DeclarationActionType
+        | typeof ActionType.REQUEST_CORRECTION
+        | typeof ActionType.UNASSIGN
+        | typeof ActionType.ARCHIVE
+        | typeof ActionType.REVOKE_REGISTRATION
+      )[]
+    | fc.Arbitrary<
+        (
+          | DeclarationActionType
+          | typeof ActionType.REQUEST_CORRECTION
+          | typeof ActionType.UNASSIGN
+          | typeof ActionType.ARCHIVE
+          | typeof ActionType.REVOKE_REGISTRATION
+        )[]
+      >
+) {
+  const sampleSize = 200
+
+  const { users, isUnderAdministrativeArea, administrativeAreas, locations } =
+    await setupHierarchyWithUsers()
+
+  const rng = createPrng(rngSeed)
+  const eventsDb = getClient()
+
+  // Create arbitrary combinations of actions, ensure they end up in fc format.
+  const actionsArb = Array.isArray(seedActions)
+    ? fc.constant(seedActions)
+    : seedActions
+
+  const eventConfigArb = fc.constantFrom(tennisClubMembershipEvent, {
+    ...tennisClubMembershipEvent,
+    id: 'tennis-club-membership_premium'
+  })
+
+  const sampledEvents = fc.sample(
+    fc.record({
+      eventConfig: eventConfigArb,
+      user: fc.constantFrom(...users),
+      actions: actionsArb
+    }),
+    sampleSize
+  )
+
+  for (const seed of sampledEvents) {
+    await seedEvent(eventsDb, {
+      eventConfig: seed.eventConfig,
+      actions: seed.actions,
+      user: seed.user,
+      rng,
+      administrativeHierarchy: {
+        administrativeAreas,
+        locations
+      }
+    })
+  }
+
+  const events = await eventsDb
+    .selectFrom('events')
+    .select(['id', 'eventType'])
+    .execute()
+
+  expect(events.length).toEqual(sampleSize)
+
+  return {
+    users,
+    administrativeAreas,
+    isUnderAdministrativeArea,
+    eventIds: events.map(({ id }) => id)
+  }
+}
+
+/**
+ *
+ * @param eventIds
+ * @param user
+ * @param scope
+ * @param clientReadingAllEvents
+ * @param action
+ * @returns
+ */
+export async function attemptScopedAction(
+  eventId: string,
+  user: CreatedUser,
+  scope: string,
+  clientReadingAllEvents: ReturnType<typeof createTestClient>,
+  action: (
+    testClient: ReturnType<typeof createTestClient>
+  ) => Promise<EventDocument>
+): Promise<{ success: boolean; event: EventDocument }> {
+  // Assignment always assigns to the calling user (processAction ignores
+  // `input.assignedTo`), so it must be self-assigned by `testClient` — but
+  // it also requires `record.read`, which the scope under test may not
+  // grant. Add unrestricted `record.read` alongside it; this only affects
+  // the assign/get endpoints, not the action under test.
+  const testClient = createTestClient(user, [
+    scope,
+    encodeScope({ type: 'record.read' })
+  ])
+
+  await expect(
+    testClient.event.actions.assignment.assign({
+      eventId,
+      transactionId: getUUID(),
+      assignedTo: user.id,
+      type: ActionType.ASSIGN
+    })
+  ).resolves.not.toThrow()
+
+  try {
+    // 1. Perform the action with the given test client.
+    const event = await action(testClient)
+    return { success: true, event }
+  } catch (error) {
+    if (error instanceof EventNotFoundError) {
+      // 2. If action fails, attempt to fetch the event with the client that has access to all events to verify the failure was due to scope restrictions.
+      const event = await clientReadingAllEvents.event.get({ eventId })
+      return { success: false, event }
+    }
+    throw error
+  }
+}
+
+export function assertScopeResult(
+  result: { success: boolean; event: EventDocument },
+  {
+    user,
+    event,
+    placeOfEvent,
+    isUnderAdministrativeArea,
+    notifiedBy,
+    notifiedIn,
+    createdBy,
+    createdIn,
+    declaredBy,
+    declaredIn,
+    registeredBy,
+    registeredIn
+  }: {
+    user: CreatedUser
+    event: string[] | undefined
+    placeOfEvent: JurisdictionFilter | undefined
+    isUnderAdministrativeArea: (
+      locationId: UUID,
+      adminAreaId: UUID | null
+    ) => boolean
+    notifiedBy?: UserFilter
+    notifiedIn?: JurisdictionFilter
+    createdBy?: UserFilter
+    createdIn?: JurisdictionFilter
+    declaredBy?: UserFilter
+    registeredBy?: UserFilter
+    declaredIn?: JurisdictionFilter
+    registeredIn?: JurisdictionFilter
+  }
+) {
+  const eventConfig =
+    result.event.type === TENNIS_CLUB_MEMBERSHIP
+      ? tennisClubMembershipEvent
+      : { ...tennisClubMembershipEvent, id: 'tennis-club-membership_premium' }
+
+  const eventIndex = getCurrentEventState(result.event, eventConfig)
+
+  const isAccessibleWithScope = eventMatchesScope({
+    eventIndex,
+    user,
+    notifiedBy,
+    notifiedIn,
+    createdBy,
+    createdIn,
+    declaredBy,
+    registeredBy,
+    declaredIn,
+    registeredIn,
+    event,
+    placeOfEvent,
+    isUnderAdministrativeArea
+  })
+
+  expect(result.success).toBe(isAccessibleWithScope)
+}
+
+export function assertUserScopeResult(
+  result: {
+    success: boolean
+    user: User
+    updatePayloadRole: string | undefined
+  },
+  props: {
+    userRequesting: CreatedUser
+    userTargeted: CreatedUser | User
+    role: string[] | undefined
+    accessLevel: JurisdictionFilter | undefined
+    isUnderAdministrativeArea: (
+      locationId: UUID,
+      adminAreaId: UUID | null
+    ) => boolean
+  }
+) {
+  const isAccessibleWithScope = userMatchesScope(props)
+  const userCanUpdateToRoleOption = userCanUpdateToRole({
+    ...props,
+    roleToUpdateTo: result.updatePayloadRole,
+    roleOption: props.role
+  })
+
+  expect(result.success).toBe(
+    isAccessibleWithScope && userCanUpdateToRoleOption
+  )
+}
+
+export async function systemInitialisationTestSetup() {
+  const TEST_SUPER_USER_PASSWORD = 'super-secure-password'
+
+  const eventsDb = getClient()
+
+  const salt = genSaltSync(10)
+  const hash = hashSync(TEST_SUPER_USER_PASSWORD, salt)
+
+  await eventsDb
+    .insertInto('systemInitialisation')
+    .values({
+      hash,
+      salt,
+      id: 1
+    })
+    .execute()
+
+  return {
+    db: eventsDb,
+    password: TEST_SUPER_USER_PASSWORD
+  }
 }

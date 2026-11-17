@@ -8,7 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import type { Meta, StoryObj } from '@storybook/react'
+import type { Meta, StoryObj } from '@storybook/react-vite'
 import { TestUserRole } from '@opencrvs/commons/client'
 
 import { Sidebar } from './Sidebar'
@@ -24,24 +24,24 @@ type Story = StoryObj<typeof Sidebar>
 
 export const LocalRegistrar: Story = {
   parameters: {
-    userRole: TestUserRole.Enum.LOCAL_REGISTRAR
+    userRole: TestUserRole.enum.LOCAL_REGISTRAR
   }
 }
 
 export const FieldAgent: Story = {
   parameters: {
-    userRole: TestUserRole.Enum.FIELD_AGENT
+    userRole: TestUserRole.enum.FIELD_AGENT
   }
 }
 
 export const RegistrationAgent: Story = {
   parameters: {
-    userRole: TestUserRole.Enum.REGISTRATION_AGENT
+    userRole: TestUserRole.enum.REGISTRATION_AGENT
   }
 }
 
 export const LocalSystemAdmin: Story = {
   parameters: {
-    userRole: TestUserRole.Enum.LOCAL_SYSTEM_ADMIN
+    userRole: TestUserRole.enum.LOCAL_SYSTEM_ADMIN
   }
 }

@@ -1,0 +1,28 @@
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at https://mozilla.org/MPL/2.0/.
+#
+# OpenCRVS is also distributed under the terms of the Civil Registration
+# & Healthcare Disclaimer located at http://opencrvs.org/license.
+#
+# Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
+
+# Deprecated: replaced by publish-to-registry.yml, which publishes to any container registry.
+#
+# The file is kept, with nothing to do, so that the workflow stays listed in the repository.
+# Release branches that were cut before the replacement still carry the Docker Hub only
+# version, and GitHub can only run a workflow whose file exists on the default branch.
+# Remove this file once those release branches are no longer published from.
+name: Deprecated workflow
+run-name: Deprecated workflow, use publish-to-registry.yml
+on:
+  workflow_dispatch:
+
+jobs:
+  deprecated:
+    runs-on: ubuntu-26.04
+    steps:
+      - name: Use publish-to-registry.yml instead
+        run: |
+          echo "::error::This workflow is deprecated and publishes nothing. Run 'Publish image to container registry' (publish-to-registry.yml) instead."
+          exit 1

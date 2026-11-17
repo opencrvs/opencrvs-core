@@ -1,0 +1,79 @@
+/*
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at https://mozilla.org/MPL/2.0/.
+ *
+ * OpenCRVS is also distributed under the terms of the Civil Registration
+ * & Healthcare Disclaimer located at http://opencrvs.org/license.
+ *
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
+ */
+import { test, expect, type Page } from '@playwright/test'
+import { findOnOrganisationPage, login } from '@e2e/support/helpers'
+import { CREDENTIALS } from '@e2e/support/constants'
+import { verifyMembersClickable } from '@e2e/support/birth/helpers'
+import { navigateToWorkqueue } from '@e2e/support/utils'
+test('4. Organisation Page', async ({ page }) => {
+  await test.step('4.1 UI check', async () => {
+    await test.step('4.1.0 Verify UI', async () => {
+      await login(page, CREDENTIALS.PROVINCIAL_REGISTRAR)
+      await page.getByRole('button', { name: 'Organisation' }).click()
+      await expect(page.locator('#content-name')).toHaveText('Organisation')
+      await expect(page.getByText('Farajaland', { exact: true })).toBeVisible()
+    })
+    await test.step('4.1.1 My jurisdiction ', async () => {
+      await test.step('4.1.1.0 Verify Province -> District -> Health Facility', async () => {
+        await page.getByRole('button', { name: /Central/ }).click()
+        await page.getByRole('button', { name: /^Ibombo$/ }).click()
+        await page
+          .getByRole('button', { name: /Ibombo District Hospital/ })
+          .click()
+        await expect(page.locator('#content-name')).toHaveText(
+          /Ibombo District Hospital/
+        )
+        await expect(
+          page.getByText('Ibombo, Central', { exact: true })
+        ).toBeVisible()
+      })
+      await test.step('4.1.1.1 Verify Province -> District -> District Office', async () => {
+        await navigateToWorkqueue(page, 'Organisation')
+        await page.getByRole('button', { name: /Central/ }).click()
+        await page
+          .getByRole('button', { name: /Central Province Office/ })
+          .click()
+
+        await expect(page.locator('#content-name')).toHaveText(
+          /Central Province Office/
+        )
+        await expect(page.getByText('Central', { exact: true })).toBeVisible()
+      })
+      await test.step('4.1.1.2 Verify team page member list', async () => {
+        const members = ['Mitchel Owen', 'Emmanuel Mayuka']
+
+        await verifyMembersClickable(page, members, 'Central Province Office')
+      })
+    })
+    await test.step('4.1.2 Outside of Jurisdiction', async () => {
+      await test.step('4.1.2.0 Verify Embassy Official', async () => {
+        await navigateToWorkqueue(page, 'Organisation')
+        await expect(
+          await findOnOrganisationPage(page, /French Embassy Office/)
+        ).toBeDisabled()
+      })
+      await test.step('4.1.2.1 Verify Province -> District -> District Office', async () => {
+        await navigateToWorkqueue(page, 'Organisation')
+        await expect(
+          page.getByRole('button', { name: /HQ Office/ })
+        ).toBeDisabled()
+      })
+      await test.step('4.1.2.2 Verify Province -> District', async () => {
+        await navigateToWorkqueue(page, 'Organisation')
+        await (await findOnOrganisationPage(page, /Pualula/)).click()
+
+        await expect(
+          page.getByRole('button', { name: /Pualula Province Office/ })
+        ).toBeDisabled()
+      })
+    })
+  })
+})

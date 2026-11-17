@@ -24,8 +24,11 @@ import {
   EventConfig,
   getDeclarationFields,
   DataEntry,
-  isFieldReference
+  isFieldReference,
+  todayISO,
+  PlainDate
 } from '@opencrvs/commons/client'
+import { List } from '@opencrvs/components'
 import { Output } from '@client/v2-events/features/events/components/Output'
 import { useValidatorContext } from '@client/v2-events/hooks/useValidatorContext'
 import { makeFormikFieldIdOpenCRVSCompatible } from '@client/v2-events/components/forms/utils'
@@ -88,28 +91,19 @@ const Container = styled.div`
   background-color: ${({ theme }) => theme.colors.background};
   padding: 17px 20px 10px;
   border-radius: 5px;
+  ${({ theme }) => theme.fonts.reg16}
 
   label {
     ${({ theme }) => theme.fonts.h3};
     margin-bottom: 0.3rem;
     display: block;
   }
-
-  dt {
-    ${({ theme }) => theme.fonts.bold16};
-    display: block;
-    margin-bottom: 0.4rem;
-  }
-
-  dd {
-    margin: 0 0 1.5rem;
-  }
 `
 
 const Subtitle = styled.div`
   ${({ theme }) => theme.fonts.reg16};
   color: ${({ theme }) => theme.colors.grey500};
-  margin: 0 0 2rem;
+  margin: 0 0 1rem;
 `
 
 /**
@@ -212,16 +206,18 @@ function DataInput({
     <Container>
       {title && <label>{title}</label>}
       {subtitle && <Subtitle>{intl.formatMessage(subtitle)}</Subtitle>}
-      <dl>
+      <List>
         {fields.map(({ config, value }) => (
-          <React.Fragment key={config.id}>
-            <dt>{intl.formatMessage(config.label)}</dt>
-            <dd>
-              <Output field={config} value={value} />
-            </dd>
-          </React.Fragment>
+          <List.Item
+            key={config.id}
+            label={intl.formatMessage(config.label)}
+            // Behavior-preserving: today's name. Anchoring this live form-entry
+            // preview to the form's event date is the selector-anchoring
+            // follow-up (#13143).
+            value={<Output anchor={todayISO()} field={config} value={value} />}
+          />
         ))}
-      </dl>
+      </List>
     </Container>
   )
 }
@@ -233,7 +229,8 @@ function DataInput({
 function getDataOutputEntry(
   value: NonNullable<DataFieldValue>,
   dataEntryConfig: DataEntry,
-  declarationFields: FieldConfig[]
+  declarationFields: FieldConfig[],
+  anchor: PlainDate
 ) {
   if ('id' in dataEntryConfig) {
     const { id, label } = dataEntryConfig
@@ -247,6 +244,7 @@ function getDataOutputEntry(
       label,
       valueDisplay: (
         <Output
+          anchor={anchor}
           field={{ type: FieldType.TEXT, id, label }}
           value={value.data[id]}
         />
@@ -270,7 +268,11 @@ function getDataOutputEntry(
     id: fieldId,
     label: referencedFieldConfig.label,
     valueDisplay: (
-      <Output field={referencedFieldConfig} value={value.data[fieldId]} />
+      <Output
+        anchor={anchor}
+        field={referencedFieldConfig}
+        value={value.data[fieldId]}
+      />
     )
   }
 }
@@ -281,11 +283,13 @@ function getDataOutputEntry(
 function DataOutput({
   value,
   field,
-  eventConfig
+  eventConfig,
+  anchor
 }: {
   value: DataFieldValue
   field: DataField
   eventConfig: EventConfig
+  anchor: PlainDate
 }) {
   const intl = useIntl()
 
@@ -295,7 +299,7 @@ function DataOutput({
 
   const declarationFields = getDeclarationFields(eventConfig)
   const entries = field.configuration.data
-    .map((d) => getDataOutputEntry(value, d, declarationFields))
+    .map((d) => getDataOutputEntry(value, d, declarationFields, anchor))
     .filter((e) => e !== null)
 
   if (!entries.length) {

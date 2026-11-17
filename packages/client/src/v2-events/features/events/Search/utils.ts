@@ -10,12 +10,12 @@
  */
 /* eslint-disable max-lines */
 import { isArray, isNil, isPlainObject, isString } from 'lodash'
-import { parse as parseQuery, stringify } from 'query-string'
-import { useSelector } from 'react-redux'
+import { parse as parseQuery, stringify } from 'qs'
 import { validate as validateEmail } from 'email-validator'
 import {
   EventConfig,
   FieldConfig,
+  AdministrativeAreas,
   QueryInputType,
   AdvancedSearchField,
   EventFieldId,
@@ -24,24 +24,48 @@ import {
   EventState,
   FieldType,
   QueryExpression,
+  FieldValue,
   NameFieldValue,
   DateRangeFieldValue,
   SelectDateRangeValue,
   AddressFieldValue,
+  AddressField,
+  AdministrativeAreaField,
+  Country as CountryField,
+  AddressType,
+  field as fieldHelper,
+  HiddenField,
+  FieldGroup,
+  FieldGroupValue,
   timePeriodToDateRange,
   EventStatus,
   AdvancedSearchConfigWithFieldsResolved,
   METADATA_FIELD_PREFIX,
-  ValidatorContext
+  ValidatorContext,
+  getAcceptedScopesByType,
+  scopeUsesFullOptions,
+  user,
+  EncodedScope
 } from '@opencrvs/commons/client'
-import { findScope, getAllUniqueFields } from '@opencrvs/commons/client'
-import { getScope } from '@client/profile/profileSelectors'
+import { getAllUniqueFields } from '@opencrvs/commons/client'
+import { isVersionedLocation } from '@client/v2-events/VersionedLocation'
+import { AdminStructureItem } from '@client/utils/referenceApi'
+import { generateAddressFields } from '@client/v2-events/features/events/registered-fields/Address'
 import { Name } from '@client/v2-events/features/events/registered-fields/Name'
 import {
   IntlErrors,
   getStructuralValidationErrorsForForm
 } from '@client/v2-events/components/forms/validation'
+import { toLocationId } from '@client/v2-events/utils'
 import { statusOptions, timePeriodOptions } from './EventMetadataSearchOptions'
+
+function isNameFieldValue(value: unknown): value is NameFieldValue {
+  return NameFieldValue.validate(value)
+}
+
+function isFieldGroupValue(value: unknown): value is FieldGroupValue {
+  return FieldGroupValue.validate(value)
+}
 
 export function getAdvancedSearchFieldErrors(
   sections: AdvancedSearchConfigWithFieldsResolved[],
@@ -75,7 +99,9 @@ const defaultSearchFieldGenerator: Record<
       id: 'advancedSearch.registeredAtLocation.helperText'
     },
     configuration: {
-      searchableResource: ['locations', 'offices']
+      allowedLocations: user.jurisdiction(
+        user.scope('record.search').attribute('registeredIn')
+      )
     }
   }),
   'event.legalStatuses.REGISTERED.acceptedAt': (_) => ({
@@ -152,7 +178,7 @@ const defaultSearchFieldGenerator: Record<
 } satisfies Record<EventFieldId, (config: AdvancedSearchField) => FieldConfig>
 
 function isEventFieldId(id: string): id is EventFieldId {
-  return EventFieldId.safeParse(id).success
+  return EventFieldId.validate(id)
 }
 
 export const getMetadataFieldConfigs = (
@@ -317,17 +343,102 @@ function timePeriodToRangeString(value: SelectDateRangeValue): string {
  *
  * @returns {Record<string, Condition>} A mapping of transformed field keys to their respective query conditions.
  */
+
+/**
+ * Folds an address search group back into the {@link AddressFieldValue} shape
+ * the events service indexes: the deepest level picked becomes
+ * `administrativeArea`, and every entry that is not a level becomes a street
+ * detail.
+ *
+ * Version pins are stripped here — the version is display-only and must never
+ * reach a query term.
+ */
+function toAddressQueryValue(
+  value: FieldValue | undefined,
+  group: FieldGroup,
+  addressField: AddressField | undefined
+): AddressFieldValue | undefined {
+  const candidate: unknown = value
+
+  if (!isFieldGroupValue(candidate)) {
+    return undefined
+  }
+
+  // This trick is needed for the 'proper' inference.
+  const entries = candidate
+  const country =
+    typeof entries.country === 'string' ? entries.country : undefined
+
+  if (!country) {
+    return undefined
+  }
+
+  const adminLevelIds = group.fields
+    .filter((subfield) => subfield.type === FieldType.ADMINISTRATIVE_AREA)
+    .map((subfield) => subfield.id)
+
+  const streetLevelDetails = (
+    addressField?.configuration?.streetAddressForm ?? []
+  ).reduce<Record<string, string>>((details, streetField) => {
+    const entry = entries[streetField.id]
+
+    return typeof entry === 'string' && entry
+      ? { ...details, [streetField.id]: entry }
+      : details
+  }, {})
+
+  if (country !== (window.config.COUNTRY || 'FAR')) {
+    return {
+      country,
+      addressType: AddressType.INTERNATIONAL,
+      streetLevelDetails
+    }
+  }
+
+  const leaf = adminLevelIds
+    .map((level) => entries[level])
+    .filter((level) => typeof level === 'string' && level.length > 0)
+    .pop()
+
+  if (typeof leaf !== 'string') {
+    return undefined
+  }
+
+  return {
+    country,
+    addressType: AddressType.DOMESTIC,
+    administrativeArea: toLocationId(leaf),
+    streetLevelDetails
+  }
+}
+
+/**
+ * Strips the version off a pinned location. The version is display-only and
+ * must never reach a query term.
+ */
+function toQueryableValue(value: FieldValue | undefined) {
+  return isVersionedLocation(value) ? toLocationId(value) : value
+}
+
+function isAddressSearchGroup(
+  field: FieldConfig,
+  addressFields: Map<string, AddressField>
+): field is FieldGroup {
+  return field.type === FieldType.FIELD_GROUP && addressFields.has(field.id)
+}
+
 function buildSearchQueryFields(
   searchConfigurations: {
     fieldId: string
     searchType: keyof typeof MatchType
     fieldConfig: FieldConfig
   }[],
-  searchInput: EventState // values from UI or query string
+  searchInput: EventState, // values from UI or query string
+  addressFields: Map<string, AddressField>
 ): Record<string, Condition> {
   return searchConfigurations.reduce(
     (result: Record<string, Condition>, config) => {
-      const value = searchInput[config.fieldId]
+      const value = toQueryableValue(searchInput[config.fieldId])
       const fieldId = config.fieldId
 
       const searchType = config.searchType
@@ -354,32 +465,44 @@ function buildSearchQueryFields(
       }
 
       if (config.fieldConfig.type === FieldType.NAME) {
-        const parsedName = NameFieldValue.safeParse(searchInput[config.fieldId])
+        if (isNameFieldValue(value)) {
+          const name = Name.stringify(value)
 
-        if (parsedName.success) {
-          if (Name.stringify(parsedName.data) === '') {
+          if (name === '') {
             return result
           }
           return {
             ...result,
-            [fieldId]: buildSearchClause(
-              Name.stringify(parsedName.data),
-              searchType
-            )
+            [fieldId]: buildSearchClause(name, searchType)
           }
         }
       }
 
-      if (
-        config.fieldConfig.type === FieldType.ADDRESS &&
-        AddressFieldValue.safeParse(searchInput[config.fieldId]).success
-      ) {
+      if (config.fieldConfig.type === FieldType.ADDRESS) {
+        if (!AddressFieldValue.validate(value)) {
+          return result
+        }
+
         return {
           ...result,
-          [fieldId]: buildSearchClause(
-            JSON.stringify(searchInput[config.fieldId]),
-            searchType
-          )
+          [fieldId]: buildSearchClause(JSON.stringify(value), searchType)
+        }
+      }
+
+      if (isAddressSearchGroup(config.fieldConfig, addressFields)) {
+        const address = toAddressQueryValue(
+          value,
+          config.fieldConfig,
+          addressFields.get(config.fieldId)
+        )
+
+        if (!address || !AddressFieldValue.validate(address)) {
+          return result
+        }
+
+        return {
+          ...result,
+          [fieldId]: buildSearchClause(JSON.stringify(address), searchType)
         }
       }
 
@@ -409,12 +532,35 @@ function buildSearchQueryFields(
 }
 
 /**
- * @returns the field configuration with overrides applied from the search field
+ * @returns the field with the default value its search field asks for: the
+ * form's (omitted or true), none (false), or the given value
  */
-function applySearchFieldOverridesToFieldConfig(
+function withSearchDefaultValue(
   field: FieldConfig,
   searchField: AdvancedSearchField
 ): FieldConfig {
+  if (
+    searchField.fieldType !== 'field' ||
+    searchField.defaultValue === undefined ||
+    searchField.defaultValue === true
+  ) {
+    return field
+  }
+  if (searchField.defaultValue === false) {
+    return { ...field, defaultValue: undefined } as FieldConfig
+  }
+  // Event config validation only lets a value through for field types that take it
+  return { ...field, defaultValue: searchField.defaultValue } as FieldConfig
+}
+
+/**
+ * @returns the field configuration with overrides applied from the search field
+ */
+function applySearchFieldOverridesToFieldConfig(
+  formField: FieldConfig,
+  searchField: AdvancedSearchField
+): FieldConfig {
+  const field = withSearchDefaultValue(formField, searchField)
   const commonConfig = {
     conditionals: searchField.conditionals ?? field.conditionals,
     validation: searchField.validations ?? field.validation,
@@ -483,10 +629,22 @@ function applySearchFieldOverridesToFieldConfig(
       ...(searchField.options && { options: searchField.options })
     }
   }
-  return {
-    ...field,
-    ...commonConfig
+  if (
+    field.type === FieldType.LOCATION ||
+    field.type === FieldType.ADMINISTRATIVE_AREA
+  ) {
+    return {
+      ...field,
+      ...commonConfig,
+      ...(searchField.allowedLocations && {
+        configuration: {
+          ...field.configuration,
+          allowedLocations: searchField.allowedLocations
+        }
+      })
+    } as FieldConfig
   }
+  return { ...field, ...commonConfig }
 }
 
 /**
@@ -526,8 +684,162 @@ function generateSearchFieldConfig(
   return applySearchFieldOverridesToFieldConfig(baseFieldConfig, searchField)
 }
 
+/**
+ * Gives address group fields a default value from the whole address field.
+ * This ensures a search form still opens pre-filled with the user's own area.
+ */
+function withAddressDefault<T extends CountryField | AdministrativeAreaField>(
+  subfield: T,
+  addressDefault: AddressField['defaultValue']
+): T {
+  if (!addressDefault || !('country' in addressDefault)) {
+    return subfield
+  }
+
+  if (subfield.type === FieldType.COUNTRY) {
+    return { ...subfield, defaultValue: addressDefault.country }
+  }
+
+  const area =
+    'administrativeArea' in addressDefault
+      ? addressDefault.administrativeArea
+      : undefined
+
+  if (!area || typeof area === 'string') {
+    return subfield
+  }
+
+  return {
+    ...subfield,
+    defaultValue: { ...area, $location: subfield.id }
+  }
+}
+
+/**
+ * The `addressType` an address group carries, as a hidden field.
+ *
+ * Nobody types an address type and no input renders one: it follows from the
+ * country, and exists only because an address field works it out when it stores
+ * its value. A group stores one value per field and works out nothing, yet a
+ * country's street fields are guarded on it (`isDomesticAddress()`), so the
+ * group has to produce it.
+ *
+ * `value` rather than `defaultValue`, and referenced by its full path rather
+ * than a bare id, so that changing the country reaches it: a listener is
+ * registered under the path its parent is named by, and the referenced value is
+ * resolved again every time that parent changes.
+ */
+function addressTypeField(
+  groupId: string,
+  countryFieldId: string
+): HiddenField {
+  const country = fieldHelper(groupId).get(countryFieldId)
+
+  return {
+    id: 'addressType',
+    type: FieldType.ALPHA_HIDDEN,
+    label: {
+      id: 'messages.emptyString',
+      defaultMessage: '',
+      description: 'empty string'
+    },
+    parent: country,
+    value: country.customClientEvaluation((countryValue) =>
+      countryValue === (window.config.COUNTRY || 'FAR')
+        ? 'DOMESTIC'
+        : 'INTERNATIONAL'
+    )
+  }
+}
+
+/**
+ * The country, admin levels and street fields an address filter is made of,
+ * flattened into a FIELD_GROUP under the address field's own id.
+ *
+ * A declaration keeps only the leaf id; a filter needs every level to remember
+ * the name it was picked under. {@link toAddressQueryValue} reverses it.
+ */
+function toAddressSearchGroup(
+  field: AddressField,
+  adminStructure: AdminStructureItem[]
+): FieldGroup {
+  const { countryField, domesticFields, streetAddressFields } =
+    generateAddressFields(
+      {
+        ...field,
+        configuration: {
+          ...field.configuration,
+          activeOnly: true,
+          anchorToDateOfEvent: false
+        }
+      },
+      adminStructure
+    )
+
+  return {
+    id: field.id,
+    type: FieldType.FIELD_GROUP,
+    label: field.label,
+    hideLabel: true,
+    conditionals: field.conditionals,
+    required: false,
+    configuration: { separator: ', ', hideEmptyFields: true },
+    fields: [
+      withAddressDefault(countryField, field.defaultValue),
+      addressTypeField(field.id, countryField.id),
+      ...domesticFields.map((level) =>
+        withAddressDefault(level, field.defaultValue)
+      ),
+      ...streetAddressFields
+    ]
+  }
+}
+
+/**
+ * Stamps advanced-search behaviour onto a resolved location/admin-area field
+ * so the (presentational) selectors know to list every historical name and,
+ * for admin structures, offer only currently-active areas. This is where the
+ * search view "amends" the field config rather than the country configuring it.
+ */
+export function withSearchLocationBehaviour(
+  field: FieldConfig,
+  adminStructure: AdminStructureItem[]
+): FieldConfig {
+  if (field.type === FieldType.LOCATION) {
+    // Offices / health facilities: keep inactive ones listed, so a record filed
+    // at a since-closed facility stays findable.
+    return {
+      ...field,
+      configuration: {
+        ...field.configuration,
+        activeOnly: false,
+        anchorToDateOfEvent: false
+      }
+    }
+  }
+
+  if (field.type === FieldType.ADMINISTRATIVE_AREA) {
+    return {
+      ...field,
+      configuration: {
+        ...field.configuration,
+        activeOnly:
+          field.configuration.type === AdministrativeAreas.enum.ADMIN_STRUCTURE,
+        anchorToDateOfEvent: false
+      }
+    }
+  }
+
+  if (field.type === FieldType.ADDRESS) {
+    return toAddressSearchGroup(field, adminStructure)
+  }
+
+  return field
+}
+
 export function resolveAdvancedSearchConfig(
-  eventConfig: EventConfig
+  eventConfig: EventConfig,
+  adminStructure: AdminStructureItem[]
 ): AdvancedSearchConfigWithFieldsResolved[] {
   const declarationFieldsMap = getAllUniqueFields(eventConfig).reduce(
     (acc, field) => {
@@ -540,19 +852,21 @@ export function resolveAdvancedSearchConfig(
     return {
       ...section,
       fields: section.fields.map((field) => {
+        let resolved: FieldConfig
         if (isEventFieldId(field.fieldId)) {
-          return defaultSearchFieldGenerator[field.fieldId](field)
+          resolved = defaultSearchFieldGenerator[field.fieldId](field)
         } else if (
           field.config.searchFields &&
           field.config.searchFields.length > 0
         ) {
-          return generateSearchFieldConfig(field)
+          resolved = generateSearchFieldConfig(field)
         } else {
-          return applySearchFieldOverridesToFieldConfig(
+          resolved = applySearchFieldOverridesToFieldConfig(
             declarationFieldsMap[field.fieldId],
             field
           )
         }
+        return withSearchLocationBehaviour(resolved, adminStructure)
       })
     }
   })
@@ -563,7 +877,8 @@ export function resolveAdvancedSearchConfig(
  */
 export function getSearchParamsFieldConfigs(
   eventConfig: EventConfig,
-  searchParams: SearchQueryParams
+  searchParams: SearchQueryParams,
+  adminStructure: AdminStructureItem[]
 ): FieldConfig[] {
   // Flatten all advanced search fields across all sections
   const allSearchFields = eventConfig.advancedSearch.flatMap(
@@ -583,9 +898,11 @@ export function getSearchParamsFieldConfigs(
     ...metadataFieldConfigs,
     ...declarationFieldConfigs,
     ...searchOnlyFieldConfigs
-  ].filter((field) => {
-    return Object.keys(searchParams).some((key) => key === field.id)
-  })
+  ]
+    .filter((field) => {
+      return Object.keys(searchParams).some((key) => key === field.id)
+    })
+    .map((field) => withSearchLocationBehaviour(field, adminStructure))
 
   return searchFieldConfigs
 }
@@ -596,11 +913,13 @@ export function getSearchParamsFieldConfigs(
  */
 export function parseFieldSearchParams(
   eventConfig: EventConfig,
-  searchParams: SearchQueryParams
+  searchParams: SearchQueryParams,
+  adminStructure: AdminStructureItem[]
 ) {
   const searchFieldConfigs = getSearchParamsFieldConfigs(
     eventConfig,
-    searchParams
+    searchParams,
+    adminStructure
   )
 
   // filter out any unrelated search parameters
@@ -635,8 +954,15 @@ export function parseFieldSearchParams(
 export function buildSearchQuery(
   formValues: EventState,
   resolvedFieldConfigs: FieldConfig[],
-  searchFieldConfigs: AdvancedSearchField[]
+  searchFieldConfigs: AdvancedSearchField[],
+  eventConfig: EventConfig
 ): QueryInputType {
+  const addressFields = new Map(
+    getAllUniqueFields(eventConfig)
+      .filter((field) => field.type === FieldType.ADDRESS)
+      .map((field) => [field.id, field])
+  )
+
   const fieldsMap = searchFieldConfigs.reduce(
     (acc, config) => {
       acc[config.fieldId] = config
@@ -652,7 +978,7 @@ export function buildSearchQuery(
   }))
 
   // Generate the final query condition object from the filtered keys and raw input
-  return buildSearchQueryFields(searchConfigs, formValues)
+  return buildSearchQueryFields(searchConfigs, formValues, addressFields)
 }
 
 const searchFieldTypeMapping = {
@@ -762,15 +1088,28 @@ export function buildQuickSearchQuery(
 }
 
 /**
- * @returns a boolean indicating whether the current user has the scope to search for an event
+ * @returns a boolean indicating whether the given scopes allow searching for an event
  */
-export function checkScopeForEventSearch(eventId: string) {
-  const scopes = useSelector(getScope)
-  const searchScopes = findScope(scopes ?? [], 'search')
+export function checkScopeForEventSearch(
+  eventId: string,
+  scopes: EncodedScope[] | null
+) {
+  const searchScopes = getAcceptedScopesByType({
+    acceptedScopes: ['record.search'],
+    scopes: scopes ?? []
+  })
 
-  const isEventSearchAllowed =
-    searchScopes &&
-    Object.keys(searchScopes.options).some((id) => eventId === id)
+  const isEventSearchAllowed = searchScopes.some((scope) => {
+    if (!scopeUsesFullOptions(scope)) {
+      return false
+    }
+
+    // Unless specified, event search is allowed for all events
+    return (
+      scope.options?.event?.includes(eventId) ||
+      scope.options?.event === undefined
+    )
+  })
 
   return isEventSearchAllowed
 }
@@ -795,7 +1134,7 @@ export function serializeSearchParams(
     (acc, [key, value]) => {
       const serialized = serializeValue(value)
       // If we don't care about the empty objects, we might be able to keep it as simple as this:
-      if (!isNil(serialized)) {
+      if (!isNil(serialized) && !(serialized === '')) {
         acc[key] = serialized
       }
 
@@ -803,7 +1142,11 @@ export function serializeSearchParams(
     },
     {} as Record<string, unknown>
   )
-  return stringify(simplifiedValue, { skipEmptyString: true })
+  return stringify(simplifiedValue, {
+    // Configs are to match query-string behavior. qs adds indices by default for arrays. Otherwise they are arbitrary.
+    indices: false,
+    sort: (a, b) => a.localeCompare(b)
+  })
 }
 
 function tryParse(value: unknown): unknown {
@@ -828,7 +1171,9 @@ function tryParse(value: unknown): unknown {
 export function deserializeSearchParams(
   queryParams: string
 ): Record<string, unknown> {
-  const parsedParams = parseQuery(queryParams)
+  const parsedParams = parseQuery(queryParams, {
+    ignoreQueryPrefix: true
+  })
 
   const deserialized = Object.entries(parsedParams).reduce(
     (acc, [key, value]) => {

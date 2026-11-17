@@ -9,8 +9,10 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
+/* eslint-disable max-lines */
+
 import { estypes } from '@elastic/elasticsearch'
-import { z } from 'zod'
+import * as z from 'zod/v4'
 import {
   ActionCreationMetadata,
   RegistrationCreationMetadata,
@@ -22,39 +24,50 @@ import {
   FieldConfig,
   FieldType,
   getCurrentEventState,
-  getDeclarationFields,
+  getDeclarationFieldsOfAllVersions,
   WorkqueueCountInput,
   getEventConfigById,
-  SearchScopeAccessLevels,
   SearchQuery,
   DateRangeField,
   SelectDateRangeField
 } from '@opencrvs/commons/events'
-import { logger } from '@opencrvs/commons'
+import {
+  dropSecuredDeclarationFields,
+  EventIndexWithAdministrativeHierarchy,
+  getEventConfigForRecord,
+  logger,
+  RecordScopeV2,
+  TokenWithBearer,
+  VersionedEventConfig
+} from '@opencrvs/commons'
 import {
   getEventAliasName,
   getEventIndexName,
   getOrCreateClient
 } from '@events/storage/elasticsearch'
+import { primeAdministrativeHierarchyCache } from '@events/storage/postgres/administrative-hierarchy/locations'
+import { getValidatorContext } from '@events/router/middleware/validate/utils'
+import { TrpcUserContext } from '../../context'
 import {
+  collectLocationIds,
   decodeEventIndex,
   EncodedEventIndex,
   encodeEventIndex,
   encodeFieldId,
+  getEventIndexWithAdministrativeHierarchy,
+  getEventIndexWithoutLocationHierarchy,
   NAME_QUERY_KEY,
   AGE_DOB_QUERY_KEY,
-  removeSecuredFields,
   IndexedAgeFieldValue,
+  resolveRecordActionScopeToIds,
+  valueFromTotal,
   IndexedNameFieldValue
 } from './utils'
 import {
   buildElasticQueryFromSearchPayload,
+  withFlagsFilter,
   withJurisdictionFilters
 } from './query'
-
-// Elasticsearch has a limit of 10,000 results for a query, and
-// trying to get beyond that will result in a “Result window is too large“ error
-const ELASTICSEARCH_MAXIMUM_QUERY_SIZE = 10000
 
 function eventToEventIndex(
   event: EventDocument,
@@ -63,9 +76,7 @@ function eventToEventIndex(
   return encodeEventIndex(getCurrentEventState(event, config), config)
 }
 
-/*
- * This type ensures all properties of EventIndex are present in the mapping
- */
+/* This type ensures all properties of EventIndex are present in the mapping */
 type EventIndexMapping = { [key in keyof EventIndex]: estypes.MappingProperty }
 
 async function ensureAlias(indexName: string) {
@@ -102,13 +113,16 @@ function mapFieldTypeToElasticsearch(
     case FieldType.DATE:
       return { type: 'date' }
     case FieldType.DATE_RANGE:
-    case FieldType.TEXT:
     case FieldType.TEXTAREA:
     case FieldType.PARAGRAPH:
+    case FieldType.HEADING:
     case FieldType.BULLET_LIST:
     case FieldType.PAGE_HEADER:
     case FieldType.TIME:
+    case FieldType.ALPHA_HIDDEN:
       return { type: 'text' }
+    case FieldType.TEXT:
+      return { type: 'keyword' }
     case FieldType.NUMBER_WITH_UNIT:
       return {
         type: 'object',
@@ -122,6 +136,14 @@ function mapFieldTypeToElasticsearch(
         type: 'keyword',
         normalizer: 'lowercase'
       }
+    case FieldType.AUTOCOMPLETE:
+      return {
+        type: 'object',
+        properties: {
+          label: { type: 'keyword' },
+          value: { type: 'keyword' }
+        }
+      }
     case FieldType.DIVIDER:
     case FieldType.RADIO_GROUP:
     case FieldType.SELECT:
@@ -134,6 +156,7 @@ function mapFieldTypeToElasticsearch(
     case FieldType.BUTTON:
     case FieldType.ALPHA_PRINT_BUTTON:
     case FieldType.ID:
+    case FieldType.USER_ROLE:
     case FieldType.PHONE:
     case FieldType.VERIFICATION_STATUS:
       return { type: 'keyword' }
@@ -157,6 +180,7 @@ function mapFieldTypeToElasticsearch(
       } satisfies {
         [K in keyof Required<AllFieldsUnion>]: estypes.MappingProperty
       }
+
       return {
         type: 'object',
         properties: addressProperties
@@ -207,14 +231,22 @@ function mapFieldTypeToElasticsearch(
     case FieldType.SEARCH:
     case FieldType.ID_READER:
     case FieldType.QR_READER:
+    /**
+     * HTTP values are redirected to other fields via `value: field('http').get('data.my-data')`, so we currently don't need to enable exhaustive indexing.
+     * The field still lands in `_source`.
+     */
     case FieldType.HTTP:
     case FieldType.LINK_BUTTON:
     case FieldType.QUERY_PARAM_READER:
+    /** Images are not indexed as they're currently asserted read-only. */
+    case FieldType.IMAGE_VIEW:
     case FieldType.LOADER:
-      /**
-       * HTTP values are redirected to other fields via `value: field('http').get('data.my-data')`, so we currently don't need to enable exhaustive indexing.
-       * The field still lands in `_source`.
-       */
+      return {
+        type: 'object',
+        enabled: false
+      }
+    /** Custom fields are not indexed as their structure is unknown. */
+    case FieldType._EXPERIMENTAL_CUSTOM:
       return {
         type: 'object',
         enabled: false
@@ -259,12 +291,14 @@ export async function createIndex(
         properties: {
           id: { type: 'keyword' },
           type: { type: 'keyword' },
+          configVersionId: { type: 'keyword' },
           status: { type: 'keyword' },
           createdAt: { type: 'date' },
           createdByUserType: { type: 'keyword' },
           createdBy: { type: 'keyword' },
           createdAtLocation: { type: 'keyword' },
           updatedAtLocation: { type: 'keyword' },
+          placeOfEvent: { type: 'keyword' },
           updatedAt: { type: 'date' },
           assignedTo: { type: 'keyword' },
           updatedBy: { type: 'keyword' },
@@ -277,6 +311,20 @@ export async function createIndex(
           legalStatuses: {
             type: 'object',
             properties: {
+              [EventStatus.enum.NOTIFIED]: {
+                type: 'object',
+                properties: {
+                  createdAt: { type: 'date' },
+                  createdBy: { type: 'keyword' },
+                  createdByUserType: { type: 'keyword' },
+                  createdAtLocation: { type: 'keyword' },
+                  createdByRole: { type: 'keyword' },
+                  acceptedAt: { type: 'date' }
+                } satisfies Record<
+                  keyof ActionCreationMetadata,
+                  estypes.MappingProperty
+                >
+              },
               [EventStatus.enum.DECLARED]: {
                 type: 'object',
                 properties: {
@@ -285,7 +333,6 @@ export async function createIndex(
                   createdByUserType: { type: 'keyword' },
                   createdAtLocation: { type: 'keyword' },
                   createdByRole: { type: 'keyword' },
-                  createdBySignature: { type: 'keyword' },
                   acceptedAt: { type: 'date' }
                 } satisfies Record<
                   keyof ActionCreationMetadata,
@@ -300,11 +347,24 @@ export async function createIndex(
                   createdByUserType: { type: 'keyword' },
                   createdAtLocation: { type: 'keyword' },
                   createdByRole: { type: 'keyword' },
-                  createdBySignature: { type: 'keyword' },
                   acceptedAt: { type: 'date' },
                   registrationNumber: { type: 'keyword' }
                 } satisfies Record<
                   keyof RegistrationCreationMetadata,
+                  estypes.MappingProperty
+                >
+              },
+              [EventStatus.enum.REVOKED]: {
+                type: 'object',
+                properties: {
+                  createdAt: { type: 'date' },
+                  createdBy: { type: 'keyword' },
+                  createdByUserType: { type: 'keyword' },
+                  createdAtLocation: { type: 'keyword' },
+                  createdByRole: { type: 'keyword' },
+                  acceptedAt: { type: 'date' }
+                } satisfies Record<
+                  keyof ActionCreationMetadata,
                   estypes.MappingProperty
                 >
               }
@@ -328,7 +388,9 @@ export async function createIndex(
   }
 }
 
-export async function ensureIndexExists(eventConfiguration: EventConfig) {
+export async function ensureIndexExists(
+  eventConfiguration: VersionedEventConfig
+) {
   const esClient = getOrCreateClient()
   const indexName = getEventIndexName(eventConfiguration.id)
 
@@ -346,7 +408,10 @@ export async function ensureIndexExists(eventConfiguration: EventConfig) {
 
   if (!hasConcreteIndex) {
     logger.info(`Creating index ${indexName}`)
-    await createIndex(indexName, getDeclarationFields(eventConfiguration))
+    await createIndex(
+      indexName,
+      getDeclarationFieldsOfAllVersions(eventConfiguration)
+    )
   } else {
     logger.info(`Index ${indexName} already exists as a concrete index.`)
     await ensureAlias(indexName)
@@ -362,27 +427,68 @@ type Combine<T> = { [K in keyof _Combine<T>]: _Combine<T>[K] }
 type AllFieldsUnion = Combine<AddressFieldValue>
 export type BulkResponse = estypes.BulkResponse
 
+/**
+ * @returns the configuration of the version `record` was created under.
+ * @throws when its event type or version is not configured.
+ */
+export function getConfigForRecord(
+  configs: VersionedEventConfig[],
+  record: Pick<EventIndex, 'type' | 'configVersionId'>
+) {
+  return getEventConfigForRecord(
+    getEventConfigById(configs, record.type),
+    record
+  )
+}
+
 export async function indexEventsInBulk(
   batch: EventDocument[],
-  configs: EventConfig[],
-
+  configs: VersionedEventConfig[],
   indexNameOverrides?: Map<string, string>
 ) {
   const esClient = getOrCreateClient()
 
-  const body = batch.flatMap((doc) => [
-    {
-      index: {
-        _index:
-          indexNameOverrides?.get(doc.type) ?? getEventIndexName(doc.type),
-        _id: doc.id
-      }
-    },
-    eventToEventIndex(doc, getEventConfigById(configs, doc.type))
-  ])
+  const hiearchyResolutionStarted = new Date()
 
+  const indexableEvents = batch.map((doc) => {
+    // Each record is indexed with the version it was created under.
+    const config = getConfigForRecord(configs, doc)
+    return { doc, config, eventIndex: eventToEventIndex(doc, config) }
+  })
+
+  await primeAdministrativeHierarchyCache(
+    indexableEvents.flatMap(({ config, eventIndex }) =>
+      collectLocationIds(config, eventIndex)
+    )
+  )
+
+  const indexedDocs = await Promise.all(
+    indexableEvents.map(async ({ doc, config, eventIndex }) => {
+      const eventIndexWithLocationHierarchy =
+        await getEventIndexWithAdministrativeHierarchy(config, eventIndex)
+      return [
+        {
+          index: {
+            _index:
+              indexNameOverrides?.get(doc.type) ?? getEventIndexName(doc.type),
+            _id: doc.id
+          }
+        },
+        eventIndexWithLocationHierarchy
+      ]
+    })
+  )
+  const batchId = batch[0]?.id ?? 'unknown'
+  logger.info(
+    `Batch ${batchId}: Resolving admin hierarchy took ${new Date().valueOf() - hiearchyResolutionStarted.valueOf()} ms`
+  )
+
+  const body = indexedDocs.flat()
+  const start = new Date()
   const response = await esClient.bulk({ refresh: false, body })
-
+  logger.info(
+    `Batch ${batchId}: Bulk indexing took ${new Date().valueOf() - start.valueOf()} ms`
+  )
   if (response.errors) {
     const failures = response.items
       .filter((item) => item.index?.error)
@@ -401,104 +507,56 @@ export async function indexEventsInBulk(
   return response
 }
 
-export async function indexEvent(event: EventDocument, config: EventConfig) {
+export async function indexEvent(
+  event: EventDocument,
+  config: EventConfig,
+  waitFor: boolean
+) {
   const esClient = getOrCreateClient()
   const indexName = getEventIndexName(event.type)
+  const eventIndex = eventToEventIndex(event, config)
 
-  return esClient.index<EventIndex>({
+  const eventIndexWithAdministrativeHierarchy =
+    await getEventIndexWithAdministrativeHierarchy(config, eventIndex)
+  return esClient.index<EventIndexWithAdministrativeHierarchy>({
     index: indexName,
     id: event.id,
     /** We derive the full state (without nulls) from eventToEventIndex, replace instead of update. */
-    document: eventToEventIndex(event, config),
-    refresh: 'wait_for'
+    document: eventIndexWithAdministrativeHierarchy,
+    refresh: waitFor ? 'wait_for' : false
   })
 }
 
-export async function getIndexedEvents(
-  userId: string,
+export async function findRecordsByQuery({
+  search,
+  eventConfigs,
+  versionedEventConfigs,
+  user,
+  acceptedScopes,
+  token
+}: {
+  search: SearchQuery
   eventConfigs: EventConfig[]
-) {
+  versionedEventConfigs: VersionedEventConfig[]
+  user: TrpcUserContext
+  acceptedScopes: RecordScopeV2[]
+  token: TokenWithBearer
+}) {
   const esClient = getOrCreateClient()
-
-  const hasEventsIndex = await esClient.indices.existsAlias({
-    name: getEventAliasName()
-  })
-
-  if (!hasEventsIndex) {
-    logger.error(
-      `Event alias ${getEventAliasName()} not created. Sending empty array. Ensure indexing is running.`
-    )
-    return []
-  }
-
-  const query = {
-    // We basically want to fetch all events,
-    // UNLESS they are in status 'CREATED' (i.e. undeclared drafts) and not created by current user.
-    bool: {
-      should: [
-        {
-          bool: {
-            must_not: [{ term: { status: EventStatus.enum.CREATED } }],
-            should: undefined
-          }
-        },
-        {
-          bool: {
-            must: [
-              { term: { status: EventStatus.enum.CREATED } },
-              { term: { createdBy: userId } }
-            ],
-            should: undefined
-          }
-        }
-      ],
-      minimum_should_match: 1
-    }
-  } satisfies estypes.QueryDslQueryContainer
-
-  const response = await esClient.search<EncodedEventIndex>({
-    index: getEventAliasName(),
-    query,
-    size: ELASTICSEARCH_MAXIMUM_QUERY_SIZE,
-    request_cache: false
-  })
-
-  return response.hits.hits
-    .map((hit) => hit._source)
-    .filter((event): event is EncodedEventIndex => event !== undefined)
-    .map((eventIndex) => {
-      const eventConfig = getEventConfigById(eventConfigs, eventIndex.type)
-      const decodedEventIndex = decodeEventIndex(eventConfig, eventIndex)
-      return removeSecuredFields(eventConfig, decodedEventIndex)
-    })
-}
-
-function valueFromTotal(total?: number | estypes.SearchTotalHits) {
-  if (!total) {
-    return 0
-  }
-  if (typeof total === 'number') {
-    return total
-  } else {
-    return total.value
-  }
-}
-
-export async function findRecordsByQuery(
-  search: SearchQuery,
-  eventConfigs: EventConfig[],
-  options: Record<string, SearchScopeAccessLevels>,
-  userOfficeId: string | undefined
-) {
-  const esClient = getOrCreateClient()
-
   const { query, limit, offset } = search
-
-  const esQuery = withJurisdictionFilters(
-    await buildElasticQueryFromSearchPayload(query, eventConfigs),
-    options,
-    userOfficeId
+  const resolvedScopes = acceptedScopes.map((scope) =>
+    resolveRecordActionScopeToIds(scope, user)
   )
+
+  const validatorContext = await getValidatorContext({ token })
+
+  const esQuery = withFlagsFilter({
+    query: withJurisdictionFilters({
+      query: await buildElasticQueryFromSearchPayload(query, eventConfigs),
+      scopesV2: resolvedScopes
+    }),
+    scopesV2: resolvedScopes
+  })
 
   const response = await esClient.search<EncodedEventIndex>({
     index: getEventAliasName(),
@@ -525,10 +583,19 @@ export async function findRecordsByQuery(
   const events = response.hits.hits
     .map((hit) => hit._source)
     .filter((event): event is EncodedEventIndex => event !== undefined)
-    .map((eventIndex) => {
-      const eventConfig = getEventConfigById(eventConfigs, eventIndex.type)
+    .map((eventIndex: EncodedEventIndex) => {
+      // Each hit is decoded and secured with the version its record was created under.
+      const eventConfig = getConfigForRecord(versionedEventConfigs, eventIndex)
       const decodedEventIndex = decodeEventIndex(eventConfig, eventIndex)
-      return removeSecuredFields(eventConfig, decodedEventIndex)
+      const eventIndexWithoutLocationHierarchy =
+        getEventIndexWithoutLocationHierarchy(eventConfig, decodedEventIndex)
+
+      return dropSecuredDeclarationFields(
+        eventConfig,
+        eventIndexWithoutLocationHierarchy,
+        // @TODO: This is not a full context. It will require fetching every EventDocument. https://github.com/opencrvs/opencrvs-core/issues/13530
+        validatorContext
+      )
     })
 
   return { results: events, total: valueFromTotal(response.hits.total) }
@@ -547,21 +614,37 @@ const MsearchResponseSchema = z.object({
   })
 })
 
-export async function getEventCount(
-  queries: WorkqueueCountInput,
-  eventConfigs: EventConfig[],
-  options: Record<string, SearchScopeAccessLevels>,
-  userOfficeId: string | undefined
-) {
+export async function getEventCount({
+  queries,
+  eventConfigs,
+  user,
+  acceptedScopes
+}: {
+  queries: WorkqueueCountInput
+  eventConfigs: EventConfig[]
+  user: TrpcUserContext
+  acceptedScopes: RecordScopeV2[]
+}) {
   const esClient = getOrCreateClient()
+
+  const resolvedScopes = acceptedScopes.map((scope) =>
+    resolveRecordActionScopeToIds(scope, user)
+  )
 
   const esQueries = queries.map(async (query) =>
     buildElasticQueryFromSearchPayload(query.query, eventConfigs)
   )
 
   const filteredQueries = (await Promise.all(esQueries)).map((query) =>
-    withJurisdictionFilters(query, options, userOfficeId)
+    withFlagsFilter({
+      query: withJurisdictionFilters({
+        query,
+        scopesV2: resolvedScopes
+      }),
+      scopesV2: resolvedScopes
+    })
   )
+
   const { responses } = await esClient.msearch({
     searches: filteredQueries.flatMap((query) => [
       { index: getEventAliasName() },
@@ -572,12 +655,10 @@ export async function getEventCount(
   return responses.reduce((acc: Record<string, number>, response, index) => {
     const slug = queries[index].slug
 
-    const validatedResponse = MsearchResponseSchema.safeParse(response)
-
     return {
       ...acc,
-      [slug]: validatedResponse.success
-        ? validatedResponse.data.hits.total.value
+      [slug]: MsearchResponseSchema.validate(response)
+        ? response.hits.total.value
         : 0
     }
   }, {})

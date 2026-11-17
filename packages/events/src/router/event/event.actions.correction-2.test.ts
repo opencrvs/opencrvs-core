@@ -13,11 +13,13 @@ import { http, HttpResponse } from 'msw'
 import {
   ActionType,
   and,
-  BIRTH_EVENT,
+  CHILD_ONBOARDING_EVENT,
   ConditionalType,
   defineConfig,
+  resolveEventConfig,
   defineDeclarationForm,
   defineFormPage,
+  encodeScope,
   field,
   FieldType,
   getCurrentEventState,
@@ -26,16 +28,24 @@ import {
   PageTypes,
   generateTranslationConfig,
   EventState,
-  SCOPES
+  UUID,
+  getDeclarationFields,
+  withDeclaration,
+  getDeclaration,
+  getDeclarationPages,
+  toVersionedEventConfig
 } from '@opencrvs/commons'
-import { v2BirthEvent } from '@opencrvs/commons/fixtures'
+import { ChildOnboardingEvent } from '@opencrvs/commons/fixtures'
 import {
   createSystemTestClient,
   createTestClient,
-  setupTestCase
+  setupTestCase,
+  TEST_SYSTEM_ID
 } from '@events/tests/utils'
 import { mswServer } from '@events/tests/msw'
 import { env } from '@events/environment'
+import { getEventIndexName } from '@events/storage/elasticsearch'
+import { createIndex } from '@events/service/indexing/indexing'
 
 describe('Overwriting parent field', () => {
   const informantOtherThanMother = and(
@@ -150,31 +160,37 @@ describe('Overwriting parent field', () => {
     ]
   })
 
-  const modiedV2BirthEvent = defineConfig({
-    ...v2BirthEvent,
-    actions: [
-      ...v2BirthEvent.actions,
-      {
-        type: ActionType.REQUEST_CORRECTION,
-        label: generateTranslationConfig('Correct record'),
-        correctionForm: {
-          label: generateTranslationConfig('Correct record'),
-          pages: []
-        }
-      }
-    ],
-    declaration: defineDeclarationForm({
-      ...v2BirthEvent.declaration,
-      pages: [...v2BirthEvent.declaration.pages, informant]
+  const modifiedChildOnboardingEvent = withDeclaration(
+    resolveEventConfig(
+      defineConfig({
+        ...ChildOnboardingEvent,
+        actions: [
+          ...ChildOnboardingEvent.actions,
+          {
+            type: ActionType.REQUEST_CORRECTION,
+            label: generateTranslationConfig('Correct record'),
+            correctionForm: {
+              label: generateTranslationConfig('Correct record'),
+              pages: []
+            }
+          }
+        ]
+      })
+    ),
+    defineDeclarationForm({
+      ...getDeclaration(ChildOnboardingEvent),
+      pages: [...getDeclarationPages(ChildOnboardingEvent), informant]
     })
-  })
+  )
   it('should overwrite informant.relation via REQUEST_CORRECTION action', async () => {
     mswServer.use(
-      http.get(`${env.COUNTRY_CONFIG_URL}/events`, () => {
-        return HttpResponse.json([modiedV2BirthEvent])
+      http.get(`${env.COUNTRY_CONFIG_URL}/config/events`, () => {
+        return HttpResponse.json([
+          toVersionedEventConfig(modifiedChildOnboardingEvent)
+        ])
       }),
       http.post(
-        `${env.COUNTRY_CONFIG_URL}/trigger/events/v2-birth/actions/:action`,
+        `${env.COUNTRY_CONFIG_URL}/trigger/events/child-onboarding/actions/:action`,
         (ctx) => {
           const payload =
             ctx.params.action === ActionType.REGISTER
@@ -198,21 +214,25 @@ describe('Overwriting parent field', () => {
       'informant.relation': 'BROTHER',
       'informant.name': { firstname: 'Rok', surname: 'Doe' },
       'informant.dob': '1988-06-12',
-      'informant.dobUnknown': false
+      'informant.dobUnknown': false,
+      'child.placeOfBirth': 'PRIVATE_HOME',
+      'child.birthLocation.privateHome': {
+        country: 'FAR',
+        addressType: 'DOMESTIC' as const,
+        administrativeArea: '62a0ccb4-880d-4f30-8882-f256007dfff9' as UUID
+      }
     } satisfies EventState
 
     let event = await client.event.create(
-      generator.event.create({ type: BIRTH_EVENT })
+      generator.event.create({ type: CHILD_ONBOARDING_EVENT })
+    )
+    await createIndex(
+      getEventIndexName(CHILD_ONBOARDING_EVENT),
+      getDeclarationFields(modifiedChildOnboardingEvent)
     )
 
     event = await client.event.actions.declare.request(
       generator.event.actions.declare(event.id, {
-        declaration,
-        keepAssignment: true
-      })
-    )
-    await client.event.actions.validate.request(
-      generator.event.actions.validate(event.id, {
         declaration,
         keepAssignment: true
       })
@@ -224,7 +244,7 @@ describe('Overwriting parent field', () => {
       })
     )
 
-    let eventState = getCurrentEventState(event, modiedV2BirthEvent)
+    let eventState = getCurrentEventState(event, modifiedChildOnboardingEvent)
     expect(eventState.id).toBeDefined()
     expect(eventState.declaration['informant.dobUnknown']).toBe(false)
     expect(eventState.declaration['informant.dob']).toBe('1988-06-12')
@@ -250,7 +270,7 @@ describe('Overwriting parent field', () => {
       })
     )
 
-    eventState = getCurrentEventState(event, modiedV2BirthEvent)
+    eventState = getCurrentEventState(event, modifiedChildOnboardingEvent)
     expect(eventState.declaration['informant.dobUnknown']).toBeFalsy()
     expect(eventState.declaration['informant.relation']).toBe('MOTHER')
   })
@@ -289,31 +309,37 @@ describe('Search index should reflect corrected null informant fields', () => {
     ]
   })
 
-  const modifiedV2BirthEvent = defineConfig({
-    ...v2BirthEvent,
-    actions: [
-      ...v2BirthEvent.actions,
-      {
-        type: ActionType.REQUEST_CORRECTION,
-        label: generateTranslationConfig('Correct record'),
-        correctionForm: {
-          label: generateTranslationConfig('Correct record'),
-          pages: []
-        }
-      }
-    ],
-    declaration: defineDeclarationForm({
-      ...v2BirthEvent.declaration,
-      pages: [...v2BirthEvent.declaration.pages, informant]
+  const modifiedChildOnboardingEvent = withDeclaration(
+    resolveEventConfig(
+      defineConfig({
+        ...ChildOnboardingEvent,
+        actions: [
+          ...ChildOnboardingEvent.actions,
+          {
+            type: ActionType.REQUEST_CORRECTION,
+            label: generateTranslationConfig('Correct record'),
+            correctionForm: {
+              label: generateTranslationConfig('Correct record'),
+              pages: []
+            }
+          }
+        ]
+      })
+    ),
+    defineDeclarationForm({
+      ...getDeclaration(ChildOnboardingEvent),
+      pages: [...getDeclarationPages(ChildOnboardingEvent), informant]
     })
-  })
+  )
   it('should not return record when searching by informant.name after correction sets it to null', async () => {
     mswServer.use(
-      http.get(`${env.COUNTRY_CONFIG_URL}/events`, () => {
-        return HttpResponse.json([modifiedV2BirthEvent])
+      http.get(`${env.COUNTRY_CONFIG_URL}/config/events`, () => {
+        return HttpResponse.json([
+          toVersionedEventConfig(modifiedChildOnboardingEvent)
+        ])
       }),
       http.post(
-        `${env.COUNTRY_CONFIG_URL}/trigger/events/v2-birth/actions/:action`,
+        `${env.COUNTRY_CONFIG_URL}/trigger/events/child-onboarding/actions/:action`,
         (ctx) => {
           const payload =
             ctx.params.action === ActionType.REGISTER
@@ -336,23 +362,27 @@ describe('Search index should reflect corrected null informant fields', () => {
       'mother.idType': 'NID',
       'mother.nid': 'ID123456789',
       'informant.relation': 'FATHER',
-      'informant.name': { firstname: 'Rok', surname: 'Doe' }
+      'informant.name': { firstname: 'Rok', surname: 'Doe' },
+      'child.placeOfBirth': 'PRIVATE_HOME',
+      'child.birthLocation.privateHome': {
+        country: 'FAR',
+        addressType: 'DOMESTIC' as const,
+        administrativeArea: '62a0ccb4-880d-4f30-8882-f256007dfff9' as UUID
+      }
     } satisfies EventState
 
-    // 1) Create -> Declare -> Validate -> Register
+    // 1) Create -> Declare -> Register
     let event = await client.event.create(
-      generator.event.create({ type: BIRTH_EVENT })
+      generator.event.create({ type: CHILD_ONBOARDING_EVENT })
+    )
+
+    await createIndex(
+      getEventIndexName(CHILD_ONBOARDING_EVENT),
+      getDeclarationFields(modifiedChildOnboardingEvent)
     )
 
     event = await client.event.actions.declare.request(
       generator.event.actions.declare(event.id, {
-        declaration,
-        keepAssignment: true
-      })
-    )
-
-    await client.event.actions.validate.request(
-      generator.event.actions.validate(event.id, {
         declaration,
         keepAssignment: true
       })
@@ -366,15 +396,15 @@ describe('Search index should reflect corrected null informant fields', () => {
     )
 
     // sanity
-    let eventState = getCurrentEventState(event, modifiedV2BirthEvent)
+    let eventState = getCurrentEventState(event, modifiedChildOnboardingEvent)
     expect(eventState.declaration['informant.name']).toEqual({
       firstname: 'Rok',
       surname: 'Doe'
     })
 
     // 2) Search by informant name should return it
-    const recordSearchClient = createSystemTestClient('test-system', [
-      SCOPES.RECORDSEARCH
+    const recordSearchClient = createSystemTestClient(TEST_SYSTEM_ID, [
+      encodeScope({ type: 'record.search' })
     ])
     const { results: resultsBeforeCorrection } =
       await recordSearchClient.event.search({
@@ -382,7 +412,7 @@ describe('Search index should reflect corrected null informant fields', () => {
           type: 'and',
           clauses: [
             {
-              eventType: BIRTH_EVENT,
+              eventType: CHILD_ONBOARDING_EVENT,
               data: {
                 'informant.name': { type: 'fuzzy', term: 'Rok' }
               }
@@ -414,7 +444,7 @@ describe('Search index should reflect corrected null informant fields', () => {
       })
     )
 
-    eventState = getCurrentEventState(event, modifiedV2BirthEvent)
+    eventState = getCurrentEventState(event, modifiedChildOnboardingEvent)
     expect(eventState.declaration['informant.name']).toBeUndefined()
 
     // 5) Now searching by informant.name should NOT return the record
@@ -424,7 +454,7 @@ describe('Search index should reflect corrected null informant fields', () => {
           type: 'and',
           clauses: [
             {
-              eventType: BIRTH_EVENT,
+              eventType: CHILD_ONBOARDING_EVENT,
               data: {
                 'informant.name': { type: 'fuzzy', term: 'Rok' }
               }
@@ -442,7 +472,7 @@ describe('Search index should reflect corrected null informant fields', () => {
           type: 'and',
           clauses: [
             {
-              eventType: BIRTH_EVENT,
+              eventType: CHILD_ONBOARDING_EVENT,
               data: {
                 'child.dob': { type: 'exact', term: '2020-05-15' }
               }

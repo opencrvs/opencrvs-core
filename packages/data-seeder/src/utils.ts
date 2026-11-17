@@ -8,7 +8,6 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { inspect } from 'util'
 
 export function raise(...params: Parameters<typeof console.error>): never {
   // eslint-disable-next-line no-console
@@ -16,17 +15,13 @@ export function raise(...params: Parameters<typeof console.error>): never {
   process.exit(1)
 }
 
-export function parseGQLResponse<T>(
-  response: { data: T } | { errors: Array<{ message: string }> }
-) {
-  if ('errors' in response) {
-    raise(inspect(response.errors))
-  }
-  return response.data
-}
-
 export async function delay(timeInMilliseconds: number) {
   return new Promise((resolve) => {
     setTimeout(resolve, timeInMilliseconds)
   })
+}
+
+export function getOfficeExternalId(primaryOfficeId: string): string {
+  const segments = primaryOfficeId.split('_')
+  return segments[segments.length - 1]
 }

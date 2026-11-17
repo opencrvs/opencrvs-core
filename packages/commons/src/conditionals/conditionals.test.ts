@@ -9,6 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
+import { INITIAL_EVENT_CONFIG_VERSION_ID } from '../events/EventConfig'
 import { validate, compileClientFunction } from './validate'
 import {
   user,
@@ -18,16 +19,20 @@ import {
   ConditionalParameters,
   UserConditionalParameters,
   EventConditionalParameters,
-  FormConditionalParameters
+  FormConditionalParameters,
+  EventStateConditionalParameters,
+  flag,
+  status
 } from './conditionals'
 import { formatISO } from 'date-fns'
-import { SCOPES } from '../scopes'
 import { ActionType } from '../events/ActionType'
 import { ActionStatus, EventState } from '../events/ActionDocument'
 import { field } from '../events/field'
 import { event } from '../events/event'
-import { TokenUserType } from '../authentication'
+import { EncodedScope, TokenUserType } from '../users/authentication'
 import { UUID } from '../uuid'
+import { EventStatus, InherentFlags } from '../client'
+import { getEventWithCompleteAcceptedActions } from '../events/utils'
 
 /* eslint-disable max-lines */
 const DEFAULT_FORM = {
@@ -1006,7 +1011,7 @@ describe('"field" conditionals', () => {
 describe('"user" conditionals', () => {
   const userParams = {
     $user: {
-      scope: ['record.register', 'record.registration-correct'],
+      scope: ['type=test-scope-1', 'type=test-scope-2'] as EncodedScope[],
       role: 'LOCAL_REGISTRAR',
       exp: '1739881718',
       algorithm: 'RS256',
@@ -1023,13 +1028,8 @@ describe('"user" conditionals', () => {
   }
 
   it('validates "user.hasScope" conditional', () => {
-    expect(validate(user.hasScope(SCOPES.BYPASSRATELIMIT), userParams)).toBe(
-      false
-    )
-
-    expect(validate(user.hasScope(SCOPES.RECORD_REGISTER), userParams)).toBe(
-      true
-    )
+    expect(validate(user.hasScope('type=test-scope-0'), userParams)).toBe(false)
+    expect(validate(user.hasScope('type=test-scope-1'), userParams)).toBe(true)
   })
 
   it('validates "user.isOnline" conditional', () => {
@@ -1043,6 +1043,75 @@ describe('"user" conditionals', () => {
   })
 })
 
+describe('"flag" conditionals', () => {
+  it('validates "flag()" conditional', () => {
+    const params = {
+      $flags: [InherentFlags.CORRECTION_REQUESTED],
+      $status: EventStatus.enum.REGISTERED,
+      $now: formatISO(new Date(), { representation: 'date' }),
+      $online: true
+    } satisfies EventStateConditionalParameters
+
+    expect(validate(flag(InherentFlags.REJECTED), params)).toBe(false)
+    expect(validate(flag(InherentFlags.CORRECTION_REQUESTED), params)).toBe(
+      true
+    )
+  })
+
+  it('validation fails if flags array is empty', () => {
+    const params = {
+      $flags: [],
+      $status: EventStatus.enum.REGISTERED,
+      $now: formatISO(new Date(), { representation: 'date' }),
+      $online: true
+    } satisfies EventStateConditionalParameters
+
+    expect(validate(flag(InherentFlags.CORRECTION_REQUESTED), params)).toBe(
+      false
+    )
+    expect(
+      validate(not(flag(InherentFlags.CORRECTION_REQUESTED)), params)
+    ).toBe(true)
+  })
+
+  it('validation fails if params dont include flags', () => {
+    const params = {
+      $status: EventStatus.enum.REGISTERED,
+      $now: formatISO(new Date(), { representation: 'date' }),
+      $online: true
+    }
+
+    // @ts-expect-error testing missing flags param
+    expect(validate(flag(InherentFlags.CORRECTION_REQUESTED), params)).toBe(
+      false
+    )
+  })
+})
+
+describe('"status" conditionals', () => {
+  it('validates "status()" conditional', () => {
+    const params = {
+      $flags: [],
+      $status: EventStatus.enum.REGISTERED,
+      $now: formatISO(new Date(), { representation: 'date' }),
+      $online: true
+    } satisfies EventStateConditionalParameters
+
+    expect(validate(status('REGISTERED'), params)).toBe(true)
+  })
+
+  it('validation fails if params dont include status', () => {
+    const params = {
+      $flags: [],
+      $now: formatISO(new Date(), { representation: 'date' }),
+      $online: true
+    }
+
+    // @ts-expect-error testing missing status param
+    expect(validate(status('REGISTERED'), params)).toBe(false)
+  })
+})
+
 describe('"event" conditionals', () => {
   it('validates "event.hasAction" conditional', () => {
     const now = formatISO(new Date(), { representation: 'date' })
@@ -1052,6 +1121,7 @@ describe('"event" conditionals', () => {
         id: '123' as UUID,
         type: 'birth',
         trackingId: 'TEST12',
+        configVersionId: INITIAL_EVENT_CONFIG_VERSION_ID,
         createdAt: now,
         updatedAt: now,
         actions: [
@@ -1060,7 +1130,7 @@ describe('"event" conditionals', () => {
             type: ActionType.DECLARE,
             createdAt: now,
             createdBy: '12345',
-            createdByUserType: TokenUserType.Enum.user,
+            createdByUserType: TokenUserType.enum.user,
             createdByRole: 'some-role',
             declaration: {},
             createdAtLocation: '123456' as UUID,
@@ -1089,6 +1159,7 @@ describe('"event" conditionals', () => {
         id: '123' as UUID,
         type: 'birth',
         trackingId: 'TEST12',
+        configVersionId: INITIAL_EVENT_CONFIG_VERSION_ID,
         createdAt: now,
         updatedAt: now,
         actions: [
@@ -1099,7 +1170,7 @@ describe('"event" conditionals', () => {
             createdAt: now,
             status: ActionStatus.Accepted,
             transactionId: 'tx1',
-            createdByUserType: TokenUserType.Enum.user,
+            createdByUserType: TokenUserType.enum.user,
             createdBy: 'user1',
             createdByRole: 'role1',
             createdAtLocation: 'loc1' as UUID,
@@ -1112,7 +1183,7 @@ describe('"event" conditionals', () => {
             createdAt: now,
             status: ActionStatus.Accepted,
             transactionId: 'tx2',
-            createdByUserType: TokenUserType.Enum.user,
+            createdByUserType: TokenUserType.enum.user,
             createdBy: 'user2',
             createdByRole: 'role2',
             createdAtLocation: 'loc2' as UUID,
@@ -1193,6 +1264,145 @@ describe('"event" conditionals', () => {
           baseEvent
         )
       ).toBe(false)
+    })
+
+    it('counts a Requested and Accepted pair as a single action', () => {
+      const [acceptedPrint] = baseEvent.$event.actions
+      const requestedPrint = {
+        ...acceptedPrint,
+        id: 'a0' as UUID,
+        status: ActionStatus.Requested
+      }
+      const eventWithOnePrint = {
+        ...baseEvent,
+        $event: {
+          ...baseEvent.$event,
+          actions: [
+            requestedPrint,
+            { ...acceptedPrint, originalActionId: requestedPrint.id }
+          ]
+        }
+      }
+
+      expect(
+        validate(
+          event.hasAction(ActionType.PRINT_CERTIFICATE).minCount(2),
+          eventWithOnePrint
+        )
+      ).toBe(false)
+      expect(
+        validate(
+          event.hasAction(ActionType.PRINT_CERTIFICATE).maxCount(1),
+          eventWithOnePrint
+        )
+      ).toBe(true)
+    })
+
+    it('does not count pending or rejected actions', () => {
+      const [print] = baseEvent.$event.actions
+      const eventWithoutAcceptedPrint = {
+        ...baseEvent,
+        $event: {
+          ...baseEvent.$event,
+          actions: [
+            { ...print, status: ActionStatus.Requested },
+            { ...print, id: 'a2' as UUID, status: ActionStatus.Rejected }
+          ]
+        }
+      }
+
+      expect(
+        validate(
+          event.hasAction(ActionType.PRINT_CERTIFICATE),
+          eventWithoutAcceptedPrint
+        )
+      ).toBe(false)
+      expect(
+        validate(
+          event.hasAction(ActionType.PRINT_CERTIFICATE).minCount(1),
+          eventWithoutAcceptedPrint
+        )
+      ).toBe(false)
+    })
+
+    describe('given a print confirmed by country config', () => {
+      const [print] = baseEvent.$event.actions
+      const requestedPrint = {
+        ...print,
+        id: 'r1' as UUID,
+        status: ActionStatus.Requested,
+        annotation: { 'collector.type': 'MOTHER' }
+      }
+      // A sync confirmation keeps the request input without its annotation.
+      const { annotation: _annotation, ...syncAcceptedPrint } = {
+        ...requestedPrint,
+        id: 'a3' as UUID,
+        status: ActionStatus.Accepted,
+        originalActionId: requestedPrint.id
+      }
+      // An async `accept` holds only what country config sent, created by the
+      // system user.
+      const asyncAcceptedPrint = {
+        id: 'a4' as UUID,
+        type: ActionType.PRINT_CERTIFICATE,
+        status: ActionStatus.Accepted,
+        originalActionId: requestedPrint.id,
+        createdAt: now,
+        transactionId: 'tx1',
+        createdByUserType: TokenUserType.enum.system,
+        createdBy: 'country-config',
+        createdAtLocation: 'loc1' as UUID,
+        declaration: {}
+      }
+      const printedOnce = (fields: Record<string, unknown>) =>
+        event
+          .hasAction(ActionType.PRINT_CERTIFICATE)
+          .withFields(fields)
+          .minCount(1)
+
+      it.each([
+        ['sync', syncAcceptedPrint],
+        ['async', asyncAcceptedPrint]
+      ])(
+        "matches the request's template, user and annotation once %s-confirmed",
+        (_, acceptedPrint) => {
+          const params = {
+            ...baseEvent,
+            $event: getEventWithCompleteAcceptedActions({
+              ...baseEvent.$event,
+              actions: [requestedPrint, acceptedPrint]
+            })
+          }
+
+          expect(
+            validate(
+              event
+                .hasAction(ActionType.PRINT_CERTIFICATE)
+                .withTemplate('TEMPLATE_1')
+                .minCount(1),
+              params
+            )
+          ).toBe(true)
+          expect(validate(printedOnce({ createdBy: 'user1' }), params)).toBe(
+            true
+          )
+          expect(
+            validate(printedOnce({ createdByRole: 'role1' }), params)
+          ).toBe(true)
+          expect(
+            validate(
+              printedOnce({ annotation: { 'collector.type': 'MOTHER' } }),
+              params
+            )
+          ).toBe(true)
+          expect(
+            validate(
+              event.hasAction(ActionType.PRINT_CERTIFICATE).maxCount(1),
+              params
+            )
+          ).toBe(true)
+        }
+      )
     })
   })
 })

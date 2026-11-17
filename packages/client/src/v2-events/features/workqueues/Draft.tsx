@@ -15,7 +15,6 @@ import { useTypedSearchParams } from 'react-router-typesafe-routes/dom'
 import { useIntl } from 'react-intl'
 import {
   EventDocument,
-  getOrThrow,
   mandatoryColumns,
   getCurrentEventState,
   applyDraftToEventIndex
@@ -23,8 +22,8 @@ import {
 
 import { ROUTES } from '@client/v2-events/routes'
 import { CoreWorkqueues, WORKQUEUE_DRAFT } from '@client/v2-events/utils'
-import { useEventConfigurations } from '../events/useEventConfiguration'
-import { SearchResultComponent } from '../events/Search/SearchResult'
+import { useEventConfigurationResolver } from '../events/useEventConfiguration'
+import { SearchResultComponent } from '../events/Search/SearchResult/SearchResult'
 import { useDrafts } from '../drafts/useDrafts'
 import { useOutbox } from '../events/useEvents/outbox'
 import { findLocalEventDocument } from '../events/useEvents/api'
@@ -32,14 +31,15 @@ import { findLocalEventDocument } from '../events/useEvents/api'
 export function Draft() {
   const [searchParams] = useTypedSearchParams(ROUTES.V2.WORKQUEUES.WORKQUEUE)
 
-  const eventConfigs = useEventConfigurations()
+  const findEventConfiguration = useEventConfigurationResolver()
+
   const intl = useIntl()
 
   const outboxIds = useOutbox().map(({ id }) => id)
 
-  const { getAllRemoteDrafts } = useDrafts()
+  const { useDisplayableDrafts } = useDrafts()
 
-  const drafts = getAllRemoteDrafts({
+  const drafts = useDisplayableDrafts({
     refetchOnMount: 'always',
     staleTime: 0,
     refetchInterval: 20000
@@ -48,17 +48,24 @@ export function Draft() {
   const eventsWithDrafts = drafts
     .map(({ eventId }) => findLocalEventDocument(eventId))
     .filter((event): event is EventDocument => !!event)
-    .map((event) => {
-      const draft = first(drafts.filter((d) => d.eventId === event.id))
-      const configuration = getOrThrow(
-        eventConfigs.find(({ id }) => id === event.type),
-        `Event configuration not found for ${event.type}`
-      )
+    .flatMap((event) => {
+      const configuration = findEventConfiguration(event)
+      // A record of an unknown version cannot be shown
+      if (!configuration) {
+        // eslint-disable-next-line no-console
+        console.error(
+          `Draft of event ${event.id} is hidden: its configuration version "${event.configVersionId}" is not available.`
+        )
+        return []
+      }
 
+      const draft = first(drafts.filter((d) => d.eventId === event.id))
       const currentEventState = getCurrentEventState(event, configuration)
-      return draft
-        ? applyDraftToEventIndex(currentEventState, draft, configuration)
-        : currentEventState
+      return [
+        draft
+          ? applyDraftToEventIndex(currentEventState, draft, configuration)
+          : currentEventState
+      ]
     })
 
   const sortedDrafts = orderBy(eventsWithDrafts, 'updatedAt', 'desc')
@@ -71,9 +78,8 @@ export function Draft() {
   return (
     <SearchResultComponent
       key={`${CoreWorkqueues.DRAFT}-${outboxIds.length}`}
-      actions={['DEFAULT']}
+      action={WORKQUEUE_DRAFT.action}
       columns={mandatoryColumns}
-      eventConfigs={eventConfigs}
       paginationVisibleOffline={true}
       queryData={currentPageDrafts}
       title={intl.formatMessage(WORKQUEUE_DRAFT.name)}

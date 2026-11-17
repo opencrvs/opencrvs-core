@@ -1,0 +1,161 @@
+/*
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at https://mozilla.org/MPL/2.0/.
+ *
+ * OpenCRVS is also distributed under the terms of the Civil Registration
+ * & Healthcare Disclaimer located at http://opencrvs.org/license.
+ *
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
+ */
+import { expect, test } from '@playwright/test'
+
+import {
+  formatName,
+  getToken,
+  login,
+  triggerDeclarationAction
+} from '@e2e/support/helpers'
+import { CREDENTIALS } from '@e2e/support/constants'
+import {
+  fillNotificationChildPage,
+  fillNotificationMotherPage,
+  generateBirthNotificationInputs,
+  startBirthNotification
+} from '@e2e/support/birth/notify'
+import {
+  clickWorkqueueActionByTitle,
+  getRowByTitle,
+  openRecordByTitle
+} from '@e2e/support/print-certificate/birth/helpers'
+import { createCompleteBirthDraftViaApi } from '@e2e/support/test-data/api-actions'
+
+test('Validate my draft tab', async ({ page }) => {
+  // A complete notification, so that the draft can be notified at the end
+  const inputs = generateBirthNotificationInputs()
+  const name = inputs.child.name
+
+  const formattedName = formatName(name)
+
+  await test.step('1.1 Record does not appear in draft ', async () => {
+    await login(page, CREDENTIALS.HOSPITAL_OFFICIAL)
+    await page.getByRole('button', { name: 'Drafts' }).click()
+
+    await expect(page.getByTestId('search-result')).not.toContainText(
+      formattedName
+    )
+  })
+
+  await test.step('1.2 Create a draft', async () => {
+    await startBirthNotification(page)
+    await fillNotificationChildPage(page, inputs)
+    await fillNotificationMotherPage(page, inputs)
+
+    const draftResponse = page.waitForResponse(
+      (res) => res.url().includes('event.draft.create') && res.ok()
+    )
+
+    await page.getByRole('button', { name: 'Save & Exit' }).click()
+    await page.getByRole('button', { name: 'Confirm' }).click()
+
+    await draftResponse
+  })
+
+  await test.step('1.3 Record appears in draft', async () => {
+    await page.getByRole('button', { name: 'Drafts' }).click()
+
+    // 5s (Playwright's default) wasn't always enough for the drafts
+    // workqueue query to reflect a just-created draft under CI load.
+    await expect(page.getByTestId('search-result')).toContainText(
+      formattedName,
+      { timeout: 15000 }
+    )
+  })
+
+  await test.step('1.4 Record has "Update" -CTA', async () => {
+    await clickWorkqueueActionByTitle(page, formattedName, 'Update')
+
+    await expect(page.getByTestId('child.name-value')).toHaveText(formattedName)
+    await expect(page.getByTestId('change-button-child.name')).toBeVisible()
+  })
+
+  await test.step('1.5 Record does not appear in draft for other user: RO', async () => {
+    await login(page, CREDENTIALS.REGISTRATION_OFFICER)
+    await page.getByRole('button', { name: 'Drafts' }).click()
+
+    await expect(page.getByTestId('search-result')).not.toContainText(
+      formattedName
+    )
+  })
+
+  await test.step('1.6 Record does not appear in draft for other user: LR ', async () => {
+    await login(page, CREDENTIALS.REGISTRAR)
+    await page.getByRole('button', { name: 'Drafts' }).click()
+
+    await expect(page.getByTestId('search-result')).not.toContainText(
+      formattedName
+    )
+  })
+
+  await test.step('1.7 Record does not appear in draft after notifying ', async () => {
+    await login(page, CREDENTIALS.HOSPITAL_OFFICIAL, true)
+    await page.getByRole('button', { name: 'Drafts' }).click()
+
+    await getRowByTitle(page, formattedName)
+      .getByRole('button', {
+        name: 'Update'
+      })
+      .click()
+
+    await triggerDeclarationAction(page, 'Notify')
+
+    await expect(page.getByTestId('search-result')).toContainText('Drafts')
+    await expect(page.getByTestId('search-result')).not.toContainText(
+      formattedName
+    )
+  })
+})
+
+test('Declaring a draft removes it from my drafts', async ({ page }) => {
+  let formattedName = ''
+
+  await test.step('2.1 Create a complete declare draft (via API)', async () => {
+    formattedName = await createCompleteBirthDraftViaApi(
+      await getToken(CREDENTIALS.REGISTRATION_OFFICER)
+    )
+  })
+
+  await test.step('2.2 Record appears in draft', async () => {
+    await login(page, CREDENTIALS.REGISTRATION_OFFICER)
+    await page.getByRole('button', { name: 'Drafts' }).click()
+
+    await expect(page.getByTestId('search-result')).toContainText(
+      formattedName,
+      { timeout: 15000 }
+    )
+  })
+
+  await test.step('2.3 Reopen the draft with the "Update" -CTA and declare', async () => {
+    await clickWorkqueueActionByTitle(page, formattedName, 'Update')
+
+    await expect(page.getByTestId('child.name-value')).toHaveText(formattedName)
+
+    await triggerDeclarationAction(page, 'Declare')
+  })
+
+  await test.step('2.4 Record does not appear in draft after declaring', async () => {
+    await page.getByRole('button', { name: 'Drafts' }).click()
+
+    await expect(page.getByTestId('search-result')).toContainText('Drafts')
+    await expect(page.getByTestId('search-result')).not.toContainText(
+      formattedName
+    )
+  })
+
+  await test.step('2.5 Record is declared', async () => {
+    await page.getByText('Recent').click()
+    await openRecordByTitle(page, formattedName)
+
+    await expect(page.getByTestId('status-value')).toHaveText('Declared')
+  })
+})

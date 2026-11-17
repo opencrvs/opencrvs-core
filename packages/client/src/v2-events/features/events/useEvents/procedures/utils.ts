@@ -24,23 +24,18 @@ import type {
 } from '@trpc/tanstack-react-query'
 import { isObject } from 'lodash'
 import {
-  ActionType,
   deepMerge,
   FileFieldValue,
   FileFieldValueWithOption,
-  FileFieldWithOptionValue
+  isFileFieldValue,
+  isFileFieldWithOptionValue
 } from '@opencrvs/commons/client'
 import {
-  findLocalEventDocument,
-  findLocalEventIndex
-} from '@client/v2-events/features/events/useEvents/api'
-import {
-  AppRouter,
-  queryClient,
-  trpcOptionsProxy
-} from '@client/v2-events/trpc'
+  getCreatedEvent,
+  resolveTemporaryIdInPath
+} from '@client/v2-events/features/events/useEvents/temporary-id'
+import { AppRouter, queryClient } from '@client/v2-events/trpc'
 import { isTemporaryId, RequireKey } from '@client/v2-events/utils'
-import { prefetchPotentialDuplicates } from '../../actions/dedup/getDuplicates'
 
 export function waitUntilEventIsCreated<T extends { eventId: string }, R>(
   canonicalMutationFn: (params: T) => Promise<R>
@@ -48,39 +43,18 @@ export function waitUntilEventIsCreated<T extends { eventId: string }, R>(
   return async (params) => {
     const { eventId } = params
 
-    if (!isTemporaryId(eventId)) {
-      return canonicalMutationFn({ ...params, eventId })
-    }
-
-    const localVersion =
-      findLocalEventIndex(eventId) || findLocalEventDocument(eventId)
-
-    if (!localVersion || isTemporaryId(localVersion.id)) {
-      throw new Error(
-        'Event that has not been stored yet cannot be actioned on'
-      )
-    }
-
     const replaceTemporaryIdInDocumentPath = (
       fieldValue: FileFieldValue | FileFieldValueWithOption
-    ) => {
-      const path = fieldValue.path
-        .split('/')
-        .map((chunk) => (chunk === eventId ? localVersion.id : chunk))
-        .join('/')
-      return { ...fieldValue, path }
-    }
+    ) => ({ ...fieldValue, path: resolveTemporaryIdInPath(fieldValue.path) })
 
     const replaceTemporaryIdInObject = (obj: object) => {
       return Object.fromEntries(
         Object.entries(obj).map(([key, value]) => {
-          const maybeFile = FileFieldValue.safeParse(value)
-          if (maybeFile.success) {
-            return [key, replaceTemporaryIdInDocumentPath(maybeFile.data)]
+          if (isFileFieldValue(value)) {
+            return [key, replaceTemporaryIdInDocumentPath(value)]
           }
-          const maybeFileWithOptions = FileFieldWithOptionValue.safeParse(value)
-          if (maybeFileWithOptions.success) {
-            const filesWithActualUrls = maybeFileWithOptions.data.map((file) =>
+          if (isFileFieldWithOptionValue(value)) {
+            const filesWithActualUrls = value.map((file) =>
               replaceTemporaryIdInDocumentPath(file)
             )
             return [key, filesWithActualUrls]
@@ -102,8 +76,22 @@ export function waitUntilEventIsCreated<T extends { eventId: string }, R>(
         ? replaceTemporaryIdInObject(params.annotation)
         : {}
 
+    const paramsWithResolvedFiles = deepMerge(
+      deepMerge(params, { declaration }),
+      {
+        annotation
+      }
+    )
+
+    if (!isTemporaryId(eventId)) {
+      // Files attached before the event synced keep the temporary id in their path.
+      return canonicalMutationFn({ ...paramsWithResolvedFiles, eventId })
+    }
+
+    const localVersion = getCreatedEvent(eventId)
+
     return canonicalMutationFn({
-      ...deepMerge(deepMerge(params, { declaration }), { annotation }),
+      ...paramsWithResolvedFiles,
       eventId: localVersion.id,
       eventType: localVersion.type
     })
@@ -150,7 +138,7 @@ export function setMutationDefaults<
 }
 
 /**
- * Sets the default options for a mutation procedure.
+ * Sets the default options for a query procedure.
  */
 export function setQueryDefaults<
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -205,9 +193,6 @@ export function createEventActionMutationFn<
         ...params,
         declaration: params.declaration
       })
-      if (params.type === ActionType.ASSIGN) {
-        await prefetchPotentialDuplicates(params.eventId)
-      }
       return response
     }
   )

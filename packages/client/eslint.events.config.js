@@ -10,6 +10,7 @@
  */
 
 const eventsConfig = require('../../eslint.events.config.js')
+const typescriptConfig = require('../../eslint.typescript.config.js')
 const { defineConfig } = require('eslint/config')
 
 module.exports = defineConfig([
@@ -24,12 +25,23 @@ module.exports = defineConfig([
     ],
     rules: {
       ...eventsConfig.rules,
+      ...(process.env.CI === 'true' ? typescriptConfig.rules : {}),
       'max-lines': ['warn', 600],
       'no-console': 'warn',
       '@typescript-eslint/ban-ts-comment': 'off',
       '@typescript-eslint/no-unused-vars': 'warn',
       'react/destructuring-assignment': 'warn',
       'object-shorthand': 'warn',
+      'no-restricted-syntax': [
+        ...eventsConfig.rules['no-restricted-syntax'],
+        {
+          // rules-of-hooks only recognises hooks by call-site name, so `{ getFoo: useFoo }` hides a hook from it
+          selector:
+            'ObjectExpression > Property[value.type="Identifier"][value.name=/^use[A-Z]/][key.name!=/^use[A-Z]/]',
+          message:
+            'Hooks must be exposed under a `use*` key, otherwise rules-of-hooks cannot check their call sites.'
+        }
+      ],
       'react/jsx-key': 1,
       'react/jsx-no-literals': 1,
       'react/no-unused-prop-types': 1,

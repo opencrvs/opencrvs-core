@@ -27,11 +27,11 @@ Login with the connection string `postgres://<user>:<password>@localhost:5432/ev
 
 ## Migrations
 
-Unlike MongoDB and other NoSQL databases, PostgreSQL **requires** writing migrations to create tables where data is written into. This structure is called a schema.
+Unlike NoSQL databases, PostgreSQL **requires** writing migrations to create tables where data is written into. This structure is called a schema.
 
 Before migrations are run, the database is initialized using an [init script](../migration/src/migrations/postgres/0001_init.sql). This initialization is ran in the root `docker-compose.dev-deps.yml` file.
 
-See [@opencrvs/migration](/packages/migration/README.md) for more information around the migrations. See the first migration to understand the format. If you run migrations, see `## Tests` to update the test migration file.
+See [@opencrvs/migration](/packages/migration/README.md) for more information around the migrations. See the first migration to understand the format.
 
 ## Directory structure
 
@@ -65,4 +65,4 @@ The schema directory is generated with `yarn generate-db-types`, but runs automa
 
 ## Tests
 
-Tests use a migration file that is essentially a dump of the database schema. You can create it with `yarn generate-db-schema`, requires a running Postgres instance. The tests spin up a testcontainer for Postgres and create a new database for each test.
+The tests spin up a testcontainer for Postgres and run the migrations from @opencrvs/migration once into a template database. Each test gets a new database copied from that template.

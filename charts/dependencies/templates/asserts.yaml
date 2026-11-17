@@ -1,0 +1,6 @@
+{{- if not .Values.hostname }}
+{{- fail "Invalid configuration: hostname value is not defined, please check values.yaml and (or) GitHub environment DOMAIN variable" }}
+{{- end }}
+{{- if eq .Values.restore.backup_server_dir .Values.backup.backup_server_dir }}
+{{- fail "Invalid configuration: backup and restore 'backup_server_dir' is the same, please check values.yaml and (or) GitHub environment. Values should differ to avoid backup corruption." }}
+{{- end }}

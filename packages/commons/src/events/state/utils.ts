@@ -10,7 +10,12 @@
  */
 
 import { ActionType, ActionTypes } from '../ActionType'
-import { Action, ActionStatus, RegisterAction } from '../ActionDocument'
+import {
+  Action,
+  ActionBase,
+  ActionStatus,
+  RegisterAction
+} from '../ActionDocument'
 import { EventStatus } from '../EventMetadata'
 import { getOrThrow } from '../../utils'
 import { pick } from 'lodash'
@@ -22,7 +27,10 @@ import { pick } from 'lodash'
  * @returns existing actions for the given action type grouped by action status
  */
 function getActionRequests(actionType: ActionType, actions: Action[]) {
-  const filtered = actions.filter((action) => action.type === actionType)
+  const filtered = actions
+    .filter((action) => action.type === actionType)
+    // Reverse the array to get the latest action first, as there might be multiple actions of the same type.
+    .reverse()
 
   const accept = filtered.find(
     (action) => action.status === ActionStatus.Accepted
@@ -51,7 +59,7 @@ function getActionRequests(actionType: ActionType, actions: Action[]) {
 /**
  * Given action type and actions, returns the action creation metadata for the event.
  * Since we do not consistently store the request action, we need to check if it exists.
- * * @returns details of the user who created the first **Declaration** action of that type.
+ * @returns details of the user who created the latest **Declaration** action of that type.
  *
  */
 function getDeclarationActionCreationMetadata(
@@ -82,32 +90,43 @@ function getDeclarationActionCreationMetadata(
       requestAction?.createdAtLocation ?? acceptAction.createdAtLocation,
     acceptedAt: acceptAction.createdAt,
     createdByRole: requestAction?.createdByRole ?? acceptAction.createdByRole,
-    createdBySignature:
-      requestAction?.createdBySignature ?? acceptAction.createdBySignature,
     registrationNumber
   }
 }
 
 /** Actions which are considered event updates, i.e. actions which should update the 'updatedAt' fields */
-const updateActions = ActionTypes.extract([
-  ActionType.CREATE,
-  ActionType.NOTIFY,
-  ActionType.DECLARE,
-  ActionType.VALIDATE,
-  ActionType.REGISTER,
-  ActionType.REJECT,
-  ActionType.ARCHIVE,
-  ActionType.PRINT_CERTIFICATE,
-  ActionType.REQUEST_CORRECTION
-])
+const updateActions = new Set<ActionType>(
+  ActionTypes.extract([
+    ActionType.CREATE,
+    ActionType.NOTIFY,
+    ActionType.EDIT,
+    ActionType.DECLARE,
+    ActionType.REGISTER,
+    ActionType.REJECT,
+    ActionType.ARCHIVE,
+    ActionType.UNARCHIVE,
+    ActionType.PRINT_CERTIFICATE,
+    ActionType.REQUEST_CORRECTION,
+    ActionType.APPROVE_CORRECTION,
+    ActionType.REJECT_CORRECTION,
+    ActionType.REVOKE_REGISTRATION,
+    ActionType.REINSTATE_REGISTRATION,
+    ActionType.CUSTOM
+  ]).options
+)
 
 /**
- * Given action type and actions, returns the action creation metadata for the event.
- * Since we do not consistently store the request action, we need to check if it exists.
- * @returns details of last user who triggered **Declaration** action.
- * @see EventIndex for the description of the returned object.
+ * Returns the creation metadata of the last update action (Requested or Accepted).
+ * Requested actions are included so that async flows (202) correctly reflect the
+ * metadata of the user who triggered the action before country config accepts it.
  *
- * */
+ * When an Accepted action carries an originalActionId, its metadata is sourced from
+ * the original Requested action (the human who triggered it), not from the system
+ * or 3rd party that accepted it.
+ *
+ * @returns metadata of the last user who triggered a status-changing action.
+ * @see EventIndex for the description of the returned object.
+ */
 export function getActionUpdateMetadata(actions: Action[]) {
   const createAction = getOrThrow(
     actions.find((action) => action.type === ActionType.CREATE),
@@ -120,12 +139,11 @@ export function getActionUpdateMetadata(actions: Action[]) {
     'createdByUserType',
     'createdAtLocation',
     'createdByRole'
-  ]
+  ] as const
 
   return actions
-    .filter(({ type }) => updateActions.safeParse(type).success)
-    .filter(({ status }) => status === ActionStatus.Accepted)
-    .reduce(
+    .filter(({ type }) => updateActions.has(type))
+    .reduce<Pick<ActionBase, (typeof metadataFields)[number]>>(
       (_, action) => {
         if (action.originalActionId) {
           const originalAction =
@@ -142,8 +160,12 @@ export function getActionUpdateMetadata(actions: Action[]) {
  * @returns the legal statuses of the event. Event is considered legal if it has been accepted.
  * @see EventIndex for the description of the returned object.
  */
-export function getLegalStatuses(actions: Action[]) {
+export function getLegalStatuses(actions: Action[], status: EventStatus) {
   return {
+    [EventStatus.enum.NOTIFIED]: getDeclarationActionCreationMetadata(
+      ActionType.NOTIFY,
+      actions
+    ),
     [EventStatus.enum.DECLARED]: getDeclarationActionCreationMetadata(
       ActionType.DECLARE,
       actions
@@ -151,6 +173,14 @@ export function getLegalStatuses(actions: Action[]) {
     [EventStatus.enum.REGISTERED]: getDeclarationActionCreationMetadata(
       ActionType.REGISTER,
       actions
-    )
+    ),
+    // A later reinstate does not remove the revoke action, so only report it while the record is still revoked.
+    [EventStatus.enum.REVOKED]:
+      status === EventStatus.enum.REVOKED
+        ? getDeclarationActionCreationMetadata(
+            ActionType.REVOKE_REGISTRATION,
+            actions
+          )
+        : null
   }
 }

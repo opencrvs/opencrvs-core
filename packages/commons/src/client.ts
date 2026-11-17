@@ -8,18 +8,25 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
+// eslint-disable-next-line import/no-unassigned-import
+import 'zod/compile' // enables compile-by-default. Perf boost.
+
 export * from './search'
 export * from './events'
-export * from './scopes'
+export * from './users/scopes'
+export * from './users/Role'
 export * from './documents'
 export * from './uuid'
 export * from './utils'
 export * from './conditionals/validate'
-export { DEFAULT_ROLES_DEFINITION } from './authentication'
 export * from './fixtures'
-export * from './users/User'
-export * from './authentication'
+export * from './users'
+export * from './users/authentication'
 export * from './url'
 export * from './events/serializers/user/serializer'
 export * from './events/serializers/date/serializer'
-export { TriggerEvent } from './notification'
+export * from './events/mocks.test.utils'
+export { TriggerEvent } from './notification/UserNotifications'
+export * from './application-config'
+export * from './icons'
+export { findPendingCorrectionAction } from './events/state/flags'

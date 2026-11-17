@@ -10,6 +10,7 @@
  */
 
 import { beforeEach, describe, expect, it, vi } from 'vitest'
+import * as z from 'zod/v4'
 import {
   CertificateTemplateConfig,
   event,
@@ -38,6 +39,8 @@ vi.mock('@client/v2-events/hooks/useAppConfig', () => ({
 
 describe('useCertificateTemplateSelectorFieldConfig', () => {
   beforeEach(() => {
+    z.globalRegistry.clear()
+
     vi.resetModules()
     vi.clearAllMocks()
     mockTemplates = []
@@ -113,7 +116,7 @@ describe('useCertificateTemplateSelectorFieldConfig', () => {
     })
 
     it('should show only basic template when template requires multiple print actions but only one exists', async () => {
-      const { ActionType, generateActionDocument, tennisClubMembershipEvent } =
+      const { ActionType, generateActionDocuments, tennisClubMembershipEvent } =
         await import('@opencrvs/commons/client')
 
       mockTemplates = [
@@ -121,14 +124,14 @@ describe('useCertificateTemplateSelectorFieldConfig', () => {
         tennisClubMembershipCertificateWithMultiplePrintConditionals
       ]
 
-      const printAction = generateActionDocument({
+      const printActionPair = generateActionDocuments({
         configuration: tennisClubMembershipEvent,
         action: ActionType.PRINT_CERTIFICATE
       })
 
       const eventDocumentWithOnePrint = {
         ...testEventDocument,
-        actions: [...testEventDocument.actions, printAction]
+        actions: [...testEventDocument.actions, ...printActionPair]
       }
 
       const { useCertificateTemplateSelectorFieldConfig } = await import(
@@ -194,18 +197,18 @@ describe('useCertificateTemplateSelectorFieldConfig', () => {
         conditionalTemplate
       ]
 
-      const { ActionType, generateActionDocument, tennisClubMembershipEvent } =
+      const { ActionType, generateActionDocuments, tennisClubMembershipEvent } =
         await import('@opencrvs/commons/client')
 
       // Create two print actions to exceed maxCount(1)
-      const printAction1 = generateActionDocument({
+      const firstPrintActionPair = generateActionDocuments({
         configuration: tennisClubMembershipEvent,
         action: ActionType.PRINT_CERTIFICATE,
         defaults: {
           content: { templateId: 'tennis-club-membership-certificate' }
         }
       })
-      const printAction2 = generateActionDocument({
+      const secondPrintActionPair = generateActionDocuments({
         configuration: tennisClubMembershipEvent,
         action: ActionType.PRINT_CERTIFICATE,
         defaults: {
@@ -217,7 +220,11 @@ describe('useCertificateTemplateSelectorFieldConfig', () => {
 
       const eventWithExcessivePrints = {
         ...testEventDocument,
-        actions: [...testEventDocument.actions, printAction1, printAction2]
+        actions: [
+          ...testEventDocument.actions,
+          ...firstPrintActionPair,
+          ...secondPrintActionPair
+        ]
       }
 
       const { useCertificateTemplateSelectorFieldConfig } = await import(
@@ -254,9 +261,9 @@ describe('useCertificateTemplateSelectorFieldConfig', () => {
         conditionalTemplate
       ]
 
-      const { ActionType, generateActionDocument, tennisClubMembershipEvent } =
+      const { ActionType, generateActionDocuments, tennisClubMembershipEvent } =
         await import('@opencrvs/commons/client')
-      const printBasicAction = generateActionDocument({
+      const printBasicActionPair = generateActionDocuments({
         configuration: tennisClubMembershipEvent,
         action: ActionType.PRINT_CERTIFICATE,
         defaults: {
@@ -265,7 +272,7 @@ describe('useCertificateTemplateSelectorFieldConfig', () => {
       })
       const eventWithBasicPrint = {
         ...testEventDocument,
-        actions: [...testEventDocument.actions, printBasicAction]
+        actions: [...testEventDocument.actions, ...printBasicActionPair]
       }
 
       const { useCertificateTemplateSelectorFieldConfig } = await import(
@@ -292,22 +299,26 @@ describe('useCertificateTemplateSelectorFieldConfig', () => {
         tennisClubMembershipCertificateWithMultiplePrintConditionals
       ]
 
-      const { ActionType, generateActionDocument, tennisClubMembershipEvent } =
+      const { ActionType, generateActionDocuments, tennisClubMembershipEvent } =
         await import('@opencrvs/commons/client')
 
-      const printAction1 = generateActionDocument({
+      const firstPrintActionPair = generateActionDocuments({
         configuration: tennisClubMembershipEvent,
         action: ActionType.PRINT_CERTIFICATE
       })
 
-      const printAction2 = generateActionDocument({
+      const secondPrintActionPair = generateActionDocuments({
         configuration: tennisClubMembershipEvent,
         action: ActionType.PRINT_CERTIFICATE
       })
 
       const eventWithTwoPrintActions = {
         ...testEventDocument,
-        actions: [...testEventDocument.actions, printAction1, printAction2]
+        actions: [
+          ...testEventDocument.actions,
+          ...firstPrintActionPair,
+          ...secondPrintActionPair
+        ]
       }
 
       const { useCertificateTemplateSelectorFieldConfig } = await import(
@@ -347,10 +358,10 @@ describe('useCertificateTemplateSelectorFieldConfig', () => {
         templateWithSpecificPrintConditional
       ]
 
-      const { ActionType, generateActionDocument, tennisClubMembershipEvent } =
+      const { ActionType, generateActionDocuments, tennisClubMembershipEvent } =
         await import('@opencrvs/commons/client')
 
-      const printAction = generateActionDocument({
+      const printActionPair = generateActionDocuments({
         configuration: tennisClubMembershipEvent,
         action: ActionType.PRINT_CERTIFICATE,
         defaults: {
@@ -362,7 +373,7 @@ describe('useCertificateTemplateSelectorFieldConfig', () => {
 
       const eventWithSpecificPrint = {
         ...testEventDocument,
-        actions: [...testEventDocument.actions, printAction]
+        actions: [...testEventDocument.actions, ...printActionPair]
       }
 
       const { useCertificateTemplateSelectorFieldConfig } = await import(

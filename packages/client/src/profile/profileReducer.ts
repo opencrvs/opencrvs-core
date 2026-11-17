@@ -22,20 +22,23 @@ import {
   storeToken,
   getToken,
   isTokenStillValid,
-  removeToken
+  removeToken,
+  removeAccessToken,
+  getRefreshToken,
+  storeRefreshToken,
+  ensureFreshAccessToken
 } from '@client/utils/authUtils'
 import { queries } from '@client/profile/queries'
 import * as changeLanguageActions from '@client/i18n/actions'
 import { EMPTY_STRING } from '@client/utils/constants'
-import { serviceApi } from '@client/profile/serviceApi'
 import { IStoreState } from '@client/store'
-import { ITokenPayload } from '@opencrvs/commons/client'
+import { ITokenPayload, User } from '@opencrvs/commons/client'
 
 export type ProfileState = {
   authenticated: boolean
   tokenPayload: ITokenPayload | null
   userDetailsFetched: boolean
-  userDetails: UserDetails | null
+  userDetails: User | null
   nonce: string
 }
 
@@ -74,19 +77,15 @@ export const profileReducer: LoopReducer<
             Cmd.run(
               (getState: () => IStoreState) => {
                 if (shouldRedirectBack) {
-                  const baseUrl = window.location.origin
-                  const restUrl = window.location.href.replace(baseUrl, '')
-                  const redirectToURL = new URL(
-                    restUrl === '/'
+                  const redirectUrl = window.location.pathname
+                  const params =
+                    redirectUrl === '/'
                       ? `?lang=${getState().i18n.language}`
-                      : `?lang=${getState().i18n.language}&redirectTo=${restUrl}`,
-                    window.config.LOGIN_URL
-                  ).toString()
-
-                  window.location.assign(redirectToURL)
+                      : `?lang=${getState().i18n.language}&redirectTo=${redirectUrl}`
+                  window.location.assign(`/login${params}`)
                 } else {
                   window.location.assign(
-                    `${window.config.LOGIN_URL}?lang=${getState().i18n.language}`
+                    `/login?lang=${getState().i18n.language}`
                   )
                 }
               },
@@ -96,32 +95,58 @@ export const profileReducer: LoopReducer<
           { sequence: true }
         )
       )
-    case actions.CHECK_AUTH:
-      const token = getToken()
-
-      // Remove token and language from url if these exists
-      if (window.location.search.includes('token=')) {
+    case actions.CHECK_AUTH: {
+      const refreshToken = getRefreshToken()
+      // A refresh token in the URL is an explicit (re)authentication handoff —
+      // possibly for a different user than the one whose access token is still
+      // in localStorage.
+      const refreshTokenFromUrl =
+        window.location.search.includes('refreshToken=')
+      // strip token params from the url if present
+      if (
+        window.location.search.includes('token=') ||
+        window.location.search.includes('refreshToken=')
+      ) {
         window.history.replaceState(null, '', window.location.pathname)
       }
-
+      return loop(
+        state,
+        Cmd.run(
+          async () => {
+            if (refreshToken) {
+              storeRefreshToken(refreshToken)
+            }
+            // On an explicit URL handoff, discard any still-fresh access token
+            // so it can't short-circuit the refresh — the access token must be
+            // minted from the just-handed refresh token (which may be a
+            // different user).
+            if (refreshTokenFromUrl) {
+              removeAccessToken()
+            }
+            // mints + stores an access token from the refresh token
+            // (no-op if a fresh access token already exists)
+            await ensureFreshAccessToken()
+            return getToken()
+          },
+          {
+            successActionCreator: (token: string) =>
+              actions.checkAuthComplete(token),
+            failActionCreator: () => actions.redirectToAuthentication(true)
+          }
+        )
+      )
+    }
+    case actions.CHECK_AUTH_COMPLETE: {
+      const token = action.payload.token
       const payload = getTokenPayload(token)
-
       if (!payload) {
         return loop(
-          {
-            ...state,
-            authenticated: false
-          },
+          { ...state, authenticated: false },
           Cmd.action(actions.redirectToAuthentication(true))
         )
       }
-
       return loop(
-        {
-          ...state,
-          authenticated: true,
-          tokenPayload: payload
-        },
+        { ...state, authenticated: true, tokenPayload: payload },
         Cmd.list([
           Cmd.run(() => {
             if (isTokenStillValid(payload)) {
@@ -131,30 +156,20 @@ export const profileReducer: LoopReducer<
           Cmd.action(actions.setInitialUserDetails())
         ])
       )
+    }
     case actions.SET_USER_DETAILS:
-      const result = action.payload
-      const data = result && result.data
-
-      if (data && data.getUser) {
-        const userDetails = data.getUser
-
-        return loop(
-          {
-            ...state,
-            userDetailsFetched: true,
-            userDetails
-          },
-          Cmd.list([
-            Cmd.run(() => storeUserDetails(userDetails)),
-            Cmd.action(actions.userDetailsAvailable(userDetails))
-          ])
-        )
-      } else {
-        return {
+      const userDetails = action.payload
+      return loop(
+        {
           ...state,
-          userDetailsFetched: false
-        }
-      }
+          userDetailsFetched: true,
+          userDetails
+        },
+        Cmd.list([
+          Cmd.run(() => storeUserDetails(userDetails)),
+          Cmd.action(actions.userDetailsAvailable(userDetails))
+        ])
+      )
     case actions.MODIFY_USER_DETAILS:
       const modifiedDetails = action.payload
       if (state.userDetails) {
@@ -197,7 +212,7 @@ export const profileReducer: LoopReducer<
         state.tokenPayload &&
         (!userDetailsCollection ||
           'systemRole' in userDetailsCollection ||
-          userDetailsCollection.userMgntUserID !== state.tokenPayload.sub)
+          userDetailsCollection.id !== state.tokenPayload.sub)
       ) {
         return loop(
           {
@@ -210,37 +225,28 @@ export const profileReducer: LoopReducer<
           })
         )
       } else {
+        const immediateCmd = Cmd.action(
+          actions.userDetailsAvailable(userDetailsCollection!)
+        )
+        // Use the cached value immediately so offline data loading is not delayed,
+        // but also re-fetch from the server so stale fields (e.g. primaryOfficeId
+        // changed by an admin) are corrected without requiring a re-login.
         return loop(
           {
             ...state,
             userDetails: userDetailsCollection
           },
-          Cmd.action(actions.userDetailsAvailable(userDetailsCollection!))
+          state.tokenPayload
+            ? Cmd.list([
+                immediateCmd,
+                Cmd.run(queries.fetchUserDetails, {
+                  successActionCreator: actions.setUserDetails,
+                  args: [state.tokenPayload.sub]
+                })
+              ])
+            : immediateCmd
         )
       }
-    case actions.SEND_VERIFY_CODE:
-      const { notificationEvent, phoneNumber, email } = action.payload
-      if (state.tokenPayload && notificationEvent && (phoneNumber || email)) {
-        return loop(
-          {
-            ...state
-          },
-          Cmd.run(serviceApi.sendVerifyCode, {
-            successActionCreator: actions.SendVerifyCodeSuccess,
-            args: [action.payload]
-          })
-        )
-      }
-      return state
-    case actions.SEND_VERIFY_CODE_COMPLETED:
-      const successPayload = action.payload
-      if (
-        state.tokenPayload &&
-        (!successPayload || successPayload.userId === state.tokenPayload.sub)
-      ) {
-        return { ...state, nonce: successPayload.nonce }
-      }
-      return state
 
     default:
       return state

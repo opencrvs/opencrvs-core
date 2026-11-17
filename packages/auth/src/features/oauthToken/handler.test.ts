@@ -8,47 +8,89 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import * as fetchAny from 'jest-fetch-mock'
 import { AuthServer, createServer } from '@auth/server'
 import * as authService from '@auth/features/authenticate/service'
 
-const fetch = fetchAny as fetchAny.FetchMock
+const CREDENTIALS =
+  'client_id=123&client_secret=456&grant_type=client_credentials'
+
+const formEncodedRequest = (payload: string) => ({
+  method: 'POST' as const,
+  url: '/token',
+  payload,
+  headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
+})
+
 describe('authenticate handler receives a request', () => {
   let server: AuthServer
+  let authenticateSystem: jest.SpyInstance
 
   beforeEach(async () => {
     server = await createServer()
+    jest
+      .spyOn(authService, 'createToken')
+      .mockReturnValue(Promise.resolve('789'))
+    authenticateSystem = jest.spyOn(authService, 'authenticateSystem')
+    authenticateSystem.mockReturnValue(
+      Promise.resolve({
+        systemId: '1',
+        status: 'active',
+        scope: []
+      })
+    )
   })
 
-  describe('user management service says credentials are not valid', () => {
+  describe('events service says credentials are not valid', () => {
     it('returns a 401 response to client', async () => {
-      fetch.mockReject(new Error())
-      const res = await server.server.inject({
-        method: 'POST',
-        url: '/token?client_id=123&client_secret=456&grant_type=client_credentials'
-      })
+      jest
+        .spyOn(authService, 'authenticateSystem')
+        .mockRejectedValue(new Error('Invalid credentials'))
+      const res = await server.server.inject(formEncodedRequest(CREDENTIALS))
 
       expect(res.statusCode).toBe(401)
     })
   })
-  describe('user management service says credentials are valid', () => {
+  describe('events service says credentials are valid', () => {
     it('returns a token to the client', async () => {
-      jest
-        .spyOn(authService, 'createToken')
-        .mockReturnValue(Promise.resolve('789'))
-      fetch.mockResponse(
-        JSON.stringify({
-          systemId: '1',
-          status: 'active',
-          scope: ['nationalId']
-        })
-      )
+      const res = await server.server.inject(formEncodedRequest(CREDENTIALS))
+
+      expect(JSON.parse(res.payload).access_token).toBe('789')
+    })
+    it('returns a token when using a JSON payload', async () => {
       const res = await server.server.inject({
         method: 'POST',
-        url: '/token?client_id=123&client_secret=456&grant_type=client_credentials'
+        url: '/token',
+        payload: {
+          client_id: '123',
+          client_secret: '456',
+          grant_type: 'client_credentials'
+        }
       })
 
       expect(JSON.parse(res.payload).access_token).toBe('789')
+    })
+  })
+
+  describe('parameters are passed in the query string', () => {
+    it('does not authenticate the client', async () => {
+      const res = await server.server.inject({
+        method: 'POST',
+        url: `/token?${CREDENTIALS}`
+      })
+
+      expect(res.statusCode).toBe(400)
+      expect(JSON.parse(res.payload).error).toBe('unsupported_grant_type')
+      expect(JSON.parse(res.payload).access_token).toBeUndefined()
+    })
+
+    it('reads the payload, ignoring what the query string carries', async () => {
+      const res = await server.server.inject({
+        ...formEncodedRequest(CREDENTIALS),
+        url: '/token?client_secret=wrong'
+      })
+
+      expect(JSON.parse(res.payload).access_token).toBe('789')
+      expect(authenticateSystem).toHaveBeenCalledWith('123', '456')
     })
   })
 })

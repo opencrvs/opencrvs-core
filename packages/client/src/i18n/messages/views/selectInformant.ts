@@ -14,8 +14,6 @@ interface IFormMessages
   extends Record<string | number | symbol, MessageDescriptor> {
   name: MessageDescriptor
   title: MessageDescriptor
-  whoIsBirthInformant: MessageDescriptor
-  whoIsDeathInformant: MessageDescriptor
   GRANDFATHER: MessageDescriptor
   GRANDMOTHER: MessageDescriptor
   MOTHER: MessageDescriptor
@@ -23,7 +21,6 @@ interface IFormMessages
   BROTHER: MessageDescriptor
   SISTER: MessageDescriptor
   LEGAL_GUARDIAN: MessageDescriptor
-  informantError: MessageDescriptor
   SON: MessageDescriptor
   OTHER: MessageDescriptor
   SON_IN_LAW: MessageDescriptor
@@ -31,8 +28,6 @@ interface IFormMessages
   DAUGHTER: MessageDescriptor
   DAUGHTER_IN_LAW: MessageDescriptor
   GRANDDAUGHTER: MessageDescriptor
-  birthErrorMessage: MessageDescriptor
-  deathErrorMessage: MessageDescriptor
   OTHER_FAMILY_MEMBER: MessageDescriptor
   birthInformantTitle: MessageDescriptor
   deathInformantTitle: MessageDescriptor
@@ -49,21 +44,6 @@ const messagesToDefine: IFormMessages = {
     id: 'informant.title',
     defaultMessage: 'Select Informant',
     description: 'Informant section title'
-  },
-  whoIsBirthInformant: {
-    defaultMessage: 'Who is informant',
-    description: 'Label for option birth informant',
-    id: 'form.field.label.informantRelation.whoIsBirthInformant'
-  },
-  whoIsDeathInformant: {
-    defaultMessage: 'Who is informant',
-    description: 'Label for option death informant',
-    id: 'form.field.label.informantRelation.whoIsDeathInformant'
-  },
-  informantError: {
-    id: 'correction.informant.error',
-    defaultMessage: 'Please select who is informant',
-    description: 'Error for corrector form'
   },
   MOTHER: {
     defaultMessage: 'Mother',
@@ -84,11 +64,6 @@ const messagesToDefine: IFormMessages = {
     defaultMessage: 'Bride',
     description: 'Label for option bride',
     id: 'form.field.label.informantRelation.bride'
-  },
-  groomAndBride: {
-    defaultMessage: 'Groom & Bride',
-    description: 'Label for option Groom & Bride',
-    id: 'form.field.label.informantRelation.groomAndBride'
   },
   GRANDFATHER: {
     defaultMessage: 'Grandfather',
@@ -164,16 +139,6 @@ const messagesToDefine: IFormMessages = {
     defaultMessage: 'Granddaughter',
     description: 'Label for option Granddaughter',
     id: 'form.field.label.informantRelation.granddaughter'
-  },
-  birthErrorMessage: {
-    defaultMessage: 'Please select who is present and applying',
-    description: 'Label for birth error message',
-    id: 'register.selectInformant.birthErrorMessage'
-  },
-  deathErrorMessage: {
-    defaultMessage: 'Please select the relationship to the deceased.',
-    description: 'Label for death error message',
-    id: 'register.selectInformant.deathErrorMessage'
   },
   OTHER_FAMILY_MEMBER: {
     defaultMessage: 'Other family member',

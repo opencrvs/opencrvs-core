@@ -9,56 +9,80 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { minioClient } from '@documents/minio/client'
-import { MINIO_BUCKET } from '@documents/minio/constants'
+import {
+  listObjectKeys,
+  removeObject,
+  removeObjects,
+  statObjectIfExists
+} from '@documents/s3/client'
+import { env } from '@documents/s3/constants'
 import * as Hapi from '@hapi/hapi'
-import { FullDocumentPath, getUserId, toDocumentPath } from '@opencrvs/commons'
+import { badRequest, forbidden } from '@hapi/boom'
+import {
+  DOCUMENT_DELETE_SCOPES,
+  DocumentPath,
+  hasAnyScope,
+  isAttachmentPath
+} from '@opencrvs/commons'
+
+/** See {@link DOCUMENT_DELETE_SCOPES} for why the check is by scope. */
+function assertCallerCanDelete(token: string) {
+  if (!hasAnyScope(token, DOCUMENT_DELETE_SCOPES)) {
+    throw forbidden('request failed: caller may not delete documents')
+  }
+}
 
 export async function deleteDocument(
   request: Hapi.Request,
   h: Hapi.ResponseToolkit
 ) {
-  // Ensure file is still in the desired format. forwarding url from gateway,
-  // '/files/{filePath*}' --> files//ocrvs/filename.jpg and the double slash is removed.
-  const filePath = FullDocumentPath.parse(request.params.filePath)
+  assertCallerCanDelete(request.headers.authorization as string)
 
-  const userId = getUserId(request.headers.authorization)
+  const documentPath = DocumentPath.parse(request.params.filePath)
 
-  if (!userId)
-    return Promise.reject(
-      new Error(
-        `request failed: Authorization token is missing or does not contain a valid user ID.`
-      )
-    )
-
-  let stat
-
-  const documentPath = toDocumentPath(filePath)
-  try {
-    stat = await minioClient.statObject(MINIO_BUCKET, documentPath)
-  } catch (error) {
-    if (error.code === 'NotFound') {
-      return h
-        .response(
-          `request failed: document ${documentPath} does not exist in bucket ${MINIO_BUCKET}`
-        )
-        .code(404)
-    }
-
-    throw error
-  }
-
-  const createdBy = stat.metaData['created-by']
-
-  if (createdBy !== userId) {
+  if (!(await statObjectIfExists(documentPath))) {
     return h
       .response(
-        `request failed: user with id ${userId} does not have permission to delete this document`
+        `request failed: document ${documentPath} does not exist in bucket ${env.S3_BUCKET}`
       )
-      .code(403)
+      .code(404)
   }
 
-  await minioClient.removeObject(MINIO_BUCKET, toDocumentPath(filePath))
+  await removeObject(documentPath)
 
   return h.response().code(204)
+}
+
+/**
+ * Deletes every object under a record's or a user's prefix. A record that is
+ * gone owns nothing, so its prefix goes with it, including files no action ever
+ * referenced.
+ */
+export async function deletePrefix(
+  request: Hapi.Request,
+  h: Hapi.ResponseToolkit
+) {
+  assertCallerCanDelete(request.headers.authorization as string)
+
+  const prefix = request.params.prefix.endsWith('/')
+    ? request.params.prefix
+    : `${request.params.prefix}/`
+
+  /*
+   * Only a whole record's or a whole user's prefix may go at once. Anything
+   * looser would let one request empty the bucket.
+   */
+  if (!isAttachmentPath(prefix)) {
+    throw badRequest(
+      `request failed: ${prefix} is not a record or user prefix, refusing to delete`
+    )
+  }
+
+  const names = await listObjectKeys(prefix)
+
+  if (names.length > 0) {
+    await removeObjects(names)
+  }
+
+  return h.response({ deleted: names.length }).code(200)
 }

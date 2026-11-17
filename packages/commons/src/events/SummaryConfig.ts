@@ -8,9 +8,47 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { z } from 'zod'
+import * as z from 'zod/v4'
 import { TranslationConfig } from './TranslationConfig'
 import { ShowConditional } from './Conditional'
+import { AvailableIcons } from '../icons'
+
+export const InfoBox = z
+  .object({
+    type: z
+      .enum(['info', 'positive', 'warning', 'negative'])
+      .describe(
+        'Semantic tint of the icon block: info (blue), positive (green), warning (orange), negative (red).'
+      ),
+    background: z
+      .enum(['tinted', 'white'])
+      .default('tinted')
+      .optional()
+      .describe(
+        'tinted reads as a recessed empty state; white reads as a standalone card.'
+      ),
+    icon: AvailableIcons.optional().describe(
+      'Icon displayed inside the icon block. Defaults to FileSearch.'
+    ),
+    heading: TranslationConfig.describe(
+      'Primary message. Short, sentence-case.'
+    ),
+    description: TranslationConfig.optional().describe(
+      'Secondary copy displayed below the heading, typically a suggested next step.'
+    ),
+    conditionals: z
+      .array(ShowConditional)
+      .default([])
+      .optional()
+      .describe(
+        'Conditions under which the info box is shown. When omitted, it is always shown.'
+      )
+  })
+  .describe(
+    'A compact icon-block + heading + description block displayed above the summary fields in the event overview.'
+  )
+
+export type InfoBox = z.infer<typeof InfoBox>
 
 const BaseField = z.object({
   emptyValueMessage: TranslationConfig.optional().describe(
@@ -29,17 +67,28 @@ const ReferenceField = BaseField.extend({
 const Field = BaseField.extend({
   id: z.string().describe('Identifier of the summary field.'),
   value: TranslationConfig.describe(
-    'Field value template supporting variables from configuration and EventMetadata (e.g. "{informant.phoneNo} {informant.email}").'
+    'Field value template supports variables from configuration (e.g. "{informant.phoneNo} {informant.email}") and EventMetadata (e.g. "{event.legalStatuses.REGISTERED.acceptedAt, date, ::dd MMMM yyyy}"). "{event.configVersionLabel}" gives the label of the configuration version that the record was created under.'
   ),
   label: TranslationConfig
 }).describe('Custom field defined for the summary view.')
 
 export const SummaryConfig = z
   .object({
+    banners: z
+      .array(InfoBox)
+      .default([])
+      .optional()
+      .describe(
+        'Info boxes displayed above the summary fields in the event overview.'
+      ),
     fields: z
       .array(z.union([Field, ReferenceField]))
       .describe('Fields displayed in the event summary view.')
   })
-  .describe('Configuration of the event summary section.')
+  .meta({
+    id: 'SummaryConfig',
+    description:
+      'Configuration of the event overview page. Defines which declaration fields appear in the record summary, optionally with custom labels, empty-value messages, and templated values.'
+  })
 
 export type SummaryConfig = z.infer<typeof SummaryConfig>

@@ -9,13 +9,13 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { Button } from '@opencrvs/components/lib/Button'
+import { Button } from '@opencrvs/components'
 import React from 'react'
 import { defineMessages, useIntl } from 'react-intl'
 import styled from 'styled-components'
 import { EventIndex } from '@opencrvs/commons/client'
 import { useOutbox } from '../features/events/useEvents/outbox'
-import { Mutation, useQueryClient } from '@tanstack/react-query'
+import { useQueryClient } from '@tanstack/react-query'
 
 const RetryAction = styled(Button)`
   height: 40px;

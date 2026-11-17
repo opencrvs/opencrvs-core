@@ -11,21 +11,136 @@
 
 import React from 'react'
 import { useIntl } from 'react-intl'
-
 import { useTypedSearchParams } from 'react-router-typesafe-routes/dom'
-import { Icon } from '@opencrvs/components/lib/Icon'
-import { CaretDown } from '@opencrvs/components/lib/Icon/all-icons'
-import { PrimaryButton } from '@opencrvs/components/lib/buttons'
-import { DropdownMenu } from '@opencrvs/components/lib/Dropdown'
-import { getOrThrow } from '@opencrvs/commons/client'
+import { Icons, Button, DropdownMenu, Icon } from '@opencrvs/components'
+import {
+  EventConfig,
+  EventIndex,
+  getOrThrow,
+  ActionType,
+  ClientSpecificAction,
+  todayISO
+} from '@opencrvs/commons/client'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
 import { messages } from '@client/i18n/messages/views/action'
 import { useAuthentication } from '@client/utils/userUtils'
 import { useUsers } from '@client/v2-events/hooks/useUsers'
-import { getUsersFullName } from '@client/v2-events/utils'
+import {
+  flattenEventIndex,
+  getUsersFullName,
+  resolveLocationName
+} from '@client/v2-events/utils'
 import { useLocations } from '@client/v2-events/hooks/useLocations'
 import { ROUTES } from '@client/v2-events/routes'
-import { useAllowedActionConfigurations } from './useAllowedActionConfigurations'
+import { useEventConfigurationForRecord } from '@client/v2-events/features/events/useEventConfiguration'
+import { useIntlFormatMessageWithFlattenedParams } from '@client/v2-events/messages/utils'
+import { useAllowedActionConfigurations } from '../../Actions/useAllowedActionConfigurations'
+import { ActionMenuItem } from '../../Actions/utils'
+
+/** This is the default order of actions if no actionOrder is defined in event configuration. */
+const DEFAULT_ACTION_ORDER = [
+  ActionType.ASSIGN,
+  ActionType.REGISTER,
+  ClientSpecificAction.CONTINUE_DRAFT,
+  ActionType.EDIT,
+  ActionType.REJECT,
+  ActionType.ARCHIVE,
+  ActionType.UNARCHIVE,
+  ActionType.DELETE,
+  ActionType.MARK_AS_DUPLICATE,
+  ActionType.PRINT_CERTIFICATE,
+  ActionType.REQUEST_CORRECTION,
+  ClientSpecificAction.REVIEW_CORRECTION_REQUEST,
+  ActionType.CUSTOM,
+  ActionType.REVOKE_REGISTRATION,
+  ActionType.REINSTATE_REGISTRATION,
+  ActionType.UNASSIGN,
+  ActionType.READ
+]
+
+export function sortActions(
+  actionMenuItems: ActionMenuItem[],
+  eventConfiguration: EventConfig
+) {
+  const sortedByDefault = actionMenuItems.sort(
+    (a, b) =>
+      DEFAULT_ACTION_ORDER.indexOf(a.type) -
+      DEFAULT_ACTION_ORDER.indexOf(b.type)
+  )
+
+  const actionOrder = eventConfiguration.actionOrder
+
+  if (!actionOrder) {
+    return sortedByDefault
+  }
+
+  const getActionIndex = (item: ActionMenuItem) => {
+    // `REVIEW_CORRECTION_REQUEST` is a client-specific action that is not part
+    // of `actionOrder`. Since it and `REQUEST_CORRECTION` are never available
+    // at the same time, sort it at the same position as `REQUEST_CORRECTION`.
+    if (item.type === ClientSpecificAction.REVIEW_CORRECTION_REQUEST) {
+      return actionOrder.indexOf(ActionType.REQUEST_CORRECTION)
+    }
+
+    // `CONTINUE_DRAFT` stands in for `DECLARE` in the menu, so it takes its configured position
+    if (item.type === ClientSpecificAction.CONTINUE_DRAFT) {
+      return actionOrder.indexOf(ActionType.DECLARE)
+    }
+
+    if ('customActionType' in item && item.customActionType) {
+      return actionOrder.indexOf(item.customActionType)
+    }
+
+    return actionOrder.indexOf(item.type)
+  }
+
+  return sortedByDefault.sort((a, b) => getActionIndex(a) - getActionIndex(b))
+}
+
+function ActionMenuItems({
+  items,
+  eventConfiguration,
+  eventIndex,
+  backTo,
+  onAction
+}: {
+  items: ActionMenuItem[]
+  eventConfiguration: EventConfig
+  eventIndex: EventIndex
+  backTo?: string
+  onAction?: () => void
+}) {
+  const sortedActions = sortActions(items, eventConfiguration)
+  const intl = useIntlFormatMessageWithFlattenedParams()
+
+  if (sortedActions.length === 0) {
+    return (
+      <DropdownMenu.Label>
+        <i>{intl.formatMessage(messages.noActionsAvailable)}</i>
+      </DropdownMenu.Label>
+    )
+  }
+
+  return sortedActions.map((action) => {
+    return (
+      <DropdownMenu.Item
+        key={
+          'customActionType' in action
+            ? `custom.${action.customActionType}`
+            : action.type
+        }
+        disabled={'disabled' in action ? action.disabled : false}
+        onClick={async () => {
+          await action.onClick(backTo)
+          onAction?.()
+        }}
+      >
+        <Icon color="currentColor" name={action.icon} size="small" />
+        {intl.formatMessage(action.label, flattenEventIndex(eventIndex))}
+      </DropdownMenu.Item>
+    )
+  })
+}
 
 export function ActionMenu({
   eventId,
@@ -35,10 +150,11 @@ export function ActionMenu({
   onAction?: () => void
 }) {
   const intl = useIntl()
-  const [{ workqueue }] = useTypedSearchParams(ROUTES.V2.EVENTS.OVERVIEW)
-  const { getUser } = useUsers()
+  const [{ backTo }] = useTypedSearchParams(ROUTES.V2.EVENTS.EVENT)
+  const { getUsers } = useUsers()
   const { getLocations } = useLocations()
-  const [locations] = getLocations.useSuspenseQuery()
+  const locations = getLocations.useSuspenseQuery()
+
   const { searchEventById } = useEvents()
 
   const maybeAuth = useAuthentication()
@@ -54,36 +170,46 @@ export function ActionMenu({
   if (eventResults.total === 0) {
     throw new Error(`Event ${eventId} not found`)
   }
-  const eventState = eventResults.results[0]
 
-  const assignedToUser = getUser.useQuery(eventState.assignedTo || '', {
-    enabled: !!eventState.assignedTo
+  const eventIndex = eventResults.results[0]
+
+  if (!eventIndex) {
+    throw new Error(`Event ${eventId} not found`)
+  }
+
+  const assignedToUser = getUsers.useQueryById(eventIndex.assignedTo || '', {
+    enabled: !!eventIndex.assignedTo
   }).data
-  const assignedUserFullName = assignedToUser
-    ? getUsersFullName(assignedToUser.name, intl.locale)
-    : ''
-  const assignedOffice = assignedToUser?.primaryOfficeId || ''
-  const assignedOfficeName =
-    locations.find((l) => l.id === assignedOffice)?.name || ''
 
-  const [modal, actionMenuItems] = useAllowedActionConfigurations(
-    eventState,
-    auth
+  const assignedUserFullName = assignedToUser
+    ? getUsersFullName(assignedToUser.name)
+    : ''
+
+  const assignedOffice = assignedToUser?.primaryOfficeId
+  // Assigned office is a present-tense surface — today's name.
+  const assignedOfficeName = resolveLocationName(
+    assignedOffice ? locations.get(assignedOffice) : undefined,
+    todayISO()
   )
 
+  const [modals, actionMenuItems] = useAllowedActionConfigurations(eventIndex)
+
+  const { eventConfiguration } = useEventConfigurationForRecord(eventIndex)
+
   const assignedToOther =
-    eventState.assignedTo && eventState.assignedTo !== auth.sub
+    eventIndex.assignedTo && eventIndex.assignedTo !== auth.sub
 
   return (
     <>
       <DropdownMenu id="action">
         <DropdownMenu.Trigger asChild>
-          <PrimaryButton
+          <Button
             data-testid="action-dropdownMenu"
-            icon={() => <CaretDown />}
+            size="medium"
+            type="primary"
           >
-            {intl.formatMessage(messages.action)}
-          </PrimaryButton>
+            {intl.formatMessage(messages.action)} <Icons.CaretDown />
+          </Button>
         </DropdownMenu.Trigger>
         <DropdownMenu.Content>
           {assignedToOther && (
@@ -97,24 +223,16 @@ export function ActionMenu({
               <DropdownMenu.Separator />
             </>
           )}
-          {actionMenuItems.map((action) => {
-            return (
-              <DropdownMenu.Item
-                key={action.type}
-                disabled={'disabled' in action ? action.disabled : false}
-                onClick={async () => {
-                  await action.onClick(workqueue)
-                  onAction?.()
-                }}
-              >
-                <Icon color="currentColor" name={action.icon} size="small" />
-                {intl.formatMessage(action.label)}
-              </DropdownMenu.Item>
-            )
-          })}
+          <ActionMenuItems
+            backTo={backTo}
+            eventConfiguration={eventConfiguration}
+            eventIndex={eventIndex}
+            items={actionMenuItems}
+            onAction={onAction}
+          />
         </DropdownMenu.Content>
       </DropdownMenu>
-      {modal}
+      {modals}
     </>
   )
 }

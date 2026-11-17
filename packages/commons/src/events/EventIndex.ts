@@ -9,19 +9,21 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { z, ZodType } from 'zod'
-import { EventMetadata, EventStatus, Flag } from './EventMetadata'
+import { z, ZodType } from 'zod/v4'
+import { EventMetadata, EventStatus } from './EventMetadata'
+import { ContainsFlags } from './Flag'
 import { EventState } from './ActionDocument'
-import { extendZodWithOpenApi } from 'zod-openapi'
+
 import { TENNIS_CLUB_MEMBERSHIP } from './Constants'
-import { TokenUserType } from '../authentication'
+import { TokenUserType } from '../users/authentication'
 import { SelectDateRangeValue } from './FieldValue'
-extendZodWithOpenApi(z)
+
+export { ContainsFlags } from './Flag'
 
 export const EventIndex = EventMetadata.extend({
   declaration: EventState
-}).openapi({
-  ref: 'EventIndex'
+}).meta({
+  id: 'EventIndex'
 })
 
 export const EventSearchIndex = z
@@ -31,8 +33,8 @@ export const EventSearchIndex = z
       type: z.string() // Ensures "type" (event-id) exists and is a string
     })
   )
-  .openapi({
-    ref: 'EventSearchIndex'
+  .meta({
+    id: 'EventSearchIndex'
   })
 
 export type EventSearchIndex = z.infer<typeof EventSearchIndex>
@@ -40,23 +42,25 @@ export type EventIndex = z.infer<typeof EventIndex>
 
 export const Fuzzy = z
   .object({ type: z.literal('fuzzy'), term: z.string() })
-  .openapi({
-    ref: 'Fuzzy'
+  .meta({
+    id: 'Fuzzy'
   })
 
 export const Exact = z
   .object({ type: z.literal('exact'), term: z.string() })
-  .openapi({
-    ref: 'Exact'
+  .meta({
+    id: 'Exact'
   })
+
+export type Exact = z.infer<typeof Exact>
 
 export const ExactStatus = z
   .object({
     type: z.literal('exact'),
     term: EventStatus
   })
-  .openapi({
-    ref: 'ExactStatus'
+  .meta({
+    id: 'ExactStatus'
   })
 
 export const ExactUserType = z
@@ -64,8 +68,8 @@ export const ExactUserType = z
     type: z.literal('exact'),
     term: TokenUserType
   })
-  .openapi({
-    ref: 'ExactUserType'
+  .meta({
+    id: 'ExactUserType'
   })
 
 export const AnyOf = z
@@ -73,8 +77,8 @@ export const AnyOf = z
     type: z.literal('anyOf'),
     terms: z.array(z.string())
   })
-  .openapi({
-    ref: 'AnyOf'
+  .meta({
+    id: 'AnyOf'
   })
 
 export const AnyOfStatus = z
@@ -82,8 +86,17 @@ export const AnyOfStatus = z
     type: z.literal('anyOf'),
     terms: z.array(EventStatus)
   })
-  .openapi({
-    ref: 'AnyOfStatus'
+  .meta({
+    id: 'AnyOfStatus'
+  })
+
+export const NoneOfStatus = z
+  .object({
+    type: z.literal('noneOf'),
+    terms: z.array(EventStatus)
+  })
+  .meta({
+    id: 'NoneOfStatus'
   })
 
 export const Range = z
@@ -92,37 +105,29 @@ export const Range = z
     gte: z.string(),
     lte: z.string()
   })
-  .openapi({
-    ref: 'Range'
-  })
-
-export const ContainsFlags = z
-  .object({
-    anyOf: z.array(Flag).optional(),
-    noneOf: z.array(Flag).optional()
-  })
-  .openapi({
-    ref: 'ContainsFlags'
+  .meta({
+    id: 'Range'
   })
 
 export const Within = z
   .object({ type: z.literal('within'), location: z.string() })
-  .openapi({
-    ref: 'Within'
+  .meta({
+    id: 'Within'
   })
+export type Within = z.infer<typeof Within>
 
 const RangeDate = z
   .object({
     type: z.literal('range'),
-    gte: z.string().date().or(z.string().datetime()),
-    lte: z.string().date().or(z.string().datetime())
+    gte: z.iso.date().or(z.iso.datetime()),
+    lte: z.iso.date().or(z.iso.datetime())
   })
-  .openapi({ ref: 'RangeDate' })
+  .meta({ id: 'RangeDate' })
 
 export const ExactDate = Exact.extend({
-  term: z.string().date().or(z.string().datetime())
-}).openapi({
-  ref: 'ExactDate'
+  term: z.iso.date().or(z.iso.datetime())
+}).meta({
+  id: 'ExactDate'
 })
 
 const TimePeriod = z
@@ -130,15 +135,13 @@ const TimePeriod = z
     type: z.literal('timePeriod'),
     term: SelectDateRangeValue
   })
-  .openapi({
-    ref: 'TimePeriod'
+  .meta({
+    id: 'TimePeriod'
   })
 
-export const DateCondition = z
-  .union([ExactDate, RangeDate, TimePeriod])
-  .openapi({
-    ref: 'DateCondition'
-  })
+export const DateCondition = z.union([ExactDate, RangeDate, TimePeriod]).meta({
+  id: 'DateCondition'
+})
 
 export type DateCondition = z.infer<typeof DateCondition>
 
@@ -151,8 +154,8 @@ export const QueryInput: ZodType = z
       z.record(z.string(), QueryInput)
     ])
   )
-  .openapi({
-    ref: 'QueryInput'
+  .meta({
+    id: 'QueryInput'
   })
 export type BaseInput =
   | z.infer<typeof Fuzzy>
@@ -173,17 +176,16 @@ export const QueryExpression = z
   .object({
     id: z.optional(z.string()),
     eventType: z.string(),
-    status: z.optional(z.union([AnyOfStatus, ExactStatus])),
+    status: z.optional(z.union([AnyOfStatus, NoneOfStatus, ExactStatus])),
     createdAt: z.optional(DateCondition),
     updatedAt: z.optional(DateCondition),
+    'legalStatuses.DECLARED.createdAtLocation': z.optional(Within).nullable(),
+    'legalStatuses.DECLARED.createdByRole': z.optional(AnyOf),
     'legalStatuses.REGISTERED.acceptedAt': z.optional(DateCondition),
-    'legalStatuses.DECLARED.createdAtLocation': z.optional(
-      z.union([Within, Exact])
-    ),
-    'legalStatuses.REGISTERED.createdAtLocation': z.optional(
-      z.union([Within, Exact])
-    ),
+    'legalStatuses.REGISTERED.createdAtLocation': z.optional(Within).nullable(),
+    'legalStatuses.REGISTERED.createdByRole': z.optional(AnyOf),
     'legalStatuses.REGISTERED.registrationNumber': z.optional(Exact),
+    'legalStatuses.REVOKED.createdAtLocation': z.optional(Within).nullable(),
     createdAtLocation: z.optional(z.union([Within, Exact])),
     updatedAtLocation: z.optional(z.union([Within, Exact])),
     assignedTo: z.optional(Exact),
@@ -198,22 +200,26 @@ export const QueryExpression = z
   })
   .partial()
   .refine((obj) => Object.values(obj).some((val) => val !== undefined), {
-    message: 'At least one query field must be specified.'
+    error: 'At least one query field must be specified.'
   })
-  .openapi({
-    ref: 'QueryExpression'
+  .meta({
+    id: 'QueryExpression'
   })
 
 // Use `ZodType` here to avoid locking the output type prematurely —
 // this keeps recursive inference intact and allows `z.infer<typeof QueryType>` to work correctly.
-export const QueryType: ZodType = z
+export type QueryTypeShape = {
+  type: 'and' | 'or'
+  clauses: Array<z.infer<typeof QueryExpression> | QueryTypeShape>
+}
+export const QueryType: z.ZodType<QueryTypeShape> = z
   .lazy(() =>
     z.object({
-      type: z.literal('and').or(z.literal('or')).openapi({ default: 'and' }),
+      type: z.literal('and').or(z.literal('or')).meta({ default: 'and' }),
       clauses: z
         .array(z.union([QueryExpression, QueryType]))
         .nonempty('At least one clause is required.')
-        .openapi({
+        .meta({
           default: [
             {
               eventType: TENNIS_CLUB_MEMBERSHIP,
@@ -232,8 +238,8 @@ export const QueryType: ZodType = z
         })
     })
   )
-  .openapi({
-    ref: 'QueryType'
+  .meta({
+    id: 'QueryType'
   })
 
 function parseStringifiedQueryField(val: unknown) {
@@ -245,7 +251,7 @@ function parseStringifiedQueryField(val: unknown) {
 
 export const SearchQuery = z
   .object({
-    query: z.preprocess(parseStringifiedQueryField, QueryType).openapi({
+    query: z.preprocess(parseStringifiedQueryField, QueryType).meta({
       default: {
         type: 'and',
         clauses: [
@@ -279,19 +285,11 @@ export const SearchQuery = z
       )
       .optional()
   })
-  .openapi({
-    ref: 'SearchQuery'
+  .meta({
+    id: 'SearchQuery'
   })
 
 export type SearchQuery = z.infer<typeof SearchQuery>
 
 export type QueryType = z.infer<typeof QueryType>
 export type QueryExpression = z.infer<typeof QueryExpression>
-
-export const SearchScopeAccessLevels = {
-  MY_JURISDICTION: 'my-jurisdiction',
-  ALL: 'all'
-} as const
-
-export type SearchScopeAccessLevels =
-  (typeof SearchScopeAccessLevels)[keyof typeof SearchScopeAccessLevels]

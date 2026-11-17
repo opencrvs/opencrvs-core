@@ -18,7 +18,9 @@ import {
 import styled from 'styled-components'
 import { Props } from 'react-select/lib/Select'
 import { isEqual } from 'lodash'
+import { useIntl } from 'react-intl'
 import { Icon } from '@opencrvs/components'
+import { formMessages } from '@client/i18n/messages'
 import { Option } from '@client/v2-events/utils'
 
 /* Based on components/Select.tsx */
@@ -155,7 +157,7 @@ function getSelectedOption<T>(
   return selectedOption ?? null
 }
 
-export interface SelectProps<T>
+interface SelectProps<T>
   extends Omit<StyledSelectProps, 'value' | 'onChange' | 'options'> {
   searchableLength?: number
   onChange: (option: Option<T>) => void
@@ -172,6 +174,7 @@ export function Select<T>({
   value,
   ...props
 }: SelectProps<T>) {
+  const intl = useIntl()
   const valueFromOptions = getSelectedOption(value, options)
 
   return (
@@ -186,6 +189,7 @@ export function Select<T>({
       value={valueFromOptions}
       onChange={onChange}
       {...props}
+      placeholder={props.placeholder ?? intl.formatMessage(formMessages.select)}
     />
   )
 }

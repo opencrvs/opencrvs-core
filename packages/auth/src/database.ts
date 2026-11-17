@@ -12,7 +12,7 @@ import { env } from '@auth/environment'
 import { logger } from '@opencrvs/commons'
 import { createClient } from 'redis'
 
-export let redis: ReturnType<typeof createClient>
+export let redis: ReturnType<typeof createClient<{}, {}, {}, 3>>
 
 export async function stop() {
   redis.quit()
@@ -22,11 +22,14 @@ export async function start() {
   logger.info(`REDIS_HOST, ${JSON.stringify(env.REDIS_HOST)}`)
   logger.info(`REDIS_USERNAME, ${JSON.stringify(env.REDIS_USERNAME)}`)
 
-  redis = await createClient({
+  const client = createClient({
     username: env.REDIS_USERNAME,
     password: env.REDIS_PASSWORD,
     socket: {
       host: env.REDIS_HOST
     }
-  }).connect()
+  })
+
+  await client.connect()
+  redis = client
 }

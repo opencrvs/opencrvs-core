@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import type { Meta, StoryObj } from '@storybook/react'
+import type { Meta, StoryObj } from '@storybook/react-vite'
 import React from 'react'
 import styled from 'styled-components'
 import {
@@ -19,6 +19,7 @@ import {
   AddressField,
   AddressType,
   getDeclaration,
+  toPlainDate,
   UUID
 } from '@opencrvs/commons/client'
 import { FormFieldGenerator } from '@client/v2-events/components/forms/FormFieldGenerator'
@@ -67,7 +68,7 @@ export default meta
 type FormStory = StoryObj<typeof FormFieldGenerator>
 
 const leafAdminStructureLocationId =
-  '62a0ccb4-880d-4f30-8882-f256007dfff9' as UUID
+  '1d4e5f6a-7b8c-4912-8efa-345678901234' as UUID
 
 export const DefaultAddressField: FormStory = {
   name: 'Empty address input'
@@ -156,7 +157,10 @@ export const AddressFieldWithUserPrimaryOfficeAddress: FormStory = {
         defaultValue: {
           country: 'BGD',
           addressType: AddressType.DOMESTIC,
-          administrativeArea: leafAdminStructureLocationId
+          administrativeArea: {
+            $userField: 'primaryOfficeId',
+            $location: 'district'
+          }
         },
         configuration: {
           streetAddressForm: [
@@ -310,7 +314,7 @@ export const AddressInCopy: ReviewStory = {
   name: 'Address to string',
   render: function Component() {
     const allFields = declarationForm.pages.map((page) => page.fields).flat()
-    const stringifier = useFormDataStringifier()
+    const stringifier = useFormDataStringifier(toPlainDate('2025-01-01'))
     const flattenedIntl = useIntlFormatMessageWithFlattenedParams()
     const FORM_DATA = {
       'applicant.address': {

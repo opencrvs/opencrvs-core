@@ -9,14 +9,14 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import type { Meta, StoryObj } from '@storybook/react'
-import { expect, userEvent, waitFor, within } from '@storybook/test'
+import { expect, userEvent, waitFor, within } from 'storybook/test'
 import { createTRPCMsw, httpLink } from '@vafanassieff/msw-trpc'
 import superjson from 'superjson'
 import {
   ActionType,
-  EventConfig,
   FieldConfig,
-  tennisClubMembershipEvent
+  tennisClubMembershipEvent,
+  toVersionedEventConfig
 } from '@opencrvs/commons/client'
 import { AppRouter } from '@client/v2-events/trpc'
 import { ROUTES, routesConfig } from '@client/v2-events/routes'
@@ -158,20 +158,27 @@ export const ClearFormPage: Story = {
 
 const EMAIL_DEFAULT = 'a@b.co'
 
-const eventWithEmailDefault: EventConfig = {
+const eventWithEmailDefault = toVersionedEventConfig({
   ...tennisClubMembershipEvent,
-  declaration: {
-    ...tennisClubMembershipEvent.declaration,
-    pages: tennisClubMembershipEvent.declaration.pages.map((page) => ({
-      ...page,
-      fields: page.fields.map((field) =>
-        field.id === 'applicant.email'
-          ? ({ ...field, defaultValue: EMAIL_DEFAULT } as FieldConfig)
-          : field
-      )
-    }))
-  }
-}
+  actions: tennisClubMembershipEvent.actions.map((action) =>
+    action.type === ActionType.DECLARE
+      ? {
+          ...action,
+          declaration: {
+            ...action.declaration,
+            pages: action.declaration.pages.map((page) => ({
+              ...page,
+              fields: page.fields.map((field) =>
+                field.id === 'applicant.email'
+                  ? ({ ...field, defaultValue: EMAIL_DEFAULT } as FieldConfig)
+                  : field
+              )
+            }))
+          }
+        }
+      : action
+  )
+})
 
 export const ClearRestoresDefaults: Story = {
   name: 'Clear button restores configured default values',

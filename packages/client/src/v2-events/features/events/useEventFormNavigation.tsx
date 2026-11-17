@@ -10,8 +10,8 @@
  */
 import React from 'react'
 import { defineMessages, useIntl } from 'react-intl'
-import { useNavigate } from 'react-router-dom'
-import { Button, ResponsiveModal, Stack, Text } from '@opencrvs/components'
+import { useLocation, useNavigate } from 'react-router-dom'
+import { Button, Dialog, Stack, Text } from '@opencrvs/components'
 import { EventIndex, isUndeclaredDraft } from '@opencrvs/commons/client'
 import { ROUTES } from '@client/v2-events/routes'
 import { useModal } from '@client/v2-events/hooks/useModal'
@@ -45,21 +45,42 @@ const modalMessages = defineMessages({
   },
   deleteDeclarationDescription: {
     id: 'register.form.modal.description.deleteDeclarationConfirm',
-    defaultMessage: `Are you certain you want to delete this draft declaration form? Please note, this action can't be undone.`,
-    description: 'Description for delete declaration confirmation modal'
+    defaultMessage: 'Are you sure you want to delete this draft?',
+    description: 'Description for delete draft confirmation modal'
   }
 })
+
+/**
+ * Returns the full URL (pathname + search) of the current page when the user
+ * is on a list-like view (workqueue or search-result). This URL is propagated
+ * as the `backTo` query param so event-detail/action flows can send the user
+ * back to exactly where they came from on exit.
+ *
+ * Returns undefined when called from any other page, in which case exit flows
+ * fall back to the home route.
+ */
+export function useCurrentBackTo(): string | undefined {
+  const location = useLocation()
+  const isOnList =
+    location.pathname.startsWith('/workqueue/') ||
+    location.pathname.startsWith('/search-result/')
+
+  if (!isOnList) {
+    return undefined
+  }
+  return location.pathname + location.search
+}
 
 export function useEventFormNavigation() {
   const intl = useIntl()
   const navigate = useNavigate()
 
   const events = useEvents()
-  const { getAllRemoteDrafts } = useDrafts()
-  const remoteDrafts = getAllRemoteDrafts()
+  const { useDisplayableDrafts, setLocalDraft } = useDrafts()
+  const displayableDrafts = useDisplayableDrafts()
+
   const deleteEvent = events.deleteEvent.useMutation()
 
-  const { setLocalDraft } = useDrafts()
   const clearForm = useEventFormData((state) => state.clear)
   const clearAnnotation = useActionAnnotation((state) => state.clear)
 
@@ -67,10 +88,6 @@ export function useEventFormNavigation() {
 
   function goToHome() {
     navigate(ROUTES.V2.path)
-  }
-
-  function goToWorkqueue(slug: string) {
-    navigate(ROUTES.V2.WORKQUEUES.WORKQUEUE.buildPath({ slug }))
   }
 
   function clearEphemeralFormState() {
@@ -85,25 +102,28 @@ export function useEventFormNavigation() {
   }
 
   /**
-   * Accepts an optional workqueue slug to navigate to after closing the view.
+   * Accepts an optional back-to URL (full pathname + search) — typically the
+   * originating workqueue or search-result page captured via `useCurrentBackTo`.
+   * Falls through to home if not set.
    *
    * DO NOT pass this function directly to `onClick` handlers like `onClick={closeActionView}`
    * because React will inject a MouseEvent as the first argument.
    *
    * Always wrap in an arrow function instead: `onClick={() => closeActionView()}`
-   *
-   * If you have a `string | undefined` (e.g. `slug`), you can pass it directly:
-   * `closeActionView(slug)`
    */
-  function closeActionView(workqueueToGoBackTo?: string) {
-    workqueueToGoBackTo ? goToWorkqueue(workqueueToGoBackTo) : goToHome()
+  function closeActionView(backTo?: string) {
+    if (backTo) {
+      navigate(backTo)
+    } else {
+      goToHome()
+    }
     clearEphemeralFormState()
   }
 
-  async function exit(event: EventIndex) {
+  async function exit(event: EventIndex, backTo?: string) {
     const exitConfirm = await openModal<boolean | null>((close) => (
-      <ResponsiveModal
-        autoHeight
+      <Dialog
+        isOpen
         actions={[
           <Button
             key="cancel_save_without_exit"
@@ -126,37 +146,35 @@ export function useEventFormNavigation() {
             {intl.formatMessage(modalMessages.confirm)}
           </Button>
         ]}
-        handleClose={() => close(null)}
-        responsive={false}
-        show={true}
         title={intl.formatMessage(modalMessages.exitWithoutSavingTitle)}
+        onClose={() => close(null)}
       >
         <Stack>
           <Text color="grey500" element="p" variant="reg16">
             {intl.formatMessage(modalMessages.exitWithoutSavingDescription)}
           </Text>
         </Stack>
-      </ResponsiveModal>
+      </Dialog>
     ))
 
     if (!exitConfirm) {
       return
     }
-    const hasDrafts = remoteDrafts.find((draft) => draft.eventId === event.id)
+
+    const hasDrafts = displayableDrafts.find(
+      (draft) => draft.eventId === event.id
+    )
     if (isUndeclaredDraft(event.status) && !hasDrafts) {
       deleteEvent.mutate({ eventId: event.id })
     }
 
-    closeActionView()
+    closeActionView(backTo)
   }
 
-  async function deleteDeclaration(
-    eventId: string,
-    workqueueToGoBackTo?: string
-  ) {
+  async function deleteDeclaration(eventId: string, backTo?: string) {
     const deleteConfirm = await openModal<boolean | null>((close) => (
-      <ResponsiveModal
-        autoHeight
+      <Dialog
+        isOpen
         actions={[
           <Button
             key="cancel_delete"
@@ -179,22 +197,20 @@ export function useEventFormNavigation() {
             {intl.formatMessage(modalMessages.confirm)}
           </Button>
         ]}
-        handleClose={() => close(null)}
-        responsive={false}
-        show={true}
         title={intl.formatMessage(modalMessages.deleteDeclarationTitle)}
+        onClose={() => close(null)}
       >
         <Stack>
           <Text color="grey500" element="p" variant="reg16">
             {intl.formatMessage(modalMessages.deleteDeclarationDescription)}
           </Text>
         </Stack>
-      </ResponsiveModal>
+      </Dialog>
     ))
 
     if (deleteConfirm) {
       deleteEvent.mutate({ eventId })
-      closeActionView(workqueueToGoBackTo)
+      closeActionView(backTo)
     }
   }
 

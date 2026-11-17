@@ -8,17 +8,20 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import type { Meta } from '@storybook/react'
-import { ActionType } from '@opencrvs/commons/client'
-import { AssignmentStatus } from '@client/v2-events/utils'
+import type { Meta } from '@storybook/react-vite'
+import {
+  TestUserRole,
+  ActionType,
+  AssignmentStatus
+} from '@opencrvs/commons/client'
+
 import { ActionMenu } from '../../ActionMenu'
 import {
   baseMeta,
   getHiddenActions,
   createStoriesFromScenarios,
   AssertType,
-  Scenario,
-  UserRoles
+  Scenario
 } from '../ActionMenu.common'
 
 export default {
@@ -34,16 +37,15 @@ const registeredScenariosForRegistrationAgent: Scenario[] = [
       ActionType.CREATE,
       AssignmentStatus.ASSIGNED_TO_SELF,
       ActionType.DECLARE,
-      ActionType.VALIDATE,
       ActionType.REGISTER,
       ActionType.UNASSIGN
     ],
     expected: {
       ...getHiddenActions(),
-      [ActionType.ASSIGN]: AssertType.ENABLED,
-      [ActionType.READ]: AssertType.ENABLED,
-      [ActionType.PRINT_CERTIFICATE]: AssertType.DISABLED,
-      [ActionType.REQUEST_CORRECTION]: AssertType.DISABLED
+      ['Assign']: AssertType.ENABLED,
+      ['Print certificate']: AssertType.DISABLED,
+      ['Request correction']: AssertType.DISABLED,
+      ['Revoke registration']: AssertType.DISABLED
     }
   },
   {
@@ -53,15 +55,14 @@ const registeredScenariosForRegistrationAgent: Scenario[] = [
       ActionType.CREATE,
       AssignmentStatus.ASSIGNED_TO_SELF,
       ActionType.DECLARE,
-      ActionType.VALIDATE,
       ActionType.REGISTER
     ],
     expected: {
       ...getHiddenActions(),
-      [ActionType.UNASSIGN]: AssertType.ENABLED,
-      [ActionType.READ]: AssertType.ENABLED,
-      [ActionType.PRINT_CERTIFICATE]: AssertType.ENABLED,
-      [ActionType.REQUEST_CORRECTION]: AssertType.ENABLED
+      ['Unassign']: AssertType.ENABLED,
+      ['Print certificate']: AssertType.ENABLED,
+      ['Request correction']: AssertType.ENABLED,
+      ['Revoke registration']: AssertType.ENABLED
     }
   },
   {
@@ -71,23 +72,22 @@ const registeredScenariosForRegistrationAgent: Scenario[] = [
       ActionType.CREATE,
       AssignmentStatus.ASSIGNED_TO_SELF,
       ActionType.DECLARE,
-      ActionType.VALIDATE,
       ActionType.REGISTER,
       ActionType.UNASSIGN,
       AssignmentStatus.ASSIGNED_TO_OTHERS
     ],
     expected: {
       ...getHiddenActions(),
-      [ActionType.READ]: AssertType.ENABLED,
-      [ActionType.PRINT_CERTIFICATE]: AssertType.DISABLED,
-      [ActionType.REQUEST_CORRECTION]: AssertType.DISABLED
+      ['Print certificate']: AssertType.DISABLED,
+      ['Request correction']: AssertType.DISABLED,
+      ['Revoke registration']: AssertType.DISABLED
     }
   }
 ]
 
 const stories = createStoriesFromScenarios(
   registeredScenariosForRegistrationAgent,
-  UserRoles.REGISTRATION_AGENT
+  TestUserRole.enum.REGISTRATION_AGENT
 )
 
 export const Unassigned = stories['Unassigned']

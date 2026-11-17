@@ -11,24 +11,29 @@
 import * as React from 'react'
 import { ReactElement } from 'react'
 import styled from 'styled-components'
-import { ICON_ALIGNMENT, TertiaryButton } from '../buttons'
-import { colors } from '../colors'
-import { BackArrow } from '../icons'
+import { colors } from '../tokens'
 
 const Container = styled.div<{ size: ContentSize }>`
   position: relative;
   border-radius: 4px;
   box-sizing: border-box;
   margin: 24px auto;
+  /*
+   * The 48px is the gutter. It has to come off the width rather than go on as
+   * a margin, because 'margin: auto' only shares out space that is left over:
+   * once the region is narrower than the card there is none, the margins
+   * compute to zero, and the card sits flush against the navigation and the
+   * window.
+   */
   max-width: ${({ size }) => {
     switch (size) {
       case 'large':
-        return '1140px'
+        return 'min(1140px, 100% - 48px)'
       case 'normal':
-        return '778px'
+        return 'min(778px, 100% - 48px)'
       case 'small':
       default:
-        return '568px'
+        return 'min(568px, 100% - 48px)'
     }
   }};
   border: 1px solid ${({ theme }) => theme.colors.grey300};
@@ -151,7 +156,9 @@ const Title = styled.div`
 `
 
 const Icon = styled.div`
-  height: 24px;
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
   background-color: ${({ theme }) => theme.colors.white};
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
     display: none;
@@ -174,8 +181,6 @@ export enum ContentSize {
 interface IProps {
   id?: string
   icon?: () => React.ReactNode
-  backButtonLabel?: string
-  backButtonAction?: () => void
   title?: string | React.ReactNode
   titleColor?: keyof typeof colors
   showTitleOnMobile?: boolean
@@ -193,8 +198,6 @@ interface IProps {
 
 export const UnstyledContent = ({
   icon,
-  backButtonLabel,
-  backButtonAction,
   title,
   titleColor,
   showTitleOnMobile,
@@ -211,17 +214,6 @@ export const UnstyledContent = ({
 }: IProps) => (
   <Container size={size} className={className}>
     <Header>
-      {backButtonLabel && (
-        <BackButtonContainer>
-          <TertiaryButton
-            align={ICON_ALIGNMENT.LEFT}
-            icon={() => <BackArrow />}
-            onClick={backButtonAction}
-          >
-            {backButtonLabel}
-          </TertiaryButton>
-        </BackButtonContainer>
-      )}
       {(icon || title || topActionButtons) && (
         <TopBar keepShowing={showTitleOnMobile}>
           <TitleContainer titleColor={titleColor}>

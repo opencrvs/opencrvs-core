@@ -1,3 +1,4 @@
+/* eslint-disable max-lines */
 /*
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -10,8 +11,9 @@
  */
 import { TRPCError } from '@trpc/server'
 import { MutationProcedure } from '@trpc/server/unstable-core-do-not-import'
-import { z } from 'zod'
+import * as z from 'zod/v4'
 import { OpenApiMeta } from 'trpc-to-openapi'
+import { fromZodError } from 'zod-validation-error'
 import { logger, UUID } from '@opencrvs/commons'
 import {
   ActionType,
@@ -22,9 +24,11 @@ import {
   RegisterActionInput,
   RejectDeclarationActionInput,
   ArchiveActionInput,
+  UnarchiveActionInput,
+  RevokeRegistrationActionInput,
+  ReinstateRegistrationActionInput,
   PrintCertificateActionInput,
   DeclareActionInput,
-  ValidateActionInput,
   ACTION_SCOPE_MAP,
   RequestCorrectionActionInput,
   ApproveCorrectionActionInput,
@@ -32,26 +36,32 @@ import {
   getPendingAction,
   ActionInputWithType,
   EventConfig,
-  BaseActionInput
+  BaseActionInput,
+  CustomActionInput,
+  EditActionInput
 } from '@opencrvs/commons/events'
+import { EventActionAuditLog } from '@opencrvs/commons/events'
 import { TokenWithBearer } from '@opencrvs/commons/authentication'
 import * as middleware from '@events/router/middleware'
+import { setBearerForToken } from '@events/router/middleware'
 import {
-  requiresAnyOfScopes,
-  setBearerForToken
-} from '@events/router/middleware'
-import { systemProcedure } from '@events/router/trpc'
+  systemOnlyProcedure,
+  userAndSystemProcedure,
+  userOnlyProcedure
+} from '@events/router/trpc'
 
 import {
   getEventById,
   addAction,
   addAsyncRejectAction,
-  ensureEventIndexed,
+  throwConflictIfActionNotAllowed,
   processAction
 } from '@events/service/events/events'
-import { getEventConfigurationById } from '@events/service/config/config'
+import { getEventConfigurationForRecord } from '@events/service/config/config'
 import { TrpcUserContext } from '@events/context'
-import { getActionConfirmationToken } from '@events/service/auth'
+import { getServiceToken } from '@events/service/auth'
+import { writeAuditLog } from '@events/storage/postgres/events/auditLog'
+import { validateActionPayloadStructure } from '@events/router/middleware/validate/utils'
 import {
   ActionConfirmationResponse,
   requestActionConfirmation
@@ -75,6 +85,14 @@ const defaultConfig = {
 } as const
 
 const ACTION_PROCEDURE_CONFIG = {
+  [ActionType.EDIT]: {
+    ...defaultConfig,
+    inputSchema: EditActionInput
+  },
+  [ActionType.CUSTOM]: {
+    ...defaultConfig,
+    inputSchema: CustomActionInput
+  },
   [ActionType.NOTIFY]: {
     ...defaultConfig,
     inputSchema: NotifyActionInput,
@@ -82,8 +100,8 @@ const ACTION_PROCEDURE_CONFIG = {
       openapi: {
         summary: 'Notify an event',
         method: 'POST',
-        path: '/events/notifications',
-        tags: ['events'],
+        path: '/events/{eventId}/notify',
+        tags: ['Events'],
         protect: true
       }
     }
@@ -91,10 +109,6 @@ const ACTION_PROCEDURE_CONFIG = {
   [ActionType.DECLARE]: {
     ...defaultConfig,
     inputSchema: DeclareActionInput
-  },
-  [ActionType.VALIDATE]: {
-    ...defaultConfig,
-    inputSchema: ValidateActionInput
   },
   [ActionType.REGISTER]: {
     ...defaultConfig,
@@ -111,6 +125,18 @@ const ACTION_PROCEDURE_CONFIG = {
     ...defaultConfig,
     inputSchema: ArchiveActionInput
   },
+  [ActionType.UNARCHIVE]: {
+    ...defaultConfig,
+    inputSchema: UnarchiveActionInput
+  },
+  [ActionType.REVOKE_REGISTRATION]: {
+    ...defaultConfig,
+    inputSchema: RevokeRegistrationActionInput
+  },
+  [ActionType.REINSTATE_REGISTRATION]: {
+    ...defaultConfig,
+    inputSchema: ReinstateRegistrationActionInput
+  },
   [ActionType.PRINT_CERTIFICATE]: {
     ...defaultConfig,
     inputSchema: PrintCertificateActionInput
@@ -122,8 +148,8 @@ const ACTION_PROCEDURE_CONFIG = {
       openapi: {
         summary: 'Request correction for an event',
         method: 'POST',
-        path: '/events/correction/request',
-        tags: ['events'],
+        path: '/events/{eventId}/correction/request',
+        tags: ['Events'],
         protect: true
       }
     }
@@ -135,8 +161,8 @@ const ACTION_PROCEDURE_CONFIG = {
       openapi: {
         summary: 'Approve correction for an event',
         method: 'POST',
-        path: '/events/correction/approve',
-        tags: ['events'],
+        path: '/events/{eventId}/correction/approve',
+        tags: ['Events'],
         protect: true
       }
     }
@@ -148,25 +174,51 @@ const ACTION_PROCEDURE_CONFIG = {
       openapi: {
         summary: 'Reject correction for an event',
         method: 'POST',
-        path: '/events/correction/reject',
-        tags: ['events'],
+        path: '/events/{eventId}/correction/reject',
+        tags: ['Events'],
         protect: true
       }
     }
   }
 } satisfies Partial<Record<ActionType, ActionProcedureConfig>>
 
+export type ConfirmableActionType = keyof typeof ACTION_PROCEDURE_CONFIG
+
+/**
+ * Maps action types to their corresponding audit log operation names (tRPC paths).
+ * Only includes action types that should be audit-logged.
+ */
+const AUDIT_LOG_OPERATION_MAP: Partial<
+  Record<ConfirmableActionType, EventActionAuditLog['operation']>
+> = {
+  [ActionType.NOTIFY]: 'event.actions.notify.request',
+  [ActionType.DECLARE]: 'event.actions.declare.request',
+  [ActionType.REGISTER]: 'event.actions.register.request',
+  [ActionType.REJECT]: 'event.actions.reject.request',
+  [ActionType.ARCHIVE]: 'event.actions.archive.request',
+  [ActionType.UNARCHIVE]: 'event.actions.unarchive.request',
+  [ActionType.REVOKE_REGISTRATION]: 'event.actions.revoke_registration.request',
+  [ActionType.REINSTATE_REGISTRATION]:
+    'event.actions.reinstate_registration.request',
+  [ActionType.PRINT_CERTIFICATE]: 'event.actions.print_certificate.request',
+  [ActionType.EDIT]: 'event.actions.edit.request',
+  [ActionType.REQUEST_CORRECTION]: 'event.actions.correction.request.request',
+  [ActionType.APPROVE_CORRECTION]: 'event.actions.correction.approve.request',
+  [ActionType.REJECT_CORRECTION]: 'event.actions.correction.reject.request'
+}
+
 type DistributiveOmit<T, K extends keyof T> = T extends T ? Omit<T, K> : never
 
 const AsyncActionInput = BaseActionInput.pick({
   eventId: true,
   transactionId: true,
-  keepAssignment: true
+  keepAssignment: true,
+  waitFor: true
 }).extend({
   actionId: UUID
 })
 
-export type AsyncActionInput = z.infer<typeof AsyncActionInput>
+type AsyncActionInput = z.infer<typeof AsyncActionInput>
 
 const SyncActionConfirmationSchema = BaseActionInput.pick({
   declaration: true,
@@ -203,6 +255,14 @@ export async function defaultRequestHandler(
   // @TODO: Could this be typed with the actual input schema, or could these actually be anything?
   actionConfirmationResponseSchema?: z.ZodObject<z.ZodRawShape>
 ) {
+  // If keep assignment is given, we expect there to be a series of actions. (e.g. declare + register).
+  // 2.1.0 onwards, we do not support async checks for these "intermediary" actions.
+  const expectSynchronousResponse = [
+    input.keepAssignment,
+    input.keepAssignmentIfAccepted,
+    input.keepAssignmentIfRejected
+  ].some((i) => !!i)
+
   // A retry: the request was made before with the same transaction id and its requested
   // action is stored, for example because the country config call failed. Send that action
   // again instead of storing a new one, which the stored one would refuse.
@@ -213,10 +273,22 @@ export async function defaultRequestHandler(
       action.type === input.type
   )
 
+  if (!isRetry) {
+    await throwConflictIfActionNotAllowed(
+      input.eventId,
+      input.type,
+      token,
+      'customActionType' in input ? input.customActionType : undefined,
+      event
+    )
+  }
+
+  const eventActionToken = await getServiceToken()
+
   const eventWithRequestedAction = isRetry
     ? event
     : await addAction(input, {
-        event,
+        eventId: event.id,
         user,
         token,
         status: ActionStatus.Requested,
@@ -224,10 +296,7 @@ export async function defaultRequestHandler(
       })
 
   const requestedAction = getPendingAction(eventWithRequestedAction.actions)
-  const eventActionToken = await getActionConfirmationToken(
-    { eventId: input.eventId, actionId: requestedAction.id },
-    token
-  )
+
   const { responseStatus, responseBody } = await requestActionConfirmation(
     input.type,
     input.transactionId,
@@ -235,7 +304,7 @@ export async function defaultRequestHandler(
     setBearerForToken(eventActionToken)
   )
 
-  // If we get an unexpected failure response, we just return HTTP 500 without saving the
+  // If we get an unexpected failure response, we just return HTTP 500. Event stays in 'requested' / pending.
   if (responseStatus === ActionConfirmationResponse.UnexpectedFailure) {
     throw new TRPCError({
       code: 'INTERNAL_SERVER_ERROR',
@@ -245,8 +314,32 @@ export async function defaultRequestHandler(
 
   // For Async flow, we just return the event with the requested action and ensure it is indexed
   if (responseStatus === ActionConfirmationResponse.RequiresProcessing) {
-    await ensureEventIndexed(eventWithRequestedAction, configuration)
-    return eventWithRequestedAction
+    if (expectSynchronousResponse) {
+      throw new TRPCError({
+        code: 'INTERNAL_SERVER_ERROR',
+        message: 'Confirmation API did not return a synchronous response.'
+      })
+    } else {
+      const eventWithUnassign = await processAction(
+        {
+          eventId: input.eventId,
+          transactionId: input.transactionId,
+          declaration: {},
+          type: ActionType.UNASSIGN,
+          assignedTo: null,
+          waitFor: true
+        },
+        {
+          eventId: event.id,
+          user,
+          token,
+          status: ActionStatus.Accepted,
+          configuration
+        }
+      )
+
+      return eventWithUnassign
+    }
   }
 
   // For Sync flow, we parse the result and merge it with the action input
@@ -256,25 +349,48 @@ export async function defaultRequestHandler(
       ? ActionStatus.Accepted
       : ActionStatus.Rejected
 
-  const schema =
-    responseStatus === ActionConfirmationResponse.Success
-      ? SyncActionConfirmationSchema.merge(
-          actionConfirmationResponseSchema ?? z.object({})
-        )
-      : z.object({})
+  let parsedBody: z.infer<typeof SyncActionConfirmationSchema> | undefined
 
-  const maybeParsed = schema.safeParse(responseBody ?? {})
+  if (responseStatus === ActionConfirmationResponse.Success) {
+    const maybeParsed = SyncActionConfirmationSchema.safeParse(
+      responseBody ?? {}
+    )
+    // Parse separately to keep type information.
+    if (!maybeParsed.success) {
+      logger.error(fromZodError(maybeParsed.error))
+      throw new TRPCError({
+        code: 'INTERNAL_SERVER_ERROR',
+        message:
+          'Invalid payload received from country config action confirmation API'
+      })
+    }
 
-  if (!maybeParsed.success) {
-    logger.error(maybeParsed.error)
-    throw new TRPCError({
-      code: 'INTERNAL_SERVER_ERROR',
-      message:
-        'Invalid payload received from country config action confirmation API'
+    const maybeCustom = (
+      actionConfirmationResponseSchema ?? z.object({})
+    ).safeParse(responseBody ?? {})
+
+    if (!maybeCustom.success) {
+      logger.error(fromZodError(maybeCustom.error))
+      throw new TRPCError({
+        code: 'INTERNAL_SERVER_ERROR',
+        message:
+          'Invalid payload received from country config action confirmation API'
+      })
+    }
+
+    parsedBody = { ...maybeParsed.data, ...maybeCustom.data }
+
+    validateActionPayloadStructure({
+      eventConfig: configuration,
+      input: {
+        type: input.type,
+        annotation: parsedBody.annotation,
+        declaration: parsedBody.declaration,
+        customActionType:
+          input.type === ActionType.CUSTOM ? input.customActionType : undefined
+      }
     })
   }
-
-  const parsedBody = maybeParsed.data
 
   logger.debug(
     {
@@ -291,28 +407,30 @@ export async function defaultRequestHandler(
     declaration,
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     annotation,
-    keepAssignment,
-    keepAssignmentIfAccepted,
-    keepAssignmentIfRejected,
     ...strippedInput
   } = input
-
-  const effectiveKeepAssignment =
-    status === ActionStatus.Accepted
-      ? (keepAssignmentIfAccepted ?? keepAssignment ?? false)
-      : (keepAssignmentIfRejected ?? keepAssignment ?? false)
 
   return processAction(
     {
       ...strippedInput,
-      keepAssignment: effectiveKeepAssignment,
+      waitFor: input.waitFor,
       declaration: {},
       originalActionId: requestedAction.id,
       ...parsedBody
     },
-    { event, user, token, status, configuration }
+    { eventId: event.id, user, token, status, configuration }
   )
 }
+
+/**
+ * To prevent accidental access granting, we want to make sure that system users can only access events with scopes that explicitly allow system user access, even if the scope options would match the system user's context.
+ */
+const SYSTEM_USER_ALLOWED_ACTIONS = [
+  ActionType.NOTIFY,
+  ActionType.REJECT_CORRECTION,
+  ActionType.APPROVE_CORRECTION,
+  ActionType.REQUEST_CORRECTION
+] as const
 
 /**
  * Most actions share a similar model, where the action is first requested, and then either synchronously or asynchronously
@@ -326,35 +444,36 @@ export async function defaultRequestHandler(
  * @param actionType - The action type for which we want to create router handlers.
  */
 export function getDefaultActionProcedures(
-  actionType: keyof typeof ACTION_PROCEDURE_CONFIG
+  actionType: ConfirmableActionType
 ): ActionProcedure {
   const actionConfig = ACTION_PROCEDURE_CONFIG[actionType]
 
-  const requireScopesForRequestMiddleware = requiresAnyOfScopes(
-    [],
-    ACTION_SCOPE_MAP[actionType]
-  )
-
   const meta = 'meta' in actionConfig ? actionConfig.meta : {}
 
+  const userTypeBasedProcedure = SYSTEM_USER_ALLOWED_ACTIONS.some(
+    (act) => act === actionType
+  )
+    ? userAndSystemProcedure
+    : userOnlyProcedure
+
   return {
-    request: systemProcedure
+    request: userTypeBasedProcedure
       .meta(meta)
-      .use(requireScopesForRequestMiddleware)
-      .input(actionConfig.inputSchema)
-      .use(middleware.eventTypeAuthorization)
+      .use(middleware.canAccessEventWithScopes(ACTION_SCOPE_MAP[actionType]))
+      .input(actionConfig.inputSchema.strict())
       .use(middleware.requireAssignment)
-      .use(middleware.validateAction)
+      .use(middleware.validateRequestAction)
       .use(middleware.detectDuplicate)
       .use(middleware.requireLocationForSystemUserAction)
       .output(EventDocument)
       .mutation(async ({ ctx, input }) => {
         const { token, user, existingAction, duplicates } = ctx
         const { eventId } = input
-        const event = await getEventById(eventId)
-        const eventConfiguration = await getEventConfigurationById({
-          token,
-          eventType: event.type
+        const event = ctx.event
+
+        const eventConfiguration = await getEventConfigurationForRecord({
+          event: event,
+          token
         })
 
         // An action with an outcome has been handled already. A requested action without one
@@ -370,7 +489,7 @@ export function getDefaultActionProcedures(
           return duplicates.event
         }
 
-        return defaultRequestHandler(
+        const result = await defaultRequestHandler(
           input,
           user,
           token,
@@ -378,35 +497,46 @@ export function getDefaultActionProcedures(
           eventConfiguration,
           actionConfig.actionConfirmationResponseSchema
         )
-      }),
 
-    accept: systemProcedure
-      .input(
-        actionConfig.inputSchema
-          .merge(actionConfig.actionConfirmationResponseSchema ?? z.object({}))
-          .merge(AsyncActionInput)
-      )
-      .use(middleware.requireActionConfirmationAuthorization)
-      .mutation(async ({ ctx, input }) => {
-        const { token, user } = ctx
-        const { eventId, actionId } = input
-        const event = await getEventById(eventId)
-        const originalAction = event.actions.find((a) => a.id === actionId)
-        const confirmationAction = event.actions.find(
-          (a) => a.originalActionId === actionId
-        )
-        const configuration = await getEventConfigurationById({
-          token,
-          eventType: event.type
-        })
-
-        // Original action is not found
-        if (!originalAction) {
-          throw new TRPCError({
-            code: 'NOT_FOUND',
-            message: 'Action not found.'
+        const auditOperation = AUDIT_LOG_OPERATION_MAP[actionType]
+        if (auditOperation) {
+          await writeAuditLog({
+            clientId: user.id,
+            clientType: user.type,
+            operation: auditOperation,
+            requestData: {
+              eventId,
+              actionType,
+              eventType: result.type,
+              trackingId: result.trackingId,
+              transactionId: input.transactionId
+            }
           })
         }
+
+        return result
+      }),
+
+    accept: systemOnlyProcedure
+      .input(
+        actionConfig.inputSchema
+          .extend(AsyncActionInput.shape)
+          .extend(
+            (actionConfig.actionConfirmationResponseSchema ?? z.object({}))
+              .shape
+          )
+      )
+      .use(middleware.canAccessEventWithScopes(['record.action.accept']))
+      .use(middleware.requireConfirmableAction(actionType))
+      .use(middleware.requireAssignment)
+      .use(middleware.validateAcceptAction)
+      .mutation(async ({ ctx, input }) => {
+        const { token, user, event, confirmationAction } = ctx
+        const { actionId } = input
+        const configuration = await getEventConfigurationForRecord({
+          event: event,
+          token
+        })
 
         if (confirmationAction) {
           // Action is already rejected, so we throw an error
@@ -447,7 +577,7 @@ export function getDefaultActionProcedures(
             originalActionId: actionId
           },
           {
-            event,
+            eventId: event.id,
             user,
             token,
             status: ActionStatus.Accepted,
@@ -456,21 +586,14 @@ export function getDefaultActionProcedures(
         )
       }),
 
-    reject: systemProcedure
+    reject: systemOnlyProcedure
       .input(AsyncActionInput)
-      .use(middleware.requireActionConfirmationAuthorization)
+      .use(middleware.canAccessEventWithScopes(['record.action.reject']))
+      .use(middleware.requireConfirmableAction(actionType))
+      .use(middleware.requireAssignment)
       .mutation(async ({ input, ctx }) => {
-        const { eventId, actionId } = input
-        const event = await getEventById(eventId)
-        const action = event.actions.find((a) => a.id === actionId)
-        const confirmationAction = event.actions.find(
-          (a) => a.originalActionId === actionId
-        )
-
-        // Action is not found
-        if (!action) {
-          throw new Error(`Action not found.`)
-        }
+        const { event, confirmationAction, originalAction } = ctx
+        const { actionId } = input
 
         if (confirmationAction) {
           // Action is already accepted
@@ -482,14 +605,21 @@ export function getDefaultActionProcedures(
           return getEventById(input.eventId)
         }
 
-        const configuration = await getEventConfigurationById({
-          token: ctx.token,
-          eventType: event.type
+        const configuration = await getEventConfigurationForRecord({
+          event: event,
+          token: ctx.token
         })
 
         return addAsyncRejectAction(
           {
             ...input,
+            // `event_actions_check` wants a `requestId` on corrections & a reason on REJECT.
+            requestId:
+              'requestId' in originalAction
+                ? originalAction.requestId
+                : undefined,
+            content:
+              'content' in originalAction ? originalAction.content : undefined,
             type: actionType,
             originalActionId: actionId,
             keepAssignment: input.keepAssignment ?? false

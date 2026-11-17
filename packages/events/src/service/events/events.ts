@@ -9,10 +9,17 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
+/* eslint-disable max-lines */
 import { TRPCError } from '@trpc/server'
 import { NoResultError } from 'kysely'
-import { z } from 'zod'
-import { TokenUserType, TokenWithBearer, UUID } from '@opencrvs/commons'
+import * as z from 'zod/v4'
+import {
+  eventAttachmentPath,
+  logger,
+  TokenUserType,
+  TokenWithBearer,
+  UUID
+} from '@opencrvs/commons'
 import {
   ActionInputWithType,
   ActionStatus,
@@ -20,6 +27,7 @@ import {
   ActionUpdate,
   AsyncRejectActionDocument,
   EventConfig,
+  VersionedEventConfig,
   EventDocument,
   EventIndex,
   EventInput,
@@ -27,23 +35,29 @@ import {
   FieldType,
   FieldUpdateValue,
   FileFieldValue,
-  getAcceptedActions,
+  getActionConfig,
   getAvailableActionsForEvent,
   getCurrentEventState,
   getDeclarationFields,
   getStatusFromActions,
-  isWriteAction
+  isActionVisible,
+  isActionEnabled,
+  isWriteAction,
+  isFileFieldValue
 } from '@opencrvs/commons/events'
+
 import { TrpcUserContext } from '@events/context'
-import { getEventConfigurationById } from '@events/service/config/config'
+import { getEventConfigurationForRecord } from '@events/service/config/config'
+import { resolveVersionForNewRecord } from '@events/service/events/configVersion'
 import {
-  cleanupUnreferencedFiles,
-  deleteFile,
+  sweepUnreferencedFiles,
+  deleteFilesByPrefix,
   fileExists
 } from '@events/service/files'
 import { indexEvent } from '@events/service/indexing/indexing'
 import * as draftsRepo from '@events/storage/postgres/events/drafts'
 import * as eventsRepo from '@events/storage/postgres/events/events'
+import { getValidatorContext } from '@events/router/middleware/validate/utils'
 
 export class EventNotFoundError extends TRPCError {
   constructor(id: string) {
@@ -66,6 +80,14 @@ export const getEventById = async (eventId: UUID): Promise<EventDocument> => {
   }
 }
 
+/**
+ * Throws tRPC HTTP 404 unless the id names a record. The documents service
+ * cannot make this check, because it knows nothing about events.
+ */
+export const assertEventExists = async (eventId: UUID): Promise<void> => {
+  await getEventById(eventId)
+}
+
 function getValidFileValue(
   fieldKey: string,
   fieldValue: FieldUpdateValue,
@@ -73,36 +95,12 @@ function getValidFileValue(
 ) {
   const isFileType =
     fieldTypes.find((field) => field.id === fieldKey)?.type === FieldType.FILE
-  const validFieldValue = FileFieldValue.safeParse(fieldValue)
-  if (!isFileType || !validFieldValue.success) {
+
+  if (!isFileType || !isFileFieldValue(fieldValue)) {
     return undefined
   }
-  return validFieldValue.data
-}
 
-async function deleteEventAttachments(
-  token: TokenWithBearer,
-  event: EventDocument
-) {
-  const configuration = await getEventConfigurationById({
-    eventType: event.type,
-    token
-  })
-
-  const actions = getAcceptedActions(event)
-  // @TODO: Check that this works after making sure data incldues only declaration fields.
-  const fieldConfigs = getDeclarationFields(configuration)
-  for (const ac of actions) {
-    for (const [key, value] of Object.entries(ac.declaration)) {
-      const fileValue = getValidFileValue(key, value, fieldConfigs)
-
-      if (!fileValue) {
-        continue
-      }
-
-      await deleteFile(fileValue.path, token)
-    }
-  }
+  return fieldValue
 }
 
 /** Throws tRPC HTTP 409 if the status and the flags of the event do not allow the action. */
@@ -120,20 +118,56 @@ function throwConflictIfActionNotAvailable(
   }
 }
 
+/**
+ * Ensure that an action is allowed depending on the current event state. This does two checks:
+ * 1. Check that the action is allowed in the current event status and flags
+ * 2. Check that any conditionals defined for the action are met
+ *
+ * If any of the checks fail, a tRPC HTTP 409 Conflict error is thrown.
+ */
 export async function throwConflictIfActionNotAllowed(
   eventId: UUID,
   actionType: ActionType,
-  token: TokenWithBearer
+  token: TokenWithBearer,
+  customActionType?: string,
+  existingEvent?: EventDocument
 ) {
-  const event = await getEventById(eventId)
-  const eventConfig = await getEventConfigurationById({
-    eventType: event.type,
+  const event = existingEvent ?? (await getEventById(eventId))
+  const eventConfiguration = await getEventConfigurationForRecord({
+    event: event,
     token
   })
-  throwConflictIfActionNotAvailable(
-    getCurrentEventState(event, eventConfig),
-    actionType
-  )
+
+  const eventIndex = getCurrentEventState(event, eventConfiguration)
+
+  throwConflictIfActionNotAvailable(eventIndex, actionType)
+
+  const actionConfig = getActionConfig({
+    actionType,
+    eventConfiguration,
+    customActionType
+  })
+
+  // If no action config found, we are executing an action which does not have conditionals
+  if (!actionConfig) {
+    return
+  }
+
+  const context = await getValidatorContext({
+    token,
+    event: { document: event, state: eventIndex }
+  })
+  const actionIsEnabled = isActionEnabled(actionConfig, eventIndex, context)
+  const actionIsAvailable = isActionVisible(actionConfig, eventIndex, context)
+
+  if (!actionIsEnabled || !actionIsAvailable) {
+    throw new TRPCError({
+      code: 'CONFLICT',
+      message: `Conditions for action: ${actionType} were not met, action cannot be performed`
+    })
+  }
+
+  return
 }
 
 export async function deleteEvent(
@@ -152,7 +186,7 @@ export async function deleteEvent(
   }
 
   const { id } = event
-  await deleteEventAttachments(token, event)
+  await deleteFilesByPrefix(eventAttachmentPath(id), token)
   await draftsRepo.deleteDraftsByEventId(id)
   await eventsRepo.deleteEventById(id)
 
@@ -176,28 +210,43 @@ function generateTrackingId(): string {
 export async function createEvent({
   eventInput,
   user,
-  transactionId
+  transactionId,
+  createdAtLocation,
+  config,
+  timeZone
 }: {
   eventInput: z.infer<typeof EventInput>
   user: TrpcUserContext
   transactionId: string
-  config: EventConfig
+  createdAtLocation?: UUID | null | undefined
+  config: VersionedEventConfig
+  /** The country's time zone, in which configuration versions take effect. */
+  timeZone: string
 }): Promise<EventDocument> {
   const isSystem = user.type === TokenUserType.enum.system
+  const version = resolveVersionForNewRecord(
+    config,
+    eventInput.configVersionId,
+    new Date(),
+    timeZone
+  )
 
   const getOrCreateEvent = isSystem
     ? eventsRepo.getOrCreateEvent // System users create events without assignment
     : eventsRepo.getOrCreateEventAndAssign
 
+  const eventLocation = isSystem ? createdAtLocation : user.primaryOfficeId
   const event = await getOrCreateEvent({
     eventType: eventInput.type,
     transactionId: transactionId,
     trackingId: generateTrackingId(),
     createdBy: user.id,
     createdByUserType: user.type,
-    createdByRole: user.role,
+    createdByRole:
+      user.type === TokenUserType.enum.user ? user.role : undefined,
     createdBySignature: user.signature,
-    createdAtLocation: user.primaryOfficeId
+    createdAtLocation: eventLocation,
+    configVersionId: version.id
   })
 
   return event
@@ -237,11 +286,14 @@ export function buildAction(
     annotation: input.annotation,
     ...('content' in input ? { content: input.content } : {}),
     createdBy: user.id,
-    createdByRole: user.role,
+    createdByRole:
+      user.type === TokenUserType.enum.user ? user.role : undefined,
     createdByUserType: user.type,
     createdBySignature: user.signature,
     createdAtLocation:
-      user.type === 'system' ? input.createdAtLocation : user.primaryOfficeId,
+      user.type === TokenUserType.enum.system
+        ? input.createdAtLocation
+        : user.primaryOfficeId,
     originalActionId: input.originalActionId
   }
   switch (input.type) {
@@ -276,21 +328,25 @@ export function buildAction(
         requestId: input.requestId
       }
     }
+    case ActionType.CUSTOM: {
+      return { ...commonAttributes, customActionType: input.customActionType }
+    }
     case ActionType.REJECT:
     case ActionType.ARCHIVE:
+    case ActionType.UNARCHIVE:
+    case ActionType.REVOKE_REGISTRATION:
+    case ActionType.REINSTATE_REGISTRATION:
     case ActionType.PRINT_CERTIFICATE:
     case ActionType.READ:
     case ActionType.CREATE:
     case ActionType.NOTIFY:
     case ActionType.DECLARE:
-    case ActionType.VALIDATE:
     case ActionType.DUPLICATE_DETECTED:
     case ActionType.MARK_AS_NOT_DUPLICATE:
     case ActionType.MARK_AS_DUPLICATE:
+    case ActionType.EDIT:
     case ActionType.REQUEST_CORRECTION: {
-      return {
-        ...commonAttributes
-      }
+      return commonAttributes
     }
   }
 }
@@ -335,20 +391,19 @@ async function addRequestedAction(
 export async function addAction(
   input: ActionInputWithType,
   {
-    event,
+    eventId,
     user,
     token,
     status,
     configuration
   }: {
-    event: EventDocument
+    eventId: UUID
     user: TrpcUserContext
     token: TokenWithBearer
     status: ActionStatus
     configuration: EventConfig
   }
 ): Promise<EventDocument> {
-  const eventId = event.id
   // @TODO: Check that this works after making sure data incldues only declaration fields.
   const fieldConfigs = getDeclarationFields(configuration)
   const fileValuesInCurrentAction = extractFileValues(
@@ -387,6 +442,7 @@ export async function addAction(
       buildAction(
         {
           eventId: input.eventId,
+          waitFor: input.waitFor,
           transactionId: input.transactionId,
           type: ActionType.UNASSIGN,
           declaration: {},
@@ -402,27 +458,36 @@ export async function addAction(
 
   if (input.type !== ActionType.READ && input.type !== ActionType.ASSIGN) {
     await draftsRepo.deleteDraftsByEventId(input.eventId)
-    await cleanupUnreferencedFiles(updatedEvent, token)
+    await sweepUnreferencedFiles(updatedEvent, token)
   }
 
   return updatedEvent
 }
 
-/**
- * Created events are never indexed, and only created events can be deleted. Together these
- * guarantee that every event deduplication can flag still exists.
- */
-function isEventIndexable(event: EventDocument) {
-  return getStatusFromActions(event.actions) !== EventStatus.enum.CREATED
+/** @returns false for drafts and READ actions, which never change the EventIndex. */
+function isEventIndexable(event: EventDocument, actionType: ActionType) {
+  return (
+    actionType !== ActionType.READ &&
+    getStatusFromActions(event.actions) !== EventStatus.enum.CREATED
+  )
 }
 
-export async function ensureEventIndexed(
-  event: EventDocument,
-  configuration: EventConfig
-) {
-  if (isEventIndexable(event)) {
-    await indexEvent(event, configuration)
-  }
+/**
+ * Resolves the effective `keepAssignment` for an action based on the
+ * status-specific `keepAssignmentIfAccepted` / `keepAssignmentIfRejected`
+ * flags, falling back to the catch-all `keepAssignment` flag.
+ */
+function resolveKeepAssignment(
+  input: {
+    keepAssignment?: boolean
+    keepAssignmentIfAccepted?: boolean
+    keepAssignmentIfRejected?: boolean
+  },
+  status: ActionStatus
+): boolean {
+  return status === ActionStatus.Accepted
+    ? (input.keepAssignmentIfAccepted ?? input.keepAssignment ?? false)
+    : (input.keepAssignmentIfRejected ?? input.keepAssignment ?? false)
 }
 
 /**
@@ -437,29 +502,46 @@ export async function ensureEventIndexed(
 export async function processAction(
   input: ActionInputWithType,
   {
-    event,
+    eventId,
     user,
     token,
     status,
     configuration
   }: {
-    event: EventDocument
+    eventId: UUID
     user: TrpcUserContext
     token: TokenWithBearer
     status: ActionStatus
     configuration: EventConfig
   }
 ): Promise<EventDocument> {
-  const updatedEvent = await addAction(input, {
-    event,
+  const resolvedInput = {
+    ...input,
+    keepAssignment: resolveKeepAssignment(input, status)
+  }
+
+  const updatedEvent = await addAction(resolvedInput, {
+    eventId,
     user,
     token,
     status,
     configuration
   })
 
-  // Only send the event to Elasticsearch if it is not a draft
-  await ensureEventIndexed(updatedEvent, configuration)
+  if (!input.waitFor) {
+    logger.debug(
+      {
+        transactionId: input.transactionId,
+        actionType: input.type,
+        eventId
+      },
+      `Indexing action without waiting for results. Action type: ${input.type}`
+    )
+  }
+  if (isEventIndexable(updatedEvent, input.type)) {
+    await indexEvent(updatedEvent, configuration, input.waitFor)
+  }
+
   return updatedEvent
 }
 
@@ -468,6 +550,9 @@ type AsyncRejectActionInput = Pick<
   'transactionId' | 'originalActionId' | 'type'
 > & {
   keepAssignment: boolean
+  waitFor: boolean
+  requestId?: UUID
+  content?: Record<string, unknown> | null
 }
 
 export async function addAsyncRejectAction(
@@ -475,7 +560,10 @@ export async function addAsyncRejectAction(
     transactionId,
     originalActionId,
     type,
-    keepAssignment
+    keepAssignment,
+    waitFor,
+    requestId,
+    content
   }: AsyncRejectActionInput,
   {
     user,
@@ -494,8 +582,11 @@ export async function addAsyncRejectAction(
     actionType: type,
     status: ActionStatus.Rejected,
     originalActionId,
+    requestId,
+    content,
     createdBy: user.id,
-    createdByRole: user.role,
+    createdByRole:
+      user.type === TokenUserType.enum.user ? user.role : undefined,
     createdByUserType: user.type,
     createdAtLocation: user.primaryOfficeId
   })
@@ -505,6 +596,7 @@ export async function addAsyncRejectAction(
       buildAction(
         {
           eventId,
+          waitFor,
           transactionId,
           type: ActionType.UNASSIGN,
           declaration: {},
@@ -517,7 +609,9 @@ export async function addAsyncRejectAction(
   }
 
   const updatedEvent = await getEventById(eventId)
-  await ensureEventIndexed(updatedEvent, configuration)
+  if (isEventIndexable(updatedEvent, type)) {
+    await indexEvent(updatedEvent, configuration, waitFor)
+  }
   await draftsRepo.deleteDraftsByEventId(eventId)
 
   return updatedEvent

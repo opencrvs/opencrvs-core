@@ -11,18 +11,22 @@
 import * as React from 'react'
 import { useIntl } from 'react-intl'
 import { Field, Form } from 'react-final-form'
-import { InputField } from '@opencrvs/components/lib/InputField'
-import { TextInput } from '@opencrvs/components/lib/TextInput'
-import { CountryLogo } from '@opencrvs/components/lib/icons'
+import {
+  InputField,
+  TextInput,
+  Text,
+  Box,
+  Toast,
+  Stack,
+  Button
+} from '@opencrvs/components'
+import { CountryLogo } from '@opencrvs/components/icons'
 import { stepTwoFields } from '@login/views/StepTwo/stepTwoFields'
-import { Text } from '@opencrvs/components/lib/Text'
 
 import * as actions from '@login/login/actions'
 import { IVerifyCodeNumbers, resetSubmissionError } from '@login/login/actions'
-import { ceil } from 'lodash'
 import { messages } from '@login/i18n/messages/views/stepTwoForm'
 import { useDispatch, useSelector } from 'react-redux'
-import { Box } from '@login/../../components/lib/Box'
 import {
   getResentAuthenticationCode,
   getStepOneDetails,
@@ -30,13 +34,9 @@ import {
   getsubmitting,
   selectApplicationName
 } from '@login/login/selectors'
-import { Toast } from '@opencrvs/components'
 import { usePersistentCountryLogo } from '@login/common/LoginBackgroundWrapper'
 import { Container, FormWrapper, LogoContainer } from '@login/views/Common'
-import { Stack } from '@opencrvs/components/lib/Stack/Stack'
-import { Button } from '@opencrvs/components/lib/Button'
 import { NotificationEvent } from '@login/utils/authApi'
-import { maskEmail, maskString } from '@login/utils/authUtils'
 
 const FORM_NAME = 'STEP_TWO'
 
@@ -58,9 +58,9 @@ export function StepTwoContainer() {
     if (appName) document.title = appName
   }, [appName])
 
-  const mobileNumber =
-    stepOneDetails.mobile && maskString(stepOneDetails.mobile)
-  const emailAddress = stepOneDetails.email && maskEmail(stepOneDetails.email)
+  // mobile and email arrive already masked from the auth service
+  const mobileNumber = stepOneDetails.mobile
+  const emailAddress = stepOneDetails.email
 
   const field = stepTwoFields.code
   const notificationEvent = NotificationEvent.TWO_FACTOR_AUTHENTICATION

@@ -36,8 +36,8 @@ for i in {1..5}; do
   fi
 done
 
-yarn db:clear:all
-yarn seed:dev
+pnpm db:clear:all
+pnpm seed:dev
 echo -e "
 
 

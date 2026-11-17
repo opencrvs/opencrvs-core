@@ -11,7 +11,7 @@
 import React from 'react'
 import { Banner, IBannerProps } from './Banner'
 import { Text } from '../Text'
-import { Meta, StoryObj } from '@storybook/react'
+import { Meta, StoryObj } from '@storybook/react-vite'
 import { Button } from '../Button'
 import { Pill } from '../Pill'
 import { Icon } from '../Icon'
@@ -19,7 +19,7 @@ import { Icon } from '../Icon'
 const meta: Meta<IBannerProps> = {
   title: 'Layout/Banner',
   argTypes: {
-    type: {
+    variant: {
       control: {
         type: 'radio',
         options: ['active', 'inactive', 'pending', 'default']
@@ -27,8 +27,8 @@ const meta: Meta<IBannerProps> = {
     }
   },
   render: (args) => (
-    <Banner.Container>
-      <Banner.Header type={args.type}>
+    <Banner.Container variant={args.variant}>
+      <Banner.Header>
         <Text variant="reg16" element="span">
           This is header
         </Text>
@@ -49,26 +49,26 @@ export default meta
 
 export const Default: StoryObj<IBannerProps> = {
   args: {
-    type: 'default'
+    variant: 'default'
   }
 }
 
 export const Active: StoryObj<IBannerProps> = {
   args: {
-    type: 'active'
+    variant: 'active'
   }
 }
 
 export const Pending: StoryObj<IBannerProps> = {
   args: {
-    type: 'pending'
+    variant: 'pending'
   }
 }
 
 export const PendingAdvanced: StoryObj<IBannerProps> = {
   render: () => (
-    <Banner.Container>
-      <Banner.Header type="pending">
+    <Banner.Container variant="pending">
+      <Banner.Header>
         <Pill
           type="pending"
           size="small"

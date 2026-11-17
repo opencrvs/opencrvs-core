@@ -10,33 +10,68 @@
  */
 
 import React, { useEffect, useMemo } from 'react'
-import { useTypedParams } from 'react-router-typesafe-routes/dom'
+import { useNavigate } from 'react-router-dom'
+import {
+  useTypedParams,
+  useTypedSearchParams
+} from 'react-router-typesafe-routes/dom'
 import { noop } from 'lodash'
+import { defineMessages, useIntl } from 'react-intl'
+import styled from 'styled-components'
 import {
   ActionType,
-  getActionReview,
+  aggregateActionAnnotations,
   applyDraftToEventIndex,
+  deepDropNulls,
+  deepMerge,
+  EventState,
   getDeclaration,
   getOrThrow,
-  getCurrentEventState
+  getCurrentEventState,
+  UUID,
+  getAssignmentStatus,
+  AssignmentStatus,
+  eventAttachmentPath
 } from '@opencrvs/commons/client'
-import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
+import { Content, ContentSize } from '@opencrvs/components'
+import { useEventConfigurationForRecord } from '@client/v2-events/features/events/useEventConfiguration'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
 import { ROUTES } from '@client/v2-events/routes'
 import { Review as ReviewComponent } from '@client/v2-events/features/events/components/Review'
-import { FormLayout } from '@client/v2-events/layouts'
 import { useIntlFormatMessageWithFlattenedParams } from '@client/v2-events/messages/utils'
 import { withSuspense } from '@client/v2-events/components/withSuspense'
 import { useDrafts } from '@client/v2-events/features/drafts/useDrafts'
 import { useValidatorContext } from '@client/v2-events/hooks/useValidatorContext'
+import { recordAnchorDate } from '@client/v2-events/utils'
 import { useAuthentication } from '@client/utils/userUtils'
-import { AssignmentStatus, getAssignmentStatus } from '@client/v2-events/utils'
+import { useOnlineStatus } from '@client/utils'
+import { queryClient, useTRPC } from '@client/v2-events/trpc'
+
+import { useCanAccessEventWithScopes } from '@client/v2-events/hooks/useCanAccessEventWithScopes'
 import { removeCachedFiles } from '../files/cache'
 
-function ReadonlyView() {
-  const { eventId } = useTypedParams(ROUTES.V2.EVENTS.DECLARE.REVIEW)
+const messages = defineMessages({
+  offlineTitle: {
+    id: 'v2.event.record.offline.title',
+    defaultMessage: 'No connection',
+    description: 'Title shown on the Record page when the user is offline'
+  },
+  offlineDescription: {
+    id: 'v2.event.record.offline.description',
+    defaultMessage:
+      'This record has not been downloaded yet so it cannot be opened offline. Please reconnect to the internet to view it.',
+    description:
+      'Message shown on the Record page when the user is offline and the record has not been cached locally'
+  }
+})
+
+const OfflineMessageWrapper = styled.div`
+  text-align: center;
+`
+
+function ReadonlyViewContent({ eventId }: { eventId: UUID }) {
   const events = useEvents()
-  const event = events.getEvent.viewEvent(eventId)
+  const event = events.getEvent.useGetOrDownloadEvent(eventId)
   const validatorContext = useValidatorContext(event)
 
   const maybeAuth = useAuthentication()
@@ -45,11 +80,10 @@ function ReadonlyView() {
     'Authentication is not available but is required'
   )
 
-  const { getRemoteDraftByEventId } = useDrafts()
-  const draft = getRemoteDraftByEventId(event.id)
-  const { eventConfiguration: configuration } = useEventConfiguration(
-    event.type
-  )
+  const { useRemoteDraftByEventId } = useDrafts()
+  const draft = useRemoteDraftByEventId(event.id)
+  const { eventConfiguration: configuration } =
+    useEventConfigurationForRecord(event)
 
   const eventStateWithDraft = useMemo(() => {
     const eventState = getCurrentEventState(event, configuration)
@@ -64,10 +98,20 @@ function ReadonlyView() {
     authentication.sub
   )
 
-  const { title, fields } = getActionReview(configuration, ActionType.READ)
   const { formatMessage } = useIntlFormatMessageWithFlattenedParams()
 
   const formConfig = getDeclaration(configuration)
+
+  const annotation = useMemo((): EventState | undefined => {
+    const merged = aggregateActionAnnotations(event)
+    const withDraft =
+      draft?.action.annotation != null
+        ? deepMerge(merged, draft.action.annotation)
+        : merged
+    const cleaned = deepDropNulls(withDraft)
+
+    return Object.keys(cleaned).length > 0 ? cleaned : undefined
+  }, [event, draft])
 
   useEffect(() => {
     return () => {
@@ -80,21 +124,76 @@ function ReadonlyView() {
     }
   }, [event, assignmentStatus])
 
-  return (
-    <FormLayout route={ROUTES.V2.EVENTS.DECLARE}>
-      <ReviewComponent.Body
-        readonlyMode
-        form={eventStateWithDraft.declaration}
-        formConfig={formConfig}
-        reviewFields={fields}
-        title={formatMessage(title, eventStateWithDraft.declaration)}
-        validatorContext={validatorContext}
-        onEdit={noop}
-      >
-        <></>
-      </ReviewComponent.Body>
-    </FormLayout>
+  const actionConfiguration = configuration.actions.find(
+    (a) => a.type === ActionType.READ
   )
+  if (!actionConfiguration) {
+    throw new Error('Action configuration not found')
+  }
+
+  const { title, fields } = actionConfiguration.review
+
+  return (
+    <ReviewComponent.Body
+      readonlyMode
+      anchor={recordAnchorDate(eventStateWithDraft)}
+      annotation={annotation}
+      attachmentPath={eventAttachmentPath(eventId)}
+      form={eventStateWithDraft.declaration}
+      formConfig={formConfig}
+      reviewFields={fields}
+      title={formatMessage(title, eventStateWithDraft.declaration)}
+      validatorContext={validatorContext}
+      onEdit={noop}
+    />
+  )
+}
+
+function OfflineRecordMessage() {
+  const intl = useIntl()
+  return (
+    <Content
+      size={ContentSize.SMALL}
+      title={intl.formatMessage(messages.offlineTitle)}
+    >
+      <OfflineMessageWrapper data-testid="record-offline-message">
+        {intl.formatMessage(messages.offlineDescription)}
+      </OfflineMessageWrapper>
+    </Content>
+  )
+}
+
+function ReadonlyView() {
+  const { eventId } = useTypedParams(ROUTES.V2.EVENTS.EVENT.RECORD)
+  const [{ backTo }] = useTypedSearchParams(ROUTES.V2.EVENTS.EVENT.RECORD)
+  const navigate = useNavigate()
+  const { canAccessEventWithScopes } = useCanAccessEventWithScopes(eventId, [
+    'record.read'
+  ])
+  const isOnline = useOnlineStatus()
+  const trpc = useTRPC()
+
+  if (!canAccessEventWithScopes()) {
+    navigate(ROUTES.V2.EVENTS.EVENT.buildPath({ eventId }, { backTo }), {
+      replace: true
+    })
+    return null
+  }
+
+  const isCachedAsAssigned = queryClient.getQueryData(
+    trpc.event.get.queryKey({ eventId })
+  )
+
+  // React Query pauses queries when the browser is offline, so the suspense
+  // boundary inside ReadonlyViewContent would hang on a spinner forever if
+  // the user opens a record they have not previously downloaded.
+  // Render a clear message instead — useOnlineStatus re-renders this when
+  // the connection returns, so the content loads automatically.
+  if (!isOnline && !isCachedAsAssigned) {
+    return <OfflineRecordMessage />
+  }
+
+  return <ReadonlyViewContent eventId={eventId} />
 }
 
 export const ReadonlyViewIndex = withSuspense(ReadonlyView)

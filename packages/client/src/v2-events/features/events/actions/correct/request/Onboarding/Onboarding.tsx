@@ -15,11 +15,16 @@ import {
   useTypedParams,
   useTypedSearchParams
 } from 'react-router-typesafe-routes/dom'
-import { ActionType, getCurrentEventState } from '@opencrvs/commons/client'
-import { ActionPageLight } from '@opencrvs/components/lib/ActionPageLight'
-import { buttonMessages } from '@client/i18n/messages'
+import {
+  ActionType,
+  eventAttachmentPath,
+  getCurrentEventState
+} from '@opencrvs/commons/client'
+import { Frame, Button, Icon, AppBar } from '@opencrvs/components'
+import { buttonMessages, constantsMessages } from '@client/i18n/messages'
 import { Pages as PagesComponent } from '@client/v2-events/features/events/components/Pages'
-import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
+import { getFormBackAction } from '@client/v2-events/layouts/form/FormBackAction'
+import { useEventConfigurationForRecord } from '@client/v2-events/features/events/useEventConfiguration'
 import { useActionAnnotation } from '@client/v2-events/features/events/useActionAnnotation'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
 import { ROUTES } from '@client/v2-events/routes'
@@ -38,7 +43,7 @@ export function Onboarding() {
   const { eventId, pageId } = useTypedParams(
     ROUTES.V2.EVENTS.REQUEST_CORRECTION.ONBOARDING
   )
-  const [{ workqueue }] = useTypedSearchParams(
+  const [{ backTo }] = useTypedSearchParams(
     ROUTES.V2.EVENTS.REQUEST_CORRECTION.ONBOARDING
   )
 
@@ -46,15 +51,14 @@ export function Onboarding() {
   const annotation = useActionAnnotation((state) => state.getAnnotation())
   const setAnnotation = useActionAnnotation((state) => state.setAnnotation)
 
-  const event = events.getEvent.getFromCache(eventId)
+  const event = events.getEvent.useGetEventFromCache(eventId)
   const validatorContext = useValidatorContext(event)
 
   const navigate = useNavigate()
   const intl = useIntl()
   const { closeActionView } = useEventFormNavigation()
-  const { eventConfiguration: configuration } = useEventConfiguration(
-    event.type
-  )
+  const { eventConfiguration: configuration } =
+    useEventConfigurationForRecord(event)
 
   const actionConfiguration = configuration.actions.find(
     (action) => action.type === ActionType.REQUEST_CORRECTION
@@ -79,56 +83,118 @@ export function Onboarding() {
           {
             eventId: event.id
           },
-          { workqueue }
+          { backTo }
         )
       )
     }
-  }, [currentPageId, navigate, event.id, workqueue])
+  }, [currentPageId, navigate, event.id, backTo])
 
   if (!currentPageId) {
     return null
   }
 
+  const pagesValidatorContext = {
+    ...validatorContext,
+    baseFormState: eventIndex.declaration
+  }
+
+  const onPageChange = (nextPageId: string) =>
+    navigate(
+      ROUTES.V2.EVENTS.REQUEST_CORRECTION.ONBOARDING.buildPath(
+        { eventId, pageId: nextPageId },
+        { backTo }
+      )
+    )
+
+  /*
+   * Inside the onboarding form the header's back action means "previous form
+   * page", resolved against the visible pages so conditionally hidden pages are
+   * skipped. There is no previous page on the first page, so there it keeps
+   * falling back to leaving the flow.
+   */
+  const onBack =
+    getFormBackAction({
+      formPages,
+      formData: annotation,
+      validatorContext: pagesValidatorContext,
+      pageId: currentPageId,
+      onNavigateToPage: onPageChange
+    }) ?? (() => navigate(-1))
+
+  const title = intl.formatMessage(messages.title)
+
   return (
-    <ActionPageLight
-      hideBackground
-      goBack={() => navigate(-1)}
-      goHome={() => closeActionView()}
+    <Frame
+      header={
+        <AppBar
+          desktopLeft={
+            <Button
+              aria-label="Go back"
+              size="medium"
+              type="icon"
+              onClick={onBack}
+            >
+              <Icon name="ArrowLeft" />
+            </Button>
+          }
+          desktopRight={
+            <Button
+              size="medium"
+              type="icon"
+              onClick={() => closeActionView(backTo)}
+            >
+              <Icon color="primary" name="X" />
+            </Button>
+          }
+          desktopTitle={title}
+          mobileLeft={
+            <Button
+              aria-label="Go back"
+              size="medium"
+              type="icon"
+              onClick={onBack}
+            >
+              <Icon name="ArrowLeft" />
+            </Button>
+          }
+          mobileRight={
+            <Button
+              data-testid="exit-button"
+              size="medium"
+              type="icon"
+              onClick={() => closeActionView(backTo)}
+            >
+              <Icon color="primary" name="X" />
+            </Button>
+          }
+          mobileTitle={title}
+        />
+      }
       id="corrector_form"
-      title={intl.formatMessage(messages.title)}
+      skipToContentText={intl.formatMessage(
+        constantsMessages.skipToMainContent
+      )}
     >
       <PagesComponent
         hideBackToReview
+        attachmentPath={eventAttachmentPath(event.id)}
         continueButtonText={intl.formatMessage(buttonMessages.continueButton)}
         eventConfig={configuration}
         formData={annotation}
         formPages={formPages}
         pageId={currentPageId}
         setFormData={(data) => setAnnotation(data)}
-        validatorContext={{
-          ...validatorContext,
-          baseFormState: eventIndex.declaration
-        }}
-        onPageChange={(nextPageId: string) => {
-          return navigate(
-            ROUTES.V2.EVENTS.REQUEST_CORRECTION.ONBOARDING.buildPath(
-              {
-                eventId,
-                pageId: nextPageId
-              },
-              { workqueue }
-            )
-          )
-        }}
+        validatorContext={pagesValidatorContext}
+        onPageChange={onPageChange}
         onSubmit={() => {
           return navigate(
             ROUTES.V2.EVENTS.REQUEST_CORRECTION.REVIEW.buildPath(
               { eventId },
-              { workqueue }
+              { backTo }
             )
           )
         }}
       />
-    </ActionPageLight>
+    </Frame>
   )
 }

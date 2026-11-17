@@ -8,10 +8,21 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import type { Meta, StoryObj } from '@storybook/react'
+import type { Meta, StoryObj } from '@storybook/react-vite'
 import React from 'react'
-import { tennisClubMembershipEvent } from '@opencrvs/commons/client'
+import { createTRPCMsw, httpLink } from '@vafanassieff/msw-trpc'
+import superjson from 'superjson'
+import { expect, fn, userEvent, waitFor, within } from 'storybook/test'
+import {
+  ActionType,
+  generateEventDocument,
+  toVersionedEventConfig,
+  tennisClubMembershipEvent,
+  VersionedEventConfig
+} from '@opencrvs/commons/client'
+import { AppRouter } from '@client/v2-events/trpc'
 import { TRPCProvider } from '@client/v2-events/trpc'
+import { testDataGenerator } from '@client/tests/test-data-generators'
 import { EventSelection } from './EventSelection'
 import { addLocalEventConfig } from './useEvents/api'
 
@@ -30,9 +41,8 @@ const meta: Meta<typeof EventSelection> = {
 export default meta
 type Story = StoryObj<typeof EventSelection>
 
-// has 'record.create[event=birth|death|tennis-club-membership]' scope
 const tokenWithCreateScopeForAllEventTypes =
-  'eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJzY29wZSI6WyJyZWNvcmQuZGVjbGFyYXRpb24tc3VibWl0LWZvci1yZXZpZXciLCJzZWFyY2guYmlydGgiLCJzZWFyY2guZGVhdGgiLCJzZWFyY2gubWFycmlhZ2UiLCJ3b3JrcXVldWVbaWQ9YWxsLWV2ZW50c3xhc3NpZ25lZC10by15b3V8cmVjZW50fHJlcXVpcmVzLXVwZGF0ZXN8c2VudC1mb3ItcmV2aWV3XSIsInNlYXJjaFtldmVudD1iaXJ0aCxhY2Nlc3M9YWxsXSIsInNlYXJjaFtldmVudD1kZWF0aCxhY2Nlc3M9YWxsXSIsInNlYXJjaFtldmVudD10ZW5uaXMtY2x1Yi1tZW1iZXJzaGlwLGFjY2Vzcz1hbGxdIiwic2VhcmNoW2V2ZW50PUZPT1RCQUxMX0NMVUJfTUVNQkVSU0hJUCxhY2Nlc3M9YWxsXSIsInJlY29yZC5jcmVhdGVbZXZlbnQ9YmlydGh8ZGVhdGh8dGVubmlzLWNsdWItbWVtYmVyc2hpcF0iXSwiaWF0IjoxNDg3MDc2NzA4LCJhdWQiOiJvcGVuY3J2czpnYXRld2F5LXVzZXIiLCJpc3MiOiJvcGVuY3J2czphdXRoLXNlcnZpY2UiLCJzdWIiOiI2N2VmN2Y4M2Q2YTljYjkyZTllZGFhOTkifQ.fr2bUI9j1ubODKoiiSIr3xN3BZaP7842Lld1loX6pqHSQiylvOC2ncTV_1bFC0ndGei2Ae0osHx4KmBfwnk-AmqkigSVdmhuuChhR8SG9t3OeASwPNHkFSNWzRSUoskdoTgjeAyiO-_pICEOKcavuRYKbxdyYTxPJyTXQyXXhrN65-8hAU3xMR6LaHQMU8GHyqeVNk0HRsBRlmK6ukk-CPXa2far-rm_gW_tQxBVeobNEkN8-TR87gm8-4U68Br7L12y0oeCWmlYeF4GnvtDfIEj-0U4fEy3N8c_Kr2a9AZLEQw6wC-6T42iahomvIOydpyxeUH0fOkNzHyQiiCe-31NzGq5sBLkxg4iFnuL62h6ZPlYMNuulrNdVHPIMDpMlxJBlJoQPZBZVvTH23mEPhLgJv65b3pICN_2HSfvfnWCde58biyWya3aNLb97qwk-dHxMOsFk5r-um5lgIxS2NGsyVctvpBlXUInCCGOWAk_xxoYUG2_DmFsta98W0CWrIHvgDIIbnn61GLECjvduvWAPDZSIP5twf0UYiFzSvhzaDPxyypd3tzzs76Vkex9bwhjoDeVbBQC35WSgl52gy2RD_i4LJdP44uaI80BMisaFTONbegblpBGEYE9i0ESSkzyYCy6nVY4-J7TVizTvoEjQgk19WIYlK08S3apv5U'
+  testDataGenerator().user.token.registrationAgent
 
 const birthConfig = {
   ...tennisClubMembershipEvent,
@@ -57,8 +67,8 @@ const randomConfig = {
 
 export const EventSelectionWithCreateScopeForAllEventTypes: Story = {
   beforeEach: () => {
-    addLocalEventConfig(birthConfig)
-    addLocalEventConfig(randomConfig)
+    addLocalEventConfig(toVersionedEventConfig(birthConfig))
+    addLocalEventConfig(toVersionedEventConfig(randomConfig))
   },
   loaders: [
     async () => {
@@ -71,4 +81,146 @@ export const EventSelectionWithCreateScopeForAllEventTypes: Story = {
       await new Promise((resolve) => setTimeout(resolve, 50))
     }
   ]
+}
+
+const tRPCMsw = createTRPCMsw<AppRouter>({
+  links: [httpLink({ url: '/api/events' })],
+  transformer: { input: superjson, output: superjson }
+})
+
+const [initialVersion] = toVersionedEventConfig(birthConfig).versions
+
+/** Birth with a past version 'initial' and the current version 'v2'. Listed newest first, to check the order. */
+const birthWithTwoVersions: VersionedEventConfig = {
+  ...toVersionedEventConfig(birthConfig),
+  versions: [
+    {
+      ...initialVersion,
+      id: 'v2',
+      label: { id: 'v2', defaultMessage: 'V2', description: 'Version v2' },
+      // Before the date that the preview mocks as today (2025-08-12)
+      effectiveFrom: '2025-01-01'
+    },
+    {
+      ...initialVersion,
+      label: {
+        id: 'initial',
+        defaultMessage: 'Initial',
+        description: 'Version initial'
+      }
+    }
+  ]
+}
+
+const createEventSpy =
+  fn<(input: { type: string; configVersionId?: string }) => void>()
+
+function withLegacyRecordsFeatureFlag(enabled: boolean) {
+  const features = window.config.FEATURES
+  window.config.FEATURES = {
+    ...features,
+    _EXPERIMENTAL_LEGACY_RECORDS: enabled
+  }
+  return () => {
+    window.config.FEATURES = features
+  }
+}
+
+const createEventParameters = {
+  msw: {
+    handlers: {
+      createEvent: [
+        tRPCMsw.event.create.mutation((input) => {
+          createEventSpy(input)
+          return generateEventDocument({
+            configuration: tennisClubMembershipEvent,
+            actions: [{ type: ActionType.CREATE }]
+          })
+        })
+      ]
+    }
+  }
+}
+
+const registrationAgentLoaders = [
+  async () => {
+    window.localStorage.setItem(
+      'opencrvs',
+      tokenWithCreateScopeForAllEventTypes
+    )
+    await new Promise((resolve) => setTimeout(resolve, 50))
+  }
+]
+
+export const NoVersionChoiceWithoutLegacyRecordsFeatureFlag: Story = {
+  parameters: createEventParameters,
+  loaders: registrationAgentLoaders,
+  beforeEach: () => withLegacyRecordsFeatureFlag(false),
+  play: async ({ canvasElement, step }) => {
+    const canvas = within(canvasElement)
+    // The preview's loaders clear the query cache, so the configuration is added once the story renders
+    addLocalEventConfig(birthWithTwoVersions)
+
+    await step('Event with two versions shows no version choice', async () => {
+      await userEvent.click(await canvas.findByLabelText('Birth'))
+      await expect(canvas.queryByText('Form version')).not.toBeInTheDocument()
+    })
+  }
+}
+
+export const PickPastVersionWithLegacyRecordsFeatureFlag: Story = {
+  parameters: createEventParameters,
+  loaders: registrationAgentLoaders,
+  beforeEach: () => {
+    createEventSpy.mockClear()
+    return withLegacyRecordsFeatureFlag(true)
+  },
+  play: async ({ canvasElement, step }) => {
+    const canvas = within(canvasElement)
+    // The preview's loaders clear the query cache, so the configuration is added once the story renders
+    addLocalEventConfig(birthWithTwoVersions)
+
+    await step('Versions show oldest first, current one selected', async () => {
+      await userEvent.click(await canvas.findByLabelText('Birth'))
+      await canvas.findByText('Form version')
+
+      const initial = canvas.getByLabelText('Initial')
+      const v2 = canvas.getByLabelText('V2')
+      await expect(
+        initial.compareDocumentPosition(v2) & Node.DOCUMENT_POSITION_FOLLOWING
+      ).toBeTruthy()
+      await expect(v2).toBeChecked()
+      await expect(initial).not.toBeChecked()
+    })
+
+    await step('The record is created under the picked version', async () => {
+      await userEvent.click(canvas.getByLabelText('Initial'))
+      await userEvent.click(canvas.getByRole('button', { name: 'Continue' }))
+
+      await waitFor(async () =>
+        expect(createEventSpy).toHaveBeenCalledWith(
+          expect.objectContaining({
+            type: 'birth',
+            configVersionId: 'initial'
+          })
+        )
+      )
+    })
+  }
+}
+
+export const NoVersionChoiceForSingleVersion: Story = {
+  parameters: createEventParameters,
+  loaders: registrationAgentLoaders,
+  beforeEach: () => withLegacyRecordsFeatureFlag(true),
+  play: async ({ canvasElement, step }) => {
+    const canvas = within(canvasElement)
+    // The preview's loaders clear the query cache, so the configuration is added once the story renders
+    addLocalEventConfig(toVersionedEventConfig(birthConfig))
+
+    await step('Event with one version shows no version choice', async () => {
+      await userEvent.click(await canvas.findByLabelText('Birth'))
+      await expect(canvas.queryByText('Form version')).not.toBeInTheDocument()
+    })
+  }
 }

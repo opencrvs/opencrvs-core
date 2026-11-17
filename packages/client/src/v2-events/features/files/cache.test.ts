@@ -10,7 +10,8 @@
  */
 import {
   ActionType,
-  generateActionDocument,
+  DocumentPath,
+  generateActionDocuments,
   tennisClubMembershipEvent
 } from '@opencrvs/commons/client'
 import { getFilepathsFromActionDocument } from './cache'
@@ -18,15 +19,15 @@ import { getFilepathsFromActionDocument } from './cache'
 describe('getFilepathsFromActionDocument', () => {
   test('extracts document and signature filepaths', () => {
     const filepaths = getFilepathsFromActionDocument([
-      generateActionDocument({
+      ...generateActionDocuments({
         configuration: tennisClubMembershipEvent,
         action: ActionType.DECLARE,
         defaults: {
-          createdBySignature: '/ocrvs/signature.png'
+          createdBySignature: 'signature.png' as DocumentPath
         },
         declarationOverrides: {
           'applicant.image': {
-            path: '/ocrvs/image.jpg',
+            path: 'image.jpg' as DocumentPath,
             originalFilename: 'dp.jpg',
             type: 'jpg'
           }
@@ -34,7 +35,7 @@ describe('getFilepathsFromActionDocument', () => {
       })
     ])
 
-    expect(filepaths).toContain('/ocrvs/signature.png')
-    expect(filepaths).toContain('/ocrvs/image.jpg')
+    expect(filepaths).toContain('signature.png')
+    expect(filepaths).toContain('image.jpg')
   })
 })

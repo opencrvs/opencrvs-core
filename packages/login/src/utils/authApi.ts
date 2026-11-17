@@ -19,16 +19,10 @@ export interface ICountryLogo {
   file: string
 }
 
-export interface ILoginBackground {
-  backgroundColor: string
-  backgroundImage: string
-  imageFit: string
-}
 export interface IApplicationConfig {
   APPLICATION_NAME: string
   COUNTRY: string
   COUNTRY_LOGO: ICountryLogo
-  LOGIN_BACKGROUND: ILoginBackground
   USER_NOTIFICATION_DELIVERY_METHOD: string
   INFORMANT_NOTIFICATION_DELIVERY_METHOD: string
 }
@@ -42,13 +36,12 @@ export interface IAuthenticationData {
   password: string
 }
 
-export const client = axios.create({
-  baseURL: window.config.AUTH_API_URL
-})
+export const client = axios.create({})
 
 export interface IAuthenticateResponse {
   nonce: string
   token?: string
+  refreshToken?: string
   mobile?: string
   email?: string
 }
@@ -70,6 +63,7 @@ export enum NotificationEvent {
 }
 export interface ITokenResponse {
   token: string
+  refreshToken: string
 }
 
 const loginClientVersion = APP_VERSION
@@ -114,14 +108,14 @@ export function request<T>(options: AxiosRequestConfig) {
 
 const getApplicationConfig = () => {
   return request<IApplicationConfigResponse>({
-    url: new URL('/publicConfig', window.config.CONFIG_API_URL).toString(),
+    url: '/api/publicConfig',
     method: 'GET'
   })
 }
 
 const authenticate = (data: IAuthenticationData) => {
   return request<IAuthenticateResponse>({
-    url: new URL('authenticate', window.config.AUTH_API_URL).toString(),
+    url: '/api/auth/authenticate',
     method: 'POST',
     data
   })
@@ -129,30 +123,21 @@ const authenticate = (data: IAuthenticationData) => {
 
 const resendAuthenticationCode = (
   nonce: string,
-  notificationEvent: NotificationEvent,
-  retrievalFlow = false
+  notificationEvent: NotificationEvent
 ) => {
   return request({
-    url: new URL(
-      'resendAuthenticationCode',
-      window.config.AUTH_API_URL
-    ).toString(),
+    url: '/api/auth/resendAuthenticationCode',
     method: 'POST',
-    data: { nonce, notificationEvent, retrievalFlow }
+    data: { nonce, notificationEvent }
   })
 }
 
 const verifyCode = (data: ICodeVerifyData): Promise<IAuthenticateResponse> => {
   return request({
-    url: new URL('verifyCode', window.config.AUTH_API_URL).toString(),
+    url: '/api/auth/verifyCode',
     method: 'POST',
     data
   })
-}
-
-interface IUserVerifyResponse {
-  nonce: string
-  securityQuestionKey?: string
 }
 
 interface IUserVerificationDetails {
@@ -161,29 +146,38 @@ interface IUserVerificationDetails {
   retrieveFlow: string
 }
 
+/*
+ * Always resolves with an empty body, account or not — the enumeration fix.
+ * The server emails a single-use link only if it found one; the client cannot
+ * tell, and must not try to.
+ */
 const verifyUser = (
   verificationDetails: IUserVerificationDetails
-): Promise<IUserVerifyResponse> => {
+): Promise<void> => {
   return request({
-    url: new URL('verifyUser', window.config.AUTH_API_URL).toString(),
+    url: '/api/auth/verifyUser',
     method: 'POST',
     data: verificationDetails
   })
 }
 
-interface IVerifyNumberResponse {
+interface IVerifyRecoveryTokenResponse {
   nonce: string
   securityQuestionKey: string
+  retrieveFlow: string
 }
 
-const verifyNumber = (
-  nonce: string,
-  code: string
-): Promise<IVerifyNumberResponse> => {
+/*
+ * Exchanges the recovery link's single-use token for a nonce and the next
+ * security question. The server rotates the nonce, killing the emailed link.
+ */
+const verifyRecoveryToken = (
+  token: string
+): Promise<IVerifyRecoveryTokenResponse> => {
   return request({
-    url: new URL('verifyNumber', window.config.AUTH_API_URL).toString(),
+    url: '/api/auth/verifyRecoveryToken',
     method: 'POST',
-    data: { nonce, code }
+    data: { token }
   })
 }
 
@@ -200,7 +194,7 @@ const verifySecurityAnswer = (
   answer: string
 ): Promise<IVerifySecurityAnswerResponse> => {
   return request({
-    url: new URL('verifySecurityAnswer', window.config.AUTH_API_URL).toString(),
+    url: '/api/auth/verifySecurityAnswer',
     method: 'POST',
     data: { nonce, answer }
   })
@@ -208,7 +202,7 @@ const verifySecurityAnswer = (
 
 const changePassword = (nonce: string, newPassword: string): Promise<void> => {
   return request({
-    url: new URL('changePassword', window.config.AUTH_API_URL).toString(),
+    url: '/api/auth/changePassword',
     method: 'POST',
     data: { nonce, newPassword }
   })
@@ -216,7 +210,7 @@ const changePassword = (nonce: string, newPassword: string): Promise<void> => {
 
 const sendUserName = (nonce: string): Promise<void> => {
   return request({
-    url: new URL('sendUserName', window.config.AUTH_API_URL).toString(),
+    url: '/api/auth/sendUserName',
     method: 'POST',
     data: { nonce }
   })
@@ -227,8 +221,8 @@ export const authApi = {
   authenticate,
   verifyCode,
   resendAuthenticationCode,
-  verifyNumber,
   verifyUser,
+  verifyRecoveryToken,
   verifySecurityAnswer,
   changePassword,
   sendUserName,

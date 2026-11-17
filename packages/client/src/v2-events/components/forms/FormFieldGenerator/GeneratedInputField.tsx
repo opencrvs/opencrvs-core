@@ -35,6 +35,7 @@ import {
   isOfficeFieldType,
   isPageHeaderFieldType,
   isParagraphFieldType,
+  isHeadingFieldType,
   isRadioGroupFieldType,
   isSelectFieldType,
   isSignatureFieldType,
@@ -73,9 +74,16 @@ import {
   flattenFormState,
   ConditionalType,
   isConditionMet,
-  SelectOption
+  SelectOption,
+  isCustomFieldType,
+  isHiddenFieldType,
+  isImageViewFieldType,
+  isAutocompleteFieldType,
+  isUserRoleFieldType,
+  todayISO,
+  AttachmentPath,
+  EventDocument
 } from '@opencrvs/commons/client'
-import { TextArea } from '@opencrvs/components/lib/TextArea'
 import { InputField } from '@client/components/form/InputField'
 import { countries } from '@client/utils/countries'
 import {
@@ -93,13 +101,16 @@ import {
   Divider,
   PageHeader,
   Paragraph,
+  Heading,
   SelectDateRangeField,
   TimeField,
   Button,
   AlphaPrintButton,
   Http,
   LinkButton,
-  VerificationStatus
+  VerificationStatus,
+  ImageView,
+  UserRole
 } from '@client/v2-events/features/events/registered-fields'
 import { Address } from '@client/v2-events/features/events/registered-fields/Address'
 import { Data } from '@client/v2-events/features/events/registered-fields/Data'
@@ -113,6 +124,11 @@ import { QrReader } from '@client/v2-events/features/events/registered-fields/Qr
 import { QueryParamReader } from '@client/v2-events/features/events/registered-fields/QueryParamReader'
 import { Loader } from '@client/v2-events/features/events/registered-fields/Loader'
 import { NumberWithUnit } from '@client/v2-events/features/events/registered-fields/NumberWithUnit'
+import { Custom } from '@client/v2-events/features/events/registered-fields/Custom'
+import { Hidden } from '@client/v2-events/features/events/registered-fields/Hidden'
+import { TextArea } from '@client/v2-events/features/events/registered-fields/TextArea'
+import { Autocomplete } from '@client/v2-events/features/events/registered-fields/Autocomplete'
+import { liveAnchorDate } from '@client/v2-events/utils'
 import {
   makeFormFieldIdFormikCompatible,
   makeFormikFieldIdOpenCRVSCompatible
@@ -161,8 +177,46 @@ interface GeneratedInputFieldProps<T extends FieldConfig> {
   onBlur: (formikFieldId: string, newTouched?: FormState<boolean>) => void
   disabled?: boolean
   readonlyMode?: boolean
+  searchMode?: boolean
   allKnownFields: FieldConfig[]
   validatorContext: ValidatorContext
+  attachmentPath: AttachmentPath | null
+}
+
+/**
+ * A file field has to know which prefix its uploads belong to. Rendering one
+ * without an attachment path meant uploading to the bucket root, where the file
+ * belongs to no record and no deletion or sweep can reach it.
+ */
+function requireAttachmentPath(
+  attachmentPath: AttachmentPath | null,
+  fieldId: string
+): AttachmentPath {
+  if (attachmentPath === null) {
+    throw new Error(
+      `Field ${fieldId} uploads files, but the form around it was rendered without an attachmentPath`
+    )
+  }
+
+  return attachmentPath
+}
+
+/**
+ * The print button prints the record it is rendered for. Rendering one without
+ * an event in context leaves nothing to print, so the field is misconfigured
+ * rather than merely empty.
+ */
+function requireEvent(
+  event: EventDocument | undefined,
+  fieldId: string
+): EventDocument {
+  if (!event) {
+    throw new Error(
+      `Field ${fieldId} prints a record, but the form around it was rendered without an event`
+    )
+  }
+
+  return event
 }
 
 function resolveOptions(
@@ -210,7 +264,9 @@ export const GeneratedInputField = <T extends FieldConfig>(
     allKnownFields,
     ocrvsFullForm,
     disabled,
-    readonlyMode
+    attachmentPath,
+    readonlyMode,
+    searchMode
   } = props
   const intl = useIntl()
   const [input, meta] = useField<FieldValue>(name)
@@ -240,6 +296,26 @@ export const GeneratedInputField = <T extends FieldConfig>(
 
   function handleBlur<E>(_: React.FocusEvent<E>) {
     onBlur(name)
+  }
+
+  /**
+   * The date a location field resolves its options against. Fields that opt
+   * in via `anchorToDateOfEvent` anchor to the event's date-of-event field
+   * (read live off the form being filled in, falling back to the record's
+   * creation date); all others keep resolving against today, unchanged.
+   */
+  function resolveLocationAnchor(configuration?: {
+    anchorToDateOfEvent?: boolean
+  }) {
+    if (!configuration?.anchorToDateOfEvent) {
+      return todayISO()
+    }
+
+    return liveAnchorDate({
+      dateOfEvent: eventConfig?.dateOfEvent,
+      form: { ...validatorContext.baseFormState, ...ocrvsFullForm },
+      createdAt: validatorContext.event?.document.createdAt ?? todayISO()
+    })
   }
 
   const inputProps = {
@@ -282,10 +358,26 @@ export const GeneratedInputField = <T extends FieldConfig>(
       // only forward error if it is coming from the group custom validations
       error: typeof error === 'string' ? error : ''
     }
+
+    /*
+     * A group's subfields reference each other by their own ids — `partOf` on an
+     * admin level, or the SHOW conditional on a street field waiting for a
+     * district. e.g: `not(field('district').isUndefined())`.
+     * Those ids do not exist in the outer form, where the whole group
+     * sits under a single key, so the group's own values are laid over it to
+     * give the subfields the scope they expect.
+     */
+    const groupValue: Record<string, FieldValue> = field.value ?? {}
+
+    const groupScope = {
+      ...ocrvsFullForm,
+      ...groupValue
+    }
+
     return (
       <InputField {...parentInputFieldProps}>
         {field.config.fields.map((subfield) => {
-          if (!isFieldVisible(subfield, ocrvsFullForm, validatorContext)) {
+          if (!isFieldVisible(subfield, groupScope, validatorContext)) {
             return null
           }
           const subfieldName = makeFormFieldIdFormikCompatible(subfield.id)
@@ -299,6 +391,7 @@ export const GeneratedInputField = <T extends FieldConfig>(
                 {...props}
                 fieldDefinition={subfield}
                 name={subfieldFullName}
+                ocrvsFullForm={groupScope}
               />
             </FormItem>
           )
@@ -417,10 +510,12 @@ export const GeneratedInputField = <T extends FieldConfig>(
   }
 
   if (isDateRangeFieldType(field)) {
-    const parsed = DateRangeFieldValue.safeParse(field.value)
+    const parsed = DateRangeFieldValue.validate(field.value)
+      ? field.value
+      : undefined
     return (
       <InputField {...field.inputFieldProps}>
-        <DateRangeField.Input {...inputProps} value={parsed.data} />
+        <DateRangeField.Input {...inputProps} value={parsed} />
       </InputField>
     )
   }
@@ -445,16 +540,29 @@ export const GeneratedInputField = <T extends FieldConfig>(
     )
   }
 
-  if (isParagraphFieldType(field)) {
-    // @todo: is this even needed?
-    const message = intl.formatMessage(fieldDefinition.label, {
-      [fieldDefinition.id]: field.value
-    })
+  if (isImageViewFieldType(field)) {
+    return (
+      <ImageView.Input
+        configuration={field.config.configuration}
+        value={field.value}
+      />
+    )
+  }
 
+  if (isParagraphFieldType(field)) {
     return (
       <Paragraph.Input
         configuration={field.config.configuration}
-        message={message}
+        message={intl.formatMessage(fieldDefinition.label)}
+      />
+    )
+  }
+
+  if (isHeadingFieldType(field)) {
+    return (
+      <Heading.Input
+        configuration={field.config.configuration}
+        message={intl.formatMessage(fieldDefinition.label)}
       />
     )
   }
@@ -511,6 +619,7 @@ export const GeneratedInputField = <T extends FieldConfig>(
       >
         <Number.Input
           {...inputProps}
+          integer={field.config.configuration?.integer}
           max={field.config.configuration?.max}
           min={field.config.configuration?.min}
           value={field.value}
@@ -549,11 +658,11 @@ export const GeneratedInputField = <T extends FieldConfig>(
           intl.formatMessage(field.config.configuration.prefix)
         }
       >
-        <TextArea
+        <TextArea.Input
           {...inputProps}
           maxLength={field.config.configuration?.maxLength}
           value={field.value}
-          onChange={(e) => onFieldValueChange(name, e.target.value)}
+          onChange={(val) => onFieldValueChange(name, val)}
         />
       </InputField>
     )
@@ -571,6 +680,7 @@ export const GeneratedInputField = <T extends FieldConfig>(
           acceptedFileTypes={field.config.configuration.acceptedFileTypes}
           disabled={disabled}
           error={inputFieldProps.error}
+          filePath={requireAttachmentPath(attachmentPath, name)}
           label={uploadedFileNameLabel}
           maxFileSize={field.config.configuration.maxFileSize}
           maxImageSize={field.config.configuration.maxImageSize}
@@ -596,6 +706,7 @@ export const GeneratedInputField = <T extends FieldConfig>(
         <Address.Input
           config={field.config}
           disabled={disabled}
+          eventConfig={eventConfig}
           id={field.config.id}
           name={name}
           touched={groupTouched}
@@ -692,6 +803,7 @@ export const GeneratedInputField = <T extends FieldConfig>(
         <SignatureField.Input
           {...field.config}
           disabled={disabled}
+          filePath={requireAttachmentPath(attachmentPath, name)}
           maxFileSize={field.config.configuration.maxFileSize}
           modalTitle={intl.formatMessage(field.config.signaturePromptLabel)}
           name={name}
@@ -713,7 +825,11 @@ export const GeneratedInputField = <T extends FieldConfig>(
       <InputField {...inputFieldProps} htmlFor={name}>
         <AdministrativeArea.Input
           {...inputProps}
+          anchor={resolveLocationAnchor(field.config.configuration)}
+          configuration={field.config.configuration}
+          eventType={eventConfig?.id}
           partOf={typeof partOf === 'string' ? partOf : null}
+          searchMode={searchMode}
           value={field.value}
         />
       </InputField>
@@ -725,12 +841,11 @@ export const GeneratedInputField = <T extends FieldConfig>(
       <InputField {...inputFieldProps}>
         <LocationSearch.Input
           {...field.config}
+          anchor={resolveLocationAnchor(field.config.configuration)}
           disabled={disabled}
-          searchableResource={
-            field.config.configuration.searchableResource.length > 0
-              ? field.config.configuration.searchableResource
-              : ['locations']
-          }
+          eventType={eventConfig?.id}
+          locationTypes={field.config.configuration?.locationTypes}
+          searchMode={searchMode}
           value={field.value}
           onBlur={handleBlur}
           onChange={(val) => onFieldValueChange(name, val)}
@@ -744,8 +859,10 @@ export const GeneratedInputField = <T extends FieldConfig>(
       <InputField {...inputFieldProps}>
         <LocationSearch.Input
           {...field.config}
+          anchor={todayISO()}
           disabled={disabled}
-          searchableResource={['offices']}
+          eventType={eventConfig?.id}
+          locationTypes={['CRVS_OFFICE']}
           value={field.value}
           onBlur={handleBlur}
           onChange={(val) => onFieldValueChange(name, val)}
@@ -759,8 +876,10 @@ export const GeneratedInputField = <T extends FieldConfig>(
       <InputField {...inputFieldProps}>
         <LocationSearch.Input
           {...field.config}
+          anchor={todayISO()}
           disabled={disabled}
-          searchableResource={['facilities']}
+          eventType={eventConfig?.id}
+          locationTypes={['CRVS_OFFICE']}
           value={field.value}
           onBlur={handleBlur}
           onChange={(val) => onFieldValueChange(name, val)}
@@ -768,9 +887,11 @@ export const GeneratedInputField = <T extends FieldConfig>(
       </InputField>
     )
   }
+
   if (isDividerFieldType(field)) {
     return <Divider.Input />
   }
+
   if (isFileFieldWithOptionType(field)) {
     const resolvedOptions = resolveOptions(
       field.config.options,
@@ -783,11 +904,11 @@ export const GeneratedInputField = <T extends FieldConfig>(
           {...inputProps}
           acceptedFileTypes={field.config.configuration.acceptedFileTypes}
           error={inputFieldProps.error}
+          filePath={requireAttachmentPath(attachmentPath, name)}
           maxFileSize={field.config.configuration.maxFileSize}
           maxImageSize={field.config.configuration.maxImageSize}
           options={resolvedOptions}
-          // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-          value={field.value ?? []}
+          value={field.value}
           onChange={(val) => onFieldValueChange(name, val)}
         />
       </InputField>
@@ -810,9 +931,9 @@ export const GeneratedInputField = <T extends FieldConfig>(
       <AlphaPrintButton.Input
         buttonLabel={field.config.configuration.buttonLabel}
         disabled={disabled}
+        event={requireEvent(validatorContext.event?.document, name)}
         id={name}
         template={field.config.configuration.template}
-        value={field.value}
         onChange={(val) => onFieldValueChange(name, val)}
       />
     )
@@ -843,11 +964,32 @@ export const GeneratedInputField = <T extends FieldConfig>(
           ocrvsFullForm
         )}
         form={ocrvsFullForm}
-        parentValue={ocrvsFullForm[field.config.configuration.trigger.$$field]}
+        trigger={
+          field.config.configuration.trigger
+            ? {
+                mode: 'onChange',
+                value: ocrvsFullForm[field.config.configuration.trigger.$$field]
+              }
+            : { mode: 'onMount' }
+        }
         onChange={(val) => onFieldValueChange(name, val)}
       />
     )
   }
+
+  if (isAutocompleteFieldType(field)) {
+    return (
+      <InputField {...inputFieldProps}>
+        <Autocomplete.Input
+          {...field.config}
+          key={fieldDefinition.id}
+          value={field.value}
+          onChange={(val) => onFieldValueChange(fieldDefinition.id, val)}
+        />
+      </InputField>
+    )
+  }
+
   if (isSearchFieldType(field)) {
     const {
       label: inputLabel,
@@ -860,9 +1002,11 @@ export const GeneratedInputField = <T extends FieldConfig>(
         <Search.Input
           key={name}
           configuration={field.config.configuration}
+          disabled={inputProps.disabled}
           form={ocrvsFullForm}
           helperText={fieldDefinition.helperText}
           label={inputLabel}
+          placeholder={inputProps.placeholder}
           value={field.value}
           onChange={(val) => onFieldValueChange(name, val)}
         />
@@ -885,6 +1029,8 @@ export const GeneratedInputField = <T extends FieldConfig>(
       <VerificationStatus.Input
         configuration={field.config.configuration}
         id={field.config.id}
+        label={inputFieldProps.label}
+        required={inputFieldProps.required}
         value={field.value}
         onReset={() => {
           if (Array.isArray(fieldDefinition.parent)) {
@@ -922,11 +1068,13 @@ export const GeneratedInputField = <T extends FieldConfig>(
 
   if (isIdReaderFieldType(field)) {
     return (
-      <IdReader.Input
-        id={field.config.id}
-        methods={field.config.methods}
-        onChange={(val) => onFieldValueChange(name, val)}
-      />
+      <InputField variant="highlighted" {...inputFieldProps}>
+        <IdReader.Input
+          id={field.config.id}
+          methods={field.config.methods}
+          onChange={(val) => onFieldValueChange(name, val)}
+        />
+      </InputField>
     )
   }
 
@@ -941,10 +1089,42 @@ export const GeneratedInputField = <T extends FieldConfig>(
 
   if (isLoaderFieldType(field)) {
     return (
-      <Loader.Input
-        configuration={field.config.configuration}
-        id={field.config.id}
-      />
+      <InputField {...inputFieldProps} variant={field.config.variant}>
+        <Loader.Input
+          configuration={field.config.configuration}
+          id={field.config.id}
+        />
+      </InputField>
+    )
+  }
+
+  if (isCustomFieldType(field)) {
+    return (
+      <InputField {...inputFieldProps}>
+        <Custom.Input
+          {...field.config}
+          configuration={field.config.configuration}
+          disabled={disabled}
+          id={field.config.id}
+          value={field.value}
+          onBlur={handleBlur}
+          onChange={(val) => onFieldValueChange(fieldDefinition.id, val)}
+        />
+      </InputField>
+    )
+  }
+
+  if (isHiddenFieldType(field)) {
+    return (
+      <Hidden.Input {...inputProps} value={field.value as string | undefined} />
+    )
+  }
+
+  if (isUserRoleFieldType(field)) {
+    return (
+      <InputField {...inputFieldProps}>
+        <UserRole.Input {...inputProps} value={field.value} />
+      </InputField>
     )
   }
 

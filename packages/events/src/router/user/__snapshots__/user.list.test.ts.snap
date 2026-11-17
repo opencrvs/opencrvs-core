@@ -3,104 +3,73 @@
 exports[`Returns both normal users and system users 1`] = `
 [
   {
+    "administrativeAreaId": "27160bbd-32d1-4625-812f-860226bfb92a",
     "avatar": undefined,
-    "device": undefined,
     "fullHonorificName": undefined,
     "id": "[sanitized]",
-    "name": [
-      {
-        "family": "Doe",
-        "given": [
-          "John",
-        ],
-        "use": "en",
-      },
-    ],
-    "primaryOfficeId": "27160bbd-32d1-4625-812f-860226bfb92a",
+    "name": {
+      "firstname": "John",
+      "surname": "Doe",
+    },
+    "primaryOfficeId": "0ffbd058-391f-42a3-839f-b6cdd55325db",
     "role": "REGISTRATION_AGENT",
-    "signature": undefined,
     "type": "user",
   },
   {
+    "administrativeAreaId": "15125bb4-f42d-41c1-b8fb-0012def8aa07",
     "avatar": undefined,
-    "device": undefined,
     "fullHonorificName": undefined,
     "id": "[sanitized]",
-    "name": [
-      {
-        "family": "Doe",
-        "given": [
-          "John",
-        ],
-        "use": "en",
-      },
-    ],
-    "primaryOfficeId": "5fe99b4f-c5c4-4fa2-929f-f27ffad4a5c8",
+    "name": {
+      "firstname": "John",
+      "surname": "Doe",
+    },
+    "primaryOfficeId": "71a46e4a-a030-48be-8a60-982d93a8192e",
     "role": "REGISTRATION_AGENT",
-    "signature": undefined,
     "type": "user",
   },
   {
+    "administrativeAreaId": "cb435d9c-910b-4d8a-a9ef-7b3f90516c5c",
     "avatar": undefined,
-    "device": undefined,
     "fullHonorificName": undefined,
     "id": "[sanitized]",
-    "name": [
-      {
-        "family": "Doe",
-        "given": [
-          "John",
-        ],
-        "use": "en",
-      },
-    ],
-    "primaryOfficeId": "bf6ba32a-eef5-4669-9397-2f5989eb23b9",
+    "name": {
+      "firstname": "John",
+      "surname": "Doe",
+    },
+    "primaryOfficeId": "def971c6-4303-40bf-8822-85468b8ab756",
     "role": "REGISTRATION_AGENT",
-    "signature": undefined,
     "type": "user",
   },
   {
+    "administrativeAreaId": "a0316c43-4f27-48fd-a034-ed3b4dc653fe",
     "avatar": undefined,
-    "device": undefined,
     "fullHonorificName": undefined,
     "id": "[sanitized]",
-    "name": [
-      {
-        "family": "Doe",
-        "given": [
-          "John",
-        ],
-        "use": "en",
-      },
-    ],
-    "primaryOfficeId": "15125bb4-f42d-41c1-b8fb-0012def8aa07",
+    "name": {
+      "firstname": "John",
+      "surname": "Doe",
+    },
+    "primaryOfficeId": "e0f1460b-9569-49cf-88eb-21e0c5f8c899",
     "role": "REGISTRATION_AGENT",
-    "signature": undefined,
     "type": "user",
   },
   {
+    "administrativeAreaId": "d2adaa28-878e-4b3d-adb5-ecedc043f15a",
     "avatar": undefined,
-    "device": undefined,
     "fullHonorificName": undefined,
     "id": "[sanitized]",
-    "name": [
-      {
-        "family": "Doe",
-        "given": [
-          "John",
-        ],
-        "use": "en",
-      },
-    ],
-    "primaryOfficeId": "f2a39423-0bc4-4dc4-9ef4-a3e4577305ad",
+    "name": {
+      "firstname": "John",
+      "surname": "Doe",
+    },
+    "primaryOfficeId": "ea498fc5-6ef8-4027-893f-972dbfe25fb9",
     "role": "REGISTRATION_AGENT",
-    "signature": undefined,
     "type": "user",
   },
   {
     "id": "[sanitized]",
     "name": "My health system integration",
-    "role": "HEALTH",
     "type": "system",
   },
 ]
@@ -109,98 +78,68 @@ exports[`Returns both normal users and system users 1`] = `
 exports[`Returns multiple users with honorifics 1`] = `
 [
   {
+    "administrativeAreaId": "27160bbd-32d1-4625-812f-860226bfb92a",
     "avatar": undefined,
-    "device": undefined,
     "fullHonorificName": "4th Class Registration Officer, John Doe",
     "id": "[sanitized]",
-    "name": [
-      {
-        "family": "Doe",
-        "given": [
-          "John",
-        ],
-        "use": "en",
-      },
-    ],
-    "primaryOfficeId": "27160bbd-32d1-4625-812f-860226bfb92a",
+    "name": {
+      "firstname": "John",
+      "surname": "Doe",
+    },
+    "primaryOfficeId": "0ffbd058-391f-42a3-839f-b6cdd55325db",
     "role": "REGISTRATION_AGENT",
-    "signature": undefined,
     "type": "user",
   },
   {
+    "administrativeAreaId": "15125bb4-f42d-41c1-b8fb-0012def8aa07",
     "avatar": undefined,
-    "device": undefined,
     "fullHonorificName": "5th Class Registration Officer, John Doe",
     "id": "[sanitized]",
-    "name": [
-      {
-        "family": "Doe",
-        "given": [
-          "John",
-        ],
-        "use": "en",
-      },
-    ],
-    "primaryOfficeId": "5fe99b4f-c5c4-4fa2-929f-f27ffad4a5c8",
+    "name": {
+      "firstname": "John",
+      "surname": "Doe",
+    },
+    "primaryOfficeId": "71a46e4a-a030-48be-8a60-982d93a8192e",
     "role": "REGISTRATION_AGENT",
-    "signature": undefined,
     "type": "user",
   },
   {
+    "administrativeAreaId": "cb435d9c-910b-4d8a-a9ef-7b3f90516c5c",
     "avatar": undefined,
-    "device": undefined,
     "fullHonorificName": "6th Class Registration Officer, John Doe",
     "id": "[sanitized]",
-    "name": [
-      {
-        "family": "Doe",
-        "given": [
-          "John",
-        ],
-        "use": "en",
-      },
-    ],
-    "primaryOfficeId": "bf6ba32a-eef5-4669-9397-2f5989eb23b9",
+    "name": {
+      "firstname": "John",
+      "surname": "Doe",
+    },
+    "primaryOfficeId": "def971c6-4303-40bf-8822-85468b8ab756",
     "role": "REGISTRATION_AGENT",
-    "signature": undefined,
     "type": "user",
   },
   {
+    "administrativeAreaId": "a0316c43-4f27-48fd-a034-ed3b4dc653fe",
     "avatar": undefined,
-    "device": undefined,
     "fullHonorificName": "7th Class Registration Officer, John Doe",
     "id": "[sanitized]",
-    "name": [
-      {
-        "family": "Doe",
-        "given": [
-          "John",
-        ],
-        "use": "en",
-      },
-    ],
-    "primaryOfficeId": "15125bb4-f42d-41c1-b8fb-0012def8aa07",
+    "name": {
+      "firstname": "John",
+      "surname": "Doe",
+    },
+    "primaryOfficeId": "e0f1460b-9569-49cf-88eb-21e0c5f8c899",
     "role": "REGISTRATION_AGENT",
-    "signature": undefined,
     "type": "user",
   },
   {
+    "administrativeAreaId": "d2adaa28-878e-4b3d-adb5-ecedc043f15a",
     "avatar": undefined,
-    "device": undefined,
     "fullHonorificName": "8th Class Registration Officer, John Doe",
     "id": "[sanitized]",
-    "name": [
-      {
-        "family": "Doe",
-        "given": [
-          "John",
-        ],
-        "use": "en",
-      },
-    ],
-    "primaryOfficeId": "f2a39423-0bc4-4dc4-9ef4-a3e4577305ad",
+    "name": {
+      "firstname": "John",
+      "surname": "Doe",
+    },
+    "primaryOfficeId": "ea498fc5-6ef8-4027-893f-972dbfe25fb9",
     "role": "REGISTRATION_AGENT",
-    "signature": undefined,
     "type": "user",
   },
 ]

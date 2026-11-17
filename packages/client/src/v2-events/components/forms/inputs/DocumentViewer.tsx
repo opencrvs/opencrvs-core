@@ -10,12 +10,16 @@
  */
 
 import styled from 'styled-components'
-import React, { useState } from 'react'
-import PanControls from '@opencrvs/components/lib/DocumentViewer/components/PanControls'
-import PanViewer from '@opencrvs/components/lib/DocumentViewer/components/PanViewer'
+import React, { useEffect, useState } from 'react'
+import { useIntl } from 'react-intl'
+import { PanControls, PanViewer, Button } from '@opencrvs/components'
+import { DocumentPath } from '@opencrvs/commons/client'
 import { Option } from '@client/v2-events/utils'
+import { precacheFile, toFileUrl } from '@client/v2-events/cache'
+import { buttonMessages, formMessages } from '@client/i18n/messages'
 import { Select } from './Select'
 import { SimplePdfPreview } from './FileInput/SimplePdfPreview'
+import { PreviewErrorBox } from './FileInput/PreviewErrorBox'
 
 /* Based on components/DocumentViewer.tsx */
 
@@ -50,13 +54,14 @@ const ViewerHeader = styled.div`
 `
 
 const ViewerImage = styled.div`
+  position: relative;
   display: flex;
   height: 700px;
   align-items: center;
 `
 export interface DocumentViewerOptionValue {
   filename: string
-  url: string
+  url: DocumentPath
   id: string
 }
 
@@ -69,6 +74,7 @@ export function DocumentViewer({
   options: Option<DocumentViewerOptionValue>[]
   children?: React.ReactNode
 }) {
+  const intl = useIntl()
   const [selectedOption, setSelectedOption] = useState<
     Option<DocumentViewerOptionValue> | undefined
   >(options[0])
@@ -78,6 +84,25 @@ export function DocumentViewer({
 
   const [zoom, setZoom] = useState(1)
   const [rotation, setRotation] = useState(0)
+  const [imageFailed, setImageFailed] = useState(false)
+  const [isRetrying, setIsRetrying] = useState(false)
+
+  // DocumentViewer isn't remounted when switching documents, so clear a previous document's failure state before the new one loads.
+  useEffect(() => {
+    setImageFailed(false)
+  }, [selectedOption?.value.url])
+
+  async function retry(url: DocumentPath) {
+    setIsRetrying(true)
+    try {
+      await precacheFile(url)
+      setImageFailed(false)
+    } catch {
+      setImageFailed(true)
+    } finally {
+      setIsRetrying(false)
+    }
+  }
 
   const zoomIn = () => {
     setZoom((prev) => prev + 0.2)
@@ -97,13 +122,36 @@ export function DocumentViewer({
   }
 
   const renderDocument = () => {
-    const url = selectedOption?.value.url || ''
+    const url = (selectedOption?.value.url || '') as DocumentPath
 
     if (url.toLowerCase().endsWith('.pdf')) {
-      return <SimplePdfPreview pdfUrl={url} />
+      return <SimplePdfPreview path={url} />
     }
 
-    return <PanViewer image={url} rotation={rotation} zoom={zoom} />
+    if (imageFailed) {
+      return (
+        <PreviewErrorBox>
+          {intl.formatMessage(formMessages.imageLoadFailed)}
+          <Button
+            id="preview_retry"
+            loading={isRetrying}
+            type="secondary"
+            onClick={async () => retry(url)}
+          >
+            {intl.formatMessage(buttonMessages.retry)}
+          </Button>
+        </PreviewErrorBox>
+      )
+    }
+
+    return (
+      <PanViewer
+        image={toFileUrl(url)}
+        rotation={rotation}
+        zoom={zoom}
+        onError={() => setImageFailed(true)}
+      />
+    )
   }
 
   return (

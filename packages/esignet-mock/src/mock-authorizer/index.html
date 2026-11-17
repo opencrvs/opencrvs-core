@@ -1,0 +1,194 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>eSignet</title>
+    <link
+      rel="icon"
+      href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink' width='320' height='320' viewBox='0 0 320 320'><defs><clipPath id='clip-Original_Small_Scale_Logo_SVG'><rect width='320' height='320'/></clipPath></defs><g id='Original_Small_Scale_Logo_SVG' clip-path='url(%23clip-Original_Small_Scale_Logo_SVG)'><path id='Path_54' data-name='Path 54' d='M135.739,0h-4.277A131.574,131.574,0,0,0,0,131.686v.2a123.842,123.842,0,0,0,123.943,123.74H251.934a15.51,15.51,0,0,0,15.489-15.5V131.686c0-.078,0-.155,0-.233A131.569,131.569,0,0,0,135.739,0m86.643,221.217-.011.038-.746,0-.037,0-.04,0-81.484-.2c-2.156.131-4.33.2-6.521.2-2.253,0-4.482-.1-6.7-.234H126.5l.011-.023c-51.621-3.392-92.384-43.748-92.384-93.067,0-51.542,44.512-93.326,99.419-93.326s99.42,41.783,99.42,93.326A88.046,88.046,0,0,1,230.386,149L126.5,148.993c-11.24,0-20.426-8.382-20.426-18.934s9.185-18.081,20.426-18.081h3.593l61.369.279c-7.242-23.623-30.422-40.91-57.917-40.91-33.29,0-60.278,25.333-60.278,56.583s26.988,56.583,60.278,56.583h87.263l.059.034c.242-.007.48-.034.723-.034,10.809,0,19.571,8.226,19.571,18.371,0,9.895-8.339,17.939-18.777,18.334' transform='translate(26 32)' fill='%23eb6f2d'/></g></svg>"
+    />
+
+    <style type="text/css">
+      body {
+        background: linear-gradient(
+          to bottom,
+          rgb(142, 166, 231),
+          rgba(191, 213, 253, 0.5),
+          rgba(255, 255, 255, 1)
+        );
+        height: 100vh;
+        margin: 0;
+        font-family:
+          ui-sans-serif,
+          system-ui,
+          sans-serif,
+          Apple Color Emoji,
+          Segoe UI Emoji,
+          Segoe UI Symbol,
+          Noto Color Emoji;
+        font-size: 16px;
+        display: grid;
+        grid-template-rows: 70px 1fr 60px;
+      }
+      header {
+        background: #fff;
+        display: flex;
+        align-items: center;
+        padding-left: 64px;
+      }
+      main {
+        background: #fff;
+        align-self: center;
+        justify-self: center;
+        width: 320px;
+        border-radius: 16px;
+        padding: 20px;
+      }
+      footer {
+        background: #004282;
+        color: white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      #id-input {
+        height: 40px;
+        font-size: 17px;
+        border: 1px solid #dbdbdb;
+        width: calc(100% - 12px - 12px - 2px);
+        margin: 8px 0;
+        border-radius: 4px;
+        padding: 0 12px;
+      }
+      #authenticate {
+        line-height: 40px;
+        font-size: 14px;
+        background: #004282;
+        border-radius: 4px;
+        text-align: center;
+        width: 100%;
+        border: 0;
+        color: #fff;
+        cursor: pointer;
+      }
+
+      #authenticate:hover {
+        background: #005bb6;
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <img
+        src="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink' width='320' height='320' viewBox='0 0 320 320'><defs><clipPath id='clip-Original_Small_Scale_Logo_SVG'><rect width='320' height='320'/></clipPath></defs><g id='Original_Small_Scale_Logo_SVG' clip-path='url(%23clip-Original_Small_Scale_Logo_SVG)'><path id='Path_54' data-name='Path 54' d='M135.739,0h-4.277A131.574,131.574,0,0,0,0,131.686v.2a123.842,123.842,0,0,0,123.943,123.74H251.934a15.51,15.51,0,0,0,15.489-15.5V131.686c0-.078,0-.155,0-.233A131.569,131.569,0,0,0,135.739,0m86.643,221.217-.011.038-.746,0-.037,0-.04,0-81.484-.2c-2.156.131-4.33.2-6.521.2-2.253,0-4.482-.1-6.7-.234H126.5l.011-.023c-51.621-3.392-92.384-43.748-92.384-93.067,0-51.542,44.512-93.326,99.419-93.326s99.42,41.783,99.42,93.326A88.046,88.046,0,0,1,230.386,149L126.5,148.993c-11.24,0-20.426-8.382-20.426-18.934s9.185-18.081,20.426-18.081h3.593l61.369.279c-7.242-23.623-30.422-40.91-57.917-40.91-33.29,0-60.278,25.333-60.278,56.583s26.988,56.583,60.278,56.583h87.263l.059.034c.242-.007.48-.034.723-.034,10.809,0,19.571,8.226,19.571,18.371,0,9.895-8.339,17.939-18.777,18.334' transform='translate(26 32)' fill='%23eb6f2d'/></g></svg>"
+        alt="E-Signet"
+        style="width: 50px; margin-right: 6px"
+      />
+      <h1 style="margin: 0; padding: 0; font-size: 26px">Signet</h1>
+    </header>
+    <main>
+      <!-- info text-->
+      <center>
+        <p style="margin-top: 0">Login</p>
+        <p style="color: #9ca3af">Please enter your UIN/VID</p>
+      </center>
+
+      <!-- OpenCRVS & E-Signet images -->
+      <div
+        style="
+          display: flex;
+          justify-content: space-around;
+          align-items: center;
+        "
+      >
+        <div style="padding: 5px">
+          <svg
+            style="width: 80px"
+            version="1.1"
+            xmlns="http://www.w3.org/2000/svg"
+            xmlns:xlink="http://www.w3.org/1999/xlink"
+            viewBox="0 0 150 150"
+          >
+            <path
+              style="fill: #1470ff"
+              d="M109.375,0h-0.1489563c-1.5796814,0-2.9581299,1.1752625-3.0952911,2.74897
+            C104.7388,18.7205124,91.3327332,31.25,75,31.25c-16.3325577,0-29.7387848-12.5294876-31.1307526-28.50103
+            C43.7320938,1.1752586,42.3536377,0,40.7739639,0H40.625C18.1884308,0,0,18.1884308,0,40.625v68.75
+            C0,131.8115692,18.1884308,150,40.625,150h0.1489639c1.5796738,0,2.9581223-1.1752625,3.0952835-2.7489624
+            C45.2612152,131.2795105,58.6674423,118.7501831,75,118.7501831c16.3327332,0,29.7388,12.5293274,31.1307526,28.5008392
+            C106.2679138,148.8247375,107.6463623,150,109.2260437,150H109.375C131.8115692,150,150,131.8115692,150,109.375v-68.75
+            C150,18.1884308,131.8115692,0,109.375,0z M75,106.25c-17.2588348,0-31.25-13.9909668-31.25-31.25
+            c0-17.2588348,13.9911652-31.25,31.25-31.25c17.2590179,0,31.25,13.9911652,31.25,31.25
+            C106.25,92.2590332,92.2590179,106.25,75,106.25z"
+            ></path>
+          </svg>
+        </div>
+        <div>
+          <svg
+            width="50"
+            height="50"
+            viewBox="0 0 50 50"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <g
+              fill="none"
+              stroke="#5a5a5a"
+              stroke-width="4"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <path d="M10 15h30" />
+              <path d="M10 15l5-5" />
+              <path d="M10 15l5 5" />
+              <path d="M40 35H10" />
+              <path d="M40 35l-5 5" />
+              <path d="M40 35l-5-5" />
+            </g>
+          </svg>
+        </div>
+        <div style="width: 90px">
+          <img
+            src="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink' width='320' height='320' viewBox='0 0 320 320'><defs><clipPath id='clip-Original_Small_Scale_Logo_SVG'><rect width='320' height='320'/></clipPath></defs><g id='Original_Small_Scale_Logo_SVG' clip-path='url(%23clip-Original_Small_Scale_Logo_SVG)'><path id='Path_54' data-name='Path 54' d='M135.739,0h-4.277A131.574,131.574,0,0,0,0,131.686v.2a123.842,123.842,0,0,0,123.943,123.74H251.934a15.51,15.51,0,0,0,15.489-15.5V131.686c0-.078,0-.155,0-.233A131.569,131.569,0,0,0,135.739,0m86.643,221.217-.011.038-.746,0-.037,0-.04,0-81.484-.2c-2.156.131-4.33.2-6.521.2-2.253,0-4.482-.1-6.7-.234H126.5l.011-.023c-51.621-3.392-92.384-43.748-92.384-93.067,0-51.542,44.512-93.326,99.419-93.326s99.42,41.783,99.42,93.326A88.046,88.046,0,0,1,230.386,149L126.5,148.993c-11.24,0-20.426-8.382-20.426-18.934s9.185-18.081,20.426-18.081h3.593l61.369.279c-7.242-23.623-30.422-40.91-57.917-40.91-33.29,0-60.278,25.333-60.278,56.583s26.988,56.583,60.278,56.583h87.263l.059.034c.242-.007.48-.034.723-.034,10.809,0,19.571,8.226,19.571,18.371,0,9.895-8.339,17.939-18.777,18.334' transform='translate(26 32)' fill='%23eb6f2d'/></g></svg>"
+            alt="E-Signet"
+            style="width: 100px"
+          />
+        </div>
+      </div>
+
+      <!-- Login -->
+      <form id="login">
+        <label for="id-input" style="font-size: 12px; color: #111827b3"
+          >UIN/VID</label
+        ><br />
+        <input id="id-input" placeholder="Enter your UIN or VID" required />
+        <input type="submit" id="authenticate" value="Authenticate" />
+      </form>
+    </main>
+    <footer>Powered by E-Signet</footer>
+    <script>
+      /**
+       * @param {SubmitEvent} event
+       */
+      function handleSubmit(event) {
+        event.preventDefault();
+
+        const params = new URLSearchParams(window.location.search);
+        const destinationURL = new URL(params.get("redirect_uri"));
+        // instead of a E-Signet "code" (nonce), for mock, lets directly use the NID as the value
+        // this allows us to mock the correct user data without creating a database for the nonces
+        const personId = document.getElementById("id-input").value;
+        // it's base64'd using `btoa` so that in demo the NID doesn't leak to URL and cause awkward questions
+        destinationURL.searchParams.set("code", btoa(personId));
+
+        if (params.get("state"))
+          destinationURL.searchParams.set("state", params.get("state"));
+
+        console.log(destinationURL.href);
+        window.location.replace(destinationURL.href);
+      }
+
+      document.getElementById("login").addEventListener("submit", handleSubmit);
+    </script>
+  </body>
+</html>

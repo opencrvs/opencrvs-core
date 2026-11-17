@@ -19,10 +19,12 @@ import {
   isNonInteractiveFieldType,
   PageTypes,
   PageConfig,
-  ValidatorContext
+  AttachmentPath,
+  ValidatorContext,
+  isNameFieldType,
+  FieldConfig
 } from '@opencrvs/commons/client'
-import { MAIN_CONTENT_ANCHOR_ID } from '@opencrvs/components/lib/Frame/components/SkipToContent'
-import { Button } from '@opencrvs/components/lib/Button'
+import { MAIN_CONTENT_ANCHOR_ID, Button } from '@opencrvs/components'
 import {
   FormFieldGenerator,
   FormFieldGeneratorHandle
@@ -52,6 +54,7 @@ interface PagesProps {
   validatorContext: ValidatorContext
   continueButtonText?: string
   eventConfig?: EventConfig
+  attachmentPath: AttachmentPath
   isCorrection?: boolean
 }
 
@@ -62,6 +65,7 @@ interface PagesProps {
 export function Pages({
   formData,
   hideBackToReview = false,
+  attachmentPath,
   formPages,
   onPageChange,
   onSubmit,
@@ -112,24 +116,24 @@ export function Pages({
 
   // values is used on the verification page wizard to set the verification page result
   function onNextPage(values?: EventState) {
+    // submit() flushes the current page values (including values computed
+    // inside FormFieldGenerator, e.g. default values) into the form state
+    // store and returns any validation errors.
     const errors = formRef.current?.submit(values) ?? []
-    // onValidSubmit (i.e. switchToNextPage) is called as part of submit only if
-    // there are no errors in the form. But if the current page doesn't require
-    // completion to continue and there are errors on the page, we manually call
-    // switchToNextPage.
-    if (!page.requireCompletionToContinue && errors.length > 0) {
+    // Navigate when the page allows incomplete values, or when the page is
+    // error-free.
+    const allowErrors = !page.requireCompletionToContinue
+    if (allowErrors || errors.length === 0) {
       switchToNextPage()
     }
   }
 
-  function onPreviousPage() {
-    const previousPageIdx = pageIdx - 1
-    const previousPage =
-      previousPageIdx >= 0 ? visiblePages[previousPageIdx] : undefined
-
-    if (previousPage) {
-      return onPageChange(previousPage.id)
-    }
+  function handleSubmit() {
+    // submit() flushes the current page values (including values computed
+    // inside FormFieldGenerator, e.g. default values) into the form state
+    // store. Navigating to review is allowed even when the page has errors.
+    formRef.current?.submit()
+    onSubmit()
   }
 
   async function onClearPage() {
@@ -139,11 +143,34 @@ export function Pages({
       return
     }
 
+    /**
+     * A cleared field falls back to its configured default value. Fields with no
+     * default clear to `null`, except NAME fields: those hold an object, and
+     * `null` leaves the sub-inputs rendering the values that were just cleared,
+     * so they need an explicitly empty name instead.
+     */
+    function getClearedValue(field: FieldConfig) {
+      const defaultValue = getDefaultValue(field, {})
+
+      if (defaultValue !== undefined) {
+        return defaultValue
+      }
+
+      const candidate = { config: field, value: formData[field.id] }
+
+      if (!isNameFieldType(candidate)) {
+        return null
+      }
+
+      return candidate.config.configuration?.name?.middlename
+        ? { firstname: '', middlename: '', surname: '' }
+        : { firstname: '', surname: '' }
+    }
+
     const clearedPageValues = Object.fromEntries(
       page.fields
         .filter((field) => !isNonInteractiveFieldType(field))
-        // A cleared field falls back to its configured default value
-        .map((field) => [field.id, getDefaultValue(field, {}) ?? null])
+        .map((field) => [field.id, getClearedValue(field)])
     )
 
     setFormData({ ...formData, ...clearedPageValues })
@@ -173,17 +200,15 @@ export function Pages({
     : undefined
 
   const wizardProps = {
-    currentPage: pageIdx,
     pageTitle: intl.formatMessage(page.title),
     showReviewButton: !hideBackToReview,
     onNextPage,
-    onPreviousPage,
-    onSubmit
+    onSubmit: handleSubmit
   }
-
   const fields = (
     <FormFieldGenerator
       ref={formRef}
+      attachmentPath={attachmentPath}
       eventConfig={eventConfig}
       fields={page.fields}
       formTouched={formTouched}
@@ -193,7 +218,6 @@ export function Pages({
       validatorContext={validatorContext}
       onFormChange={setFormData}
       onTouchedChange={setFormTouched}
-      onValidSubmit={switchToNextPage}
     />
   )
 

@@ -1,0 +1,108 @@
+/*
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at https://mozilla.org/MPL/2.0/.
+ *
+ * OpenCRVS is also distributed under the terms of the Civil Registration
+ * & Healthcare Disclaimer located at http://opencrvs.org/license.
+ *
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
+ */
+
+import React, { useEffect } from 'react'
+import { useNavigate } from 'react-router-dom'
+import {
+  useTypedParams,
+  useTypedSearchParams
+} from 'react-router-typesafe-routes/dom'
+import { eventAttachmentPath } from '@opencrvs/commons/client'
+import { Pages as PagesComponent } from '@client/v2-events/features/events/components/Pages'
+import { getFormBackAction } from '@client/v2-events/layouts/form/FormBackAction'
+import { useEventFormData } from '@client/v2-events/features/events/useEventFormData'
+import { useEventFormNavigation } from '@client/v2-events/features/events/useEventFormNavigation'
+import { FormLayout } from '@client/v2-events/layouts'
+import { ROUTES } from '@client/v2-events/routes'
+import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
+import { useValidatorContext } from '@client/v2-events/hooks/useValidatorContext'
+import { EditPageBanner } from './EditPageBanner'
+import { useEditForm } from './useEditForm'
+
+export function Pages() {
+  const { eventId, pageId } = useTypedParams(ROUTES.V2.EVENTS.EDIT.PAGES)
+  const [searchParams] = useTypedSearchParams(ROUTES.V2.EVENTS.EDIT.PAGES)
+  const events = useEvents()
+  const navigate = useNavigate()
+  const { modal } = useEventFormNavigation()
+  const { getFormValues, setFormValues } = useEventFormData()
+  const formValues = getFormValues()
+  const event = events.getEvent.useGetEventFromCache(eventId)
+
+  const validatorContext = useValidatorContext(event)
+  const { eventConfiguration: configuration, formConfig } = useEditForm(event)
+  const declarationPages = formConfig.pages
+
+  const currentPageId =
+    declarationPages.find((p) => p.id === pageId)?.id || declarationPages[0]?.id
+
+  if (!currentPageId) {
+    throw new Error('Form does not have any pages')
+  }
+
+  useEffect(() => {
+    if (pageId !== currentPageId) {
+      navigate(
+        ROUTES.V2.EVENTS.EDIT.PAGES.buildPath(
+          {
+            eventId,
+            pageId: currentPageId
+          },
+          searchParams
+        ),
+        { replace: true }
+      )
+    }
+  }, [pageId, currentPageId, navigate, eventId, searchParams])
+
+  const onPageChange = (nextPageId: string) =>
+    navigate(
+      ROUTES.V2.EVENTS.EDIT.PAGES.buildPath(
+        { eventId, pageId: nextPageId },
+        searchParams
+      )
+    )
+
+  const backAction = getFormBackAction({
+    formPages: declarationPages,
+    formData: formValues,
+    validatorContext,
+    pageId: currentPageId,
+    onNavigateToPage: onPageChange
+  })
+
+  return (
+    <>
+      <EditPageBanner />
+      <FormLayout backAction={backAction} route={ROUTES.V2.EVENTS.EDIT}>
+        {modal}
+        <PagesComponent
+          attachmentPath={eventAttachmentPath(eventId)}
+          eventConfig={configuration}
+          formData={formValues}
+          formPages={declarationPages}
+          pageId={currentPageId}
+          setFormData={(data) => setFormValues(data)}
+          validatorContext={validatorContext}
+          onPageChange={onPageChange}
+          onSubmit={() =>
+            navigate(
+              ROUTES.V2.EVENTS.EDIT.REVIEW.buildPath(
+                { eventId },
+                { backTo: searchParams.backTo }
+              )
+            )
+          }
+        />
+      </FormLayout>
+    </>
+  )
+}

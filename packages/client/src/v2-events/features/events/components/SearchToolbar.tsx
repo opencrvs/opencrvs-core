@@ -13,9 +13,9 @@ import styled from 'styled-components'
 import { useIntl } from 'react-intl'
 import { useLocation, useNavigate } from 'react-router-dom'
 import { useSelector } from 'react-redux'
-import { ClearText } from '@opencrvs/components/src/icons'
-import { Button } from '@opencrvs/components/src/Button'
-import { Icon } from '@opencrvs/components/src/Icon'
+import { ClearText } from '@opencrvs/components/icons'
+import { Button, Icon } from '@opencrvs/components'
+import { getAcceptedScopesByType } from '@opencrvs/commons/client'
 import { ROUTES } from '@client/v2-events/routes'
 import { serializeSearchParams } from '@client/v2-events/features/events/Search/utils'
 import { getScope } from '@client/profile/profileSelectors'
@@ -119,7 +119,19 @@ export const SearchToolbar = () => {
 
   const scopes = useSelector(getScope) ?? []
 
-  const hasSearchScope = scopes.some((scope) => scope.startsWith('search'))
+  const hasSearchScope =
+    getAcceptedScopesByType({
+      acceptedScopes: ['record.search'],
+      scopes
+    }).length > 0
+
+  useEffect(() => {
+    // Clear the search term when navigating away from the search results page
+    if (location.pathname !== ROUTES.V2.SEARCH.buildPath({})) {
+      setSearchTerm(undefined)
+    }
+  }, [location.pathname])
+
   if (!hasSearchScope) {
     return null
   }
@@ -144,13 +156,6 @@ export const SearchToolbar = () => {
 
     navigate(`${searchUrl}?${serializedParams}`)
   }
-
-  useEffect(() => {
-    // Clear the search term when navigating away from the search results page
-    if (location.pathname !== ROUTES.V2.SEARCH.buildPath({})) {
-      setSearchTerm(undefined)
-    }
-  }, [location.pathname])
 
   return (
     <SearchBox className={'search-tool'}>

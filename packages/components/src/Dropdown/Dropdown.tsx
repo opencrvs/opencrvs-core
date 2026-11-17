@@ -10,8 +10,7 @@
  */
 
 import React, { ReactNode, useEffect } from 'react'
-import { disabled } from '../Button/Button.styles'
-import styled from 'styled-components'
+import styled, { css } from 'styled-components'
 import { DropdownProvider, useDropdown } from './DropdownContext'
 
 const StyledWrapper = styled.nav`
@@ -21,7 +20,8 @@ const StyledWrapper = styled.nav`
 
 const StyledTrigger = styled.div.withConfig({
   shouldForwardProp: (prop, defaultValidatorFn) =>
-    ['popovertarget'].includes(prop) || defaultValidatorFn(prop)
+    ['popovertarget', 'aria-label', 'ariaLabel'].includes(prop) ||
+    defaultValidatorFn(prop)
   // Forward popovertarget prop directly
 })<{ popovertarget?: string; dropdownName?: string }>`
   anchor-name: ${({ dropdownName }) =>
@@ -73,6 +73,12 @@ const Separator = styled.div<{ weight: number }>`
   border-bottom: ${({ weight }) => `${weight}px solid `}
     ${({ theme }) => theme.colors.grey300};
   margin: 4px 0;
+`
+
+const disabled = css`
+  opacity: 0.5;
+  pointer-events: none;
+  user-select: none;
 `
 
 const MenuItem = styled.li<{ disabled?: boolean }>`
@@ -134,15 +140,16 @@ export const DropdownMenu = ({
   )
 }
 
-const Trigger: React.FC<{ children: JSX.Element; asChild?: boolean }> = ({
-  children,
-  asChild = false
-}) => {
+const Trigger: React.FC<{
+  children: JSX.Element
+  asChild?: boolean
+  ariaLabel?: string
+}> = ({ children, asChild = false, ariaLabel }) => {
   const { dropdownName } = useDropdown()
 
   if (asChild) {
     return (
-      <StyledTrigger>
+      <StyledTrigger aria-label={ariaLabel}>
         {React.cloneElement(children, {
           ...children.props,
           popovertarget: `${dropdownName}-Dropdown-Content`,
@@ -154,6 +161,7 @@ const Trigger: React.FC<{ children: JSX.Element; asChild?: boolean }> = ({
   return (
     <StyledTrigger
       as={'button'}
+      aria-label={ariaLabel}
       popovertarget={`${dropdownName}-Dropdown-Content`}
       dropdownName={dropdownName}
     >

@@ -10,15 +10,14 @@
  */
 import { AuthServer } from '@auth/server'
 import { createProductionEnvironmentServer } from '@auth/tests/util'
-import {
-  DEFAULT_ROLES_DEFINITION,
-  SCOPES
-} from '@opencrvs/commons/authentication'
+import { encodeScope } from '@opencrvs/commons'
 import * as fetchMock from 'jest-fetch-mock'
+import { DEFAULT_ROLES_DEFINITION } from '@auth/features/authenticate/handler.test'
 
 jest.mock('@opencrvs/commons', () => {
   const actual = jest.requireActual('@opencrvs/commons')
   return {
+    __esModule: true,
     ...actual,
     triggerUserEventNotification: jest.fn()
   }
@@ -32,9 +31,12 @@ describe('authenticate handler receives a request', () => {
 
   beforeEach(async () => {
     server = await createProductionEnvironmentServer()
+    // eslint-disable-next-line @typescript-eslint/no-var-requires, @typescript-eslint/no-require-imports
+    const authService = require('../authenticate/service')
+    jest.spyOn(authService, 'recordUserAuditEvent').mockImplementation(() => {})
   })
 
-  describe('user management service says credentials are valid', () => {
+  describe('events service says credentials are valid', () => {
     it('verifies a code and generates a token', async () => {
       /* eslint-disable @typescript-eslint/no-require-imports */
       /* eslint-disable @typescript-eslint/no-var-requires */
@@ -58,8 +60,12 @@ describe('authenticate handler receives a request', () => {
         role: 'NATIONAL_SYSTEM_ADMIN',
         status: 'active',
         mobile: '+345345343',
-        email: 'test@test.org'
+        email: 'test@test.org',
+        primaryOfficeId: '1'
       })
+      jest
+        .spyOn(authService, 'assertOfficeIsActive')
+        .mockResolvedValue(undefined)
 
       const authRes: { result?: AuthenticateResponse } =
         await server.server.inject({
@@ -88,17 +94,54 @@ describe('authenticate handler receives a request', () => {
       const [, payload] = res.result!.token.split('.')
       const body = JSON.parse(Buffer.from(payload, 'base64').toString())
       expect(body.scope).toEqual([
-        SCOPES.USER_CREATE,
-        SCOPES.USER_READ,
-        SCOPES.USER_UPDATE,
-        SCOPES.ORGANISATION_READ_LOCATIONS,
-        SCOPES.PERFORMANCE_READ,
-        SCOPES.PERFORMANCE_READ_DASHBOARDS,
-        SCOPES.PERFORMANCE_EXPORT_VITAL_STATISTICS
+        encodeScope({ type: 'user.create' }),
+        encodeScope({ type: 'user.read' }),
+        encodeScope({ type: 'user.edit' }),
+        encodeScope({ type: 'organisation.read-locations' }),
+        encodeScope({ type: 'performance.read' }),
+        encodeScope({ type: 'performance.read-dashboards' }),
+        encodeScope({ type: 'performance.vital-statistics-export' })
       ])
       expect(body.sub).toBe('1')
     })
   })
+  it('returns both an access token and a refresh token', async () => {
+    fetch.mockResponseOnce(JSON.stringify(DEFAULT_ROLES_DEFINITION), {
+      status: 200
+    })
+    const authService = require('../authenticate/service')
+    const codeService = require('./service')
+    const codeSpy = jest.spyOn(codeService, 'sendVerificationCode')
+    jest.spyOn(authService, 'authenticate').mockReturnValue({
+      userId: '1',
+      role: 'NATIONAL_SYSTEM_ADMIN',
+      mobile: '+345345343',
+      primaryOfficeId: '1'
+    })
+    jest.spyOn(authService, 'assertOfficeIsActive').mockResolvedValue(undefined)
+
+    const authRes: { result?: { nonce: string } } = await server.server.inject({
+      method: 'POST',
+      url: '/authenticate',
+      payload: { username: '+345345343', password: '2r23432' }
+    })
+    const code = codeSpy.mock.calls[0][0]
+
+    const res: { result?: { token: string; refreshToken: string } } =
+      await server.server.inject({
+        method: 'POST',
+        url: '/verifyCode',
+        payload: { nonce: authRes.result!.nonce, code }
+      })
+
+    expect(res.result!.token).toBeDefined()
+    expect(res.result!.refreshToken).toBeDefined()
+    const [, payload] = res.result!.refreshToken.split('.')
+    const body = JSON.parse(Buffer.from(payload, 'base64').toString())
+    expect(body.aud).toContain('opencrvs:auth-refresh')
+    expect(body.sub).toBe('1')
+  })
+
   describe('user auth service says credentials are invalid', () => {
     it('returns a 401 if the code is bad', async () => {
       const authService = require('../authenticate/service')

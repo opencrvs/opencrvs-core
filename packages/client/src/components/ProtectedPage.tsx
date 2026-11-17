@@ -17,11 +17,7 @@ import IdleTimer from 'react-idle-timer'
 import { USER_DETAILS, UserDetails } from '@client/utils/userUtils'
 import { ProtectedAccount } from '@client/components/ProtectedAccount'
 import { getCurrentUserID, IUserData } from '@client/declarations'
-import { refreshToken } from '@client/utils/authUtils'
-import {
-  DESKTOP_TIME_OUT_MILLISECONDS,
-  REFRESH_TOKEN_CHECK_MILLIS
-} from '@client/utils/constants'
+import { DESKTOP_TIME_OUT_MILLISECONDS } from '@client/utils/constants'
 import { connect } from 'react-redux'
 import { refreshOfflineData } from '@client/offline/actions'
 import { PropsWithChildren } from 'react'
@@ -29,20 +25,14 @@ import { ForgotPIN } from '@client/views/Unlock/ForgotPIN'
 import { showPINUpdateSuccessToast } from '@client/notification/actions'
 import { CreatePin } from '@client/views/PIN/CreatePin'
 import { redirectToAuthentication } from '@client/profile/profileActions'
-import { LoadingBar } from '@opencrvs/components/src/LoadingBar/LoadingBar'
+import { LoadingBar } from '@opencrvs/components'
 import { RouteComponentProps, withRouter } from './WithRouterProps'
 import { getAuthenticated } from '@client/profile/profileSelectors'
 import { IStoreState } from '@client/store'
 import { shouldBypassLock } from '@client/utils/lockBypass'
 export const SCREEN_LOCK = 'screenLock'
 
-type OwnProps = PropsWithChildren<{
-  // Kept for the legacy (V1) declaration flow, which tolerates the app
-  // backgrounding at any point on these routes, not just right after an
-  // upload click. shouldBypassLock() covers the narrower, click-triggered
-  // case (e.g. v2-events routes, which don't match these route names).
-  unprotectedRouteElements?: string[]
-}>
+type OwnProps = PropsWithChildren<{}>
 
 type DispatchProps = {
   onNumPadVisible: () => void
@@ -112,20 +102,12 @@ class ProtectedPageComponent extends React.Component<Props, IProtectPageState> {
       },
       import.meta.env.PROD ? Math.max(200, 2000 - timeSinceMount) : 0
     )
-
-    setInterval(async () => {
-      if (!(await refreshToken())) this.props.redirectToAuthentication()
-    }, REFRESH_TOKEN_CHECK_MILLIS)
   }
 
   async handleVisibilityChange(isVisible: boolean) {
     const alreadyLocked = isVisible || (await storage.getItem(SCREEN_LOCK))
 
-    const onUnprotectedPage = this.props.unprotectedRouteElements?.some(
-      (route) => this.props.router.location.pathname.includes(route)
-    )
-
-    const lockShouldBeBypassed = onUnprotectedPage || shouldBypassLock()
+    const lockShouldBeBypassed = shouldBypassLock()
 
     const newState = { ...this.state }
 

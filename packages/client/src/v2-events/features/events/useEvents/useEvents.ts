@@ -11,7 +11,6 @@
 import { useQuery, useSuspenseQuery } from '@tanstack/react-query'
 import {
   ActionType,
-  QueryType,
   SearchQuery,
   UUID,
   getCurrentEventState,
@@ -24,23 +23,25 @@ import {
 } from '@opencrvs/commons/client'
 import { useTRPC } from '@client/v2-events/trpc'
 import { useDrafts } from '../../drafts/useDrafts'
-import { useEventConfigurations } from '../useEventConfiguration'
+import { useEventConfigurationResolver } from '../useEventConfiguration'
 import { useGetEvent } from './procedures/get'
 import { useOutbox } from './outbox'
 import { useCreateEvent } from './procedures/create'
 import { useDeleteEvent } from './procedures/delete'
-import {
-  useEventAction,
-  useEventCustomAction,
-  useIsMutating
-} from './procedures/actions/action'
+import { useEventAction, useIsMutating } from './procedures/actions/action'
+import { useEventCustomAction } from './procedures/actions/customAction'
 import { useGetEventCountsByWorkqueue } from './procedures/count'
 import { findLocalEventDocument, findLocalEventIndex } from './api'
 import { QueryOptions } from './procedures/utils'
+import {
+  byIdSearchOptions,
+  taggedSearchOptions,
+  SearchCacheTag
+} from './procedures/search'
 
 function getEventWithDraftOrThrow(
   id: string,
-  eventConfigs: EventConfig[],
+  findEventConfiguration: (event: EventDocument) => EventConfig | undefined,
   maybeDraft: Draft | undefined
 ): { event: EventDocument; draft: Draft; configuration: EventConfig } {
   const event = findLocalEventDocument(id)
@@ -50,8 +51,8 @@ function getEventWithDraftOrThrow(
   }
 
   const configuration = getOrThrow(
-    eventConfigs.find(({ id: cfgId }) => cfgId === event.type),
-    `Event configuration not found for ${event.type}`
+    findEventConfiguration(event),
+    `Event configuration not found for ${event.type}, version ${event.configVersionId}`
   )
 
   return { event, draft: maybeDraft, configuration }
@@ -73,26 +74,36 @@ export function useEvents() {
   const trpc = useTRPC()
   const getEvent = useGetEvent()
   const assignMutation = useEventAction(trpc.event.actions.assignment.assign)
-  const eventConfigs = useEventConfigurations()
-  const { getRemoteDraftByEventId } = useDrafts()
+  const findEventConfiguration = useEventConfigurationResolver()
+  const { useRemoteDraftByEventId } = useDrafts()
+
+  /** The result for a record the server has not indexed yet, from its draft. */
+  function buildDraftedResult(id: string, maybeDraft: Draft | undefined) {
+    const { event, draft, configuration } = getEventWithDraftOrThrow(
+      id,
+      findEventConfiguration,
+      maybeDraft
+    )
+    return buildDraftedEventResult(event, draft, configuration)
+  }
 
   return {
-    createEvent: useCreateEvent,
+    useCreateEvent,
     /** Returns an event with full history. If you only need the state of the event, use getEventState. */
     getEvent,
     useGetEventCountsByWorkqueue,
     deleteEvent: {
       useMutation: useDeleteEvent
     },
-    getOutbox: useOutbox,
+    useOutbox,
     searchEvent: {
       useQuery: (
         query: SearchQuery,
+        tag: SearchCacheTag,
         options: QueryOptions<typeof trpc.event.search> = {}
       ) => {
         return useQuery({
-          ...trpc.event.search.queryOptions(query),
-          queryKey: trpc.event.search.queryKey(query),
+          ...taggedSearchOptions(query, tag),
           refetchOnMount: 'always',
           staleTime: 0,
           ...options
@@ -100,11 +111,11 @@ export function useEvents() {
       },
       useSuspenseQuery: (
         query: SearchQuery,
+        tag: SearchCacheTag,
         options: QueryOptions<typeof trpc.event.search> = {}
       ) => {
         return useSuspenseQuery({
-          ...trpc.event.search.queryOptions(query),
-          queryKey: trpc.event.search.queryKey(query),
+          ...taggedSearchOptions(query, tag),
           refetchOnMount: 'always',
           staleTime: 0,
           ...options
@@ -113,41 +124,13 @@ export function useEvents() {
     },
     searchEventById: {
       useQuery: (id: string) => {
-        const query = {
-          type: 'and',
-          clauses: [{ id }]
-        } satisfies QueryType
-
-        const maybeDraft = getRemoteDraftByEventId(id)
-        const options = trpc.event.search.queryOptions({ query })
+        const maybeDraft = useRemoteDraftByEventId(id)
 
         return useQuery({
-          ...options,
-          queryKey: trpc.event.search.queryKey({ query }),
+          ...byIdSearchOptions(id, () => buildDraftedResult(id, maybeDraft)),
           enabled: !findLocalEventIndex(id),
-          staleTime: 0,
           refetchOnMount: 'always',
-          queryFn: async (...args) => {
-            // Try Elasticsearch first
-            const queryFn = options.queryFn
-            if (!queryFn) {
-              throw new Error('Query function is not defined')
-            }
-
-            const res = await queryFn(...args)
-            if (res.total > 0) {
-              return res
-            }
-
-            // Search for locally created events if record is not found in ES
-            const { event, draft, configuration } = getEventWithDraftOrThrow(
-              id,
-              eventConfigs,
-              maybeDraft
-            )
-
-            return buildDraftedEventResult(event, draft, configuration)
-          },
+          staleTime: 0,
           initialData: () => {
             const eventIndex = findLocalEventIndex(id)
             return eventIndex ? { results: [eventIndex], total: 1 } : undefined
@@ -155,37 +138,12 @@ export function useEvents() {
         })
       },
       useSuspenseQuery: (id: string) => {
-        const query = {
-          type: 'and',
-          clauses: [{ id }]
-        } satisfies QueryType
-
-        const options = trpc.event.search.queryOptions({ query })
-        const maybeDraft = getRemoteDraftByEventId(id)
+        const maybeDraft = useRemoteDraftByEventId(id)
 
         return useSuspenseQuery({
-          ...options,
-          queryKey: trpc.event.search.queryKey({ query }),
-          queryFn: async (...args) => {
-            // Try Elasticsearch first
-            const queryFn = options.queryFn
-            if (!queryFn) {
-              throw new Error('Query function is not defined')
-            }
-            const res = await queryFn(...args)
-            if (res.total > 0) {
-              return res
-            }
-
-            // Search for locally created events if record is not found in ES
-            const { event, draft, configuration } = getEventWithDraftOrThrow(
-              id,
-              eventConfigs,
-              maybeDraft
-            )
-
-            return buildDraftedEventResult(event, draft, configuration)
-          },
+          ...byIdSearchOptions(id, () => buildDraftedResult(id, maybeDraft)),
+          refetchOnMount: 'always',
+          staleTime: 0,
           initialData: () => {
             const eventIndex = findLocalEventIndex(id)
             return eventIndex ? { results: [eventIndex], total: 1 } : undefined
@@ -194,9 +152,10 @@ export function useEvents() {
       }
     },
     actions: {
-      validate: useEventAction(trpc.event.actions.validate.request),
+      custom: useEventAction(trpc.event.actions.custom.request),
       reject: useEventAction(trpc.event.actions.reject.request),
       archive: useEventAction(trpc.event.actions.archive.request),
+      unarchive: useEventAction(trpc.event.actions.unarchive.request),
       notify: useEventAction(trpc.event.actions.notify.request),
       declare: useEventAction(trpc.event.actions.declare.request),
       register: useEventAction(trpc.event.actions.register.request),
@@ -205,9 +164,15 @@ export function useEvents() {
         approve: useEventAction(trpc.event.actions.correction.approve.request),
         reject: useEventAction(trpc.event.actions.correction.reject.request)
       },
+      revocation: {
+        revoke: useEventAction(trpc.event.actions.revocation.revoke.request),
+        reinstate: useEventAction(
+          trpc.event.actions.revocation.reinstate.request
+        )
+      },
       assignment: {
         assign: {
-          isAssigning: (eventId: UUID) => {
+          useIsAssigning: (eventId: UUID) => {
             return useIsMutating(eventId, trpc.event.actions.assignment.assign)
           },
           mutate: async ({
@@ -249,10 +214,11 @@ export function useEvents() {
     },
     customActions: {
       registerOnDeclare: useEventCustomAction('registerOnDeclare'),
-      validateOnDeclare: useEventCustomAction('validateOnDeclare'),
-      registerOnValidate: useEventCustomAction('registerOnValidate'),
       archiveOnDuplicate: useEventCustomAction('archiveOnDuplicate'),
-      makeCorrectionOnRequest: useEventCustomAction('makeCorrectionOnRequest')
+      makeCorrectionOnRequest: useEventCustomAction('makeCorrectionOnRequest'),
+      editAndRegister: useEventCustomAction('editAndRegister'),
+      editAndDeclare: useEventCustomAction('editAndDeclare'),
+      editAndNotify: useEventCustomAction('editAndNotify')
     }
   }
 }

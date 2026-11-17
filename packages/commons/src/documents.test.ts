@@ -9,7 +9,32 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { FullDocumentPath } from './documents'
+import { FullDocumentPath, isS3Url } from './documents'
+
+describe('isS3Url', () => {
+  const host = 'https://s3.opencrvs.dev'
+
+  it.each(['jpg', 'jpeg', 'jfif', 'png', 'pdf', 'svg'])(
+    'matches a document url with a .%s extension',
+    (extension) => {
+      expect(isS3Url(`${host}/ocrvs/event-1/document-1.${extension}`)).toBe(
+        true
+      )
+    }
+  )
+
+  it('matches a .jfif document url with a query string', () => {
+    expect(isS3Url(`${host}/ocrvs/event-1/document-1.jfif?token=abc`)).toBe(
+      true
+    )
+  })
+
+  it('does not match non-document urls', () => {
+    expect(isS3Url(`${host}/index.html`)).toBe(false)
+    expect(isS3Url(`${host}/ocrvs/event-1/document-1.exe`)).toBe(false)
+  })
+})
+
 describe('FullDocumentPath', () => {
   it('should transform a path without slash prefix to have slash prefix', () => {
     const result = FullDocumentPath.parse(

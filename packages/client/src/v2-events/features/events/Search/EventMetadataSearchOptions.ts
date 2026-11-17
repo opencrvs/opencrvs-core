@@ -36,19 +36,19 @@ export const statusOptions = [
     }
   },
   {
-    value: EventStatus.enum.VALIDATED,
-    label: {
-      defaultMessage: 'Validated',
-      description: 'Option for form field: status of record',
-      id: 'advancedSearch.form.recordStatusValidated'
-    }
-  },
-  {
     value: EventStatus.enum.REGISTERED,
     label: {
       defaultMessage: 'Registered',
       description: 'Option for form field: status of record',
       id: 'advancedSearch.form.recordStatusRegistered'
+    }
+  },
+  {
+    value: EventStatus.enum.REVOKED,
+    label: {
+      defaultMessage: 'Revoked',
+      description: 'Option for form field: status of record',
+      id: 'advancedSearch.form.recordStatusRevoked'
     }
   },
   {
