@@ -26,32 +26,23 @@ let templateDir: string | undefined
  * of the pull request. It also lets a developer test template changes that are
  * not merged yet.
  */
-const TEMPLATE_DIR_ENV = 'OPENCRVS_TEMPLATE_DIR'
+const TEMPLATE_DIR_ENV = 'OPENCRVS_TEMPLATE_DIR_PATH'
 
 /**
- * @returns template directory. The directory in OPENCRVS_TEMPLATE_DIR if it is
- * set. If not, downloads the template from GitHub.
+ * @returns template directory. The directory in OPENCRVS_TEMPLATE_DIR_PATH if
+ * it is set. If not, downloads the template from GitHub.
  */
 export async function findTemplateDir() {
-const localTemplatePath = process.env.OPENCRVS_TEMPLATE_DIR_PATH
+  const localTemplatePath = process.env[TEMPLATE_DIR_ENV]
 
- if (localTemplatePath) {
+  if (localTemplatePath) {
     const localTemplateDirectory = path.resolve(localTemplatePath)
     if (!existsSync(path.join(localTemplateDirectory, 'Tiltfile'))) {
       throw new Error(
-        `${OPENCRVS_TEMPLATE_DIR_PATH} is set to ${localTemplatePath}, but that is not a country config template: there is no Tiltfile in it.`
+        `${TEMPLATE_DIR_ENV} is set to ${localTemplatePath}, but that is not a country config template: there is no Tiltfile in it.`
       )
     }
     return localTemplateDirectory
-  }
-  if (override) {
-    const overrideDir = path.resolve(override)
-    if (!existsSync(path.join(overrideDir, 'Tiltfile'))) {
-      throw new Error(
-        `${TEMPLATE_DIR_ENV} is set to ${overrideDir}, but that is not a country config template: there is no Tiltfile in it.`
-      )
-    }
-    return overrideDir
   }
 
   // Called more than once by the upgrade script, save the directory to prevent redownload.
