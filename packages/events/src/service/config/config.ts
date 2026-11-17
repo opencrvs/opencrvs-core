@@ -143,6 +143,11 @@ export async function getCountryTimeZone(token: TokenWithBearer) {
   return (await getInMemoryApplicationConfig(token)).SYSTEM_IANA_TIMEZONE
 }
 
+/** @returns today's date in the country's time zone. */
+export async function getCountryToday(token: TokenWithBearer) {
+  return toPlainDateInTimeZone(new Date(), await getCountryTimeZone(token))
+}
+
 /**
  * @returns the configuration of each event, at the version in effect today in the
  * country's time zone. For a record, use `getEventConfigurationForRecord` instead.

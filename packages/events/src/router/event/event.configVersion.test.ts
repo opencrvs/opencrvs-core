@@ -18,6 +18,7 @@ import {
   FieldType,
   getUUID,
   INITIAL_EVENT_CONFIG_VERSION_ID,
+  QueryType,
   TENNIS_CLUB_MEMBERSHIP,
   toVersionedEventConfig,
   VersionedEventConfig,
@@ -370,7 +371,11 @@ describe('the event configuration version of a record', () => {
     ])
   })
 
-  test('search finds a record by a field that only an older version has', async () => {
+  /**
+   * Declares a record with the nickname 'Ace' under v1. Then v2, which does not have the
+   * field, takes effect.
+   */
+  async function declareRecordWithNicknameOfOlderVersion() {
     await useVersions(versionWithNickname('v1'), version('v2', FUTURE))
     const { user, generator } = await setupTestCase()
     const client = createTestClient(user, SEARCH_SCOPES)
@@ -381,21 +386,36 @@ describe('the event configuration version of a record', () => {
       declaration: { ...declare.declaration, [NICKNAME_FIELD_ID]: 'Ace' }
     })
 
-    // v2, which has taken effect since, does not have the field.
     await useVersions(versionWithNickname('v1'), version('v2', PAST))
 
-    const { results } = await client.event.search({
-      query: {
-        type: 'and',
-        clauses: [
-          {
-            eventType: TENNIS_CLUB_MEMBERSHIP,
-            data: { [NICKNAME_FIELD_ID]: { type: 'exact', term: 'Ace' } }
-          }
-        ]
+    return { client, event }
+  }
+
+  const nicknameQuery = {
+    type: 'and',
+    clauses: [
+      {
+        eventType: TENNIS_CLUB_MEMBERSHIP,
+        data: { [NICKNAME_FIELD_ID]: { type: 'exact', term: 'Ace' } }
       }
-    })
+    ]
+  } satisfies QueryType
+
+  test('search finds a record by a field that only an older version has', async () => {
+    const { client, event } = await declareRecordWithNicknameOfOlderVersion()
+
+    const { results } = await client.event.search({ query: nicknameQuery })
 
     expect(results.map(({ id }) => id)).toEqual([event.id])
+  })
+
+  test('a workqueue count filters by a field that only an older version has', async () => {
+    const { client } = await declareRecordWithNicknameOfOlderVersion()
+
+    const counts = await client.workqueue.count([
+      { slug: 'recent', query: nicknameQuery }
+    ])
+
+    expect(counts).toEqual({ recent: 1 })
   })
 })

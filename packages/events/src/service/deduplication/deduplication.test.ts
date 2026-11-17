@@ -16,13 +16,21 @@ import {
   FieldValue,
   eventQueryDataGenerator,
   Clause,
-  getDeclarationFields
+  getDeclarationFields,
+  FieldType,
+  PlainDate,
+  toVersionedEventConfig,
+  withDeclarationField
 } from '@opencrvs/commons'
 import { ChildOnboardingEvent } from '@opencrvs/commons/fixtures'
 import { field, and, or, not } from '@opencrvs/commons/events/deduplication'
 import { getOrCreateClient } from '@events/storage/elasticsearch'
 import { getEventIndexName } from '@events/storage/__mocks__/elasticsearch'
-import { encodeEventIndex } from '@events/service/indexing/utils'
+import {
+  declarationReference,
+  encodeEventIndex,
+  encodeFieldId
+} from '@events/service/indexing/utils'
 import { createEventIndex } from '@events/tests/createEventIndex'
 import {
   generateElasticsearchQuery,
@@ -129,14 +137,15 @@ async function findDuplicates(eventComparison: Record<string, FieldValue[]>) {
     refresh: 'wait_for'
   })
 
-  const results = await searchForDuplicates(
-    eventQueryDataGenerator(
+  const results = await searchForDuplicates({
+    eventIndex: eventQueryDataGenerator(
       { declaration: newEvent, type: ChildOnboardingEvent.id },
       37
     ),
-    DeduplicationConfig.parse(LEGACY_BIRTH_DEDUPLICATION_RULES),
-    ChildOnboardingEvent
-  )
+    deduplication: DeduplicationConfig.parse(LEGACY_BIRTH_DEDUPLICATION_RULES),
+    versionedConfig: toVersionedEventConfig(ChildOnboardingEvent),
+    today: '2025-01-01' as PlainDate
+  })
 
   return results
 }
@@ -163,7 +172,7 @@ describe('deduplication query input conversion', () => {
       generateElasticsearchQuery(
         encodedEventIndex,
         Clause.parse(similarNamedChild),
-        ChildOnboardingEvent
+        [ChildOnboardingEvent]
       )
     ).toMatchSnapshot()
   })
@@ -182,7 +191,7 @@ describe('deduplication query input conversion', () => {
       generateElasticsearchQuery(
         encodedEventIndex,
         Clause.parse(childDobWithin5Days),
-        ChildOnboardingEvent
+        [ChildOnboardingEvent]
       )
     ).toMatchSnapshot()
   })
@@ -201,7 +210,7 @@ describe('deduplication query input conversion', () => {
       generateElasticsearchQuery(
         encodedEventIndex,
         Clause.parse(similarNamedMother),
-        ChildOnboardingEvent
+        [ChildOnboardingEvent]
       )
     ).toMatchSnapshot()
   })
@@ -220,7 +229,7 @@ describe('deduplication query input conversion', () => {
       generateElasticsearchQuery(
         encodedEventIndex,
         Clause.parse(similarAgedMother),
-        ChildOnboardingEvent
+        [ChildOnboardingEvent]
       )
     ).toMatchSnapshot()
   })
@@ -241,7 +250,7 @@ describe('deduplication query input conversion', () => {
         generateElasticsearchQuery(
           encodedEventIndex,
           Clause.parse(similarAgedMother),
-          ChildOnboardingEvent
+          [ChildOnboardingEvent]
         )
       ).toMatchSnapshot()
     })
@@ -260,7 +269,7 @@ describe('deduplication query input conversion', () => {
         generateElasticsearchQuery(
           encodedEventIndex,
           Clause.parse(similarAgedMother),
-          ChildOnboardingEvent
+          [ChildOnboardingEvent]
         )
       ).toMatchSnapshot()
     })
@@ -281,7 +290,7 @@ describe('deduplication query input conversion', () => {
       generateElasticsearchQuery(
         encodedEventIndex,
         Clause.parse(motherIdMatchesIfGiven),
-        ChildOnboardingEvent
+        [ChildOnboardingEvent]
       )
     ).toMatchSnapshot()
   })
@@ -300,7 +309,7 @@ describe('deduplication query input conversion', () => {
       generateElasticsearchQuery(
         encodedEventIndex,
         Clause.parse(exactNamedChild),
-        ChildOnboardingEvent
+        [ChildOnboardingEvent]
       )
     ).toMatchSnapshot()
   })
@@ -361,11 +370,14 @@ describe('deduplication tests', () => {
       type: ChildOnboardingEvent.id
     })
 
-    const matchResultForDuplicateEvent = await searchForDuplicates(
-      duplicateEvent,
-      DeduplicationConfig.parse(LEGACY_BIRTH_DEDUPLICATION_RULES),
-      ChildOnboardingEvent
-    )
+    const matchResultForDuplicateEvent = await searchForDuplicates({
+      eventIndex: duplicateEvent,
+      deduplication: DeduplicationConfig.parse(
+        LEGACY_BIRTH_DEDUPLICATION_RULES
+      ),
+      versionedConfig: toVersionedEventConfig(ChildOnboardingEvent),
+      today: '2025-01-01' as PlainDate
+    })
     expect(matchResultForDuplicateEvent).toHaveLength(1)
 
     const duplicateEventWithSameId = eventQueryDataGenerator({
@@ -374,11 +386,14 @@ describe('deduplication tests', () => {
       declaration: declarationOverrides
     })
 
-    const matchResultForEventWithSameId = await searchForDuplicates(
-      duplicateEventWithSameId,
-      DeduplicationConfig.parse(LEGACY_BIRTH_DEDUPLICATION_RULES),
-      ChildOnboardingEvent
-    )
+    const matchResultForEventWithSameId = await searchForDuplicates({
+      eventIndex: duplicateEventWithSameId,
+      deduplication: DeduplicationConfig.parse(
+        LEGACY_BIRTH_DEDUPLICATION_RULES
+      ),
+      versionedConfig: toVersionedEventConfig(ChildOnboardingEvent),
+      today: '2025-01-01' as PlainDate
+    })
     expect(matchResultForEventWithSameId).toHaveLength(0)
   })
   it('finds a duplicate with very similar details', async () => {
@@ -606,5 +621,54 @@ describe('deduplication tests', () => {
         'mother.nid': ['23412387', '23412387']
       })
     ).resolves.toHaveLength(0)
+  })
+})
+
+describe('deduplication across versions', () => {
+  const OLDER_FIELD_ID = 'mother.previousDob'
+
+  // Another version of the event, with a field that the record's own version does not have.
+  const otherVersion = withDeclarationField(ChildOnboardingEvent, {
+    id: OLDER_FIELD_ID,
+    type: FieldType.DATE,
+    label: {
+      id: 'mother.previousDob.label',
+      defaultMessage: 'Previous date of birth',
+      description: 'Field that only another version has'
+    }
+  })
+
+  const clause = Clause.parse(
+    field('mother.dob').dateRangeMatches({
+      days: 365,
+      matchAgainst: OLDER_FIELD_ID
+    })
+  )
+
+  const encodedEventIndex = encodeEventIndex(
+    eventQueryDataGenerator({
+      type: ChildOnboardingEvent.id,
+      declaration: { 'mother.dob': '1990-01-01' }
+    }),
+    ChildOnboardingEvent
+  )
+
+  it('matches against a field that only another version has', () => {
+    const query = generateElasticsearchQuery(encodedEventIndex, clause, [
+      ChildOnboardingEvent,
+      otherVersion
+    ])
+
+    expect(JSON.stringify(query)).toContain(
+      declarationReference(encodeFieldId(OLDER_FIELD_ID))
+    )
+  })
+
+  it('throws when no version has the field', () => {
+    expect(() =>
+      generateElasticsearchQuery(encodedEventIndex, clause, [
+        ChildOnboardingEvent
+      ])
+    ).toThrow(`Field with id ${OLDER_FIELD_ID} not found in any version`)
   })
 })

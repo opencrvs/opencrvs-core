@@ -22,7 +22,11 @@ import {
 } from '@opencrvs/commons/events'
 import { getUUID, TokenUserType } from '@opencrvs/commons'
 import { TrpcContext } from '@events/context'
-import { getEventConfigurationForRecord } from '@events/service/config/config'
+import {
+  getCountryToday,
+  getEventConfigurationForRecord,
+  getVersionedEventConfigurationById
+} from '@events/service/config/config'
 import { searchForDuplicates } from '@events/service/deduplication/deduplication'
 import { processAction } from '@events/service/events/events'
 
@@ -128,11 +132,15 @@ export const detectDuplicate: MiddlewareFunction<
     })
   }
 
-  const duplicates = await searchForDuplicates(
-    futureEventState,
-    dedupConfig,
-    config
-  )
+  const duplicates = await searchForDuplicates({
+    eventIndex: futureEventState,
+    deduplication: dedupConfig,
+    versionedConfig: await getVersionedEventConfigurationById({
+      eventType: storedEvent.type,
+      token
+    }),
+    today: await getCountryToday(token)
+  })
 
   if (duplicates.length > 0) {
     const event = await processAction(

@@ -18,14 +18,19 @@ import {
   ClauseOutput,
   FieldValue,
   EventConfig,
-  getDeclarationFieldById,
   FieldType,
   extractPotentialDuplicatesFromActions,
-  EventDocument
+  EventDocument,
+  getAllUniqueFields,
+  getEventConfigForRecord,
+  getEventConfigsInLookupOrder,
+  PlainDate,
+  VersionedEventConfig
 } from '@opencrvs/commons/events'
 import {
   getAcceptedScopesFromToken,
   getCurrentEventState,
+  getOrThrow,
   isPlainDate,
   logger,
   userCanAccessEventWithScopes
@@ -53,18 +58,21 @@ import { getEventConfigurationForRecord } from '../config/config'
  * If the value referenced in a query is missing, the query resolves to null
  * The `and` query resolves to null if any of the sub-queries is null,
  * while the `or` query resolves to null if all of the sub-queries are null
+ *
+ * @param eventConfigs the configurations to look fields up in: the record's own version
+ * first, then the other versions of its event in lookup order. A field of the other
+ * records (`matchAgainst`) may exist only in another version.
  */
-
 export function generateElasticsearchQuery(
   eventIndex: EncodedEventIndex,
   queryInput: ClauseOutput,
-  eventConfig: EventConfig
+  eventConfigs: EventConfig[]
 ): elasticsearch.estypes.QueryDslQueryContainer | null {
   if (queryInput.type === 'not') {
     const resolvedQuery = generateElasticsearchQuery(
       eventIndex,
       queryInput.clause,
-      eventConfig
+      eventConfigs
     )
     if (resolvedQuery === null) {
       return null
@@ -78,7 +86,7 @@ export function generateElasticsearchQuery(
   }
   if (queryInput.type === 'and') {
     const resolvedQueries = queryInput.clauses.map((clause) => {
-      return generateElasticsearchQuery(eventIndex, clause, eventConfig)
+      return generateElasticsearchQuery(eventIndex, clause, eventConfigs)
     })
 
     if (resolvedQueries.some((q) => q === null)) {
@@ -95,7 +103,7 @@ export function generateElasticsearchQuery(
     }
   } else if (queryInput.type === 'or') {
     const resolvedQueries = queryInput.clauses.map((clause) => {
-      return generateElasticsearchQuery(eventIndex, clause, eventConfig)
+      return generateElasticsearchQuery(eventIndex, clause, eventConfigs)
     })
 
     if (resolvedQueries.every((q) => q === null)) {
@@ -112,7 +120,11 @@ export function generateElasticsearchQuery(
   }
 
   function resolveFieldPath(fieldId: string): string {
-    const fieldConfig = getDeclarationFieldById(eventConfig, fieldId)
+    // When several versions have the field, `find` takes it from the first one: the record's own version.
+    const fieldConfig = getOrThrow(
+      eventConfigs.flatMap(getAllUniqueFields).find(({ id }) => id === fieldId),
+      `Field with id ${fieldId} not found in any version of event ${eventIndex.type}`
+    )
     const encodedFieldId = encodeFieldId(fieldId)
     if (fieldConfig.type == FieldType.NAME) {
       return nameQueryKey(encodedFieldId)
@@ -223,18 +235,34 @@ export function generateElasticsearchQuery(
   }
 }
 
-export async function searchForDuplicates(
-  eventIndex: EventIndex,
-  configuration: DeduplicationConfig,
-  eventConfig: EventConfig
-): Promise<{ score: number; event: EventIndex }[]> {
+/**
+ * @param today the date in the country's time zone, which orders the versions to look
+ * fields up in
+ */
+export async function searchForDuplicates({
+  eventIndex,
+  deduplication,
+  versionedConfig,
+  today
+}: {
+  eventIndex: EventIndex
+  deduplication: DeduplicationConfig
+  versionedConfig: VersionedEventConfig
+  today: PlainDate
+}): Promise<{ score: number; event: EventIndex }[]> {
   const esClient = getOrCreateClient()
-  const query = configuration.query
+  const query = deduplication.query
+  const eventConfig = getEventConfigForRecord(versionedConfig, eventIndex)
+  const otherVersionConfigs = getEventConfigsInLookupOrder(
+    versionedConfig,
+    today
+  ).filter((config) => config !== eventConfig)
 
   const esQuery = generateElasticsearchQuery(
     encodeEventIndex(eventIndex, eventConfig),
     query,
-    eventConfig
+    // Own version first, so a field is read with the type that the record was stored with.
+    [eventConfig, ...otherVersionConfigs]
   )
 
   if (!esQuery) {
