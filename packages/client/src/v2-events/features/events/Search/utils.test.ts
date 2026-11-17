@@ -25,8 +25,12 @@ import {
   AdministrativeAreaField,
   withDeclaration,
   getDeclaration,
-  getDeclarationPages
+  getDeclarationPages,
+  getAllUniqueFields,
+  toVersionedEventConfig,
+  withDeclarationField
 } from '@opencrvs/commons/client'
+import { getFieldsOfAllVersions } from '@client/v2-events/features/events/useEventConfiguration'
 import { toVersionedLocation } from '@client/v2-events/VersionedLocation'
 import { AdminStructureItem } from '@client/utils/referenceApi'
 import {
@@ -245,9 +249,10 @@ describe('serializeSearchParams and deserializeSearchParams (full roundtrip)', (
 describe('buildQuickSearchQuery', () => {
   it('should build a quick search query', () => {
     const searchTerm = 'abcdefg'
-    const resultQuery = buildQuickSearchQuery(searchTerm, [
-      tennisClubMembershipEvent
-    ])
+    const resultQuery = buildQuickSearchQuery(
+      searchTerm,
+      getAllUniqueFields(tennisClubMembershipEvent)
+    )
 
     expect(resultQuery).toEqual({
       type: 'or',
@@ -294,9 +299,10 @@ describe('buildQuickSearchQuery', () => {
 
   it('emails are searched only in email fields', () => {
     const searchTerm = 'abc@gmail.com'
-    const resultQuery = buildQuickSearchQuery(searchTerm, [
-      tennisClubMembershipEvent
-    ])
+    const resultQuery = buildQuickSearchQuery(
+      searchTerm,
+      getAllUniqueFields(tennisClubMembershipEvent)
+    )
 
     expect(resultQuery).toEqual({
       type: 'or',
@@ -310,6 +316,45 @@ describe('buildQuickSearchQuery', () => {
           }
         }
       ]
+    })
+  })
+})
+
+describe('buildQuickSearchQuery with the fields of every version', () => {
+  const NICKNAME_FIELD_ID = 'applicant.nickname'
+  const { versions, ...eventLevel } = toVersionedEventConfig(
+    tennisClubMembershipEvent
+  )
+  const [base] = versions
+
+  // v1 has a NAME field that v2, in effect since 2020, does not have.
+  const config = {
+    ...eventLevel,
+    versions: [
+      withDeclarationField(
+        { ...base, id: 'v1' },
+        {
+          id: NICKNAME_FIELD_ID,
+          type: FieldType.NAME,
+          label: {
+            id: 'nickname.label',
+            defaultMessage: 'Nickname',
+            description: 'Field that only the older version has'
+          }
+        }
+      ),
+      { ...base, id: 'v2', effectiveFrom: '2020-01-01' }
+    ]
+  }
+
+  it('searches a field that only an older version has', () => {
+    const resultQuery = buildQuickSearchQuery(
+      'abcdefg',
+      getFieldsOfAllVersions(config, '2025-06-01' as PlainDate)
+    )
+
+    expect(resultQuery.clauses).toContainEqual({
+      data: { [NICKNAME_FIELD_ID]: { type: 'fuzzy', term: 'abcdefg' } }
     })
   })
 })

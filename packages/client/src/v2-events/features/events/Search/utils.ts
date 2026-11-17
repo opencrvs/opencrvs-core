@@ -1080,20 +1080,14 @@ function buildQueryFromQuickSearchFields(
  *
  * The resulting query uses `OR` logic (`type: 'or'`), meaning any matching clause is sufficient.
  *
- * @param searchParams - A flat object of field-value pairs submitted from the UI.
- * @param events - The event configurations to extract searchable fields from.
+ * @param term - The term the user typed.
+ * @param fieldsOfEvents - The fields to search: those of every version of each event (`useSearchableFields`).
  * @returns QueryType - A structured query used to hit Elasticsearch.
  */
 export function buildQuickSearchQuery(
   term: string,
-  events: EventConfig[]
+  fieldsOfEvents: FieldConfig[]
 ): QueryType {
-  // Flatten all searchable fields from the selected events
-  const fieldsOfEvents = events.reduce<FieldConfig[]>((acc, event) => {
-    const fields = getAllUniqueFields(event)
-    return [...acc, ...fields]
-  }, [])
-
   const isEmailTerm = validateEmail(term)
 
   // Filter fields to only include those that are supported in quick search
