@@ -80,6 +80,10 @@ export const CreateUserInput = User.pick({
   data: true
 })
   .extend({
+    /**
+     * The id of the new user. If the input has no id, the server creates one.
+     */
+    id: UUID.optional(),
     username: z.undefined().optional(),
     password: z.undefined().optional(),
     signature: FileFieldValue.optional()

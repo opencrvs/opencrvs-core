@@ -387,6 +387,8 @@ export async function createUser(
   const resolvedUser = resolveCreateUserInput({ ...input, username })
 
   const userPayload = {
+    // Undefined lets the database create the id.
+    id: resolvedUser.id,
     firstname: resolvedUser.name.firstname,
     surname: resolvedUser.name.surname,
     // Normalise to undefined for the same reason as mobile above.

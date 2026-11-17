@@ -8,17 +8,13 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import fs from 'fs'
 import path from 'path'
 import { expect, Page } from '@playwright/test'
 import { faker } from '@faker-js/faker'
-import { v4 as uuidv4 } from 'uuid'
-import { createClient } from '@opencrvs/toolkit/api'
 import {
   continueForm,
   createPIN,
   getAuthTokens,
-  getToken,
   login,
   loginWithNewUser,
   NEW_USER_PASSWORD,
@@ -28,7 +24,6 @@ import {
   AUTH_URL,
   CLIENT_URL,
   CREDENTIALS,
-  GATEWAY_HOST,
   TEST_USER_PASSWORD
 } from '@e2e/support/constants'
 import { ASSETS_DIR } from '@e2e/support/paths'
@@ -109,8 +104,6 @@ export async function createRegistrarWithSignature(page: Page, office: string) {
   const { token } = await getAuthTokens(username, NEW_USER_PASSWORD)
   const userId = readUserId(token)
 
-  await repairSignaturePath(userId)
-
   return {
     userId,
     username,
@@ -125,49 +118,6 @@ function readUserId(token: string) {
   )
 
   return sub as string
-}
-
-/**
- * Re-attaches the signature under the user's real id.
- *
- * A signature attached while creating a user is uploaded before the user
- * exists, so it lands under the temporary id the form was using -
- * `users/tmp-<uuid>/...` - and the stored path keeps that prefix. Nothing
- * serves such a path, so the signature renders as a broken image everywhere
- * except the browser that uploaded it, which still has it cached.
- */
-async function repairSignaturePath(userId: string) {
-  const adminToken = await getToken(CREDENTIALS.NATIONAL_SYSTEM_ADMIN)
-  const signature = fs.readFileSync(path.join(ASSETS_DIR, 'sign1.png'))
-
-  const form = new FormData()
-  form.append(
-    'file',
-    new File([new Uint8Array(signature)], 'sign1.png', { type: 'image/png' })
-  )
-  form.append('transactionId', uuidv4())
-  form.append('path', `users/${userId}`)
-
-  const response = await fetch(`${GATEWAY_HOST}/upload`, {
-    method: 'POST',
-    headers: { Authorization: `Bearer ${adminToken}` },
-    body: form
-  })
-
-  if (!response.ok) {
-    throw new Error(`Failed to upload the signature: ${response.statusText}`)
-  }
-
-  const client = createClient(GATEWAY_HOST + '/events', `Bearer ${adminToken}`)
-
-  await client.user.update.mutate({
-    id: userId,
-    signature: {
-      path: await response.text(),
-      originalFilename: 'sign1.png',
-      type: 'image/png'
-    }
-  })
 }
 
 /**
