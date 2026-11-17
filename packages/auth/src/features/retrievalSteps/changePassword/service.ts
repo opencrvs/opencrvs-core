@@ -8,29 +8,11 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import fetch from 'node-fetch'
-import { env } from '@auth/environment'
-import { resolve } from 'url'
+import { internalClient } from '@auth/features/authenticate/service'
 
-export async function changePassword(
-  userId: string,
-  password: string,
-  remoteAddress: string,
-  userAgent: string
-) {
-  const url = resolve(env.USER_MANAGEMENT_URL, '/changePassword')
-
-  const res = await fetch(url, {
-    method: 'POST',
-    body: JSON.stringify({ userId, password }),
-    headers: {
-      'Content-Type': 'application/json',
-      'x-real-ip': remoteAddress,
-      'x-real-user-agent': userAgent
-    }
+export async function changePassword(userId: string, password: string) {
+  await internalClient.user.changePassword.mutate({
+    userId,
+    password
   })
-
-  if (res.status !== 200) {
-    throw Error(res.statusText)
-  }
 }

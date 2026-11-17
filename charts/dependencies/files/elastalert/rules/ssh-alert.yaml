@@ -1,0 +1,67 @@
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at https://mozilla.org/MPL/2.0/.
+#
+# OpenCRVS is also distributed under the terms of the Civil Registration
+# & Healthcare Disclaimer located at http://opencrvs.org/license.
+#
+# Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
+name: 'ssh-alert'
+type: 'frequency'
+index: 'kibana-alert-history-default'
+is_enabled: true
+num_events: 1
+realert:
+  minutes: 1
+terms_size: 50
+timeframe:
+  minutes: 1
+timestamp_field: '@timestamp'
+timestamp_type: 'iso'
+use_strftime_index: false
+# https://github.com/Yelp/elastalert/issues/1260
+raw_count_keys: false
+filter:
+  - query:
+      term:
+        rule.name.keyword:
+          value: 'Successful SSH login'
+
+alert:
+  - ${NOTIFICATION_TYPE}
+
+email:
+  - ${ALERT_EMAIL}
+
+# Old way to define alerting action, kept for backward compatibility with existing rules:
+http_post2_url: '${HTTP_POST2_ALERT_URL}'
+http_post2_payload:
+  subject: "{% raw %}{{DOMAIN}}{% endraw %}: Login to {{kibana.alert.context['__es-query'].hits[0]._source.user.name}} from {{kibana.alert.context['__es-query'].hits[0]._source.source.ip}} 🚨"
+  html: 'Login to https://kibana.{% raw %}{{DOMAIN}}{% endraw %} to view the alert.'
+  from: '{% raw %}{{SENDER_EMAIL_ADDRESS}}{% endraw %}'
+  to: '{% raw %}{{ALERT_EMAIL}}{% endraw %}'
+
+# New way to define alerting action with more flexible templating:
+alert_subject: '${DOMAIN}: SSH login alert 🚨'
+alert_text_type: alert_text_jinja
+email_format: 'html'
+
+alert_text: |
+  <p>Successful SSH login detected.</p>
+
+  <table border="1" cellpadding="6" cellspacing="0">
+    <tr>
+      <th>User</th>
+      <th>Source IP</th>
+    </tr>
+
+    {% for hit in kibana["alert"]["context"]["__es-query"]["hits"] %}
+    <tr>
+      <td>{{ hit["_source"]["user"]["name"] | default("unknown") }}</td>
+      <td>{{ hit["_source"]["source"]["ip"] | default("unknown") }}</td>
+    </tr>
+    {% endfor %}
+  </table>
+
+  <p>Open Kibana:</p>
+  <p><a href="https://kibana.${DOMAIN}">https://kibana.${DOMAIN}</a></p>

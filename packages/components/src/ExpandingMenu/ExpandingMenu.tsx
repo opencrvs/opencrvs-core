@@ -74,7 +74,10 @@ export const ExpandingMenu = ({
   }
 
   return (
-    <NavigationMainWrapper onClick={() => menuCollapse()}>
+    <NavigationMainWrapper
+      data-testid="expanding-menu"
+      onClick={() => menuCollapse()}
+    >
       <Backdrop />
       <NavigationContainer onClick={(e) => e.stopPropagation()}>
         {navigation && navigation()}

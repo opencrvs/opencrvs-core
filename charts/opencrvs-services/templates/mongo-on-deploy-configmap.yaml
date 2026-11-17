@@ -1,0 +1,14 @@
+{{- if eq .Values.mongodb.auth_mode "auto" }}
+apiVersion: v1
+data:
+  on-deploy.sh: |
+    {{- .Files.Get "files/mongodb-create-users.sh" | indent 8 }}
+kind: ConfigMap
+metadata:
+  labels:
+    app: mongo
+  annotations:
+    "helm.sh/hook": pre-install,pre-upgrade
+    "helm.sh/hook-weight": "0"
+  name: mongo-on-deploy-script
+{{- end }}

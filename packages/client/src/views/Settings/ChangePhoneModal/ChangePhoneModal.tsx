@@ -27,13 +27,16 @@ interface IProps {
 export function ChangePhoneModal({ show, onClose, onSuccess }: IProps) {
   const [view, setView] = React.useState(VIEW_TYPE.CHANGE_NUMBER)
   const [phoneNumber, setPhoneNumber] = React.useState(EMPTY_STRING)
-  const onSuccessChangeNumber = (phoneNumber: string) => {
+  const [nonce, setNonce] = React.useState(EMPTY_STRING)
+  const onSuccessChangeNumber = (phoneNumber: string, nonceValue: string) => {
     setPhoneNumber(phoneNumber)
+    setNonce(nonceValue)
     setView(VIEW_TYPE.VERIFY_NUMBER)
   }
   const restoreState = () => {
     setView(VIEW_TYPE.CHANGE_NUMBER)
     setPhoneNumber(EMPTY_STRING)
+    setNonce(EMPTY_STRING)
   }
   React.useEffect(() => {
     if (!show) {
@@ -52,6 +55,7 @@ export function ChangePhoneModal({ show, onClose, onSuccess }: IProps) {
         show={show && view === VIEW_TYPE.VERIFY_NUMBER}
         onSuccess={onSuccess}
         onClose={onClose}
+        nonce={nonce}
         data={{ phoneNumber }}
       />
     </>

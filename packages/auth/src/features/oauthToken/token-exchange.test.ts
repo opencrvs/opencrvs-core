@@ -10,7 +10,7 @@
  */
 import { readFileSync } from 'fs'
 import * as jwt from 'jsonwebtoken'
-import { TokenUserType } from '@opencrvs/commons'
+import { encodeScope, TokenUserType } from '@opencrvs/commons'
 import { AuthServer, createServer } from '@auth/server'
 import { createToken } from '@auth/features/authenticate/service'
 import { env } from '@auth/environment'
@@ -42,11 +42,10 @@ describe('token exchange for action confirmation', () => {
   it('issues a confirmation token bound to the event and action', async () => {
     const subjectToken = await createToken(
       'user-id',
-      ['record.register'],
+      [encodeScope({ type: 'record.register' })],
       ['opencrvs:auth-user'],
       'opencrvs:auth-service',
       undefined,
-      true,
       TokenUserType.enum.user
     )
 
@@ -60,8 +59,8 @@ describe('token exchange for action confirmation', () => {
     const payload = decodeTokenPayload(JSON.parse(res.payload).access_token)
     expect(payload.scope).toEqual(
       expect.arrayContaining([
-        'record.confirm-registration',
-        'record.reject-registration'
+        encodeScope({ type: 'record.confirm-registration' }),
+        encodeScope({ type: 'record.reject-registration' })
       ])
     )
     expect(payload.sub).toBe('user-id')
@@ -76,11 +75,10 @@ describe('token exchange for action confirmation', () => {
     // and audited as the system client, not as a user
     const subjectToken = await createToken(
       'system-id',
-      ['record.register'],
+      [encodeScope({ type: 'record.register' })],
       ['opencrvs:auth-user'],
       'opencrvs:auth-service',
       undefined,
-      true,
       TokenUserType.enum.system
     )
 

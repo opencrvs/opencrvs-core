@@ -17,14 +17,14 @@ export const requestRoutes = route(
   {
     params: { eventId: uuid().defined() },
     searchParams: {
-      workqueue: string()
+      backTo: string()
     }
   },
   {
     ONBOARDING: route('onboarding/:pageId', {
       params: { pageId: string() },
       searchParams: {
-        workqueue: string()
+        backTo: string()
       },
       hash: hashValues()
     }),
@@ -32,18 +32,18 @@ export const requestRoutes = route(
       params: { pageId: string() },
       searchParams: {
         from: string(),
-        workqueue: string()
+        backTo: string()
       },
       hash: hashValues()
     }),
     REVIEW: route('review', {
       searchParams: {
-        workqueue: string()
+        backTo: string()
       }
     }),
     SUMMARY: route('summary', {
       searchParams: {
-        workqueue: string()
+        backTo: string()
       },
       hash: hashValues()
     })
@@ -55,13 +55,13 @@ export const reviewRoutes = route(
   {
     params: { eventId: uuid().defined() },
     searchParams: {
-      workqueue: string()
+      backTo: string()
     }
   },
   {
     REVIEW: route('review', {
       searchParams: {
-        workqueue: string()
+        backTo: string()
       }
     })
   }

@@ -18,6 +18,7 @@ export {
   ArrowCounterClockwise,
   ArrowLeft,
   ArrowRight,
+  Briefcase,
   Buildings,
   CaretDown,
   CaretLeft,
@@ -69,6 +70,7 @@ export {
   Paperclip,
   PaperPlaneTilt,
   Pen,
+  PenNib,
   Pencil,
   PencilCircle,
   PencilLine,
@@ -93,6 +95,8 @@ export {
   WarningCircle,
   Webcam,
   X,
+  Stamp,
+  ChatText,
   XCircle
 } from 'phosphor-react'
 export * from './custom-icons'

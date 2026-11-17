@@ -10,7 +10,7 @@
  */
 /* eslint-disable max-lines */
 import { isArray, isNil, isPlainObject, isString } from 'lodash'
-import { parse as parseQuery, stringify } from 'query-string'
+import { parse as parseQuery, stringify } from 'qs'
 import { useSelector } from 'react-redux'
 import { validate as validateEmail } from 'email-validator'
 import {
@@ -32,9 +32,12 @@ import {
   EventStatus,
   AdvancedSearchConfigWithFieldsResolved,
   METADATA_FIELD_PREFIX,
-  ValidatorContext
+  ValidatorContext,
+  getAcceptedScopesByType,
+  scopeUsesFullOptions,
+  user
 } from '@opencrvs/commons/client'
-import { findScope, getAllUniqueFields } from '@opencrvs/commons/client'
+import { getAllUniqueFields } from '@opencrvs/commons/client'
 import { getScope } from '@client/profile/profileSelectors'
 import { Name } from '@client/v2-events/features/events/registered-fields/Name'
 import {
@@ -75,7 +78,9 @@ const defaultSearchFieldGenerator: Record<
       id: 'advancedSearch.registeredAtLocation.helperText'
     },
     configuration: {
-      searchableResource: ['locations', 'offices']
+      allowedLocations: user.jurisdiction(
+        user.scope('record.search').attribute('registeredIn')
+      )
     }
   }),
   'event.legalStatuses.REGISTERED.acceptedAt': (_) => ({
@@ -483,10 +488,22 @@ function applySearchFieldOverridesToFieldConfig(
       ...(searchField.options && { options: searchField.options })
     }
   }
-  return {
-    ...field,
-    ...commonConfig
+  if (
+    field.type === FieldType.LOCATION ||
+    field.type === FieldType.ADMINISTRATIVE_AREA
+  ) {
+    return {
+      ...field,
+      ...commonConfig,
+      ...(searchField.allowedLocations && {
+        configuration: {
+          ...field.configuration,
+          allowedLocations: searchField.allowedLocations
+        }
+      })
+    } as FieldConfig
   }
+  return { ...field, ...commonConfig }
 }
 
 /**
@@ -766,11 +783,23 @@ export function buildQuickSearchQuery(
  */
 export function checkScopeForEventSearch(eventId: string) {
   const scopes = useSelector(getScope)
-  const searchScopes = findScope(scopes ?? [], 'search')
 
-  const isEventSearchAllowed =
-    searchScopes &&
-    Object.keys(searchScopes.options).some((id) => eventId === id)
+  const searchScopes = getAcceptedScopesByType({
+    acceptedScopes: ['record.search'],
+    scopes: scopes ?? []
+  })
+
+  const isEventSearchAllowed = searchScopes.some((scope) => {
+    if (!scopeUsesFullOptions(scope)) {
+      return false
+    }
+
+    // Unless specified, event search is allowed for all events
+    return (
+      scope.options?.event?.includes(eventId) ||
+      scope.options?.event === undefined
+    )
+  })
 
   return isEventSearchAllowed
 }
@@ -795,7 +824,7 @@ export function serializeSearchParams(
     (acc, [key, value]) => {
       const serialized = serializeValue(value)
       // If we don't care about the empty objects, we might be able to keep it as simple as this:
-      if (!isNil(serialized)) {
+      if (!isNil(serialized) && !(serialized === '')) {
         acc[key] = serialized
       }
 
@@ -803,7 +832,11 @@ export function serializeSearchParams(
     },
     {} as Record<string, unknown>
   )
-  return stringify(simplifiedValue, { skipEmptyString: true })
+  return stringify(simplifiedValue, {
+    // Configs are to match query-string behavior. qs adds indices by default for arrays. Otherwise they are arbitrary.
+    indices: false,
+    sort: (a, b) => a.localeCompare(b)
+  })
 }
 
 function tryParse(value: unknown): unknown {
@@ -828,7 +861,9 @@ function tryParse(value: unknown): unknown {
 export function deserializeSearchParams(
   queryParams: string
 ): Record<string, unknown> {
-  const parsedParams = parseQuery(queryParams)
+  const parsedParams = parseQuery(queryParams, {
+    ignoreQueryPrefix: true
+  })
 
   const deserialized = Object.entries(parsedParams).reduce(
     (acc, [key, value]) => {

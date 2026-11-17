@@ -1,0 +1,85 @@
+{{ if and .Values.mongodb.enabled .Values.restore.enabled }}
+---
+apiVersion: batch/v1
+{{ if .Values.restore.cronjob }}
+kind: CronJob
+{{- else }}
+kind: Job
+{{- end }}
+metadata:
+  name: mongodb-restore
+  labels:
+    app: mongodb
+    job-type: restore
+spec:
+  {{ if .Values.restore.cronjob }}
+  schedule: {{ .Values.restore.backup_schedule | default .Values.restore.schedule }}
+  {{- if .Values.timezone }}
+  timeZone: {{ .Values.timezone }}
+  {{- end }}
+  jobTemplate:
+    spec:
+  {{- end }}
+      template:
+        metadata:
+          labels:
+            app: mongodb
+            job-type: restore
+        spec:
+          restartPolicy: OnFailure
+          containers:
+            - name: backup
+              image: mongo:4.4
+              env:
+                - name: MONGODB_HOST
+                  value: mongodb-0.mongodb.{{ .Release.Namespace }}.svc.cluster.local:27017
+              {{- if not .Values.mongodb.use_default_credentials }}
+                - name: MONGODB_ADMIN_USER
+                  valueFrom:
+                    secretKeyRef:
+                      name: {{ .Values.mongodb.admin_user_secret_name }}
+                      key: MONGODB_ADMIN_USER
+                - name: MONGODB_ADMIN_PASSWORD
+                  valueFrom:
+                    secretKeyRef:
+                      name: {{ .Values.mongodb.admin_user_secret_name }}
+                      key: MONGODB_ADMIN_PASSWORD
+              {{- end }}
+                - name: ENCRYPT_PASS
+                  valueFrom:
+                    secretKeyRef:
+                      name: {{ .Values.restore.backup_encryption_secret }}
+                      key: backup_encryption_key
+                - name: BACKUP_USER
+                  valueFrom:
+                    secretKeyRef:
+                      name: {{ .Values.restore.backup_server_secret }}
+                      key: user
+                - name: BACKUP_HOST
+                  valueFrom:
+                    secretKeyRef:
+                      name: {{ .Values.restore.backup_server_secret }}
+                      key: host
+                - name: BACKUP_REMOTE_DIR
+                  value: "{{ .Values.mongodb.restore_server_dir | default .Values.restore.backup_server_dir }}"
+              {{- include "render-env-vars" (dict "service_name" "restore" "Values" .Values) | nindent 4 }}
+              command: ["/scripts/restore.sh"]
+              volumeMounts:
+                - name: backup-ssh-key
+                  mountPath: /ssh
+                  readOnly: true
+                - mountPath: /scripts
+                  name: mongodb-scripts
+          volumes:
+            - name: backup-ssh-key
+              secret:
+                secretName: {{ .Values.restore.backup_server_secret }}
+                defaultMode: 0400
+                items:
+                  - key: ssh_key
+                    path: ssh_key
+            - name: mongodb-scripts
+              configMap:
+                name: mongodb-scripts
+                defaultMode: 0755
+{{- end }}

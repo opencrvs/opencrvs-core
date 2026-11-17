@@ -10,8 +10,14 @@
  */
 import styled from 'styled-components'
 import { Button } from './Button'
+import { ITheme } from '../theme'
 
-export const PrimaryButton = styled(Button)`
+/** @knipignore */
+export interface PrimaryButtonProps {
+  bg?: keyof ITheme['colors']
+}
+
+export const PrimaryButton = styled(Button)<PrimaryButtonProps>`
   padding: 0 8px;
   transition: background 0.4s ease;
   border-radius: 4px;
@@ -29,7 +35,7 @@ export const PrimaryButton = styled(Button)`
   }
 
   &:not([data-focus-visible-added]) {
-    background: ${({ theme }) => theme.colors.primary};
+    background: ${({ theme, bg = 'primary' }) => theme.colors[bg]};
     color: ${({ theme }) => theme.colors.white};
   }
 

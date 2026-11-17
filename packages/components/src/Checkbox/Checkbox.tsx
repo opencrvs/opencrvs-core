@@ -42,9 +42,12 @@ const Check = styled.span<{ size?: string; disabled?: boolean }>`
   ${({ size }) =>
     size === 'large'
       ? `height: 40px;
-    width: 40px;`
+    width: 40px;
+    min-width: 40px;`
       : ` height: 24px;
-    width: 24px;`}
+    width: 24px;
+    min-width: 24px;`}
+  flex-shrink: 0;
   transition: border 0.25s linear;
   -webkit-transition: border 0.25s linear;
   position: relative;
@@ -58,8 +61,8 @@ const Check = styled.span<{ size?: string; disabled?: boolean }>`
       size === 'large'
         ? `height: 36px;
     width: 36px;`
-        : ` height: 20.5px;
-    width: 20.5px;`}
+        : ` height: 20px;
+    width: 20px;`}
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);

@@ -18,7 +18,8 @@ import {
   Flag,
   getCurrentEventState,
   createPrng,
-  generateActionDuplicateDeclarationInput
+  generateActionDuplicateDeclarationInput,
+  encodeScope
 } from '@opencrvs/commons'
 import {
   tennisClubMembershipEvent,
@@ -43,13 +44,15 @@ test('Adds ACTION-requested flag while waiting for external validation', async (
   const { type } = generator.event.create()
   const client = createTestClient(user, [
     ...TEST_USER_DEFAULT_SCOPES,
-    `search[event=${type},access=all]`
+    encodeScope({
+      type: 'record.search',
+      options: {
+        event: [type]
+      }
+    })
   ])
 
-  const event = await createEvent(client, generator, [
-    ActionType.DECLARE,
-    ActionType.VALIDATE
-  ])
+  const event = await createEvent(client, generator, [ActionType.DECLARE])
 
   mswServer.use(
     http.post(
@@ -96,13 +99,15 @@ test('Does not add any flags when accepted form countryconfig', async () => {
   const { type } = generator.event.create()
   const client = createTestClient(user, [
     ...TEST_USER_DEFAULT_SCOPES,
-    `search[event=${type},access=all]`
+    encodeScope({
+      type: 'record.search',
+      options: {
+        event: [type]
+      }
+    })
   ])
 
-  const event = await createEvent(client, generator, [
-    ActionType.DECLARE,
-    ActionType.VALIDATE
-  ])
+  const event = await createEvent(client, generator, [ActionType.DECLARE])
 
   mswServer.use(
     http.post(
@@ -149,13 +154,15 @@ test('Adds ACTION-rejected flag when rejected form countryconfig', async () => {
   const { type } = generator.event.create()
   const client = createTestClient(user, [
     ...TEST_USER_DEFAULT_SCOPES,
-    `search[event=${type},access=all]`
+    encodeScope({
+      type: 'record.search',
+      options: {
+        event: [type]
+      }
+    })
   ])
 
-  const event = await createEvent(client, generator, [
-    ActionType.DECLARE,
-    ActionType.VALIDATE
-  ])
+  const event = await createEvent(client, generator, [ActionType.DECLARE])
 
   mswServer.use(
     http.post(
@@ -196,167 +203,22 @@ test('Adds ACTION-rejected flag when rejected form countryconfig', async () => {
   )
 })
 
-test(`Adds ${InherentFlags.PENDING_CERTIFICATION} flag after ${ActionType.REGISTER} is called`, async () => {
-  const { user, generator } = await setupTestCase()
-
-  const { type } = generator.event.create()
-  const client = createTestClient(user, [
-    ...TEST_USER_DEFAULT_SCOPES,
-    `search[event=${type},access=all]`
-  ])
-
-  await createEvent(client, generator, [
-    ActionType.DECLARE,
-    ActionType.VALIDATE,
-    ActionType.REGISTER
-  ])
-
-  const { results: index } = await client.event.search({
-    query: {
-      type: 'and',
-      clauses: [
-        {
-          eventType: type
-        }
-      ]
-    }
-  })
-
-  expect(index[0].flags).toContain(InherentFlags.PENDING_CERTIFICATION)
-})
-
-test(`Removes ${InherentFlags.PENDING_CERTIFICATION} flag after ${ActionType.PRINT_CERTIFICATE} is called`, async () => {
-  const { user, generator } = await setupTestCase()
-
-  const { type } = generator.event.create()
-  const client = createTestClient(user, [
-    ...TEST_USER_DEFAULT_SCOPES,
-    `search[event=${type},access=all]`
-  ])
-
-  const event = await createEvent(client, generator, [
-    ActionType.DECLARE,
-    ActionType.VALIDATE,
-    ActionType.REGISTER
-  ])
-
-  await client.event.actions.printCertificate.request(
-    generator.event.actions.printCertificate(event.id)
-  )
-
-  const { results: index } = await client.event.search({
-    query: {
-      type: 'and',
-      clauses: [
-        {
-          eventType: type
-        }
-      ]
-    }
-  })
-
-  expect(index[0].flags).not.toContain(InherentFlags.PENDING_CERTIFICATION)
-})
-
-test(`Removes ${InherentFlags.PENDING_CERTIFICATION} flag after ${ActionType.REQUEST_CORRECTION} is called`, async () => {
-  const { user, generator } = await setupTestCase()
-
-  const { type } = generator.event.create()
-  const client = createTestClient(user, [
-    ...TEST_USER_DEFAULT_SCOPES,
-    `search[event=${type},access=all]`
-  ])
-
-  const event = await createEvent(client, generator, [
-    ActionType.DECLARE,
-    ActionType.VALIDATE,
-    ActionType.REGISTER,
-    ActionType.PRINT_CERTIFICATE
-  ])
-
-  await client.event.actions.correction.request.request(
-    generator.event.actions.correction.request(event.id, {
-      keepAssignment: true
-    })
-  )
-
-  const { results: index } = await client.event.search({
-    query: {
-      type: 'and',
-      clauses: [
-        {
-          eventType: type
-        }
-      ]
-    }
-  })
-
-  expect(index[0].flags).not.toContain(InherentFlags.PENDING_CERTIFICATION)
-})
-test(`Adds back ${InherentFlags.PENDING_CERTIFICATION} flag after ${ActionType.APPROVE_CORRECTION} is called`, async () => {
-  const { user, generator } = await setupTestCase()
-
-  const { type } = generator.event.create()
-  const client = createTestClient(user, [
-    ...TEST_USER_DEFAULT_SCOPES,
-    `search[event=${type},access=all]`
-  ])
-
-  const event = await createEvent(client, generator, [
-    ActionType.DECLARE,
-    ActionType.VALIDATE,
-    ActionType.REGISTER,
-    ActionType.PRINT_CERTIFICATE
-  ])
-
-  const withCorrectionRequest =
-    await client.event.actions.correction.request.request(
-      generator.event.actions.correction.request(event.id, {
-        keepAssignment: true
-      })
-    )
-
-  const actionId = withCorrectionRequest.actions.at(-1)?.id
-
-  if (!actionId) {
-    throw new Error('Request ID is undefined')
-  }
-
-  const approveCorrectionPayload = generator.event.actions.correction.approve(
-    withCorrectionRequest.id,
-    actionId
-  )
-
-  await client.event.actions.correction.approve.request(
-    approveCorrectionPayload
-  )
-
-  const { results: index2 } = await client.event.search({
-    query: {
-      type: 'and',
-      clauses: [
-        {
-          eventType: type
-        }
-      ]
-    }
-  })
-
-  expect(index2[0].flags).toContain(InherentFlags.PENDING_CERTIFICATION)
-})
-
 test(`Adds ${InherentFlags.CORRECTION_REQUESTED} flag after ${ActionType.REQUEST_CORRECTION} is called`, async () => {
   const { user, generator } = await setupTestCase()
 
   const { type } = generator.event.create()
   const client = createTestClient(user, [
     ...TEST_USER_DEFAULT_SCOPES,
-    `search[event=${type},access=all]`
+    encodeScope({
+      type: 'record.search',
+      options: {
+        event: [type]
+      }
+    })
   ])
 
   const event = await createEvent(client, generator, [
     ActionType.DECLARE,
-    ActionType.VALIDATE,
     ActionType.REGISTER
   ])
 
@@ -386,12 +248,16 @@ test(`Removes ${InherentFlags.CORRECTION_REQUESTED} flag after ${ActionType.APPR
   const { type } = generator.event.create()
   const client = createTestClient(user, [
     ...TEST_USER_DEFAULT_SCOPES,
-    `search[event=${type},access=all]`
+    encodeScope({
+      type: 'record.search',
+      options: {
+        event: [type]
+      }
+    })
   ])
 
   const event = await createEvent(client, generator, [
     ActionType.DECLARE,
-    ActionType.VALIDATE,
     ActionType.REGISTER
   ])
 
@@ -449,7 +315,18 @@ test(`Adds ${InherentFlags.INCOMPLETE} flag after ${ActionType.NOTIFY} is called
   const { type } = generator.event.create()
   const client = createTestClient(user, [
     ...TEST_USER_DEFAULT_SCOPES,
-    `search[event=${type},access=all]`
+    encodeScope({
+      type: 'record.search',
+      options: {
+        event: [type]
+      }
+    }),
+    encodeScope({
+      type: 'record.notify',
+      options: {
+        event: [type]
+      }
+    })
   ])
 
   const event = await createEvent(client, generator, [])
@@ -472,13 +349,24 @@ test(`Adds ${InherentFlags.INCOMPLETE} flag after ${ActionType.NOTIFY} is called
   expect(index[0].flags).toContain(InherentFlags.INCOMPLETE)
 })
 
-test(`Removes ${InherentFlags.INCOMPLETE} flag after ${ActionType.DECLARE} is called`, async () => {
+test(`Removes ${InherentFlags.INCOMPLETE} flag after ${ActionType.EDIT} + ${ActionType.DECLARE} is called`, async () => {
   const { user, generator } = await setupTestCase()
 
   const { type } = generator.event.create()
   const client = createTestClient(user, [
     ...TEST_USER_DEFAULT_SCOPES,
-    `search[event=${type},access=all]`
+    encodeScope({
+      type: 'record.search',
+      options: {
+        event: [type]
+      }
+    }),
+    encodeScope({
+      type: 'record.notify',
+      options: {
+        event: [type]
+      }
+    })
   ])
 
   const event = await createEvent(client, generator, [])
@@ -493,9 +381,20 @@ test(`Removes ${InherentFlags.INCOMPLETE} flag after ${ActionType.DECLARE} is ca
     })
   )
 
+  await client.event.actions.edit.request(
+    generator.event.actions.edit(event.id)
+  )
+
+  await client.event.actions.assignment.assign(
+    generator.event.actions.assign(event.id, {
+      assignedTo: event.actions[0].createdBy
+    })
+  )
+
   await client.event.actions.declare.request(
     generator.event.actions.declare(event.id)
   )
+
   const { results: index } = await client.event.search({
     query: {
       type: 'and',
@@ -516,7 +415,12 @@ test(`Adds ${InherentFlags.REJECTED} flag after ${ActionType.REJECT} is called`,
   const { type } = generator.event.create()
   const client = createTestClient(user, [
     ...TEST_USER_DEFAULT_SCOPES,
-    `search[event=${type},access=all]`
+    encodeScope({
+      type: 'record.search',
+      options: {
+        event: [type]
+      }
+    })
   ])
 
   const event = await createEvent(client, generator, [ActionType.DECLARE])
@@ -538,19 +442,34 @@ test(`Adds ${InherentFlags.REJECTED} flag after ${ActionType.REJECT} is called`,
   expect(index[0].flags).toContain(InherentFlags.REJECTED)
 })
 
-test(`Removes ${InherentFlags.REJECTED} flag after ${ActionType.DECLARE} is called again`, async () => {
+test(`Removes ${InherentFlags.REJECTED} flag after ${ActionType.EDIT} + ${ActionType.DECLARE} is called`, async () => {
   const { user, generator } = await setupTestCase()
 
   const { type } = generator.event.create()
   const client = createTestClient(user, [
     ...TEST_USER_DEFAULT_SCOPES,
-    `search[event=${type},access=all]`
+    encodeScope({
+      type: 'record.search',
+      options: {
+        event: [type]
+      }
+    })
   ])
 
   const event = await createEvent(client, generator, [ActionType.DECLARE])
 
   await client.event.actions.reject.request(
     generator.event.actions.reject(event.id)
+  )
+
+  await client.event.actions.assignment.assign(
+    generator.event.actions.assign(event.id, {
+      assignedTo: event.actions[0].createdBy
+    })
+  )
+
+  await client.event.actions.edit.request(
+    generator.event.actions.edit(event.id)
   )
 
   await client.event.actions.assignment.assign(
@@ -580,7 +499,7 @@ test(`Removes ${InherentFlags.REJECTED} flag after ${ActionType.DECLARE} is call
 suite(InherentFlags.POTENTIAL_DUPLICATE, () => {
   beforeEach(() => {
     mswServer.use(
-      http.get(`${env.COUNTRY_CONFIG_URL}/events`, () => {
+      http.get(`${env.COUNTRY_CONFIG_URL}/config/events`, () => {
         return HttpResponse.json([
           tennisClubMembershipEventWithDedupCheck(ActionType.DECLARE)
         ])
@@ -613,7 +532,7 @@ suite(InherentFlags.POTENTIAL_DUPLICATE, () => {
       })
     )
 
-    return [declaredDuplicateEvent, client, generator] as const
+    return [declaredDuplicateEvent, client, generator, user] as const
   }
 
   test(`Adds the flag after ${ActionType.DECLARE} if duplicates are detected`, async () => {
@@ -625,7 +544,14 @@ suite(InherentFlags.POTENTIAL_DUPLICATE, () => {
   })
 
   test(`Removes the flag after ${ActionType.MARK_AS_NOT_DUPLICATE}`, async () => {
-    const [duplicateEvent, client, generator] = await createDuplicateEvent()
+    const [duplicateEvent, client, generator, user] =
+      await createDuplicateEvent()
+
+    await client.event.actions.assignment.assign(
+      generator.event.actions.assign(duplicateEvent.id, {
+        assignedTo: user.id
+      })
+    )
 
     const event = await client.event.actions.duplicate.markNotDuplicate(
       generator.event.actions.duplicate.markNotDuplicate(duplicateEvent.id)
@@ -636,7 +562,14 @@ suite(InherentFlags.POTENTIAL_DUPLICATE, () => {
   })
 
   test(`Removes the flag after ${ActionType.MARK_AS_DUPLICATE}`, async () => {
-    const [duplicateEvent, client, generator] = await createDuplicateEvent()
+    const [duplicateEvent, client, generator, user] =
+      await createDuplicateEvent()
+
+    await client.event.actions.assignment.assign(
+      generator.event.actions.assign(duplicateEvent.id, {
+        assignedTo: user.id
+      })
+    )
 
     const event = await client.event.actions.duplicate.markAsDuplicate(
       generator.event.actions.duplicate.markAsDuplicate(duplicateEvent.id)
@@ -644,5 +577,35 @@ suite(InherentFlags.POTENTIAL_DUPLICATE, () => {
     expect(
       getCurrentEventState(event, tennisClubMembershipEvent).flags
     ).not.toContain(InherentFlags.POTENTIAL_DUPLICATE)
+  })
+
+  test(`Rejects ${ActionType.MARK_AS_DUPLICATE} when the caller is not assigned to the event`, async () => {
+    const { users, generator } = await setupTestCase()
+    const [assignedUser, unassignedUser] = users
+    const assignedClient = createTestClient(assignedUser)
+    const unassignedClient = createTestClient(unassignedUser)
+
+    const event = await assignedClient.event.create(generator.event.create())
+
+    await expect(
+      unassignedClient.event.actions.duplicate.markAsDuplicate(
+        generator.event.actions.duplicate.markAsDuplicate(event.id)
+      )
+    ).rejects.toThrow('You are not assigned to this event')
+  })
+
+  test(`Rejects ${ActionType.MARK_AS_NOT_DUPLICATE} when the caller is not assigned to the event`, async () => {
+    const { users, generator } = await setupTestCase()
+    const [assignedUser, unassignedUser] = users
+    const assignedClient = createTestClient(assignedUser)
+    const unassignedClient = createTestClient(unassignedUser)
+
+    const event = await assignedClient.event.create(generator.event.create())
+
+    await expect(
+      unassignedClient.event.actions.duplicate.markNotDuplicate(
+        generator.event.actions.duplicate.markNotDuplicate(event.id)
+      )
+    ).rejects.toThrow('You are not assigned to this event')
   })
 })

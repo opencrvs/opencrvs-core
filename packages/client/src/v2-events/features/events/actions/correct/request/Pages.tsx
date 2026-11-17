@@ -40,8 +40,12 @@ function getCorrectablePages(formPages: PageConfig[]) {
 }
 
 export function Pages() {
-  const { eventId, pageId } = useTypedParams(ROUTES.V2.EVENTS.REGISTER.PAGES)
-  const [searchParams] = useTypedSearchParams(ROUTES.V2.EVENTS.REGISTER.PAGES)
+  const { eventId, pageId } = useTypedParams(
+    ROUTES.V2.EVENTS.REQUEST_CORRECTION.PAGES
+  )
+  const [searchParams] = useTypedSearchParams(
+    ROUTES.V2.EVENTS.REQUEST_CORRECTION.PAGES
+  )
   const setFormValues = useEventFormData((state) => state.setFormValues)
   const form = useEventFormData((state) => state.getFormValues())
   const navigate = useNavigate()
@@ -84,6 +88,7 @@ export function Pages() {
     <FormLayout route={ROUTES.V2.EVENTS.REQUEST_CORRECTION}>
       {modal}
       <PagesComponent
+        attachmentPath={`events/${eventId}/`}
         eventConfig={configuration}
         formData={form}
         formPages={correctablePages}
@@ -106,7 +111,7 @@ export function Pages() {
           navigate(
             ROUTES.V2.EVENTS.REQUEST_CORRECTION.REVIEW.buildPath(
               { eventId },
-              { workqueue: searchParams.workqueue }
+              { backTo: searchParams.backTo }
             )
           )
         }

@@ -9,60 +9,32 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import fetch from 'node-fetch'
-import { OPENCRVS_SPECIFICATION_URL } from './constants'
 import { env } from './environment'
-import { TypeOf, z } from 'zod'
+import { z } from 'zod'
 import { raise } from './utils'
 import { fromZodError } from 'zod-validation-error'
+import { getUUID } from '@opencrvs/commons'
+import { createInitialisationClient } from './index'
 
-const LOCATION_TYPES = [
-  'ADMIN_STRUCTURE',
-  'HEALTH_FACILITY',
-  'CRVS_OFFICE'
-] as const
-
-const LocationSchema = z.array(
+const RawLocationSchema =
   z.object({
     id: z.string(),
     name: z.string(),
-    alias: z.string().optional(),
     partOf: z.string(),
-    locationType: z.enum(LOCATION_TYPES),
-    jurisdictionType: z
-      .enum([
-        'STATE',
-        'DISTRICT',
-        'LOCATION_LEVEL_3',
-        'LOCATION_LEVEL_4',
-        'LOCATION_LEVEL_5'
-      ])
-      .optional(),
-    statistics: z
-      .array(
-        z.object({
-          year: z.number(),
-          male_population: z.number(),
-          female_population: z.number(),
-          population: z.number(),
-          crude_birth_rate: z.number()
-        })
-      )
-      .optional()
+    locationType: z.string()
   })
-)
 
-function validateAdminStructure(locations: TypeOf<typeof LocationSchema>) {
+const RawAdministrativeAreaSchema = RawLocationSchema.omit({ locationType: true })
+
+const CountryConfigLocationResponse = z.object({
+  locations: z.array(RawLocationSchema),
+  administrativeAreas: z.array(RawAdministrativeAreaSchema)
+})
+
+function validateAdminStructure(locations: z.output<typeof CountryConfigLocationResponse>['administrativeAreas']) {
   const locationsMap = new Map(
-    locations.map(({ statistics, ...loc }) => {
-      return [
-        loc.id,
-        {
-          ...loc,
-          statistics: new Map(
-            (statistics ?? []).map(({ year, ...stats }) => [year, stats])
-          )
-        }
-      ]
+    locations.map((loc) => {
+      return [loc.id, loc]
     })
   )
 
@@ -75,6 +47,7 @@ function validateAdminStructure(locations: TypeOf<typeof LocationSchema>) {
   )
   // this is the root location
   locationNodeMap.set('0', { id: '0', children: [] })
+
   locations.forEach((loc) => {
     const parent = locationNodeMap.get(loc.partOf.split('/')[1])
     if (!parent) {
@@ -83,157 +56,76 @@ function validateAdminStructure(locations: TypeOf<typeof LocationSchema>) {
     parent.children.push(loc.id)
   })
 
-  // Validate statistics only for top-level locations (states)
-  const statisticsErrors: Error[] = []
-  locationNodeMap.get('0')!.children.forEach((stateId) => {
-    const state = locationsMap.get(stateId)!
-    if (!state.statistics || state.statistics.size === 0) {
-      statisticsErrors.push(
-        new Error(
-          `Top-level location (state) "${state.name}" must have statistics data`
-        )
-      )
-      return
-    }
-
-    // Validate statistics data for the state
-    for (const [year, stats] of state.statistics.entries()) {
-      if (stats.population < stats.male_population + stats.female_population) {
-        statisticsErrors.push(
-          new Error(
-            `Location: ${state.name}, year: ${year} -> Sum of male population and female population ${
-              stats.male_population + stats.female_population
-            } is higher than the total population ${stats.population}`
-          )
-        )
-      }
-    }
-  })
-
-  if (statisticsErrors.length > 0) {
-    raise(statisticsErrors.map((error) => error.message).join('\n'))
-  }
-
   return locationsMap
 }
 
 async function getLocations() {
-  const url = new URL('locations', env.COUNTRY_CONFIG_HOST).toString()
+  const url = new URL('config/locations', env.COUNTRY_CONFIG_HOST).toString()
   const res = await fetch(url)
   if (!res.ok) {
     raise(`Expected to get the locations from ${url}`)
   }
-  const parsedLocations = LocationSchema.safeParse(await res.json())
-  if (!parsedLocations.success) {
+
+  const parsedResponse = CountryConfigLocationResponse.safeParse(await res.json())
+  if (!parsedResponse.success) {
     raise(
-      fromZodError(parsedLocations.error, {
+      fromZodError(parsedResponse.error, {
         prefix: `Error validating locations data returned from ${url}`
       })
     )
   }
-  const adminStructureMap = validateAdminStructure(
-    parsedLocations.data.filter(
-      ({ locationType }) => locationType === 'ADMIN_STRUCTURE'
-    )
+
+  const {administrativeAreas, locations} = parsedResponse.data
+
+  const administrativeAreaMap = validateAdminStructure(administrativeAreas)
+
+  const NULL_ADMINISTRATIVE_AREA_ID = '0'
+  locations.forEach((location) => {
+    const administrativeAreaId = location.partOf.split('/')[1]
+    if (
+      !administrativeAreaMap.get(administrativeAreaId) &&
+      administrativeAreaId !== NULL_ADMINISTRATIVE_AREA_ID
+    ) {
+      raise(
+        `Parent location "${location.partOf}" not found for ${location.name}`
+      )
+    }
+  })
+
+  const administrativeHierarchyIdMap = new Map(
+    administrativeAreas.map(({ id }) => [id, getUUID()])
   )
-  parsedLocations.data
-    .filter(({ locationType }) => locationType !== 'ADMIN_STRUCTURE')
-    .forEach((facilityOrOffice) => {
-      if (!adminStructureMap.get(facilityOrOffice.partOf.split('/')[1])) {
-        raise(
-          `Parent location "${facilityOrOffice.partOf}" not found for ${facilityOrOffice.name}`
-        )
-      }
-    })
-  return parsedLocations.data
+
+  const locationIdMap = new Map(
+    locations.map(({ id }) => [id, getUUID()])
+  )
+
+  return {
+    administrativeAreas: administrativeAreas.map((a) => ({
+      id: administrativeHierarchyIdMap.get(a.id)!,
+      name: a.name,
+      parentId:
+        administrativeHierarchyIdMap.get(a.partOf.split('/')[1]) || null,
+      externalId: a.id,
+      validUntil: null
+    })),
+    locations: locations.map((loc) => ({
+      id: locationIdMap.get(loc.id)!,
+      name: loc.name,
+      administrativeAreaId:
+        administrativeHierarchyIdMap.get(loc.partOf.split('/')[1]) || null,
+      locationType: loc.locationType,
+      externalId: loc.id,
+      validUntil: null
+    }))
+  }
 }
-
-const bundleToLocationEntries = (bundle: fhir3.Bundle<fhir3.Location>) =>
-  (bundle.entry ?? [])
-    .map((bundleEntry) => bundleEntry.resource)
-    .filter((maybeLocation): maybeLocation is fhir3.Location =>
-      Boolean(maybeLocation)
-    )
-
-function locationBundleToIdentifier(
-  bundle: fhir3.Bundle<fhir3.Location>
-): string[] {
-  return bundleToLocationEntries(bundle)
-    .map((location) => getExternalIdFromIdentifier(location.identifier))
-    .filter((maybeId): maybeId is string => Boolean(maybeId))
-}
-
-/**
- * Get the externally defined id for location. Defined in country-config.
- */
-
-const getExternalIdFromIdentifier = (
-  identifiers: fhir3.Location['identifier']
-) =>
-  identifiers
-    ?.find(({ system }) =>
-      [
-        `${OPENCRVS_SPECIFICATION_URL}id/statistical-code`,
-        `${OPENCRVS_SPECIFICATION_URL}id/internal-id`
-      ].some((identifierSystem) => identifierSystem === system)
-    )
-    ?.value?.split('_')
-    .pop()
 
 export async function seedLocations(token: string) {
-  const savedLocations = (
-    await Promise.all(
-      LOCATION_TYPES.map((type) =>
-        getLocationsByType(type)
-          .then((res) => res.json())
-          .then((bundle: fhir3.Bundle<fhir3.Location>) =>
-            locationBundleToIdentifier(bundle)
-          )
-      )
-    )
-  ).flat()
+  const { administrativeAreas, locations } = await getLocations()
 
-  const savedLocationsSet = new Set(savedLocations)
-  const locations = (await getLocations()).filter((location) => {
-    return !savedLocationsSet.has(location.id)
-  })
-  const res = await fetch(`${env.GATEWAY_HOST}/locations?`, {
-    method: 'POST',
-    headers: {
-      Authorization: `Bearer ${token}`,
-      'Content-Type': 'application/fhir+json'
-    },
-    body: JSON.stringify(
-      locations
-        // statisticalID & code are legacy properties
-        .map(({ id, locationType, ...loc }) => ({
-          statisticalID: id,
-          code: locationType,
-          ...loc
-        }))
-    )
-  })
+  const client = createInitialisationClient(token)
 
-  if (!res.ok) {
-    raise(await res.text())
-  }
-
-  const response: fhir3.Bundle<fhir3.BundleEntryResponse> = await res.json()
-  response.entry?.forEach((res, index) => {
-    if (res.response?.status !== '201') {
-      // eslint-disable-next-line no-console
-      console.log(
-        `Failed to create location resource for: "${locations[index].name}"`
-      )
-    }
-  })
-}
-
-function getLocationsByType(type: string) {
-  return fetch(`${env.GATEWAY_HOST}/locations?type=${type}&_count=0`, {
-    headers: {
-      'Content-Type': 'application/fhir+json',
-      'Cache-Control': 'no-store'
-    }
-  })
+  await client.administrativeAreas.set.mutate(administrativeAreas)
+  await client.locations.set.mutate(locations)
 }

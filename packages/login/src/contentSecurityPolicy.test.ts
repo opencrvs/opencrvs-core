@@ -19,7 +19,7 @@ import { describe, expect, it } from 'vitest'
  * @opencrvs/commons nor the client, which is also why it needs no 'unsafe-eval'.
  */
 const nginxConf = fs.readFileSync(
-  path.join(__dirname, '..', 'nginx.conf'),
+  path.join(__dirname, '..', 'nginx.template.conf'),
   'utf8'
 )
 
@@ -27,7 +27,9 @@ function getDirectives(conf: string): Record<string, string[]> {
   const header = conf.match(/add_header Content-Security-Policy "([^"]+)"/)?.[1]
 
   if (!header) {
-    throw new Error('No Content-Security-Policy header found in nginx.conf')
+    throw new Error(
+      'No Content-Security-Policy header found in nginx.template.conf'
+    )
   }
 
   return Object.fromEntries(
@@ -46,26 +48,42 @@ describe('login Content-Security-Policy', () => {
   const directives = getDirectives(nginxConf)
 
   it('defines the directives the ANSSI audit requires', () => {
-    // frame-ancestors mirrors X-Frame-Options: SAMEORIGIN, which is also still sent
-    expect(directives['frame-ancestors']).toEqual(["'self'"])
+    // Stricter than the X-Frame-Options: SAMEORIGIN header, which is also still sent.
+    // The login form is never framed.
+    expect(directives['frame-ancestors']).toEqual(["'none'"])
     expect(directives['base-uri']).toEqual(["'self'"])
     expect(directives['form-action']).toEqual(["'self'"])
     expect(directives['object-src']).toEqual(["'none'"])
   })
 
-  it('does not allow plain-http images', () => {
-    // 'http:' in img-src permits mixed content on an https deployment
-    expect(directives['img-src']).not.toContain('http:')
+  it('serves images only from this origin', () => {
+    // 'http:' permits mixed content on an https deployment; a blanket 'https:' is
+    // unnecessary because every image login renders is proxied same-origin.
+    expect(directives['img-src']).toEqual(["'self'", 'data:'])
   })
 
   /*
-   * Login loads only its own bundle and login-config.js, proxied same-origin via
-   * /api/countryconfig/: no wildcard (ANSSI flagged it as over-broad), no third-party
-   * host since the Sentry dialog was removed (#13460). Asserted whole, so 'unsafe-eval'
-   * or 'unsafe-inline' also fails here — login compiles no JavaScript at runtime.
+   * The login app compiles no JavaScript at runtime. If this fails, something new in the
+   * bundle calls eval() or new Function — find and remove it rather than reinstating
+   * 'unsafe-eval', because this is the policy the audit was run against.
    */
-  it('loads scripts from this origin only', () => {
-    expect(directives['script-src']).toEqual(["'self'"])
+  it('does not allow eval or inline scripts', () => {
+    expect(directives['script-src']).not.toContain("'unsafe-eval'")
+    expect(directives['script-src']).not.toContain("'unsafe-inline'")
+  })
+
+  /*
+   * Everything login fetches — its own bundle, login-config.js, public config, auth — is
+   * proxied same-origin through this nginx, so no directive needs the deploy-time
+   * *.<domain> wildcard, which the ANSSI report flagged as an over-broad source. Asserted
+   * across the whole header rather than script-src alone: a wildcard in default-src is
+   * inherited by every directive that isn't set explicitly, connect-src included.
+   */
+  it('names no wildcard origin in any directive', () => {
+    expect(nginxConf).not.toMatch(
+      /add_header Content-Security-Policy "[^"]*\{\{CONTENT_SECURITY_POLICY_WILDCARD\}\}/
+    )
+    expect(directives['default-src']).toEqual(["'self'"])
   })
 })
 

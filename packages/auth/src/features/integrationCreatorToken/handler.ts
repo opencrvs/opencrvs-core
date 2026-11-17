@@ -11,7 +11,11 @@
 import * as Hapi from '@hapi/hapi'
 import * as Joi from 'joi'
 import { createToken } from '@auth/features/authenticate/service'
-import { SCOPES, TokenUserType } from '@opencrvs/commons'
+import {
+  encodeScope,
+  INTEGRATION_CREATOR_USER_ID,
+  TokenUserType
+} from '@opencrvs/commons'
 
 interface IAuthResponse {
   token: string
@@ -22,12 +26,13 @@ export default async function integrationCreatorTokenHandler(
   _h: Hapi.ResponseToolkit
 ): Promise<IAuthResponse> {
   const token = await createToken(
-    'opencrvs:countryconfig-service',
-    [SCOPES.INTEGRATION_CREATE],
-    ['opencrvs:countryconfig-user', 'opencrvs:user-mgnt-user'],
+    INTEGRATION_CREATOR_USER_ID,
+    [encodeScope({ type: 'integration.create' })],
+    // Consumed by countryconfig (system/ready trigger) and events, which owns
+    // integration creation
+    ['opencrvs:countryconfig-user', 'opencrvs:events-user'],
     'opencrvs:auth-service',
     undefined,
-    true,
     TokenUserType.enum.system,
     60
   )

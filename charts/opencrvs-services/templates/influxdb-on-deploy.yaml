@@ -1,0 +1,32 @@
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  annotations:
+    "helm.sh/hook": pre-install,pre-upgrade
+    "helm.sh/hook-weight": "1"
+  labels:
+    app: influxdb-on-deploy
+  name: influxdb-on-deploy
+spec:
+  template:
+    metadata:
+      labels:
+        app: influxdb-on-deploy
+    spec:
+      containers:
+        - name: influxdb
+          image: "appropriate/curl"
+          command: ["/bin/sh", "-c"]
+          args:
+            - |
+              echo "Creating db $DB"
+              curl -X POST http://$HOST:$PORT/query --data-urlencode "q=CREATE DATABASE \"$DB\""
+          env:
+            - name: HOST
+              value: {{ .Values.influxdb.host }}
+            - name: PORT
+              value: {{ .Values.influxdb.port | quote }}
+            - name: DB
+              value: {{ .Values.influxdb.db }}
+      restartPolicy: "OnFailure"

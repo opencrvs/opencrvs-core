@@ -75,6 +75,7 @@ interface IUserSetupMessages
   passwordResetAuditAction: MessageDescriptor
   usernameReminderByAdmin: MessageDescriptor
   passwordResetByAdmin: MessageDescriptor
+  resendInviteAuditAction: MessageDescriptor
   userNameReminderAuditAction: MessageDescriptor
   retrievedAuditAction: MessageDescriptor
   viewedAuditAction: MessageDescriptor
@@ -404,6 +405,11 @@ const messagesToDefine: IUserSetupMessages = {
     description: 'Description for sending temporal password action',
     id: 'user.profile.auditList.passwordResetByAdmin'
   },
+  resendInviteAuditAction: {
+    defaultMessage: 'Resent invite',
+    description: 'Description for resending user invite audit action',
+    id: 'user.profile.auditList.resendInvite'
+  },
   usernameReminderByAdmin: {
     defaultMessage: 'Sent username reminder',
     description: 'Description for send username reminder audit action',
@@ -452,6 +458,21 @@ const messagesToDefine: IUserSetupMessages = {
     defaultMessage: 'Marked as not duplicate',
     description: 'Description for marked as not duplicate in audit action',
     id: 'user.profile.auditList.markedAsNotDuplicate'
+  },
+  createdAuditAction: {
+    defaultMessage: 'Created',
+    description: 'Description for created audit action',
+    id: 'user.profile.auditList.created'
+  },
+  searchAuditAction: {
+    defaultMessage: 'Searched record',
+    description: 'Description for search audit action',
+    id: 'user.profile.auditList.search'
+  },
+  downloadAuditAction: {
+    defaultMessage: 'Downloaded record',
+    description: 'Description for download audit action',
+    id: 'user.profile.auditList.download'
   }
 }
 

@@ -9,20 +9,84 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import * as Hapi from '@hapi/hapi'
+import { rateLimitedAuthProxy } from '@gateway/config/proxies'
 import { getRoutes } from '@gateway/config/routes'
 import { createServer } from '@gateway/server'
 
 let mockAuthUrl = ''
-// AUTH_URL is read lazily, after the stand-in auth server has started. The
-// getter is defined separately because the compiled object spread would
-// evaluate it straight away.
 jest.mock('@gateway/constants', () =>
+  // A getter in an object literal next to a spread is read eagerly once the
+  // spread is transpiled to Object.assign, so define it separately.
   Object.defineProperty(
-    { __esModule: true, ...jest.requireActual('@gateway/constants') },
+    { ...jest.requireActual('@gateway/constants') },
     'AUTH_URL',
     { get: () => mockAuthUrl }
   )
 )
+
+/**
+ * DISABLE_RATE_LIMIT defaults to `true` in the test (dev) environment, so the
+ * underlying `withRateLimit` short-circuits. These tests therefore exercise the
+ * *key resolution* wiring — i.e. that verifyCode and resendAuthenticationCode
+ * are rate limited on the `nonce` field rather than silently falling through to
+ * the unthrottled catch-all proxy.
+ */
+
+const makeArgs = (payload: unknown, path: string) => {
+  const request = {
+    headers: {},
+    payload: Buffer.from(JSON.stringify(payload))
+  }
+  const h = {
+    request: { path },
+    proxy: jest.fn(() => 'PROXIED')
+  }
+  return [request, h] as unknown as Parameters<
+    (typeof rateLimitedAuthProxy.verifyCode)['handler']
+  >
+}
+
+describe('rate-limited auth proxy', () => {
+  // Every nonce-keyed auth route added to close the brute-force / SMS-flooding
+  // pentest findings. Keep this list in sync with `rateLimitedAuthProxy`.
+  const nonceKeyedRoutes = [
+    ['verifyCode', '/auth/verifyCode'],
+    ['resendAuthenticationCode', '/auth/resendAuthenticationCode'],
+    ['verifyNumber', '/auth/verifyNumber'],
+    ['verifySecurityAnswer', '/auth/verifySecurityAnswer'],
+    ['sendUserName', '/auth/sendUserName'],
+    ['changePassword', '/auth/changePassword']
+  ] as const
+
+  it.each(nonceKeyedRoutes)(
+    'proxies %s when the nonce key is present',
+    (name, path) => {
+      const route = rateLimitedAuthProxy[name]
+      const result = route.handler(...makeArgs({ nonce: 'abc123' }, path))
+
+      expect(result).toBe('PROXIED')
+    }
+  )
+
+  it.each(nonceKeyedRoutes)(
+    'throws on %s when the nonce key is missing (fails closed)',
+    (name, path) => {
+      const route = rateLimitedAuthProxy[name]
+
+      expect(() => route.handler(...makeArgs({}, path))).toThrow(
+        "Couldn't find the value for a rate limiting key in payload"
+      )
+    }
+  )
+
+  it('registers a dedicated route for every rate-limited auth endpoint', () => {
+    const paths = getRoutes().map((route) => route.path)
+
+    for (const [, path] of nonceKeyedRoutes) {
+      expect(paths).toContain(path)
+    }
+  })
+})
 
 describe('auth proxy', () => {
   // Every auth endpoint the gateway exposes. Anything else under /auth/ must be
@@ -52,7 +116,7 @@ describe('auth proxy', () => {
     for (const path of [
       '/ping',
       '/.well-known',
-      '/anonymous-token',
+      '/internal/anonymous-token',
       '/internal/reindexing-token',
       '/internal/integration-creator-token',
       '/verifyToken',
@@ -96,6 +160,7 @@ describe('auth proxy', () => {
       payload: {
         username: 'user',
         nonce: 'nonce',
+        token: 'token',
         email: 'user@example.com'
       }
     })
@@ -109,9 +174,11 @@ describe('auth proxy', () => {
   const blockedAttempts = [
     '/auth/internal/integration-creator-token',
     '/auth/internal/reindexing-token',
+    '/auth/internal/anonymous-token',
     '/auth/internal%2Fintegration-creator-token',
     '/auth/internal%2fintegration-creator-token',
     '/auth/internal%2Freindexing-token',
+    '/auth/internal%2Fanonymous-token',
     '/auth/%2Finternal%2Fintegration-creator-token',
     '/auth/%2E%2E%2Finternal%2Fintegration-creator-token',
     '/auth/refreshToken%2F..%2Finternal%2Fintegration-creator-token',

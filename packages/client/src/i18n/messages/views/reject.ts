@@ -22,7 +22,6 @@ interface IRejectMessages
   rejectionReasonOther: MessageDescriptor
   rejectionCommentForHealthWorkerLabel: MessageDescriptor
   rejectionFormInstruction: MessageDescriptor
-  markAsDuplicate: MessageDescriptor
   rejectionReasonLabel: MessageDescriptor
 }
 
@@ -56,11 +55,6 @@ const messagesToDefine: IRejectMessages = {
   rejectionReasonDuplicate: {
     id: 'review.rejection.form.reasons.duplicate',
     defaultMessage: 'Duplicate declaration',
-    description: 'Label for rejection option duplicate'
-  },
-  markAsDuplicate: {
-    id: 'review.rejection.form.reasons.markDuplicate',
-    defaultMessage: 'Mark as a duplicate',
     description: 'Label for rejection option duplicate'
   },
   rejectionReasonMisspelling: {

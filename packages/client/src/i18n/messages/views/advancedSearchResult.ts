@@ -188,5 +188,5 @@ const messagesToDefine: IAdvancedSearchResultMessages = {
     id: 'advancedSearchResult.table.noResult'
   }
 }
-export const messages: IAdvancedSearchResultMessages =
+const messages: IAdvancedSearchResultMessages =
   defineMessages(messagesToDefine)

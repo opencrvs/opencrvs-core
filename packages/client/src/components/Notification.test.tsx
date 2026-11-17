@@ -13,7 +13,6 @@ import { ReactWrapper } from 'enzyme'
 import { Store } from 'redux'
 import * as actions from '@client/notification/actions'
 import { TOAST_MESSAGES } from '@client/user/userReducer'
-import { AUDIT_ACTION } from '@client/views/SysAdmin/Team/user/UserAuditActionModal'
 import { waitForElement } from '@client/tests/wait-for-element'
 
 describe('when app notifies the user', () => {
@@ -111,7 +110,7 @@ describe('when app notifies the user', () => {
       beforeEach(() => {
         const action = actions.showUserAuditSuccessToast(
           'John Doe',
-          AUDIT_ACTION.DEACTIVATE
+          actions.AUDIT_ACTION.DEACTIVATE
         )
         store.dispatch(action)
         app.update()

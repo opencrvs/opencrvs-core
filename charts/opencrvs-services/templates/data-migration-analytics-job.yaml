@@ -1,0 +1,107 @@
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  annotations:
+    "helm.sh/hook": pre-install,pre-upgrade
+    "helm.sh/hook-weight": "3"
+  labels:
+    app: data-migration-analytics
+  name: data-migration-analytics
+spec:
+  template:
+    metadata:
+      labels:
+        app: data-migration-analytics
+    spec:
+      {{- include "opencrvs.imagePullSecrets" (dict "root" . "service" .Values.countryconfig) | nindent 6 }}
+      initContainers:
+        - name: copy-assets
+          image: {{ include "opencrvs.image" (dict "root" . "service" .Values.countryconfig) }}-assets
+          command:
+            - sh
+            - -c
+            - >
+              cp -R /assets/postgres/* /data-assets/ &&
+              chmod +x /data-assets/*.sh || true
+          volumeMounts:
+            - name: assets
+              mountPath: /data-assets
+      containers:
+        - name: data-migration-analytics
+          command:
+            - bash
+            - -c
+            - |
+              scripts=(/data-assets/*.sh)
+
+              if [ ${#scripts[@]} -eq 0 ]; then
+                echo "No scripts found in /data-assets"
+                exit 0
+              fi
+
+              for script in "${scripts[@]}"; do
+                echo "Running ${script}"
+                "${script}"
+              done
+          image: {{ .Values.postgres.image }}
+          env:
+            - name: POSTGRES_HOST
+              value: {{ .Values.postgres.host }}
+            - name: POSTGRES_PORT
+              value: "5432"
+          {{- if eq .Values.postgres.auth_mode "disabled" }}
+            - name: POSTGRES_USER
+              value: postgres
+            - name: POSTGRES_PASSWORD
+              value: postgres
+          {{- else }}
+            - name: POSTGRES_USER
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.postgres.admin_user_secret_name }}
+                  key: POSTGRES_USER
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.postgres.admin_user_secret_name }}
+                  key: POSTGRES_PASSWORD
+          {{- end }}
+            - name: EVENTS_APP_ROLE
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.postgres.users_secret }}
+                  key: EVENTS_APP_POSTGRES_USER
+            - name: EVENTS_APP_POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.postgres.users_secret }}
+                  key: EVENTS_APP_POSTGRES_PASSWORD
+            - name: EVENTS_MIGRATOR_ROLE
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.postgres.users_secret }}
+                  key: EVENTS_MIGRATOR_POSTGRES_USER
+            - name: EVENTS_MIGRATOR_POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.postgres.users_secret }}
+                  key: EVENTS_MIGRATOR_POSTGRES_PASSWORD
+            - name: ANALYTICS_POSTGRES_USER
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.postgres.users_secret }}
+                  key: EVENTS_ANALYTICS_POSTGRES_USER
+            - name: ANALYTICS_POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.postgres.users_secret }}
+                  key: EVENTS_ANALYTICS_POSTGRES_PASSWORD
+          {{- include "render-env-vars" (dict "service_name" "postgres_on_deploy" "Values" .Values) }}
+          volumeMounts:
+            - name: assets
+              mountPath: /data-assets
+      volumes:
+        - name: assets
+          emptyDir: {}
+      restartPolicy: "OnFailure"

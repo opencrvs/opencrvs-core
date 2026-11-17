@@ -39,7 +39,7 @@ export const validateFunc = async (
   let valid = false
   if (checkInvalidToken) {
     valid = await verifyToken(
-      request.headers.authorization.replace('Bearer ', ''),
+      (request.headers.authorization as string).replace('Bearer ', ''),
       authUrl
     )
   }

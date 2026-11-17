@@ -8,6 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
+import { encodeScope, INTEGRATION_CREATOR_USER_ID } from '@opencrvs/commons'
 import { AuthServer, createServer } from '@auth/server'
 
 const decodeTokenPayload = (token: string) =>
@@ -31,14 +32,17 @@ describe('integration creator token handler', () => {
     const { token } = JSON.parse(res.payload)
     const payload = decodeTokenPayload(token)
 
-    expect(payload.scope).toEqual(['integration.create'])
-    expect(payload.sub).toBe('opencrvs:countryconfig-service')
+    expect(payload.scope).toEqual([
+      encodeScope({ type: 'integration.create' })
+    ])
+    // A UUID subject, so events can resolve the token as a SystemContext
+    expect(payload.sub).toBe(INTEGRATION_CREATOR_USER_ID)
     expect(payload.userType).toBe('system')
     // The token is consumed by countryconfig (system/ready trigger) and
-    // user-mgnt (createIntegration)
+    // events (integrations.create)
     expect(payload.aud).toEqual([
       'opencrvs:countryconfig-user',
-      'opencrvs:user-mgnt-user'
+      'opencrvs:events-user'
     ])
     expect(payload.exp - payload.iat).toBe(60)
   })

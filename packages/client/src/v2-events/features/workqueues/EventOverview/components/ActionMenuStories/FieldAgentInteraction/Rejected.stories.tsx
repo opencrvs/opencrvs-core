@@ -9,17 +9,19 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import type { Meta } from '@storybook/react'
-import { ActionType } from '@opencrvs/commons/client'
-import { AssignmentStatus } from '@client/v2-events/utils'
+import {
+  TestUserRole,
+  ActionType,
+  AssignmentStatus
+} from '@opencrvs/commons/client'
+
 import { ActionMenu } from '../../ActionMenu'
 import {
   baseMeta,
   getHiddenActions,
   createStoriesFromScenarios,
   AssertType,
-  Scenario,
-  UserRoles,
-  REJECTED_DECLARE_AS_REVIEW
+  Scenario
 } from '../ActionMenu.common'
 
 export default {
@@ -40,9 +42,8 @@ const rejectedScenariosForFieldAgent: Scenario[] = [
     ],
     expected: {
       ...getHiddenActions(),
-      [ActionType.ASSIGN]: AssertType.ENABLED,
-      [ActionType.READ]: AssertType.ENABLED,
-      [REJECTED_DECLARE_AS_REVIEW]: AssertType.DISABLED
+      ['Assign']: AssertType.ENABLED,
+      ['Edit']: AssertType.DISABLED
     }
   },
   {
@@ -56,9 +57,8 @@ const rejectedScenariosForFieldAgent: Scenario[] = [
     ],
     expected: {
       ...getHiddenActions(),
-      [ActionType.UNASSIGN]: AssertType.ENABLED,
-      [ActionType.READ]: AssertType.ENABLED,
-      [REJECTED_DECLARE_AS_REVIEW]: AssertType.ENABLED
+      ['Unassign']: AssertType.ENABLED,
+      ['Edit']: AssertType.ENABLED
     }
   },
   {
@@ -72,15 +72,14 @@ const rejectedScenariosForFieldAgent: Scenario[] = [
     ],
     expected: {
       ...getHiddenActions(),
-      [ActionType.READ]: AssertType.ENABLED,
-      [REJECTED_DECLARE_AS_REVIEW]: AssertType.DISABLED
+      ['Edit']: AssertType.DISABLED
     }
   }
 ]
 
 const stories = createStoriesFromScenarios(
   rejectedScenariosForFieldAgent,
-  UserRoles.FIELD_AGENT
+  TestUserRole.enum.FIELD_AGENT
 )
 
 export const Unassigned = stories['Unassigned']

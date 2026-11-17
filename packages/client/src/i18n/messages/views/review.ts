@@ -113,11 +113,6 @@ const messagesToDefine = {
     description: 'Edit modal confirmation text',
     id: 'review.edit.modal.confirmationText'
   },
-  editDocuments: {
-    defaultMessage: 'Add attachement',
-    description: 'Edit documents text',
-    id: 'review.documents.editDocuments'
-  },
   headerSubjectWithName: {
     defaultMessage:
       '{name} {eventType, select, birth {Birth} death {Death} other {Marriage} } declaration',

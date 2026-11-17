@@ -1,0 +1,1875 @@
+/*
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at https://mozilla.org/MPL/2.0/.
+ *
+ * OpenCRVS is also distributed under the terms of the Civil Registration
+ * & Healthcare Disclaimer located at http://opencrvs.org/license.
+ *
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
+ */
+import type { Meta, StoryObj } from '@storybook/react'
+import { within, expect, fn, waitFor } from '@storybook/test'
+import { userEvent } from '@storybook/testing-library'
+import { createTRPCMsw, httpLink } from '@vafanassieff/msw-trpc'
+import superjson from 'superjson'
+import { TRPCError } from '@trpc/server'
+import {
+  DocumentPath,
+  encodeScope,
+  TestUserRole,
+  TokenUserType,
+  User,
+  UUID
+} from '@opencrvs/commons/client'
+import { AppRouter } from '@client/v2-events/trpc'
+import { ROUTES } from '@client/v2-events/routes/routes'
+import { routesConfig } from '@client/v2-events/routes/config'
+import { testDataGenerator } from '@client/tests/test-data-generators'
+import { mockOfflineData } from '@client/tests/mock-offline-data'
+import { createTemporaryId } from '@client/v2-events/utils'
+import { useEventFormData } from '@client/v2-events/features/events/useEventFormData'
+import * as V1_LEGACY_ROUTES from '@client/navigation/routes'
+
+import { useUserFormState } from './useUserFormState'
+import { EditUser } from './UserEditor'
+
+const tRPCMsw = createTRPCMsw<AppRouter>({
+  links: [httpLink({ url: '/api/events' })],
+  transformer: { input: superjson, output: superjson }
+})
+
+const mockRoles = [
+  { id: TestUserRole.enum.REGISTRATION_AGENT, scopes: [] },
+  { id: TestUserRole.enum.LOCAL_REGISTRAR, scopes: [] }
+]
+
+const generator = testDataGenerator()
+const mockUser = generator.user.registrationAgent().v2
+const createUserSpy = fn()
+const updateUserSpy = fn()
+
+const meta: Meta = {
+  title: 'SysAdmin/UserEditor/Interaction',
+  parameters: {
+    userRole: TestUserRole.enum.NATIONAL_SYSTEM_ADMIN,
+    msw: {
+      handlers: {
+        userRoles: [tRPCMsw.user.roles.list.query(() => mockRoles)],
+        locationHierarchy: [
+          tRPCMsw.locations.getLocationHierarchy.query(
+            () => ibomboOfficeHierarchy
+          )
+        ]
+      }
+    }
+  },
+  beforeEach: () => {
+    window.config.ADDITIONAL_USER_FIELDS = []
+    window.config.USER_NOTIFICATION_DELIVERY_METHOD = 'email'
+    mockOfflineData.config.USER_NOTIFICATION_DELIVERY_METHOD = 'email'
+    useUserFormState.getState().clear()
+    useUserFormState
+      .getState()
+      .setUserForm({ primaryOfficeId: mockUser.primaryOfficeId })
+  }
+}
+
+export default meta
+
+/**
+ * Mock jurisdiction context used in office-picker scope stories below.
+ * IDs match V2_DEFAULT_MOCK_ADMINISTRATIVE_AREAS and V2_DEFAULT_MOCK_LOCATIONS.
+ *
+ * Hierarchy:
+ *   Central (province)
+ *     └── Ibombo (district)
+ *         ├── Ibombo District Office  ← LOCAL_SYSTEM_ADMIN's office (set in preview.tsx)
+ *         └── Ibombo Rural Health Centre
+ *   Sulaka (province, separate root)
+ *       └── Ilanga (district)
+ *           ├── Sulaka Provincial Office
+ *           └── Ilanga District Office
+ */
+const IBOMBO_DISTRICT_OFFICE_ID = '028d2c85-ca31-426d-b5d1-2cef545a4902' as UUID
+
+/**
+ * LOCAL_SYSTEM_ADMIN holds user.edit { accessLevel: 'administrativeArea' },
+ * scoping their jurisdiction to the Ibombo administrative area (Central province).
+ * The office picker when editing an existing user must show only offices within
+ * that area and exclude offices from other provinces.
+ *
+ * Expected:
+ *   - "Ibombo District Office" visible (adminArea = Ibombo ✓)
+ *   - "Sulaka Provincial Office" absent (adminArea = Sulaka ✗)
+ */
+export const EditUserOfficePickerRestrictedByAdministrativeArea: StoryObj = {
+  parameters: {
+    chromatic: { disableSnapshot: true },
+    userRole: TestUserRole.enum.LOCAL_SYSTEM_ADMIN,
+    reactRouter: {
+      router: routesConfig,
+      initialPath: ROUTES.V2.SETTINGS.USER.EDIT.buildPath({
+        userId: mockUser.id,
+        pageId: 'user.office'
+      })
+    },
+    msw: {
+      handlers: {
+        userRoles: [tRPCMsw.user.roles.list.query(() => mockRoles)],
+        user: [tRPCMsw.user.get.query(() => mockUser)],
+        locationHierarchy: [
+          tRPCMsw.locations.getLocationHierarchy.query(() => [
+            CENTRAL_ADMIN_AREA_ID,
+            IBOMBO_ADMIN_AREA_ID,
+            IBOMBO_DISTRICT_OFFICE_ID
+          ])
+        ]
+      }
+    }
+  },
+  beforeEach: () => {
+    useUserFormState.getState().clear()
+  },
+  play: async ({ canvasElement, step }) => {
+    const canvas = within(canvasElement)
+
+    await step(
+      'Ibombo District Office appears — it is within the Ibombo administrative area',
+      async () => {
+        const input = await canvas.findByRole('combobox')
+        await userEvent.type(input, 'Ibombo')
+        await expect(
+          canvas.findByText('Ibombo District Office')
+        ).resolves.toBeInTheDocument()
+      }
+    )
+
+    await step(
+      'Sulaka Provincial Office does not appear — it is outside the Ibombo jurisdiction',
+      async () => {
+        const input = canvas.getByRole('combobox')
+        await userEvent.clear(input)
+        await userEvent.type(input, 'Sulaka')
+        await waitFor(() =>
+          expect(canvas.queryByText('Sulaka Provincial Office')).toBeNull()
+        )
+      }
+    )
+  }
+}
+
+/**
+ * LOCAL_SYSTEM_ADMIN holds user.create { accessLevel: 'administrativeArea' },
+ * scoping their jurisdiction to the Ibombo administrative area (Central province).
+ * The office picker when creating a new user must show only offices within
+ * that area and exclude offices from other provinces.
+ *
+ * Expected:
+ *   - "Ibombo District Office" visible (adminArea = Ibombo ✓)
+ *   - "Ilanga District Office" absent (adminArea = Ilanga under Sulaka ✗)
+ */
+export const CreateUserOfficePickerRestrictedByAdministrativeArea: StoryObj = {
+  parameters: {
+    chromatic: { disableSnapshot: true },
+    userRole: TestUserRole.enum.LOCAL_SYSTEM_ADMIN,
+    reactRouter: {
+      router: routesConfig,
+      initialPath: ROUTES.V2.SETTINGS.USER.EDIT.buildPath({
+        userId: createTemporaryId(),
+        pageId: 'user.office'
+      })
+    },
+    msw: {
+      handlers: {
+        userRoles: [tRPCMsw.user.roles.list.query(() => mockRoles)],
+        // The admin's primaryOfficeId must resolve to a location in V2_DEFAULT_MOCK_LOCATIONS
+        // so that filterLocationsByJurisdiction can walk the administrative area hierarchy.
+        user: [
+          tRPCMsw.user.get.query(() => ({
+            ...localSystemAdminUser,
+            primaryOfficeId: IBOMBO_DISTRICT_OFFICE_ID
+          }))
+        ]
+      }
+    }
+  },
+  beforeEach: () => {
+    useUserFormState.getState().clear()
+  },
+  play: async ({ canvasElement, step }) => {
+    const canvas = within(canvasElement)
+
+    await step(
+      "Ibombo District Office appears — within the admin's Ibombo jurisdiction",
+      async () => {
+        const input = await canvas.findByRole('combobox')
+        await userEvent.type(input, 'Ibombo')
+        await expect(
+          canvas.findByText('Ibombo District Office')
+        ).resolves.toBeInTheDocument()
+      }
+    )
+
+    await step(
+      'Ilanga District Office does not appear — it is in Ilanga/Sulaka, outside Ibombo jurisdiction',
+      async () => {
+        const input = canvas.getByRole('combobox')
+        await userEvent.clear(input)
+        await userEvent.type(input, 'Ilanga')
+        await waitFor(() =>
+          expect(canvas.queryByText('Ilanga District Office')).toBeNull()
+        )
+      }
+    )
+  }
+}
+
+/**
+ * NATIONAL_SYSTEM_ADMIN holds user.create without an accessLevel restriction,
+ * which resolves to 'all'. The office picker when creating a new user must
+ * show offices from any province in the system.
+ *
+ * Expected:
+ *   - "Ibombo District Office" visible (Central province ✓)
+ *   - "Sulaka Provincial Office" visible (Sulaka province ✓)
+ */
+export const CreateUserOfficePickerUnrestrictedForNationalAdmin: StoryObj = {
+  parameters: {
+    chromatic: { disableSnapshot: true },
+    userRole: TestUserRole.enum.NATIONAL_SYSTEM_ADMIN,
+    reactRouter: {
+      router: routesConfig,
+      initialPath: ROUTES.V2.SETTINGS.USER.EDIT.buildPath({
+        userId: createTemporaryId(),
+        pageId: 'user.office'
+      })
+    },
+    msw: {
+      handlers: {
+        userRoles: [tRPCMsw.user.roles.list.query(() => mockRoles)]
+      }
+    }
+  },
+  beforeEach: () => {
+    useUserFormState.getState().clear()
+  },
+  play: async ({ canvasElement, step }) => {
+    const canvas = within(canvasElement)
+
+    await step(
+      'Ibombo District Office appears (in Central province)',
+      async () => {
+        const input = await canvas.findByRole('combobox')
+        await userEvent.type(input, 'Ibombo')
+        await expect(
+          canvas.findByText('Ibombo District Office')
+        ).resolves.toBeInTheDocument()
+      }
+    )
+
+    await step(
+      'Sulaka Provincial Office also appears — no jurisdiction restriction for national admin',
+      async () => {
+        const input = canvas.getByRole('combobox')
+        await userEvent.clear(input)
+        await userEvent.type(input, 'Sulaka')
+        await expect(
+          canvas.findByText('Sulaka Provincial Office')
+        ).resolves.toBeInTheDocument()
+      }
+    )
+  }
+}
+
+/**
+ * Regression test for: hospital offices not appearing as Registration Office options.
+ *
+ * The registration office field must include both CRVS_OFFICE and HEALTH_FACILITY
+ * locations so that hospital clerks can be assigned to a hospital as their office.
+ */
+export const RegistrationOfficeIncludesHospitals: StoryObj = {
+  parameters: {
+    reactRouter: {
+      router: routesConfig,
+      initialPath: ROUTES.V2.SETTINGS.USER.EDIT.buildPath({
+        userId: createTemporaryId(),
+        pageId: 'user.office'
+      })
+    }
+  },
+  play: async ({ canvasElement, step }) => {
+    const canvas = within(canvasElement)
+
+    await step(
+      'Registration office dropdown shows both CRVS offices and hospital facilities',
+      async () => {
+        const input = await canvas.findByRole('combobox')
+
+        await userEvent.type(input, 'Ibombo')
+
+        await expect(
+          canvas.findByText('Ibombo District Office')
+        ).resolves.toBeInTheDocument()
+
+        await expect(
+          canvas.findByText('Ibombo Rural Health Centre')
+        ).resolves.toBeInTheDocument()
+      }
+    )
+  }
+}
+
+/**
+ * Regression test for: invalid phone number not showing a validation error.
+ *
+ * The user.details page has requireCompletionToContinue: true, so clicking
+ * Continue with an invalid phone number must surface the error inline and
+ * keep the user on the same page.
+ */
+export const InvalidPhoneNumberShowsValidationError: StoryObj = {
+  parameters: {
+    chromatic: { disableSnapshot: true },
+    reactRouter: {
+      router: routesConfig,
+      initialPath: ROUTES.V2.SETTINGS.USER.EDIT.buildPath({
+        userId: createTemporaryId(),
+        pageId: 'user.details'
+      })
+    }
+  },
+  beforeEach: () => {
+    // Pre-seed required fields so only the phone validation fires.
+    useUserFormState.getState().setUserForm({
+      primaryOfficeId: mockUser.primaryOfficeId,
+      role: TestUserRole.enum.REGISTRATION_AGENT,
+      name: { firstname: 'Test', surname: 'User' },
+      email: 'test@opencrvs.org'
+    })
+  },
+  play: async ({ canvasElement, step }) => {
+    const canvas = within(canvasElement)
+
+    await step('Type an invalid phone number', async () => {
+      const phoneInput = await canvas.findByTestId('text__phoneNumber')
+      await userEvent.type(phoneInput, '12345')
+    })
+
+    await step('Click Continue to trigger validation', async () => {
+      await userEvent.click(await canvas.findByText('Continue'))
+    })
+
+    await step('Validation error is shown for the phone field', async () => {
+      await waitFor(() =>
+        expect(
+          canvasElement.querySelector('#phoneNumber_error')
+        ).toHaveTextContent(
+          'Must be a valid 10 digit number that starts with 0(7|9)'
+        )
+      )
+    })
+  }
+}
+
+export const EmptyNameAfterTouchingBlocksContinue: StoryObj = {
+  parameters: {
+    chromatic: { disableSnapshot: true },
+    reactRouter: {
+      router: routesConfig,
+      initialPath: ROUTES.V2.SETTINGS.USER.EDIT.buildPath({
+        userId: createTemporaryId(),
+        pageId: 'user.details'
+      })
+    }
+  },
+  beforeEach: () => {
+    // Pre-seed every other required field so that only the name validation
+    // can block navigation.
+    useUserFormState.getState().setUserForm({
+      primaryOfficeId: mockUser.primaryOfficeId,
+      role: TestUserRole.enum.REGISTRATION_AGENT,
+      phoneNumber: '01712345678',
+      email: 'test@opencrvs.org'
+    })
+  },
+  play: async ({ canvasElement, step }) => {
+    const canvas = within(canvasElement)
+
+    await step('Type a first name, then clear it', async () => {
+      const firstnameInput = await canvas.findByTestId('text__firstname')
+      await userEvent.type(firstnameInput, 'Test')
+      await userEvent.clear(firstnameInput)
+    })
+
+    await step('Type a last name, then clear it', async () => {
+      const surnameInput = await canvas.findByTestId('text__surname')
+      await userEvent.type(surnameInput, 'User')
+      await userEvent.clear(surnameInput)
+    })
+
+    await step('Click Continue', async () => {
+      await userEvent.click(await canvas.findByText('Continue'))
+    })
+
+    await step('Validation errors appear for both name subfields', async () => {
+      await waitFor(() =>
+        expect(
+          canvasElement.querySelector('#firstname_error')
+        ).toBeInTheDocument()
+      )
+      await waitFor(() =>
+        expect(
+          canvasElement.querySelector('#surname_error')
+        ).toBeInTheDocument()
+      )
+    })
+
+    await step(
+      'User remains on the details page — Continue was blocked',
+      async () => {
+        expect(await canvas.findByText('Continue')).toBeInTheDocument()
+      }
+    )
+  }
+}
+
+/**
+ * Regression test for: touched-then-cleared email field submitting "" instead
+ * of undefined, which would be rejected by the backend's z.email() validator.
+ *
+ * The form state is pre-seeded with email: "" (what the Zustand store holds
+ * after a user types an address and clears it). USER_NOTIFICATION_DELIVERY_METHOD
+ * is set to 'sms' so email is not required and the form submits. Submitting
+ * must normalise email to undefined so it is stored as NULL in the database.
+ */
+export const ClearedEmailNormalisedToUndefined: StoryObj = {
+  parameters: {
+    chromatic: { disableSnapshot: true },
+    reactRouter: {
+      router: routesConfig,
+      initialPath: ROUTES.V2.SETTINGS.USER.REVIEW.buildPath({
+        userId: createTemporaryId()
+      })
+    },
+    msw: {
+      handlers: {
+        userRoles: [tRPCMsw.user.roles.list.query(() => mockRoles)],
+        createUser: [
+          tRPCMsw.user.create.mutation((input) => {
+            createUserSpy(input)
+            return mockUser
+          })
+        ]
+      }
+    }
+  },
+  beforeEach: () => {
+    window.config.USER_NOTIFICATION_DELIVERY_METHOD = 'sms'
+    mockOfflineData.config.USER_NOTIFICATION_DELIVERY_METHOD = 'sms'
+    createUserSpy.mockReset()
+    useUserFormState.getState().setUserForm({
+      primaryOfficeId: mockUser.primaryOfficeId,
+      role: TestUserRole.enum.REGISTRATION_AGENT,
+      name: { firstname: 'Test', surname: 'User' },
+      phoneNumber: '01712345678',
+      email: '' // touched-and-cleared email field — the bug scenario
+    })
+  },
+  play: async ({ canvasElement, step }) => {
+    const canvas = within(canvasElement)
+
+    await step('Submit the form with a cleared email', async () => {
+      const submitButton = await canvas.findByRole('button', {
+        name: /create user/i
+      })
+      await userEvent.click(submitButton)
+    })
+
+    await step(
+      'email is not sent as empty string — it must be undefined so the DB stores NULL',
+      async () => {
+        await waitFor(() =>
+          expect(createUserSpy).toHaveBeenCalledWith(
+            expect.not.objectContaining({ email: '' })
+          )
+        )
+      }
+    )
+  }
+}
+
+/**
+ * Regression test for: touched-then-cleared phone field submitting "" instead
+ * of undefined, causing a duplicate-key error on the second user creation at
+ * the same office.
+ *
+ * The form state is pre-seeded with phoneNumber: "" (what the Zustand store
+ * holds after a user types a number and clears the field). Submitting should
+ * normalise this to undefined so mobile is stored as NULL in the database.
+ */
+export const ClearedPhoneNumberNormalisedToUndefined: StoryObj = {
+  parameters: {
+    chromatic: { disableSnapshot: true },
+    reactRouter: {
+      router: routesConfig,
+      initialPath: ROUTES.V2.SETTINGS.USER.REVIEW.buildPath({
+        userId: createTemporaryId()
+      })
+    },
+    msw: {
+      handlers: {
+        userRoles: [tRPCMsw.user.roles.list.query(() => mockRoles)],
+        createUser: [
+          tRPCMsw.user.create.mutation((input) => {
+            createUserSpy(input)
+            return mockUser
+          })
+        ]
+      }
+    }
+  },
+  beforeEach: () => {
+    createUserSpy.mockReset()
+    useUserFormState.getState().setUserForm({
+      primaryOfficeId: mockUser.primaryOfficeId,
+      role: TestUserRole.enum.REGISTRATION_AGENT,
+      name: { firstname: 'Test', surname: 'User' },
+      phoneNumber: '', // touched-and-cleared phone field — the bug scenario
+      email: 'newuser@opencrvs.org'
+    })
+  },
+  play: async ({ canvasElement, step }) => {
+    const canvas = within(canvasElement)
+
+    await step('Submit the form with a cleared phone number', async () => {
+      const submitButton = await canvas.findByRole('button', {
+        name: /create user/i
+      })
+      await userEvent.click(submitButton)
+    })
+
+    await step(
+      'mobile is not sent as empty string — it must be undefined so the DB stores NULL',
+      async () => {
+        await waitFor(() =>
+          expect(createUserSpy).toHaveBeenCalledWith(
+            expect.not.objectContaining({ mobile: '' })
+          )
+        )
+      }
+    )
+  }
+}
+
+export const AllFieldsAreIncludedInCreatePayload: StoryObj = {
+  parameters: {
+    chromatic: { disableSnapshot: true },
+    reactRouter: {
+      router: routesConfig,
+      initialPath: ROUTES.V2.SETTINGS.USER.REVIEW.buildPath({
+        userId: createTemporaryId()
+      })
+    },
+    msw: {
+      handlers: {
+        userRoles: [tRPCMsw.user.roles.list.query(() => mockRoles)],
+        createUser: [
+          tRPCMsw.user.create.mutation((input) => {
+            createUserSpy(input)
+            return mockUser
+          })
+        ]
+      }
+    }
+  },
+  beforeEach: () => {
+    createUserSpy.mockReset()
+    useUserFormState.getState().setUserForm({
+      phoneNumber: mockUser.mobile,
+      signature: {
+        path: mockUser.signature as DocumentPath,
+        originalFilename: 'signature.png',
+        type: 'image/png'
+      },
+      primaryOfficeId: mockUser.primaryOfficeId,
+      role: TestUserRole.enum.REGISTRATION_AGENT,
+      name: { firstname: 'Test', surname: 'User' },
+      email: 'test@opencrvs.org',
+      fullHonorificName: 'Dr. Test User',
+      device: 'Test Device'
+    })
+  },
+  play: async ({ canvasElement, step }) => {
+    const canvas = within(canvasElement)
+
+    await step('Submit the create form', async () => {
+      const submitButton = await canvas.findByRole('button', {
+        name: /create user/i
+      })
+      await userEvent.click(submitButton)
+    })
+
+    await step(
+      'create payload contains every expected field at the correct value',
+      async () => {
+        await waitFor(() =>
+          expect(createUserSpy).toHaveBeenCalledWith(
+            expect.objectContaining({
+              mobile: mockUser.mobile,
+              email: 'test@opencrvs.org',
+              fullHonorificName: 'Dr. Test User',
+              device: 'Test Device',
+              role: TestUserRole.enum.REGISTRATION_AGENT,
+              primaryOfficeId: mockUser.primaryOfficeId,
+              signature: {
+                path: mockUser.signature as DocumentPath,
+                originalFilename: 'signature.png',
+                type: 'image/png'
+              },
+              name: { firstname: 'Test', surname: 'User' },
+              data: {
+                'user.staffId': null
+              }
+            })
+          )
+        )
+      }
+    )
+  }
+}
+
+export const AllFieldsAreIncludedInUpdatePayload: StoryObj = {
+  parameters: {
+    chromatic: { disableSnapshot: true },
+    reactRouter: {
+      router: routesConfig,
+      initialPath: ROUTES.V2.SETTINGS.USER.REVIEW.buildPath({
+        userId: mockUser.id
+      })
+    },
+    msw: {
+      handlers: {
+        userRoles: [tRPCMsw.user.roles.list.query(() => mockRoles)],
+        user: [
+          tRPCMsw.user.get.query(() => ({
+            ...mockUser,
+            fullHonorificName: 'Dr. Existing User',
+            device: 'Existing Device'
+          }))
+        ],
+        updateUser: [
+          tRPCMsw.user.update.mutation((input) => {
+            updateUserSpy(input)
+            return {
+              ...mockUser,
+              fullHonorificName: 'Dr. Updated User',
+              device: 'Updated Device'
+            }
+          })
+        ]
+      }
+    }
+  },
+  beforeEach: () => {
+    updateUserSpy.mockReset()
+    useUserFormState.getState().setUserForm(
+      {
+        phoneNumber: mockUser.mobile,
+        signature: {
+          path: mockUser.signature as DocumentPath,
+          originalFilename: 'signature.png',
+          type: 'image/png'
+        },
+        primaryOfficeId: mockUser.primaryOfficeId,
+        role: TestUserRole.enum.REGISTRATION_AGENT,
+        name: {
+          firstname: mockUser.name.firstname,
+          surname: mockUser.name.surname
+        },
+        email: mockUser.email,
+        fullHonorificName: 'Dr. Updated User',
+        device: 'Updated Device'
+      },
+      mockUser.id
+    )
+  },
+  play: async ({ canvasElement, step }) => {
+    const canvas = within(canvasElement)
+
+    await step('Submit the update form', async () => {
+      const submitButton = await canvas.findByRole('button', {
+        name: /confirm/i
+      })
+      await userEvent.click(submitButton)
+    })
+
+    await step(
+      'update payload contains every expected field at the correct value',
+      async () => {
+        await waitFor(() =>
+          expect(updateUserSpy).toHaveBeenCalledWith(
+            expect.objectContaining({
+              id: mockUser.id,
+              mobile: mockUser.mobile,
+              email: mockUser.email,
+              fullHonorificName: 'Dr. Updated User',
+              device: 'Updated Device',
+              role: TestUserRole.enum.REGISTRATION_AGENT,
+              primaryOfficeId: mockUser.primaryOfficeId,
+              signature: {
+                path: mockUser.signature as DocumentPath,
+                originalFilename: 'signature.png',
+                type: 'image/png'
+              },
+              name: {
+                firstname: mockUser.name.firstname,
+                surname: mockUser.name.surname
+              },
+              data: {
+                'user.staffId': null
+              }
+            })
+          )
+        )
+      }
+    )
+  }
+}
+
+const rolesWithSignatureScopes = [
+  { id: TestUserRole.enum.REGISTRATION_AGENT, scopes: [] },
+  {
+    id: TestUserRole.enum.LOCAL_REGISTRAR,
+    scopes: [
+      encodeScope({
+        type: 'profile.electronic-signature'
+      })
+    ]
+  },
+  { id: TestUserRole.enum.COMMUNITY_LEADER, scopes: [] }
+]
+
+export const SignatureRequiredForRegistrar: StoryObj = {
+  parameters: {
+    chromatic: { disableSnapshot: true },
+    reactRouter: {
+      router: routesConfig,
+      initialPath: ROUTES.V2.SETTINGS.USER.EDIT.buildPath({
+        userId: createTemporaryId(),
+        pageId: 'user.details'
+      })
+    },
+    msw: {
+      handlers: {
+        userRoles: [
+          tRPCMsw.user.roles.list.query(() => rolesWithSignatureScopes)
+        ]
+      }
+    }
+  },
+  beforeEach: () => {
+    useUserFormState.getState().setUserForm({
+      primaryOfficeId: mockUser.primaryOfficeId,
+      role: TestUserRole.enum.LOCAL_REGISTRAR,
+      name: { firstname: 'Test', surname: 'User' },
+      phoneNumber: '01712345678',
+      email: 'test@opencrvs.org'
+    })
+  },
+  play: async ({ canvasElement, step }) => {
+    const canvas = within(canvasElement)
+
+    await step('Click Continue from the user details page', async () => {
+      await userEvent.type(
+        await canvas.findByTestId('text__user____staffId'),
+        '01712345678'
+      )
+      await userEvent.click(await canvas.findByText('Staff ID'))
+      await userEvent.click(await canvas.findByText('Continue'))
+    })
+
+    await step(
+      'Signature page is shown — Registrar role carries the electronic-signature scope',
+      async () => {
+        await expect(
+          canvas.findByText('Attach the signature')
+        ).resolves.toBeInTheDocument()
+        await expect(
+          canvas.findByRole('button', { name: 'Sign' })
+        ).resolves.toBeInTheDocument()
+      }
+    )
+
+    await step(
+      'Trying to continue without signing should show an error',
+      async () => {
+        await userEvent.click(await canvas.findByText('Continue'))
+        await expect(canvas.findByText('Required')).resolves.toBeInTheDocument()
+      }
+    )
+  }
+}
+
+/**
+ * Regression test for: signature preview disappearing after navigating back
+ * from user.signature to user.details and then returning.
+ *
+ * Root cause: SignatureFieldInput initialised local `signature` state from the
+ * `value` prop on mount. Formik's enableReinitialize fires asynchronously, so
+ * on the first render after navigation the prop was still undefined — the local
+ * state was frozen at that wrong initial value and never recovered even though
+ * the prop was subsequently corrected.
+ *
+ * Fix: a useEffect that syncs `value` → local `signature` state whenever the
+ * prop changes, so the async Formik reinitialise is picked up correctly.
+ */
+export const SignaturePreviewRestoredAfterBackNavigation: StoryObj = {
+  parameters: {
+    chromatic: { disableSnapshot: true },
+    reactRouter: {
+      router: routesConfig,
+      initialPath: ROUTES.V2.SETTINGS.USER.EDIT.buildPath({
+        userId: createTemporaryId(),
+        pageId: 'user.details'
+      })
+    },
+    msw: {
+      handlers: {
+        userRoles: [
+          tRPCMsw.user.roles.list.query(() => rolesWithSignatureScopes)
+        ]
+      }
+    }
+  },
+  beforeEach: () => {
+    useUserFormState.getState().setUserForm({
+      primaryOfficeId: mockUser.primaryOfficeId,
+      role: TestUserRole.enum.LOCAL_REGISTRAR,
+      name: { firstname: 'Test', surname: 'User' },
+      email: 'test@opencrvs.org',
+      'user.staffId': 'test-staff-001',
+      signature: {
+        path: 'signature-test.png' as DocumentPath,
+        originalFilename: 'signature-test.png',
+        type: 'image/png'
+      }
+    })
+  },
+  play: async ({ canvasElement, step }) => {
+    const canvas = within(canvasElement)
+
+    await step('Navigate to the signature page', async () => {
+      await userEvent.click(
+        await canvas.findByRole('button', { name: 'Continue' })
+      )
+    })
+
+    await step(
+      'Signature preview is visible on the signature page',
+      async () => {
+        await canvas.findByAltText(/signature/i)
+      }
+    )
+
+    await step('Navigate back to the user details page', async () => {
+      await userEvent.click(await canvas.findByRole('button', { name: 'Back' }))
+    })
+
+    await step('Navigate forward to the signature page again', async () => {
+      await userEvent.click(
+        await canvas.findByRole('button', { name: 'Continue' })
+      )
+    })
+
+    await step(
+      'Signature preview is still visible after back-navigation',
+      async () => {
+        await waitFor(async () => {
+          await expect(
+            canvas.findByAltText(/signature/i)
+          ).resolves.toBeInTheDocument()
+        })
+      }
+    )
+  }
+}
+
+export const SignatureNotRequiredForCommunityLeader: StoryObj = {
+  parameters: {
+    chromatic: { disableSnapshot: true },
+    reactRouter: {
+      router: routesConfig,
+      initialPath: ROUTES.V2.SETTINGS.USER.EDIT.buildPath({
+        userId: createTemporaryId(),
+        pageId: 'user.details'
+      })
+    },
+    msw: {
+      handlers: {
+        userRoles: [
+          tRPCMsw.user.roles.list.query(() => rolesWithSignatureScopes)
+        ]
+      }
+    }
+  },
+  beforeEach: () => {
+    useUserFormState.getState().setUserForm({
+      primaryOfficeId: mockUser.primaryOfficeId,
+      role: TestUserRole.enum.COMMUNITY_LEADER,
+      name: { firstname: 'Test', surname: 'User' },
+      phoneNumber: '01712345678',
+      email: 'test@opencrvs.org'
+    })
+  },
+  play: async ({ canvasElement, step }) => {
+    const canvas = within(canvasElement)
+
+    await step('Click Continue from the user details page', async () => {
+      await userEvent.type(
+        await canvas.findByTestId('text__user____staffId'),
+        '01712345678'
+      )
+      await userEvent.click(await canvas.findByText('Staff ID'))
+      await userEvent.click(await canvas.findByText('Continue'))
+    })
+
+    await step(
+      'Review page is shown — the signature page is skipped for Community Leader',
+      async () => {
+        await expect(
+          canvas.findByRole('button', { name: /create user/i })
+        ).resolves.toBeInTheDocument()
+      }
+    )
+
+    await step(
+      'Signature page content is not present — the field is not required for this role',
+      async () => {
+        expect(canvas.queryByText('Attach the signature')).toBeNull()
+        expect(canvas.queryByRole('button', { name: 'Sign' })).toBeNull()
+      }
+    )
+  }
+}
+
+/**
+ * Authorization tests for the EditUser flow against the user.edit scope.
+ *
+ * Hierarchy in V2_DEFAULT_MOCK_ADMINISTRATIVE_AREAS_MAP:
+ *   Central (province, root)
+ *     └── Ibombo (district)
+ *   Sulaka  (province, separate root)
+ *
+ * Scope shape (test-data-generators.ts):
+ *   - NATIONAL_SYSTEM_ADMIN: user.edit with no jurisdiction filter; allowed
+ *     roles include REGISTRATION_AGENT.
+ *   - LOCAL_SYSTEM_ADMIN: user.edit with accessLevel: 'administrativeArea'
+ *     and an allowed role list that does NOT include NATIONAL_SYSTEM_ADMIN.
+ */
+
+const CENTRAL_ADMIN_AREA_ID = 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c' as UUID
+const IBOMBO_ADMIN_AREA_ID = '62a0ccb4-880d-4f30-8882-f256007dfff9' as UUID
+const SULAKA_ADMIN_AREA_ID = 'c599b691-fd2d-45e1-abf4-d185de727fb5' as UUID
+const CENTRAL_PROVINCIAL_OFFICE_ID =
+  '6f6186ce-cd5f-4a5f-810a-2d99e7c4ba12' as UUID
+const SULAKA_PROVINCIAL_OFFICE_ID =
+  '2884f5b9-17b4-49ce-bf4d-f538228935df' as UUID
+
+// mockUser.primaryOfficeId === Ibombo District Office
+const ibomboOfficeHierarchy: UUID[] = [
+  CENTRAL_ADMIN_AREA_ID,
+  IBOMBO_ADMIN_AREA_ID,
+  mockUser.primaryOfficeId
+]
+
+const TARGET_NSA_USER_ID = 'ac0babf3-282a-447a-aecc-3b9aa9fb7cc5' as UUID
+const TARGET_FIELD_AGENT_USER_ID =
+  'b7d2c1f4-3a5e-4c8d-9b2e-1f6a8d4e5c7b' as UUID
+
+const targetNationalSystemAdmin = {
+  id: TARGET_NSA_USER_ID,
+  name: { firstname: 'Target', surname: 'NSA' },
+  role: TestUserRole.enum.NATIONAL_SYSTEM_ADMIN,
+  primaryOfficeId: CENTRAL_PROVINCIAL_OFFICE_ID,
+  administrativeAreaId: CENTRAL_ADMIN_AREA_ID,
+  type: TokenUserType.enum.user,
+  status: 'active',
+  mobile: '+260921000001',
+  email: 'target.nsa@opencrvs.org'
+} as unknown as User
+
+const targetFieldAgentInSulaka = {
+  id: TARGET_FIELD_AGENT_USER_ID,
+  name: { firstname: 'Target', surname: 'FieldAgent' },
+  role: TestUserRole.enum.FIELD_AGENT,
+  primaryOfficeId: SULAKA_PROVINCIAL_OFFICE_ID,
+  administrativeAreaId: SULAKA_ADMIN_AREA_ID,
+  type: TokenUserType.enum.user,
+  status: 'active',
+  mobile: '+260921000002',
+  email: 'target.fa@opencrvs.org'
+} as unknown as User
+
+/**
+ * Returns the user shape the redux profile fetch should receive for the
+ * current user (so we can override admin area / office at story level), and
+ * the target user payload for any other id.
+ */
+function userGetHandler({
+  currentUserId,
+  currentUser,
+  targetUser
+}: {
+  currentUserId: string
+  currentUser: User
+  targetUser: User
+}) {
+  return tRPCMsw.user.get.query((id) => {
+    if (id === currentUserId) {
+      return currentUser
+    }
+    return targetUser
+  })
+}
+
+const localSystemAdminUser = generator.user.localSystemAdmin().v2
+const nationalSystemAdminUser = generator.user.nationalSystemAdmin().v2
+
+/**
+ * 1) New-user flow is gated by canAddOfficeUsers — the admin must hold a
+ *    user.create scope whose jurisdiction (accessLevel) covers the chosen
+ *    primaryOffice. NATIONAL_SYSTEM_ADMIN holds user.create without an
+ *    accessLevel filter (defaults to 'all'), so any office is permitted and
+ *    the form renders.
+ */
+export const NewUserCreationAllowedInJurisdiction: StoryObj = {
+  parameters: {
+    chromatic: { disableSnapshot: true },
+    userRole: TestUserRole.enum.NATIONAL_SYSTEM_ADMIN,
+    reactRouter: {
+      router: routesConfig,
+      initialPath: ROUTES.V2.SETTINGS.USER.EDIT.buildPath({
+        userId: createTemporaryId(),
+        pageId: 'user.details'
+      })
+    }
+  },
+  beforeEach: () => {
+    useUserFormState.getState().setUserForm({
+      primaryOfficeId: mockUser.primaryOfficeId
+    })
+  },
+  play: async ({ canvasElement, step }) => {
+    const canvas = within(canvasElement)
+
+    await step('User details form renders for the new-user flow', async () => {
+      await expect(
+        canvas.findByTestId('text__phoneNumber')
+      ).resolves.toBeInTheDocument()
+    })
+
+    await step('No unauthorized toast is shown', async () => {
+      expect(
+        within(document.body).queryByText(
+          'We are unable to display this page to you'
+        )
+      ).toBeNull()
+    })
+  }
+}
+
+/**
+ * 1b) Same gate, denial path: a role without a user.create scope (here,
+ *     REGISTRATION_AGENT) cannot create users in any office. The form must
+ *     not render and the unauthorized toast must surface.
+ */
+export const NewUserCreationBlockedWithoutScope: StoryObj = {
+  parameters: {
+    chromatic: { disableSnapshot: true },
+    userRole: TestUserRole.enum.REGISTRATION_AGENT,
+    reactRouter: {
+      router: routesConfig,
+      initialPath: ROUTES.V2.SETTINGS.USER.EDIT.buildPath({
+        userId: createTemporaryId(),
+        pageId: 'user.details'
+      })
+    }
+  },
+  beforeEach: () => {
+    useUserFormState.getState().setUserForm({
+      primaryOfficeId: mockUser.primaryOfficeId
+    })
+  },
+  play: async ({ step }) => {
+    await step(
+      'Unauthorized toast appears (no user.create scope grants jurisdiction over the chosen office)',
+      async () => {
+        await waitFor(() =>
+          expect(
+            within(document.body).getByText(
+              'We are unable to display this page to you'
+            )
+          ).toBeInTheDocument()
+        )
+        document.getElementById('undefinedCancel')?.click()
+      }
+    )
+
+    await step('New-user form is not rendered (redirected)', async () => {
+      await waitFor(() =>
+        expect(
+          document.querySelector('[data-testid="text__phoneNumber"]')
+        ).toBeNull()
+      )
+    })
+  }
+}
+
+/**
+ * 1c) LOCAL_SYSTEM_ADMIN (user.create with accessLevel: 'administrativeArea')
+ *     whose primary office is Ibombo District Office (Central jurisdiction)
+ *     tries to create a user in Sulaka Provincial Office (separate root).
+ *     Sulaka is not in Central's hierarchy → canAddOfficeUsers returns false
+ *     → toast appears and the form is not rendered.
+ */
+export const NewUserCreationBlockedOutsideJurisdiction: StoryObj = {
+  parameters: {
+    chromatic: { disableSnapshot: true },
+    userRole: TestUserRole.enum.LOCAL_SYSTEM_ADMIN,
+    reactRouter: {
+      router: routesConfig,
+      initialPath: ROUTES.V2.SETTINGS.USER.EDIT.buildPath({
+        userId: createTemporaryId(),
+        pageId: 'user.details'
+      })
+    },
+    msw: {
+      handlers: {
+        user: [
+          userGetHandler({
+            currentUserId: localSystemAdminUser.id,
+            currentUser: {
+              ...localSystemAdminUser,
+              primaryOfficeId: IBOMBO_DISTRICT_OFFICE_ID
+            },
+            targetUser: mockUser
+          })
+        ]
+      }
+    }
+  },
+  beforeEach: () => {
+    useUserFormState.getState().setUserForm({
+      primaryOfficeId: SULAKA_PROVINCIAL_OFFICE_ID
+    })
+  },
+  play: async ({ step }) => {
+    await step(
+      'Unauthorized toast appears (chosen office is outside the user.create jurisdiction)',
+      async () => {
+        await waitFor(() =>
+          expect(
+            within(document.body).getByText(
+              'We are unable to display this page to you'
+            )
+          ).toBeInTheDocument()
+        )
+        document.getElementById('undefinedCancel')?.click()
+      }
+    )
+
+    await step('New-user form is not rendered (redirected)', async () => {
+      await waitFor(() =>
+        expect(
+          document.querySelector('[data-testid="text__phoneNumber"]')
+        ).toBeNull()
+      )
+    })
+  }
+}
+
+/**
+ * 2) NATIONAL_SYSTEM_ADMIN editing a REGISTRATION_AGENT — allowed by the
+ *    role list on user.edit. The form renders, no toast.
+ */
+export const EditUserWithProperAccess: StoryObj = {
+  parameters: {
+    chromatic: { disableSnapshot: true },
+    userRole: TestUserRole.enum.NATIONAL_SYSTEM_ADMIN,
+    reactRouter: {
+      router: routesConfig,
+      initialPath: ROUTES.V2.SETTINGS.USER.EDIT.buildPath({
+        userId: mockUser.id,
+        pageId: 'user.details'
+      })
+    },
+    msw: {
+      handlers: {
+        userRoles: [tRPCMsw.user.roles.list.query(() => mockRoles)],
+        user: [
+          userGetHandler({
+            currentUserId: nationalSystemAdminUser.id,
+            currentUser: nationalSystemAdminUser,
+            targetUser: mockUser
+          })
+        ]
+      }
+    }
+  },
+  beforeEach: () => {
+    useUserFormState.getState().setUserForm({
+      primaryOfficeId: mockUser.primaryOfficeId,
+      role: TestUserRole.enum.REGISTRATION_AGENT,
+      name: {
+        firstname: mockUser.name.firstname,
+        surname: mockUser.name.surname
+      },
+      email: mockUser.email
+    })
+  },
+  play: async ({ canvasElement, step }) => {
+    const canvas = within(canvasElement)
+
+    await step('User details form is visible', async () => {
+      await expect(
+        canvas.findByTestId('text__phoneNumber')
+      ).resolves.toBeInTheDocument()
+    })
+
+    await step('No unauthorized toast is shown', async () => {
+      expect(
+        within(document.body).queryByText(
+          'We are unable to display this page to you'
+        )
+      ).toBeNull()
+    })
+  }
+}
+
+/**
+ * 3) LOCAL_SYSTEM_ADMIN trying to edit a NATIONAL_SYSTEM_ADMIN — blocked by
+ *    the role-restricted user.edit scope. Toast appears and the user is
+ *    redirected away from the edit form.
+ */
+export const EditUserBlockedByRoleRestriction: StoryObj = {
+  parameters: {
+    chromatic: { disableSnapshot: true },
+    userRole: TestUserRole.enum.LOCAL_SYSTEM_ADMIN,
+    reactRouter: {
+      router: routesConfig,
+      initialPath: ROUTES.V2.SETTINGS.USER.EDIT.buildPath({
+        userId: TARGET_NSA_USER_ID,
+        pageId: 'user.details'
+      })
+    },
+    msw: {
+      handlers: {
+        userRoles: [tRPCMsw.user.roles.list.query(() => mockRoles)],
+        user: [
+          userGetHandler({
+            currentUserId: localSystemAdminUser.id,
+            // Pin the admin's jurisdiction to Central so the admin-area check
+            // passes; only the role check should fail in this story.
+            currentUser: {
+              ...localSystemAdminUser,
+              primaryOfficeId: CENTRAL_PROVINCIAL_OFFICE_ID,
+              administrativeAreaId: CENTRAL_ADMIN_AREA_ID
+            } as unknown as User,
+            targetUser: targetNationalSystemAdmin
+          })
+        ]
+      }
+    }
+  },
+  play: async ({ step }) => {
+    await step(
+      'Unauthorized toast appears (target role is not in the user.edit role list)',
+      async () => {
+        await waitFor(() =>
+          expect(
+            within(document.body).getByText(
+              'We are unable to display this page to you'
+            )
+          ).toBeInTheDocument()
+        )
+        document.getElementById('undefinedCancel')?.click()
+      }
+    )
+
+    await step('Edit form is no longer rendered (redirected)', async () => {
+      await waitFor(() =>
+        expect(
+          document.querySelector('[data-testid="text__phoneNumber"]')
+        ).toBeNull()
+      )
+    })
+  }
+}
+
+/**
+ * 4) LOCAL_SYSTEM_ADMIN whose jurisdiction is Central trying to edit a
+ *    FIELD_AGENT under Sulaka (separate root). Role is allowed, but the
+ *    administrative-area check fails. Toast appears, user is redirected.
+ */
+export const EditUserBlockedByAdministrativeAreaMismatch: StoryObj = {
+  parameters: {
+    chromatic: { disableSnapshot: true },
+    userRole: TestUserRole.enum.LOCAL_SYSTEM_ADMIN,
+    reactRouter: {
+      router: routesConfig,
+      initialPath: ROUTES.V2.SETTINGS.USER.EDIT.buildPath({
+        userId: TARGET_FIELD_AGENT_USER_ID,
+        pageId: 'user.details'
+      })
+    },
+    msw: {
+      handlers: {
+        userRoles: [tRPCMsw.user.roles.list.query(() => mockRoles)],
+        user: [
+          userGetHandler({
+            currentUserId: localSystemAdminUser.id,
+            currentUser: {
+              ...localSystemAdminUser,
+              primaryOfficeId: CENTRAL_PROVINCIAL_OFFICE_ID,
+              administrativeAreaId: CENTRAL_ADMIN_AREA_ID
+            } as unknown as User,
+            targetUser: targetFieldAgentInSulaka
+          })
+        ]
+      }
+    }
+  },
+  play: async ({ step }) => {
+    await step(
+      "Unauthorized toast appears (target sits outside the admin's jurisdiction)",
+      async () => {
+        await waitFor(() =>
+          expect(
+            within(document.body).getByText(
+              'We are unable to display this page to you'
+            )
+          ).toBeInTheDocument()
+        )
+        document.getElementById('undefinedCancel')?.click()
+      }
+    )
+
+    await step('Edit form is no longer rendered (redirected)', async () => {
+      await waitFor(() =>
+        expect(
+          document.querySelector('[data-testid="text__phoneNumber"]')
+        ).toBeNull()
+      )
+    })
+  }
+}
+
+/**
+ * Authorization tests for the ReviewUser flow.
+ *
+ * Same canEditUser gate as EditUser — opening the review page for an
+ * existing user the current user cannot edit must surface an unauthorized
+ * toast and redirect away (replace).
+ */
+
+export const ReviewUserWithProperAccess: StoryObj = {
+  parameters: {
+    chromatic: { disableSnapshot: true },
+    userRole: TestUserRole.enum.NATIONAL_SYSTEM_ADMIN,
+    reactRouter: {
+      router: routesConfig,
+      initialPath: ROUTES.V2.SETTINGS.USER.REVIEW.buildPath({
+        userId: mockUser.id
+      })
+    },
+    msw: {
+      handlers: {
+        userRoles: [tRPCMsw.user.roles.list.query(() => mockRoles)],
+        user: [
+          userGetHandler({
+            currentUserId: nationalSystemAdminUser.id,
+            currentUser: nationalSystemAdminUser,
+            targetUser: mockUser
+          })
+        ]
+      }
+    }
+  },
+  beforeEach: () => {
+    useUserFormState.getState().setUserForm({
+      primaryOfficeId: mockUser.primaryOfficeId,
+      role: TestUserRole.enum.REGISTRATION_AGENT,
+      name: {
+        firstname: mockUser.name.firstname,
+        surname: mockUser.name.surname
+      },
+      email: mockUser.email
+    })
+  },
+  play: async ({ step }) => {
+    await step(
+      'Review page renders the confirm submit button (target editable)',
+      async () => {
+        await waitFor(() =>
+          expect(
+            document.querySelector('#submit-edit-user-form')
+          ).not.toBeNull()
+        )
+      }
+    )
+
+    await step('No unauthorized toast is shown', async () => {
+      expect(
+        within(document.body).queryByText(
+          'We are unable to display this page to you'
+        )
+      ).toBeNull()
+    })
+  }
+}
+
+export const ReviewUserBlockedByRoleRestriction: StoryObj = {
+  parameters: {
+    chromatic: { disableSnapshot: true },
+    userRole: TestUserRole.enum.LOCAL_SYSTEM_ADMIN,
+    reactRouter: {
+      router: routesConfig,
+      initialPath: ROUTES.V2.SETTINGS.USER.REVIEW.buildPath({
+        userId: TARGET_NSA_USER_ID
+      })
+    },
+    msw: {
+      handlers: {
+        userRoles: [tRPCMsw.user.roles.list.query(() => mockRoles)],
+        user: [
+          userGetHandler({
+            currentUserId: localSystemAdminUser.id,
+            currentUser: {
+              ...localSystemAdminUser,
+              primaryOfficeId: CENTRAL_PROVINCIAL_OFFICE_ID,
+              administrativeAreaId: CENTRAL_ADMIN_AREA_ID
+            } as unknown as User,
+            targetUser: targetNationalSystemAdmin
+          })
+        ]
+      }
+    }
+  },
+  play: async ({ step }) => {
+    await step(
+      'Unauthorized toast appears (target role outside the user.edit role list)',
+      async () => {
+        await waitFor(() =>
+          expect(
+            within(document.body).getByText(
+              'We are unable to display this page to you'
+            )
+          ).toBeInTheDocument()
+        )
+        document.getElementById('undefinedCancel')?.click()
+      }
+    )
+
+    await step('Review submit button is gone (redirected)', async () => {
+      await waitFor(() =>
+        expect(document.querySelector('#submit-edit-user-form')).toBeNull()
+      )
+    })
+  }
+}
+
+export const ReviewUserBlockedByAdministrativeAreaMismatch: StoryObj = {
+  parameters: {
+    chromatic: { disableSnapshot: true },
+    userRole: TestUserRole.enum.LOCAL_SYSTEM_ADMIN,
+    reactRouter: {
+      router: routesConfig,
+      initialPath: ROUTES.V2.SETTINGS.USER.REVIEW.buildPath({
+        userId: TARGET_FIELD_AGENT_USER_ID
+      })
+    },
+    msw: {
+      handlers: {
+        userRoles: [tRPCMsw.user.roles.list.query(() => mockRoles)],
+        user: [
+          userGetHandler({
+            currentUserId: localSystemAdminUser.id,
+            currentUser: {
+              ...localSystemAdminUser,
+              primaryOfficeId: CENTRAL_PROVINCIAL_OFFICE_ID,
+              administrativeAreaId: CENTRAL_ADMIN_AREA_ID
+            } as unknown as User,
+            targetUser: targetFieldAgentInSulaka
+          })
+        ]
+      }
+    }
+  },
+  play: async ({ step }) => {
+    await step(
+      "Unauthorized toast appears (target sits outside the admin's jurisdiction)",
+      async () => {
+        await waitFor(() =>
+          expect(
+            within(document.body).getByText(
+              'We are unable to display this page to you'
+            )
+          ).toBeInTheDocument()
+        )
+        document.getElementById('undefinedCancel')?.click()
+      }
+    )
+
+    await step('Review submit button is gone (redirected)', async () => {
+      await waitFor(() =>
+        expect(document.querySelector('#submit-edit-user-form')).toBeNull()
+      )
+    })
+  }
+}
+
+const userA = generator.user.registrationAgent().v2
+const userB = generator.user.localRegistrar().v2
+
+/**
+ * Find the ToggleMenu trigger button in the row containing the given user name.
+ */
+function findMenuTriggerForUser(
+  container: HTMLElement,
+  userName: string
+): HTMLButtonElement {
+  const profileLinks = Array.from(
+    container.querySelectorAll<HTMLButtonElement>('#profile-link')
+  )
+  const nameCell = profileLinks.find(
+    (el) => el.textContent?.trim() === userName
+  )
+  if (!nameCell) throw new Error(`User row not found for: ${userName}`)
+  const row = nameCell.closest('tr')
+  if (!row) throw new Error(`Table row not found for: ${userName}`)
+  const trigger = row.querySelector<HTMLButtonElement>('button[popovertarget]')
+  if (!trigger)
+    throw new Error(`Menu trigger not found in row for: ${userName}`)
+  return trigger
+}
+
+/**
+ * Regression test for: stale form state from a previously viewed user appearing
+ * when navigating to a different user's edit/review page.
+ *
+ * Scenario: the admin opens Kennedy's profile, edits a field, then cancels back
+ * to the user list without submitting. Opening Felix's profile next must show
+ * Felix's own data, not Kennedy's leftover form state.
+ */
+export const CorrectUserDataLoadedAfterSwitchingUsers: StoryObj<
+  typeof EditUser
+> = {
+  parameters: {
+    reactRouter: {
+      router: routesConfig,
+      initialPath:
+        V1_LEGACY_ROUTES.TEAM_USER_LIST + `?locationId=${userA.primaryOfficeId}`
+    },
+    msw: {
+      handlers: {
+        user: [
+          tRPCMsw.user.search.query(() => [userA, userB]),
+          tRPCMsw.user.get.query((id) =>
+            id === userB.id ? { ...userB, data: {} } : { ...userA, data: {} }
+          )
+        ]
+      }
+    }
+  },
+  loaders: [
+    async () => {
+      window.config.ADDITIONAL_USER_FIELDS = []
+      useUserFormState.getState().clear()
+    }
+  ],
+  play: async ({ canvasElement, step }) => {
+    const canvas = within(canvasElement)
+
+    await step('Wait for user list to load', async () => {
+      await canvas.findByText(`${userA.name.firstname} ${userA.name.surname}`, {
+        selector: '#profile-link'
+      })
+      await canvas.findByText(`${userB.name.firstname} ${userB.name.surname}`, {
+        selector: '#profile-link'
+      })
+    })
+
+    await step(
+      `Open ${userB.name.firstname}'s action menu and click Edit details`,
+      async () => {
+        const trigger = findMenuTriggerForUser(
+          canvasElement,
+          `${userB.name.firstname} ${userB.name.surname}`
+        )
+        await userEvent.click(trigger)
+
+        const popoverId = trigger.getAttribute('popovertarget')
+        const popover = popoverId ? document.getElementById(popoverId) : null
+        if (!popover)
+          throw new Error(`${userB.name.firstname} menu popover not found`)
+        await userEvent.click(within(popover).getByText('Edit details'))
+      }
+    )
+
+    await step(
+      `Verify ${userB.name.firstname}'s review page loaded`,
+      async () => {
+        await canvas.findByText(
+          `${userB.name.firstname} ${userB.name.surname}`,
+          { selector: '[data-testid="row-value-name"]', exact: false }
+        )
+      }
+    )
+
+    await step('Click Edit on the email field', async () => {
+      await userEvent.click(await canvas.findByTestId('change-button-email'))
+    })
+
+    await step('Modify the email field without submitting', async () => {
+      const emailInputs = await canvas.findAllByTestId('text__email')
+      await userEvent.clear(emailInputs[0])
+      await userEvent.type(emailInputs[0], 'modified@example.com')
+      await userEvent.click(document.body)
+    })
+
+    await step(
+      'Cancel — close without submitting, back to user list',
+      async () => {
+        await userEvent.click(await canvas.findByTestId('crcl-btn'))
+      }
+    )
+
+    await step(
+      `Open ${userA.name.firstname}'s action menu and click Edit details`,
+      async () => {
+        const trigger = findMenuTriggerForUser(
+          canvasElement,
+          `${userA.name.firstname} ${userA.name.surname}`
+        )
+        await userEvent.click(trigger)
+
+        const popoverId = trigger.getAttribute('popovertarget')
+        const popover = popoverId ? document.getElementById(popoverId) : null
+        if (!popover)
+          throw new Error(`${userA.name.firstname} menu popover not found`)
+        await userEvent.click(within(popover).getByText('Edit details'))
+      }
+    )
+
+    await step(
+      `${userA.name.firstname}'s review page shows ${userA.name.firstname}'s data`,
+      async () => {
+        await expect(
+          canvas.findByText(`${userA.name.firstname} ${userA.name.surname}`, {
+            selector: '[data-testid="row-value-name"]',
+            exact: false
+          })
+        ).resolves.toBeInTheDocument()
+      }
+    )
+  }
+}
+
+/**
+ * Regression test for #12530: opening the create-user form after a previous
+ * submission must not carry over stale "touched" state. The touched state lives
+ * in useEventFormData (separate from useUserFormState), so the create entry
+ * point (CreateNewUserComponent) must clear it too. Otherwise the freshly
+ * opened form shows required-field validation errors before any interaction.
+ */
+export const CreateUserStartsWithCleanFormState: StoryObj = {
+  parameters: {
+    chromatic: { disableSnapshot: true },
+    reactRouter: {
+      router: routesConfig,
+      initialPath: ROUTES.V2.SETTINGS.USER.CREATE.buildPath(
+        {},
+        { officeId: mockUser.primaryOfficeId }
+      )
+    }
+  },
+  beforeEach: () => {
+    // Simulate touched state left over from a previous user creation: the name
+    // field was touched and is now empty (what would trigger a required error).
+    useEventFormData
+      .getState()
+      .setFormTouched({ name: { firstname: true, surname: true } })
+  },
+  play: async ({ canvasElement, step }) => {
+    const canvas = within(canvasElement)
+
+    await step('Fresh create form renders on the details page', async () => {
+      await canvas.findByTestId('text__firstname')
+    })
+
+    await step(
+      'No required-field validation error is shown before interaction',
+      async () => {
+        await waitFor(() =>
+          expect(useEventFormData.getState().formTouched).toEqual({})
+        )
+        expect(
+          canvasElement.querySelector('#firstname_error')
+        ).not.toBeInTheDocument()
+      }
+    )
+  }
+}
+
+export const CreateUserShowsSuccessToast: StoryObj = {
+  parameters: {
+    chromatic: { disableSnapshot: true },
+    reactRouter: {
+      router: routesConfig,
+      initialPath: ROUTES.V2.SETTINGS.USER.REVIEW.buildPath({
+        userId: createTemporaryId()
+      })
+    },
+    msw: {
+      handlers: {
+        userRoles: [tRPCMsw.user.roles.list.query(() => mockRoles)],
+        createUser: [tRPCMsw.user.create.mutation(() => mockUser)]
+      }
+    }
+  },
+  beforeEach: () => {
+    useUserFormState.getState().setUserForm({
+      primaryOfficeId: mockUser.primaryOfficeId,
+      role: TestUserRole.enum.REGISTRATION_AGENT,
+      name: { firstname: 'Test', surname: 'User' },
+      phoneNumber: '01712345678',
+      email: 'test@opencrvs.org'
+    })
+  },
+  play: async ({ canvasElement, step }) => {
+    const canvas = within(canvasElement)
+
+    await step('Submit the create form', async () => {
+      await userEvent.click(
+        await canvas.findByRole('button', { name: /create user/i })
+      )
+    })
+
+    await step('Success toast "New user created" appears', async () => {
+      // Toasts render in a portal outside canvasElement — query document.body.
+      await waitFor(() =>
+        expect(
+          within(document.body).getByText('New user created')
+        ).toBeInTheDocument()
+      )
+    })
+  }
+}
+
+export const UpdateUserShowsSuccessToast: StoryObj = {
+  parameters: {
+    chromatic: { disableSnapshot: true },
+    reactRouter: {
+      router: routesConfig,
+      initialPath: ROUTES.V2.SETTINGS.USER.REVIEW.buildPath({
+        userId: mockUser.id
+      })
+    },
+    msw: {
+      handlers: {
+        userRoles: [tRPCMsw.user.roles.list.query(() => mockRoles)],
+        user: [tRPCMsw.user.get.query(() => mockUser)],
+        updateUser: [tRPCMsw.user.update.mutation(() => mockUser)]
+      }
+    }
+  },
+  beforeEach: () => {
+    useUserFormState.getState().setUserForm(
+      {
+        primaryOfficeId: mockUser.primaryOfficeId,
+        role: TestUserRole.enum.REGISTRATION_AGENT,
+        name: {
+          firstname: mockUser.name.firstname,
+          surname: mockUser.name.surname
+        },
+        phoneNumber: mockUser.mobile,
+        email: mockUser.email
+      },
+      mockUser.id
+    )
+  },
+  play: async ({ canvasElement, step }) => {
+    const canvas = within(canvasElement)
+
+    await step('Submit the update form', async () => {
+      await userEvent.click(
+        await canvas.findByRole('button', { name: /confirm/i })
+      )
+    })
+
+    await step(
+      'Success toast "User details have been updated" appears',
+      async () => {
+        await waitFor(() =>
+          expect(
+            within(document.body).getByText('User details have been updated')
+          ).toBeInTheDocument()
+        )
+      }
+    )
+  }
+}
+
+export const CreateUserShowsErrorToastOnUnknownFailure: StoryObj = {
+  parameters: {
+    chromatic: { disableSnapshot: true },
+    reactRouter: {
+      router: routesConfig,
+      initialPath: ROUTES.V2.SETTINGS.USER.REVIEW.buildPath({
+        userId: createTemporaryId()
+      })
+    },
+    msw: {
+      handlers: {
+        userRoles: [tRPCMsw.user.roles.list.query(() => mockRoles)],
+        createUser: [
+          tRPCMsw.user.create.mutation(() => {
+            throw new TRPCError({
+              code: 'CONFLICT',
+              message: 'UNHANDLED_CONFLICT'
+            })
+          })
+        ]
+      }
+    }
+  },
+  beforeEach: () => {
+    useUserFormState.getState().setUserForm({
+      primaryOfficeId: mockUser.primaryOfficeId,
+      role: TestUserRole.enum.REGISTRATION_AGENT,
+      name: { firstname: 'Test', surname: 'User' },
+      phoneNumber: '01712345678',
+      email: 'test@opencrvs.org'
+    })
+  },
+  play: async ({ canvasElement, step }) => {
+    const canvas = within(canvasElement)
+
+    await step('Submit the create form', async () => {
+      await userEvent.click(
+        await canvas.findByRole('button', { name: /create user/i })
+      )
+    })
+
+    await step(
+      'Generic error toast "Sorry! Something went wrong" appears',
+      async () => {
+        await waitFor(() =>
+          expect(
+            within(document.body).getByText('Sorry! Something went wrong')
+          ).toBeInTheDocument()
+        )
+      }
+    )
+  }
+}

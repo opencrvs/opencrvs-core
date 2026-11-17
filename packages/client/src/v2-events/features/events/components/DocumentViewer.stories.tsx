@@ -11,7 +11,6 @@
 
 import type { Meta, StoryObj } from '@storybook/react'
 import React from 'react'
-import { noop } from 'lodash'
 import {
   tennisClubMembershipEvent,
   generateTranslationConfig,
@@ -19,7 +18,7 @@ import {
   defineActionForm,
   getDeclaration,
   PageTypes,
-  FullDocumentPath
+  DocumentPath
 } from '@opencrvs/commons/client'
 import { DocumentViewer } from './DocumentViewer'
 
@@ -38,7 +37,6 @@ export const EmptyDocumentViewer: StoryObj<typeof DocumentViewer> = {
       <DocumentViewer
         form={{}}
         formConfig={getDeclaration(tennisClubMembershipEvent)}
-        onEdit={noop}
       />
     )
   }
@@ -46,38 +44,38 @@ export const EmptyDocumentViewer: StoryObj<typeof DocumentViewer> = {
 
 const form = {
   'documents.one': {
-    path: '/ocrvs/tree.svg' as FullDocumentPath,
+    path: 'files/tree.svg' as DocumentPath,
     originalFilename: 'tree.svg',
     type: 'image/svg+xml'
   },
   'documents.two': [
     {
-      path: '/ocrvs/fish.svg' as FullDocumentPath,
+      path: 'files/fish.svg' as DocumentPath,
       originalFilename: 'fish.svg',
       type: 'image/svg+xml',
       option: 'NATIONAL_ID'
     },
     {
-      path: '/ocrvs/mountain.svg' as FullDocumentPath,
+      path: 'files/mountain.svg' as DocumentPath,
       originalFilename: 'mountain.svg',
       type: 'image/svg+xml',
       option: 'PASSPORT'
     },
     {
-      path: '/ocrvs/tree.svg' as FullDocumentPath,
+      path: 'files/tree.svg' as DocumentPath,
       originalFilename: 'tree.svg',
       type: 'image/svg+xml',
       option: 'BIRTH_REGISTRATION_NUMBER'
     },
     {
-      path: '/ocrvs/fish.svg' as FullDocumentPath,
+      path: 'files/fish.svg' as DocumentPath,
       originalFilename: 'fish.svg',
       type: 'image/svg+xml',
       option: 'NONE'
     }
   ],
   'documents.three': {
-    path: '/ocrvs/tree.svg' as FullDocumentPath,
+    path: 'files/tree.svg' as DocumentPath,
     originalFilename: 'tree.svg',
     type: 'image/svg+xml'
   }
@@ -134,7 +132,6 @@ export const DocumentViewerWithFiles: StoryObj<typeof DocumentViewer> = {
           ],
           label: generateTranslationConfig('form label')
         })}
-        onEdit={noop}
       />
     )
   }
@@ -167,25 +164,25 @@ export const SameOptionsForDifferentFields: StoryObj<typeof DocumentViewer> = {
 
     const duplicateDocuments = [
       {
-        path: '/ocrvs/fish.svg' as FullDocumentPath,
+        path: 'files/fish.svg' as DocumentPath,
         originalFilename: 'fish.svg',
         type: 'image/svg+xml',
         option: 'NATIONAL_ID'
       },
       {
-        path: '/ocrvs/mountain.svg' as FullDocumentPath,
+        path: 'files/mountain.svg' as DocumentPath,
         originalFilename: 'mountain.svg',
         type: 'image/svg+xml',
         option: 'PASSPORT'
       },
       {
-        path: '/ocrvs/tree.svg' as FullDocumentPath,
+        path: 'files/tree.svg' as DocumentPath,
         originalFilename: 'tree.svg',
         type: 'image/svg+xml',
         option: 'BIRTH_REGISTRATION_NUMBER'
       },
       {
-        path: '/ocrvs/fish.svg' as FullDocumentPath,
+        path: 'files/fish.svg' as DocumentPath,
         originalFilename: 'fish.svg',
         type: 'image/svg+xml',
         option: 'NONE'
@@ -196,7 +193,7 @@ export const SameOptionsForDifferentFields: StoryObj<typeof DocumentViewer> = {
       'documents.one': duplicateDocuments,
       'documents.two': duplicateDocuments,
       'documents.three': {
-        path: '/ocrvs/tree.svg' as FullDocumentPath,
+        path: 'files/tree.svg' as DocumentPath,
         originalFilename: 'tree.svg',
         type: 'image/svg+xml'
       }
@@ -208,7 +205,7 @@ export const SameOptionsForDifferentFields: StoryObj<typeof DocumentViewer> = {
         formConfig={defineActionForm({
           pages: [
             {
-              type: PageTypes.Enum.FORM,
+              type: PageTypes.enum.FORM,
               fields: [
                 {
                   id: 'documents.one',
@@ -242,7 +239,6 @@ export const SameOptionsForDifferentFields: StoryObj<typeof DocumentViewer> = {
           ],
           label: generateTranslationConfig('form label')
         })}
-        onEdit={noop}
       />
     )
   }

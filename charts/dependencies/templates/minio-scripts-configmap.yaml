@@ -1,0 +1,13 @@
+{{- if or .Values.backup.enabled .Values.restore.enabled }}
+apiVersion: v1
+data:
+{{- range $path, $file := .Files.Glob "files/minio/*" }}
+    {{ base $path }}: |
+{{ toString $file | indent 8 }}
+{{- end }}
+kind: ConfigMap
+metadata:
+  labels:
+    app: minio
+  name: minio-scripts
+{{- end }}

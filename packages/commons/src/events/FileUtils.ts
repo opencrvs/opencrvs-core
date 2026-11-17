@@ -9,15 +9,13 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { FullDocumentPath } from '../documents'
+import { DocumentPath } from '../documents'
 import { ActionDocument, ActionStatus } from './ActionDocument'
 import { FileFieldValue, FileFieldWithOptionValue } from './CompositeFieldValue'
 import { EventDocument } from './EventDocument'
 import { uniq } from 'lodash'
 
-export function getFilePathsFromEvent(
-  event: EventDocument
-): FullDocumentPath[] {
+export function getFilePathsFromEvent(event: EventDocument): DocumentPath[] {
   const filepaths = event.actions
     .filter(
       (action): action is ActionDocument =>

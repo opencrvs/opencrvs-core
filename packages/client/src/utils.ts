@@ -23,10 +23,6 @@ export async function validateApplicationVersion() {
       ? []
       : (JSON.parse(userData) as IUserData[])
 
-    allUserData.forEach((userData) => {
-      userData['declarations'] = []
-    })
-
     await storage.setItem('USER_DATA', JSON.stringify(allUserData))
   }
 }

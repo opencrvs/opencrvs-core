@@ -9,7 +9,8 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import * as actions from '@client/profile/profileActions'
-import { initialState } from '@client/profile/profileReducer'
+import { initialState, profileReducer } from '@client/profile/profileReducer'
+import { queries } from '@client/profile/queries'
 import { createStore, AppStore } from '@client/store'
 import {
   mockUserResponse,
@@ -18,7 +19,9 @@ import {
   mockRegistrarUserResponse
 } from '@client/tests/util'
 import { storage } from '@client/storage'
+import { getCmd, getModel } from 'redux-loop'
 import { vi, Mock } from 'vitest'
+import type { ITokenPayload } from '@opencrvs/commons/client'
 
 storage.removeItem = vi.fn()
 
@@ -84,6 +87,33 @@ describe('profileReducer tests', () => {
       }
       store.dispatch(action)
       expect(store.getState().profile.userDetails?.mobile).toBe('2121')
+    })
+  })
+
+  describe('GET_USER_DETAILS_SUCCESS with valid cache hit', () => {
+    it('uses cached details immediately and triggers a background re-fetch', () => {
+      const tokenPayload: ITokenPayload = {
+        sub: userDetails.id,
+        exp: '9999999999',
+        algorithm: 'RS256',
+        scope: [],
+        userType: 'user'
+      }
+      const stateWithToken = { ...initialState, tokenPayload }
+
+      const result = profileReducer(
+        stateWithToken,
+        actions.getStorageUserDetailsSuccess(JSON.stringify(userDetails))
+      )
+
+      expect(getModel(result).userDetails).toEqual(userDetails)
+
+      const cmd = getCmd(result) as { cmds: unknown[] }
+      expect(cmd.cmds).toHaveLength(2)
+      expect(cmd.cmds[1]).toMatchObject({
+        func: queries.fetchUserDetails,
+        args: [userDetails.id]
+      })
     })
   })
 

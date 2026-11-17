@@ -273,6 +273,18 @@ const messagesToDefine: ISysAdminMessages = {
     id: 'system.user.total',
     defaultMessage: '{totalUser} users',
     description: 'User list table header text'
+  },
+  toggleActivateStatusSuccess: {
+    defaultMessage: 'Updated {name}\'s account status to "{status}"',
+    description:
+      'The label for success notification when toggling user activate status',
+    id: 'sysAdHome.toggleActivateStatusSuccess'
+  },
+  toggleActivateStatusError: {
+    defaultMessage: 'Failed to update {name}\'s account status to "{status}"',
+    description:
+      'The label for error notification when toggling user activate status',
+    id: 'sysAdHome.toggleActivateStatusError'
   }
 }
 

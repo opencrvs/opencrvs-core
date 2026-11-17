@@ -10,19 +10,32 @@
  */
 
 import fetch from 'node-fetch'
+import * as z from 'zod/v4'
 import { UUID } from '@opencrvs/commons'
 import { env } from '@events/environment'
+import {
+  getSystemInitialisation as getSystemInitialisationQuery,
+  completeSystemInitialisation as completeSystemInitialisationQuery
+} from '@events/storage/postgres/system-initialisation'
 
 export async function getAnonymousToken() {
-  const res = await fetch(new URL('/anonymous-token', env.AUTH_URL).toString())
+  const res = await fetch(
+    new URL('/internal/anonymous-token', env.AUTH_URL).toString()
+  )
   const { token } = await res.json()
   return token as string
 }
 
-export async function getIntegrationCreatorToken() {
+/**
+ * Callers retry on failure, so this must fail rather than stall. Auth and
+ * events start concurrently, and without a timeout a peer that accepts the
+ * connection but never answers parks the caller on its first attempt forever —
+ * silently, since nothing is logged until an attempt settles.
+ */
+export async function getIntegrationCreatorToken(timeoutMs: number) {
   const res = await fetch(
     new URL('/internal/integration-creator-token', env.AUTH_URL).toString(),
-    { method: 'POST' }
+    { method: 'POST', timeout: timeoutMs }
   )
   if (!res.ok) {
     throw new Error(
@@ -71,4 +84,36 @@ export async function getActionConfirmationToken(
     access_token: string
   }
   return accessToken
+}
+
+const SystemInitialisation = z
+  .object({
+    id: z.number(),
+    hash: z.string(),
+    salt: z.string(),
+    completedAt: z.null()
+  })
+  .or(
+    z.object({
+      id: z.number(),
+      hash: z.null(),
+      salt: z.null(),
+      completedAt: z.string()
+    })
+  )
+
+export async function getSystemInitialisation() {
+  const systemInitialisation = await getSystemInitialisationQuery()
+  if (!systemInitialisation) {
+    throw new Error('System initialisation not found')
+  }
+
+  const parsedSystemInitialisation =
+    SystemInitialisation.parse(systemInitialisation)
+
+  return parsedSystemInitialisation
+}
+
+export async function completeSystemInitialisation() {
+  return completeSystemInitialisationQuery()
 }

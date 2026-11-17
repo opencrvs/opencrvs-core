@@ -9,9 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { z } from 'zod'
-import { extendZodWithOpenApi } from 'zod-openapi'
-extendZodWithOpenApi(z)
+import * as z from 'zod/v4'
 
 export const MINIO_REGEX =
   /^https?:\/\/[^\/]+(.*)?\/[^\/?]+\.(jpg|png|jpeg|pdf|svg)(\?.*)?$/i
@@ -38,8 +36,8 @@ export type FullDocumentUrl = z.infer<typeof FullDocumentUrl>
 
 export const FullDocumentPath = z
   .string()
-  .transform((val) => (val.startsWith('/') ? val : `/${val}`))
-  .openapi({ effectType: 'input', type: 'string' })
+  .overwrite((val) => (val.startsWith('/') ? val : `/${val}`))
+  .meta({ effectType: 'input', type: 'string' })
   .describe(
     'A full absolute path with bucket name, starting from the root of the S3 server, /bucket-name/document-id.jpg'
   )
@@ -50,7 +48,7 @@ export const DocumentPath = z
   .string()
   .brand('DocumentPath')
   .describe(
-    'A full identifier starting from the root of the S3 bucket, e.g. /document-id.jpg or /directory/document-id.jpg but never /bucket-name/document-id.jpg'
+    'A relative path within the S3 bucket, never starting with /. e.g. document-id.jpg or directory/document-id.jpg. The document service constructs the full /bucket/path internally.'
   )
 
 export type DocumentPath = z.infer<typeof DocumentPath>
@@ -58,3 +56,4 @@ export type DocumentPath = z.infer<typeof DocumentPath>
 export const toDocumentPath = (path: FullDocumentPath): DocumentPath => {
   return path.split('/').slice(2).join('/') as DocumentPath
 }
+

@@ -15,9 +15,9 @@ import * as crypto from 'crypto'
 import { createToken } from '@auth/features/authenticate/service'
 import {
   triggerUserEventNotification,
-  personNameFromV1ToV2,
-  IUserName,
-  TriggerEvent
+  UserName,
+  TriggerEvent,
+  TokenUserType
 } from '@opencrvs/commons'
 
 interface ICodeDetails {
@@ -68,7 +68,7 @@ export function generateNonce() {
 export async function sendVerificationCode(
   verificationCode: string,
   notificationEvent: NotificationEvent,
-  userFullName: IUserName[],
+  name: UserName,
   mobile?: string,
   email?: string
 ): Promise<void> {
@@ -80,7 +80,7 @@ export async function sendVerificationCode(
     payload: {
       code: verificationCode,
       recipient: {
-        name: personNameFromV1ToV2(userFullName),
+        name,
         mobile,
         email
       }
@@ -89,11 +89,11 @@ export async function sendVerificationCode(
     authHeader: {
       Authorization: `Bearer ${await createToken(
         'auth',
-        ['service'],
-        ['opencrvs:notification-user', 'opencrvs:countryconfig-user'],
+        [],
+        ['opencrvs:countryconfig-user'],
         JWT_ISSUER,
         undefined,
-        true
+        TokenUserType.enum.system
       )}`
     }
   })

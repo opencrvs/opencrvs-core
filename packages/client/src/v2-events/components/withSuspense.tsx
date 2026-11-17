@@ -10,32 +10,19 @@
  */
 
 import React from 'react'
-import styled from 'styled-components'
-import { Spinner } from '@opencrvs/components'
+import { SuspenseLoadingFallback } from './SuspenseLoadingFallback'
 
 /**
- * HOC to wrap a component in a suspense boundary with a spinner fallback.
+ * HOC to wrap a component in a suspense boundary with an offline-aware
+ * loading fallback. See {@link SuspenseLoadingFallback} for why the fallback
+ * is offline-aware.
  */
-
-const FullSizeWrapper = styled.div`
-  width: 100%;
-  height: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-`
 
 export function withSuspense<P extends object>(
   Component: React.ComponentType<P>
 ) {
   return (props: P) => (
-    <React.Suspense
-      fallback={
-        <FullSizeWrapper>
-          <Spinner id={`page-spinner-${Date.now()}`} />
-        </FullSizeWrapper>
-      }
-    >
+    <React.Suspense fallback={<SuspenseLoadingFallback />}>
       <Component {...props} />
     </React.Suspense>
   )

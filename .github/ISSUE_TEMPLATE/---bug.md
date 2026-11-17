@@ -52,7 +52,6 @@ A clear and concise description of what the bug is.
   Declaration form configuration
   Performance
   Team or user management
-  Search
   Settings
   Export
   Reports
@@ -124,7 +123,7 @@ If applicable, add screenshots to help explain your problem.
 - Version [e.g. 22]
 
 **Root cause**
-What is the underlying cause for this issue? 
+What is the underlying cause for this issue?
 
 **Additional context**
 Add any other context about the problem here. Does it happen in all contexts or only when a specific condition applies?

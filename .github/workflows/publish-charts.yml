@@ -1,0 +1,89 @@
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at https://mozilla.org/MPL/2.0/.
+#
+# OpenCRVS is also distributed under the terms of the Civil Registration
+# & Healthcare Disclaimer located at http://opencrvs.org/license.
+#
+# Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
+name: Release Helm Charts
+
+on:
+  workflow_dispatch: {}
+  push:
+    tags:
+      - "v*.*.*"
+    branches:
+      - "master"
+      - "develop"
+      - "release/*"
+    paths:
+      - "charts/**"
+      - ".github/workflows/publish-charts.yml"
+jobs:
+  release:
+    permissions:
+      contents: write
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+      - name: Pre-release checks
+        if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/')
+        run: |
+            for chart in charts/*; do
+              [ -f "$chart/Chart.yaml" ] || continue
+              NAME=$(yq '.name' "$chart/Chart.yaml")
+              VERSION=$(yq '.version' "$chart/Chart.yaml")
+              APP_VERSION=$(yq '.appVersion // "N/A"' "$chart/Chart.yaml")
+              echo "Chart: $NAME, Version: $VERSION, App Version: $APP_VERSION"
+              if [[ "$APP_VERSION" != "$GITHUB_REF_NAME" ]]; then
+                echo "Error: Chart App version $APP_VERSION does not match tag $GITHUB_REF_NAME"
+                echo "Please update the appVersion field in $chart/Chart.yaml to match the tag version before releasing."
+                exit_code=1
+              fi
+              if [[ "$VERSION" != "$GITHUB_REF_NAME" ]]; then
+                echo "Error: Chart version $VERSION does not match tag $GITHUB_REF_NAME"
+                echo "Please update the version field in $chart/Chart.yaml to match the tag version before releasing."
+                exit_code=1
+              fi
+            done
+            exit ${exit_code:-0}
+      - name: Package helm charts
+        run: |
+          mkdir helm-packages
+          charts=$(ls -1 charts)
+          for chart in $(ls -1 charts)
+          do
+            helm package charts/$chart --destination helm-packages
+          done
+      - name: Publish helm charts
+        env:
+            GITHUB_TOKEN_REGISTRY: ${{ secrets.PACKAGE_GITHUB_TOKEN }}
+        run: |
+          echo $GITHUB_TOKEN_REGISTRY | helm registry login ghcr.io --username ocrvs-bot --password-stdin
+          for package in $(ls -1 helm-packages)
+          do
+            helm push helm-packages/$package oci://ghcr.io/opencrvs
+          done
+
+      - name: Generate summary
+        run: |
+          {
+            echo "## 📦 Helm Charts Release"
+            echo ""
+            echo "| Chart | Version | App Version | Chart link |"
+            echo "|-------|--------|------------|------------|"
+
+            for chart in charts/*; do
+              [ -f "$chart/Chart.yaml" ] || continue
+
+              NAME=$(yq '.name' "$chart/Chart.yaml")
+              VERSION=$(yq '.version' "$chart/Chart.yaml")
+              APP_VERSION=$(yq '.appVersion // "N/A"' "$chart/Chart.yaml")
+              CHART_LINK="oci://ghcr.io/opencrvs/$NAME:$VERSION"
+              echo "| $NAME | $VERSION | $APP_VERSION | $CHART_LINK |"
+            done
+          } >> $GITHUB_STEP_SUMMARY

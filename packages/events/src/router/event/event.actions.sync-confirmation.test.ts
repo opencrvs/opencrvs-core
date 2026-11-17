@@ -10,7 +10,6 @@
  */
 
 import { HttpResponse, http } from 'msw'
-import { TRPCError } from '@trpc/server'
 import { ActionDocument, ActionStatus, ActionType } from '@opencrvs/commons'
 import { createTestClient, setupTestCase } from '@events/tests/utils'
 import { mswServer } from '@events/tests/msw'
@@ -195,17 +194,16 @@ describe('Synchronous confirmation - CC response payload', () => {
 
     mockDeclareApi(200, { unknownField: 'not-in-schema' })
 
-    await expect(
-      client.event.actions.declare.request(
-        generator.event.actions.declare(event.id)
-      )
-    ).rejects.toThrow(
-      new TRPCError({
-        code: 'INTERNAL_SERVER_ERROR',
-        message:
-          'Invalid payload received from country config action confirmation API'
-      })
+    const response = await client.event.actions.declare.request(
+      generator.event.actions.declare(event.id)
     )
+
+    const acceptedAction = findDeclareAction(
+      response.actions,
+      ActionStatus.Accepted
+    )
+
+    expect(acceptedAction?.declaration).toEqual({})
   })
 
   test('CC sends body on sync reject: body ignored, action saved with empty declaration', async () => {

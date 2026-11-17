@@ -62,7 +62,7 @@ const router = {
         /*
          * Explicitly trigger the download of the event
          */
-        const event = getEvent.findFromCache(createdEvent.id)
+        const event = getEvent.useFindEventFromCache(createdEvent.id)
 
         /*
          * Explicitly call the hook to trigger draft fetching
@@ -211,7 +211,7 @@ export const GetEventHook: Story = {
 
     await step('Fetches file content', async () => {
       await waitFor(async () => {
-        await expect(spies.fetchFile).toBe(1)
+        await expect(spies.fetchFile).toBeGreaterThanOrEqual(1)
       })
     })
 

@@ -12,7 +12,6 @@ import { createTestApp, flushPromises, getItem } from '@client/tests/util'
 
 import * as actions from '@client/notification/actions'
 import { AppStore } from '@client/store'
-import { createClient } from '@client/utils/apolloClient'
 import { referenceApi } from '@client/utils/referenceApi'
 import { ReactWrapper } from 'enzyme'
 import { vi } from 'vitest'
@@ -45,7 +44,7 @@ it('renders without crashing', () =>
 
 it("redirects user to SSO if user doesn't have a token", async () => {
   await createTestApp({ waitUntilOfflineCountryConfigLoaded: false })
-  await waitFor(() => assign.mock.calls[0][0].includes(window.config.LOGIN_URL))
+  await waitFor(() => assign.mock.calls[0][0].includes('/login'))
 })
 
 describe('when user has a valid token in url but an expired one in localStorage', () => {
@@ -85,11 +84,6 @@ describe('when session expired', () => {
     store = testApp.store
   })
 
-  it('when apolloClient is created', () => {
-    const client = createClient(store)
-    expect(client.link).toBeDefined()
-  })
-
   it('displays session expired confirmation dialog', async () => {
     const action = actions.showSessionExpireConfirmation()
     await store.dispatch(action)
@@ -111,15 +105,11 @@ describe('when user has a valid token in local storage', () => {
     expect(assign.mock.calls).toHaveLength(0)
   })
 
-  it('loads languages, facilities and locations on startup', async () => {
-    const loadFacilities = vi.spyOn(referenceApi, 'loadFacilities')
+  it('loads content on startup', async () => {
     const loadContent = vi.spyOn(referenceApi, 'loadContent')
-    const loadLocations = vi.spyOn(referenceApi, 'loadLocations')
 
     createTestApp()
     await flushPromises()
-    expect(loadFacilities).toHaveBeenCalled()
     expect(loadContent).toHaveBeenCalled()
-    expect(loadLocations).toHaveBeenCalled()
   })
 })
