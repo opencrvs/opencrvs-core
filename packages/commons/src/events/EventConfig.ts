@@ -429,6 +429,26 @@ export function resolveEffectiveVersion(
 }
 
 /**
+ * @returns the configuration of each version, in the order to look up a field in: the
+ * version in effect at `now` first, then older versions, newest first. Versions that
+ * take effect later come last, earliest first.
+ */
+export function getEventConfigsInLookupOrder(
+  config: VersionedEventConfig,
+  timeZone: string,
+  now: Date = new Date()
+): EventConfig[] {
+  const inEffect = getVersionsInEffect(config, now, timeZone)
+  const later = config.versions
+    .filter((version) => !inEffect.includes(version))
+    .sort(byEffectiveFrom)
+
+  return [...inEffect.reverse(), ...later].map((version) =>
+    toEventConfig(config, version)
+  )
+}
+
+/**
  * @returns the configuration of the version a record is stamped with, like
  * `getEventConfigForRecord`, or undefined when that version is not configured.
  */

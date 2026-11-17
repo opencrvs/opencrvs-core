@@ -37,6 +37,7 @@ import { ensureIndexExists } from '@events/service/indexing/indexing'
 const PAST = '2010-01-01'
 const FUTURE = '2999-01-01'
 const EXTRA_FIELD_ID = 'applicant.extra'
+const NICKNAME_FIELD_ID = 'applicant.nickname'
 const CUSTOM_ACTION_TYPE = 'VERSIONS_TEST_ACTION'
 const SECURED_FIELD_ID = 'applicant.address'
 
@@ -111,6 +112,22 @@ function versionRequiringExtraField(
       id: 'event.tennis-club-membership.action.declare.form.section.who.field.extra.label',
       defaultMessage: 'Extra',
       description: 'Field added by a newer version'
+    }
+  })
+}
+
+/** A version whose declaration has a field that the other versions do not have. */
+function versionWithNickname(
+  id: string,
+  effectiveFrom?: string
+): EventConfigVersion {
+  return withDeclarationField(version(id, effectiveFrom), {
+    id: NICKNAME_FIELD_ID,
+    type: FieldType.TEXT,
+    label: {
+      id: 'event.tennis-club-membership.action.declare.form.section.who.field.nickname.label',
+      defaultMessage: 'Nickname',
+      description: 'Field that only one version has'
     }
   })
 }
@@ -351,5 +368,34 @@ describe('the event configuration version of a record', () => {
     expect((await search()).results[0].declaration).toHaveProperty([
       SECURED_FIELD_ID
     ])
+  })
+
+  test('search finds a record by a field that only an older version has', async () => {
+    await useVersions(versionWithNickname('v1'), version('v2', FUTURE))
+    const { user, generator } = await setupTestCase()
+    const client = createTestClient(user, SEARCH_SCOPES)
+    const event = await client.event.create(generator.event.create())
+    const declare = generator.event.actions.declare(event.id)
+    await client.event.actions.declare.request({
+      ...declare,
+      declaration: { ...declare.declaration, [NICKNAME_FIELD_ID]: 'Ace' }
+    })
+
+    // v2, which has taken effect since, does not have the field.
+    await useVersions(versionWithNickname('v1'), version('v2', PAST))
+
+    const { results } = await client.event.search({
+      query: {
+        type: 'and',
+        clauses: [
+          {
+            eventType: TENNIS_CLUB_MEMBERSHIP,
+            data: { [NICKNAME_FIELD_ID]: { type: 'exact', term: 'Ace' } }
+          }
+        ]
+      }
+    })
+
+    expect(results.map(({ id }) => id)).toEqual([event.id])
   })
 })

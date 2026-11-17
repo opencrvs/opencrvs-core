@@ -16,6 +16,7 @@ import {
   EventDocument,
   getEventConfigById,
   getEventConfigForRecord,
+  getEventConfigsInLookupOrder,
   logger,
   resolveEventConfigInTimeZone,
   Role,
@@ -152,6 +153,22 @@ export async function getInMemoryEventConfigurations(token: TokenWithBearer) {
   ])
   return configurations.map((config) =>
     resolveEventConfigInTimeZone(config, timeZone)
+  )
+}
+
+/**
+ * @returns the configuration of every version of every event. The versions of each event
+ * are in the order to look up a field in, so the first match is the newest version in effect.
+ */
+export async function getInMemoryEventConfigurationsInLookupOrder(
+  token: TokenWithBearer
+) {
+  const [configurations, timeZone] = await Promise.all([
+    getInMemoryVersionedEventConfigurations(token),
+    getCountryTimeZone(token)
+  ])
+  return configurations.flatMap((config) =>
+    getEventConfigsInLookupOrder(config, timeZone)
   )
 }
 

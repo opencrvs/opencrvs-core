@@ -62,7 +62,8 @@ function dateClauseToElasticQuery(
 
 /**
  * Generates an Elasticsearch query to search within `document.declaration`
- * using the provided search payload.
+ * using the provided search payload. Each field is read from the first of
+ * `eventConfigs` that has it, so pass the versions of an event in lookup order.
  */
 function generateQuery(
   event: QueryInputType,

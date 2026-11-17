@@ -15,6 +15,7 @@ import {
   getConfigVersion,
   getEventConfigForRecord,
   getEventConfigOfVersion,
+  getEventConfigsInLookupOrder,
   getVersionIndexSegment,
   resolveEffectiveVersion,
   resolveEventConfigInTimeZone,
@@ -88,6 +89,34 @@ describe('resolveEffectiveVersion()', () => {
         'UTC'
       )
     ).toBeUndefined()
+  })
+})
+
+describe('getEventConfigsInLookupOrder()', () => {
+  // Uses `config` at the top of this file: v1 from the beginning of time, v2 from 2020-01-01, v3 from 2030-01-01.
+  const idsInLookupOrder = (now: Date) =>
+    getEventConfigsInLookupOrder(config, 'UTC', now).map(
+      (eventConfig) =>
+        config.versions.find(
+          (version) =>
+            getEventConfigOfVersion(config, version.id) === eventConfig
+        )?.id
+    )
+
+  it('puts the version in effect first, then older versions newest first, then later versions', () => {
+    expect(idsInLookupOrder(new Date('2025-06-01T10:00:00.000Z'))).toEqual([
+      'v2',
+      'v1',
+      'v3'
+    ])
+  })
+
+  it('puts a version first once it takes effect', () => {
+    expect(idsInLookupOrder(new Date('2030-01-01T00:00:00.000Z'))).toEqual([
+      'v3',
+      'v2',
+      'v1'
+    ])
   })
 })
 

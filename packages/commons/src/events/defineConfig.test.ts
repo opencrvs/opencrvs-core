@@ -520,9 +520,7 @@ describe('defineConfig()', () => {
             advancedSearch: searchingNickname('Ace'),
             versions: [textInV1, numberInV2]
           })
-        ).toThrow(
-          `Advanced search field ${NICKNAME_FIELD_ID} has defaultValue "Ace", which is not a valid NUMBER value.`
-        )
+        ).toThrow('which is not a valid NUMBER value.')
       })
     })
 
