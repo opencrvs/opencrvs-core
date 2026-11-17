@@ -173,21 +173,15 @@ jobs:
         if: steps.merge.outputs.needed == 'true' && steps.merge.outputs.conflicts != '[]'
         # if Claude fails, the next step asks for a merge by hand
         continue-on-error: true
-        uses: anthropics/claude-code-action@4fa93a88de49bbef68b10eb15aabedf28ca0e1ed # v1.0.271
-        with:
-          claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
-          # The action needs a token. Claude can't push or call GitHub with it:
-          # its tools are limited to editing files and local, read-only or
-          # staging git commands.
-          github_token: ${{ github.token }}
-          # resolve.sh start saved the target's settings; --setting-sources user
-          # skips the working tree's copy, which can hold conflict markers
-          settings: ${{ runner.temp }}/claude-settings.json
-          claude_args: >-
-            --setting-sources user
-            --max-turns 200
-            --allowedTools "Read,Edit,Write,Glob,Grep,Bash(git status:*),Bash(git diff:*),Bash(git log:*),Bash(git show:*),Bash(git ls-files:*),Bash(git add:*),Bash(git rm:*),Bash(git checkout --ours:*),Bash(git checkout --theirs:*)"
-          prompt: |
+        # The CLI, not anthropics/claude-code-action: the action refuses push
+        # events, which start most runs. Claude gets no GitHub token; its tools
+        # are limited to editing files and local, read-only or staging git
+        # commands. resolve.sh start saved the target's settings, and
+        # --setting-sources user skips the working tree's copy, which can hold
+        # conflict markers.
+        env:
+          CLAUDE_CODE_OAUTH_TOKEN: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+          PROMPT: |
             A git merge is in progress in this repository, OpenCRVS core: `${{ matrix.hop.conflict_merging }}` is being merged into `${{ matrix.hop.pr_branch }}`. That branch carries the release line `${{ needs.plan.outputs.source }}` into the newer line `${{ matrix.hop.target }}`, and will be merged into `${{ matrix.hop.target }}` after review.
 
             These files have conflicts: ${{ join(fromJSON(steps.merge.outputs.conflicts), ', ') }}
@@ -202,6 +196,13 @@ jobs:
             Remove every conflict marker and `git add` (or `git rm`) each resolved file. Do not commit, push, or abort the merge.
 
             Finally, write a short Markdown summary to `${{ runner.temp }}/resolution.md`: one bullet per file saying what you kept and why, and a separate list of anything a reviewer should check closely.
+        run: |
+          npm install -g @anthropic-ai/claude-code@2.1.318
+          printf '%s' "$PROMPT" | claude -p \
+            --settings "$RUNNER_TEMP/claude-settings.json" \
+            --setting-sources user \
+            --max-turns 200 \
+            --allowedTools "Read,Edit,Write,Glob,Grep,Bash(git status:*),Bash(git diff:*),Bash(git log:*),Bash(git show:*),Bash(git ls-files:*),Bash(git add:*),Bash(git rm:*),Bash(git checkout --ours:*),Bash(git checkout --theirs:*)"
 
       - name: Push the resolution
         if: steps.merge.outputs.needed == 'true'
