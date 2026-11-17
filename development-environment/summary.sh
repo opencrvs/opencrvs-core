@@ -7,16 +7,14 @@
 #
 # Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
 set -e
-echo -e "\033[32m:::::::: In the terminal on the top right, OpenCRVS core is starting. ::::::::\033[0m"
-echo
-echo -e "\033[32m:::::::: In the terminal on the bottom right, an OpenCRVS country config will start when OpenCRVS core is running ::::::::\033[0m"
+echo -e "\033[32m:::::::: In the terminal on the right, OpenCRVS Core and the Testland country config are starting. ::::::::\033[0m"
 echo
 echo "Please be patient as this can still take 15 minutes if your RAM isnt high."
 echo "Please do not give up, you are nearly there.  This process cannot be interrupted."
 echo
 echo -e "\033[32m::::::::::::::::::::::::: PLEASE WAIT FOR THE LOGO :::::::::::::::::::::::::\033[0m"
 echo
-echo "Waiting till contry config server is running before seeding data." && wait-on -l tcp:3040
+echo "Waiting until the Testland country config server is running before seeding data." && wait-on -l tcp:3040
 echo
 
 for i in {1..5}; do
