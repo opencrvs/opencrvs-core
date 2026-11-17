@@ -71,7 +71,7 @@ export async function causeOfDeathSearchHandler(
 
     return h.response({ results: rows }).code(200)
   } catch (err) {
-    request.log(['error'], err)
+    request.log(['error'], err instanceof Error ? err.message : String(err))
     return h.response({ error: 'Internal server error' }).code(500)
   }
 }
