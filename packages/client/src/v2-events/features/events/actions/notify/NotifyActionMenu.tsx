@@ -13,6 +13,7 @@ import { v4 as uuid } from 'uuid'
 import {
   ActionType,
   EventDocument,
+  getActionDialogCopy,
   getActionFormFields,
   getActionConfig,
   isValidIcon
@@ -44,20 +45,10 @@ function getNotificationActions(
     confirmAction
   }: ReviewPageState
 ): ActionMenuItem[] {
-  const declareActionConfig = getActionConfig({
-    eventConfiguration,
-    actionType: ActionType.DECLARE
-  })
-
   const notifyActionConfig = getActionConfig({
     eventConfiguration,
     actionType: ActionType.NOTIFY
   })
-
-  const dialogCopy =
-    declareActionConfig && 'dialogCopy' in declareActionConfig
-      ? declareActionConfig.dialogCopy
-      : null
 
   const canNotify =
     availableActions.includes(ActionType.NOTIFY) &&
@@ -71,8 +62,7 @@ function getNotificationActions(
     onClick: async () =>
       confirmAction({
         confirmLabel: actionLabels[ActionType.NOTIFY],
-        supportingCopy:
-          notifyActionConfig?.supportingCopy ?? dialogCopy?.notify,
+        dialogCopy: getActionDialogCopy(eventConfiguration, ActionType.NOTIFY),
         fields: getActionFormFields(eventConfiguration, ActionType.NOTIFY),
         title: {
           id: 'review.notify.confirmModal.title',

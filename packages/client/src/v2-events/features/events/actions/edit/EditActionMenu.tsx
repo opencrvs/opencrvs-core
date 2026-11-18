@@ -98,7 +98,7 @@ interface EditActionModalResult {
 
 function EditActionModal({
   title,
-  supportingCopy,
+  dialogCopy,
   close,
   fields = [],
   eventConfiguration,
@@ -110,7 +110,7 @@ function EditActionModal({
   /** Record the action is taken on, for fields that act on it, e.g. a print button. */
   event?: EventDocument
   title: MessageDescriptor
-  supportingCopy?: MessageDescriptor
+  dialogCopy?: MessageDescriptor
   close: (result: EditActionModalResult) => void
   fields?: FieldConfig[]
   eventConfiguration: EventConfig
@@ -164,12 +164,12 @@ function EditActionModal({
       width={800}
       onClose={() => close({ confirmed: false })}
     >
-      {supportingCopy && (
+      {dialogCopy && (
         <Stack>
           <TranslationTextWithFormatModifier
             color="grey500"
             element="p"
-            message={supportingCopy}
+            message={dialogCopy}
             variant="reg16"
           />
         </Stack>
@@ -255,9 +255,7 @@ function useEditActions(event: EventDocument) {
   })
 
   const dialogCopy =
-    actionConfig && 'dialogCopy' in actionConfig
-      ? actionConfig.dialogCopy
-      : null
+    actionConfig?.type === ActionType.EDIT ? actionConfig.dialogCopy : undefined
 
   return {
     modals: [modal],
@@ -279,7 +277,7 @@ function useEditActions(event: EventDocument) {
                     eventConfiguration,
                     ActionType.REGISTER
                   )}
-                  supportingCopy={dialogCopy?.register}
+                  dialogCopy={dialogCopy?.register}
                   title={messages.editAndRegisterLabel}
                 />
               )
@@ -319,7 +317,7 @@ function useEditActions(event: EventDocument) {
                     eventConfiguration,
                     ActionType.DECLARE
                   )}
-                  supportingCopy={dialogCopy?.declare}
+                  dialogCopy={dialogCopy?.declare}
                   title={messages.editAndDeclareLabel}
                 />
               )
@@ -361,7 +359,7 @@ function useEditActions(event: EventDocument) {
                     eventConfiguration,
                     ActionType.NOTIFY
                   )}
-                  supportingCopy={dialogCopy?.notify}
+                  dialogCopy={dialogCopy?.notify}
                   title={messages.editAndNotifyLabel}
                 />
               )

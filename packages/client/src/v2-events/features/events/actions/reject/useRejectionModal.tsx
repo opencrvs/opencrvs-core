@@ -13,7 +13,7 @@ import React from 'react'
 import { v4 as uuid } from 'uuid'
 import {
   EventIndex,
-  getActionConfig,
+  getActionDialogCopy,
   getActionFormFields,
   ActionType,
   eventAttachmentPath
@@ -32,12 +32,7 @@ export function useRejectionModal(event: EventIndex) {
   const [modal, openModal] = useModal()
   const events = useEvents()
   const { eventConfiguration } = useEventConfigurationForRecord(event)
-  const rejectActionConfig = getActionConfig({
-    eventConfiguration,
-    actionType: ActionType.REJECT
-  })
-
-  const supportingCopy = rejectActionConfig?.supportingCopy
+  const dialogCopy = getActionDialogCopy(eventConfiguration, ActionType.REJECT)
   const fields = getActionFormFields(eventConfiguration, ActionType.REJECT)
 
   async function handleRejection(onClose: () => void) {
@@ -49,7 +44,7 @@ export function useRejectionModal(event: EventIndex) {
           event={findLocalEventDocument(eventId)}
           eventConfiguration={eventConfiguration}
           fields={fields}
-          supportingCopy={supportingCopy}
+          dialogCopy={dialogCopy}
         />
       )
     )

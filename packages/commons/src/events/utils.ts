@@ -70,6 +70,7 @@ import {
 } from './FieldValue'
 import { subDays, subYears, format } from 'date-fns'
 import { FieldType } from './FieldType'
+import { TranslationConfig } from './TranslationConfig'
 import { EventIndex } from './EventIndex'
 
 /* eslint-disable max-lines */
@@ -246,6 +247,21 @@ export function getActionFormFields(
   }
 
   return actionConfig.form
+}
+
+/**
+ * Returns the copy of the confirmation dialog of the action, or `undefined` when the action gives none.
+ * The EDIT action gives one copy for each of its dialogs, so read `dialogCopy` of the EDIT action instead.
+ */
+export function getActionDialogCopy(
+  eventConfiguration: EventConfig,
+  actionType: Exclude<ActionType, typeof ActionType.EDIT>
+): TranslationConfig | undefined {
+  const actionConfig = getActionConfig({ eventConfiguration, actionType })
+  if (!actionConfig || actionConfig.type === ActionType.EDIT) {
+    return undefined
+  }
+  return actionConfig.dialogCopy
 }
 
 export function getPrintCertificatePages(configuration: EventConfig) {

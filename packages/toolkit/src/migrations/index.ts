@@ -11,6 +11,7 @@
 import { main as addTranslations } from './persistent/add-translations'
 import { main as moveDeclarationToDeclareAction } from './move-declaration-to-declare-action'
 import { main as addNotifyConfig } from './add-notify-config'
+import { main as moveSupportingCopyToDialogCopy } from './move-supporting-copy-to-dialog-copy'
 import { main as readDeclarationThroughHelper } from './read-declaration-through-helper'
 import { main as resolveVersionedEventConfig } from './resolve-versioned-event-config'
 import { main as updateToolkitDependency } from './persistent/update-toolkit-dependency'
@@ -30,6 +31,8 @@ export async function runUpgrade(toolkitVersion: string) {
   await moveDeclarationToDeclareAction()
   // After moving `declaration` onto DECLARE, where it copies it from
   await addNotifyConfig()
+  // After addNotifyConfig, which may add the NOTIFY action that receives the notify copy
+  await moveSupportingCopyToDialogCopy()
   // Before readDeclarationThroughHelper, which rewrites the declaration reads it
   // routes through resolveEventConfig
   await resolveVersionedEventConfig()

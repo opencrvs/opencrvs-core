@@ -26,6 +26,7 @@ import {
   FieldConfig,
   FieldUpdateValue,
   getActionConfig,
+  getActionDialogCopy,
   runFieldValidations,
   UUID,
   getCurrentEventState,
@@ -62,7 +63,7 @@ const quickActions = {
 
 interface ModalConfig {
   label?: MessageDescriptor
-  supportingCopy?: MessageDescriptor
+  dialogCopy?: MessageDescriptor
   confirmButtonType?: ButtonType
   confirmButtonLabel?: MessageDescriptor
   fields?: FieldConfig[]
@@ -191,11 +192,11 @@ function QuickActionModal({
       onClose={() => close({ result: false })}
     >
       <Stack alignItems="left" direction="column" gap={16}>
-        {config.supportingCopy && (
+        {config.dialogCopy && (
           <TranslationTextWithFormatModifier
             color="supportingCopy"
             element="p"
-            message={config.supportingCopy}
+            message={config.dialogCopy}
             variant="reg16"
           />
         )}
@@ -232,7 +233,7 @@ export function useQuickActionModal(
     const config = quickActions[actionType]
     const label = actionLabels[actionType]
     const actionConfig = getActionConfig({ actionType, eventConfiguration })
-    const supportingCopy = actionConfig?.supportingCopy
+    const dialogCopy = getActionDialogCopy(eventConfiguration, actionType)
 
     const { result, values } = await openModal<ModalResult>((close) => (
       <QuickActionModal
@@ -246,7 +247,7 @@ export function useQuickActionModal(
               ? actionConfig.form
               : undefined,
           ...config.modal,
-          supportingCopy: supportingCopy ?? config.modal.supportingCopy
+          dialogCopy: dialogCopy ?? config.modal.dialogCopy
         }}
         eventConfiguration={eventConfiguration}
         eventId={eventIndex.id}
@@ -303,7 +304,7 @@ export function useCustomActionModal(
         config={{
           ...customActionConfigBase,
           label: actionConfig.label,
-          supportingCopy: actionConfig.supportingCopy,
+          dialogCopy: actionConfig.dialogCopy,
           fields: actionConfig.form,
           icon: isValidIcon(actionConfig.icon) ? actionConfig.icon : undefined
         }}

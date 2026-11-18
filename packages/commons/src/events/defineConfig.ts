@@ -23,6 +23,7 @@ import {
   validateDeclarationGivenExactlyOnce,
   validateExactlyOneDeclareAction
 } from './eventConfigValidation'
+import { warnOnDeprecatedDialogCopy } from './deprecatedDialogCopy'
 
 /**
  * Moves a top-level `declaration` onto the DECLARE action, where `EventConfig` expects it.
@@ -154,4 +155,17 @@ const EventConfigDefinition = z
  */
 export const defineConfig = (
   config: EventConfigInput | VersionedEventConfigInput
-) => EventConfigDefinition.parse(config)
+) => {
+  const parsed = EventConfigDefinition.parse(config)
+
+  // After parsing, so that the warnings name only the dialog copy of valid actions
+  const versions =
+    'versions' in config
+      ? config.versions
+      : [{ id: INITIAL_EVENT_CONFIG_VERSION_ID, actions: config.actions }]
+  versions.forEach(({ id, actions }) =>
+    warnOnDeprecatedDialogCopy({ eventId: config.id, versionId: id }, actions)
+  )
+
+  return parsed
+}

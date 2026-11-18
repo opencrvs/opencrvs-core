@@ -35,9 +35,6 @@ export const ActionConfigBase = z.object({
     .optional()
     .default([])
     .describe('Flag actions which are executed when the action is performed.'),
-  supportingCopy: TranslationConfig.optional().describe(
-    'Text displayed on the confirmation dialog'
-  ),
   /**
    * Icon representing the action.
    *
@@ -63,9 +60,26 @@ const actionConfirmationForm = z
     'Fields rendered on the action confirmation dialog. Submitted values are stored in the action annotation and shown in the audit history.'
   )
 
+/** Copy of the confirmation dialog of an action. */
+const dialogCopy = TranslationConfig.optional().describe(
+  'Text shown at the top of the confirmation dialog of the action.'
+)
+
+/** `dialogCopy` of an action whose dialogs show no copy from the configuration. */
+const noDialogCopy = z
+  .never({
+    error:
+      'This action does not support `dialogCopy`. No dialog of this action shows copy from the configuration.'
+  })
+  .optional()
+  .describe(
+    'Not supported. No dialog of this action shows copy from the configuration.'
+  )
+
 const ReadActionConfig = ActionConfigBase.extend(
   z.object({
     type: z.literal(ActionType.READ),
+    dialogCopy: noDialogCopy,
     review: DeclarationReviewConfig.describe(
       'Configuration of the review page for read-only view.'
     ),
@@ -91,7 +105,8 @@ const NotifyConfig = ActionConfigBase.extend(
     review: DeclarationReviewConfig.describe(
       'Review page configuration for the notify action. Values of its fields are stored as the NOTIFY action annotation.'
     ),
-    form: actionConfirmationForm
+    form: actionConfirmationForm,
+    dialogCopy
   }).shape
 )
 
@@ -104,7 +119,7 @@ const DuplicateDetectedConfig = ActionConfigBase.extend(
       .describe(
         'DUPLICATE_DETECTED is system-generated and never shown as a button, so it has no label.'
       ),
-    supportingCopy: z.never().optional(),
+    dialogCopy: noDialogCopy,
     icon: z
       .never()
       .optional()
@@ -122,19 +137,22 @@ const DuplicateDetectedConfig = ActionConfigBase.extend(
 
 const MarkAsDuplicateConfig = ActionConfigBase.extend(
   z.object({
-    type: z.literal(ActionType.MARK_AS_DUPLICATE)
+    type: z.literal(ActionType.MARK_AS_DUPLICATE),
+    dialogCopy: noDialogCopy
   }).shape
 )
 
 const MarkAsNotDuplicateConfig = ActionConfigBase.extend(
   z.object({
-    type: z.literal(ActionType.MARK_AS_NOT_DUPLICATE)
+    type: z.literal(ActionType.MARK_AS_NOT_DUPLICATE),
+    dialogCopy: noDialogCopy
   }).shape
 )
 
 const AssignConfig = ActionConfigBase.extend(
   z.object({
     type: z.literal(ActionType.ASSIGN),
+    dialogCopy: noDialogCopy,
     flags: z
       .never()
       .optional()
@@ -147,6 +165,7 @@ const AssignConfig = ActionConfigBase.extend(
 const UnassignConfig = ActionConfigBase.extend(
   z.object({
     type: z.literal(ActionType.UNASSIGN),
+    dialogCopy: noDialogCopy,
     flags: z
       .never()
       .optional()
@@ -158,7 +177,8 @@ const UnassignConfig = ActionConfigBase.extend(
 
 const DeleteConfig = ActionConfigBase.extend(
   z.object({
-    type: z.literal(ActionType.DELETE)
+    type: z.literal(ActionType.DELETE),
+    dialogCopy: noDialogCopy
   }).shape
 )
 
@@ -172,46 +192,40 @@ const DeclareConfig = DeclarationActionBase.extend(
       'Configuration of the review page fields.'
     ),
     form: actionConfirmationForm,
-    dialogCopy: z
-      .object({
-        notify: TranslationConfig.describe(
-          'Confirmation text for the notify action'
-        ),
-        declare: TranslationConfig.describe(
-          'Confirmation text for the declare action'
-        ),
-        register: TranslationConfig.describe(
-          'Confirmation text for the register action'
-        )
-      })
-      .optional()
+    dialogCopy: dialogCopy.describe(
+      'Text shown at the top of the confirmation dialog of the declare action. The notify and register dialogs on the review page show the `dialogCopy` of the NOTIFY and REGISTER actions.'
+    )
   }).shape
 )
 
 const ArchiveConfig = ActionConfigBase.extend(
   z.object({
     type: z.literal(ActionType.ARCHIVE),
-    form: actionConfirmationForm
+    form: actionConfirmationForm,
+    dialogCopy
   }).shape
 )
 
 const UnarchiveConfig = ActionConfigBase.extend(
   z.object({
-    type: z.literal(ActionType.UNARCHIVE)
+    type: z.literal(ActionType.UNARCHIVE),
+    dialogCopy
   }).shape
 )
 
 const RevokeRegistrationConfig = ActionConfigBase.extend(
   z.object({
     type: z.literal(ActionType.REVOKE_REGISTRATION),
-    form: actionConfirmationForm
+    form: actionConfirmationForm,
+    dialogCopy
   }).shape
 )
 
 const ReinstateRegistrationConfig = ActionConfigBase.extend(
   z.object({
     type: z.literal(ActionType.REINSTATE_REGISTRATION),
-    form: actionConfirmationForm
+    form: actionConfirmationForm,
+    dialogCopy
   }).shape
 )
 
@@ -235,40 +249,48 @@ const EditActionConfig = ActionConfigBase.extend(
 const RejectConfig = ActionConfigBase.extend(
   z.object({
     type: z.literal(ActionType.REJECT),
-    form: actionConfirmationForm
+    form: actionConfirmationForm,
+    dialogCopy
   }).shape
 )
 
 const RegisterConfig = DeclarationActionBase.extend(
   z.object({
     type: z.literal(ActionType.REGISTER),
-    form: actionConfirmationForm
+    form: actionConfirmationForm,
+    dialogCopy: dialogCopy.describe(
+      'Text shown at the top of the confirmation dialog of the register action. The register dialog on the review page of the declare action also shows it.'
+    )
   }).shape
 )
 
 const PrintCertificateActionConfig = ActionConfigBase.extend(
   z.object({
     type: z.literal(ActionType.PRINT_CERTIFICATE),
-    printForm: ActionFormConfig
+    printForm: ActionFormConfig,
+    dialogCopy: noDialogCopy
   }).shape
 )
 
 const RequestCorrectionConfig = ActionConfigBase.extend(
   z.object({
     type: z.literal(ActionType.REQUEST_CORRECTION),
-    correctionForm: ActionFormConfig
+    correctionForm: ActionFormConfig,
+    dialogCopy: noDialogCopy
   }).shape
 )
 
 const ApproveCorrectionConfig = ActionConfigBase.extend(
   z.object({
-    type: z.literal(ActionType.APPROVE_CORRECTION)
+    type: z.literal(ActionType.APPROVE_CORRECTION),
+    dialogCopy: noDialogCopy
   }).shape
 )
 
 const RejectCorrectionConfig = ActionConfigBase.extend(
   z.object({
-    type: z.literal(ActionType.REJECT_CORRECTION)
+    type: z.literal(ActionType.REJECT_CORRECTION),
+    dialogCopy: noDialogCopy
   }).shape
 )
 
@@ -286,7 +308,8 @@ const CustomActionConfig = ActionConfigBase.extend(
       ),
     auditHistoryLabel: TranslationConfig.describe(
       'The label to show in audit history for this action. For example "Approved".'
-    )
+    ),
+    dialogCopy
   }).shape
 )
 

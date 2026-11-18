@@ -85,7 +85,7 @@ Below, "your revoked flag" means the flag your custom revoke adds. The examples 
 
 **Do not delete the custom revoke action or your revoked flag.** Flags are recalculated from the current config, so removing them un-revokes every record revoked with them. Keep both, and stop new custom revocations instead:
 
-1. **Event config.** Add the core actions next to the custom ones. Copy the custom actions' `label`, `icon`, `supportingCopy`, `form` and `flags`, leaving out every operation on your revoked flag: the `REVOKED` status replaces it. Hide the core revoke on records revoked the old way:
+1. **Event config.** Add the core actions next to the custom ones. Copy the custom actions' `label`, `icon`, `dialogCopy` (`supportingCopy` before 2.2), `form` and `flags`, leaving out every operation on your revoked flag: the `REVOKED` status replaces it. Hide the core revoke on records revoked the old way:
 
    ```ts
    {
@@ -299,6 +299,59 @@ Check conditionals that rely on the old counting:
 - `not(event.hasAction(DECLARE))` is now true while a `DECLARE` awaits confirmation, so actions hidden by it show again until the declaration is accepted.
 
 [#10876](https://github.com/opencrvs/opencrvs-core/issues/10876)
+
+### Deprecations
+
+#### `supportingCopy` is renamed to `dialogCopy`, and each action gives the copy of its own dialog
+
+`dialogCopy` is now the one key for the text at the top of a confirmation dialog:
+
+- `NOTIFY`, `DECLARE`, `REGISTER`, `REJECT`, `ARCHIVE`, `UNARCHIVE`, `REVOKE_REGISTRATION`, `REINSTATE_REGISTRATION` and custom actions give one message in `dialogCopy`. The dialog of the action shows it, wherever the dialog opens.
+- `EDIT` gives `dialogCopy.notify`, `dialogCopy.declare` and `dialogCopy.register` for the dialogs of the edit page, as before.
+- The other actions do not accept `dialogCopy`, because no dialog of these actions shows copy from the configuration.
+
+The `DECLARE` action no longer gives copy for the notify and register dialogs of the declaration review page. These dialogs show the `dialogCopy` of the `NOTIFY` and `REGISTER` actions.
+
+```diff
+ {
+   type: ActionType.DECLARE,
+-  dialogCopy: {
+-    notify: { id: 'event.birth.action.declare.notify.copy', ... },
+-    declare: { id: 'event.birth.action.declare.declare.copy', ... },
+-    register: { id: 'event.birth.action.declare.register.copy', ... }
+-  },
++  dialogCopy: { id: 'event.birth.action.declare.declare.copy', ... },
+   ...
+ },
+ {
+   type: ActionType.NOTIFY,
++  dialogCopy: { id: 'event.birth.action.declare.notify.copy', ... },
+   ...
+ },
+ {
+   type: ActionType.REGISTER,
++  dialogCopy: { id: 'event.birth.action.declare.register.copy', ... },
+   ...
+ },
+ {
+   type: ActionType.REJECT,
+-  supportingCopy: { id: 'event.birth.action.reject.supportingCopy', ... },
++  dialogCopy: { id: 'event.birth.action.reject.supportingCopy', ... },
+   ...
+ }
+```
+
+**Change in behaviour:** before 2.2, the register dialog of the declaration review page showed `dialogCopy.register` of the `DECLARE` action, and the register dialog of the action menu showed `supportingCopy` of the `REGISTER` action. Now both dialogs show the `dialogCopy` of the `REGISTER` action. If your config gives both, make sure that the copy of the `REGISTER` action fits both dialogs.
+
+`supportingCopy`, and `dialogCopy` with `notify`, `declare` and `register` on the `DECLARE` action, still work. `defineConfig` logs a deprecation warning for each, and v2.3 removes them. `opencrvs upgrade` changes them for you. Its `move-supporting-copy-to-dialog-copy` codemod:
+
+- renames `supportingCopy` to `dialogCopy`, and removes the `supportingCopy` that no dialog showed
+- gives the `declare` copy of the `DECLARE` action as its `dialogCopy`, and moves the `notify` and `register` copy to the `NOTIFY` and `REGISTER` actions. When one of these actions already gives copy, the codemod keeps that copy.
+- lists every place that it could not change, for you to change by hand
+
+The translation keys do not change.
+
+[#13697](https://github.com/opencrvs/opencrvs-core/issues/13697)
 
 ### New features
 
