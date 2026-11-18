@@ -2554,10 +2554,10 @@ components:
                 description: Summary information displayed in the event overview.
                 $ref: "#/components/schemas/SummaryConfig"
               actions:
-                description: Configuration of core and custom actions associated with the event.
                 type: array
                 items:
                   $ref: "#/components/schemas/ActionConfig"
+                description: Configuration of core and custom actions associated with the event.
               actionOrder:
                 description: Order of actions in the action menu. Use either the action type for
                   core actions or the customActionType for custom actions.
@@ -3800,6 +3800,9 @@ components:
         flags:
           description: READ is a meta action excluded from flag resolution, so flags
             configured here would never apply.
+          not: {}
+        supportingCopy:
+          description: Removed in v2.2. Use `dialogCopy`.
           not: {}
         icon:
           type: string
@@ -14494,6 +14497,9 @@ components:
           description: ASSIGN is a meta action excluded from flag resolution, so flags
             configured here would never apply.
           not: {}
+        supportingCopy:
+          description: Removed in v2.2. Use `dialogCopy`.
+          not: {}
         icon:
           type: string
           description: Icon representing the action
@@ -14523,6 +14529,9 @@ components:
         flags:
           description: UNASSIGN is a meta action excluded from flag resolution, so flags
             configured here would never apply.
+          not: {}
+        supportingCopy:
+          description: Removed in v2.2. Use `dialogCopy`.
           not: {}
         icon:
           type: string
@@ -14556,6 +14565,9 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/ActionFlagConfig"
+        supportingCopy:
+          description: Removed in v2.2. Use `dialogCopy`.
+          not: {}
         icon:
           type: string
           description: Icon representing the action
@@ -14620,6 +14632,9 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/ActionFlagConfig"
+        supportingCopy:
+          description: Removed in v2.2. Use `dialogCopy`.
+          not: {}
         icon:
           type: string
           description: Icon representing the action
@@ -14735,6 +14750,9 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/ActionFlagConfig"
+        supportingCopy:
+          description: Removed in v2.2. Use `dialogCopy`.
+          not: {}
         icon:
           type: string
           description: Icon representing the action
@@ -14944,6 +14962,9 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/ActionFlagConfig"
+        supportingCopy:
+          description: Removed in v2.2. Use `dialogCopy`.
+          not: {}
         icon:
           description: DUPLICATE_DETECTED is system-generated and never shown as a button,
             so it has no icon.
@@ -14978,6 +14999,9 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/ActionFlagConfig"
+        supportingCopy:
+          description: Removed in v2.2. Use `dialogCopy`.
+          not: {}
         icon:
           type: string
           description: Icon representing the action
@@ -15011,6 +15035,9 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/ActionFlagConfig"
+        supportingCopy:
+          description: Removed in v2.2. Use `dialogCopy`.
+          not: {}
         icon:
           type: string
           description: Icon representing the action
@@ -15045,6 +15072,9 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/ActionFlagConfig"
+        supportingCopy:
+          description: Removed in v2.2. Use `dialogCopy`.
+          not: {}
         icon:
           type: string
           description: Icon representing the action
@@ -15083,6 +15113,9 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/ActionFlagConfig"
+        supportingCopy:
+          description: Removed in v2.2. Use `dialogCopy`.
+          not: {}
         icon:
           type: string
           description: Icon representing the action
@@ -15125,6 +15158,9 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/ActionFlagConfig"
+        supportingCopy:
+          description: Removed in v2.2. Use `dialogCopy`.
+          not: {}
         icon:
           type: string
           description: Icon representing the action
@@ -15293,6 +15329,9 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/ActionFlagConfig"
+        supportingCopy:
+          description: Removed in v2.2. Use `dialogCopy`.
+          not: {}
         icon:
           type: string
           description: Icon representing the action
@@ -15343,6 +15382,9 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/ActionFlagConfig"
+        supportingCopy:
+          description: Removed in v2.2. Use `dialogCopy`.
+          not: {}
         icon:
           type: string
           description: Icon representing the action
@@ -15376,6 +15418,9 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/ActionFlagConfig"
+        supportingCopy:
+          description: Removed in v2.2. Use `dialogCopy`.
+          not: {}
         icon:
           type: string
           description: Icon representing the action
@@ -15409,6 +15454,9 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/ActionFlagConfig"
+        supportingCopy:
+          description: Removed in v2.2. Use `dialogCopy`.
+          not: {}
         icon:
           type: string
           description: Icon representing the action
@@ -15456,6 +15504,9 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/ActionFlagConfig"
+        supportingCopy:
+          description: Removed in v2.2. Use `dialogCopy`.
+          not: {}
         icon:
           type: string
           description: Icon representing the action
@@ -15494,6 +15545,9 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/ActionFlagConfig"
+        supportingCopy:
+          description: Removed in v2.2. Use `dialogCopy`.
+          not: {}
         icon:
           type: string
           description: Icon representing the action
@@ -15526,6 +15580,9 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/ActionFlagConfig"
+        supportingCopy:
+          description: Removed in v2.2. Use `dialogCopy`.
+          not: {}
         icon:
           type: string
           description: Icon representing the action
@@ -15564,6 +15621,9 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/ActionFlagConfig"
+        supportingCopy:
+          description: Removed in v2.2. Use `dialogCopy`.
+          not: {}
         icon:
           type: string
           description: Icon representing the action
@@ -15602,6 +15662,9 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/ActionFlagConfig"
+        supportingCopy:
+          description: Removed in v2.2. Use `dialogCopy`.
+          not: {}
         icon:
           type: string
           description: Icon representing the action
