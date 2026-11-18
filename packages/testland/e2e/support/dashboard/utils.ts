@@ -32,6 +32,7 @@ import {
   METABASE_PASSWORD,
   METABASE_URL
 } from '@e2e/support/constants'
+import { BirthVersion } from '@countryconfig/events/birth/versions'
 
 /*
  * A broken Metabase card renders a warning icon and an error message
@@ -155,33 +156,58 @@ export async function populateDashboardRecords(page: Page) {
 
   const records: CreateDeclarationResponse[] = []
 
-  for (const [index, placeOfBirth] of placeOfBirthVariants.entries()) {
-    const declaration = {
-      'informant.relation': 'MOTHER',
-      'informant.email': faker.internet.email(),
+  // Create every variant under each birth version, so that the dashboards
+  // read records of both versions. Only version 'initial' has the marital
+  // status fields of the parents. Only version 'v2' has the type of birth
+  // and the weight at birth.
+  for (const version of Object.values(BirthVersion)) {
+    for (const [index, placeOfBirth] of placeOfBirthVariants.entries()) {
+      const declaration = {
+        'informant.relation': 'MOTHER',
+        'informant.email': faker.internet.email(),
 
-      'child.name': {
-        firstname: faker.person.firstName(),
-        surname: faker.person.lastName()
-      },
-      'child.gender': (['male', 'female', 'unknown'] as const)[index],
-      'child.dob': randomPastDate(14),
-      ...placeOfBirth,
-      'child.attendantAtBirth': (['PHYSICIAN', 'NURSE', 'MIDWIFE'] as const)[
-        index
-      ],
-      'child.birthType': (['SINGLE', 'TWIN', 'TRIPLET'] as const)[index],
-      'child.weightAtBirth': 3.5,
+        'child.name': {
+          firstname: faker.person.firstName(),
+          surname: faker.person.lastName()
+        },
+        'child.gender': (['male', 'female', 'unknown'] as const)[index],
+        'child.dob': randomPastDate(14),
+        ...placeOfBirth,
+        'child.attendantAtBirth': (['PHYSICIAN', 'NURSE', 'MIDWIFE'] as const)[
+          index
+        ],
 
-      ...fullParentDetails('mother', village),
-      'mother.previousBirths': index,
+        ...fullParentDetails('mother', village),
+        'mother.previousBirths': index,
 
-      'father.detailsNotAvailable': false,
-      ...fullParentDetails('father', village),
-      'father.addressSameAs': 'NO'
+        'father.detailsNotAvailable': false,
+        ...fullParentDetails('father', village),
+        'father.addressSameAs': 'NO',
+
+        ...(version === BirthVersion.INITIAL
+          ? {
+              'mother.maritalStatus': 'MARRIED',
+              'father.maritalStatus': 'MARRIED'
+            }
+          : {
+              'child.birthType': (['SINGLE', 'TWIN', 'TRIPLET'] as const)[
+                index
+              ],
+              'child.weightAtBirth': 3.5
+            })
+      }
+
+      records.push(
+        await createDeclaration(
+          token,
+          declaration,
+          undefined,
+          undefined,
+          undefined,
+          version
+        )
+      )
     }
-
-    records.push(await createDeclaration(token, declaration))
   }
 
   // ensure json is unfolded in metabase

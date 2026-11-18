@@ -18,6 +18,7 @@
 ###### Infrastructure
 
 **Back up the data.** After RustFS writes to the volume, going back to MinIO loses the user metadata of the objects that RustFS wrote. Use `minio-backup` kubernetes cronjob:
+
 ```
 kubectl create job --from cronjob/minio-backup minio-backup-manual
 ```
@@ -207,6 +208,8 @@ Records created before 2.2 are stamped with `initial`, the id `defineConfig` giv
 Core 2.2 reads event configurations only in the versioned shape, so a country config built with `@opencrvs/toolkit` 2.1 or earlier stops loading. Upgrade core and the country config together.
 
 `opencrvs upgrade` does it for you: the `resolve-versioned-event-config` codemod rewrites every read of a version's field on a `VersionedEventConfig` under `src/`, and every `VersionedEventConfig` passed where an `EventConfig` is expected, to go through `resolveEventConfig`, and imports it. It then lists every use it could not rewrite (an optional chain, a destructured field, an assignment, a value that may be `undefined`) for you to change by hand.
+
+**Analytics must use the version of each record.** The codemod makes `src/analytics/analytics.ts` read each event configuration through `resolveEventConfig`, which gives the version in effect today. This is correct while an event has one version. When you add a second version, read the configuration of each record through `getEventConfigForRecord(config, event)` instead. Otherwise, analytics drops the fields that only an older version has, and the Metabase cards that use those fields break. See `packages/testland/src/analytics/analytics.ts` in opencrvs-core for an example.
 
 **`GET /api/events/config` returns the versioned shape.** Each event in the response is now `{ id, label, advancedSearch, versions }`, and the fields of a version (`actions`, `title`, `summary`, `flags`...) are under `versions[]`, each with its `id` and `effectiveFrom`. An event configured without versions comes back as a single version with id `initial` and `effectiveFrom` `0001-01-01`. Integrations that read `actions` or another version field off an event must read it from a version instead.
 
