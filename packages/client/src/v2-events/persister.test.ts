@@ -98,8 +98,8 @@ describe('createIDBPersister', () => {
     const persister = createIDBPersister(STORE)
     const restored = largeQuery('locations', new Map([['a', 1]]))
 
-    vi.mocked(storage.getItem).mockImplementation(async (key: string) =>
-      key === LARGE_KEY ? [restored] : persistedClient([])
+    vi.mocked(storage.getItem).mockImplementation((key: string) =>
+      Promise.resolve(key === LARGE_KEY ? [restored] : persistedClient([]))
     )
 
     const client = await persister.restoreClient()
