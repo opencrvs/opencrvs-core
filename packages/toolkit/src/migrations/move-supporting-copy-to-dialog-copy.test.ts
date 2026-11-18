@@ -265,6 +265,34 @@ const actions = [
       )
     })
 
+    it('removes the `notify` copy when the event has no NOTIFY action, which cannot be notified', () => {
+      const { changes, text } = rewrite(`
+const actions = [
+  {
+    type: 'DECLARE',
+    dialogCopy: {
+      notify: DECLARE_NOTIFY_COPY,
+      declare: DECLARE_COPY,
+      register: DECLARE_REGISTER_COPY
+    }
+  },
+  { type: 'REGISTER', label: REGISTER_LABEL }
+]
+`)
+
+      expect(changes).toBe(1)
+      expect(text).toBe(`
+const actions = [
+  {
+    type: 'DECLARE',
+    dialogCopy: DECLARE_COPY
+  },
+  { type: 'REGISTER', label: REGISTER_LABEL, dialogCopy: DECLARE_REGISTER_COPY }
+]
+`)
+      expect(warn).not.toHaveBeenCalled()
+    })
+
     it('logs and keeps it when the event has no REGISTER action', () => {
       const source = `
 const actions = [

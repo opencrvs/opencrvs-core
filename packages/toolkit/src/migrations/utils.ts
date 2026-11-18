@@ -137,7 +137,7 @@ export function restOfLine(text: string, position: number) {
   return text.slice(position, lineEnd === -1 ? text.length : lineEnd)
 }
 
-export function isOnlyComments(text: string) {
+function isOnlyComments(text: string) {
   return /^\s*(?:\/\/.*|\/\*.*?\*\/\s*)*$/.test(text)
 }
 

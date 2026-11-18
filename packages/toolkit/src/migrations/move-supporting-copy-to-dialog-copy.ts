@@ -32,12 +32,14 @@
  *     DECLARE action with its `declare` copy, and moves its `notify` and
  *     `register` copy to `dialogCopy` of the NOTIFY and REGISTER actions in
  *     the same `actions` array. When one of these actions gives copy of its
- *     own, it keeps that copy and drops the copy of the DECLARE action
+ *     own, it keeps that copy and drops the copy of the DECLARE action. When
+ *     the event has no NOTIFY action, it removes the `notify` copy, because
+ *     an event without a NOTIFY action cannot be notified
  *   - Logs, without changing, what it cannot rewrite safely: an action whose
  *     type it cannot read, an action with both `supportingCopy` and
  *     `dialogCopy`, a `dialogCopy` of the DECLARE action that is not written
  *     inline or that has other keys, a NOTIFY or REGISTER action that is not
- *     written inline or that is missing, and every other reference to
+ *     written inline, a missing REGISTER action, and every other reference to
  *     `supportingCopy`
  *   - Saves the modified files in-place
  */
@@ -98,10 +100,14 @@ const ACTION_TYPES_WITHOUT_SUPPORTING_COPY = [
   'REJECT_CORRECTION'
 ]
 
-/** The keys of `dialogCopy` of the DECLARE action that move to another action, and that action. */
+/**
+ * The keys of `dialogCopy` of the DECLARE action that move to another action, and that action.
+ * An event without a NOTIFY action cannot be notified, so no dialog shows its `notify` copy,
+ * and the codemod removes it. A missing REGISTER action gives no such guarantee.
+ */
 const MOVED_DECLARE_COPY = [
-  { key: 'notify', actionType: 'NOTIFY' },
-  { key: 'register', actionType: 'REGISTER' }
+  { key: 'notify', actionType: 'NOTIFY', isRemovedWithoutAction: true },
+  { key: 'register', actionType: 'REGISTER', isRemovedWithoutAction: false }
 ] as const
 
 const DECLARE_COPY_KEYS = ['notify', 'declare', 'register']
@@ -252,13 +258,26 @@ function rewriteDeclareDialogCopy(
   const edits: TextEdit[] = []
   const messages: Array<() => void> = []
 
-  for (const { key, actionType } of MOVED_DECLARE_COPY) {
+  for (const {
+    key,
+    actionType,
+    isRemovedWithoutAction
+  } of MOVED_DECLARE_COPY) {
     const candidates = actions
       .getElements()
       .filter(
         (action) => action !== declareAction && mayBeAction(action, actionType)
       )
     const target = candidates[0]
+
+    if (candidates.length === 0 && isRemovedWithoutAction) {
+      messages.push(() =>
+        console.log(
+          `  [${location(copies[key])}] Removed \`${DIALOG_COPY}.${key}\` of the ${DECLARE_ACTION_TYPE} action: the event has no ${actionType} action, so no dialog shows it. If you add a ${actionType} action, give it this copy as \`${DIALOG_COPY}\`.`
+        )
+      )
+      continue
+    }
 
     if (candidates.length !== 1 || !Node.isObjectLiteralExpression(target)) {
       const problem =

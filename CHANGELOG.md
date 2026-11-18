@@ -347,7 +347,7 @@ The `DECLARE` action no longer gives copy for the notify and register dialogs of
 **Country configs must change the old keys.** A config with `supportingCopy` fails validation, and so does a `DECLARE` action whose `dialogCopy` has `notify`, `declare` and `register`. `opencrvs upgrade` changes them for you. Its `move-supporting-copy-to-dialog-copy` codemod:
 
 - renames `supportingCopy` to `dialogCopy`, and removes the `supportingCopy` that no dialog showed
-- gives the `declare` copy of the `DECLARE` action as its `dialogCopy`, and moves the `notify` and `register` copy to the `NOTIFY` and `REGISTER` actions. When one of these actions already gives copy, the codemod keeps that copy.
+- gives the `declare` copy of the `DECLARE` action as its `dialogCopy`, and moves the `notify` and `register` copy to the `NOTIFY` and `REGISTER` actions. When one of these actions already gives copy, the codemod keeps that copy. When the event has no `NOTIFY` action, the codemod removes the `notify` copy, because an event without a `NOTIFY` action cannot be notified.
 - lists every place that it could not change, for you to change by hand
 
 The translation keys do not change.

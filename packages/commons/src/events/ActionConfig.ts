@@ -35,7 +35,7 @@ export const ActionConfigBase = z.object({
     .optional()
     .default([])
     .describe('Flag actions which are executed when the action is performed.'),
-  // Rejects the key of v2.1 that zod would otherwise drop without an error. Remove in v2.3.
+  // Rejects the key of v2.1 that zod would otherwise drop without an error. Should be removed in v2.3.
   supportingCopy: z
     .never({
       error:
@@ -73,21 +73,9 @@ const dialogCopy = TranslationConfig.optional().describe(
   'Text shown at the top of the confirmation dialog of the action.'
 )
 
-/** `dialogCopy` of an action whose dialogs show no copy from the configuration. */
-const noDialogCopy = z
-  .never({
-    error:
-      'This action does not support `dialogCopy`. No dialog of this action shows copy from the configuration.'
-  })
-  .optional()
-  .describe(
-    'Not supported. No dialog of this action shows copy from the configuration.'
-  )
-
 const ReadActionConfig = ActionConfigBase.extend(
   z.object({
     type: z.literal(ActionType.READ),
-    dialogCopy: noDialogCopy,
     review: DeclarationReviewConfig.describe(
       'Configuration of the review page for read-only view.'
     ),
@@ -127,7 +115,6 @@ const DuplicateDetectedConfig = ActionConfigBase.extend(
       .describe(
         'DUPLICATE_DETECTED is system-generated and never shown as a button, so it has no label.'
       ),
-    dialogCopy: noDialogCopy,
     icon: z
       .never()
       .optional()
@@ -145,22 +132,19 @@ const DuplicateDetectedConfig = ActionConfigBase.extend(
 
 const MarkAsDuplicateConfig = ActionConfigBase.extend(
   z.object({
-    type: z.literal(ActionType.MARK_AS_DUPLICATE),
-    dialogCopy: noDialogCopy
+    type: z.literal(ActionType.MARK_AS_DUPLICATE)
   }).shape
 )
 
 const MarkAsNotDuplicateConfig = ActionConfigBase.extend(
   z.object({
-    type: z.literal(ActionType.MARK_AS_NOT_DUPLICATE),
-    dialogCopy: noDialogCopy
+    type: z.literal(ActionType.MARK_AS_NOT_DUPLICATE)
   }).shape
 )
 
 const AssignConfig = ActionConfigBase.extend(
   z.object({
     type: z.literal(ActionType.ASSIGN),
-    dialogCopy: noDialogCopy,
     flags: z
       .never()
       .optional()
@@ -173,7 +157,6 @@ const AssignConfig = ActionConfigBase.extend(
 const UnassignConfig = ActionConfigBase.extend(
   z.object({
     type: z.literal(ActionType.UNASSIGN),
-    dialogCopy: noDialogCopy,
     flags: z
       .never()
       .optional()
@@ -185,8 +168,7 @@ const UnassignConfig = ActionConfigBase.extend(
 
 const DeleteConfig = ActionConfigBase.extend(
   z.object({
-    type: z.literal(ActionType.DELETE),
-    dialogCopy: noDialogCopy
+    type: z.literal(ActionType.DELETE)
   }).shape
 )
 
@@ -275,31 +257,23 @@ const RegisterConfig = DeclarationActionBase.extend(
 const PrintCertificateActionConfig = ActionConfigBase.extend(
   z.object({
     type: z.literal(ActionType.PRINT_CERTIFICATE),
-    printForm: ActionFormConfig,
-    dialogCopy: noDialogCopy
+    printForm: ActionFormConfig
   }).shape
 )
 
 const RequestCorrectionConfig = ActionConfigBase.extend(
   z.object({
     type: z.literal(ActionType.REQUEST_CORRECTION),
-    correctionForm: ActionFormConfig,
-    dialogCopy: noDialogCopy
+    correctionForm: ActionFormConfig
   }).shape
 )
 
 const ApproveCorrectionConfig = ActionConfigBase.extend(
-  z.object({
-    type: z.literal(ActionType.APPROVE_CORRECTION),
-    dialogCopy: noDialogCopy
-  }).shape
+  z.object({ type: z.literal(ActionType.APPROVE_CORRECTION) }).shape
 )
 
 const RejectCorrectionConfig = ActionConfigBase.extend(
-  z.object({
-    type: z.literal(ActionType.REJECT_CORRECTION),
-    dialogCopy: noDialogCopy
-  }).shape
+  z.object({ type: z.literal(ActionType.REJECT_CORRECTION) }).shape
 )
 
 const CustomActionConfig = ActionConfigBase.extend(
