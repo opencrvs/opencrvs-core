@@ -569,6 +569,45 @@ test('reindex per-version write alias is re-pointed on every subsequent reindex'
   expect(indexAfterSecond).toMatch(new RegExp(`^${writeAliasName}_\\d+$`))
 })
 
+test('reindex deletes the index of a version that was removed from the config', async () => {
+  const esClient = getOrCreateClient()
+  const [initialVersion] = versionedTennisClubMembershipEvent.versions
+  const v2Name = getEventVersionIndexName(TENNIS_CLUB_MEMBERSHIP, 'v2')
+
+  mswServer.use(
+    http.get(`${env.COUNTRY_CONFIG_URL}/config/events`, () =>
+      HttpResponse.json([
+        {
+          ...versionedTennisClubMembershipEvent,
+          versions: [
+            initialVersion,
+            { ...initialVersion, id: 'v2', effectiveFrom: '2999-01-01' }
+          ]
+        }
+      ])
+    )
+  )
+  await runReindex(reindexToken)
+  const [v2Index] = Object.keys(
+    await esClient.indices.getAlias({ name: v2Name })
+  )
+
+  // v2 never took effect, so no record uses it and it can be removed.
+  mswServer.use(singleEventConfigHandler)
+  await runReindex(reindexToken)
+
+  expect(await esClient.indices.exists({ index: v2Index })).toBe(false)
+
+  const eventIndexName = getEventIndexName(TENNIS_CLUB_MEMBERSHIP)
+  await esClient.indices.refresh({ index: eventIndexName })
+  const body = await esClient.search({
+    index: eventIndexName,
+    body: { query: { match_all: {} } }
+  })
+  // The declared record of the initial version is still found; the draft is not indexed.
+  expect(body.hits.hits).toHaveLength(1)
+})
+
 test('does not stop runReindex when the cleanup itself fails', async () => {
   const esClient = getOrCreateClient()
   const clientSpy = vi

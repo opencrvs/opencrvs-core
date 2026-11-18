@@ -155,6 +155,37 @@ describe('ensureIndexExists()', () => {
     ).toEqual([eventIndexName])
   })
 
+  test('a new version gets its own index, not the leftover index of a removed version (one taken out of the config after a reindex built its index)', async () => {
+    const esClient = getOrCreateClient()
+    const eventIndexName = getEventIndexName(EVENT_ID)
+    const v2Index = getEventVersionIndexName(EVENT_ID, 'v2')
+    const v3Index = getEventVersionIndexName(EVENT_ID, 'v3')
+
+    // After a reindex, each version has its own index behind the event's name.
+    for (const versionId of ['v1', 'v2']) {
+      const versionIndex = getEventVersionIndexName(EVENT_ID, versionId)
+      const reindexedIndex = `${versionIndex}_1700000000000`
+      await createIndex(
+        reindexedIndex,
+        getDeclarationFields(tennisClubMembershipEvent)
+      )
+      await esClient.indices.putAlias({
+        index: reindexedIndex,
+        name: versionIndex
+      })
+      await esClient.indices.putAlias({
+        index: reindexedIndex,
+        name: eventIndexName
+      })
+    }
+
+    // v2 never took effect, so no record uses it and it can be removed. v3 is added.
+    await ensureIndexExists(configOf(version('v1'), version('v3', LATER)))
+
+    expect(await indicesBehind(v3Index)).toEqual([v3Index])
+    expect(await indicesBehind(v2Index)).toEqual([`${v2Index}_1700000000000`])
+  })
+
   test('a version added later gets a new index, and the existing one keeps its records', async () => {
     const esClient = getOrCreateClient()
     const v1Index = getEventVersionIndexName(EVENT_ID, 'v1')

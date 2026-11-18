@@ -417,6 +417,22 @@ export async function getIndicesBehind(name: string) {
   return esClient.indices.getAlias({ index: name })
 }
 
+/** The suffix that a reindex adds to an index name: the time it started, in milliseconds since 1970 (13 digits). */
+const REINDEX_TIMESTAMP = /^\d{13}$/
+
+/**
+ * Whether `index` is the index that all versions shared before 2.2: `<event>`, or
+ * `<event>_<timestamp>` after a reindex. Versions without an index are pointed at it,
+ * so a leftover index of a removed version (`<event>_<version>_<timestamp>`) must not match.
+ */
+function isSharedIndexName(index: string, eventIndexName: string) {
+  return (
+    index === eventIndexName ||
+    (index.startsWith(`${eventIndexName}_`) &&
+      REINDEX_TIMESTAMP.test(index.slice(eventIndexName.length + 1)))
+  )
+}
+
 /**
  * Makes sure every version of the event has a name its records can be written to.
  *
@@ -440,6 +456,7 @@ export async function ensureIndexExists(
   const [sharedIndex] = Object.entries(indicesOfEvent)
     .filter(
       ([index, { aliases }]) =>
+        isSharedIndexName(index, eventIndexName) &&
         !versions.some(
           ({ indexName }) => indexName === index || indexName in aliases
         )
@@ -450,6 +467,8 @@ export async function ensureIndexExists(
     await ensureAlias(sharedIndex)
   }
 
+  // Makes each version's name point to an index its records can be written to: kept as
+  // it is when it exists, aliased to the shared index until a reindex, or a new index.
   for (const { version, indexName } of versions) {
     if (await esClient.indices.exists({ index: indexName })) {
       continue
