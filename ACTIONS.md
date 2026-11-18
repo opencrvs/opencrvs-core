@@ -42,7 +42,6 @@ The `NOTIFY` action configuration has these parts:
 - `notificationForm` is the form that the notifier fills in. Each of its fields must also be in the declaration form, with the same type. The submitted values become part of the record declaration and pre-fill the declaration form later. The backend rejects values for fields that are not in the notification form, and it checks the required fields of the notification form.
 - `review` is the review page of the notify flow. The values of its fields are stored as the annotation of the `NOTIFY` action, not in the declaration.
 - `form` is optional. It contains the fields of the confirmation dialog. Their values are also stored as the annotation of the `NOTIFY` action.
-- `dialogCopy` is optional. It is the text at the top of the confirmation dialog. See [Dialog copy](#dialog-copy).
 
 A user with the `record.notify` scope uses the notify flow. A role cannot have both `record.notify` and `record.declare` for the same event.
 
@@ -64,7 +63,7 @@ All custom actions and certain core actions are configurable.
 
 Actions are configured on a per–event-type basis, meaning different event types do not share action configurations.
 
-Below we describe three configuration options: flag configurations, action conditionals and dialog copy. It is important to note that additional configuration options are available and that many core actions have configuration options specific to their action type.
+Below we describe two configuration options: flag configurations and action conditionals. It is important to note that additional configuration options are available and that many core actions have configuration options specific to their action type.
 
 ### Flag configurations
 
@@ -99,29 +98,4 @@ conditionals: [
     conditional: flag('approval-required-for-late-registration')
   }
 ]
-```
-
-### Dialog copy
-
-`dialogCopy` is the text at the top of a confirmation dialog. The `form` of the action gives the fields of the dialog.
-
-- `NOTIFY`, `DECLARE`, `REGISTER`, `REJECT`, `ARCHIVE`, `UNARCHIVE`, `REVOKE_REGISTRATION`, `REINSTATE_REGISTRATION` and custom actions give one message. The dialog of the action shows it, wherever the dialog opens. For example, the register dialog of the declaration review page and the register dialog of the action menu both show the `dialogCopy` of `REGISTER`.
-- `EDIT` gives `dialogCopy.notify`, `dialogCopy.declare` and `dialogCopy.register`. The dialogs of the edit page show them, so that these dialogs can have copy that is different from the other dialogs.
-- The other actions do not accept `dialogCopy`. No dialog of these actions shows copy from the configuration.
-
-**Example:** Different copy for registration from the edit page:
-
-```js
-{
-  type: ActionType.REGISTER,
-  dialogCopy: { id: 'event.birth.action.register.copy', ... }
-},
-{
-  type: ActionType.EDIT,
-  dialogCopy: {
-    notify: { id: 'event.birth.action.edit.notify.copy', ... },
-    declare: { id: 'event.birth.action.edit.declare.copy', ... },
-    register: { id: 'event.birth.action.edit.register.copy', ... }
-  }
-}
 ```
