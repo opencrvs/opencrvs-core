@@ -24,6 +24,9 @@ import { APPLICATION_VERSION } from '@client/utils/constants'
 import { errorMessages, buttonMessages } from '@client/i18n/messages'
 import { buildLoginUrl } from '@client/components/VersionMismatchModal'
 import { useLocations } from '@client/v2-events/hooks/useLocations'
+// Registers the query defaults that `PrefetchQueries` uses for the administrative area list.
+// eslint-disable-next-line import/no-unassigned-import
+import '@client/v2-events/hooks/useAdministrativeAreas'
 import * as V1_LEGACY_ROUTES from '@client/navigation/routes'
 import { Debug } from '@client/v2-events/features/debug/debug'
 import { router as correctionRequestRouter } from '@client/v2-events/features/events/actions/correct/request/router'
