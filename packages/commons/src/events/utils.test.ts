@@ -55,7 +55,6 @@ import {
   generateActionDocument,
   generateEmptyTestValidatorContext,
   generateTranslationConfig,
-  generateTestValidatorContext,
   withDeclaration
 } from './test.utils'
 import { DeclarationFormConfig } from './FormConfig'
@@ -609,8 +608,9 @@ describe('omitHiddenPaginatedFields', () => {
     const declaration = fieldConfigsToActionPayload(fields, rng)
     const declarationWithoutHiddenFields = omitHiddenPaginatedFields(
       declarationConfig,
-      generateEmptyTestValidatorContext(declaration)
-    )
+      { declaration, annotation: {} },
+      generateEmptyTestValidatorContext(tennisClubMembershipEvent)
+    ).declaration
 
     const missingKeys = difference(
       Object.keys(declaration),
@@ -638,13 +638,17 @@ describe('omitHiddenPaginatedFields', () => {
     const declaration = fieldConfigsToActionPayload(fields, rng)
     const declarationWithoutHiddenFields = omitHiddenPaginatedFields(
       declarationConfig,
-      generateEmptyTestValidatorContext({
-        ...declaration,
-        'recommender.name': null,
-        'recommender.id': null
-      }),
+      {
+        declaration: {
+          ...declaration,
+          'recommender.name': null,
+          'recommender.id': null
+        },
+        annotation: {}
+      },
+      generateEmptyTestValidatorContext(tennisClubMembershipEvent),
       true
-    )
+    ).declaration
 
     const missingKeys = difference(
       Object.keys(declaration),
@@ -699,8 +703,9 @@ describe('omitHiddenPaginatedFields', () => {
     const values = { 'shared.field': 'value', toggle: 'false' }
     const result = omitHiddenPaginatedFields(
       formConfig,
-      generateEmptyTestValidatorContext(values)
-    )
+      { declaration: values, annotation: {} },
+      generateEmptyTestValidatorContext(tennisClubMembershipEvent)
+    ).declaration
 
     expect(result).toMatchObject({ 'shared.field': 'value' })
   })
@@ -1136,20 +1141,12 @@ describe('getActionAnnotationFields() with dialog form', () => {
           }
         } satisfies EventState
       })
-      const { user, leafAdminStructureLocationIds = [] } =
-        generateTestValidatorContext()
-
-      if (!user) {
-        throw new Error('Test validator context has no user')
-      }
-
       expect(
-        dropSecuredDeclarationFields(tennisClubMembershipEvent, {
-          user,
-          leafAdminStructureLocationIds,
-          eventIndex: eventIndexWithSecuredData,
-          form: eventIndexWithSecuredData.declaration
-        }).declaration
+        dropSecuredDeclarationFields(
+          tennisClubMembershipEvent,
+          eventIndexWithSecuredData,
+          { eventIndex: eventIndexWithSecuredData }
+        ).declaration
       ).toEqual({
         'applicant.name': {
           firstname: 'John',

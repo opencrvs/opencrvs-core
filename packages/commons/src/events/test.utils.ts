@@ -25,9 +25,9 @@ import {
 } from './ActionDocument'
 import {
   getEventValidatorContext,
-  StrictValidatorContextWithoutEventDocument,
   ValidatorContext
 } from '../conditionals/validate'
+import { ActionFormConditionalContext } from '../conditionals/validate-v2'
 import {
   ApproveCorrectionActionInput,
   ArchiveActionInput,
@@ -108,17 +108,21 @@ import { V2_DEFAULT_MOCK_ADMINISTRATIVE_AREAS_MAP } from './mocks.test.utils'
  * @TODO: Placeholder context to generate test data without a stored event or a user.
  * Before the strict context, these callers passed an empty context (`{}`).
  * The user has no role and no scopes, so user conditionals are false, as before.
+ * The event document has only the CREATE action, because the event state cannot be calculated without it.
  * We handle this case separately.
  */
-export function generateEmptyTestValidatorContext<
-  T extends EventState | ActionUpdate
->(form: T): StrictValidatorContextWithoutEventDocument<T> {
+export function generateEmptyTestValidatorContext(
+  configuration: EventConfig
+): ActionFormConditionalContext {
   return {
     user: { sub: '', scope: [], userType: TokenUserType.enum.user },
     leafAdminStructureLocationIds: [],
     // eslint-disable-next-line @typescript-eslint/no-use-before-define
-    eventIndex: eventQueryDataGenerator({ flags: [] }),
-    form
+    eventDocument: generateEventDocument({
+      configuration,
+      actions: [{ type: ActionType.CREATE }]
+    }),
+    eventConfig: configuration
   }
 }
 /**
@@ -432,12 +436,13 @@ export function generateActionDeclarationInput(
     // If this is not done, the mock data might contain hidden or disabled fields, which will cause validation errors
     return omitHiddenPaginatedFields(
       declarationConfig,
-      generateEmptyTestValidatorContext({
-        ...declaration,
-        ...overrides
-      }),
+      {
+        declaration: { ...declaration, ...overrides },
+        annotation: {}
+      },
+      generateEmptyTestValidatorContext(configuration),
       true
-    )
+    ).declaration
   }
 
   // eslint-disable-next-line no-console
@@ -475,10 +480,14 @@ function generateActionAnnotationInput(
 
   const annotation = fieldConfigsToActionPayload(annotationFields, rng)
 
+  // The annotation is generated without a declaration, as before.
+  const form = { declaration: {}, annotation }
+  const context = generateEmptyTestValidatorContext(configuration)
+
   const visibleVerificationPageIds = getVisibleVerificationPageIds(
     findRecordActionPages(configuration, action),
-
-    generateEmptyTestValidatorContext(annotation)
+    form,
+    context
   )
 
   const visiblePageVerificationMap = visibleVerificationPageIds.reduce(
@@ -491,9 +500,9 @@ function generateActionAnnotationInput(
 
   const fieldBasedPayload = omitHiddenFields(
     annotationFields,
-
-    generateEmptyTestValidatorContext(annotation)
-  )
+    form,
+    context
+  ).annotation
 
   return {
     ...fieldBasedPayload,
