@@ -270,13 +270,13 @@ function useEditActions(event: EventDocument) {
                   attachmentPath={eventAttachmentPath(event.id)}
                   close={close}
                   declaration={declaration}
+                  dialogCopy={dialogCopy?.register}
                   event={event}
                   eventConfiguration={eventConfiguration}
                   fields={getActionFormFields(
                     eventConfiguration,
                     ActionType.REGISTER
                   )}
-                  dialogCopy={dialogCopy?.register}
                   title={messages.editAndRegisterLabel}
                 />
               )
@@ -310,13 +310,13 @@ function useEditActions(event: EventDocument) {
                   attachmentPath={eventAttachmentPath(event.id)}
                   close={close}
                   declaration={declaration}
+                  dialogCopy={dialogCopy?.declare}
                   event={event}
                   eventConfiguration={eventConfiguration}
                   fields={getActionFormFields(
                     eventConfiguration,
                     ActionType.DECLARE
                   )}
-                  dialogCopy={dialogCopy?.declare}
                   title={messages.editAndDeclareLabel}
                 />
               )
@@ -352,13 +352,13 @@ function useEditActions(event: EventDocument) {
                   attachmentPath={eventAttachmentPath(event.id)}
                   close={close}
                   declaration={declaration}
+                  dialogCopy={dialogCopy?.notify}
                   event={event}
                   eventConfiguration={eventConfiguration}
                   fields={getActionFormFields(
                     eventConfiguration,
                     ActionType.NOTIFY
                   )}
-                  dialogCopy={dialogCopy?.notify}
                   title={messages.editAndNotifyLabel}
                 />
               )

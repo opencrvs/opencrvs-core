@@ -41,10 +41,10 @@ export function useRejectionModal(event: EventIndex) {
         <ReviewComponent.ActionModal.Reject
           attachmentPath={eventAttachmentPath(eventId)}
           close={close}
+          dialogCopy={dialogCopy}
           event={findLocalEventDocument(eventId)}
           eventConfiguration={eventConfiguration}
           fields={fields}
-          dialogCopy={dialogCopy}
         />
       )
     )
