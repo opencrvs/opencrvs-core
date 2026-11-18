@@ -493,6 +493,62 @@ describe('defineConfig()', () => {
         )
       })
 
+      it('should accept a part of a field in searchFields when a version has the field', () => {
+        const ANY_FIRST_NAME_ID = 'applicant.anyFirstName'
+
+        function searchingAnyFirstName(searchFields: string[]) {
+          return [
+            ...advancedSearch,
+            {
+              title: advancedSearch[1].title,
+              fields: [
+                {
+                  fieldId: ANY_FIRST_NAME_ID,
+                  fieldType: 'field' as const,
+                  type: FieldType.TEXT,
+                  label: {
+                    id: 'anyFirstName.label',
+                    defaultMessage: 'First name',
+                    description: 'Search field over several fields'
+                  },
+                  config: { type: 'fuzzy' as const, searchFields }
+                }
+              ]
+            }
+          ]
+        }
+
+        expect(() =>
+          defineConfig({
+            id: eventId,
+            label,
+            advancedSearch: searchingAnyFirstName([
+              NICKNAME_FIELD_ID,
+              'applicant.name.firstname'
+            ]),
+            versions: [v1, v2WithExtraField]
+          })
+        ).not.toThrow()
+
+        // A field that no version has, a part that a name does not have, and a part of a TEXT field
+        for (const searchField of [
+          'applicant.unknown.firstname',
+          'applicant.name.babablacksheep',
+          `${NICKNAME_FIELD_ID}.firstname`
+        ]) {
+          expect(() =>
+            defineConfig({
+              id: eventId,
+              label,
+              advancedSearch: searchingAnyFirstName([searchField]),
+              versions: [v1, v2WithExtraField]
+            })
+          ).toThrow(
+            `Invalid AdvancedSearch field IDs for event ${eventId}: ${ANY_FIRST_NAME_ID}`
+          )
+        }
+      })
+
       it('should check a defaultValue against the newest version that has the field', () => {
         const textInV1 = withDeclarationField(v1, nicknameField(FieldType.TEXT))
         const numberInV1 = withDeclarationField(

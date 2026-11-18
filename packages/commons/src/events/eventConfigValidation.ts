@@ -24,6 +24,7 @@ import {
   getDeclarationPages
 } from './utils'
 import { FieldType } from './FieldType'
+import { FieldConfig } from './FieldConfig'
 import { mapFieldTypeToZod } from './FieldTypeMapping'
 import { EventFieldId } from './AdvancedSearchConfig'
 import { isFieldReference } from '../conditionals/conditionals'
@@ -57,6 +58,39 @@ function everyVersionHasOneDeclareAction(versions: EventConfig[]) {
   )
 }
 
+/** Whether a value of `schema` can have a property at `keys`, such as `['firstname']` for a name. */
+function schemaHasPath(schema: z.core.$ZodType, keys: string[]): boolean {
+  if (keys.length === 0) {
+    return true
+  }
+  if (schema instanceof z.ZodOptional || schema instanceof z.ZodNullable) {
+    return schemaHasPath(schema.unwrap(), keys)
+  }
+  if (schema instanceof z.ZodUnion) {
+    return schema.options.some((option) => schemaHasPath(option, keys))
+  }
+  if (schema instanceof z.ZodObject) {
+    const [key, ...rest] = keys
+    return (
+      Object.hasOwn(schema.shape, key) && schemaHasPath(schema.shape[key], rest)
+    )
+  }
+  return false
+}
+
+/** Whether `path` is the id of one of `fields`, or a part of its value, such as `child.name.firstname`. */
+function isFieldOrFieldPart(path: string, fields: FieldConfig[]) {
+  return fields.some(
+    (field) =>
+      path === field.id ||
+      (path.startsWith(`${field.id}.`) &&
+        schemaHasPath(
+          mapFieldTypeToZod(field),
+          path.slice(field.id.length + 1).split('.')
+        ))
+  )
+}
+
 /**
  * Rejects advanced search fields that match a field of none of the `versions`, nor a
  * metadata field. A field that only some versions have can still be searched.
@@ -70,9 +104,8 @@ export function validateAdvancedSearchFieldIds(
     return
   }
 
-  const fieldIds = versions.flatMap((version) =>
-    findAllFields(version).map((field) => field.id)
-  )
+  const fields = versions.flatMap(findAllFields)
+  const fieldIds = fields.map((field) => field.id)
 
   const invalidFields = event.advancedSearch.flatMap((section) =>
     // Check if the fieldId is not in the fieldIds array
@@ -84,7 +117,9 @@ export function validateAdvancedSearchFieldIds(
           (EventFieldId.options as string[]).includes(field.fieldId) ||
           (field.config.searchFields &&
             field.config.searchFields.length > 0 &&
-            field.config.searchFields.every((sf) => fieldIds.includes(sf)))
+            field.config.searchFields.every((sf) =>
+              isFieldOrFieldPart(sf, fields)
+            ))
         )
     )
   )
