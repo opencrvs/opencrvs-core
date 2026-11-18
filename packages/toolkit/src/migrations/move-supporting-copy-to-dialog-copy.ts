@@ -20,7 +20,7 @@
  *   As of v2.2, `supportingCopy` is renamed to `dialogCopy`, and only the
  *   actions whose dialog shows it accept it. The `dialogCopy` of the DECLARE
  *   action with `notify`, `declare` and `register` is replaced by `dialogCopy`
- *   of the DECLARE, NOTIFY and REGISTER actions. v2.3 removes the old keys.
+ *   of the DECLARE, NOTIFY and REGISTER actions. v2.2 rejects the old keys.
  *   See CHANGELOG.md.
  *
  * What it does:

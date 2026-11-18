@@ -10,10 +10,6 @@
  */
 import * as z from 'zod/v4'
 import { ActionConfig } from './ActionConfig'
-import {
-  ActionConfigInputWithDeprecatedDialogCopy,
-  ActionConfigsWithDeprecatedDialogCopy
-} from './deprecatedDialogCopy'
 import { SummaryConfig } from './SummaryConfig'
 import { TranslationConfig } from './TranslationConfig'
 import { AdvancedSearchConfig } from './AdvancedSearchConfig'
@@ -59,7 +55,7 @@ export type EventConfig = {
   icon?: Partial<Record<AvailableIcons, JSONSchema>>
 }
 
-type ActionConfigInput = ActionConfigInputWithDeprecatedDialogCopy
+type ActionConfigInput = z.input<typeof ActionConfig>
 
 type DeclareActionConfigInput = Extract<
   ActionConfigInput,
@@ -169,9 +165,11 @@ const versionFields = {
   summary: SummaryConfig.describe(
     'Summary information displayed in the event overview.'
   ),
-  actions: ActionConfigsWithDeprecatedDialogCopy.describe(
-    'Configuration of core and custom actions associated with the event.'
-  ),
+  actions: z
+    .array(ActionConfig)
+    .describe(
+      'Configuration of core and custom actions associated with the event.'
+    ),
   actionOrder: z
     .array(z.string())
     .optional()

@@ -181,3 +181,56 @@ describe('READ action config', () => {
     expect(res.success).toBe(false)
   })
 })
+
+describe('dialogCopy', () => {
+  const dialogCopy = {
+    defaultMessage: 'Copy of the dialog',
+    description: 'Copy of the confirmation dialog',
+    id: 'events.actionConfig.test.dialogCopy'
+  }
+
+  it('accepts one message on an action whose dialog shows it', () => {
+    const res = ActionConfig.safeParse({
+      type: ActionType.UNARCHIVE,
+      label,
+      dialogCopy
+    })
+
+    expect(res.success).toBe(true)
+  })
+
+  it('rejects `dialogCopy` on an action whose dialogs show no copy from the configuration', () => {
+    const res = ActionConfig.safeParse({
+      type: ActionType.DELETE,
+      label,
+      dialogCopy
+    })
+
+    expect(res.error?.issues).toMatchObject([
+      {
+        path: ['dialogCopy'],
+        message:
+          'This action does not support `dialogCopy`. No dialog of this action shows copy from the configuration.'
+      }
+    ])
+  })
+
+  it.each([ActionType.UNARCHIVE, ActionType.DELETE])(
+    'rejects `supportingCopy` of v2.1 on the %s action, and names the codemod that changes it',
+    (type) => {
+      const res = ActionConfig.safeParse({
+        type,
+        label,
+        supportingCopy: dialogCopy
+      })
+
+      expect(res.error?.issues).toMatchObject([
+        {
+          path: ['supportingCopy'],
+          message:
+            '`supportingCopy` was removed in v2.2. Run `opencrvs upgrade`: it renames `supportingCopy` to `dialogCopy`, or removes it from the actions whose dialog does not show it.'
+        }
+      ])
+    }
+  )
+})
