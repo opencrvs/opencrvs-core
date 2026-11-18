@@ -261,6 +261,34 @@ export function purgeLegacySearchQueries(client: QueryClient) {
   })
 }
 
+/**
+ * Drops the location and administrative area list entries that earlier
+ * client versions left in the cache, which would never be collected (gcTime
+ * is Infinity):
+ *
+ * - The entries under a key with filter input, which the list hooks filled.
+ * - The entries that hold the raw list array, which `PrefetchQueries` filled
+ *   under the shared key. The hooks now read that key and expect a Map.
+ *
+ * @deprecated - A one-off migration of the client cache. Remove one release
+ * after it ships in 2.2, with its call in `onSuccess` below and its test.
+ */
+export function purgeLegacyLocationListQueries(client: QueryClient) {
+  for (const path of [
+    ['locations', 'list'],
+    ['administrativeAreas', 'list']
+  ]) {
+    client.removeQueries({
+      queryKey: [path],
+      predicate: (query) => {
+        const [, options] = query.queryKey as [string[], object | undefined]
+        const hasInput = options !== undefined && 'input' in options
+        return hasInput || Array.isArray(query.state.data)
+      }
+    })
+  }
+}
+
 export function TRPCProvider({
   children,
   waitForClientRestored = true,
@@ -321,6 +349,7 @@ export function TRPCProvider({
       }}
       onSuccess={async () => {
         purgeLegacySearchQueries(queryClient)
+        purgeLegacyLocationListQueries(queryClient)
 
         setQueriesRestored(true)
         await queryClient.resumePausedMutations()

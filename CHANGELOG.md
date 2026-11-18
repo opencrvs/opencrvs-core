@@ -18,6 +18,7 @@
 ###### Infrastructure
 
 **Back up the data.** After RustFS writes to the volume, going back to MinIO loses the user metadata of the objects that RustFS wrote. Use `minio-backup` kubernetes cronjob:
+
 ```
 kubectl create job --from cronjob/minio-backup minio-backup-manual
 ```
@@ -208,6 +209,8 @@ Core 2.2 reads event configurations only in the versioned shape, so a country co
 
 `opencrvs upgrade` does it for you: the `resolve-versioned-event-config` codemod rewrites every read of a version's field on a `VersionedEventConfig` under `src/`, and every `VersionedEventConfig` passed where an `EventConfig` is expected, to go through `resolveEventConfig`, and imports it. It then lists every use it could not rewrite (an optional chain, a destructured field, an assignment, a value that may be `undefined`) for you to change by hand.
 
+**Analytics must use the version of each record.** The codemod makes `src/analytics/analytics.ts` read each event configuration through `resolveEventConfig`, which gives the version in effect today. This is correct while an event has one version. When you add a second version, read the configuration of each record through `getEventConfigForRecord(config, event)` instead. Otherwise, analytics drops the fields that only an older version has, and the Metabase cards that use those fields break. See `packages/testland/src/analytics/analytics.ts` in opencrvs-core for an example.
+
 **`GET /api/events/config` returns the versioned shape.** Each event in the response is now `{ id, label, advancedSearch, versions }`, and the fields of a version (`actions`, `title`, `summary`, `flags`...) are under `versions[]`, each with its `id` and `effectiveFrom`. An event configured without versions comes back as a single version with id `initial` and `effectiveFrom` `0001-01-01`. Integrations that read `actions` or another version field off an event must read it from a version instead.
 
 **Records carry `configVersionId`.** Event documents and search results have the id of the version the record was created under. `event.create` takes an optional `configVersionId`: without it, the record is created under the version in effect. A given `configVersionId` must be a configured version already in effect, or the call fails with HTTP 400.
@@ -347,6 +350,7 @@ The toolkit and the country configuration template work with any container regis
 - `environment:init` now checks the container registry username, token and repository against the registry before storing them, instead of leaving a bad value to fail at image-pull time during deployment. If the username/token is rejected, the repository is not found (it may be empty) or the registry cannot be reached, the reason is shown and you choose whether to continue without validation. Existing GitHub secrets cannot be read back, so validation is skipped unless all four values are entered in that run. [#13412](https://github.com/opencrvs/opencrvs-core/issues/13412), [#14209](https://github.com/opencrvs/opencrvs-core/issues/14209)
 - `environment:init` now asks whether to enable monitoring, so environments that do not need their own monitoring stack (for example `qa-hotfix` on a cluster that already hosts `qa`) can switch it off without editing the generated YAML. The answer is stored as the GitHub environment variable `MONITORING_ENABLED` and drives `monitoring.enabled`, `otel.enabled` and Traefik tracing in the generated Helm values, so OpenTelemetry is on exactly when monitoring is. The Kibana credential questions are skipped when monitoring is disabled. Re-run `environment:init` for existing environments to create the variable; it defaults to enabled, which matches the previous behaviour. [#13377](https://github.com/opencrvs/opencrvs-core/issues/13377)
 - `environment:init` now asks about workflow approvals for every environment, not only production, and always stores the GitHub environment variable `APPROVAL_REQUIRED` (default `true` for production, `false` for other environments). `GH_APPROVERS` is asked whenever approvals are enabled. The infrastructure workflows require manual approval unless `APPROVAL_REQUIRED` is `false`, so re-run `environment:init` for existing non-production environments (or set the variable by hand) before updating the infrastructure repository.
+- Upgrade Node.js to 22.23.4, a Node.js security release. This applies to every core image and to CI.
 
 ### Bug fixes
 
@@ -366,12 +370,29 @@ The toolkit and the country configuration template work with any container regis
 - The utilities image now includes `minio-client` and GNU `coreutils`. The S3 backup and restore jobs of the dependencies chart installed them with `apk` on every run, which fails without access to a package repository. [#14293](https://github.com/opencrvs/opencrvs-core/pull/14293)
 - Fix monitoring alerts that never fired or were never delivered: "Successful SSH login", backup and restore errors, and service errors. After upgrading, restart the `filebeat` DaemonSet and the `elastalert` Deployment. [#14343](https://github.com/opencrvs/opencrvs-core/pull/14343)
 - Fix ElastAlert notifications being blocked by the default-deny egress network policy. [#14343](https://github.com/opencrvs/opencrvs-core/pull/14343)
+- `npx @opencrvs/toolkit upgrade` removes `COPY typings ./typings` from a v2.0 country config's `Dockerfile`. The Tiltfile it installs no longer sends `typings/` to the image build, so `tilt up` stopped at `[runner 6/6] COPY typings ./typings`. If you already upgraded with 2.1.0, delete that line from your `Dockerfile` [#14050](https://github.com/opencrvs/opencrvs-core/issues/14050)
 
-## 2.1.1
+## 2.1.2
 
 ### Improvements
 
-- Apply fix for pgbackrest maintainance process [#14035](https://github.com/opencrvs/opencrvs-core/pull/14035)
+- Upgrade Node.js to 22.23.4, a Node.js security release. This applies to every core image and to CI.
+
+## 2.1.1
+
+### Security
+
+- Fixes a critical security vulnerability. Details will be published in a security advisory.
+
+### Bug fixes
+
+- Postgres with differential backup or restore enabled no longer fails to start once its pinned pgBackRest version is superseded. The container installs pgBackRest on every start, and the PostgreSQL apt repository keeps only the latest releases, so after 2.59.0 was dropped from it the `postgres-0` pod and the restore runner could not start. They now also install from the PostgreSQL archive repository, which keeps every release, so the version in `postgres.pgbackrest_version` stays installable and keeps matching the backup server. [#14038](https://github.com/opencrvs/opencrvs-core/issues/14038)
+
+  **Deployment notes:**
+
+  - If outbound traffic from the cluster is limited to an allowlist, add `apt-archive.postgresql.org` (HTTPS).
+
+- A differential Postgres restore can now reach the backup server: the restore runner pod has the SSH key with the permissions pgBackRest needs, and is allowed through the network policies. `environment:init` now also sets the variables a differential restore needs. [#13992](https://github.com/opencrvs/opencrvs-core/pull/13992)
 
 ## 2.1.0
 

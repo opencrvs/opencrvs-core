@@ -84,7 +84,8 @@ spec:
           image: {{ include "opencrvs.image" (dict "root" . "service" .Values.countryconfig) | quote }}
           imagePullPolicy: {{ .Values.countryconfig.image.pullPolicy | default .Values.platform.imagePullPolicy }}
           env:
-          {{- include "render-otel-env-vars" (dict "Values" .Values "Release" .Release) }}
+          {{- /* Traces must use the same service.name as the pod's service_name label, which Filebeat stamps on the logs. Otherwise the APM Logs tab stays empty (testland and countryconfig-template derive other names from package.json) */}}
+          {{- include "render-otel-env-vars" (dict "Values" .Values "Release" .Release "service_name" "opencrvs_countryconfig") }}
             - name: CERT_PUBLIC_KEY_PATH
               value: /secrets/public-key.pem
             - name: COUNTRY_CONFIG_HOST
