@@ -79,7 +79,7 @@ export async function getLocations(params?: {
  * takes much less than one minute, and the next sync looks back one minute,
  * so the next sync returns that location. See more: {@link INCREMENTAL_SYNC_WINDOW}.
  */
-export async function syncLocations(since: string) {
+export async function syncLocations(since?: string) {
   const syncedAt = await locationsRepo.getDatabaseTime()
   const locations = await locationsRepo.getLocations({ writtenSince: since })
 

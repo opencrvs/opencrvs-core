@@ -51,7 +51,7 @@ export async function getAdministrativeAreas(params?: {
  * progress is not in this read, and its timestamp is earlier than `syncedAt`.
  * The next sync looks back one minute, so it returns that edit.
  */
-export async function syncAdministrativeAreas(since: string) {
+export async function syncAdministrativeAreas(since?: string) {
   const syncedAt = await getDatabaseTime()
   const administrativeAreas =
     await administrativeAreaRepo.getAdministrativeAreas({ writtenSince: since })

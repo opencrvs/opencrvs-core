@@ -98,15 +98,18 @@ export const locationRouter = router({
   ),
   /**
    * Incremental sync of the client cache. Returns the locations written since
-   * the previous sync, and `syncedAt` for the next one.
+   * the previous sync, and `syncedAt` for the next one. When `since` is not
+   * given, it returns all locations, so that the first fetch also gets
+   * `syncedAt` from the server.
    */
   sync: userAndSystemProcedure
     .input(
       z.object({
         since: z.iso
           .datetime()
+          .optional()
           .describe(
-            'Return the rows written after this time. Rows written up to one minute before it are also returned, to include writes that committed late. Pass the `syncedAt` of the previous response to receive only the new changes.'
+            'Return the rows written after this time. Rows written up to one minute before it are also returned, to include writes that committed late. Pass the `syncedAt` of the previous response to receive only the new changes. Omit it to receive all rows, for example on the first fetch.'
           )
       })
     )

@@ -230,15 +230,18 @@ describe('sync', () => {
     expect(administrativeAreas.map((a) => a.id)).toEqual([insideWindow])
   })
 
-  test('Returns seeded rows once, and not again when `since` is the previous `syncedAt`', async () => {
+  test('Returns all administrative areas when `since` is not given, and none again on the next sync', async () => {
     const { user } = await setupTestCase()
     const client = createTestClient(user, [])
+    // Age the seeded rows, so that they are outside the window of the next sync.
     await ageAllAdministrativeAreas()
+    const all = await client.administrativeAreas.list()
 
-    const first = await client.administrativeAreas.sync({
-      since: '2020-01-01T00:00:00.000Z'
-    })
-    expect(first.administrativeAreas.length).toBeGreaterThan(0)
+    // The first fetch of a client has no cache, so it sends no `since`.
+    const first = await client.administrativeAreas.sync({})
+    expect(first.administrativeAreas.map((a) => a.id).sort()).toEqual(
+      all.map((a) => a.id).sort()
+    )
 
     const second = await client.administrativeAreas.sync({
       since: first.syncedAt

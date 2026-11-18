@@ -322,26 +322,25 @@ describe('sync', () => {
     expect(locations.map((l) => l.id)).toEqual([insideWindow])
   })
 
-  test('Returns seeded rows once, and not again when `since` is the previous `syncedAt`', async () => {
+  test('Returns all locations when `since` is not given, and none again on the next sync', async () => {
     const { user } = await setupTestCase()
     const client = createTestClient(user, [])
     // A seed writes every row in one transaction, so all rows get the same
-    // `updatedAt`.
+    // `updatedAt`. Age them, so that they are outside the window of the next sync.
     await ageAllLocations()
+    const all = await client.locations.list()
 
-    // After a full fetch, the client sends the latest `updatedAt` in its cache
-    // as the first `since`.
-    const first = await client.locations.sync({
-      since: '2020-01-01T00:00:00.000Z'
-    })
-    expect(first.locations.length).toBeGreaterThan(0)
-    expect(first.syncedAt > '2020-01-01T00:01:00.000Z').toBe(true)
+    // The first fetch of a client has no cache, so it sends no `since`.
+    const first = await client.locations.sync({})
+    expect(first.locations.map((l) => l.id).sort()).toEqual(
+      all.map((l) => l.id).sort()
+    )
 
     const second = await client.locations.sync({ since: first.syncedAt })
     expect(second.locations).toEqual([])
   })
 
-  test('Returns syncedAt from the database clock, read before the rows', async () => {
+  test('Returns syncedAt from the database clock', async () => {
     const { user } = await setupTestCase()
     const client = createTestClient(user, [locationEditScope])
     const created = await client.locations.create({
