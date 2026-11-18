@@ -103,7 +103,7 @@ function renderTiltfile(template: string, existing?: string) {
 }
 
 /** `contents` with `line` appended, unless an equivalent entry is there already. */
-function withIgnoreEntry(contents: string, line: string) {
+export function withIgnoreEntry(contents: string, line: string) {
   const normalise = (entry: string) =>
     entry.trim().replace(/^\//, '').replace(/\/$/, '')
 
