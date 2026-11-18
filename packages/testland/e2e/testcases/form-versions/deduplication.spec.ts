@@ -86,8 +86,16 @@ async function createMixedPair(
 
   return {
     name: formatV2ChildName(identity),
-    existing: { eventId: existing.eventId, trackingId: existing.trackingId! },
-    flagged: { eventId: flagged.eventId, trackingId: flagged.trackingId! }
+    existing: {
+      eventId: existing.eventId,
+      trackingId: existing.trackingId!,
+      version: existingVersion
+    },
+    flagged: {
+      eventId: flagged.eventId,
+      trackingId: flagged.trackingId!,
+      version: newVersion
+    }
   }
 }
 
@@ -128,148 +136,190 @@ async function expectFlagged(pair: MixedPair) {
   )
 }
 
+/** The flagged record is version v2, so its page titles and labels win. */
+async function expectV2ComparedWithInitial(page: Page) {
+  const placeOfBirth = comparisonRow(page, 'Place of delivery')
+  await expect(placeOfBirth.flagged).toContainText('Residential address')
+  await expect(placeOfBirth.existing).toContainText('Residential address')
+  await expect(
+    page.getByRole('rowheader', { name: 'Facility of occurrence' })
+  ).toHaveCount(0)
+
+  const birthType = comparisonRow(page, 'Type of birth')
+  await expect(birthType.flagged).toContainText('Twin')
+  await expect(birthType.existing).not.toContainText('Twin')
+
+  const weight = comparisonRow(page, 'Weight at birth')
+  await expect(weight.flagged).toContainText('3.2')
+  await expect(weight.existing).not.toContainText('3.2')
+
+  const maritalStatus = comparisonRow(page, 'Marital Status')
+  await expect(maritalStatus.existing).toContainText('Married')
+  await expect(maritalStatus.flagged).not.toContainText('Married')
+
+  const informant = comparisonRow(page, 'Relationship to child')
+  await expect(informant.flagged).toContainText('Legal guardian')
+  await expect(informant.existing).toContainText('Brother')
+}
+
+/** The flagged record is version initial, so its page titles and labels win. */
+async function expectInitialComparedWithV2(page: Page) {
+  const placeOfBirth = comparisonRow(page, 'Facility of occurrence')
+  await expect(placeOfBirth.flagged).toContainText('Residential address')
+  await expect(placeOfBirth.existing).toContainText('Residential address')
+  await expect(
+    page.getByRole('rowheader', { name: 'Place of delivery' })
+  ).toHaveCount(0)
+
+  const birthType = comparisonRow(page, 'Type of birth')
+  await expect(birthType.existing).toContainText('Twin')
+  await expect(birthType.flagged).not.toContainText('Twin')
+
+  const weight = comparisonRow(page, 'Weight at birth')
+  await expect(weight.existing).toContainText('3.2')
+  await expect(weight.flagged).not.toContainText('3.2')
+
+  const maritalStatus = comparisonRow(page, 'Marital Status')
+  await expect(maritalStatus.flagged).toContainText('Married')
+  await expect(maritalStatus.existing).not.toContainText('Married')
+
+  const informant = comparisonRow(page, 'Relationship to child')
+  await expect(informant.flagged).toContainText('Brother')
+  await expect(informant.existing).toContainText('Legal guardian')
+}
+
+/** Marks the flagged record as not a duplicate, then registers it over the API. */
+async function markNotDuplicateAndRegister(page: Page, pair: MixedPair) {
+  await page
+    .getByRole('button', { name: pair.flagged.trackingId, exact: true })
+    .click()
+  await page.locator('#not-a-duplicate').click()
+  await page.locator('#not-duplicate-confirm').click()
+  await expect(page.getByTestId('status-value')).toBeVisible()
+
+  // The client sends the action through its outbox, so wait for the server to have it.
+  await expect(async () => {
+    const event = await getEvent(pair.flagged.eventId)
+    expect(event.actions.map(({ type }) => type)).toContain(
+      ActionType.MARK_AS_NOT_DUPLICATE
+    )
+  }).toPass({ timeout: 15_000 })
+
+  const token = await getToken(CREDENTIALS.REGISTRAR)
+  const client = createClient(GATEWAY_HOST + '/events', `Bearer ${token}`)
+  await client.event.actions.register.request.mutate({
+    eventId: pair.flagged.eventId,
+    transactionId: uuidv4(),
+    declaration: {},
+    annotation: {
+      'review.comment': 'Not a duplicate',
+      // Version 'initial' of the birth form does not ask for the signature of the informant.
+      ...(pair.flagged.version === BirthVersion.V2
+        ? { 'review.signature': await uploadFile(getSignatureFile(), token) }
+        : {})
+    }
+  })
+
+  await expect(async () => {
+    const event = await getEvent(pair.flagged.eventId)
+    expect(event.configVersionId).toBe(pair.flagged.version)
+    expect(
+      event.actions.map(({ type, status }) => `${type}:${status}`)
+    ).toContain(`${ActionType.REGISTER}:${ActionStatus.Accepted}`)
+  }).toPass({ timeout: 15_000 })
+}
+
+/** Marks the flagged record as a duplicate of the existing record. */
+async function markAsDuplicate(page: Page, pair: MixedPair) {
+  await page
+    .getByRole('button', { name: pair.flagged.trackingId, exact: true })
+    .click()
+  await page.getByRole('button', { name: 'Mark as duplicate' }).click()
+  await page.locator('.react-select__control').first().click()
+  await page
+    .locator('.react-select__option')
+    .getByText(pair.existing.trackingId)
+    .click()
+  await page.locator('#describe-reason').fill('Same child')
+  await page.getByTestId('mark-as-duplicate-button').click()
+
+  await expect(async () => {
+    const flagged = await getEvent(pair.flagged.eventId)
+    expect(flagged.actions.map(({ type }) => type)).toContain(
+      ActionType.MARK_AS_DUPLICATE
+    )
+    expect(flagged.configVersionId).toBe(pair.flagged.version)
+  }).toPass({ timeout: 15_000 })
+
+  const existing = await getEvent(pair.existing.eventId)
+  expect(existing.configVersionId).toBe(pair.existing.version)
+  expect(existing.actions.map(({ type }) => type)).not.toContain(
+    ActionType.MARK_AS_DUPLICATE
+  )
+}
+
+const TEST_CASES = [
+  {
+    title: "A 'v2' record that matches an 'initial' record",
+    existingVersion: BirthVersion.INITIAL,
+    newVersion: BirthVersion.V2,
+    expectComparison: expectV2ComparedWithInitial
+  },
+  {
+    title: "An 'initial' record that matches a 'v2' record",
+    existingVersion: BirthVersion.V2,
+    newVersion: BirthVersion.INITIAL,
+    expectComparison: expectInitialComparedWithV2
+  }
+]
+
 test.describe('Deduplication across birth versions', () => {
-  test("A 'v2' record that matches an 'initial' record", async ({ page }) => {
-    const pair = await createMixedPair(BirthVersion.INITIAL, BirthVersion.V2)
-
-    await test.step('The record is flagged as a potential duplicate', async () => {
-      await expectFlagged(pair)
-    })
-
-    await test.step('The comparison shows the fields of each version', async () => {
-      await openDuplicateReview(page, pair)
-      await page
-        .getByRole('button', { name: pair.existing.trackingId, exact: true })
-        .click()
-
-      // The flagged record is version v2, so its label wins.
-      const placeOfBirth = comparisonRow(page, 'Place of delivery')
-      await expect(placeOfBirth.flagged).toContainText('Residential address')
-      await expect(placeOfBirth.existing).toContainText('Residential address')
-      await expect(
-        page.getByRole('rowheader', { name: 'Facility of occurrence' })
-      ).toHaveCount(0)
-
-      const birthType = comparisonRow(page, 'Type of birth')
-      await expect(birthType.flagged).toContainText('Twin')
-      await expect(birthType.existing).not.toContainText('Twin')
-
-      const weight = comparisonRow(page, 'Weight at birth')
-      await expect(weight.flagged).toContainText('3.2')
-      await expect(weight.existing).not.toContainText('3.2')
-
-      const maritalStatus = comparisonRow(page, 'Marital Status')
-      await expect(maritalStatus.existing).toContainText('Married')
-      await expect(maritalStatus.flagged).not.toContainText('Married')
-
-      const informant = comparisonRow(page, 'Relationship to child')
-      await expect(informant.flagged).toContainText('Legal guardian')
-      await expect(informant.existing).toContainText('Brother')
-    })
-
-    await test.step("'Not a duplicate' lets the record be registered under its own version", async () => {
-      await page
-        .getByRole('button', { name: pair.flagged.trackingId, exact: true })
-        .click()
-      await page.locator('#not-a-duplicate').click()
-      await page.locator('#not-duplicate-confirm').click()
-      await expect(page.getByTestId('status-value')).toBeVisible()
-
-      // The client sends the action through its outbox, so wait for the server to have it.
-      await expect(async () => {
-        const event = await getEvent(pair.flagged.eventId)
-        expect(event.actions.map(({ type }) => type)).toContain(
-          ActionType.MARK_AS_NOT_DUPLICATE
+  for (const testCase of TEST_CASES) {
+    test.describe(testCase.title, () => {
+      /** Creates the pair, checks that it is flagged, and opens the comparison. */
+      async function reviewNewPair(page: Page) {
+        const pair = await createMixedPair(
+          testCase.existingVersion,
+          testCase.newVersion
         )
-      }).toPass({ timeout: 15_000 })
 
-      const token = await getToken(CREDENTIALS.REGISTRAR)
-      const client = createClient(GATEWAY_HOST + '/events', `Bearer ${token}`)
-      const signature = await uploadFile(getSignatureFile(), token)
-      await client.event.actions.register.request.mutate({
-        eventId: pair.flagged.eventId,
-        transactionId: uuidv4(),
-        declaration: {},
-        annotation: {
-          'review.comment': 'Not a duplicate',
-          'review.signature': signature
-        }
+        await test.step('The record is flagged as a potential duplicate', async () => {
+          await expectFlagged(pair)
+        })
+
+        await test.step('The comparison shows the fields of each version', async () => {
+          await openDuplicateReview(page, pair)
+          await page
+            .getByRole('button', {
+              name: pair.existing.trackingId,
+              exact: true
+            })
+            .click()
+          await testCase.expectComparison(page)
+        })
+
+        return pair
+      }
+
+      test("'Not a duplicate' lets the record be registered under its own version", async ({
+        page
+      }) => {
+        const pair = await reviewNewPair(page)
+
+        await test.step("Mark as 'Not a duplicate' and register", async () => {
+          await markNotDuplicateAndRegister(page, pair)
+        })
       })
 
-      await expect(async () => {
-        const event = await getEvent(pair.flagged.eventId)
-        expect(event.configVersionId).toBe(BirthVersion.V2)
-        expect(
-          event.actions.map(({ type, status }) => `${type}:${status}`)
-        ).toContain(`${ActionType.REGISTER}:${ActionStatus.Accepted}`)
-      }).toPass({ timeout: 15_000 })
+      test("'Mark as duplicate' marks the record and leaves the other one as it is", async ({
+        page
+      }) => {
+        const pair = await reviewNewPair(page)
+
+        await test.step('Mark as duplicate of the existing record', async () => {
+          await markAsDuplicate(page, pair)
+        })
+      })
     })
-  })
-
-  test("An 'initial' record that matches a 'v2' record", async ({ page }) => {
-    const pair = await createMixedPair(BirthVersion.V2, BirthVersion.INITIAL)
-
-    await test.step('The record is flagged as a potential duplicate', async () => {
-      await expectFlagged(pair)
-    })
-
-    await test.step('The comparison shows the fields of each version', async () => {
-      await openDuplicateReview(page, pair)
-      await page
-        .getByRole('button', { name: pair.existing.trackingId, exact: true })
-        .click()
-
-      // The flagged record is version initial, so its label wins.
-      const placeOfBirth = comparisonRow(page, 'Facility of occurrence')
-      await expect(placeOfBirth.flagged).toContainText('Residential address')
-      await expect(placeOfBirth.existing).toContainText('Residential address')
-      await expect(
-        page.getByRole('rowheader', { name: 'Place of delivery' })
-      ).toHaveCount(0)
-
-      const birthType = comparisonRow(page, 'Type of birth')
-      await expect(birthType.existing).toContainText('Twin')
-      await expect(birthType.flagged).not.toContainText('Twin')
-
-      const weight = comparisonRow(page, 'Weight at birth')
-      await expect(weight.existing).toContainText('3.2')
-      await expect(weight.flagged).not.toContainText('3.2')
-
-      const maritalStatus = comparisonRow(page, 'Marital Status')
-      await expect(maritalStatus.flagged).toContainText('Married')
-      await expect(maritalStatus.existing).not.toContainText('Married')
-
-      const informant = comparisonRow(page, 'Relationship to child')
-      await expect(informant.flagged).toContainText('Brother')
-      await expect(informant.existing).toContainText('Legal guardian')
-    })
-
-    await test.step("'Mark as duplicate' archives the record and leaves the other one as it is", async () => {
-      await page
-        .getByRole('button', { name: pair.flagged.trackingId, exact: true })
-        .click()
-      await page.getByRole('button', { name: 'Mark as duplicate' }).click()
-      await page.locator('.react-select__control').first().click()
-      await page
-        .locator('.react-select__option')
-        .getByText(pair.existing.trackingId)
-        .click()
-      await page.locator('#describe-reason').fill('Same child')
-      await page.getByTestId('mark-as-duplicate-button').click()
-
-      await expect(async () => {
-        const flagged = await getEvent(pair.flagged.eventId)
-        expect(flagged.actions.map(({ type }) => type)).toContain(
-          ActionType.MARK_AS_DUPLICATE
-        )
-        expect(flagged.configVersionId).toBe(BirthVersion.INITIAL)
-      }).toPass({ timeout: 15_000 })
-
-      const existing = await getEvent(pair.existing.eventId)
-      expect(existing.configVersionId).toBe(BirthVersion.V2)
-      expect(existing.actions.map(({ type }) => type)).not.toContain(
-        ActionType.MARK_AS_DUPLICATE
-      )
-    })
-  })
+  }
 })
