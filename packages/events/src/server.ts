@@ -11,6 +11,7 @@
 
 import { randomUUID } from 'crypto'
 import { createServer, IncomingMessage } from 'http'
+import { trace } from '@opentelemetry/api'
 import { pinoHttp } from 'pino-http'
 import { createOpenApiHttpHandler } from 'trpc-to-openapi'
 import { createHTTPHandler } from '@trpc/server/adapters/standalone'
@@ -42,8 +43,9 @@ const httpLogger =
   process.env.NODE_ENV === 'production'
     ? pinoHttp({
         logger,
-        genReqId: (req) =>
-          req.headers['x-correlation-id']?.toString() ?? randomUUID(),
+        // The trace ID ties the request log line to the trace in APM.
+        genReqId: () =>
+          trace.getActiveSpan()?.spanContext().traceId ?? randomUUID(),
         // NOTE: pino-http@7 types customLogLevel as taking the request, but
         // never passes it. Read it off the response instead.
         customLogLevel: (_, res) => {
