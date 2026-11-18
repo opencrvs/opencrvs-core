@@ -51,5 +51,5 @@ export default defineClientConfig({
       url: `https://metabase.${env.DOMAIN}/public/dashboard/dc66b77a-79df-4f68-8fc8-5e5d5a2d7a35#bordered=false&titled=false&refresh=300`
     }
   ],
-  FEATURES: {}
+  FEATURES: { _EXPERIMENTAL_LEGACY_RECORDS: true }
 })

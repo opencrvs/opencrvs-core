@@ -158,18 +158,12 @@ function isIndexedAgeFieldValue(
   )
 }
 
-function stripIndexFieldsFromValue(
-  eventConfig: EventConfig,
-  fieldId: string,
-  value: FieldValue
-) {
-  const field = { config: getDeclarationFieldById(eventConfig, fieldId), value }
-
-  if (isIndexedNameFieldValue(field.value)) {
-    return _.omit(field.value, [NAME_QUERY_KEY])
+function stripIndexFieldsFromValue(value: FieldValue) {
+  if (isIndexedNameFieldValue(value)) {
+    return _.omit(value, [NAME_QUERY_KEY])
   }
-  if (isIndexedAgeFieldValue(field.value)) {
-    return _.omit(field.value, [AGE_DOB_QUERY_KEY])
+  if (isIndexedAgeFieldValue(value)) {
+    return _.omit(value, [AGE_DOB_QUERY_KEY])
   }
 
   return value
@@ -417,20 +411,13 @@ export function collectLocationIds(
   return _.compact(ids)
 }
 
-export function decodeEventIndex(
-  eventConfig: EventConfig,
-  event: EncodedEventIndex
-): EventIndex {
+export function decodeEventIndex(event: EncodedEventIndex): EventIndex {
   return {
     ...event,
     declaration: Object.entries(event.declaration).reduce(
       (acc, [key, value]) => ({
         ...acc,
-        [decodeFieldId(key)]: stripIndexFieldsFromValue(
-          eventConfig,
-          decodeFieldId(key),
-          value
-        )
+        [decodeFieldId(key)]: stripIndexFieldsFromValue(value)
       }),
       {}
     )

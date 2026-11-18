@@ -257,7 +257,7 @@ export async function searchForDuplicates(
     }
     return {
       score: hit._score || 0,
-      event: decodeEventIndex(eventConfig, hit._source)
+      event: decodeEventIndex(hit._source)
     }
   })
 }

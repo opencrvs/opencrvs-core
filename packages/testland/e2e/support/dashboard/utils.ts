@@ -123,7 +123,6 @@ function fullParentDetails(
     [`${parent}.idType`]: 'NATIONAL_ID',
     [`${parent}.nid`]: faker.string.numeric(10),
     [`${parent}.address`]: fullAddress(administrativeArea),
-    [`${parent}.maritalStatus`]: 'MARRIED',
     [`${parent}.educationalAttainment`]: 'FIRST_STAGE_TERTIARY_ISCED_5',
     [`${parent}.occupation`]: faker.person.jobTitle()
   }
