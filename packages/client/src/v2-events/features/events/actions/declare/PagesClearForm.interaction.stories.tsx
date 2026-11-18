@@ -14,9 +14,9 @@ import { createTRPCMsw, httpLink } from '@vafanassieff/msw-trpc'
 import superjson from 'superjson'
 import {
   ActionType,
+  EventConfig,
   FieldConfig,
-  tennisClubMembershipEvent,
-  toVersionedEventConfig
+  tennisClubMembershipEvent
 } from '@opencrvs/commons/client'
 import { AppRouter } from '@client/v2-events/trpc'
 import { ROUTES, routesConfig } from '@client/v2-events/routes'
@@ -158,7 +158,7 @@ export const ClearFormPage: Story = {
 
 const EMAIL_DEFAULT = 'a@b.co'
 
-const eventWithEmailDefault = toVersionedEventConfig({
+const eventWithEmailDefault: EventConfig = {
   ...tennisClubMembershipEvent,
   actions: tennisClubMembershipEvent.actions.map((action) =>
     action.type === ActionType.DECLARE
@@ -178,7 +178,7 @@ const eventWithEmailDefault = toVersionedEventConfig({
         }
       : action
   )
-})
+}
 
 export const ClearRestoresDefaults: Story = {
   name: 'Clear button restores configured default values',
@@ -223,9 +223,6 @@ export const ClearRestoresDefaults: Story = {
         event: [
           tRPCMsw.event.get.query(() => {
             return undeclaredDraftEvent
-          }),
-          tRPCMsw.event.config.get.query(() => {
-            return [eventWithEmailDefault]
           }),
           tRPCMsw.event.search.query(() => {
             return { results: [], total: 0 }
