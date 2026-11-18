@@ -325,10 +325,12 @@ describe('sync', () => {
   test('Returns seeded rows once, and not again when `since` is the previous `syncedAt`', async () => {
     const { user } = await setupTestCase()
     const client = createTestClient(user, [])
-    // A seed writes every row in one transaction, with one timestamp.
+    // A seed writes every row in one transaction, so all rows get the same
+    // `updatedAt`.
     await ageAllLocations()
 
-    // The first since is the latest updatedAt in the client cache.
+    // After a full fetch, the client sends the latest `updatedAt` in its cache
+    // as the first `since`.
     const first = await client.locations.sync({
       since: '2020-01-01T00:00:00.000Z'
     })

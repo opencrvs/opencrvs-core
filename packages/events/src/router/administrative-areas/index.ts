@@ -72,7 +72,11 @@ export const administrativeAreaRouter = router({
         ids: input?.ids
       })
     ),
-  /** See `locations.sync`. */
+  /**
+   * Incremental sync of the client cache, the same as `locations.sync`.
+   * Returns the administrative areas written since the previous sync, and
+   * `syncedAt` for the next one.
+   */
   sync: userAndSystemProcedure
     .input(
       z.object({

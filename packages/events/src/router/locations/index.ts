@@ -110,7 +110,8 @@ export const locationRouter = router({
           )
       })
     )
-    // Not validated at runtime, the same as `list`.
+    // `z.custom` does not validate the output at runtime, the same as `list`,
+    // because validation of all locations is slow.
     .output(z.custom<{ syncedAt: string; locations: Location[] }>())
     .query(async ({ input }) => syncLocations(input.since)),
   create: userAndSystemProcedure

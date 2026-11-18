@@ -25,10 +25,11 @@ interface SyncedRow {
 /**
  * The cached value of a list that syncs incrementally.
  *
- * The cache holds every row that was written before `syncedAt` minus the sync
- * window of the server. The next sync passes `syncedAt` as `since`. A value
- * earlier than the real time of the fetch is also correct: the next sync then
- * returns more rows again, and no rows are lost.
+ * The next sync sends `syncedAt` as `since`, and the server returns the rows
+ * written after it, plus the rows of its sync window before it. When
+ * `syncedAt` is earlier than the real time of the fetch, the next sync returns
+ * some rows that the cache already has. This is correct, because no rows are
+ * lost.
  */
 export interface SyncedCache<T extends SyncedRow> {
   /** `undefined` when the list was empty. The next fetch is then a full fetch. */
@@ -38,8 +39,8 @@ export interface SyncedCache<T extends SyncedRow> {
 
 /**
  * Returns `true` when the cached value has the shape of {@link SyncedCache}.
- * A cache from an earlier client version has another shape, and the caller
- * then does a full fetch.
+ * When the cache has another shape, for example a `Map` from an earlier client
+ * version, the caller does a full fetch.
  */
 export function isSyncedCache<T extends SyncedRow>(
   value: unknown

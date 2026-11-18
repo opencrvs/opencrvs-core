@@ -44,7 +44,13 @@ export async function getAdministrativeAreas(params?: {
   return administrativeAreas
 }
 
-/** See `syncLocations` in the locations service. */
+/**
+ * Returns the administrative areas that changed since the client last synced,
+ * and `syncedAt` for the next sync. It reads `syncedAt` before the rows, the
+ * same as `syncLocations` in the locations service. An edit that is still in
+ * progress is not in this read, and its timestamp is earlier than `syncedAt`.
+ * The next sync looks back one minute, so it returns that edit.
+ */
 export async function syncAdministrativeAreas(since: string) {
   const syncedAt = await getDatabaseTime()
   const administrativeAreas =

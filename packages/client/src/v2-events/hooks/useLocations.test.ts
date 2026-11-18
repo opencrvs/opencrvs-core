@@ -22,7 +22,8 @@ import {
   queryClient,
   trpcOptionsProxy
 } from '@client/v2-events/trpc'
-// setupTests mocks this module for all tests. Use the real one.
+// `setupTests` mocks this module for all tests. These tests need the real
+// query defaults, so they unmock it.
 vi.unmock('@client/v2-events/hooks/useLocations')
 
 const tRPCMsw = createTRPCMsw<AppRouter>({
@@ -53,7 +54,7 @@ const server = setupServer(
 )
 
 beforeAll(async () => {
-  // Loading the module registers the query defaults of `locations.list`.
+  // When the module loads, it registers the query defaults of `locations.list`.
   await import('./useLocations')
   server.listen()
 })

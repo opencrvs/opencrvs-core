@@ -33,11 +33,13 @@ setQueryDefaults(trpcOptionsProxy.locations.list, {
   meta: {
     useLargeQueryStorage: true
   },
-  // The cached value is a `SyncedCache`, not the `list` response. The hooks
-  // below read its `rows`. Both fetch paths strip the server-flattened
-  // `name`/`status`/`externalId` as the cache is built, so no client code can
-  // read a location's current name without going through the anchored
-  // resolution utilities.
+  // The cached value is a `SyncedCache`, not the `list` response, and the hooks
+  // below read its `rows`. When the client has no cache, or the cache has
+  // another shape, the query calls `list` for all rows. When the client already
+  // has a cache, it calls `sync` for the changed rows only. Both paths strip the
+  // server-flattened `name`/`status`/`externalId` as the cache is built, so no
+  // client code can read a location's current name without going through the
+  // anchored resolution utilities.
   queryFn: async ({ client, queryKey, signal }) => {
     const cached = client.getQueryData<unknown>(queryKey)
 

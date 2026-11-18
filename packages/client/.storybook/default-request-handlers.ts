@@ -100,7 +100,9 @@ export const handlers = {
     tRPCMsw.administrativeAreas.list.query(() => {
       return V2_DEFAULT_MOCK_ADMINISTRATIVE_AREAS
     }),
-    // A refetch after the first load syncs. The mock data does not change.
+    // When the client already has the lists cached, a refetch calls `sync`
+    // for the changed rows, not `list`. The mock lists above never change,
+    // so the sync returns no rows.
     tRPCMsw.locations.sync.query(() => ({
       syncedAt: new Date().toISOString(),
       locations: []

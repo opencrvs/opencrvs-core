@@ -131,7 +131,8 @@ export function createIDBPersister(storageIdentifier: string) {
       await storage.setItem(fullStorageIdentifier, clientWithoutLargeQueries)
 
       // 3. Persist large queries only if their data has changed since the last persist to avoid unnecessary serialization.
-      // A removed query also counts as a change, so that it leaves storage.
+      // When a large query is removed, the count changes. The persister then
+      // writes again, so that the removed query leaves storage.
       const removed = largeQueries.length !== persistedLargeQueryData.size
       const changed =
         removed ||
@@ -173,7 +174,8 @@ export function createIDBPersister(storageIdentifier: string) {
 
       // 4. Re-attach large queries to the client to provide consistent state.
       if (largeQueries) {
-        // Hydration keeps these references, so restored data is not written back unchanged.
+        // Hydration keeps these references. When the restored data does not
+        // change, the next persist does not write it back.
         for (const query of largeQueries) {
           persistedLargeQueryData.set(query.queryHash, query.state.data)
         }

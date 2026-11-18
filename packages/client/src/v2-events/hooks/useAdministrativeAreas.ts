@@ -29,8 +29,11 @@ setQueryDefaults(trpcOptionsProxy.administrativeAreas.list, {
   meta: {
     useLargeQueryStorage: true
   },
-  // See useLocations.ts: the cached value is a `SyncedCache`, and both fetch
-  // paths strip the server-flattened `name`/`status`/`externalId`.
+  // The cached value is a `SyncedCache`, not the `list` response. When the
+  // client has no cache, the query calls `list` for all rows. When the client
+  // already has a cache, it calls `sync` for the changed rows only. Both paths
+  // strip the server-flattened `name`/`status`/`externalId`, the same as for
+  // locations in useLocations.ts.
   queryFn: async ({ client, queryKey, signal }) => {
     const cached = client.getQueryData<unknown>(queryKey)
 

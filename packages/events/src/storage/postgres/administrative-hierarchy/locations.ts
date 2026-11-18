@@ -399,7 +399,7 @@ export async function getLocations({
   locationIds?: UUID[]
   isActive?: boolean
   externalId?: string
-  /** See {@link writtenSinceCondition}. */
+  /** When set, returns only the rows that {@link writtenSinceCondition} matches. */
   writtenSince?: string
 } = {}) {
   const db = getClient()

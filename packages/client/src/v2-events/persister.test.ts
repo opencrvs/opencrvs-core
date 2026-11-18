@@ -63,7 +63,7 @@ describe('createIDBPersister', () => {
     )
     expect(largeWrites()).toHaveLength(1)
 
-    // A refetch that returned the cached map again.
+    // When a refetch returns the same map, the persister does not write it again.
     await persister.persistClient(
       persistedClient([largeQuery('locations', locations)])
     )

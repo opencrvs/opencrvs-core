@@ -94,7 +94,11 @@ export const Location = z.object({
   locationType: z.string().nullable(),
   status: LocationStatus,
   versions: z.array(LocationVersion),
-  /** See {@link AdministrativeArea}. */
+  /**
+   * Server time of the last write to the row, the same as `updatedAt` of
+   * {@link AdministrativeArea}. A client that syncs its cache incrementally
+   * compares it to see if a returned row changed.
+   */
   updatedAt: z.iso.datetime()
 })
 
