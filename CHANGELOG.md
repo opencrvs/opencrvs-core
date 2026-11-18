@@ -18,6 +18,7 @@
 ###### Infrastructure
 
 **Back up the data.** After RustFS writes to the volume, going back to MinIO loses the user metadata of the objects that RustFS wrote. Use `minio-backup` kubernetes cronjob:
+
 ```
 kubectl create job --from cronjob/minio-backup minio-backup-manual
 ```
@@ -216,7 +217,11 @@ The record overview does not show the version. To show it, add a custom field to
 
 **The client shows each record with its own version.** Record pages, actions, validation, workqueue rows and the duplicate comparison use the version that the record was created under. When a new version takes effect at midnight, the client uses it for new records. A form that is already open does not change.
 
-[#13601](https://github.com/opencrvs/opencrvs-core/issues/13601) [#13602](https://github.com/opencrvs/opencrvs-core/issues/13602) [#13603](https://github.com/opencrvs/opencrvs-core/issues/13603)
+**Search covers every version.** Each version has its own search index, and a record is indexed under its own version. An `advancedSearch` field may exist in only some versions. Advanced search, quick search, workqueue counts and deduplication then find the records of every version. A search field's input and label come from the newest version in effect that has the field. A search link whose value no longer fits its field drops that value and shows a notice.
+
+**The upgrade needs a reindex.** The search reindex builds the index of each version. The Helm `elasticsearch-reindex` job runs it after `helm upgrade`. Until it has run, records of every version still go to the old index, so search keeps working. A version's id is part of its index name, so `defineConfig` rejects two versions of an event whose ids give the same name, for example `Birth.V1` and `birth v1`.
+
+[#13601](https://github.com/opencrvs/opencrvs-core/issues/13601) [#13602](https://github.com/opencrvs/opencrvs-core/issues/13602) [#13603](https://github.com/opencrvs/opencrvs-core/issues/13603) [#14335](https://github.com/opencrvs/opencrvs-core/issues/14335)
 
 #### `FEATURES.V2_EVENTS` is removed
 
