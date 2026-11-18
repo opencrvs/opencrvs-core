@@ -32,6 +32,7 @@ import {
 import { testDataGenerator } from '@client/tests/test-data-generators'
 import { ROUTES } from '@client/v2-events/routes'
 import { AppRouter } from '@client/v2-events/trpc'
+import { locationListHandlers } from '../../../../../../../.storybook/default-request-handlers'
 import { router } from './router'
 import * as Request from './index'
 
@@ -183,8 +184,10 @@ const mswConfig = {
     ],
     event: [tRPCMsw.event.get.query(() => birthEventDocument)],
     eventLocations: [
-      tRPCMsw.locations.list.query(() => [RENAMED_FACILITY]),
-      tRPCMsw.administrativeAreas.list.query(() => [])
+      ...locationListHandlers({
+        locations: [RENAMED_FACILITY],
+        administrativeAreas: []
+      })
     ],
     user: [
       tRPCMsw.user.list.query(() => [mockUser]),
@@ -282,8 +285,10 @@ const mswConfigPostRename = {
     ],
     event: [tRPCMsw.event.get.query(() => birthEventDocumentPostRename)],
     eventLocations: [
-      tRPCMsw.locations.list.query(() => [RENAMED_FACILITY]),
-      tRPCMsw.administrativeAreas.list.query(() => [])
+      ...locationListHandlers({
+        locations: [RENAMED_FACILITY],
+        administrativeAreas: []
+      })
     ],
     user: [
       tRPCMsw.user.list.query(() => [mockUser]),

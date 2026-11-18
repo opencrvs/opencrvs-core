@@ -22,11 +22,9 @@ import {
 import { trpcClient, trpcOptionsProxy, useTRPC } from '@client/v2-events/trpc'
 import { setQueryDefaults } from '../features/events/useEvents/procedures/utils'
 import {
-  applySync,
-  fromFullFetch,
-  isSyncedCache,
   LOCATION_LIST_STALE_TIME_MS,
-  SyncedCache
+  rowsOf,
+  syncCache
 } from './incremental-sync'
 
 setQueryDefaults(trpcOptionsProxy.locations.list, {
@@ -34,28 +32,20 @@ setQueryDefaults(trpcOptionsProxy.locations.list, {
     useLargeQueryStorage: true
   },
   // The cached value is a `SyncedCache`, not the `list` response, and the hooks
-  // below read its `rows`. When the client has no cache, or the cache has
-  // another shape, the query calls `list` for all rows. When the client already
-  // has a cache, it calls `sync` for the changed rows only. Both paths strip the
-  // server-flattened `name`/`status`/`externalId` as the cache is built, so no
-  // client code can read a location's current name without going through the
-  // anchored resolution utilities.
-  queryFn: async ({ client, queryKey, signal }) => {
-    const cached = client.getQueryData<unknown>(queryKey)
-
-    if (!isSyncedCache<ClientLocation>(cached) || !cached.syncedAt) {
-      const locations = await trpcClient.locations.list.query(undefined, {
-        signal
-      })
-      return fromFullFetch(locations.map(toClientLocation))
-    }
-
-    const { syncedAt, locations } = await trpcClient.locations.sync.query(
-      { since: cached.syncedAt },
-      { signal }
-    )
-    return applySync(cached, syncedAt, locations.map(toClientLocation))
-  },
+  // below read its `rows`. The query calls `sync`: without `since` for all rows
+  // when the client has no cache, and with `since` for the changed rows when it
+  // has one. The rows are stripped of the server-flattened
+  // `name`/`status`/`externalId` as the cache is built, so no client code can
+  // read a location's current name without going through the anchored
+  // resolution utilities.
+  queryFn: async ({ client, queryKey, signal }) =>
+    syncCache(client.getQueryData<unknown>(queryKey), async (since) => {
+      const { syncedAt, locations } = await trpcClient.locations.sync.query(
+        { since },
+        { signal }
+      )
+      return { syncedAt, rows: locations.map(toClientLocation) }
+    }),
   staleTime: LOCATION_LIST_STALE_TIME_MS
 })
 
@@ -113,8 +103,7 @@ export function useLocations() {
 
         return useSuspenseQuery({
           ...rest,
-          select: (data) =>
-            (data as unknown as SyncedCache<ClientLocation>).rows
+          select: (data) => rowsOf<ClientLocation>(data)
         }).data
       }
     },

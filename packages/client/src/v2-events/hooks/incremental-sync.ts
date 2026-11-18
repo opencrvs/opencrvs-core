@@ -25,22 +25,19 @@ interface SyncedRow {
 /**
  * The cached value of a list that syncs incrementally.
  *
- * The next sync sends `syncedAt` as `since`, and the server returns the rows
- * written after it, plus the rows of its sync window before it. When
- * `syncedAt` is earlier than the real time of the fetch, the next sync returns
- * some rows that the cache already has. This is correct, because no rows are
- * lost.
+ * `syncedAt` is the server time of the last sync. The next sync sends it as
+ * `since`, and the server returns the rows written after it, plus the rows of
+ * its sync window before it.
  */
 export interface SyncedCache<T extends SyncedRow> {
-  /** `undefined` when the list was empty. The next fetch is then a full fetch. */
-  syncedAt: string | undefined
+  syncedAt: string
   rows: Map<UUID, T>
 }
 
 /**
  * Returns `true` when the cached value has the shape of {@link SyncedCache}.
  * When the cache has another shape, for example a `Map` from an earlier client
- * version, the caller does a full fetch.
+ * version, {@link syncCache} fetches all rows.
  */
 export function isSyncedCache<T extends SyncedRow>(
   value: unknown
@@ -49,31 +46,30 @@ export function isSyncedCache<T extends SyncedRow>(
     typeof value === 'object' &&
     value !== null &&
     'syncedAt' in value &&
+    typeof value.syncedAt === 'string' &&
     'rows' in value &&
     value.rows instanceof Map
   )
 }
 
 /**
- * Builds the cache from a full fetch.
+ * Returns the rows that the list hooks read from the cached value.
  *
- * The full list does not carry the server time, so `syncedAt` is the latest
- * `updatedAt` in the list. That time is before the fetch, so it is correct
- * (see {@link SyncedCache}). The first sync returns the rows of the window
- * before it again, and gives the real `syncedAt`.
- *
- * `updatedAt` values are ISO strings in UTC at millisecond precision, so
- * string order is time order.
+ * When the client restores a cache from an earlier client version, the cached
+ * value is a `Map` of the rows, not a {@link SyncedCache}. The hooks render it
+ * until the next fetch replaces it, so that the client also works offline
+ * after an update.
  */
-export function fromFullFetch<T extends SyncedRow>(rows: T[]): SyncedCache<T> {
-  let syncedAt: string | undefined
-  for (const row of rows) {
-    if (syncedAt === undefined || row.updatedAt > syncedAt) {
-      syncedAt = row.updatedAt
-    }
+export function rowsOf<T extends SyncedRow>(data: unknown): Map<UUID, T> {
+  if (isSyncedCache<T>(data)) {
+    return data.rows
   }
 
-  return { syncedAt, rows: new Map(rows.map((row) => [row.id, row])) }
+  if (data instanceof Map) {
+    return data as Map<UUID, T>
+  }
+
+  return new Map()
 }
 
 /**
@@ -109,8 +105,8 @@ function applySyncedRows<T extends SyncedRow>(
  *
  * Returns the same `cached` reference when the sync returned no rows, so that
  * subscribers do not re-render and the persister does not write. This is the
- * normal case. `syncedAt` then stays at the earlier value, which is correct
- * (see {@link SyncedCache}).
+ * normal case. `syncedAt` then stays at the earlier value. This is correct,
+ * because the next sync starts from that value, so no rows are lost.
  *
  * When the sync returned rows, `syncedAt` moves to the new value. The rows
  * can be ones that the cache already has, because the server sends the rows
@@ -127,4 +123,25 @@ export function applySync<T extends SyncedRow>(
   }
 
   return { syncedAt, rows: applySyncedRows(cached.rows, rows) }
+}
+
+/**
+ * Builds the next cached value with one call to the `sync` procedure.
+ *
+ * When the client has no cache, or the cache has another shape, it calls
+ * `sync` without `since`, and the server returns all rows. When the client
+ * already has a cache, it sends `syncedAt` as `since`, and the server returns
+ * only the changed rows. Both paths get `syncedAt` from the server clock.
+ */
+export async function syncCache<T extends SyncedRow>(
+  cached: unknown,
+  sync: (since?: string) => Promise<{ syncedAt: string; rows: T[] }>
+): Promise<SyncedCache<T>> {
+  if (!isSyncedCache<T>(cached)) {
+    const { syncedAt, rows } = await sync()
+    return { syncedAt, rows: new Map(rows.map((row) => [row.id, row])) }
+  }
+
+  const { syncedAt, rows } = await sync(cached.syncedAt)
+  return applySync(cached, syncedAt, rows)
 }

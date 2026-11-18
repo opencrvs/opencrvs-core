@@ -26,6 +26,8 @@ import {
   UUID,
   TestUserRole,
   AuditLogEntry,
+  AdministrativeArea,
+  Location,
   V2_DEFAULT_MOCK_ADMINISTRATIVE_AREAS,
   V2_DEFAULT_MOCK_LOCATIONS,
   versionedTennisClubMembershipEvent,
@@ -56,6 +58,36 @@ export const tRPCMsw = createTRPCMsw<AppRouter>({
   ],
   transformer: { input: superjson, output: superjson }
 })
+
+/**
+ * Mocks of the location and administrative area lists for a story.
+ *
+ * The client fetches the lists with `sync`. When the client has no cache, it
+ * sends no `since`, and the mock returns the whole list. When the client
+ * already has a cache, it sends `since`, and the mock returns no rows, because
+ * the mock lists never change. `list` returns the whole list, for code that
+ * calls it directly.
+ */
+export function locationListHandlers({
+  locations,
+  administrativeAreas
+}: {
+  locations: Location[]
+  administrativeAreas: AdministrativeArea[]
+}) {
+  return [
+    tRPCMsw.locations.list.query(() => locations),
+    tRPCMsw.administrativeAreas.list.query(() => administrativeAreas),
+    tRPCMsw.locations.sync.query(({ since }) => ({
+      syncedAt: new Date().toISOString(),
+      locations: since ? [] : locations
+    })),
+    tRPCMsw.administrativeAreas.sync.query(({ since }) => ({
+      syncedAt: new Date().toISOString(),
+      administrativeAreas: since ? [] : administrativeAreas
+    }))
+  ]
+}
 
 export const handlers = {
   ping: [
@@ -93,25 +125,10 @@ export const handlers = {
       ]
     })
   ],
-  eventLocations: [
-    tRPCMsw.locations.list.query(() => {
-      return V2_DEFAULT_MOCK_LOCATIONS
-    }),
-    tRPCMsw.administrativeAreas.list.query(() => {
-      return V2_DEFAULT_MOCK_ADMINISTRATIVE_AREAS
-    }),
-    // When the client already has the lists cached, a refetch calls `sync`
-    // for the changed rows, not `list`. The mock lists above never change,
-    // so the sync returns no rows.
-    tRPCMsw.locations.sync.query(() => ({
-      syncedAt: new Date().toISOString(),
-      locations: []
-    })),
-    tRPCMsw.administrativeAreas.sync.query(() => ({
-      syncedAt: new Date().toISOString(),
-      administrativeAreas: []
-    }))
-  ],
+  eventLocations: locationListHandlers({
+    locations: V2_DEFAULT_MOCK_LOCATIONS,
+    administrativeAreas: V2_DEFAULT_MOCK_ADMINISTRATIVE_AREAS
+  }),
   getUserRoles: [
     graphql.query('getUserRoles', () => {
       return HttpResponse.json({

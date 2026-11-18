@@ -11,8 +11,9 @@
 import { UUID } from '@opencrvs/commons/client'
 import {
   applySync,
-  fromFullFetch,
   isSyncedCache,
+  rowsOf,
+  syncCache,
   SyncedCache
 } from './incremental-sync'
 
@@ -32,30 +33,82 @@ function toMap(rows: Row[]) {
 
 describe('isSyncedCache', () => {
   it('accepts a synced cache', () => {
-    expect(isSyncedCache({ syncedAt: undefined, rows: new Map() })).toBe(true)
+    expect(
+      isSyncedCache({ syncedAt: '2026-01-01T12:00:00.000Z', rows: new Map() })
+    ).toBe(true)
   })
 
   it('rejects the cache shapes of earlier client versions', () => {
     expect(isSyncedCache(undefined)).toBe(false)
     expect(isSyncedCache(new Map())).toBe(false)
     expect(isSyncedCache([])).toBe(false)
+    expect(isSyncedCache({ syncedAt: undefined, rows: new Map() })).toBe(false)
   })
 })
 
-describe('fromFullFetch', () => {
-  it('uses the latest updatedAt as syncedAt', () => {
-    const cache = fromFullFetch([
-      row('a', '2026-01-01T10:00:00.000Z'),
-      row('b', '2026-03-01T09:00:00.123Z'),
-      row('c', '2026-02-01T23:59:59.999Z')
-    ])
+describe('rowsOf', () => {
+  it('returns the rows of a synced cache', () => {
+    const rows = toMap([row('a', '2026-01-01T10:00:00.000Z')])
 
-    expect(cache.syncedAt).toBe('2026-03-01T09:00:00.123Z')
-    expect([...cache.rows.keys()]).toEqual(['a', 'b', 'c'])
+    expect(rowsOf({ syncedAt: '2026-01-01T12:00:00.000Z', rows })).toBe(rows)
   })
 
-  it('has no syncedAt when the list is empty', () => {
-    expect(fromFullFetch([]).syncedAt).toBeUndefined()
+  it('returns the map of an earlier client version as is', () => {
+    const legacy = toMap([row('a', '2026-01-01T10:00:00.000Z')])
+
+    expect(rowsOf(legacy)).toBe(legacy)
+  })
+
+  it('returns an empty map for any other value', () => {
+    expect(rowsOf(undefined).size).toBe(0)
+    expect(rowsOf([]).size).toBe(0)
+  })
+})
+
+describe('syncCache', () => {
+  const SYNCED_AT = '2026-01-02T12:00:00.000Z'
+
+  it('fetches all rows without `since` when there is no cache', async () => {
+    const sync = vi.fn(async (since?: string) => {
+      await Promise.resolve()
+      return {
+        syncedAt: SYNCED_AT,
+        rows: [row('a', '2026-01-01T10:00:00.000Z')]
+      }
+    })
+
+    const cache = await syncCache(undefined, sync)
+
+    expect(sync).toHaveBeenCalledWith()
+    expect(cache.syncedAt).toBe(SYNCED_AT)
+    expect([...cache.rows.keys()]).toEqual(['a'])
+  })
+
+  it('fetches all rows without `since` when the cache is a map of an earlier client version', async () => {
+    const sync = vi.fn(async (since?: string) => {
+      await Promise.resolve()
+      return { syncedAt: SYNCED_AT, rows: [] }
+    })
+
+    await syncCache(toMap([row('a', '2026-01-01T10:00:00.000Z')]), sync)
+
+    expect(sync).toHaveBeenCalledWith()
+  })
+
+  it('sends `syncedAt` as `since` when there is a cache', async () => {
+    const cached: SyncedCache<Row> = {
+      syncedAt: '2026-01-01T12:00:00.000Z',
+      rows: new Map()
+    }
+    const sync = vi.fn(async (since?: string) => {
+      await Promise.resolve()
+      return { syncedAt: SYNCED_AT, rows: [] }
+    })
+
+    const next = await syncCache(cached, sync)
+
+    expect(sync).toHaveBeenCalledWith('2026-01-01T12:00:00.000Z')
+    expect(next).toBe(cached)
   })
 })
 

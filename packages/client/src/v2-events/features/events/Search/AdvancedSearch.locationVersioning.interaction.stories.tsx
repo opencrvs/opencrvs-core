@@ -40,6 +40,7 @@ import { serializeSearchParams } from '@client/v2-events/features/events/Search/
 import { testDataGenerator } from '@client/tests/test-data-generators'
 import { TRPCProvider, AppRouter } from '@client/v2-events/trpc'
 import { ROUTES, routesConfig } from '@client/v2-events/routes'
+import { locationListHandlers } from '../../../../../.storybook/default-request-handlers'
 import { AdvancedSearch } from './index'
 
 const meta: Meta<typeof AdvancedSearch> = {
@@ -220,8 +221,10 @@ const mswConfig = {
       })
     ],
     eventLocations: [
-      tRPCMsw.locations.list.query(() => mockLocations),
-      tRPCMsw.administrativeAreas.list.query(() => mockAdministrativeAreas)
+      ...locationListHandlers({
+        locations: mockLocations,
+        administrativeAreas: mockAdministrativeAreas
+      })
     ],
     user: [
       tRPCMsw.user.list.query(() => {

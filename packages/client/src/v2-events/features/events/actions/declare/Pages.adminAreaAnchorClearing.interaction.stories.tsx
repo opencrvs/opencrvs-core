@@ -30,6 +30,7 @@ import * as selectEvent from '@client/v2-events/select-event'
 import { localDraftStore } from '@client/v2-events/features/drafts/useDrafts'
 import { ROUTES, routesConfig } from '@client/v2-events/routes'
 import { AppRouter } from '@client/v2-events/trpc'
+import { locationListHandlers } from '../../../../../../.storybook/default-request-handlers'
 import { useActionAnnotation } from '../../useActionAnnotation'
 import { useEventFormData } from '../../useEventFormData'
 import { Pages } from './index'
@@ -167,11 +168,10 @@ const mswConfig = {
       tRPCMsw.event.search.query(() => ({ results: [], total: 0 }))
     ],
     eventLocations: [
-      tRPCMsw.locations.list.query(() => []),
-      tRPCMsw.administrativeAreas.list.query(() => [
-        RENAMED_AREA,
-        RENAMED_BUT_ALWAYS_ACTIVE_AREA
-      ])
+      ...locationListHandlers({
+        locations: [],
+        administrativeAreas: [RENAMED_AREA, RENAMED_BUT_ALWAYS_ACTIVE_AREA]
+      })
     ]
   }
 }

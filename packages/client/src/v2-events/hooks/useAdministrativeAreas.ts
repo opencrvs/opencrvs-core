@@ -18,42 +18,29 @@ import {
 import { trpcClient, trpcOptionsProxy } from '@client/v2-events/trpc'
 import { setQueryDefaults } from '../features/events/useEvents/procedures/utils'
 import {
-  applySync,
-  fromFullFetch,
-  isSyncedCache,
   LOCATION_LIST_STALE_TIME_MS,
-  SyncedCache
+  rowsOf,
+  syncCache
 } from './incremental-sync'
 
 setQueryDefaults(trpcOptionsProxy.administrativeAreas.list, {
   meta: {
     useLargeQueryStorage: true
   },
-  // The cached value is a `SyncedCache`, not the `list` response. When the
-  // client has no cache, the query calls `list` for all rows. When the client
-  // already has a cache, it calls `sync` for the changed rows only. Both paths
-  // strip the server-flattened `name`/`status`/`externalId`, the same as for
-  // locations in useLocations.ts.
-  queryFn: async ({ client, queryKey, signal }) => {
-    const cached = client.getQueryData<unknown>(queryKey)
-
-    if (!isSyncedCache<ClientAdministrativeArea>(cached) || !cached.syncedAt) {
-      const administrativeAreas =
-        await trpcClient.administrativeAreas.list.query(undefined, { signal })
-      return fromFullFetch(administrativeAreas.map(toClientAdministrativeArea))
-    }
-
-    const { syncedAt, administrativeAreas } =
-      await trpcClient.administrativeAreas.sync.query(
-        { since: cached.syncedAt },
-        { signal }
-      )
-    return applySync(
-      cached,
-      syncedAt,
-      administrativeAreas.map(toClientAdministrativeArea)
-    )
-  },
+  // The cached value is a `SyncedCache`, not the `list` response. The query
+  // calls `sync`: without `since` for all rows when the client has no cache,
+  // and with `since` for the changed rows when it has one. The rows are
+  // stripped of the server-flattened `name`/`status`/`externalId`, the same as
+  // for locations in useLocations.ts.
+  queryFn: async ({ client, queryKey, signal }) =>
+    syncCache(client.getQueryData<unknown>(queryKey), async (since) => {
+      const { syncedAt, administrativeAreas } =
+        await trpcClient.administrativeAreas.sync.query({ since }, { signal })
+      return {
+        syncedAt,
+        rows: administrativeAreas.map(toClientAdministrativeArea)
+      }
+    }),
   staleTime: LOCATION_LIST_STALE_TIME_MS
 })
 
@@ -72,8 +59,7 @@ export function useAdministrativeAreas() {
 
         return useSuspenseQuery({
           ...rest,
-          select: (data) =>
-            (data as unknown as SyncedCache<ClientAdministrativeArea>).rows
+          select: (data) => rowsOf<ClientAdministrativeArea>(data)
         }).data
       }
     }
