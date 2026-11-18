@@ -339,6 +339,7 @@ The toolkit and the country configuration template work with any container regis
 
 ### Improvements
 
+- Review auth_mode secret management for OpenCRVS helm chart [#14234](https://github.com/opencrvs/opencrvs-core/issues/14234)
 - Roles no longer need a `label`. Nothing read it: the client names roles with the `event.history.role` message in `client.csv`, keyed by role id. The data seeder no longer rejects a role without a `label`, and ignores one that is still there. Country configurations can delete `label` from each role in `src/api/roles/roles.ts`, and the `userRole.*` rows it pointed to in `countryconfig.csv`. A role id that `event.history.role` does not list is shown as "Unknown". [#13981](https://github.com/opencrvs/opencrvs-core/issues/13981)
 - Refresh workqueues faster after an action on a record: only the searches the action can change are fetched again, instead of every search cached in the session [#14013](https://github.com/opencrvs/opencrvs-core/pull/14013)
 - Open the form page directly when changing a value on the declaration review page, without a confirmation dialog [#13975](https://github.com/opencrvs/opencrvs-core/issues/13975)
@@ -352,6 +353,7 @@ The toolkit and the country configuration template work with any container regis
 - The loading screens of the client now show the country logo from `COUNTRY_LOGO` in the application config. Before, they always showed the OpenCRVS logo. The client gets the logo from the `/content/country-logo` endpoint of the country config. [#14180](https://github.com/opencrvs/opencrvs-core/issues/14180)
 - Keep a 24px gutter beside a `Content` card at every width, so the workqueue and other card pages no longer sit flush against the side navigation and the browser window on screens narrower than the card's maximum [#13391](https://github.com/opencrvs/opencrvs-core/issues/13391)
 - Show images from the declaration and from the print form on the certificate preview. Files from `FILE` and `FILE_WITH_OPTIONS` fields reached the certificate as relative paths, so the browser did not find them in its cache and showed a broken image [#14187](https://github.com/opencrvs/opencrvs-core/issues/14187)
+- Store the signature that an administrator attaches when they create a user. Before, the client did not upload the file, and the user was saved with a path to a file that did not exist. Other sessions showed a broken image on the "Edit details" page of the user and on certificates. Now the user editor chooses the id of the new user, uploads the signature to `users/<id>/`, and sends the id to `user.create`. `user.create` accepts an optional `id`, and rejects the request if the signature file does not exist yet. Users that were created with a signature before this fix have no stored file, so an administrator must add their signature again. To find these users: `SELECT id FROM app.users WHERE signature_path LIKE 'users/tmp-%';` [#14350](https://github.com/opencrvs/opencrvs-core/issues/14350)
 
 ### Security
 

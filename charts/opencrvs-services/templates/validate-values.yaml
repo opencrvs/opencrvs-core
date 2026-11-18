@@ -1,0 +1,20 @@
+{{/*
+auth_mode was removed from postgres, elasticsearch and redis. The datastores always use credentials from secrets.
+The values auto, use_secret and managed are ignored. Only disabled changes the result, so it stops the installation.
+*/}}
+{{- range $name := list "postgres" "elasticsearch" "redis" }}
+{{- $datastore := index $.Values $name }}
+{{- if eq ($datastore.auth_mode | default "") "disabled" }}
+{{- fail (printf "%s.auth_mode: disabled is not supported anymore. Authentication is always enabled. See the Authentication configuration section of README.md" $name) }}
+{{- end }}
+{{- end }}
+{{/*
+use_default_credentials: true makes the password of each user the same as its username. Anyone can guess it.
+The value is for local development only, so the chart accepts it only when env.OPENCRVS_ENVIRONMENT is local.
+*/}}
+{{- $environment := (($.Values.env | default dict).OPENCRVS_ENVIRONMENT | default "production") }}
+{{- range $name := list "postgres" "elasticsearch" }}
+{{- if and (index $.Values $name).use_default_credentials (ne $environment "local") }}
+{{- fail (printf "%s.use_default_credentials: true is UNSAFE. The password of each user is the same as its username. Use it for local development only. Set env.OPENCRVS_ENVIRONMENT to local, or set %s.use_default_credentials to false. See the Authentication configuration section of README.md" $name $name) }}
+{{- end }}
+{{- end }}

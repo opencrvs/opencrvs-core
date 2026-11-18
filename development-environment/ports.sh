@@ -6,12 +6,22 @@
 # & Healthcare Disclaimer located at http://opencrvs.org/license.
 #
 # Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
-set -e
 
-echo -e "\033[32m:::::::::::::::::::::::::::::: PLEASE WAIT ::::::::::::::::::::::::::::::\033[0m"
-echo
-echo "wait-on auth microservice" && wait-on -l tcp:4040
-echo
-echo -e "\033[32m:::::::::::::::::::::::::::::: PLEASE WAIT ::::::::::::::::::::::::::::::\033[0m"
-echo
-echo "wait-on gateway microservice" && wait-on -l tcp:7070
+# Ports that setup.sh and dev.sh check are free before starting OpenCRVS
+openCRVSPorts=(
+  9200  # elasticsearch
+  6379  # redis
+  5432  # postgres
+  3535  # rustfs-api
+  3536  # rustfs-console
+  4040  # auth
+  7070  # gateway
+  5555  # events
+  9050  # documents
+  3040  # testland
+  3000  # client
+  3020  # login
+  2024  # mosip-api
+  20240 # mosip-mock
+  20260 # esignet-mock
+)

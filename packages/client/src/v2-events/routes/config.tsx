@@ -406,6 +406,14 @@ export const routesConfig = {
       element: <CreateNewUser />
     },
     {
+      path: ROUTES.V2.SETTINGS.USER.NEW.EDIT.path,
+      element: <EditUser />
+    },
+    {
+      path: ROUTES.V2.SETTINGS.USER.NEW.REVIEW.path,
+      element: <ReviewUser />
+    },
+    {
       path: ROUTES.V2.SETTINGS.USER.EDIT.path,
       element: <EditUser />
     },

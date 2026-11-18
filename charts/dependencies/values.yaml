@@ -83,11 +83,6 @@ storage_type: pvc
 # Example:
 # timezone: "Etc/UTC"
 
-# FIXME: Tiltfile deploys helm chart as template. There is no way to track existing secrets on the cluster.
-# This flag was introduced to avoid secrets update (mutation) on every file change within chart directory.
-# For OpenCRVS developers there is no need to deploy dependencies helm chart as template.
-chart_dev_mode: true
-
 platform:
   # Secrets used to pull images from private registries, if needed.
   imagePullSecrets: []
@@ -129,12 +124,15 @@ postgres:
               - protocol: TCP
                 port: 443
 
-  # By default postgres is deployed with authentication enabled user/password: postgres/postgres
+  # The chart reads the secret `admin_user_secret_name`. If it does not exist, the chart creates it from admin_username and
+  # admin_password, whatever `use_default_credentials` is. Set both or none. When none is set:
+  # - use_default_credentials: true  the administrator is postgres / postgres.
+  # - use_default_credentials: false the values are random.
+  # An existing secret is never changed: then `use_default_credentials` and admin_* are not read.
   use_default_credentials: true
-  # postgres databases and users to create, if `use_default_credentials` is set to `false`.
   admin_user_secret_name: postgres-admin-user
-  # admin user name is postgres, define password here:
-  # admin_user_password:
+  # admin_username:
+  # admin_password:
   # Fixed NodePort to expose port 5432 on, only used when `service_type` is `NodePort`.
   # node_port: 30432
 
@@ -256,16 +254,23 @@ elasticsearch:
     repository: docker.elastic.co/elasticsearch/elasticsearch
     tag: 8.19.15
   port: 9200
-  # By default Elasticsearch is deployed without authentication enabled.
+  # Security is always enabled. The administrator is the user `elastic`.
+  # The chart reads the secret `admin_user_secret_name`. If it does not exist, the chart creates it from admin_password,
+  # whatever `use_default_credentials` is. When admin_password is not set:
+  # - use_default_credentials: true  the password is `elasticadmin`.
+  # - use_default_credentials: false the password is random.
+  # An existing secret is never changed: then `use_default_credentials` and admin_password are not read.
   use_default_credentials: true
   admin_user_secret_name: elasticsearch-admin-user
-  auth_mode: auto
+  # admin_password:
   auth_users:
     - KIBANA_SYSTEM:kibana_system
     - METRICBEAT:beats_system
     - APM:apm_system
 
   # Secret to store OpenCRVS users credentials:
+  # FIXME: The opencrvs-services chart uses the same secret names for its own users. Rename them if both charts must
+  # share a namespace. They are deployed to separate namespaces.
   users_secret: elasticsearch-opencrvs-users
   urls_secret: elasticsearch-opencrvs-urls
 
@@ -420,9 +425,6 @@ rustfs:
               - protocol: TCP
                 port: 3536
 
-  # Use default credentials (username: rustfsadmin, password: rustfsadmin).
-  # Highly discouraged for production environments.
-  use_default_credentials: true
   # Admin username and password for RustFS. When both are set, they are used even if `use_default_credentials` is `true`.
   # If `use_default_credentials` is `false` and they are not set, random ones are generated. Set both or none.
   # They are written to the secret s3-opencrvs-users when it does not exist yet, and an existing secret is left as it is.
@@ -431,6 +433,19 @@ rustfs:
   # RustFS has a single root identity, built from S3_ADMIN_ACCESS_KEY and
   # S3_ADMIN_SECRET_KEY of the secret, so S3_ACCESS_KEY and S3_SECRET_KEY, which
   # the documents service uses, must hold the same values. The generated secret does.
+
+  # The chart reads the secret `admin_user_secret_name`. If it does not exist, the chart creates it from admin_username and
+  # admin_password, whatever `use_default_credentials` is. Set both or none. When none is set:
+  # - use_default_credentials: true  the administrator is rustfsadmin / rustfsadmin. Highly discouraged for production
+  #   environments
+  # - use_default_credentials: false the values are random.
+  # An existing secret is never changed: then `use_default_credentials` and admin_* are not read.
+  use_default_credentials: true
+  admin_user_secret_name: s3-opencrvs-users
+  # admin_username:
+  # admin_password:
+
+
 
   # Origins that may read the S3 API from a browser, as RUSTFS_CORS_ALLOWED_ORIGINS: `*` or a comma-separated list.
   # Browsers fetch presigned document URLs from the client origin. With `*` a browser does not send credentials,
@@ -443,6 +458,7 @@ rustfs:
     enabled: true
     # Keep `network_policy.rules` the same, it opens this port.
     port: 3536
+
 
   # storage_type: host_path
   # PVC Configuration
@@ -516,12 +532,12 @@ redis:
     repository: redis
     tag: '8'
   port: 6379
-  # By default Redis is deployed without authentication enabled.
-  # auth_mode:
-  #   - disabled: no authentication
-  #   - password: use password authentication
-  #   - acl: use ACL authentication
-  auth_mode: disabled
+  # Authentication is always enabled, the chart always generates an ACL.
+  # use_default_credentials: true  the username and the password of each user are the same, in lower case, for example `gateway`.
+  #   The password of the default user is `redispassword`.
+  # use_default_credentials: false the chart generates random usernames and passwords.
+  # The chart creates the secret `users_secret` when it does not exist. An existing secret is never changed.
+  use_default_credentials: true
   # List of placeholders for OpenCRVS users:
   # Each placeholder is converted to a variables:
   # - <PLACEHOLDER>_REDIS_USERNAME
@@ -530,6 +546,7 @@ redis:
   auth_users:
     - GATEWAY
     - AUTH
+  users_secret: redis-opencrvs-users
   # Fixed NodePort to expose port 6379 on, only used when `service_type` is `NodePort`.
   # node_port: 30379
 
