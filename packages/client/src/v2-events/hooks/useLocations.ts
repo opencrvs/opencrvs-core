@@ -19,27 +19,34 @@ import {
   toClientLocation,
   UUID
 } from '@opencrvs/commons/client'
-import { trpcOptionsProxy, useTRPC } from '@client/v2-events/trpc'
+import { trpcClient, trpcOptionsProxy, useTRPC } from '@client/v2-events/trpc'
 import { setQueryDefaults } from '../features/events/useEvents/procedures/utils'
+import {
+  LOCATION_LIST_STALE_TIME_MS,
+  rowsOf,
+  syncCache
+} from './incremental-sync'
 
 setQueryDefaults(trpcOptionsProxy.locations.list, {
   meta: {
     useLargeQueryStorage: true
   },
-  queryFn: async (...params) => {
-    const queryOptions = trpcOptionsProxy.locations.list.queryOptions()
-    if (typeof queryOptions.queryFn !== 'function') {
-      throw new Error('queryFn is not a function')
-    }
-    const locations = await queryOptions.queryFn(...params)
-    // Strip the server-flattened `name`/`status`/`externalId` as the cache is
-    // built, so no client code can read a location's current name without
-    // going through the anchored resolution utilities.
-    return new Map<UUID, ClientLocation>(
-      locations.map((l) => [l.id, toClientLocation(l)])
-    )
-  },
-  staleTime: 1000 * 60 * 60 * 24 // keep it in cache 1 day
+  // The cached value is a `SyncedCache`, not the `list` response, and the hooks
+  // below read its `rows`. The query calls `sync`: without `since` for all rows
+  // when the client has no cache, and with `since` for the changed rows when it
+  // has one. The rows are stripped of the server-flattened
+  // `name`/`status`/`externalId` as the cache is built, so no client code can
+  // read a location's current name without going through the anchored
+  // resolution utilities.
+  queryFn: async ({ client, queryKey, signal }) =>
+    syncCache(client.getQueryData<unknown>(queryKey), async (since) => {
+      const { syncedAt, locations } = await trpcClient.locations.sync.query(
+        { since },
+        { signal }
+      )
+      return { syncedAt, rows: locations.map(toClientLocation) }
+    }),
+  staleTime: LOCATION_LIST_STALE_TIME_MS
 })
 
 setQueryDefaults(trpcOptionsProxy.locations.get, {
@@ -94,10 +101,10 @@ export function useLocations() {
         const { queryFn, ...rest } =
           trpcOptionsProxy.locations.list.queryOptions()
 
-        return useSuspenseQuery(rest).data as unknown as Map<
-          UUID,
-          ClientLocation
-        >
+        return useSuspenseQuery({
+          ...rest,
+          select: (data) => rowsOf<ClientLocation>(data)
+        }).data
       }
     },
     getLocation: {

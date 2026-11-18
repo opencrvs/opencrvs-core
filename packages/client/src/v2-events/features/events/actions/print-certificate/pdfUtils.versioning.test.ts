@@ -54,6 +54,7 @@ describe('stringifyEventMetadata — versioned offices (per-fact anchors)', () =
       OFFICE_ID,
       {
         id: OFFICE_ID,
+        updatedAt: '2024-01-01T00:00:00.000Z',
         administrativeAreaId: null,
         locationType: 'CRVS_OFFICE',
         versions: [
@@ -150,6 +151,7 @@ describe('compileSvg — versioned place of event', () => {
       PROVINCE_ID,
       {
         id: PROVINCE_ID,
+        updatedAt: '2024-01-01T00:00:00.000Z',
         parentId: null,
         versions: [
           {

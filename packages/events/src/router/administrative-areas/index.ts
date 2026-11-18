@@ -29,6 +29,7 @@ import {
   createAdministrativeArea,
   getAdministrativeAreas,
   setAdministrativeAreas,
+  syncAdministrativeAreas,
   updateAdministrativeArea,
   withdrawAdministrativeAreaVersion
 } from '../../service/administrative-areas'
@@ -71,6 +72,30 @@ export const administrativeAreaRouter = router({
         ids: input?.ids
       })
     ),
+  /**
+   * Incremental sync of the client cache, the same as `locations.sync`.
+   * Returns the administrative areas written since the previous sync, and
+   * `syncedAt` for the next one. When `since` is not given, it returns all
+   * administrative areas.
+   */
+  sync: userAndSystemProcedure
+    .input(
+      z.object({
+        since: z.iso
+          .datetime()
+          .optional()
+          .describe(
+            'Return the rows written after this time. Rows written up to one minute before it are also returned, to include writes that committed late. Pass the `syncedAt` of the previous response to receive only the new changes. Omit it to receive all rows, for example on the first fetch.'
+          )
+      })
+    )
+    .output(
+      z.object({
+        syncedAt: z.iso.datetime(),
+        administrativeAreas: z.array(AdministrativeArea)
+      })
+    )
+    .query(async ({ input }) => syncAdministrativeAreas(input.since)),
   create: userAndSystemProcedure
     .meta({
       openapi: {
