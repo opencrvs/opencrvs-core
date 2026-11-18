@@ -254,8 +254,7 @@ function useEditActions(event: EventDocument) {
     reviewFields: reviewConfig.fields
   })
 
-  const dialogCopy =
-    actionConfig?.type === ActionType.EDIT ? actionConfig.dialogCopy : undefined
+  const dialogCopy = actionConfig?.dialogCopy
 
   return {
     modals: [modal],

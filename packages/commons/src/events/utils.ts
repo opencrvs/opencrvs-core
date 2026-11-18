@@ -187,26 +187,33 @@ export function isActionConfigType(
   return actionConfigTypes.has(type as any)
 }
 
-// @TODO: see if we can make this function generic so it returns a typed ActionConfig based on the given actionType (e.g. `Extract<ActionConfig, { type: T }>`),
-// instead of the current wide `ActionConfig | undefined`.
-// Perhaps this function should also throw an error if the action config is not found.
-export function getActionConfig({
+/**
+ * Returns the config of the action of the given type, typed as the config of that type.
+ * For a client-specific action, which has no config, it returns `undefined`.
+ * @TODO: Perhaps this function should throw an error if the action config is not found.
+ */
+export function getActionConfig<T extends DisplayableAction>({
   eventConfiguration,
   actionType,
   customActionType
 }: {
   eventConfiguration: EventConfig
-  actionType: DisplayableAction
+  actionType: T
   customActionType?: string
-}): ActionConfig | undefined {
-  return eventConfiguration.actions.find((a) => {
-    // We can have multiple custom actions configured, we specify the custom action with 'customActionType'
-    if (a.type === ActionType.CUSTOM && customActionType) {
-      return a.customActionType === customActionType
-    }
+}): Extract<ActionConfig, { type: T }> | undefined {
+  return eventConfiguration.actions.find(
+    (a): a is Extract<ActionConfig, { type: T }> => {
+      // We can have multiple custom actions configured, we specify the custom action with 'customActionType'
+      if (a.type === ActionType.CUSTOM && customActionType) {
+        return (
+          actionType === ActionType.CUSTOM &&
+          a.customActionType === customActionType
+        )
+      }
 
-    return a.type === actionType
-  })
+      return a.type === actionType
+    }
+  )
 }
 
 export function getCustomActionFields(
@@ -219,11 +226,7 @@ export function getCustomActionFields(
     actionType: ActionType.CUSTOM
   })
 
-  if (!actionConfig || actionConfig.type !== ActionType.CUSTOM) {
-    return []
-  }
-
-  return actionConfig.form
+  return actionConfig?.form ?? []
 }
 
 /**
@@ -251,19 +254,17 @@ export function getActionFormFields(
 
 /**
  * Returns the copy of the confirmation dialog of the action, or `undefined` when the action gives none.
- * The EDIT action gives one copy for each of its dialogs, so read `dialogCopy` of the EDIT action instead.
+ * The EDIT action gives one copy for each of its dialogs, so for edit flow dialogs, you should read `dialogCopy` of the EDIT action instead.
  */
 export function getActionDialogCopy(
   eventConfiguration: EventConfig,
-  actionType: ActionType
+  actionType: Exclude<ActionType, typeof ActionType.EDIT>
 ): TranslationConfig | undefined {
   const actionConfig = getActionConfig({ eventConfiguration, actionType })
 
-  if (!actionConfig || actionConfig.type === ActionType.EDIT) {
-    return undefined
-  }
-
-  return 'dialogCopy' in actionConfig ? actionConfig.dialogCopy : undefined
+  return actionConfig && 'dialogCopy' in actionConfig
+    ? actionConfig.dialogCopy
+    : undefined
 }
 
 export function getPrintCertificatePages(configuration: EventConfig) {
