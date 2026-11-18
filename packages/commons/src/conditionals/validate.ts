@@ -119,7 +119,8 @@ function resolveActionDate(
   event: EventDocument | undefined,
   { match, occurrence }: ActionDateReference['$action']
 ): string | undefined {
-  const dates = (event?.actions ?? [])
+  const actions = event?.actions ?? []
+  const dates = actions
     .filter(({ status }) => status === ActionStatus.Accepted)
     .filter((action) =>
       match.some(
@@ -130,7 +131,15 @@ function resolveActionDate(
               action.customActionType === customActionType))
       )
     )
-    .map(({ createdAt }) => createdAt)
+    // An async accept is a second row with the time of the accept. Use the
+    // time of the original request, as getActionUpdateMetadata does.
+    .map(
+      (action) =>
+        (action.originalActionId &&
+          actions.find(({ id }) => id === action.originalActionId)
+            ?.createdAt) ||
+        action.createdAt
+    )
     .sort()
 
   const date = occurrence === 'first' ? dates[0] : dates[dates.length - 1]

@@ -1543,10 +1543,11 @@ describe('date comparisons against an action', () => {
   const confirmed = (
     type: ActionType,
     day: number,
-    outcome: typeof ActionStatus.Accepted | typeof ActionStatus.Rejected
+    outcome: typeof ActionStatus.Accepted | typeof ActionStatus.Rejected,
+    replyDay = day
   ) => [
     action(type, day, { status: ActionStatus.Requested }),
-    action(type, day, {
+    action(type, replyDay, {
       id: `${type}-${day}-${outcome}` as UUID,
       status: outcome,
       originalActionId: `${type}-${day}` as UUID
@@ -1581,6 +1582,15 @@ describe('date comparisons against an action', () => {
       validate(
         onTimeIfDeclaredWithin30Days,
         params(confirmed(ActionType.DECLARE, 10, ActionStatus.Accepted))
+      )
+    ).toBe(true)
+  })
+
+  it('uses the date of the request when the country config accepts it later', () => {
+    expect(
+      validate(
+        onTimeIfDeclaredWithin30Days,
+        params(confirmed(ActionType.DECLARE, 10, ActionStatus.Accepted, 40))
       )
     ).toBe(true)
   })
