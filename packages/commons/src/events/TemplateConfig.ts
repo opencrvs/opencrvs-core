@@ -88,7 +88,7 @@ export function isTemplateVariable(
 export function isFieldValue(
   value: FieldConfigDefaultValue
 ): value is FieldValue {
-  return FieldValue.safeParse(value).success
+  return FieldValue.validate(value)
 }
 
 /**

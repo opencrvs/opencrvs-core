@@ -27,7 +27,7 @@ import {
   CERT_TEMPLATE_ID,
   useCertificateTemplateSelectorFieldConfig
 } from '@client/v2-events/features/events/useCertificateTemplateSelectorFieldConfig'
-import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
+import { useEventConfigurationForRecord } from '@client/v2-events/features/events/useEventConfiguration'
 import { useEventFormNavigation } from '@client/v2-events/features/events/useEventFormNavigation'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
 import { FormLayout } from '@client/v2-events/layouts'
@@ -46,10 +46,9 @@ export function Pages() {
   const { setAnnotation, getAnnotation } = useActionAnnotation()
   const annotation = getAnnotation()
   const events = useEvents()
-  const event = events.getEvent.getFromCache(eventId)
-  const { eventConfiguration: configuration } = useEventConfiguration(
-    event.type
-  )
+  const event = events.getEvent.useGetEventFromCache(eventId)
+  const { eventConfiguration: configuration } =
+    useEventConfigurationForRecord(event)
   const validatorContext = useValidatorContext(event)
   const eventIndex = getCurrentEventState(event, configuration)
   const certTemplateFieldConfig = useCertificateTemplateSelectorFieldConfig(
@@ -110,6 +109,8 @@ export function Pages() {
     >
       {modal}
       <PagesComponent
+        // Fresh form per page: late async field callbacks can't write into another page
+        key={currentPageId}
         hideBackToReview
         attachmentPath={eventAttachmentPath(eventId)}
         eventConfig={configuration}

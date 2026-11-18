@@ -17,6 +17,7 @@ import {
   DateCondition,
   Exact,
   ExactStatus,
+  NoneOfStatus,
   QueryInput,
   ExactUserType,
   AnyOf
@@ -39,7 +40,7 @@ export type SerializableWithin = z.infer<typeof SerializableWithin>
 export const SerializedQueryExpression = z
   .object({
     eventType: z.string(),
-    status: z.optional(z.union([AnyOfStatus, ExactStatus])),
+    status: z.optional(z.union([AnyOfStatus, NoneOfStatus, ExactStatus])),
     createdAt: z.optional(DateCondition),
     updatedAt: z.optional(DateCondition),
     'legalStatuses.DECLARED.createdAtLocation': z.optional(SerializableWithin),
@@ -49,6 +50,7 @@ export const SerializedQueryExpression = z
       z.optional(SerializableWithin),
     'legalStatuses.REGISTERED.createdByRole': z.optional(AnyOf),
     'legalStatuses.REGISTERED.registrationNumber': z.optional(Exact),
+    'legalStatuses.REVOKED.createdAtLocation': z.optional(SerializableWithin),
     createdAtLocation: z.optional(
       z.union([SerializableWithin, SerializableExact])
     ),

@@ -22,11 +22,11 @@ import {
   EventState,
   FieldType,
   getAcceptedActions,
+  getCompleteActionContent,
   getCurrentEventState,
   getDeclarationFields,
-  isMinioUrl,
+  isS3Url,
   LanguageConfig,
-  PrintCertificateAction,
   UserOrSystemSummary,
   UUID
 } from '@opencrvs/commons/client'
@@ -38,10 +38,10 @@ import {
 } from '@client/v2-events/features/events/actions/print-certificate/pdfUtils'
 import { fetchImageAsBase64 } from '@client/utils/imageUtils'
 import { getOfflineData } from '@client/offline/selectors'
-import { useEventConfiguration } from '../features/events/useEventConfiguration'
+import { useEventConfigurationForRecord } from '../features/events/useEventConfiguration'
 import { hasStringFilename } from '../utils'
 
-async function replaceMinioUrlWithBase64(
+async function replaceS3UrlWithBase64(
   declaration: EventState,
   config: EventConfig
 ) {
@@ -55,13 +55,31 @@ async function replaceMinioUrlWithBase64(
   for (const fieldId of fileFieldIds) {
     const field = declarationClone[fieldId]
 
-    if (hasStringFilename(field) && isMinioUrl(field.filename)) {
+    if (hasStringFilename(field) && isS3Url(field.filename)) {
       // TypeScript now knows `field` has a `filename` property of type string
       field.filename = await fetchImageAsBase64(field.filename)
     }
   }
 
   return declarationClone
+}
+
+/**
+ * Counts the confirmed prints of a certificate template. Only Accepted prints
+ * count: a print confirmed synchronously is stored as a Requested and an
+ * Accepted action, and a pending or rejected print was not printed. The
+ * template is read from the request, since a print accepted asynchronously
+ * carries no content of its own.
+ */
+export function countPrintsOfTemplate(
+  event: EventDocument,
+  templateId: string | undefined
+) {
+  return getAcceptedActions(event).filter(
+    (action) =>
+      action.type === ActionType.PRINT_CERTIFICATE &&
+      getCompleteActionContent(event, action)?.templateId === templateId
+  ).length
 }
 
 export const usePrintableCertificate = ({
@@ -81,18 +99,16 @@ export const usePrintableCertificate = ({
   certificateConfig?: CertificateTemplateConfig
   language?: LanguageConfig
 }) => {
-  const { eventConfiguration } = useEventConfiguration(event.type)
+  const { eventConfiguration } = useEventConfigurationForRecord(event)
   const { config: appConfig } = useSelector(getOfflineData)
   const { declaration, ...metadata } = getCurrentEventState(
     event,
     eventConfiguration
   )
-  const copiesPrintedForTemplate = event.actions.filter(
-    (action) =>
-      action.type === ActionType.PRINT_CERTIFICATE &&
-      (action as PrintCertificateAction).content?.templateId ===
-        certificateConfig?.id
-  ).length
+  const copiesPrintedForTemplate = countPrintsOfTemplate(
+    event,
+    certificateConfig?.id
+  )
 
   const modifiedMetadata = {
     ...metadata,
@@ -138,7 +154,7 @@ export const usePrintableCertificate = ({
   const preparePdfCertificate = async (updatedEvent: EventDocument) => {
     const { declaration: updatedDeclaration, ...updatedMetadata } =
       getCurrentEventState(updatedEvent, eventConfiguration)
-    const declarationWithResolvedImages = await replaceMinioUrlWithBase64(
+    const declarationWithResolvedImages = await replaceS3UrlWithBase64(
       updatedDeclaration,
       config
     )

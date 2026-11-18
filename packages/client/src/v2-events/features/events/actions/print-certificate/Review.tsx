@@ -54,7 +54,7 @@ import { useLocations } from '@client/v2-events/hooks/useLocations'
 import { getUserIdsFromActions } from '@client/v2-events/utils'
 import { useActionAnnotation } from '@client/v2-events/features/events/useActionAnnotation'
 import { validationErrorsInActionFormExist } from '@client/v2-events/components/forms/validation'
-import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
+import { useEventConfigurationForRecord } from '@client/v2-events/features/events/useEventConfiguration'
 import { useOnlineStatus } from '@client/utils'
 import { getUserDetails } from '@client/profile/profileSelectors'
 import { useUserAllowedActions } from '@client/v2-events/features/workqueues/Actions/useUserAllowedActions'
@@ -161,6 +161,8 @@ export function Review() {
   const isOnline = useOnlineStatus()
   const isOnlineRef = useRef(isOnline)
   isOnlineRef.current = isOnline
+  // Blocks a second print while the page is still waiting to navigate away
+  const printingRef = useRef(false)
   const [modal, openModal] = useModal()
 
   const {
@@ -168,8 +170,8 @@ export function Review() {
     onlineActions,
     actions: { assignment }
   } = useEvents()
-  const fullEvent = getEvent.getFromCache(eventId)
-  const { eventConfiguration } = useEventConfiguration(fullEvent.type)
+  const fullEvent = getEvent.useGetEventFromCache(eventId)
+  const { eventConfiguration } = useEventConfigurationForRecord(fullEvent)
   const fullEventIndex = getCurrentEventState(fullEvent, eventConfiguration)
   const validatorContext = useValidatorContext(fullEvent)
 
@@ -267,6 +269,10 @@ export function Review() {
     )
 
   const handlePrint = async () => {
+    if (printingRef.current) {
+      return
+    }
+
     const confirmed = await openModal<boolean>((close) => (
       <Dialog
         isOpen
@@ -303,6 +309,8 @@ export function Review() {
      * NOTE: We have separated the preparing and printing of the PDF certificate. Without the separation, user is already unassigned from the event and cache is cleared. @see preparePdfCertificate for more details.
      */
     if (confirmed) {
+      printingRef.current = true
+      let printed = false
       try {
         const printCertificate = await preparePdfCertificate(fullEvent)
 
@@ -316,6 +324,7 @@ export function Review() {
           transactionId: uuid(),
           type: ActionType.PRINT_CERTIFICATE
         })
+        printed = true
 
         printCertificate()
 
@@ -345,6 +354,9 @@ export function Review() {
           })
         }
       } catch (error) {
+        if (!printed) {
+          printingRef.current = false
+        }
         // TODO: add notification alert
         // eslint-disable-next-line no-console
         console.error(error)

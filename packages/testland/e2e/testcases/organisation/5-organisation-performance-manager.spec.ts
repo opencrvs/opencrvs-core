@@ -12,24 +12,15 @@ import { test, expect, type Page } from '@playwright/test'
 import { findOnOrganisationPage, login } from '@e2e/support/helpers'
 import { CREDENTIALS } from '@e2e/support/constants'
 import { navigateToWorkqueue } from '@e2e/support/utils'
-test.describe.serial('5. Organisation Page', () => {
-  let page: Page
-
-  test.beforeAll(async ({ browser }) => {
-    page = await browser.newPage()
-  })
-
-  test.afterAll(async () => {
-    await page.close()
-  })
-  test.describe.serial('5.1 Basic UI check', async () => {
-    test('5.1.0 Verify UI', async () => {
+test('5. Organisation Page', async ({ page }) => {
+  await test.step('5.1 Basic UI check', async () => {
+    await test.step('5.1.0 Verify UI', async () => {
       await login(page, CREDENTIALS.PERFORMANCE_MANAGER)
       await page.getByRole('button', { name: 'Organisation' }).click()
       await expect(page.locator('#content-name')).toHaveText('Organisation')
       await expect(page.getByText('Farajaland', { exact: true })).toBeVisible()
     })
-    test('5.1.1 Verify Province -> District -> Health Facility', async () => {
+    await test.step('5.1.1 Verify Province -> District -> Health Facility', async () => {
       await page.getByRole('button', { name: /Central/ }).click()
       await page.getByRole('button', { name: /^Ibombo$/ }).click()
 
@@ -44,7 +35,7 @@ test.describe.serial('5. Organisation Page', () => {
       ).toBeVisible()
       await expect(page.getByText('No result')).toBeHidden()
     })
-    test('5.1.2 Verify Province -> District -> Village -> Village Office(No Data)', async () => {
+    await test.step('5.1.2 Verify Province -> District -> Village -> Village Office(No Data)', async () => {
       await navigateToWorkqueue(page, 'Organisation')
       await page.getByRole('button', { name: /Sulaka/ }).click()
       await page.getByRole('button', { name: /Ilanga/ }).click()
@@ -59,7 +50,7 @@ test.describe.serial('5. Organisation Page', () => {
       ).toBeVisible()
       await expect(page.getByText('No result')).toBeVisible()
     })
-    test('5.1.3 Verify Province -> District -> District Office', async () => {
+    await test.step('5.1.3 Verify Province -> District -> District Office', async () => {
       await navigateToWorkqueue(page, 'Organisation')
       await page.getByRole('button', { name: /Sulaka/ }).click()
       await page.getByRole('button', { name: /Ilanga/ }).click()
@@ -73,7 +64,7 @@ test.describe.serial('5. Organisation Page', () => {
       ).toBeVisible()
     })
 
-    test('5.1.4 Verify team page member list of District Office', async () => {
+    await test.step('5.1.4 Verify team page member list of District Office', async () => {
       const members = ['Chilufya Tayali', 'Kondwani Mwale']
 
       for (const member of members) {
@@ -83,7 +74,7 @@ test.describe.serial('5. Organisation Page', () => {
       }
     })
 
-    test('5.1.5 Verify Embassy Office', async () => {
+    await test.step('5.1.5 Verify Embassy Office', async () => {
       await page.getByRole('button', { name: 'Organisation' }).click()
       await (
         await findOnOrganisationPage(page, 'French Embassy Office')

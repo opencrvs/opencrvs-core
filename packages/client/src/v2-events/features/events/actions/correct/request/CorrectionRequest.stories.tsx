@@ -13,6 +13,7 @@ import {
   ActionStatus,
   ActionType,
   generateActionDocument,
+  generateActionDocuments,
   tennisClubMembershipEvent,
   ChildOnboardingEvent,
   TestUserRole,
@@ -21,6 +22,7 @@ import {
   createPrng,
   Draft,
   EventState,
+  INITIAL_EVENT_CONFIG_VERSION_ID,
   UUID
 } from '@opencrvs/commons/client'
 import { ROUTES } from '@client/v2-events/routes'
@@ -44,7 +46,7 @@ const createAction = generateActionDocument({
   action: ActionType.CREATE
 })
 
-const declarationActionWithAge = generateActionDocument({
+const declarationActionPairWithAge = generateActionDocuments({
   configuration: tennisClubMembershipEvent,
   action: ActionType.DECLARE,
   defaults: {
@@ -75,7 +77,7 @@ const declarationActionWithAge = generateActionDocument({
   }
 })
 
-const declarationActionWithDob = generateActionDocument({
+const declarationActionPairWithDob = generateActionDocuments({
   configuration: tennisClubMembershipEvent,
   action: ActionType.DECLARE,
   defaults: {
@@ -85,7 +87,7 @@ const declarationActionWithDob = generateActionDocument({
   }
 })
 
-const registerAction = generateActionDocument({
+const registerActionPair = generateActionDocuments({
   configuration: tennisClubMembershipEvent,
   action: ActionType.REGISTER,
   defaults: {
@@ -95,11 +97,16 @@ const registerAction = generateActionDocument({
 
 const eventCorrectionAgeToDob = {
   trackingId: generateUuid(prng),
+  configVersionId: INITIAL_EVENT_CONFIG_VERSION_ID,
   type: tennisClubMembershipEvent.id,
   id: generateUuid(prng),
   createdAt: new Date().toISOString(),
   updatedAt: new Date().toISOString(),
-  actions: [createAction, declarationActionWithAge, registerAction]
+  actions: [
+    createAction,
+    ...declarationActionPairWithAge,
+    ...registerActionPair
+  ]
 }
 
 const correctionDraftAgeToDob = {
@@ -143,11 +150,16 @@ export const SummaryChangingDobToAge: Story = {
 
 const eventCorrectionDobToAge = {
   trackingId: generateUuid(prng),
+  configVersionId: INITIAL_EVENT_CONFIG_VERSION_ID,
   type: tennisClubMembershipEvent.id,
   id: generateUuid(prng),
   createdAt: new Date().toISOString(),
   updatedAt: new Date().toISOString(),
-  actions: [createAction, declarationActionWithDob, registerAction]
+  actions: [
+    createAction,
+    ...declarationActionPairWithDob,
+    ...registerActionPair
+  ]
 }
 
 const correctionDraftDobToAge = {
@@ -191,6 +203,7 @@ export const SummaryChangingAgeToDob: Story = {
 
 const eventCorrectionAddress = {
   trackingId: generateUuid(prng),
+  configVersionId: INITIAL_EVENT_CONFIG_VERSION_ID,
   type: ChildOnboardingEvent.id,
   id: generateUuid(prng),
   createdAt: new Date().toISOString(),
@@ -200,11 +213,11 @@ const eventCorrectionAddress = {
       configuration: ChildOnboardingEvent,
       action: ActionType.CREATE
     }),
-    generateActionDocument({
+    ...generateActionDocuments({
       configuration: ChildOnboardingEvent,
       action: ActionType.DECLARE
     }),
-    generateActionDocument({
+    ...generateActionDocuments({
       configuration: ChildOnboardingEvent,
       action: ActionType.REGISTER
     })

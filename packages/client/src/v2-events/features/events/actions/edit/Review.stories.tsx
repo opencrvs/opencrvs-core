@@ -15,7 +15,8 @@ import {
   ActionType,
   generateEventDocument,
   generateEventDraftDocument,
-  tennisClubMembershipEvent
+  tennisClubMembershipEvent,
+  versionedTennisClubMembershipEvent
 } from '@opencrvs/commons/client'
 import { AppRouter } from '@client/v2-events/trpc'
 import { ROUTES, routesConfig } from '@client/v2-events/routes'
@@ -50,7 +51,7 @@ const tRPCMsw = createTRPCMsw<AppRouter>({
 
 const draft = generateEventDraftDocument({
   eventId,
-  actionType: ActionType.REGISTER
+  actionType: ActionType.DECLARE
 })
 
 const mockUser = generator.user.fieldAgent().summary
@@ -76,7 +77,7 @@ export const ReviewForLocalRegistrarComplete: Story = {
         ],
         events: [
           tRPCMsw.event.config.get.query(() => {
-            return [tennisClubMembershipEvent]
+            return [versionedTennisClubMembershipEvent]
           })
         ],
         user: [

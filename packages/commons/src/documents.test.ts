@@ -9,29 +9,29 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { FullDocumentPath, isMinioUrl } from './documents'
+import { FullDocumentPath, isS3Url } from './documents'
 
-describe('isMinioUrl', () => {
-  const host = 'https://minio.opencrvs.dev'
+describe('isS3Url', () => {
+  const host = 'https://s3.opencrvs.dev'
 
   it.each(['jpg', 'jpeg', 'jfif', 'png', 'pdf', 'svg'])(
     'matches a document url with a .%s extension',
     (extension) => {
-      expect(isMinioUrl(`${host}/ocrvs/event-1/document-1.${extension}`)).toBe(
+      expect(isS3Url(`${host}/ocrvs/event-1/document-1.${extension}`)).toBe(
         true
       )
     }
   )
 
   it('matches a .jfif document url with a query string', () => {
-    expect(isMinioUrl(`${host}/ocrvs/event-1/document-1.jfif?token=abc`)).toBe(
+    expect(isS3Url(`${host}/ocrvs/event-1/document-1.jfif?token=abc`)).toBe(
       true
     )
   })
 
   it('does not match non-document urls', () => {
-    expect(isMinioUrl(`${host}/index.html`)).toBe(false)
-    expect(isMinioUrl(`${host}/ocrvs/event-1/document-1.exe`)).toBe(false)
+    expect(isS3Url(`${host}/index.html`)).toBe(false)
+    expect(isS3Url(`${host}/ocrvs/event-1/document-1.exe`)).toBe(false)
   })
 })
 

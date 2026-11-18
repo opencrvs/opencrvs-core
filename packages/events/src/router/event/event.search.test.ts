@@ -27,7 +27,8 @@ import {
   getUUID,
   Location,
   TENNIS_CLUB_MEMBERSHIP,
-  TEST_SYSTEM_IANA_TIMEZONE
+  TEST_SYSTEM_IANA_TIMEZONE,
+  INITIAL_EVENT_CONFIG_VERSION_ID
 } from '@opencrvs/commons'
 import { tennisClubMembershipEvent } from '@opencrvs/commons/fixtures'
 import {
@@ -337,6 +338,7 @@ test('Returns events based on the updatedAt column', async () => {
   const oldDocumentWithoutAcceptedDeclaration = {
     trackingId: getUUID(),
     type: tennisClubMembershipEvent.id,
+    configVersionId: INITIAL_EVENT_CONFIG_VERSION_ID,
     actions: oldEventActions,
     createdAt: oldEventCreatedAt,
     id: getUUID(),

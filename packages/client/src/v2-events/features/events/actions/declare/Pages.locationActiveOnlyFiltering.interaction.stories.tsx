@@ -19,7 +19,11 @@ import {
   FieldType,
   generateEventDocument,
   Location,
-  UUID
+  UUID,
+  withDeclaration,
+  getDeclaration,
+  getDeclarationPages,
+  toVersionedEventConfig
 } from '@opencrvs/commons/client'
 import * as selectEvent from '@client/v2-events/select-event'
 import { localDraftStore } from '@client/v2-events/features/drafts/useDrafts'
@@ -87,12 +91,14 @@ const INACTIVATED_FACILITY: Location = {
 function buildEventConfig(
   locationConfiguration: Record<string, boolean>
 ): EventConfig {
-  return {
-    ...ChildOnboardingEvent,
-    dateOfEvent: { $$field: 'child.dob', $$subfield: [] },
-    declaration: {
-      ...ChildOnboardingEvent.declaration,
-      pages: ChildOnboardingEvent.declaration.pages.map((page) =>
+  return withDeclaration(
+    {
+      ...ChildOnboardingEvent,
+      dateOfEvent: { $$field: 'child.dob', $$subfield: [] }
+    },
+    {
+      ...getDeclaration(ChildOnboardingEvent),
+      pages: getDeclarationPages(ChildOnboardingEvent).map((page) =>
         page.id === 'child'
           ? {
               ...page,
@@ -111,7 +117,7 @@ function buildEventConfig(
           : page
       )
     }
-  }
+  )
 }
 
 function buildStoryParams(eventConfig: EventConfig) {
@@ -122,7 +128,11 @@ function buildStoryParams(eventConfig: EventConfig) {
 
   const mswConfig = {
     handlers: {
-      events: [tRPCMsw.event.config.get.query(() => [eventConfig])],
+      events: [
+        tRPCMsw.event.config.get.query(() => [
+          toVersionedEventConfig(eventConfig)
+        ])
+      ],
       event: [
         tRPCMsw.event.get.query(() => freshDraftEvent),
         tRPCMsw.event.search.query(() => ({ results: [], total: 0 }))

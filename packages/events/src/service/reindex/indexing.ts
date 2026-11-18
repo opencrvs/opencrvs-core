@@ -8,7 +8,10 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { EventConfig, getDeclarationFields } from '@opencrvs/commons/events'
+import {
+  getDeclarationFieldsOfAllVersions,
+  VersionedEventConfig
+} from '@opencrvs/commons/events'
 import { logger } from '@opencrvs/commons'
 import {
   getEventAliasName,
@@ -19,11 +22,12 @@ import {
 import { createIndex } from '../indexing/indexing'
 
 export async function prepareTemporaryIndex(
-  eventConfiguration: EventConfig,
+  eventConfiguration: VersionedEventConfig,
   timestamp: number
 ) {
   const tempIndexName = getTemporaryIndexName(eventConfiguration.id, timestamp)
-  const formFields = getDeclarationFields(eventConfiguration)
+  // Records of every version share the index, so it maps the fields of all of them.
+  const formFields = getDeclarationFieldsOfAllVersions(eventConfiguration)
 
   logger.info(`Preparing temporary reindex index ${tempIndexName}`)
 
@@ -135,10 +139,12 @@ export async function cleanupTemporaryIndex(tempIndexName: string) {
 const ORPHAN_MIN_AGE_MS = 24 * 60 * 60 * 1000
 
 /** A temp index (`<type index>_<timestamp>`) with no alias never finished reindexing (e.g. killed mid-run) and is safe to delete. */
-export async function cleanupOrphanedIndices(configurations: EventConfig[]) {
+export async function cleanupOrphanedIndices(eventTypes: string[]) {
   const esClient = getOrCreateClient()
   const cutoff = Date.now() - ORPHAN_MIN_AGE_MS
-  const typeIndexNames = configurations.map(({ id }) => getEventIndexName(id))
+  const typeIndexNames = eventTypes.map((eventType) =>
+    getEventIndexName(eventType)
+  )
 
   // An empty index list would make getAlias return every index in the cluster.
   if (typeIndexNames.length === 0) {

@@ -18,7 +18,8 @@ import {
   EventStatus,
   generateEventDocument,
   InherentFlags,
-  tennisClubMembershipEvent
+  tennisClubMembershipEvent,
+  versionedTennisClubMembershipEvent
 } from '@opencrvs/commons/client'
 import { TRPCProvider } from '@client/v2-events/trpc'
 import { ROUTES } from '@client/v2-events/routes'
@@ -74,7 +75,7 @@ export const DirectsRejectedNotifiedToEdit: Story = {
     /*
      * Ensure record is "downloaded offline" in the user's browser
      */
-    addLocalEventConfig(tennisClubMembershipEvent)
+    addLocalEventConfig(versionedTennisClubMembershipEvent)
     setEventData(rejectedNotifiedEvent.event.id, rejectedNotifiedEvent.event)
   },
 
@@ -147,7 +148,7 @@ export const DirectsRejectedDeclaredToEdit: Story = {
     /*
      * Ensure record is "downloaded offline" in the user's browser
      */
-    addLocalEventConfig(tennisClubMembershipEvent)
+    addLocalEventConfig(versionedTennisClubMembershipEvent)
     setEventData(rejectedDeclaredEvent.event.id, rejectedDeclaredEvent.event)
   },
   args: {

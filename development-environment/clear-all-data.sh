@@ -20,14 +20,14 @@ curl -s "http://localhost:9200/_cat/indices?h=index" | while read -r index; do
     curl -XDELETE "http://elasticsearch:9200/$index" -v
 done
 
-PATH_TO_MINIO_DIR="$DIR/data/minio/ocrvs"
-# Clear Minio Data
-if [ -d $PATH_TO_MINIO_DIR ] ; then
+PATH_TO_S3_DIR="$DIR/data/rustfs/ocrvs"
+# Clear S3 object store data
+if [ -d $PATH_TO_S3_DIR ] ; then
  # Locally, as this script is called from the country config repo, the path to core is unknown
  # So we delete the data from the running shared volume location
-  docker exec `docker ps --format "{{.Names}}" | grep minio` sh -c 'rm -rf /data/ocrvs/*'
-  docker exec `docker ps --format "{{.Names}}" | grep minio` mkdir -p /data/ocrvs
-  echo "**** Removed minio data ****"
+  docker exec `docker ps --format "{{.Names}}" | grep rustfs` sh -c 'rm -rf /data/ocrvs/*'
+  docker exec `docker ps --format "{{.Names}}" | grep rustfs` mkdir -p /data/ocrvs
+  echo "**** Removed S3 object store data ****"
 fi
 
 ####################

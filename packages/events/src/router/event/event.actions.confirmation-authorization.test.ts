@@ -408,6 +408,26 @@ const CONFIRMATION_ENDPOINTS: [
     'event.actions.unarchive.reject',
     async (client: UserClient) =>
       client.event.actions.unarchive.reject({} as never)
+  ],
+  [
+    'event.actions.revocation.revoke.accept',
+    async (client: UserClient) =>
+      client.event.actions.revocation.revoke.accept({} as never)
+  ],
+  [
+    'event.actions.revocation.revoke.reject',
+    async (client: UserClient) =>
+      client.event.actions.revocation.revoke.reject({} as never)
+  ],
+  [
+    'event.actions.revocation.reinstate.accept',
+    async (client: UserClient) =>
+      client.event.actions.revocation.reinstate.accept({} as never)
+  ],
+  [
+    'event.actions.revocation.reinstate.reject',
+    async (client: UserClient) =>
+      client.event.actions.revocation.reinstate.reject({} as never)
   ]
 ]
 

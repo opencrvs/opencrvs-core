@@ -134,9 +134,9 @@ export async function sweepUnreferencedFiles(
 ): Promise<void> {
   const prefix = eventAttachmentPath(event.id)
   const referencedFiles = getFilePathsFromEvent(event)
-  const filesSavedInMinio = await listFiles(prefix, token)
+  const storedFiles = await listFiles(prefix, token)
 
-  const filesToDelete = filesSavedInMinio.filter(
+  const filesToDelete = storedFiles.filter(
     (file) => !referencedFiles.includes(file)
   )
 

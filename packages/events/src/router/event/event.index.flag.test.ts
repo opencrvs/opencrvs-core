@@ -19,7 +19,8 @@ import {
   getCurrentEventState,
   createPrng,
   generateActionDuplicateDeclarationInput,
-  encodeScope
+  encodeScope,
+  toVersionedEventConfig
 } from '@opencrvs/commons'
 import {
   tennisClubMembershipEvent,
@@ -58,10 +59,7 @@ test('Adds ACTION-requested flag while waiting for external validation', async (
     http.post(
       `${env.COUNTRY_CONFIG_URL}/trigger/events/tennis-club-membership/actions/REGISTER`,
       () => {
-        return HttpResponse.json(
-          {},
-          { status: 202 }
-        )
+        return HttpResponse.json({}, { status: 202 })
       }
     )
   )
@@ -166,10 +164,7 @@ test('Adds ACTION-rejected flag when rejected form countryconfig', async () => {
     http.post(
       `${env.COUNTRY_CONFIG_URL}/trigger/events/tennis-club-membership/actions/REGISTER`,
       () => {
-        return HttpResponse.json(
-          {},
-          { status: 400 }
-        )
+        return HttpResponse.json({}, { status: 400 })
       }
     )
   )
@@ -306,106 +301,6 @@ test(`Removes ${InherentFlags.CORRECTION_REQUESTED} flag after ${ActionType.APPR
   expect(index2[0].flags).not.toContain(InherentFlags.CORRECTION_REQUESTED)
 })
 
-test(`Adds ${InherentFlags.INCOMPLETE} flag after ${ActionType.NOTIFY} is called`, async () => {
-  const { user, generator } = await setupTestCase()
-
-  const { type } = generator.event.create()
-  const client = createTestClient(user, [
-    ...TEST_USER_DEFAULT_SCOPES,
-    encodeScope({
-      type: 'record.search',
-      options: {
-        event: [type]
-      }
-    }),
-    encodeScope({
-      type: 'record.notify',
-      options: {
-        event: [type]
-      }
-    })
-  ])
-
-  const event = await createEvent(client, generator, [])
-
-  await client.event.actions.notify.request(
-    generator.event.actions.notify(event.id)
-  )
-
-  const { results: index } = await client.event.search({
-    query: {
-      type: 'and',
-      clauses: [
-        {
-          eventType: type
-        }
-      ]
-    }
-  })
-
-  expect(index[0].flags).toContain(InherentFlags.INCOMPLETE)
-})
-
-test(`Removes ${InherentFlags.INCOMPLETE} flag after ${ActionType.EDIT} + ${ActionType.DECLARE} is called`, async () => {
-  const { user, generator } = await setupTestCase()
-
-  const { type } = generator.event.create()
-  const client = createTestClient(user, [
-    ...TEST_USER_DEFAULT_SCOPES,
-    encodeScope({
-      type: 'record.search',
-      options: {
-        event: [type]
-      }
-    }),
-    encodeScope({
-      type: 'record.notify',
-      options: {
-        event: [type]
-      }
-    })
-  ])
-
-  const event = await createEvent(client, generator, [])
-
-  await client.event.actions.notify.request(
-    generator.event.actions.notify(event.id)
-  )
-
-  await client.event.actions.assignment.assign(
-    generator.event.actions.assign(event.id, {
-      assignedTo: event.actions[0].createdBy
-    })
-  )
-
-  await client.event.actions.edit.request(
-    generator.event.actions.edit(event.id)
-  )
-
-  await client.event.actions.assignment.assign(
-    generator.event.actions.assign(event.id, {
-      assignedTo: event.actions[0].createdBy
-    })
-  )
-
-  await client.event.actions.declare.request(
-    generator.event.actions.declare(event.id)
-  )
-
-  const { results: index } = await client.event.search({
-    query: {
-      type: 'and',
-      clauses: [
-        {
-          eventType: type
-        }
-      ]
-    }
-  })
-
-  expect(index[0].flags).not.toContain(InherentFlags.INCOMPLETE)
-})
-
 test(`Adds ${InherentFlags.REJECTED} flag after ${ActionType.REJECT} is called`, async () => {
   const { user, generator } = await setupTestCase()
 
@@ -498,7 +393,9 @@ suite(InherentFlags.POTENTIAL_DUPLICATE, () => {
     mswServer.use(
       http.get(`${env.COUNTRY_CONFIG_URL}/config/events`, () => {
         return HttpResponse.json([
-          tennisClubMembershipEventWithDedupCheck(ActionType.DECLARE)
+          toVersionedEventConfig(
+            tennisClubMembershipEventWithDedupCheck(ActionType.DECLARE)
+          )
         ])
       })
     )

@@ -26,7 +26,8 @@ import {
   getOrThrow,
   getUUID,
   TENNIS_CLUB_MEMBERSHIP,
-  EventStatus
+  EventStatus,
+  toVersionedEventConfig
 } from '@opencrvs/commons'
 import {
   tennisClubMembershipEvent,
@@ -769,7 +770,9 @@ test('deduplication check is performed before register when configured', async (
   mswServer.use(
     http.get(`${env.COUNTRY_CONFIG_URL}/config/events`, () => {
       return HttpResponse.json([
-        tennisClubMembershipEventWithDedupCheck(ActionType.REGISTER)
+        toVersionedEventConfig(
+          tennisClubMembershipEventWithDedupCheck(ActionType.REGISTER)
+        )
       ])
     })
   )

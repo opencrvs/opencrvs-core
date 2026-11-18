@@ -31,6 +31,7 @@ import { advancedSearchBirth } from './advancedSearch'
 import { BIRTH_CERTIFICATE_COLLECTOR_FORM } from './forms/printForm'
 import { PlaceOfBirth } from './forms/pages/child'
 import { CORRECTION_FORM } from './forms/correctionForm'
+import { BIRTH_NOTIFICATION_FORM } from './forms/notificationForm'
 import { dedupConfig } from './dedupConfig'
 import {
   Event,
@@ -111,15 +112,6 @@ export const birthEvent = defineConfig({
         defaultMessage: 'Certified copy printed in advance of issuance',
         description:
           'Flag label for certified copy printed in advance of issuance'
-      },
-      requiresAction: true
-    },
-    {
-      id: 'revoked',
-      label: {
-        id: 'event.birth.flag.revoked',
-        defaultMessage: 'Revoked',
-        description: 'Flag label for revoked'
       },
       requiresAction: true
     }
@@ -255,8 +247,8 @@ export const birthEvent = defineConfig({
     ActionType.PRINT_CERTIFICATE,
     'ISSUE_CERTIFIED_COPY',
     ActionType.REQUEST_CORRECTION,
-    'REVOKE_REGISTRATION',
-    'REINSTATE_REVOKE_REGISTRATION',
+    ActionType.REVOKE_REGISTRATION,
+    ActionType.REINSTATE_REGISTRATION,
     ActionType.UNASSIGN
   ],
   actions: [
@@ -269,6 +261,38 @@ export const birthEvent = defineConfig({
         id: 'event.birth.action.Read.label'
       },
       review: BIRTH_DECLARATION_REVIEW
+    },
+    {
+      type: ActionType.NOTIFY,
+      label: {
+        defaultMessage: 'Notify',
+        description:
+          'This is shown as the action name anywhere the user can trigger the action from',
+        id: 'event.birth.action.notify.label'
+      },
+      notificationForm: BIRTH_NOTIFICATION_FORM,
+      review: {
+        title: {
+          defaultMessage:
+            '{child.name.firstname, select, __EMPTY__ {{child.name.surname, select, __EMPTY__ {Birth notification} other {Birth notification for {child.name.surname}}}} other {{child.name.surname, select, __EMPTY__ {Birth notification for {child.name.firstname}} other {Birth notification for {child.name.firstname} {child.name.surname}}}}}',
+          id: 'event.birth.action.notify.form.review.title',
+          description: 'Title of the form to show in review page'
+        },
+        // We dont want review fields on notification
+        fields: []
+      },
+      form: [
+        {
+          id: 'comments',
+          type: 'TEXTAREA',
+          label: {
+            defaultMessage: 'Additional comments',
+            description:
+              'This is the label for the additional comments field on the notify action dialog',
+            id: 'event.birth.action.notify.field.comments.label'
+          }
+        }
+      ]
     },
     {
       type: ActionType.DECLARE,
@@ -542,8 +566,7 @@ export const birthEvent = defineConfig({
           type: ConditionalType.SHOW,
           conditional: and(
             flag('certified-copy-printed-in-advance-of-issuance'),
-            status('REGISTERED'),
-            not(flag('revoked'))
+            status('REGISTERED')
           )
         }
       ],
@@ -738,8 +761,7 @@ export const birthEvent = defineConfig({
       }
     },
     {
-      type: ActionType.CUSTOM,
-      customActionType: 'REVOKE_REGISTRATION',
+      type: ActionType.REVOKE_REGISTRATION,
       label: {
         defaultMessage: 'Revoke registration',
         description:
@@ -749,37 +771,11 @@ export const birthEvent = defineConfig({
       icon: 'Briefcase',
       supportingCopy: {
         defaultMessage:
-          'Revoking this registration will invalidate the record and prevent its use for official purposes. This action should only be taken under lawful authority.',
+          'The registration is withdrawn and any certificate issued from it stops being valid. This is recorded on the record permanently.',
         description:
           'This is the confirmation text for the revoke registration action',
         id: 'event.birth.action.revoke-registration.supportingCopy'
       },
-      auditHistoryLabel: {
-        defaultMessage: 'Revoked',
-        description:
-          'The label to show in audit history for the revoke registration action',
-        id: 'event.birth.action.revoke-registration.audit-history-label'
-      },
-      flags: [
-        { id: 'revoked', operation: 'add' },
-        { id: 'pending-first-certificate-issuance', operation: 'remove' },
-        { id: 'escalated-to-registrar-general', operation: 'remove' },
-        { id: 'escalated-to-provincial-registrar', operation: 'remove' },
-        {
-          id: 'certified-copy-printed-in-advance-of-issuance',
-          operation: 'remove'
-        }
-      ],
-      conditionals: [
-        {
-          type: ConditionalType.SHOW,
-          conditional: and(
-            status('REGISTERED'),
-            not(flag(InherentFlags.CORRECTION_REQUESTED)),
-            not(flag('revoked'))
-          )
-        }
-      ],
       form: [
         {
           id: 'reason',
@@ -795,8 +791,7 @@ export const birthEvent = defineConfig({
       ]
     },
     {
-      type: ActionType.CUSTOM,
-      customActionType: 'REINSTATE_REVOKE_REGISTRATION',
+      type: ActionType.REINSTATE_REGISTRATION,
       label: {
         defaultMessage: 'Reinstate registration',
         description:
@@ -804,26 +799,6 @@ export const birthEvent = defineConfig({
         id: 'event.birth.action.reinstate-registration.label'
       },
       icon: 'ArchiveTray',
-      supportingCopy: {
-        defaultMessage:
-          'This will restore a previously revoked registration to active status.',
-        description:
-          'This is the confirmation text for the reinstate revoke registration action',
-        id: 'event.birth.action.revoke-registration.supportingCopy'
-      },
-      auditHistoryLabel: {
-        defaultMessage: 'Registration reinstated',
-        description:
-          'The label to show in audit history for the reinstate registration action',
-        id: 'event.birth.action.reinstate-registration.audit-history-label'
-      },
-      conditionals: [
-        {
-          type: ConditionalType.SHOW,
-          conditional: flag('revoked')
-        }
-      ],
-      flags: [{ id: 'revoked', operation: 'remove' }],
       form: [
         {
           id: 'reason',
@@ -906,10 +881,7 @@ export const birthEvent = defineConfig({
         {
           type: ConditionalType.SHOW,
           conditional: not(
-            or(
-              flag('revoked'),
-              flag('certified-copy-printed-in-advance-of-issuance')
-            )
+            flag('certified-copy-printed-in-advance-of-issuance')
           )
         }
       ],
@@ -933,9 +905,6 @@ export const birthEvent = defineConfig({
           '{child.name.firstname, select, __EMPTY__ {Birth declaration} other {{child.name.surname, select, __EMPTY__ {Birth declaration for {child.name.firstname}} other {Birth declaration for {child.name.firstname} {child.name.surname}}}}}',
         description: 'Title of the form to show in review page'
       },
-      conditionals: [
-        { type: ConditionalType.SHOW, conditional: not(flag('revoked')) }
-      ],
       correctionForm: CORRECTION_FORM
     },
     {

@@ -17,14 +17,18 @@ import styled from 'styled-components'
 import { useNavigate } from 'react-router-dom'
 import {
   ActionType,
+  EventConfig,
   EventDocument,
   EventIndex,
   getCurrentEventState,
   getDeclaration,
   eventAttachmentPath
 } from '@opencrvs/commons/client'
-import { FormTabs, Frame, Icon, IFormTabs } from '@opencrvs/components'
-import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
+import { FormTabs, Frame, Icon, IFormTabs, Text } from '@opencrvs/components'
+import {
+  useEventConfigurationForRecord,
+  useEventConfigurationResolver
+} from '@client/v2-events/features/events/useEventConfiguration'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
 import { ROUTES } from '@client/v2-events/routes'
 import { Review as ReviewComponent } from '@client/v2-events/features/events/components/Review'
@@ -110,6 +114,13 @@ export const duplicateMessages = {
     defaultMessage: 'Registered by',
     description: 'Registered by label for duplicates comparison'
   },
+  unknownConfigVersion: {
+    id: 'duplicates.content.unknownConfigVersion',
+    defaultMessage:
+      '{trackingId} cannot be compared: its configuration version "{version}" is not available.',
+    description:
+      'Shown under the tabs of the duplicate review when a potential duplicate was created under a configuration version that is not available'
+  },
   notDuplicateContentConfirmationDescription: {
     id: 'duplicates.content.notDuplicateContentConfirmationDescription',
     defaultMessage:
@@ -117,6 +128,12 @@ export const duplicateMessages = {
     description: 'Not a duplicate content confirmation description message'
   }
 }
+
+const UnknownVersionNotice = styled.div`
+  padding: 8px ${({ theme }) => theme.grid.margin}px;
+  background: ${({ theme }) => theme.colors.white};
+  border-bottom: 1px solid ${({ theme }) => theme.colors.grey300};
+`
 
 const TopBar = styled.div`
   padding: 0 ${({ theme }) => theme.grid.margin}px;
@@ -132,52 +149,47 @@ const TopBar = styled.div`
   z-index: 1;
 `
 
-function ReviewDuplicate() {
-  const { eventId } = useTypedParams(ROUTES.V2.EVENTS.DECLARE.REVIEW)
-
+function ReviewDuplicateBody({ event }: { event: EventDocument }) {
   const intl = useIntl()
-  const navigate = useNavigate()
-  const events = useEvents()
-  const event = events.getEvent.useFindEventFromCache(eventId).data
   const validatorContext = useValidatorContext(event)
-
-  useEffect(() => {
-    if (!event) {
-      // eslint-disable-next-line no-console
-      console.warn(
-        `Event with id ${eventId} not found in cache. Redirecting to overview.`
-      )
-      return navigate(ROUTES.V2.EVENTS.EVENT.buildPath({ eventId }))
-    }
-  }, [event, eventId, navigate])
-
-  if (!event) {
-    return <div />
-  }
-
   const [selectedTab, selectTab] = useState<string>(event.trackingId)
 
-  const { eventConfiguration: configuration } = useEventConfiguration(
-    event.type
-  )
+  const { eventConfiguration: configuration } =
+    useEventConfigurationForRecord(event)
+  const { formatMessage } = useIntlFormatMessageWithFlattenedParams()
+  const resolveEventConfiguration = useEventConfigurationResolver()
 
   const eventState = getCurrentEventState(event, configuration)
 
-  const potentialDuplicates = eventState.potentialDuplicates.reduce<
-    Record<string, { eventState: EventIndex; event: EventDocument }>
-  >((acc, { id, trackingId }) => {
+  // Each potential duplicate is read with the version it was created under.
+  // A potential duplicate whose version is not available cannot be compared.
+  const unknownVersionDuplicates: EventDocument[] = []
+  const potentialDuplicates: Record<
+    string,
+    {
+      event: EventDocument
+      eventConfiguration: EventConfig
+      eventState: EventIndex
+    }
+  > = {}
+  eventState.potentialDuplicates.forEach(({ id, trackingId }) => {
     const localEvent = findLocalEventDocument(id)
     if (!localEvent) {
       throw new Error(
         `Event with id ${id} and trackingId ${trackingId} not found in cache.`
       )
     }
-    acc[trackingId] = {
-      eventState: getCurrentEventState(localEvent, configuration),
-      event: localEvent
+    const duplicateConfiguration = resolveEventConfiguration(localEvent)
+    if (!duplicateConfiguration) {
+      unknownVersionDuplicates.push(localEvent)
+      return
     }
-    return acc
-  }, {})
+    potentialDuplicates[trackingId] = {
+      event: localEvent,
+      eventConfiguration: duplicateConfiguration,
+      eventState: getCurrentEventState(localEvent, duplicateConfiguration)
+    }
+  })
 
   const tabs: IFormTabs[] = [
     {
@@ -186,10 +198,19 @@ function ReviewDuplicate() {
       color: 'red',
       icon: <Icon color="red" name="WarningCircle" size="medium" />
     },
-    ...eventState.potentialDuplicates.map(({ trackingId }) => ({
-      id: trackingId,
-      title: trackingId
-    }))
+    // A potential duplicate of an unknown version gets a grey, disabled tab.
+    // The line under the tabs says why. Only the record under review has the
+    // warning icon.
+    ...eventState.potentialDuplicates.map(({ trackingId }) =>
+      trackingId in potentialDuplicates
+        ? { id: trackingId, title: trackingId }
+        : {
+            id: trackingId,
+            title: trackingId,
+            disabled: true,
+            color: 'grey400' as const
+          }
+    )
   ]
 
   const actionConfiguration = configuration.actions.find(
@@ -200,7 +221,6 @@ function ReviewDuplicate() {
   }
 
   const { title, fields } = actionConfiguration.review
-  const { formatMessage } = useIntlFormatMessageWithFlattenedParams()
 
   const formConfig = getDeclaration(configuration)
 
@@ -223,6 +243,19 @@ function ReviewDuplicate() {
           onTabClick={(id: string) => selectTab(id)}
         />
       </TopBar>
+      {unknownVersionDuplicates.map((duplicate) => (
+        <UnknownVersionNotice
+          key={duplicate.id}
+          data-testid={`unknown-config-version-${duplicate.id}`}
+        >
+          <Text color="negative" element="p" variant="reg14">
+            {intl.formatMessage(duplicateMessages.unknownConfigVersion, {
+              trackingId: duplicate.trackingId,
+              version: duplicate.configVersionId
+            })}
+          </Text>
+        </UnknownVersionNotice>
+      ))}
       {selectedTab === event.trackingId ? (
         <React.Suspense
           fallback={<SuspenseLoadingFallback id="event-form-spinner" />}
@@ -245,8 +278,12 @@ function ReviewDuplicate() {
       ) : (
         <DuplicateComparison
           originalEvent={event}
+          originalEventConfiguration={configuration}
           originalEventState={eventState}
           potentialDuplicateEvent={potentialDuplicates[selectedTab].event}
+          potentialDuplicateEventConfiguration={
+            potentialDuplicates[selectedTab].eventConfiguration
+          }
           potentialDuplicateEventState={
             potentialDuplicates[selectedTab].eventState
           }
@@ -254,6 +291,30 @@ function ReviewDuplicate() {
       )}
     </Frame>
   )
+}
+
+function ReviewDuplicate() {
+  const { eventId } = useTypedParams(ROUTES.V2.EVENTS.DECLARE.REVIEW)
+
+  const navigate = useNavigate()
+  const events = useEvents()
+  const event = events.getEvent.useFindEventFromCache(eventId).data
+
+  useEffect(() => {
+    if (!event) {
+      // eslint-disable-next-line no-console
+      console.warn(
+        `Event with id ${eventId} not found in cache. Redirecting to overview.`
+      )
+      return navigate(ROUTES.V2.EVENTS.EVENT.buildPath({ eventId }))
+    }
+  }, [event, eventId, navigate])
+
+  if (!event) {
+    return <div />
+  }
+
+  return <ReviewDuplicateBody event={event} />
 }
 
 export const ReviewDuplicateIndex = withSuspense(ReviewDuplicate)

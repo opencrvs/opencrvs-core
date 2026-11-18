@@ -14,7 +14,7 @@ import React, { useState } from 'react'
 import { defineMessages, MessageDescriptor, useIntl } from 'react-intl'
 import { useSelector } from 'react-redux'
 import styled from 'styled-components'
-import { CountryLogo } from '@opencrvs/components/lib/icons'
+import { CountryLogo } from '@opencrvs/components/icons'
 import {
   Accordion,
   Button,
@@ -44,7 +44,8 @@ import {
   IndexMap,
   FormState,
   PlainDate,
-  AttachmentPath
+  AttachmentPath,
+  EventDocument
 } from '@opencrvs/commons/client'
 import { FormFieldGenerator } from '@client/v2-events/components/forms/FormFieldGenerator'
 import { getCountryLogoFile } from '@client/offline/selectors'
@@ -162,21 +163,6 @@ const reviewMessages = defineMessages({
     id: 'buttons.change',
     defaultMessage: 'Change',
     description: 'The label for the change button'
-  },
-  changeModalContinue: {
-    id: 'changeModal.continue',
-    defaultMessage: 'Continue',
-    description: 'The label for continue button of change modal'
-  },
-  changeModalTitle: {
-    id: 'changeModal.title',
-    defaultMessage: 'Edit declaration?',
-    description: 'The title for change modal'
-  },
-  changeModalDescription: {
-    id: 'changeModal.description',
-    defaultMessage: 'A record will be created of any changes you make',
-    description: 'The description for change modal'
   },
   govtName: {
     id: 'review.header.title.govtName',
@@ -464,15 +450,7 @@ function ReviewComponent({
   annotation?: EventState
   reviewFields?: FieldConfig[]
   previousFormValues?: EventState
-  onEdit: ({
-    pageId,
-    fieldId,
-    confirmation
-  }: {
-    pageId: string
-    fieldId?: string
-    confirmation?: boolean
-  }) => void
+  onEdit: ({ pageId, fieldId }: { pageId: string; fieldId?: string }) => void
   title: string
   onAnnotationChange?: (values: EventState) => void
   readonlyMode?: boolean
@@ -627,59 +605,6 @@ function ReviewComponent({
   )
 }
 
-function EditModal({
-  copy,
-  close
-}: {
-  copy?: {
-    continue?: MessageDescriptor
-    title?: MessageDescriptor
-    description?: MessageDescriptor
-  }
-  close: (result: boolean | null) => void
-}) {
-  const intl = useIntl()
-  return (
-    <Dialog
-      isOpen
-      actions={[
-        <Button
-          key="cancel_edit"
-          id="cancel_edit"
-          type="tertiary"
-          onClick={() => {
-            close(null)
-          }}
-        >
-          {intl.formatMessage(buttonMessages.cancel)}
-        </Button>,
-        <Button
-          key="confirm_edit"
-          id="confirm_edit"
-          type="primary"
-          onClick={() => {
-            close(true)
-          }}
-        >
-          {intl.formatMessage(
-            copy?.continue || reviewMessages.changeModalContinue
-          )}
-        </Button>
-      ]}
-      title={intl.formatMessage(copy?.title || reviewMessages.changeModalTitle)}
-      onClose={() => close(null)}
-    >
-      <Stack>
-        <Text color="grey500" element="p" variant="reg16">
-          {intl.formatMessage(
-            copy?.description || reviewMessages.changeModalDescription
-          )}
-        </Text>
-      </Stack>
-    </Dialog>
-  )
-}
-
 export interface AcceptActionModalResult {
   values: Record<string, FieldUpdateValue>
 }
@@ -692,9 +617,12 @@ function AcceptActionModal({
   fields = [],
   eventConfiguration,
   declaration,
-  attachmentPath
+  attachmentPath,
+  event
 }: {
   attachmentPath: AttachmentPath
+  /** Record the action is taken on, for fields that act on it, e.g. a print button. */
+  event?: EventDocument
   copy: {
     onConfirm: MessageDescriptor
     title: MessageDescriptor
@@ -708,7 +636,7 @@ function AcceptActionModal({
   declaration: EventState
 }) {
   const intl = useIntl()
-  const validatorContext = useValidatorContext()
+  const validatorContext = useValidatorContext(event)
   const dialogForm = useDialogFormState()
   const modalValues = dialogForm.formValues
 
@@ -803,9 +731,12 @@ function RejectActionModal({
   supportingCopy,
   fields = [],
   eventConfiguration,
-  attachmentPath
+  attachmentPath,
+  event
 }: {
   attachmentPath: AttachmentPath
+  /** Record the action is taken on, for fields that act on it, e.g. a print button. */
+  event?: EventDocument
   close: (result: RejectActionModalResult | null) => void
   supportingCopy?: MessageDescriptor
   fields?: FieldConfig[]
@@ -815,7 +746,7 @@ function RejectActionModal({
   const dialogForm = useDialogFormState()
   const modalValues = dialogForm.formValues
   const intl = useIntl()
-  const validatorContext = useValidatorContext()
+  const validatorContext = useValidatorContext(event)
 
   const errorsOnField = fields.flatMap((field) =>
     flattenFormState(
@@ -892,7 +823,6 @@ function RejectActionModal({
 
 export const Review = {
   Body: withSuspense(ReviewComponent),
-  EditModal,
   ActionModal: {
     Accept: AcceptActionModal,
     Reject: RejectActionModal

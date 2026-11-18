@@ -35,6 +35,7 @@ import { advancedSearchBirth } from './advancedSearch'
 import { BIRTH_CERTIFICATE_COLLECTOR_FORM } from './forms/printForm'
 import { PlaceOfBirth } from './forms/pages/child'
 import { CORRECTION_FORM } from './forms/correctionForm'
+import { BIRTH_NOTIFICATION_FORM } from './forms/notificationForm'
 import { dedupConfig } from './dedupConfig'
 import * as verifiableCredentialActions from '@countryconfig/verifiable-credentials/issue-birth-credential-action'
 import {
@@ -186,6 +187,21 @@ export const birthEvent = defineConfig({
       }
     ],
     fields: [
+      {
+        id: 'configVersion',
+        label: {
+          defaultMessage: 'Configuration version',
+          description:
+            'Label for the id of the event configuration version the record was created under',
+          id: 'event.birth.summary.configVersion.label'
+        },
+        value: {
+          defaultMessage: '{event.configVersionId}',
+          description:
+            'Id of the event configuration version the record was created under',
+          id: 'event.birth.summary.configVersion.value'
+        }
+      },
       {
         fieldId: 'child.nid',
         conditionals: [
@@ -348,12 +364,14 @@ export const birthEvent = defineConfig({
     ActionType.PRINT_CERTIFICATE,
     'ISSUE_CERTIFIED_COPY',
     ActionType.REQUEST_CORRECTION,
-    'REVOKE_REGISTRATION',
     'REINSTATE_REVOKE_REGISTRATION',
+    ActionType.REINSTATE_REGISTRATION,
     'ISSUE_VERIFIABLE_CREDENTIAL',
     ActionType.UNASSIGN,
     'SEAL',
-    'UNSEAL'
+    'UNSEAL',
+    // Also orders the custom revoke, which no role can perform any more
+    'REVOKE_REGISTRATION'
   ],
   actions: [
     {
@@ -373,6 +391,17 @@ export const birthEvent = defineConfig({
         description:
           'This is shown as the action name anywhere the user can trigger the action from',
         id: 'event.birth.action.notify.label'
+      },
+      notificationForm: BIRTH_NOTIFICATION_FORM,
+      review: {
+        title: {
+          defaultMessage:
+            '{child.name.firstname, select, __EMPTY__ {{child.name.surname, select, __EMPTY__ {Birth notification} other {Birth notification for {child.name.surname}}}} other {{child.name.surname, select, __EMPTY__ {Birth notification for {child.name.firstname}} other {Birth notification for {child.name.firstname} {child.name.surname}}}}}',
+          id: 'event.birth.action.notify.form.review.title',
+          description: 'Title of the form to show in review page'
+        },
+        // We dont want review fields on notification
+        fields: []
       },
       form: [
         {
@@ -567,6 +596,26 @@ export const birthEvent = defineConfig({
         id: 'event.birth.action.approve.label'
       },
       form: [
+        {
+          id: 'approvalNotice',
+          type: FieldType.FILE,
+          required: false,
+          configuration: {
+            maxFileSize: 5 * 1024 * 1024,
+            acceptedFileTypes: [
+              ImageMimeType.enum['image/jpeg'],
+              ImageMimeType.enum['image/png'],
+              ImageMimeType.enum['image/jpg'],
+              DocumentMimeType.enum['application/pdf']
+            ]
+          },
+          label: {
+            defaultMessage: 'Approval notice',
+            description:
+              'Label for the approval notice document field on the late registration approval action',
+            id: 'event.birth.custom.action.approve.field.approvalNotice.label'
+          }
+        },
         {
           id: 'notes',
           type: 'TEXTAREA',
@@ -892,7 +941,7 @@ export const birthEvent = defineConfig({
       icon: 'Briefcase',
       supportingCopy: {
         defaultMessage:
-          'Revoking this registration will invalidate the record and prevent its use for official purposes. This action should only be taken under lawful authority.',
+          'The registration is withdrawn and any certificate issued from it stops being valid. This is recorded on the record permanently.',
         description:
           'This is the confirmation text for the revoke registration action',
         id: 'event.birth.action.revoke-registration.supportingCopy'
@@ -951,8 +1000,8 @@ export const birthEvent = defineConfig({
         defaultMessage:
           'This will restore a previously revoked registration to active status.',
         description:
-          'This is the confirmation text for the reinstate revoke registration action',
-        id: 'event.birth.action.revoke-registration.supportingCopy'
+          'This is the confirmation text for the reinstate registration action',
+        id: 'event.birth.action.reinstate-registration.supportingCopy'
       },
       auditHistoryLabel: {
         defaultMessage: 'Registration reinstated',
@@ -967,6 +1016,63 @@ export const birthEvent = defineConfig({
         }
       ],
       flags: [{ id: 'revoked', operation: 'remove' }],
+      form: [
+        {
+          id: 'reason',
+          type: 'TEXTAREA',
+          required: true,
+          label: {
+            defaultMessage: 'Reason',
+            description:
+              'This is the label for the reason field for revoke registration action',
+            id: 'event.birth.custom.action.revoke-registration.field.reason.label'
+          }
+        }
+      ]
+    },
+    {
+      type: ActionType.REVOKE_REGISTRATION,
+      label: {
+        defaultMessage: 'Revoke registration',
+        description:
+          'This is shown as the action name anywhere the user can trigger the action from',
+        id: 'event.birth.action.revoke-registration.label'
+      },
+      icon: 'Briefcase',
+      supportingCopy: {
+        defaultMessage:
+          'The registration is withdrawn and any certificate issued from it stops being valid. This is recorded on the record permanently.',
+        description:
+          'This is the confirmation text for the revoke registration action',
+        id: 'event.birth.action.revoke-registration.supportingCopy'
+      },
+      // Records revoked with the custom action are still REGISTERED
+      conditionals: [
+        { type: ConditionalType.SHOW, conditional: not(flag('revoked')) }
+      ],
+      form: [
+        {
+          id: 'reason',
+          type: 'TEXTAREA',
+          required: true,
+          label: {
+            defaultMessage: 'Reason',
+            description:
+              'This is the label for the reason field for revoke registration action',
+            id: 'event.birth.custom.action.revoke-registration.field.reason.label'
+          }
+        }
+      ]
+    },
+    {
+      type: ActionType.REINSTATE_REGISTRATION,
+      label: {
+        defaultMessage: 'Reinstate registration',
+        description:
+          'This is shown as the action name anywhere the user can trigger the action from',
+        id: 'event.birth.action.reinstate-registration.label'
+      },
+      icon: 'ArchiveTray',
       form: [
         {
           id: 'reason',

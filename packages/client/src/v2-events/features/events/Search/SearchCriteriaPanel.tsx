@@ -13,7 +13,7 @@ import { defineMessages, useIntl } from 'react-intl'
 import { useNavigate } from 'react-router-dom'
 import styled from 'styled-components'
 import { capitalize } from 'lodash'
-import { Pill, Link as StyledLink } from '@opencrvs/components/lib'
+import { Pill, Link as StyledLink } from '@opencrvs/components'
 import {
   EventConfig,
   EventState,
@@ -43,16 +43,12 @@ const messagesToDefine = {
 const messages = defineMessages(messagesToDefine)
 
 const SearchParamContainer = styled.div`
-  margin: 16px 0px;
+  margin: 16px 16px 16px 0;
   display: flex;
   gap: 10px;
   flex-wrap: wrap;
   align-items: center;
   color: ${({ theme }) => theme.colors.primaryDark};
-  @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
-    max-height: 200px;
-    overflow-y: scroll;
-  }
 `
 
 function convertPathToLabel(path?: string): string {

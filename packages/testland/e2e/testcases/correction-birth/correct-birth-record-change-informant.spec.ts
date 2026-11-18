@@ -35,12 +35,11 @@ import {
   waitForCorrectionAction
 } from '@e2e/support/utils'
 
-test.describe.serial('Correct record - change informant type', () => {
+test('Correct record - change informant type', async ({ page }) => {
   let declaration: DeclarationV2
   let trackingId = ''
 
   let eventId: string
-  let page: Page
 
   const updatedFatherDetails = {
     firstNames: faker.person.firstName('male'),
@@ -82,15 +81,7 @@ test.describe.serial('Correct record - change informant type', () => {
     col3 && (await expect(_page.getByText(col3, { exact: true })).toBeVisible())
   }
 
-  test.beforeAll(async ({ browser }) => {
-    page = await browser.newPage()
-  })
-
-  test.afterAll(async () => {
-    await page.close()
-  })
-
-  test('Shortcut declaration', async () => {
+  await test.step('Shortcut declaration', async () => {
     let token = await getToken(CREDENTIALS.REGISTRAR)
     const res = await createDeclarationV2(
       token,
@@ -130,7 +121,7 @@ test.describe.serial('Correct record - change informant type', () => {
     declaration = res.declaration
   })
 
-  test('Ready to correct record > record audit', async () => {
+  await test.step('Ready to correct record > record audit', async () => {
     await login(page, CREDENTIALS.REGISTRAR)
 
     await auditRecord({
@@ -143,7 +134,7 @@ test.describe.serial('Correct record - change informant type', () => {
     await selectAction(page, 'Correct')
   })
 
-  test('Correction requester: legal guardian', async () => {
+  await test.step('Correction requester: legal guardian', async () => {
     await page.locator('#requester____type').click()
     await page.getByText('Legal Guardian', { exact: true }).click()
     await page.locator('#reason____option').click()
@@ -155,21 +146,21 @@ test.describe.serial('Correct record - change informant type', () => {
     await page.getByRole('button', { name: 'Continue' }).click()
   })
 
-  test('Verify identity', async () => {
+  await test.step('Verify identity', async () => {
     await page.getByRole('button', { name: 'Verified' }).click()
   })
 
-  test('Upload supporting documents', async () => {
+  await test.step('Upload supporting documents', async () => {
     await page.getByRole('button', { name: 'Continue' }).click()
   })
 
-  test('Correction fee', async () => {
+  await test.step('Correction fee', async () => {
     await page.locator('#fees____amount').fill(correctionFee)
     await page.getByRole('button', { name: 'Continue' }).click()
   })
 
-  test.describe('Make correction', async () => {
-    test('Change informant type', async () => {
+  await test.step('Make correction', async () => {
+    await test.step('Change informant type', async () => {
       await page.getByTestId('change-button-informant.relation').click()
       await page.getByTestId('select__informant____relation').click()
       await page.getByText('Father', { exact: true }).click()
@@ -179,12 +170,12 @@ test.describe.serial('Correct record - change informant type', () => {
         .fill(updatedFatherDetails.email)
     })
 
-    test('Continue to father page', async () => {
+    await test.step('Continue to father page', async () => {
       await page.getByRole('button', { name: 'Continue' }).click()
       await page.getByRole('button', { name: 'Continue' }).click()
     })
 
-    test('Fill in father details', async () => {
+    await test.step('Fill in father details', async () => {
       await expect(
         page.getByText("Same as mother's usual place of residence?")
       ).toBeVisible()
@@ -267,12 +258,12 @@ test.describe.serial('Correct record - change informant type', () => {
     })
   })
 
-  test('Go back to review, expect to not see any validation errors', async () => {
+  await test.step('Go back to review, expect to not see any validation errors', async () => {
     await page.getByRole('button', { name: 'Go to review' }).click()
     await expect(page.getByText(REQUIRED_VALIDATION_ERROR)).not.toBeVisible()
   })
 
-  test('Correction summary', async () => {
+  await test.step('Correction summary', async () => {
     await page.getByRole('button', { name: 'Continue' }).click()
 
     await expect(
@@ -343,7 +334,7 @@ test.describe.serial('Correct record - change informant type', () => {
     await page.getByTestId('exit-event').click()
   })
 
-  test('Validate history in record audit', async () => {
+  await test.step('Validate history in record audit', async () => {
     await auditRecord({
       page,
       name: formatV2ChildName(declaration),

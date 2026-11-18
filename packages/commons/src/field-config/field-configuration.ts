@@ -25,6 +25,7 @@ export function createFieldConfig(
     validations?: ValidationConfig[]
     searchCriteriaLabelPrefix?: TranslationConfig
     allowedLocations?: JurisdictionReference
+    defaultValue?: boolean | string | number
   }
 ) {
   const baseField = {

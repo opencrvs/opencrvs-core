@@ -25,18 +25,20 @@ import {
   isFieldDisplayedOnReview,
   ValidatorContext
 } from '@opencrvs/commons/client'
-import { Table } from '@opencrvs/components/lib/Table'
-import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
+import { Table } from '@opencrvs/components'
+import { useEventConfigurationForRecord } from '@client/v2-events/features/events/useEventConfiguration'
 import { messages as correctionMessages } from '@client/i18n/messages/views/correction'
 import { withSuspense } from '@client/v2-events/components/withSuspense'
 import { Output } from '@client/v2-events/features/events/components/Output'
 import { recordAnchorDate } from '@client/v2-events/utils'
 import {
   getAnnotationComparisonForField,
-  getReviewFormFields,
+  getReviewFormFields
+} from '@client/v2-events/features/events/actions/annotationUtils'
+import {
+  getChangedDeclarationDiff,
   hasFieldChanged
-} from '@client/v2-events/features/events/actions/correct/utils'
-import { getChangedDeclarationDiff } from '@client/v2-events/features/events/useEvents/procedures/actions/declarationDiff'
+} from '@client/v2-events/features/events/useEvents/procedures/actions/declarationDiff'
 
 const TableHeader = styled.th`
   text-transform: uppercase;
@@ -112,7 +114,7 @@ function DeclarationComparisonTableComponent({
   const reviewFormFields = getReviewFormFields(eventConfig)
 
   const intl = useIntl()
-  const { eventConfiguration } = useEventConfiguration(fullEvent.type)
+  const { eventConfiguration } = useEventConfigurationForRecord(fullEvent)
 
   const eventBeforeUpdate = action
     ? sliceEventAt(fullEvent, action.id, false)

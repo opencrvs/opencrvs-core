@@ -70,16 +70,6 @@ export const env = cleanEnv(process.env, {
     devDefault: '',
     desc: 'Comma separated list of URLs to forward action events to'
   }),
-  SYSTEM_CLIENT_ID: str({
-    default: undefined,
-    devDefault: undefined,
-    desc: 'Client ID for system-to-system authentication on /api/ proxy endpoints'
-  }),
-  SYSTEM_CLIENT_SECRET: str({
-    default: undefined,
-    devDefault: undefined,
-    desc: 'Client secret for system-to-system authentication on /api/ proxy endpoints'
-  }),
   VERIFIABLE_CREDENTIALS_SDJWT_ISSUE_URL: url({
     default: 'http://countryconfig:3040/_demo-issuer/openid4vc/sdjwt/issue',
     devDefault: 'http://localhost:3040/_demo-issuer/openid4vc/sdjwt/issue',
@@ -91,6 +81,7 @@ export const env = cleanEnv(process.env, {
     desc: 'URL for signing raw JWTs for verifiable credentials issuance'
   }),
   REFERENCE_DATA_DATABASE_URL: url({
+    default: undefined,
     devDefault:
       'postgres://events_reference_data:reference_data_password@localhost:5432/events',
     desc: 'The database URL for reads and writes to `reference_data.icd10`. See `/infrastructure/postgres/setup-reference-data.sh` for how the default database is set up for your country.'

@@ -18,6 +18,10 @@ export function getUUID() {
   return uuidv4() as UUID
 }
 
-export function isUUID(id: string | UUID): id is UUID {
-  return UUID.safeParse(id).success
+export function isUUID(id: unknown): id is UUID {
+  return UUID.validate(id)
+}
+
+export function maybeUuid(value: unknown): UUID | undefined {
+  return isUUID(value) ? value : undefined
 }

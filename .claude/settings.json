@@ -21,31 +21,49 @@
       "Read(**/vnc/**)",
       "Bash(sudo:*)",
       "Bash(ssh:*)",
-      "Bash(git push:*)",
-      "Bash(git push --force:*)",
-      "Bash(docker push:*)",
       "Bash(kubectl:*)",
-      "Bash(rm -rf /:*)"
+      "Bash(rm -rf /:*)",
+      "Bash(* .env*)",
+      "Bash(*/.env*)",
+      "Bash(*.secrets/*)",
+      "Bash(*.pem*)",
+      "Bash(*id_rsa*)",
+      "Bash(*id_ed25519*)",
+      "Bash(git push --force*)",
+      "Bash(git push -f*)",
+      "Bash(git push * --force*)",
+      "Bash(git push * -f)",
+      "Bash(git push * -f *)",
+      "Bash(git push * +*)",
+      "Bash(docker push*)",
+      "Bash(docker image push*)",
+      "Bash(docker compose push*)",
+      "Bash(docker * --push*)"
     ],
-    "ask": [
-      "Bash(curl:*)",
-      "Bash(wget:*)",
-      "WebFetch",
-      "Bash(docker:*)",
-      "Bash(git commit:*)"
-    ],
+    "ask": ["Bash(git push:*)", "Bash(gh pr create:*)"],
     "allow": [
-      "Bash(yarn test:*)",
-      "Bash(yarn lint:*)",
-      "Bash(yarn build:*)",
-      "Bash(yarn tsc:*)",
-      "Bash(yarn typecheck:*)",
-      "Bash(yarn workspace:*)",
+      "Bash(pnpm typecheck*)",
+      "Bash(pnpm lint*)",
+      "Bash(pnpm test*)",
+      "Bash(pnpm build*)",
+      "Bash(pnpm exec prettier*)",
+      "Bash(nx run *)",
+      "Bash(lerna run *)",
       "Bash(git status)",
       "Bash(git diff:*)",
       "Bash(git log:*)",
       "Bash(git branch:*)",
-      "Edit(packages/**)"
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Edit(packages/**)",
+      "Bash(docker compose *)",
+      "Bash(docker ps*)",
+      "Bash(docker logs *)",
+      "Bash(docker inspect *)",
+      "Bash(docker images*)",
+      "Bash(curl:*)",
+      "Bash(wget:*)",
+      "WebFetch"
     ]
   },
   "includeCoAuthoredBy": true,
@@ -72,5 +90,8 @@
         ]
       }
     ]
+  },
+  "enabledPlugins": {
+    "chrome-devtools-mcp@claude-plugins-official": true
   }
 }

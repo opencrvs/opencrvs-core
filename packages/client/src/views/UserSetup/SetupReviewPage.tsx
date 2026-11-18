@@ -81,9 +81,9 @@ export function UserSetupReview({ setupData, goToStep }: IProps) {
 
   const { getLocation } = useLocations()
   const location = getLocation.useQuery(primaryOfficeId)
-  const { activateUser } = useUsers()
+  const { useActivateUser } = useUsers()
 
-  const activateUserUserMutation = activateUser({
+  const activateUserUserMutation = useActivateUser({
     onSuccess: onCompleted,
     onError: onError
   })

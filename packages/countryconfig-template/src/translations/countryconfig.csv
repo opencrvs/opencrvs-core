@@ -182,6 +182,11 @@ event.birth.action.form.section.signedAffidavit.label,This is the label for uplo
 event.birth.action.issue-certified-copy.label,This is shown as the action name anywhere the user can trigger the action from,Issue certified copy,Délivrer une copie certifiée
 event.birth.action.issue-certified-copy.supportingCopy,This is the confirmation text for the issue certified copy action,Issuing a certified copy confirms that an official document is being released.,Délivrer une copie certifiée confirme qu'un document officiel est remis.
 event.birth.action.issued.audit-history-label,The label to show in audit history for the issued action,Issued,Émis
+event.birth.action.notify.field.comments.label,This is the label for the additional comments field on the notify action dialog,Additional comments,Commentaires supplémentaires
+event.birth.action.notify.form.label,This is what the birth notification form is referred as,Birth notification form,Formulaire de notification de naissance
+event.birth.action.notify.form.review.title,Title of the form to show in review page,"{child.name.firstname, select, __EMPTY__ {{child.name.surname, select, __EMPTY__ {Birth notification} other {Birth notification for {child.name.surname}}}} other {{child.name.surname, select, __EMPTY__ {Birth notification for {child.name.firstname}} other {Birth notification for {child.name.firstname} {child.name.surname}}}}}","{child.name.firstname, select, __EMPTY__ {{child.name.surname, select, __EMPTY__ {Notification de naissance} other {Notification de naissance pour {child.name.surname}}}} other {{child.name.surname, select, __EMPTY__ {Notification de naissance pour {child.name.firstname}} other {Notification de naissance pour {child.name.firstname} {child.name.surname}}}}}"
+event.birth.action.notify.form.section.child.field.dob.error,This is the error message for late registration,Late registration is not allowed,L'inscription tardive n'est pas autorisée
+event.birth.action.notify.label,This is shown as the action name anywhere the user can trigger the action from,Notify,Notifier
 event.birth.action.print.collectPayment,This is the title of the section,Collect Payment,Percevoir le paiement
 event.birth.action.print.verifyIdentity,This is the title of the section,Verify their identity,Vérifier son identité
 event.birth.action.provincial-registrar-feedback.label,This is shown when the provincial registrar feedback can be triggered from the action from,Provincial registrar feedback,Retour du registraire provincial
@@ -190,11 +195,9 @@ event.birth.action.register.supportingCopy,The description for registration acti
 event.birth.action.registrar-feedback.audit-history-label,The label to show in audit history for the registrar feedback sent action,Escalation feedback,Commentaire de transmission
 event.birth.action.registrar-general-feedback.label,This is shown when the registrar general feedback can be triggered from the action from,Registrar general feedback,Retour du registraire général
 event.birth.action.registrar-general-feedback.supportingCopy,This is the confirmation text for the registrar general feedback action,Your feedback will be officially recorded and may influence the final decision on the declaration.,Votre commentaire sera officiellement consigné et pourra influencer la décision finale sur la déclaration.
-event.birth.action.reinstate-registration.audit-history-label,The label to show in audit history for the reinstate registration action,Registration reinstated,Enregistrement rétabli
 event.birth.action.reinstate-registration.label,This is shown as the action name anywhere the user can trigger the action from,Reinstate registration,Rétablir l'enregistrement
-event.birth.action.revoke-registration.audit-history-label,The label to show in audit history for the revoke registration action,Revoked,Révoqué
 event.birth.action.revoke-registration.label,This is shown as the action name anywhere the user can trigger the action from,Revoke registration,Révoqué l'enregistrement
-event.birth.action.revoke-registration.supportingCopy,This is the confirmation text for the reinstate revoke registration action,This will restore a previously revoked registration to active status.,Cela rétablira à l'état actif un enregistrement précédemment révoqué.
+event.birth.action.revoke-registration.supportingCopy,This is the confirmation text for the revoke registration action,The registration is withdrawn and any certificate issued from it stops being valid. This is recorded on the record permanently.,L'enregistrement est retiré et tout certificat délivré à partir de celui-ci n'est plus valide. Ceci est consigné définitivement dans le dossier.
 event.birth.custom.action.approve.field.collector.label,Label for collector field,Collector,le collectionneur
 event.birth.custom.action.approve.field.notes.label,This is the label for the field for a custom action,Comments,Commentaires
 event.birth.custom.action.escalate.field.escalate-to.label,This is the label for escalate to field,Escalate to,Transmettre à
@@ -210,7 +213,6 @@ event.birth.flag.certified-copy-printed-in-advance-of-issuance,Flag label for ce
 event.birth.flag.escalated-to-provincial-registrar,Flag label for escalated to provincial registrar,Escalated to Provincial Registrar,Transmis à l'officier d'état civil provincial
 event.birth.flag.escalated-to-registrar-general,Flag label for escalated to registrar general,Escalated to Registrar General,Transmis au directeur général de l'état civil
 event.birth.flag.pending-first-certificate-issuance,Pending first certificate issuance,Pending first certificate issuance,En attente de la délivrance d'une copie certifiée conforme
-event.birth.flag.revoked,Flag label for revoked,Revoked,Révoqué
 event.birth.flag.validated,Flag label for validated,Validated,Validé
 event.birth.label,This is what this event is referred as in the system,Birth,Naissance
 event.birth.summary.child.dob.empty,Label for date of birth not available,No date of birth,Pas de date de naissance
@@ -262,8 +264,8 @@ event.death.action.correction.form.section.requester.label,This is the label for
 event.death.action.correction.form.section.requester.name.label,This is the label for the field,Name,Nom
 event.death.action.correction.form.section.requester.nid.label,This is the label for the field,ID Number,Numéro d'identité
 event.death.action.correction.form.section.requester.passport.label,This is the label for the field,ID Number,Numéro d'identité
-event.death.action.correction.form.section.requester.relationship.label,This is the label for the field,Relationship to child,Relation avec l'enfant
-event.death.action.correction.form.section.requester.relationship.placeholder,This is the placeholder for the field,eg. Grandmother,ex. Grand-mère
+event.death.action.correction.form.section.requester.relationship.label,This is the label for the field,Relationship to deceased,Relation avec le défunt
+event.death.action.correction.form.section.requester.relationship.placeholder,This is the placeholder for the field,eg. Mother,ex. Mère
 event.death.action.correction.form.section.supporting-documents.title,This is the title of the section,Upload supporting documents,Télécharger les documents justificatifs
 event.death.action.correction.form.section.verifyIdentity.data.label,Title for the data section,,
 event.death.action.correction.form.verify,This is the label for the verification button,Verified,Vérifié
@@ -446,6 +448,7 @@ event.tennis-club-membership.action.form.section.passportDetails.label,Field for
 event.tennis-club-membership.action.form.section.refugeeNumberDetails.label,Field for entering Refugee Number details,Refugee Number Details,Refugee Number Details
 event.tennis-club-membership.action.form.section.relationshipToMember.label,This is the label for the relationship to member field,Relationship to Member,Relationship to Member
 event.tennis-club-membership.action.form.section.signedAffidavit.label,This is the label for uploading a signed affidavit,Signed Affidavit (Optional),Signed Affidavit (Optional)
+event.tennis-club-membership.action.notify.label,This is shown as the action name anywhere the user can trigger the action from,Notify,Notifier
 event.tennis-club-membership.action.print.collectPayment,This is the title of the section,Collect Payment,Percevoir le paiement
 event.tennis-club-membership.action.print.verifyIdentity,This is the title of the section,Verify their identity,Vérifier son identité
 event.tennis-club-membership.action.read.label,Title of the review page,Read,Lire
@@ -566,18 +569,6 @@ tennis-club-membership.searchField.validation.invalid,Error message for invalid 
 unit.days,Days,Days,Jours
 unit.hours,Hours,Hours,Heures
 unit.minutes,Minutes,Minutes,Minutes
-userRole.administrator,Name for user role Administrator,Administrator,Administrateur
-userRole.communityLeader,Name for user role Community Leader,Community Leader,Leader communautaire
-userRole.embassyOffical,Name for the user role Embassy Official,Embassy Official,Officiel d'ambassade
-userRole.hospitalClerk,Name for user role Hospital Clerk,Hospital Official,Officiel de l'hôpital
-userRole.localRegistrar,Name for user role Registrar,Registrar,Registraire
-userRole.localSystemAdmin,Name for user role Local System Admin,Local System Admin,Administrateur système local
-userRole.nationalAdministrator,Name for user role National Administrator,National Administrator,Administrateur national
-userRole.operationsManager,Name for user role Operations Manager,Operations Manager,Responsable des opérations
-userRole.provincialRegistrar,Name for user role Provincial Registrar,Provincial Registrar,Registraire provincial
-userRole.registrarGeneral,Name for user role Registrar General,Registrar General,Directeur général de l'état civil
-userRole.registrationAgent,Name for user role Registration Agent,Registration Agent,Agent d'enregistrement
-userRole.registrationOfficer,Name for user role Registration Officer,Registration Officer,Agent d'enregistrement
 v2.event.death.action.declare.form.section.deceased.field.addressHelper.label,This is the label for the field,Usual place of residence,Lieu de résidence habituel
 v2.event.death.action.declare.form.section.deceased.field.age.checkbox.label,This is the label for the field,Exact date of birth unknown,Date de naissance exacte inconnue
 v2.event.death.action.declare.form.section.deceased.field.age.postfix,This is the postfix for age field,years,ans

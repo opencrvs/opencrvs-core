@@ -14,7 +14,7 @@ import { createTRPCMsw, httpLink } from '@vafanassieff/msw-trpc'
 import superjson from 'superjson'
 import {
   eventQueryDataGenerator,
-  tennisClubMembershipEvent
+  versionedTennisClubMembershipEvent
 } from '@opencrvs/commons/client'
 import { TRPCProvider, AppRouter } from '@client/v2-events/trpc'
 import { ROUTES } from '@client/v2-events/routes'
@@ -60,7 +60,7 @@ export const Default: Story = {
             return { total: 1, results: [eventQueryDataGenerator({}, 123123)] }
           }),
           tRPCMsw.event.config.get.query(() => {
-            return [tennisClubMembershipEvent]
+            return [versionedTennisClubMembershipEvent]
           })
         ]
       }

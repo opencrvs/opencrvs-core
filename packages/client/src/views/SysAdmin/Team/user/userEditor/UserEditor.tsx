@@ -31,7 +31,8 @@ import {
   UUID,
   CreateUserInput,
   UpdateUserInput,
-  userAttachmentPath
+  userAttachmentPath,
+  maybeUuid
 } from '@opencrvs/commons/client'
 import {
   AppBar,
@@ -43,19 +44,15 @@ import {
   Dialog,
   Text
 } from '@opencrvs/components'
-import { Check, Cross } from '@opencrvs/components/lib/icons'
-import { CircleButton } from '@opencrvs/components/lib/buttons'
+import { Check, Cross } from '@opencrvs/components/icons'
+import { CircleButton } from '@opencrvs/components/legacy'
 import { TRPCClientError } from '@trpc/client'
 import React, { useCallback, useEffect } from 'react'
 import { useIntl } from 'react-intl'
 import { useNavigate } from 'react-router-dom'
-import {
-  useTypedParams,
-  useTypedSearchParams
-} from 'react-router-typesafe-routes/dom'
+import { useTypedSearchParams } from 'react-router-typesafe-routes/dom'
 import styled from 'styled-components'
 import { useUsers } from '../../../../../v2-events/hooks/useUsers'
-import { createTemporaryId, isTemporaryId } from '@client/v2-events/utils'
 import { todayISO } from '@opencrvs/commons/client'
 import { withSuspense } from '@client/v2-events/components/withSuspense'
 import { serializeSearchParams } from '@client/v2-events/features/events/Search/utils'
@@ -66,6 +63,7 @@ import { messages as notificationMessages } from '@client/i18n/messages/views/no
 import { getFormBackAction } from '@client/v2-events/layouts/form/FormBackAction'
 import { useUserEditConfig } from '@client/hooks/useUserEditConfig'
 import { useUserFormState } from './useUserFormState'
+import { useUserEditorRoutes } from './useUserEditorRoutes'
 
 const Container = styled.div`
   display: flex;
@@ -151,7 +149,9 @@ function useCloseUserForm({
 
 /**
  * Component to initiate the creation of a new user.
- * Immediately navigates to the user editor flow, supplying a temporary user ID and "user.details" page.
+ * Immediately navigates to the "user.details" page of the new user editor.
+ * `clear()` gives the form store a new `newUserId`, so each new user gets a
+ * different id.
  */
 const CreateNewUserComponent = () => {
   const [{ officeId, from }] = useTypedSearchParams(
@@ -164,11 +164,8 @@ const CreateNewUserComponent = () => {
     useEventFormData.getState().clear()
     setUserForm({ primaryOfficeId: officeId })
     navigate(
-      ROUTES.V2.SETTINGS.USER.EDIT.buildPath(
-        {
-          userId: createTemporaryId(),
-          pageId: 'user.details'
-        },
+      ROUTES.V2.SETTINGS.USER.NEW.EDIT.buildPath(
+        { pageId: 'user.details' },
         { from }
       ),
       { replace: true }
@@ -182,22 +179,22 @@ export const CreateNewUser = withSuspense(CreateNewUserComponent)
 const EditUserComponent = () => {
   const intl = useIntl()
   const navigate = useNavigate()
-  const { pageId, userId } = useTypedParams(ROUTES.V2.SETTINGS.USER.EDIT)
-  const [searchParams] = useTypedSearchParams(ROUTES.V2.SETTINGS.USER.EDIT)
+  const { isNewUser, userId, pageId, from, editPath, reviewPath } =
+    useUserEditorRoutes()
   const userForm = useUserFormState((s) => s.userForm)
   const setUserForm = useUserFormState((s) => s.setUserForm)
   const formState = userForm ?? EMPTY_FORM
   const { listRoles } = useRoles()
   const [roles] = listRoles.useSuspenseQuery()
   const selectedRole = roles.find((role) => role.id === formState['role'])
-  const isNewUser = isTemporaryId(userId)
   const { getUser } = useUsers()
   const userQuery = getUser.useQuery(userId, { enabled: !isNewUser })
   const targetUser = userQuery.data
   const additionalFields = window.config.ADDITIONAL_USER_FIELDS ?? []
-  const maybeLocationId = UUID.safeParse(userForm?.primaryOfficeId)
+  const maybeLocationId = maybeUuid(userForm?.primaryOfficeId)
+
   const { getConfig } = useUserEditConfig(
-    maybeLocationId.success ? maybeLocationId.data : undefined,
+    maybeLocationId,
     selectedRole,
     additionalFields
   )
@@ -209,7 +206,7 @@ const EditUserComponent = () => {
   const handleClose = useCloseUserForm({
     isNewUser,
     primaryOfficeId: formState['primaryOfficeId'],
-    fromUserList: searchParams.from === 'user.list',
+    fromUserList: from === 'user.list',
     userId,
     setUserForm
   })
@@ -235,17 +232,9 @@ const EditUserComponent = () => {
       return
     }
     if (!formState['primaryOfficeId'] && pageId !== USER_OFFICE_PAGE_ID) {
-      navigate(
-        ROUTES.V2.SETTINGS.USER.EDIT.buildPath(
-          {
-            pageId: USER_OFFICE_PAGE_ID,
-            userId
-          },
-          searchParams
-        )
-      )
+      navigate(editPath(USER_OFFICE_PAGE_ID))
     }
-  }, [formState, navigate, userId, pageId, searchParams, isUnauthorized])
+  }, [formState, navigate, pageId, isUnauthorized, editPath])
 
   const title = isNewUser
     ? intl.formatMessage(messages.userFormTitle)
@@ -270,13 +259,7 @@ const EditUserComponent = () => {
 
   const currentPageId = pageId || getDeclarationPages(eventConfig)[0].id
 
-  const onPageChange = (nextPageId: string) =>
-    navigate(
-      ROUTES.V2.SETTINGS.USER.EDIT.buildPath(
-        { pageId: nextPageId, userId: userId },
-        searchParams
-      )
-    )
+  const onPageChange = (nextPageId: string) => navigate(editPath(nextPageId))
 
   const backAction = getFormBackAction({
     formPages: formConfig.pages,
@@ -305,14 +288,7 @@ const EditUserComponent = () => {
         validatorContext={{}}
         onPageChange={onPageChange}
         onSubmit={() => {
-          navigate(
-            ROUTES.V2.SETTINGS.USER.REVIEW.buildPath(
-              {
-                userId: userId
-              },
-              searchParams
-            )
-          )
+          navigate(reviewPath())
         }}
       />
     </FormLayout>
@@ -328,11 +304,8 @@ const ReviewUserComponent = () => {
   const setUserForm = useUserFormState((s) => s.setUserForm)
   const getUserForm = useUserFormState((s) => s.getUserForm)
   const clear = useUserFormState((s) => s.clear)
-  const { userId } = useTypedParams(ROUTES.V2.SETTINGS.USER.REVIEW)
-
-  const [searchParams] = useTypedSearchParams(ROUTES.V2.SETTINGS.USER.REVIEW)
-  const isNewUser = isTemporaryId(userId)
-  const { getUser, createUser, updateUser } = useUsers()
+  const { isNewUser, userId, from, editPath } = useUserEditorRoutes()
+  const { getUser, useCreateUser, useUpdateUser } = useUsers()
   const { listRoles } = useRoles()
   const [roles] = listRoles.useSuspenseQuery()
   const selectedRole = roles.find(
@@ -372,9 +345,10 @@ const ReviewUserComponent = () => {
 
   const existingUserQuery = getUser.useQuery(userId, { enabled: !isNewUser })
   const additionalFields = window.config.ADDITIONAL_USER_FIELDS ?? []
-  const maybeLocationId = UUID.safeParse(userForm?.primaryOfficeId)
+  const maybeLocationId = maybeUuid(userForm?.primaryOfficeId)
+
   const { getConfig } = useUserEditConfig(
-    maybeLocationId.success ? maybeLocationId.data : undefined,
+    maybeLocationId,
     selectedRole,
     additionalFields
   )
@@ -416,8 +390,8 @@ const ReviewUserComponent = () => {
   }
 
   const formState = userForm ?? EMPTY_FORM
-  const createUserMutation = createUser()
-  const updateUserMutation = updateUser()
+  const createUserMutation = useCreateUser()
+  const updateUserMutation = useUpdateUser()
 
   const handleMutationError = (error: unknown) => {
     if (error instanceof TRPCClientError && error.data?.code === 'CONFLICT') {
@@ -443,7 +417,7 @@ const ReviewUserComponent = () => {
   const handleClose = useCloseUserForm({
     isNewUser,
     primaryOfficeId: formState['primaryOfficeId'],
-    fromUserList: searchParams.from === 'user.list',
+    fromUserList: from === 'user.list',
     userId,
     setUserForm
   })
@@ -535,17 +509,7 @@ const ReviewUserComponent = () => {
         reviewFields={[]}
         title={intl.formatMessage(messages.userFormReviewTitle)}
         validatorContext={{}}
-        onEdit={(values) =>
-          navigate(
-            ROUTES.V2.SETTINGS.USER.EDIT.buildPath(
-              {
-                userId: userId,
-                pageId: values.pageId
-              },
-              searchParams
-            )
-          )
-        }
+        onEdit={(values) => navigate(editPath(values.pageId))}
       >
         {isNewUser ? (
           <Button
@@ -562,6 +526,7 @@ const ReviewUserComponent = () => {
                 ])
               )
               const payload: CreateUserInput = {
+                id: userId,
                 // Normalise to undefined so an empty string isn't stored as a
                 // unique value, causing duplicate-key errors on the next submit.
                 mobile: formState.phoneNumber || undefined,

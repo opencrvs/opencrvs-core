@@ -1,6 +1,6 @@
 {
   "name": "@opencrvs/testland",
-  "version": "2.1.2",
+  "version": "2.2.0",
   "description": "OpenCRVS country configuration for reference data",
   "os": [
     "darwin",
@@ -23,7 +23,7 @@
     "lint": "eslint -c eslint.config.js",
     "setup-analytics": "docker exec -i -e POSTGRES_HOST=localhost -e POSTGRES_PORT=5432 -e POSTGRES_USER=postgres -e POSTGRES_PASSWORD=postgres -e ANALYTICS_POSTGRES_USER=events_analytics -e ANALYTICS_POSTGRES_PASSWORD=analytics_password postgres bash -s < ./assets/postgres/setup-analytics.sh",
     "setup-reference-data": "docker exec -i -e POSTGRES_HOST=localhost -e POSTGRES_PORT=5432 -e POSTGRES_USER=postgres -e POSTGRES_PASSWORD=postgres -e REFERENCE_DATA_POSTGRES_USER=events_reference_data -e REFERENCE_DATA_POSTGRES_PASSWORD=reference_data_password -e REFERENCE_DATA_EDITOR_USER=reference_data_editor_user -e REFERENCE_DATA_EDITOR_PASSWORD=reference_data_editor_password postgres bash -s < ./assets/postgres/setup-reference-data.sh",
-    "db:clear:all": "bash infrastructure/clear-all-data-dev.sh && pnpm setup-analytics",
+    "db:clear:all": "bash assets/clear-all-data-dev.sh && pnpm setup-analytics",
     "start": "pnpm setup-analytics && pnpm setup-reference-data &&  cross-env NODE_ENV=development NODE_OPTIONS=--dns-result-order=ipv4first nodemon --watch src --exec tsx src/index.ts",
     "start:prod": "tsx src/index.ts",
     "metabase": "bash assets/metabase/run-dev.sh",
@@ -34,7 +34,7 @@
     "@eslint/eslintrc": "^3.3.1",
     "@inquirer/editor": "^1.2.13",
     "@octokit/core": "4.2.4",
-    "@playwright/test": "^1.48.0",
+    "@playwright/test": "^1.61.1",
     "@types/google-libphonenumber": "^7.4.23",
     "@types/handlebars": "^4.1.0",
     "@types/hapi__h2o2": "8.3.3",
@@ -130,7 +130,7 @@
     "uuid": "^11.1.0",
     "whatwg-fetch": "^3.0.0",
     "yargs": "^17.7.2",
-    "zod": "^4.4.3"
+    "zod": "^4.6.5"
   },
   "lint-staged": {
     "src/**/*.{ts,graphql}": [

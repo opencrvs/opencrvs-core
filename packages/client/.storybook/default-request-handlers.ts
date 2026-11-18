@@ -24,13 +24,13 @@ import {
   generateWorkqueues,
   TENNIS_CLUB_MEMBERSHIP,
   UUID,
-  tennisClubMembershipEvent,
-  footballClubMembershipEvent,
-  libraryMembershipEvent,
   TestUserRole,
   AuditLogEntry,
   V2_DEFAULT_MOCK_ADMINISTRATIVE_AREAS,
-  V2_DEFAULT_MOCK_LOCATIONS
+  V2_DEFAULT_MOCK_LOCATIONS,
+  versionedTennisClubMembershipEvent,
+  versionedFootballClubMembershipEvent,
+  versionedLibraryMembershipEvent
 } from '@opencrvs/commons/client'
 import { testDataGenerator } from '@client/tests/test-data-generators'
 
@@ -87,9 +87,9 @@ export const handlers = {
   events: [
     tRPCMsw.event.config.get.query(() => {
       return [
-        tennisClubMembershipEvent,
-        footballClubMembershipEvent,
-        libraryMembershipEvent
+        versionedTennisClubMembershipEvent,
+        versionedFootballClubMembershipEvent,
+        versionedLibraryMembershipEvent
       ]
     })
   ],
@@ -355,10 +355,10 @@ export const handlers = {
     })
   ],
   files: [
-    http.get('/api/presigned-url/:filePath*', async (req) => {
-      return HttpResponse.json({
-        presignedURL: `http://localhost:3535/ocrvs/tree.svg`
-      })
+    tRPCMsw.event.file.getPresignedUrl.query(() => {
+      return {
+        presignedURL: 'http://localhost:3535/ocrvs/tree.svg'
+      }
     }),
     http.post('/api/upload', async (req) => {
       const formData = await req.request.formData()
@@ -2218,6 +2218,21 @@ export const handlers = {
             messages: {}
           }
         ]
+      })
+    })
+  ],
+  countryLogo: [
+    http.get('/api/countryconfig/content/country-logo', () => {
+      // The country config serves the logo as an image, not as a data URL
+      const [header, base64] =
+        mockOfflineData.config.COUNTRY_LOGO.file.split(',')
+      const mimeType = header.match(/^data:(.+);base64$/)?.[1] ?? 'image/png'
+      const bytes = Uint8Array.from(atob(base64), (char) => char.charCodeAt(0))
+
+      return new HttpResponse(bytes, {
+        headers: {
+          'Content-Type': mimeType
+        }
       })
     })
   ],

@@ -28,6 +28,7 @@ import * as V1_LEGACY_ROUTES from '@client/navigation/routes'
 import { Debug } from '@client/v2-events/features/debug/debug'
 import { router as correctionRequestRouter } from '@client/v2-events/features/events/actions/correct/request/router'
 import { router as correctionReviewRouter } from '@client/v2-events/features/events/actions/correct/review/router'
+import * as Notify from '@client/v2-events/features/events/actions/notify'
 import * as Declare from '@client/v2-events/features/events/actions/declare'
 import * as Edit from '@client/v2-events/features/events/actions/edit'
 import { DeleteEventIndex } from '@client/v2-events/features/events/actions/delete'
@@ -73,6 +74,7 @@ import { SystemList } from '../../views/SysAdmin/Config/Systems/Systems'
 import AllUserEmail from '../../views/SysAdmin/Communications/AllUserEmail/AllUserEmail'
 import { EventHistoryIndex } from '../features/workqueues/EventOverview/components/EventHistory'
 import { PerformanceDashboard } from '../features/performance/Dashboard'
+import { Documents } from '../features/workqueues/EventOverview/components/Documents'
 import { ROUTES } from './routes'
 import { Toaster } from './Toaster'
 
@@ -265,6 +267,10 @@ export const routesConfig = {
           element: <ReadonlyViewIndex />
         },
         {
+          path: ROUTES.V2.EVENTS.EVENT.DOCUMENTS.path,
+          element: <Documents />
+        },
+        {
           path: ROUTES.V2.EVENTS.EVENT.AUDIT.path,
           element: <EventHistoryIndex />
         }
@@ -277,6 +283,28 @@ export const routesConfig = {
     {
       path: ROUTES.V2.EVENTS.DELETE.path,
       element: <DeleteEventIndex />
+    },
+    {
+      path: ROUTES.V2.EVENTS.NOTIFY.path,
+      element: (
+        <DeclarationAction actionType={ActionType.NOTIFY}>
+          <Outlet />
+        </DeclarationAction>
+      ),
+      children: [
+        {
+          index: true,
+          element: <Notify.Pages />
+        },
+        {
+          path: ROUTES.V2.EVENTS.NOTIFY.PAGES.path,
+          element: <Notify.Pages />
+        },
+        {
+          path: ROUTES.V2.EVENTS.NOTIFY.REVIEW.path,
+          element: <Notify.Review />
+        }
+      ]
     },
     {
       path: ROUTES.V2.EVENTS.DECLARE.path,
@@ -389,6 +417,14 @@ export const routesConfig = {
     {
       path: ROUTES.V2.SETTINGS.USER.CREATE.path,
       element: <CreateNewUser />
+    },
+    {
+      path: ROUTES.V2.SETTINGS.USER.NEW.EDIT.path,
+      element: <EditUser />
+    },
+    {
+      path: ROUTES.V2.SETTINGS.USER.NEW.REVIEW.path,
+      element: <ReviewUser />
     },
     {
       path: ROUTES.V2.SETTINGS.USER.EDIT.path,

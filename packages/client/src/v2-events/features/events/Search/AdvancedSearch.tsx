@@ -11,6 +11,7 @@
 import React, { useCallback, useState } from 'react'
 import { defineMessages, useIntl } from 'react-intl'
 import { useLocation } from 'react-router-dom'
+import { useSelector } from 'react-redux'
 import {
   Content,
   ContentSize,
@@ -24,6 +25,7 @@ import {
 } from '@opencrvs/commons/client'
 import { useEventConfigurations } from '@client/v2-events/features/events/useEventConfiguration'
 import { useAdminStructure } from '@client/v2-events/hooks/useAdminStructure'
+import { getScope } from '@client/profile/profileSelectors'
 import { TabSearch } from './TabSearch'
 import {
   checkScopeForEventSearch,
@@ -51,6 +53,7 @@ export function AdvancedSearch() {
   const intl = useIntl()
   const allEvents = useEventConfigurations()
   const location = useLocation()
+  const scopes = useSelector(getScope)
 
   /*
    * Deliberately not parsed with `SearchQueryParams`. Its catchall is a plain
@@ -67,7 +70,8 @@ export function AdvancedSearch() {
 
   const advancedSearchEvents = allEvents.filter(
     (event) =>
-      event.advancedSearch.length > 0 && checkScopeForEventSearch(event.id)
+      event.advancedSearch.length > 0 &&
+      checkScopeForEventSearch(event.id, scopes)
   )
 
   const adminStructure = useAdminStructure()
@@ -104,6 +108,16 @@ export function AdvancedSearch() {
 
   const [activeTabId, setActiveTabId] = useState<string>(selectedTabId)
 
+  const handleFormChange = useCallback(
+    (updatedForm: Record<string, FieldValue>) => {
+      setFormValuesByTabId((prev) => ({
+        ...prev,
+        [activeTabId]: updatedForm
+      }))
+    },
+    [activeTabId]
+  )
+
   const currentEvent = allEvents.find((e) => e.id === activeTabId)
   if (!currentEvent) {
     return null
@@ -115,16 +129,6 @@ export function AdvancedSearch() {
   const handleTabClick = (tabId: string) => {
     setActiveTabId(tabId)
   }
-
-  const handleFormChange = useCallback(
-    (updatedForm: Record<string, FieldValue>) => {
-      setFormValuesByTabId((prev) => ({
-        ...prev,
-        [activeTabId]: updatedForm
-      }))
-    },
-    [activeTabId]
-  )
 
   return (
     <Content

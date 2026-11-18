@@ -27,7 +27,8 @@ import {
   generateTranslationConfig,
   getDeclarationFields,
   getOrThrow,
-  pickRandom
+  pickRandom,
+  toVersionedEventConfig
 } from '@opencrvs/commons'
 import { tennisClubMembershipEvent } from '@opencrvs/commons/fixtures'
 import {
@@ -692,7 +693,9 @@ test('placeOfEvent scope filters out results between locations and administrativ
   )
   mswServer.use(
     http.get(`${env.COUNTRY_CONFIG_URL}/config/events`, () => {
-      return HttpResponse.json([eventWithOptionalAddress])
+      return HttpResponse.json([
+        toVersionedEventConfig(eventWithOptionalAddress)
+      ])
     })
   )
 

@@ -24,6 +24,7 @@ import {
   UUID,
   TestUserRole,
   generateActionDocument,
+  generateActionDocuments,
   ActionDocument,
   EventDocumentOnlyLastAction
 } from '@opencrvs/commons/client'
@@ -90,7 +91,7 @@ const duplicateEvent = {
         assignedTo: refData.user.id.localRegistrar
       }
     }),
-    generateActionDocument({
+    ...generateActionDocuments({
       configuration: tennisClubMembershipEvent,
       action: ActionType.DECLARE,
       defaults: actionDefaults

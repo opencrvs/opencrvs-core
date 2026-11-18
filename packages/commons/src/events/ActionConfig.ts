@@ -12,7 +12,7 @@ import * as z from 'zod/v4'
 import { TranslationConfig } from './TranslationConfig'
 import { ActionType } from './ActionType'
 import { FieldConfig } from './FieldConfig'
-import { ActionFormConfig } from './FormConfig'
+import { ActionFormConfig, DeclarationFormConfig } from './FormConfig'
 import { DeduplicationConfig } from './DeduplicationConfig'
 import { ActionFlagConfig } from './Flag'
 import { ActionConditional } from './Conditional'
@@ -85,6 +85,12 @@ const ReadActionConfig = ActionConfigBase.extend(
 const NotifyConfig = ActionConfigBase.extend(
   z.object({
     type: z.literal(ActionType.NOTIFY),
+    notificationForm: DeclarationFormConfig.describe(
+      'Notification form configuration. Its fields must be a subset of the declaration form fields, with matching types. The values submitted on the notification form pre-fill the declaration.'
+    ),
+    review: DeclarationReviewConfig.describe(
+      'Review page configuration for the notify action. Values of its fields are stored as the NOTIFY action annotation.'
+    ),
     form: actionConfirmationForm
   }).shape
 )
@@ -159,6 +165,9 @@ const DeleteConfig = ActionConfigBase.extend(
 const DeclareConfig = DeclarationActionBase.extend(
   z.object({
     type: z.literal(ActionType.DECLARE),
+    declaration: DeclarationFormConfig.describe(
+      'Configuration of the form used to gather event data.'
+    ),
     review: DeclarationReviewConfig.describe(
       'Configuration of the review page fields.'
     ),
@@ -189,6 +198,20 @@ const ArchiveConfig = ActionConfigBase.extend(
 const UnarchiveConfig = ActionConfigBase.extend(
   z.object({
     type: z.literal(ActionType.UNARCHIVE)
+  }).shape
+)
+
+const RevokeRegistrationConfig = ActionConfigBase.extend(
+  z.object({
+    type: z.literal(ActionType.REVOKE_REGISTRATION),
+    form: actionConfirmationForm
+  }).shape
+)
+
+const ReinstateRegistrationConfig = ActionConfigBase.extend(
+  z.object({
+    type: z.literal(ActionType.REINSTATE_REGISTRATION),
+    form: actionConfirmationForm
   }).shape
 )
 
@@ -296,12 +319,12 @@ export const ActionConfig = z
     NotifyConfig.meta({
       id: 'NotifyActionConfig',
       description:
-        'Configuration for the notify action. When present, NOTIFY uses this config independently from DECLARE. When absent, NOTIFY falls back to the DeclareActionConfig.'
+        'Configuration for the notify action: the notification form and its review page. An event without a NOTIFY action cannot be notified.'
     }),
     DeclareConfig.meta({
       id: 'DeclareActionConfig',
       description:
-        'Configuration for the declare action. Includes review-page fields. NOTIFY falls back to this config when no dedicated NotifyActionConfig is provided.'
+        'Configuration for the declare action. Includes the declaration form and review-page fields.'
     }),
     DuplicateDetectedConfig.meta({
       id: 'DuplicateDetectedActionConfig',
@@ -355,6 +378,15 @@ export const ActionConfig = z
       id: 'UnarchiveActionConfig',
       description: 'Configuration for unarchiving a record.'
     }),
+    RevokeRegistrationConfig.meta({
+      id: 'RevokeRegistrationActionConfig',
+      description: 'Configuration for revoking a registered record.'
+    }),
+    ReinstateRegistrationConfig.meta({
+      id: 'ReinstateRegistrationActionConfig',
+      description:
+        'Configuration for reinstating a revoked record back to registered.'
+    }),
     CustomActionConfig.meta({
       id: 'CustomActionConfig',
       description:
@@ -367,6 +399,7 @@ export const ActionConfig = z
   .meta({ id: 'ActionConfig' })
 
 export type ActionConfig = z.infer<typeof ActionConfig>
+export type DeclareActionConfig = z.infer<typeof DeclareConfig>
 
 // Build a runtime set directly from the schema
 export const actionConfigTypes: Set<ActionConfigTypes> = new Set(

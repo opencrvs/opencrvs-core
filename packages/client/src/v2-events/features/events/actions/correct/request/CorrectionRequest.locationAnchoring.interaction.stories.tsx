@@ -23,7 +23,11 @@ import {
   Location,
   PageTypes,
   TestUserRole,
-  UUID
+  UUID,
+  withDeclaration,
+  getDeclaration,
+  getDeclarationPages,
+  toVersionedEventConfig
 } from '@opencrvs/commons/client'
 import { testDataGenerator } from '@client/tests/test-data-generators'
 import { ROUTES } from '@client/v2-events/routes'
@@ -84,47 +88,49 @@ const RENAMED_FACILITY: Location = {
  * `anchorToDateOfEvent`, and correction added as an available action — none
  * of which the shared fixture needs for its other (non-correction) uses.
  */
-const correctableChildOnboardingEvent: EventConfig = {
-  ...ChildOnboardingEvent,
-  // A plain literal, not `field('child.dob')` — the story seeds this config
-  // directly into IndexedDB (bypassing the network boundary that would
-  // otherwise strip `field()`'s attached methods), which chokes on them.
-  dateOfEvent: { $$field: 'child.dob', $$subfield: [] },
-  actions: [
-    ...ChildOnboardingEvent.actions,
-    {
-      type: ActionType.REQUEST_CORRECTION,
-      label: {
-        defaultMessage: 'Request correction',
-        description: 'Action label',
-        id: 'event.childOnboarding.action.requestCorrection.label'
-      },
-      flags: [],
-      correctionForm: {
+const correctableChildOnboardingEvent: EventConfig = withDeclaration(
+  {
+    ...ChildOnboardingEvent,
+    // A plain literal, not `field('child.dob')` — the story seeds this config
+    // directly into IndexedDB (bypassing the network boundary that would
+    // otherwise strip `field()`'s attached methods), which chokes on them.
+    dateOfEvent: { $$field: 'child.dob', $$subfield: [] },
+    actions: [
+      ...ChildOnboardingEvent.actions,
+      {
+        type: ActionType.REQUEST_CORRECTION,
         label: {
           defaultMessage: 'Request correction',
-          description: 'Correction form label',
-          id: 'event.childOnboarding.action.requestCorrection.form.label'
+          description: 'Action label',
+          id: 'event.childOnboarding.action.requestCorrection.label'
         },
-        pages: [
-          {
-            id: 'correction-requester',
-            type: PageTypes.enum.FORM,
-            title: {
-              defaultMessage: 'Correction requester',
-              description: 'Page title',
-              id: 'event.childOnboarding.action.requestCorrection.form.section.corrector'
-            },
-            requireCompletionToContinue: false,
-            fields: []
-          }
-        ]
+        flags: [],
+        correctionForm: {
+          label: {
+            defaultMessage: 'Request correction',
+            description: 'Correction form label',
+            id: 'event.childOnboarding.action.requestCorrection.form.label'
+          },
+          pages: [
+            {
+              id: 'correction-requester',
+              type: PageTypes.enum.FORM,
+              title: {
+                defaultMessage: 'Correction requester',
+                description: 'Page title',
+                id: 'event.childOnboarding.action.requestCorrection.form.section.corrector'
+              },
+              requireCompletionToContinue: false,
+              fields: []
+            }
+          ]
+        }
       }
-    }
-  ],
-  declaration: {
-    ...ChildOnboardingEvent.declaration,
-    pages: ChildOnboardingEvent.declaration.pages.map((page) =>
+    ]
+  },
+  {
+    ...getDeclaration(ChildOnboardingEvent),
+    pages: getDeclarationPages(ChildOnboardingEvent).map((page) =>
       page.id === 'child'
         ? {
             ...page,
@@ -143,7 +149,7 @@ const correctableChildOnboardingEvent: EventConfig = {
         : page
     )
   }
-}
+)
 
 // A birth in 1995 — well before the facility's 2023 rename.
 const declarationOverrides = {
@@ -170,7 +176,9 @@ const mockUserFull = generator.user.registrationAgent().v2
 const mswConfig = {
   handlers: {
     events: [
-      tRPCMsw.event.config.get.query(() => [correctableChildOnboardingEvent])
+      tRPCMsw.event.config.get.query(() => [
+        toVersionedEventConfig(correctableChildOnboardingEvent)
+      ])
     ],
     event: [tRPCMsw.event.get.query(() => birthEventDocument)],
     eventLocations: [
@@ -267,7 +275,9 @@ const birthEventDocumentPostRename = generateEventDocument({
 const mswConfigPostRename = {
   handlers: {
     events: [
-      tRPCMsw.event.config.get.query(() => [correctableChildOnboardingEvent])
+      tRPCMsw.event.config.get.query(() => [
+        toVersionedEventConfig(correctableChildOnboardingEvent)
+      ])
     ],
     event: [tRPCMsw.event.get.query(() => birthEventDocumentPostRename)],
     eventLocations: [

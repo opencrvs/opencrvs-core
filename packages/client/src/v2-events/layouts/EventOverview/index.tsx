@@ -38,7 +38,7 @@ import {
   DividerVertical
 } from '@opencrvs/components'
 import { useDrafts } from '@client/v2-events/features/drafts/useDrafts'
-import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
+import { useEventConfigurationForRecord } from '@client/v2-events/features/events/useEventConfiguration'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
 import { ActionMenu } from '@client/v2-events/features/workqueues/EventOverview/components/ActionMenu'
 import { useIntlFormatMessageWithFlattenedParams } from '@client/v2-events/messages/utils'
@@ -80,7 +80,7 @@ const TabContainer = styled(Stack)`
   width: 100%;
 `
 
-const messages = defineMessages({
+export const messages = defineMessages({
   summary: {
     id: 'events.overview.tabs.summary',
     defaultMessage: 'Summary'
@@ -88,6 +88,10 @@ const messages = defineMessages({
   record: {
     id: 'events.overview.tabs.record',
     defaultMessage: 'Record'
+  },
+  documents: {
+    id: 'events.overview.tabs.documents',
+    defaultMessage: 'Documents'
   },
   audit: {
     id: 'events.overview.tabs.audit',
@@ -109,44 +113,46 @@ function EventOverviewTabs() {
     return !!matchPath({ path: pattern, end: true }, location.pathname)
   }
 
+  const tabs = [
+    {
+      label: messages.summary,
+      route: ROUTES.V2.EVENTS.EVENT,
+      display: true
+    },
+    {
+      label: messages.record,
+      route: ROUTES.V2.EVENTS.EVENT.RECORD,
+      display: canAccessEventWithScopes()
+    },
+    {
+      label: messages.documents,
+      route: ROUTES.V2.EVENTS.EVENT.DOCUMENTS,
+      display: canAccessEventWithScopes()
+    },
+    {
+      label: messages.audit,
+      route: ROUTES.V2.EVENTS.EVENT.AUDIT,
+      display: true
+    }
+  ] as const
+
   return (
     <TabContainer gap={16}>
-      <Tab
-        className={isActive(ROUTES.V2.EVENTS.EVENT.path) ? 'active' : ''}
-        onClick={() => {
-          navigate(ROUTES.V2.EVENTS.EVENT.buildPath({ eventId }, { backTo }), {
-            replace: true
-          })
-        }}
-      >
-        {intl.formatMessage(messages.summary)}
-      </Tab>
-      {canAccessEventWithScopes() && (
-        <Tab
-          className={
-            isActive(ROUTES.V2.EVENTS.EVENT.RECORD.path) ? 'active' : ''
-          }
-          onClick={() => {
-            navigate(
-              ROUTES.V2.EVENTS.EVENT.RECORD.buildPath({ eventId }, { backTo }),
-              { replace: true }
-            )
-          }}
-        >
-          {intl.formatMessage(messages.record)}
-        </Tab>
-      )}
-      <Tab
-        className={isActive(ROUTES.V2.EVENTS.EVENT.AUDIT.path) ? 'active' : ''}
-        onClick={() => {
-          navigate(
-            ROUTES.V2.EVENTS.EVENT.AUDIT.buildPath({ eventId }, { backTo }),
-            { replace: true }
-          )
-        }}
-      >
-        {intl.formatMessage(messages.audit)}
-      </Tab>
+      {tabs
+        .filter((tab) => tab.display)
+        .map((tab) => (
+          <Tab
+            key={tab.route.path}
+            className={isActive(tab.route.path) ? 'active' : ''}
+            onClick={() => {
+              navigate(tab.route.buildPath({ eventId }, { backTo }), {
+                replace: true
+              })
+            }}
+          >
+            {intl.formatMessage(tab.label)}
+          </Tab>
+        ))}
     </TabContainer>
   )
 }
@@ -165,8 +171,8 @@ export function EventOverviewLayout({
   const { eventId } = useTypedParams(ROUTES.V2.EVENTS.EVENT)
   const [{ backTo }] = useTypedSearchParams(ROUTES.V2.EVENTS.EVENT)
   const { searchEventById } = useEvents()
-  const { getRemoteDraftByEventId } = useDrafts()
-  const draft = getRemoteDraftByEventId(eventId)
+  const { useRemoteDraftByEventId } = useDrafts()
+  const draft = useRemoteDraftByEventId(eventId)
   const { getUsers } = useUsers()
   const users = getUsers.getAllCached()
   const { getLocations } = useLocations()
@@ -186,7 +192,7 @@ export function EventOverviewLayout({
   const { resolveAction } = useEventActionConfigurationResolver(event)
   const readActionStatus = resolveAction(ActionType.READ)
 
-  const { eventConfiguration } = useEventConfiguration(event.type)
+  const { eventConfiguration } = useEventConfigurationForRecord(event)
   const eventIndexWithDraftApplied = draft
     ? applyDraftToEventIndex(event, draft, eventConfiguration)
     : event

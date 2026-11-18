@@ -8,7 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { test, type Page, expect } from '@playwright/test'
+import { test, expect } from '@playwright/test'
 import { v4 as uuidv4 } from 'uuid'
 import {
   Declaration,
@@ -39,70 +39,60 @@ import { createClient } from '@opencrvs/toolkit/api'
  * has province + country (no district). The old SVG template produced
  * ", Central, Farajaland". Fixed by $join which filters empty levels.
  */
-test.describe
-  .serial('Registration location renders without leading comma for province-level registrar', () => {
-  let declaration: Declaration
-  let page: Page
+test('Registration location renders without leading comma for province-level registrar', async ({
+  page
+}) => {
+  // Step 1: k.mweene declares
+  const registrarToken = await getToken(CREDENTIALS.REGISTRAR)
+  const dec = await getDeclaration({
+    token: registrarToken,
+    placeOfBirthType: 'HEALTH_FACILITY'
+  })
+  const { eventId } = await createDeclaration(
+    registrarToken,
+    dec,
+    ActionType.DECLARE
+  )
 
-  test.beforeAll(async ({ browser }) => {
-    // Step 1: k.mweene declares
-    const registrarToken = await getToken(CREDENTIALS.REGISTRAR)
-    const dec = await getDeclaration({
-      token: registrarToken,
-      placeOfBirthType: 'HEALTH_FACILITY'
-    })
-    const { eventId } = await createDeclaration(
-      registrarToken,
-      dec,
-      ActionType.DECLARE
-    )
+  // Step 2: m.owen (provincial registrar, Central Province — no district) registers.
+  // This sets legalStatuses.REGISTERED.createdAtLocation to province-level only.
+  const provincialToken = await getToken(CREDENTIALS.PROVINCIAL_REGISTRAR)
+  const client = createClient(
+    GATEWAY_HOST + '/events',
+    `Bearer ${provincialToken}`
+  )
 
-    // Step 2: m.owen (provincial registrar, Central Province — no district) registers.
-    // This sets legalStatuses.REGISTERED.createdAtLocation to province-level only.
-    const provincialToken = await getToken(CREDENTIALS.PROVINCIAL_REGISTRAR)
-    const client = createClient(
-      GATEWAY_HOST + '/events',
-      `Bearer ${provincialToken}`
-    )
+  // Decode JWT to get m.owen's user ID for the assign call
+  const userId = JSON.parse(
+    Buffer.from(provincialToken.split('.')[1], 'base64').toString()
+  ).sub
 
-    // Decode JWT to get m.owen's user ID for the assign call
-    const userId = JSON.parse(
-      Buffer.from(provincialToken.split('.')[1], 'base64').toString()
-    ).sub
-
-    await client.event.actions.assignment.assign.mutate({
-      eventId,
-      transactionId: uuidv4(),
-      type: ActionType.ASSIGN,
-      assignedTo: userId
-    })
-
-    const signature = await uploadFile(getSignatureFile(), provincialToken)
-
-    const registerRes = await client.event.actions.register.request.mutate({
-      eventId,
-      transactionId: uuidv4(),
-      declaration: dec,
-      annotation: { 'review.comment': '', 'review.signature': signature }
-    })
-
-    const registerAction = registerRes.actions.find(
-      (a: any) => a.type === ActionType.REGISTER
-    )
-    declaration = (registerAction as any).declaration as Declaration
-
-    page = await browser.newPage()
+  await client.event.actions.assignment.assign.mutate({
+    eventId,
+    transactionId: uuidv4(),
+    type: ActionType.ASSIGN,
+    assignedTo: userId
   })
 
-  test.afterAll(async () => {
-    await page.close()
+  const signature = await uploadFile(getSignatureFile(), provincialToken)
+
+  const registerRes = await client.event.actions.register.request.mutate({
+    eventId,
+    transactionId: uuidv4(),
+    declaration: dec,
+    annotation: { 'review.comment': '', 'review.signature': signature }
   })
 
-  test('c.lungu logs in as registrar general', async () => {
+  const registerAction = registerRes.actions.find(
+    (a: any) => a.type === ActionType.REGISTER
+  )
+  const declaration = (registerAction as any).declaration as Declaration
+
+  await test.step('c.lungu logs in as registrar general', async () => {
     await login(page, CREDENTIALS.REGISTRAR_GENERAL)
   })
 
-  test('Search for the record and navigate to certified copy print preview', async () => {
+  await test.step('Search for the record and navigate to certified copy print preview', async () => {
     await searchFromSearchBar(page, formatV2ChildName(declaration))
     await ensureAssignedToUser(page, CREDENTIALS.REGISTRAR_GENERAL)
     await selectAction(page, 'Print')
@@ -113,7 +103,7 @@ test.describe
     await page.getByRole('button', { name: 'Continue' }).click()
   })
 
-  test('Registration location renders without leading comma', async () => {
+  await test.step('Registration location renders without leading comma', async () => {
     // m.owen's office is Central Province (no district).
     // Before the fix: rendered as ", Central, Farajaland".
     // After the fix ($join): renders as "Central, Farajaland".

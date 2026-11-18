@@ -19,6 +19,5 @@ EVENTS_FILES=$(ls "$SCRIPT_PATH/src/migrations/events" | grep -E '\.(sql|js)$' |
 for ((n = 0; n < EVENTS_FILES; n++)); do
   DATABASE_URL="$EVENTS_POSTGRES_URL" \
     pnpm --dir "$SCRIPT_PATH" exec node-pg-migrate down \
-    --schema=app \
-    --migrations-dir="$SCRIPT_PATH/src/migrations/events"
+    --config-file "$SCRIPT_PATH/node-pg-migrate.json"
 done

@@ -30,29 +30,19 @@ async function selectIdType(page: Page, idType: string) {
   await page.getByText(idType, { exact: true }).click()
 }
 
-test.describe
-  .serial('Print to someone else using Alien Number as ID type', () => {
-  let declaration: Declaration
-  let page: Page
-  let trackingId: string | undefined
+test('Print to someone else using Alien Number as ID type', async ({
+  page
+}) => {
+  const token = await getToken(CREDENTIALS.REGISTRAR)
+  const res = await createDeclaration(token)
+  const declaration = res.declaration
+  const trackingId = res.trackingId
 
-  test.beforeAll(async ({ browser }) => {
-    const token = await getToken(CREDENTIALS.REGISTRAR)
-    const res = await createDeclaration(token)
-    declaration = res.declaration
-    trackingId = res.trackingId
-    page = await browser.newPage()
-  })
-
-  test.afterAll(async () => {
-    await page.close()
-  })
-
-  test('Log in', async () => {
+  await test.step('Log in', async () => {
     await login(page)
   })
 
-  test('Navigate to certificate print action', async () => {
+  await test.step('Navigate to certificate print action', async () => {
     await page.getByRole('button', { name: 'Pending certification' }).click()
     await navigateToCertificatePrintAction(
       page,
@@ -61,7 +51,7 @@ test.describe
     )
   })
 
-  test('Fill details, including Alien Number', async () => {
+  await test.step('Fill details, including Alien Number', async () => {
     await selectCertificationType(page, 'Birth Certificate')
     await selectRequesterType(page, 'Print and issue to someone else')
 
@@ -76,11 +66,11 @@ test.describe
     await page.getByRole('button', { name: 'Continue' }).click()
   })
 
-  test('Print', async () => {
+  await test.step('Print', async () => {
     await printAndExpectPopup(page)
   })
 
-  test('Validate Certified -modal', async () => {
+  await test.step('Validate Certified -modal', async () => {
     if (!trackingId) {
       throw new Error('Tracking ID is undefined')
     }

@@ -23,9 +23,11 @@ import {
   generateEventDraftDocument,
   getCurrentEventState,
   generateActionDocument,
+  generateActionDocuments,
   getUUID,
   EventDocument,
-  ActionInput
+  ActionInput,
+  versionedTennisClubMembershipEvent
 } from '@opencrvs/commons/client'
 import { ROUTES, routesConfig } from '@client/v2-events/routes'
 import { useEventFormData } from '@client/v2-events/features/events/useEventFormData'
@@ -136,7 +138,7 @@ export const ReviewForLocalRegistrarCompleteInteraction: Story = {
               ...declarationTrpcMsw.eventDocument,
               actions: [
                 ...declarationTrpcMsw.eventDocument.actions,
-                generateActionDocument({
+                ...generateActionDocuments({
                   configuration: tennisClubMembershipEvent,
                   action: ActionType.DECLARE
                 })
@@ -376,103 +378,6 @@ const eventDocument = generateEventDocument({
 
 const eventId = eventDocument.id
 
-export const ReviewForFieldAgentIncompleteInteraction: Story = {
-  beforeEach: () => {
-    // For this test, we want to have empty form values in zustand state
-    useEventFormData.setState({ formValues: {} })
-  },
-  loaders: [
-    () => {
-      declarationTrpcMsw.events.reset()
-      declarationTrpcMsw.drafts.reset()
-    },
-    async () => {
-      window.localStorage.setItem('opencrvs', generator.user.token.fieldAgent)
-      //  Intermittent failures starts to happen when global state gets out of whack.
-      // // This is a workaround to ensure that the state is reset when similar tests are run in parallel.
-      await new Promise((resolve) => setTimeout(resolve, 50))
-    }
-  ],
-  parameters: {
-    reactRouter: {
-      router: routesConfig,
-      initialPath: ROUTES.V2.EVENTS.DECLARE.REVIEW.buildPath({
-        eventId
-      })
-    },
-    offline: {
-      /*
-       * Ensure record is "downloaded offline" in the user's browser
-       */
-      events: [eventDocument]
-    },
-    chromatic: { disableSnapshot: true },
-    msw: {
-      handlers: {
-        drafts: [
-          tRPCMsw.event.draft.list.query(() => {
-            return []
-          })
-        ],
-        events: [
-          tRPCMsw.event.search.query((input) => {
-            return {
-              results: [
-                getCurrentEventState(
-                  declarationTrpcMsw.eventDocument,
-                  tennisClubMembershipEvent
-                )
-              ],
-              total: 1
-            }
-          }),
-          ...declarationTrpcMsw.events.handlers
-        ],
-        user: [
-          tRPCMsw.user.list.query(([id]) => {
-            return [mockUser]
-          }),
-          tRPCMsw.user.get.query((id) => {
-            return mockUserFull
-          })
-        ]
-      }
-    }
-  },
-  play: async ({ canvasElement, step }) => {
-    await step('Modal has scope based content', async () => {
-      const canvas = within(canvasElement)
-      await userEvent.click(
-        await canvas.findByRole('button', { name: 'Action' })
-      )
-      await userEvent.click(await canvas.findByText('Notify'))
-
-      await canvas.findByRole('button', { name: 'Cancel' })
-
-      await userEvent.click(
-        await canvas.findByRole('button', {
-          name: 'Notify'
-        })
-      )
-    })
-
-    await step('Confirm action triggers scope based actions', async () => {
-      const searchResult =
-        await within(canvasElement).findByTestId('search-result')
-      await within(searchResult).findAllByText('All events')
-
-      await waitFor(async () => {
-        await expect(declarationTrpcMsw.events.getSpyCalls()).toMatchObject({
-          'event.create': false,
-          'event.actions.notify.request': true,
-          'event.actions.declare.request': false,
-          'event.actions.register.request': false
-        })
-      })
-    })
-  }
-}
-
 export const ReviewForIncompleteNameInteraction: Story = {
   name: 'Declaration shows as incomplete when surname is left out',
   loaders: [
@@ -506,13 +411,6 @@ export const ReviewForIncompleteNameInteraction: Story = {
         { timeout: 5000 }
       )
       await userEvent.click(changeButton)
-      const modal = within(await canvas.findByRole('dialog'))
-
-      const confirmEditButton = await modal.findByRole('button', {
-        name: 'Continue'
-      })
-
-      await userEvent.click(confirmEditButton)
 
       const surnameInput = await canvas.findByTestId('text__surname')
       await userEvent.clear(surnameInput)
@@ -527,14 +425,6 @@ export const ReviewForIncompleteNameInteraction: Story = {
       await expect(
         canvas.getByText('Declare', { selector: 'li[disabled]' })
       ).toBeInTheDocument()
-
-      await userEvent.click(await canvas.findByText('Notify'))
-
-      await userEvent.click(
-        await canvas.findByRole('button', {
-          name: 'Notify'
-        })
-      )
     })
   }
 }
@@ -544,7 +434,7 @@ export const ChangeFieldInReview: Story = {
     /*
      * Ensure record is "downloaded offline" in the user's browser
      */
-    addLocalEventConfig(tennisClubMembershipEvent)
+    addLocalEventConfig(versionedTennisClubMembershipEvent)
     setEventData(createdEventDocument.id, createdEventDocument)
     updateLocalEventIndex(createdEventDocument.id, createdEventDocument)
   },
@@ -570,7 +460,7 @@ export const ChangeFieldInReview: Story = {
         ],
         events: [
           tRPCMsw.event.config.get.query(() => {
-            return [tennisClubMembershipEvent]
+            return [versionedTennisClubMembershipEvent]
           }),
           tRPCMsw.event.get.query(() => {
             return eventDocument
@@ -587,9 +477,6 @@ export const ChangeFieldInReview: Story = {
       )
 
       await userEvent.click(surnameChangeButton)
-
-      const continueButton = await canvas.findByText('Continue')
-      await userEvent.click(continueButton)
     })
 
     await step('Change input field value', async () => {
@@ -668,7 +555,7 @@ export const ShowToastOnDuplicateDetectedOnDeclare: Story = {
      * Ensure record is "downloaded offline" in the user's browser
      */
     currentDocument = eventDocument
-    addLocalEventConfig(tennisClubMembershipEvent)
+    addLocalEventConfig(versionedTennisClubMembershipEvent)
     setEventData(currentDocument.id, currentDocument)
     updateLocalEventIndex(currentDocument.id, currentDocument)
   },
@@ -694,7 +581,7 @@ export const ShowToastOnDuplicateDetectedOnDeclare: Story = {
         ],
         events: [
           tRPCMsw.event.config.get.query(() => {
-            return [tennisClubMembershipEvent]
+            return [versionedTennisClubMembershipEvent]
           }),
           tRPCMsw.event.get.query(() => {
             return currentDocument
@@ -704,7 +591,7 @@ export const ShowToastOnDuplicateDetectedOnDeclare: Story = {
               ...currentDocument,
               actions: [
                 ...currentDocument.actions,
-                generateActionDocument({
+                ...generateActionDocuments({
                   configuration: tennisClubMembershipEvent,
                   declarationOverrides: {
                     ...(ActionInput.safeParse(action).data?.declaration ?? {})
@@ -771,7 +658,7 @@ export const ShowToastOnDuplicateDetectedOnRegister: Story = {
     /*
      * Ensure record is "downloaded offline" in the user's browser
      */
-    addLocalEventConfig(tennisClubMembershipEvent)
+    addLocalEventConfig(versionedTennisClubMembershipEvent)
     setEventData(createdEventDocument.id, createdEventDocument)
     updateLocalEventIndex(createdEventDocument.id, createdEventDocument)
   },
@@ -797,7 +684,7 @@ export const ShowToastOnDuplicateDetectedOnRegister: Story = {
         ],
         events: [
           tRPCMsw.event.config.get.query(() => {
-            return [tennisClubMembershipEvent]
+            return [versionedTennisClubMembershipEvent]
           }),
           tRPCMsw.event.get.query(() => {
             return eventDocument
@@ -807,7 +694,7 @@ export const ShowToastOnDuplicateDetectedOnRegister: Story = {
               ...eventDocument,
               actions: [
                 ...eventDocument.actions,
-                generateActionDocument({
+                ...generateActionDocuments({
                   configuration: tennisClubMembershipEvent,
                   action: ActionType.DECLARE
                 }),

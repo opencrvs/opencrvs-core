@@ -9,14 +9,35 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import * as z from 'zod/v4'
-import { EventConfig } from './EventConfig'
+import { EventConfig, EventConfigInput } from './EventConfig'
 import { ActionType, WorkqueueActionType } from './ActionType'
 import { InherentFlags } from './Flag'
-import { findAllFields, getDeclarationFields } from './utils'
+import {
+  findAllFields,
+  getDeclarationFields,
+  getDeclarationPages
+} from './utils'
 import { FieldType } from './FieldType'
+import { mapFieldTypeToZod } from './FieldTypeMapping'
 import { EventFieldId } from './AdvancedSearchConfig'
 import { isFieldReference } from '../conditionals/conditionals'
 import { EventMetadataDateFieldIdInput } from './EventMetadata'
+
+/** Field types that accept a text, number or date defaultValue in advanced search */
+const SEARCH_DEFAULT_VALUE_FIELD_TYPES = [
+  FieldType.TEXT,
+  FieldType.TEXTAREA,
+  FieldType.EMAIL,
+  FieldType.PHONE,
+  FieldType.ID,
+  FieldType.SELECT,
+  FieldType.RADIO_GROUP,
+  FieldType.COUNTRY,
+  FieldType.LOCATION,
+  FieldType.ADMINISTRATIVE_AREA,
+  FieldType.NUMBER,
+  FieldType.DATE
+]
 
 export function validateAdvancedSearchConfig(
   event: EventConfig,
@@ -64,6 +85,79 @@ export function validateAdvancedSearchConfig(
       path: ['advancedSearch']
     })
   }
+
+  // Rejects search field default values that can't be filled into the field
+  event.advancedSearch.forEach((section, sectionIndex) => {
+    section.fields.forEach((searchField, fieldIndex) => {
+      if (
+        searchField.fieldType !== 'field' ||
+        searchField.defaultValue === undefined
+      ) {
+        return
+      }
+
+      const path = [
+        'advancedSearch',
+        sectionIndex,
+        'fields',
+        fieldIndex,
+        'defaultValue'
+      ]
+
+      if (
+        searchField.config.searchFields &&
+        searchField.config.searchFields.length > 0
+      ) {
+        ctx.addIssue({
+          code: 'custom',
+          message: `Advanced search field ${searchField.fieldId} searches across several form fields, so it does not support a defaultValue.`,
+          path
+        })
+        return
+      }
+
+      if (typeof searchField.defaultValue === 'boolean') {
+        return
+      }
+
+      const formField = allFields.find(({ id }) => id === searchField.fieldId)
+
+      // An unknown field id is already reported above
+      if (!formField) {
+        return
+      }
+
+      if (
+        !SEARCH_DEFAULT_VALUE_FIELD_TYPES.some(
+          (type) => type === formField.type
+        )
+      ) {
+        ctx.addIssue({
+          code: 'custom',
+          message: `Advanced search field ${searchField.fieldId} is a ${formField.type} field, which does not support a defaultValue value, only true or false. Field types that support a defaultValue value: ${SEARCH_DEFAULT_VALUE_FIELD_TYPES.join(', ')}.`,
+          path
+        })
+      } else if (
+        formField.type === FieldType.DATE &&
+        searchField.config.type === 'range'
+      ) {
+        ctx.addIssue({
+          code: 'custom',
+          message: `Advanced search field ${searchField.fieldId} is searched as a date range, so its defaultValue can only be true or false.`,
+          path
+        })
+      } else if (
+        !mapFieldTypeToZod(formField).safeParse(searchField.defaultValue)
+          .success
+      ) {
+        ctx.addIssue({
+          code: 'custom',
+          message: `Advanced search field ${searchField.fieldId} has defaultValue "${searchField.defaultValue}", which is not a valid ${formField.type} value.`,
+          path
+        })
+      }
+    })
+  })
 }
 
 export function validateDateOfEvent(
@@ -174,4 +268,125 @@ export function validateActionOrder(
       }
     }
   }
+}
+
+/**
+ * Runs on both the `defineConfig` input and the parsed `EventConfig`.
+ *
+ * @returns whether the event has exactly one DECLARE action.
+ */
+export function validateExactlyOneDeclareAction<
+  T extends { id: string; actions: Array<{ type: string }> }
+>(event: T, ctx: z.RefinementCtx<T>): boolean {
+  const declareActionCount = event.actions.filter(
+    (action) => action.type === ActionType.DECLARE
+  ).length
+
+  if (declareActionCount !== 1) {
+    ctx.addIssue({
+      code: 'custom',
+      message: `Event must have exactly one ${ActionType.DECLARE} action. Found ${declareActionCount} for event ${event.id}`,
+      path: ['actions']
+    })
+    return false
+  }
+
+  return true
+}
+
+/**
+ * `declaration` must be given exactly once: at the top level (kept for backwards
+ * compatibility) or on the DECLARE action.
+ */
+export function validateDeclarationGivenExactlyOnce(
+  config: EventConfigInput,
+  ctx: z.RefinementCtx<EventConfigInput>
+) {
+  const declareActionIndex = config.actions.findIndex(
+    (action) => action.type === ActionType.DECLARE
+  )
+  const declareAction = config.actions[declareActionIndex]
+  const onDeclareAction =
+    declareAction.type === ActionType.DECLARE && !!declareAction.declaration
+  const onTopLevel = !!config.declaration
+  const declareActionPath = `actions[${declareActionIndex}].declaration`
+
+  if (onTopLevel && onDeclareAction) {
+    ctx.addIssue({
+      code: 'custom',
+      message: `Event '${config.id}' defines \`declaration\` both at the top level and on the ${ActionType.DECLARE} action (\`${declareActionPath}\`). Define it in only one of these places.`,
+      path: ['declaration']
+    })
+  }
+
+  if (!onTopLevel && !onDeclareAction) {
+    ctx.addIssue({
+      code: 'custom',
+      message: `Event '${config.id}' does not define \`declaration\`. Define it either at the top level or on the ${ActionType.DECLARE} action (\`${declareActionPath}\`).`,
+      path: ['declaration']
+    })
+  }
+}
+
+/**
+ * Validation which ensures that a NOTIFY notificationForm:
+ *  - only includes fields with ids that are also in the declaration form
+ *  - the field types match the ones on the declaration form
+ *
+ * This is because the notification form is used as pre-filled values during declaration.
+ * For now we have made the design decision to not allow fields that are not present in the declaration form.
+ */
+export function validateNotificationForm(
+  event: EventConfig,
+  ctx: z.RefinementCtx<EventConfig>
+) {
+  const declarationFields = getDeclarationPages(event).flatMap((page) =>
+    page.fields.map((field) => ({ field, pageId: page.id }))
+  )
+
+  event.actions.forEach((action, actionIndex) => {
+    if (action.type !== ActionType.NOTIFY) {
+      return
+    }
+
+    action.notificationForm.pages.forEach((page, pageIndex) => {
+      page.fields.forEach((field, fieldIndex) => {
+        const path = [
+          'actions',
+          actionIndex,
+          'notificationForm',
+          'pages',
+          pageIndex,
+          'fields',
+          fieldIndex
+        ]
+
+        const matchingFields = declarationFields.filter(
+          (declarationField) => declarationField.field.id === field.id
+        )
+
+        if (matchingFields.length === 0) {
+          ctx.addIssue({
+            code: 'custom',
+            message: `Notification form field '${field.id}' does not exist in the declaration form of event '${event.id}'. Notification form fields must also be defined in the ${ActionType.DECLARE} action's declaration.`,
+            path
+          })
+          return
+        }
+
+        if (
+          !matchingFields.some(
+            (declarationField) => declarationField.field.type === field.type
+          )
+        ) {
+          const [declarationField] = matchingFields
+          ctx.addIssue({
+            code: 'custom',
+            message: `Notification form field '${field.id}' on page '${page.id}' is of type ${field.type}, but the declaration form field with the same id in event '${event.id}' (${ActionType.DECLARE} declaration, page '${declarationField.pageId}') is of type ${declarationField.field.type}.`,
+            path
+          })
+        }
+      })
+    })
+  })
 }

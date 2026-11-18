@@ -10,7 +10,7 @@
  */
 import { defineConfig, devices } from '@playwright/test'
 
-const TEST_TIMEOUT = 90000
+const TEST_TIMEOUT = 180_000
 
 const subdomains = ['register'] // TODO: Add more subdomains if needed
 const insecureOrigins = subdomains.map(
@@ -47,16 +47,17 @@ export default defineConfig({
   /* Reporter to use. See https://playwright.dev/docs/test-reporters */
   reporter: [
     ['html', { open: 'never' }],
-    ['playwright-ctrf-json-reporter', {}]
+    ['playwright-ctrf-json-reporter', {}],
+    ['./e2e/retry-reporter.ts']
   ],
   /* Shared settings for all the projects below. See https://playwright.dev/docs/api/class-testoptions. */
   use: {
     /* Base URL to use in actions like `await page.goto('/')`. */
     // baseURL: 'http://127.0.0.1:3000',
     /* Capture screenshot on failure */
-    screenshot: 'on',
+    screenshot: 'only-on-failure',
     /* Collect trace when the test failed. See https://playwright.dev/docs/trace-viewer */
-    trace: 'on',
+    trace: 'on-first-retry',
     // Ignore HTTPS errors (like untrusted or self-signed certificates) during Playwright tests on CI
     // This is useful for Let's Encrypt staging certificates that aren't publicly trusted.
     ignoreHTTPSErrors

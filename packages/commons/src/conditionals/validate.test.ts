@@ -24,13 +24,16 @@ import {
 import {
   errorMessages,
   areConditionsMet,
+  isActionVisible,
   isFieldSecured,
   isFieldVisible,
   runFieldValidations,
   validateFieldInput
 } from './validate'
 import { field } from '../events/field'
-import { flag } from './conditionals'
+import { flag, status } from './conditionals'
+import { ActionConfig } from '../events/ActionConfig'
+import { getCurrentEventState } from '../events/state'
 /**
  * Goal of testing is to ensure right error messages are returned, and our custom logic holds.
  * We should be able to trust zod validation for the rest.
@@ -453,5 +456,51 @@ describe('isFieldSecured', () => {
         generateTestValidatorContext()
       )
     ).toBe(false)
+  })
+})
+
+describe('isActionVisible with status()', () => {
+  const reinstateConfig = {
+    type: ActionType.REINSTATE_REGISTRATION,
+    label: {
+      id: 'event.action.reinstate-registration.label',
+      defaultMessage: 'Reinstate registration',
+      description: 'Label for the reinstate registration action'
+    },
+    conditionals: [
+      { type: ConditionalType.SHOW, conditional: status('REVOKED') }
+    ]
+  } as ActionConfig
+
+  const stateAfter = (actions: ActionType[]) =>
+    getCurrentEventState(
+      generateEventDocument({
+        configuration: tennisClubMembershipEvent,
+        actions: actions.map((type) => ({ type }))
+      }),
+      tennisClubMembershipEvent
+    )
+
+  it('is visible once the record is revoked', () => {
+    const state = stateAfter([
+      ActionType.CREATE,
+      ActionType.DECLARE,
+      ActionType.REGISTER,
+      ActionType.REVOKE_REGISTRATION
+    ])
+
+    expect(isActionVisible(reinstateConfig, state, {})).toBe(true)
+  })
+
+  it('is hidden again after the record is reinstated', () => {
+    const state = stateAfter([
+      ActionType.CREATE,
+      ActionType.DECLARE,
+      ActionType.REGISTER,
+      ActionType.REVOKE_REGISTRATION,
+      ActionType.REINSTATE_REGISTRATION
+    ])
+
+    expect(isActionVisible(reinstateConfig, state, {})).toBe(false)
   })
 })

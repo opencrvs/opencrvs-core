@@ -49,11 +49,15 @@ import { actionLabels } from '../../../workqueues/Actions/utils'
 import { register } from './register'
 import { archive } from './archive'
 import { unarchive } from './unarchive'
+import { revoke } from './revoke'
+import { reinstate } from './reinstate'
 
 const quickActions = {
   [ActionType.REGISTER]: register,
   [ActionType.ARCHIVE]: archive,
-  [ActionType.UNARCHIVE]: unarchive
+  [ActionType.UNARCHIVE]: unarchive,
+  [ActionType.REVOKE_REGISTRATION]: revoke,
+  [ActionType.REINSTATE_REGISTRATION]: reinstate
 } as const satisfies Partial<Record<ActionType, QuickActionConfig>>
 
 interface ModalConfig {
@@ -93,7 +97,9 @@ interface ModalResult {
 const DefaultIcons = {
   [ActionType.REGISTER]: 'PencilLine',
   [ActionType.ARCHIVE]: 'Archive',
-  [ActionType.UNARCHIVE]: 'ArchiveTray'
+  [ActionType.UNARCHIVE]: 'ArchiveTray',
+  [ActionType.REVOKE_REGISTRATION]: 'XCircle',
+  [ActionType.REINSTATE_REGISTRATION]: 'ArrowCounterClockwise'
 } as const
 
 function QuickActionModal({
@@ -108,12 +114,17 @@ function QuickActionModal({
   eventConfiguration: EventConfig
 }) {
   const intl = useIntl()
-  const validatorContext = useValidatorContext()
   const { getEvent } = useEvents()
   const dialogForm = useDialogFormState()
   const modalValues = dialogForm.formValues
   const eventDocument = getEvent.useGetOrDownloadEvent(eventId)
   const event = getCurrentEventState(eventDocument, eventConfiguration)
+  /*
+   * Pass the record itself, as every other form renderer does. Configured
+   * fields evaluate their conditionals against it, and the print button
+   * prints it.
+   */
+  const validatorContext = useValidatorContext(eventDocument)
 
   const errorsOnField = (config.fields ?? []).flatMap((field) =>
     flattenFormState(
@@ -230,12 +241,12 @@ export function useQuickActionModal(
           label,
           actionType,
           icon: isValidIcon(actionConfig?.icon) ? actionConfig.icon : undefined,
-          supportingCopy,
           fields:
             actionConfig && 'form' in actionConfig
               ? actionConfig.form
               : undefined,
-          ...config.modal
+          ...config.modal,
+          supportingCopy: supportingCopy ?? config.modal.supportingCopy
         }}
         eventConfiguration={eventConfiguration}
         eventId={eventIndex.id}

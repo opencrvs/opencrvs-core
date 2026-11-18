@@ -19,6 +19,7 @@ accessLog:
   enabled: true
   format: "json"
 
+{{#if monitoring_enabled}}
 tracing:
   serviceName: traefik
   resourceAttributes:
@@ -30,6 +31,7 @@ tracing:
       enabled: true
       endpoint: "opentelemetry-collector.opencrvs-deps-{{env}}.svc.cluster.local:4317"
       insecure: true
+{{/if}}
 
 
 ingressRoute:
@@ -48,14 +50,14 @@ providers:
 service:
   enabled: true
   single: false
-  type: NodePort
+  spec:
+    type: ClusterIP
 
 ports:
   web:
     port: 8000
     hostPort: 80
     protocol: TCP
-    nodePort: 30080
     http:
       redirections:
         entryPoint:
@@ -67,7 +69,6 @@ ports:
     port: 8443
     hostPort: 443
     protocol: TCP
-    nodePort: 30443
     {{#if lets_encrypt}}
     http:
       tls:

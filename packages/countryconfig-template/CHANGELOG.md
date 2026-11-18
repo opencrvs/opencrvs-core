@@ -1,5 +1,21 @@
 # Changelog
 
+## 2.2.0 Release Candidate
+
+### Breaking changes
+
+- Edit rights now depend on the record's status. Every `record.edit` scope sets the `status` option: `['NOTIFIED']` for roles holding `record.notify`, `['NOTIFIED', 'DECLARED']` for roles holding `record.declare`. A role holding `record.notify` must not hold `record.declare` or a `record.edit` that can match a DECLARED record. A `record.edit` with no `status` matches every status, and `notifiedBy: 'user'` still matches after the notification is declared, so the notifier could edit the declaration. Role scopes are served from `/config/roles`, so no data migration is needed. [#13983](https://github.com/opencrvs/opencrvs-core/issues/13983)
+
+### New features
+
+- Birth has its own notification form (`src/events/birth/forms/notificationForm.ts`) on an explicit `NOTIFY` action.
+- Death has an explicit `NOTIFY` action, with its declaration form and review made optional through `toNotificationForm` and `toNotificationReview`.
+
+### Improvements
+
+- Moved `roles.ts` and the `/config/roles` handler from `src/data-seeding/roles/` to `src/api/roles/`. Roles are configuration served from `/config/roles`, not seed data. The endpoint is unchanged; if you have edited `roles.ts`, carry your changes over to the new location. [#13981](https://github.com/opencrvs/opencrvs-core/issues/13981)
+- Removed `label` from the roles in `src/api/roles/roles.ts`, and the `userRole.*` rows it pointed to from `src/translations/countryconfig.csv`. Nothing read them: roles are named by the `event.history.role` message in `client.csv`, keyed by role id. You can delete them from your own roles and `countryconfig.csv`; leaving them in does no harm. [#13981](https://github.com/opencrvs/opencrvs-core/issues/13981)
+
 ## 2.1.0 Release Candidate
 
 ### Breaking changes
@@ -50,7 +66,11 @@
 
   Existing records are not corrected — this affects only declarations filled in after the upgrade; re-indexing won't change stored `deathLocationId`, only a correction that re-saves the form will. Present since 2.0.0, so audit your data if embassy offices are in use.
 
-## 2.0.3 Release Candidate
+## 2.0.3
+
+### Bug fixes
+
+- Corrected the country translations; one country could not be selected at all. [#11954](https://github.com/opencrvs/opencrvs-core/issues/11954)
 
 ## 2.0.2
 
@@ -92,14 +112,14 @@
   - `POST /tracking-id`
   - `GET /record-notification`
 - The following countryconfig endpoints have been renamed to sit under the `/config/` namespace:
-  | Old path | New path |
-  |---|---|
-  | `GET /workqueue` | `GET /config/workqueues` |
+  | Old path                  | New path                  |
+  | ------------------------- | ------------------------- |
+  | `GET /workqueue`          | `GET /config/workqueues`  |
   | `GET /application-config` | `GET /config/application` |
-  | `GET /locations` | `GET /config/locations` |
-  | `GET /roles` | `GET /config/roles` |
-  | `GET /users` | `GET /config/users` |
-  | `GET /events` | `GET /config/events` |
+  | `GET /locations`          | `GET /config/locations`   |
+  | `GET /roles`              | `GET /config/roles`       |
+  | `GET /users`              | `GET /config/users`       |
+  | `GET /events`             | `GET /config/events`      |
 - Switch to docker.io/chumaky/postgres_mongo_fdw:17.6_fdw5.5.2 image to support `mongo_fdw`. This is required for the legacy user migrations to work. It will be switched back to the official postgres image in a future release.
 - A new service `legacy-data-migration` which runs the same migration image but with the `migrate-legacy-data` flag and with the following new environment variables:
   - EVENTS_SUPERUSER_POSTGRES_URL
@@ -552,9 +572,9 @@ INSERT CSV ROWS IN ENGLISH ONLY
 - **Check your Metabase map file.** For Metabase configuration, we renamed `farajaland-map.geojson` to `map.geojson` to not tie implementations into example country naming conventions.
 - **Feature flags** In order to make application config settings more readable, we re-organised `src/api/application/application-config-default.ts` with a clear feature flag block like so. These are then used across the front and back end of the application to control configurable functionality. New feature flags DEATH_REGISTRATION allow you to optionally run off death registration if your country doesnt want to run its first pilot including death and PRINT_DECLARATION (see New Features) have been added.
   `FEATURES: {
-  DEATH_REGISTRATION: true,
-  MARRIAGE_REGISTRATION: false,
-  ...
+DEATH_REGISTRATION: true,
+MARRIAGE_REGISTRATION: false,
+...
 } `
 - **Improve rendering of addresses in review page where addresses match** When entering father's address details, some countries make use of a checkbox which says "Address is the same as the mothers. " which, when selected, makes the mother's address and fathers address the same. The checkbox has a programatic value of "Yes" or "No". As a result on the review page, the value "Yes" was displayed which didn't make grammatical sense as a response. We decided to use a custom label: "Same as mother's", which is what was asked on the form. This requires some code changes in the src/form/addresses/index.ts file to pull in the `hideInPreview` prop which will hide the value "Yes" on the review page and replace with a content managed label. Associated bug [#5086](https://github.com/opencrvs/opencrvs-core/issues/5086)
 

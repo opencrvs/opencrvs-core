@@ -13,7 +13,7 @@ import fc from 'fast-check'
 import {
   ActionTypes,
   EventDocument,
-  InherentFlags,
+  EventStatus,
   JurisdictionFilter,
   TENNIS_CLUB_MEMBERSHIP,
   UserFilter,
@@ -275,7 +275,7 @@ test('Check notifiedIn and notifiedBy scopes against event.get', async () => {
   )
 }, 120000)
 
-test('Check flags scope option against event.get', async () => {
+test('Check status scope option against event.get', async () => {
   const { user, generator } = await setupTestCase()
 
   const { type } = generator.event.create()
@@ -289,35 +289,34 @@ test('Check flags scope option against event.get', async () => {
     generator.event.actions.notify(event.id)
   )
 
-  // The NOTIFY action adds the `incomplete` flag to the event.
-  const clientRestrictedByFlags = createTestClient(user, [
+  const clientRestrictedByStatus = createTestClient(user, [
     encodeScope({
       type: 'record.read',
-      options: { flags: { noneOf: [InherentFlags.INCOMPLETE] } }
+      options: { status: [EventStatus.enum.DECLARED] }
     })
   ])
 
   await expect(
-    clientRestrictedByFlags.event.get({ eventId: event.id })
+    clientRestrictedByStatus.event.get({ eventId: event.id })
   ).rejects.toBeInstanceOf(EventNotFoundError)
 
-  const clientMatchingFlags = createTestClient(user, [
+  const clientMatchingStatus = createTestClient(user, [
     encodeScope({
       type: 'record.read',
-      options: { flags: { anyOf: [InherentFlags.INCOMPLETE] } }
+      options: { status: [EventStatus.enum.NOTIFIED] }
     })
   ])
 
   await expect(
-    clientMatchingFlags.event.get({ eventId: event.id })
+    clientMatchingStatus.event.get({ eventId: event.id })
   ).resolves.toMatchObject({ id: event.id })
 
-  const clientWithoutFlagsRestriction = createTestClient(user, [
+  const clientWithoutStatusRestriction = createTestClient(user, [
     encodeScope({ type: 'record.read' })
   ])
 
   await expect(
-    clientWithoutFlagsRestriction.event.get({ eventId: event.id })
+    clientWithoutStatusRestriction.event.get({ eventId: event.id })
   ).resolves.toMatchObject({ id: event.id })
 })
 

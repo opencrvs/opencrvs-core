@@ -27,6 +27,7 @@ import {
   AsyncRejectActionDocument,
   DisplayableAction,
   EventConfig,
+  VersionedEventConfig,
   EventDocument,
   EventInput,
   EventStatus,
@@ -40,10 +41,13 @@ import {
   getStatusFromActions,
   isActionVisible,
   isActionEnabled,
-  isWriteAction
+  isWriteAction,
+  isFileFieldValue
 } from '@opencrvs/commons/events'
+
 import { TrpcUserContext } from '@events/context'
-import { getEventConfigurationById } from '@events/service/config/config'
+import { getEventConfigurationForRecord } from '@events/service/config/config'
+import { resolveVersionForNewRecord } from '@events/service/events/configVersion'
 import {
   sweepUnreferencedFiles,
   deleteFilesByPrefix,
@@ -90,11 +94,12 @@ function getValidFileValue(
 ) {
   const isFileType =
     fieldTypes.find((field) => field.id === fieldKey)?.type === FieldType.FILE
-  const validFieldValue = FileFieldValue.safeParse(fieldValue)
-  if (!isFileType || !validFieldValue.success) {
+
+  if (!isFileType || !isFileFieldValue(fieldValue)) {
     return undefined
   }
-  return validFieldValue.data
+
+  return fieldValue
 }
 
 /**
@@ -112,8 +117,8 @@ export async function throwConflictIfActionNotAllowed(
   existingEvent?: EventDocument
 ) {
   const event = existingEvent ?? (await getEventById(eventId))
-  const eventConfiguration = await getEventConfigurationById({
-    eventType: event.type,
+  const eventConfiguration = await getEventConfigurationForRecord({
+    event: event,
     token
   })
 
@@ -198,15 +203,25 @@ export async function createEvent({
   eventInput,
   user,
   transactionId,
-  createdAtLocation
+  createdAtLocation,
+  config,
+  timeZone
 }: {
   eventInput: z.infer<typeof EventInput>
   user: TrpcUserContext
   transactionId: string
   createdAtLocation?: UUID | null | undefined
-  config: EventConfig
+  config: VersionedEventConfig
+  /** The country's time zone, in which configuration versions take effect. */
+  timeZone: string
 }): Promise<EventDocument> {
   const isSystem = user.type === TokenUserType.enum.system
+  const version = resolveVersionForNewRecord(
+    config,
+    eventInput.configVersionId,
+    new Date(),
+    timeZone
+  )
 
   const getOrCreateEvent = isSystem
     ? eventsRepo.getOrCreateEvent // System users create events without assignment
@@ -222,7 +237,8 @@ export async function createEvent({
     createdByRole:
       user.type === TokenUserType.enum.user ? user.role : undefined,
     createdBySignature: user.signature,
-    createdAtLocation: eventLocation
+    createdAtLocation: eventLocation,
+    configVersionId: version.id
   })
 
   return event
@@ -310,6 +326,8 @@ export function buildAction(
     case ActionType.REJECT:
     case ActionType.ARCHIVE:
     case ActionType.UNARCHIVE:
+    case ActionType.REVOKE_REGISTRATION:
+    case ActionType.REINSTATE_REGISTRATION:
     case ActionType.PRINT_CERTIFICATE:
     case ActionType.READ:
     case ActionType.CREATE:

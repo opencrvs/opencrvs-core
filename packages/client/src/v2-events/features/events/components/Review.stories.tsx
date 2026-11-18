@@ -37,7 +37,10 @@ import {
   eventAttachmentPath
 } from '@opencrvs/commons/client'
 import { AppRouter, TRPCProvider } from '@client/v2-events/trpc'
-import { storybookEventId, tennisClubMembershipEventDocument } from '@client/v2-events/features/events/fixtures'
+import {
+  storybookEventId,
+  tennisClubMembershipEventDocument
+} from '@client/v2-events/features/events/fixtures'
 import { useModal } from '@client/v2-events/hooks/useModal'
 import {
   getTestValidatorContext,
@@ -117,52 +120,6 @@ export const ReviewWithoutChanges: Story = {
         ]
       }
     }
-  }
-}
-
-export const ChangeModalInteraction: StoryObj<typeof Review.Body> = {
-  play: async ({ canvasElement, step }) => {
-    const canvas = within(canvasElement)
-
-    await step('Open modal', async () => {
-      const [changeButton] = await canvas.findAllByRole('button', {
-        name: 'Change'
-      })
-
-      await fireEvent.click(changeButton)
-    })
-
-    await step('Close modal', async () => {
-      const cancelButton = await canvas.findByRole('button', {
-        name: 'Cancel'
-      })
-
-      await fireEvent.click(cancelButton)
-    })
-  },
-  render: function Component(args) {
-    const [modal, openModal] = useModal()
-
-    async function handleEdit() {
-      await openModal<boolean | null>((close) => (
-        <Review.EditModal close={close}></Review.EditModal>
-      ))
-
-      return
-    }
-
-    return (
-      <>
-        <Review.Body
-          {...args}
-          form={mockDeclaration}
-          formConfig={TENNIS_CLUB_DECLARATION_FORM}
-          title="My test action"
-          onEdit={handleEdit}
-        ></Review.Body>
-        {modal}
-      </>
-    )
   }
 }
 
@@ -698,6 +655,46 @@ export const AcceptModalWithFormFields: Story = {
       name: 'Confirm'
     })
     await expect(confirmButton).toBeEnabled()
+  }
+}
+
+/**
+ * A print button configured in the action dialog prints the record the action
+ * is taken on. The dialog has to hand that record over: without it the button
+ * throws and the page falls back to the error screen.
+ */
+export const AcceptModalWithPrintButton: Story = {
+  render: function Component() {
+    return (
+      <Review.ActionModal.Accept
+        action="Declare"
+        attachmentPath={eventAttachmentPath(storybookEventId)}
+        close={fn()}
+        copy={{
+          title: generateTranslationConfig('Declare this event?'),
+          onConfirm: generateTranslationConfig('Confirm')
+        }}
+        declaration={{}}
+        event={tennisClubMembershipEventDocument}
+        eventConfiguration={tennisClubMembershipEvent}
+        eventType="Tennis club membership"
+        fields={[
+          {
+            id: 'modal-print',
+            type: FieldType.ALPHA_PRINT_BUTTON,
+            conditionals: [],
+            label: generateTranslationConfig('Print'),
+            configuration: { template: 'simple-certificate' }
+          }
+        ]}
+      />
+    )
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+
+    const printButton = await canvas.findByTestId('modal-print')
+    await expect(printButton).toBeEnabled()
   }
 }
 

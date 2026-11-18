@@ -8,7 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { test, expect, type Page } from '@playwright/test'
+import { test, expect } from '@playwright/test'
 import { getToken, login, switchEventTab } from '@e2e/support/helpers'
 import { faker } from '@faker-js/faker'
 import { CREDENTIALS } from '@e2e/support/constants'
@@ -25,9 +25,9 @@ import { ensureAssignedToUser, selectAction } from '@e2e/support/utils'
 import { AddressType } from '@opencrvs/toolkit/events'
 import { format, subDays, subYears } from 'date-fns'
 
-test.describe
-  .serial('Birth declaration case - Conditional Hidden Fields Removal', () => {
-  let page: Page
+test('Birth declaration case - Conditional Hidden Fields Removal', async ({
+  page
+}) => {
   let declaration: Declaration
 
   const informantName = {
@@ -35,15 +35,7 @@ test.describe
     surname: faker.person.lastName('male')
   }
 
-  test.beforeAll(async ({ browser }) => {
-    page = await browser.newPage()
-  })
-
-  test.afterAll(async () => {
-    await page.close()
-  })
-
-  test('Create and register declaration via API', async () => {
+  await test.step('Create and register declaration via API', async () => {
     const token = await getToken(CREDENTIALS.REGISTRAR)
     const administrativeAreas = await getAdministrativeAreas(token)
     const village = getIdByName(administrativeAreas, 'Klow')
@@ -82,12 +74,10 @@ test.describe
     declaration = res.declaration
   })
 
-  test.describe('Review and update declaration by Local Registrar', async () => {
-    test.beforeAll(async () => {
-      await login(page, CREDENTIALS.REGISTRAR)
-    })
+  await test.step('Review and update declaration by Local Registrar', async () => {
+    await login(page, CREDENTIALS.REGISTRAR)
 
-    test('Check if mother occupation is set', async () => {
+    await test.step('Check if mother occupation is set', async () => {
       await page.getByRole('button', { name: 'Pending certification' }).click()
       const childButton = page.getByRole('button', {
         name: formatV2ChildName(declaration)
@@ -103,7 +93,7 @@ test.describe
       await page.getByTestId('exit-event').click()
     })
 
-    test('Search by informant name', async () => {
+    await test.step('Search by informant name', async () => {
       await page
         .locator('#searchText')
         .fill(informantName.firstname + ' ' + informantName.surname)
@@ -116,7 +106,7 @@ test.describe
       ).toBeVisible()
     })
 
-    test('Correct the informant info', async () => {
+    await test.step('Correct the informant info', async () => {
       await page
         .getByRole('button', {
           name: formatV2ChildName(declaration)
@@ -140,14 +130,14 @@ test.describe
       await page.getByRole('button', { name: 'Continue' }).click()
     })
 
-    test('Fill in the fees form', async () => {
+    await test.step('Fill in the fees form', async () => {
       const fee = faker.number.int({ min: 1, max: 10 })
       await page.locator('#fees____amount').fill(fee.toString())
 
       await page.getByRole('button', { name: 'Continue' }).click()
     })
 
-    test('Change informant to mother', async () => {
+    await test.step('Change informant to mother', async () => {
       await page.getByTestId('change-button-informant.relation').click()
       await page.locator('#informant____relation').click()
       await page
@@ -159,7 +149,7 @@ test.describe
       await page.getByRole('button', { name: 'Go to review' }).click()
     })
 
-    test('Submit correction', async () => {
+    await test.step('Submit correction', async () => {
       await page.getByRole('button', { name: 'Continue' }).click()
       await page.getByTestId('make-correction').click()
 
@@ -175,7 +165,7 @@ test.describe
       ).toBeVisible({ timeout: 30_000 })
     })
 
-    test('Search by informant name should not get any result', async () => {
+    await test.step('Search by informant name should not get any result', async () => {
       await page
         .locator('#searchText')
         .fill(informantName.firstname + ' ' + informantName.surname)

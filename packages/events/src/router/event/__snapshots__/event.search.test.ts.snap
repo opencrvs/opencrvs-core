@@ -2,6 +2,7 @@
 
 exports[`Returns events based on the updatedAt column 1`] = `
 {
+  "configVersionId": "initial",
   "createdAt": "[sanitized]",
   "createdAtLocation": "[sanitized]",
   "createdBy": "[sanitized]",
@@ -48,6 +49,7 @@ exports[`Returns events based on the updatedAt column 1`] = `
 
 exports[`Returns events based on the updatedAt column 2`] = `
 {
+  "configVersionId": "initial",
   "createdAt": "[sanitized]",
   "createdAtLocation": "[sanitized]",
   "createdBy": "[sanitized]",
@@ -96,6 +98,7 @@ exports[`Returns relevant events in right order 1`] = `
 [
   {
     "assignedTo": "[sanitized]",
+    "configVersionId": "initial",
     "createdAt": "[sanitized]",
     "createdAtLocation": "[sanitized]",
     "createdBy": "[sanitized]",
@@ -142,6 +145,7 @@ exports[`Returns relevant events in right order 1`] = `
   },
   {
     "assignedTo": "[sanitized]",
+    "configVersionId": "initial",
     "createdAt": "[sanitized]",
     "createdAtLocation": "[sanitized]",
     "createdBy": "[sanitized]",
@@ -215,7 +219,7 @@ exports[`Throws when date field is invalid 1`] = `
                       "origin": "string",
                       "code": "invalid_format",
                       "format": "datetime",
-                      "pattern": "/^(?:(?:\\\\d\\\\d[2468][048]|\\\\d\\\\d[13579][26]|\\\\d\\\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\\\d|30)|(?:02)-(?:0[1-9]|1\\\\d|2[0-8])))T(?:(?:[01]\\\\d|2[0-3]):[0-5]\\\\d(?::[0-5]\\\\d(?:\\\\.\\\\d+)?)?(?:Z))$/",
+                      "pattern": "/^(?:(?:\\\\d\\\\d[2468][048]|\\\\d\\\\d[13579][26]|\\\\d\\\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\\\d|30)|(?:02)-(?:0[1-9]|1\\\\d|2[0-8])))T(?:(?:[01]\\\\d|2[0-3]):[0-5]\\\\d:[0-5]\\\\d(?:\\\\.\\\\d+)?(?:Z))$/",
                       "path": [],
                       "message": "Invalid ISO datetime"
                     }
@@ -436,7 +440,7 @@ exports[`Throws when one of the date range fields has invalid date 1`] = `
                       "origin": "string",
                       "code": "invalid_format",
                       "format": "datetime",
-                      "pattern": "/^(?:(?:\\\\d\\\\d[2468][048]|\\\\d\\\\d[13579][26]|\\\\d\\\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\\\d|30)|(?:02)-(?:0[1-9]|1\\\\d|2[0-8])))T(?:(?:[01]\\\\d|2[0-3]):[0-5]\\\\d(?::[0-5]\\\\d(?:\\\\.\\\\d+)?)?(?:Z))$/",
+                      "pattern": "/^(?:(?:\\\\d\\\\d[2468][048]|\\\\d\\\\d[13579][26]|\\\\d\\\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\\\d|30)|(?:02)-(?:0[1-9]|1\\\\d|2[0-8])))T(?:(?:[01]\\\\d|2[0-3]):[0-5]\\\\d:[0-5]\\\\d(?:\\\\.\\\\d+)?(?:Z))$/",
                       "path": [],
                       "message": "Invalid ISO datetime"
                     }
@@ -577,6 +581,7 @@ exports[`User only sees tennis club membership events within their jurisdiction 
 [
   {
     "assignedTo": "[sanitized]",
+    "configVersionId": "initial",
     "createdAt": "[sanitized]",
     "createdAtLocation": "[sanitized]",
     "createdBy": "[sanitized]",
@@ -621,6 +626,7 @@ exports[`User only sees tennis club membership events within their jurisdiction 
   },
   {
     "assignedTo": "[sanitized]",
+    "configVersionId": "initial",
     "createdAt": "[sanitized]",
     "createdAtLocation": "[sanitized]",
     "createdBy": "[sanitized]",
@@ -670,6 +676,7 @@ exports[`User only sees tennis club membership events within their jurisdiction 
 [
   {
     "assignedTo": "[sanitized]",
+    "configVersionId": "initial",
     "createdAt": "[sanitized]",
     "createdAtLocation": "[sanitized]",
     "createdBy": "[sanitized]",
@@ -714,6 +721,7 @@ exports[`User only sees tennis club membership events within their jurisdiction 
   },
   {
     "assignedTo": "[sanitized]",
+    "configVersionId": "initial",
     "createdAt": "[sanitized]",
     "createdAtLocation": "[sanitized]",
     "createdBy": "[sanitized]",
@@ -758,6 +766,7 @@ exports[`User only sees tennis club membership events within their jurisdiction 
   },
   {
     "assignedTo": "[sanitized]",
+    "configVersionId": "initial",
     "createdAt": "[sanitized]",
     "createdAtLocation": "[sanitized]",
     "createdBy": "[sanitized]",
@@ -806,6 +815,7 @@ exports[`User only sees tennis club membership events within their jurisdiction 
 exports[`User with "location" scope can see events from other offices based on their scopes 1`] = `
 {
   "assignedTo": "[sanitized]",
+  "configVersionId": "initial",
   "createdAt": "[sanitized]",
   "createdAtLocation": "[sanitized]",
   "createdBy": "[sanitized]",
@@ -852,6 +862,7 @@ exports[`User with "location" scope can see events from other offices based on t
 
 exports[`User with "location" scope only sees events created by system user to their primary office 1`] = `
 {
+  "configVersionId": "initial",
   "createdAt": "[sanitized]",
   "createdAtLocation": "[sanitized]",
   "createdBy": "[sanitized]",
@@ -872,7 +883,6 @@ exports[`User with "location" scope only sees events created by system user to t
     "recommender.none": true,
   },
   "flags": [
-    "incomplete",
     "health-worker-notified",
   ],
   "id": "[sanitized]",
@@ -899,6 +909,7 @@ exports[`User with "location" scope only sees events created by system user to t
 exports[`User with "location" scope only sees events from their primary office 1`] = `
 {
   "assignedTo": "[sanitized]",
+  "configVersionId": "initial",
   "createdAt": "[sanitized]",
   "createdAtLocation": "[sanitized]",
   "createdBy": "[sanitized]",
