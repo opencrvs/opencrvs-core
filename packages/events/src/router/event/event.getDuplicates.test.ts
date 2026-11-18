@@ -32,6 +32,7 @@ import { EventNotFoundError } from '@events/service/events/events'
 import { mswServer } from '../../tests/msw'
 import { env } from '../../environment'
 import AppSchema from '../../storage/postgres/events/schema/app/AppSchema'
+import { deleteEventById } from '../../storage/postgres/events/events'
 
 test('prevents forbidden access if missing required scope', async () => {
   const { user } = await setupTestCase()
@@ -441,4 +442,108 @@ test('Refuses to mark as not duplicate when the review scope has no access to th
       })
     )
   ).rejects.toMatchObject({ code: 'FORBIDDEN' })
+})
+
+test('Skips duplicates that no longer exist instead of failing', async () => {
+  const tennisClubMembershipWithDedupCheckConfig =
+    tennisClubMembershipEventWithDedupCheck(ActionType.DECLARE)
+
+  mswServer.use(
+    http.get(`${env.COUNTRY_CONFIG_URL}/config/events`, () => {
+      return HttpResponse.json([tennisClubMembershipWithDedupCheckConfig])
+    })
+  )
+
+  const { user, generator, eventsDb } = await setupTestCase(
+    1881,
+    tennisClubMembershipWithDedupCheckConfig
+  )
+
+  const client = createTestClient(user, TEST_USER_DEFAULT_SCOPES)
+
+  const declaration = generateActionDuplicateDeclarationInput(
+    tennisClubMembershipWithDedupCheckConfig,
+    ActionType.DECLARE,
+    createPrng(73)
+  )
+
+  const event1 = await client.event.create(generator.event.create())
+  await client.event.actions.declare.request(
+    generator.event.actions.declare(event1.id, { declaration })
+  )
+
+  const event2 = await client.event.create(generator.event.create())
+  await client.event.actions.declare.request(
+    generator.event.actions.declare(event2.id, { declaration })
+  )
+
+  const event3 = await client.event.create(generator.event.create())
+  await client.event.actions.declare.request(
+    generator.event.actions.declare(event3.id, { declaration })
+  )
+
+  // Not a scenario core produces: created events are never indexed and only created events can be
+  // deleted, so a flagged duplicate always exists. This reproduces the state reported in #13906 from a
+  // deployment that indexes created events. Declared events cannot be deleted through the API, so the
+  // row is removed directly.
+  await deleteEventById(event1.id)
+
+  const event2ActionsBeforeGet = await getEventActions(eventsDb, event2.id)
+
+  await client.event.actions.assignment.assign(
+    generator.event.actions.assign(event3.id, { assignedTo: user.id })
+  )
+
+  const duplicates = await client.event.getDuplicates({ eventId: event3.id })
+
+  expect(duplicates.map(({ id }) => id)).toEqual([event2.id])
+
+  const event2ActionsAfterGet = await getEventActions(eventsDb, event2.id)
+  expect(event2ActionsAfterGet).toHaveLength(event2ActionsBeforeGet.length + 1)
+  expect(last(event2ActionsAfterGet)?.actionType).toEqual(ActionType.READ)
+})
+
+test('Returns no duplicates when every flagged duplicate no longer exists', async () => {
+  const tennisClubMembershipWithDedupCheckConfig =
+    tennisClubMembershipEventWithDedupCheck(ActionType.DECLARE)
+
+  mswServer.use(
+    http.get(`${env.COUNTRY_CONFIG_URL}/config/events`, () => {
+      return HttpResponse.json([tennisClubMembershipWithDedupCheckConfig])
+    })
+  )
+
+  const { user, generator } = await setupTestCase(
+    1882,
+    tennisClubMembershipWithDedupCheckConfig
+  )
+
+  const client = createTestClient(user, TEST_USER_DEFAULT_SCOPES)
+
+  const declaration = generateActionDuplicateDeclarationInput(
+    tennisClubMembershipWithDedupCheckConfig,
+    ActionType.DECLARE,
+    createPrng(74)
+  )
+
+  const event1 = await client.event.create(generator.event.create())
+  await client.event.actions.declare.request(
+    generator.event.actions.declare(event1.id, { declaration })
+  )
+
+  const event2 = await client.event.create(generator.event.create())
+  await client.event.actions.declare.request(
+    generator.event.actions.declare(event2.id, { declaration })
+  )
+
+  // Reproduction of #13906, see 'Skips duplicates that no longer exist instead of failing'
+  await deleteEventById(event1.id)
+
+  await client.event.actions.assignment.assign(
+    generator.event.actions.assign(event2.id, { assignedTo: user.id })
+  )
+
+  await expect(
+    client.event.getDuplicates({ eventId: event2.id })
+  ).resolves.toEqual([])
 })

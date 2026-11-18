@@ -1,10 +1,19 @@
 # Changelog
 
-## 2.1.3 Release Candidate
+## 2.1.3
 
 ### Bug fixes
 
 - `npx @opencrvs/toolkit upgrade` removes `COPY typings ./typings` from a v2.0 country config's `Dockerfile`. The Tiltfile it installs no longer sends `typings/` to the image build, so `tilt up` stopped at `[runner 6/6] COPY typings ./typings`. If you already upgraded with 2.1.0, delete that line from your `Dockerfile` [#14050](https://github.com/opencrvs/opencrvs-core/issues/14050)
+- Two submissions of an action on the same record arriving at the same time no longer leave the record failing every later request with `Expected exactly one pending action`. A record now has at most one action request waiting for the country config: a request made meanwhile, including a second declaration or notification, is refused with a conflict error. A request whose confirmation failed completes when it is retried with the same transaction id, for every action, not only declare. The record's declaration and registration details come from the request that was accepted. [#13901](https://github.com/opencrvs/opencrvs-core/issues/13901)
+- Fetching the potential duplicates of a record no longer fails when one of them has been deleted, which can happen on deployments that index undeclared records. The duplicates that still exist are returned. [#13906](https://github.com/opencrvs/opencrvs-core/issues/13906)
+- A deduplication rule that matches on a number field with the value `0`, or on an unticked checkbox, now matches as configured. The clause was treated as having no value and dropped, and inside an `and` that switched off the whole rule. An empty text value still counts as no value. [#13897](https://github.com/opencrvs/opencrvs-core/issues/13897)
+- Saving a declaration no longer fails when a name field has no value, for example the father's name when the informant's relationship hides the father section. The events service returned an error (`Cannot convert undefined or null to object`) and the draft was not saved. [#13896](https://github.com/opencrvs/opencrvs-core/issues/13896)
+- Deduplication no longer logs a warning for every clause whose field is empty on a record, which is expected when a rule offers alternatives such as date of birth or age; those lines are now debug level. When a whole rule resolves to no query, so no duplicate search runs, the events service logs one warning naming the rule, the event and its type. [#13898](https://github.com/opencrvs/opencrvs-core/issues/13898)
+- A database query whose value could not be serialised left its Postgres connection permanently unusable and corrupted the next query sent on any connection, so unrelated requests to the events service failed with `invalid message format` until it restarted. The events service now requires `pg` 8.22.0 or later, which recovers from the failed query. [#13904](https://github.com/opencrvs/opencrvs-core/issues/13904)
+- Clearing a form page with the "Clear" button (`showClearButton`) no longer leaves data behind that keeps the page's section expanded on review pages and the record view. A field with a configured default value is now reset to that default; previously it was overwritten with an empty name, which was stored on the record and could stop the record being indexed for search. [#13459](https://github.com/opencrvs/opencrvs-core/issues/13459)
+
+  **Note:** records saved before this fix keep that value, so they may still be missing from search; this release does not repair them.
 
 ## 2.1.2
 
@@ -333,6 +342,52 @@ Re-running after a partial failure requires clearing the data first. [#11207](ht
 
 - Ensure JWT token key rotation is working correctly on each deployment [#13036](https://github.com/opencrvs/opencrvs-core/issues/13036)
 - Minio DockerHub image has been deprecated. Replace minio/mc image with quay.io/minio/mc [#13797](https://github.com/opencrvs/opencrvs-core/issues/13797)
+
+## 1.9.23
+
+### Bug fixes
+
+- Two submissions of an action on the same record arriving at the same time no longer leave the record failing every later request with `Expected exactly one pending action`. A record now has at most one action request waiting for the country config: a request made meanwhile, including a second declaration or notification, is refused with a conflict error. A request whose confirmation failed completes when it is retried with the same transaction id, for every action, not only declare. The record's declaration and registration details come from the request that was accepted. [#13901](https://github.com/opencrvs/opencrvs-core/issues/13901)
+- Fetching the potential duplicates of a record no longer fails with an `event_actions_event_id_fkey` foreign key violation when one of them has been deleted, which can happen on deployments that index undeclared records. The duplicates that still exist are returned. [#13906](https://github.com/opencrvs/opencrvs-core/issues/13906)
+- A deduplication rule that matches on a number field with the value `0`, or on an unticked checkbox, now matches as configured. The clause was treated as having no value and dropped, and inside an `and` that switched off the whole rule. An empty text value still counts as no value. [#13897](https://github.com/opencrvs/opencrvs-core/issues/13897)
+- Saving a declaration no longer fails when a name field has no value, for example the father's name when the informant's relationship hides the father section. The events service returned an error (`Cannot convert undefined or null to object`) and the draft was not saved. [#13896](https://github.com/opencrvs/opencrvs-core/issues/13896)
+- Deduplication no longer logs a warning for every clause whose field is empty on a record, which is expected when a rule offers alternatives such as date of birth or age; those lines are now debug level. When a whole rule resolves to no query, so no duplicate search runs, the events service logs one warning naming the rule, the event and its type. [#13898](https://github.com/opencrvs/opencrvs-core/issues/13898)
+
+## 1.9.22
+
+### Improvements
+
+- Upgrade Node.js to 22.23.4, a Node.js security release. This applies to every core image and to CI.
+
+## 1.9.21
+
+### Security
+
+- Internal auth service endpoints that issue tokens without credentials could be reached from the internet through the gateway and on the auth subdomain (`auth.<domain>`). The gateway now forwards only the public auth endpoints, and the Helm charts block `/internal/` paths on every host. [GHSA-3fpv-fj7v-pmj6](https://github.com/opencrvs/opencrvs-core/security/advisories/GHSA-3fpv-fj7v-pmj6)
+
+## 1.9.20
+
+### Bug fixes
+
+- A database query whose value could not be serialised left its Postgres connection permanently unusable and corrupted the next query sent on any connection, so unrelated requests to the events service failed with `invalid message format` until it restarted. The events service now requires `pg` 8.22.0 or later, which recovers from the failed query. [#13904](https://github.com/opencrvs/opencrvs-core/issues/13904)
+
+- Clearing a form page with the "Clear" button (`showClearButton`) no longer leaves data behind that keeps the page's section expanded on review pages and the record view. A field with a configured default value is now reset to that default; previously it was overwritten with an empty name, which was stored on the record and could stop the record being indexed for search. [#13459](https://github.com/opencrvs/opencrvs-core/issues/13459)
+
+  **Note:** records saved before this fix keep that value, so they may still be missing from search; this release does not repair them.
+
+## 1.9.19
+
+### Security
+
+- The `user.actions` endpoint in the events service now returns only audit metadata: action type, timestamp, acting user, event ID and tracking ID. It was authorised only by a user-management permission, yet returned the full record declaration of every action the target user had taken, so roles holding `user.read:all`, `user.read:my-office` or `user.read:my-jurisdiction` could read records they had no permission to open. The user audit history view is unchanged. [GHSA-hmgw-v78r-jjc4](https://github.com/opencrvs/opencrvs-core/security/advisories/GHSA-hmgw-v78r-jjc4) (High)
+
+### Bug fixes
+
+- MinIO removed its images from quay.io and Docker Hub, so the MinIO server image could no longer be pulled. It now comes from an OpenCRVS-hosted copy of the same release, `ghcr.io/opencrvs/minio:release.2025-06-13t11-33-47z`. [#13909](https://github.com/opencrvs/opencrvs-core/pull/13909)
+
+  **Deployment notes:**
+
+  - Docker Swarm deployments also need [opencrvs-countryconfig#1534](https://github.com/opencrvs/opencrvs-countryconfig/pull/1534), which moves the MinIO client (`mc`) to `ghcr.io/opencrvs/minio-mc:release.2025-05-21t01-59-54z`.
 
 ## 1.9.18
 
