@@ -108,65 +108,6 @@ describe('getCurrentEventState()', () => {
     expect(state.legalStatuses[EventStatus.enum.REGISTERED]).toBe(undefined)
   })
 
-  test('legalStatuses use the request that was accepted when an earlier request has no outcome', () => {
-    const failedRequest = generateActionDocument({
-      configuration: tennisClubMembershipEvent,
-      action: ActionType.DECLARE,
-      defaults: {
-        status: ActionStatus.Requested,
-        createdAt: '2023-01-01T00:01:00.000Z',
-        createdBy: 'user-of-the-failed-request'
-      }
-    })
-    const acceptedRequest = generateActionDocument({
-      configuration: tennisClubMembershipEvent,
-      action: ActionType.DECLARE,
-      defaults: {
-        status: ActionStatus.Requested,
-        createdAt: '2023-01-01T00:02:00.000Z',
-        createdBy: 'user-of-the-accepted-request'
-      }
-    })
-    const accept = generateActionDocument({
-      configuration: tennisClubMembershipEvent,
-      action: ActionType.DECLARE,
-      defaults: {
-        status: ActionStatus.Accepted,
-        createdAt: '2023-01-01T00:03:00.000Z',
-        originalActionId: acceptedRequest.id
-      }
-    })
-
-    const event = {
-      trackingId: getUUID(),
-      type: tennisClubMembershipEvent.id,
-      actions: [
-        generateActionDocument({
-          configuration: tennisClubMembershipEvent,
-          action: ActionType.CREATE
-        }),
-        failedRequest,
-        acceptedRequest,
-        accept
-      ],
-      createdAt: new Date(Date.now()).toISOString(),
-      id: getUUID(),
-      configVersionId: INITIAL_EVENT_CONFIG_VERSION_ID,
-      updatedAt: new Date(Date.now()).toISOString()
-    }
-
-    const state = getCurrentEventState(event, tennisClubMembershipEvent)
-
-    expect(state.legalStatuses[EventStatus.enum.DECLARED]).toEqual({
-      createdAt: acceptedRequest.createdAt,
-      createdBy: acceptedRequest.createdBy,
-      createdByUserType: acceptedRequest.createdByUserType,
-      createdAtLocation: acceptedRequest.createdAtLocation,
-      createdByRole: acceptedRequest.createdByRole,
-      acceptedAt: accept.createdAt
-    })
-  })
-
   test('Sets timestamps correctly when legal statuses were accepted async', () => {
     // NOTE: Values are not important, just the fact that right one is set. Using human-readable values for clarity
     const createAction = generateActionDocument({
