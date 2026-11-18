@@ -199,20 +199,15 @@ describe('dialogCopy', () => {
     expect(res.success).toBe(true)
   })
 
-  it('rejects `dialogCopy` on an action whose dialogs show no copy from the configuration', () => {
+  it('drops `dialogCopy` from an action whose dialogs show no copy from the configuration', () => {
     const res = ActionConfig.safeParse({
       type: ActionType.DELETE,
       label,
       dialogCopy
     })
 
-    expect(res.error?.issues).toMatchObject([
-      {
-        path: ['dialogCopy'],
-        message:
-          'This action does not support `dialogCopy`. No dialog of this action shows copy from the configuration.'
-      }
-    ])
+    expect(res.success).toBe(true)
+    expect(res.data).not.toHaveProperty('dialogCopy')
   })
 
   it.each([ActionType.UNARCHIVE, ActionType.DELETE])(

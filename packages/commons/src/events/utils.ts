@@ -255,13 +255,15 @@ export function getActionFormFields(
  */
 export function getActionDialogCopy(
   eventConfiguration: EventConfig,
-  actionType: Exclude<ActionType, typeof ActionType.EDIT>
+  actionType: ActionType
 ): TranslationConfig | undefined {
   const actionConfig = getActionConfig({ eventConfiguration, actionType })
+
   if (!actionConfig || actionConfig.type === ActionType.EDIT) {
     return undefined
   }
-  return actionConfig.dialogCopy
+
+  return 'dialogCopy' in actionConfig ? actionConfig.dialogCopy : undefined
 }
 
 export function getPrintCertificatePages(configuration: EventConfig) {

@@ -5,6 +5,7 @@
 ### Breaking changes
 
 - Edit rights now depend on the record's status. Every `record.edit` scope sets the `status` option: `['NOTIFIED']` for roles holding `record.notify`, `['NOTIFIED', 'DECLARED']` for roles holding `record.declare`. A role holding `record.notify` must not hold `record.declare` or a `record.edit` that can match a DECLARED record. A `record.edit` with no `status` matches every status, and `notifiedBy: 'user'` still matches after the notification is declared, so the notifier could edit the declaration. Role scopes are served from `/config/roles`, so no data migration is needed. [#13983](https://github.com/opencrvs/opencrvs-core/issues/13983)
+- `supportingCopy` is renamed to `dialogCopy` on the birth and death actions, and each confirmation dialog shows the `dialogCopy` of the action that it submits. The `notify` copy of the birth `DECLARE` action moves to its `NOTIFY` action, and the `DECLARE` actions keep only their `declare` copy. The `REGISTER` actions already give copy, so the register dialog of the review page now shows that copy. The `event.birth.action.declare.register.copy` and `event.death.action.declare.register.copy` rows in `src/translations/countryconfig.csv` are no longer used. `opencrvs upgrade` makes these changes in your config. [#13697](https://github.com/opencrvs/opencrvs-core/issues/13697)
 
 ### New features
 
