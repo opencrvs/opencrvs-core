@@ -17,6 +17,20 @@ data:
       labels:
         app: postgres-restore-runner
     spec:
+    {{- $node_selector := default .Values.node_selector .Values.postgres.node_selector }}
+    {{- if $node_selector }}
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+            - matchExpressions:
+            {{- range $k, $v := $node_selector }}
+              - key: {{ $k }}
+                operator: In
+                values:
+                - {{ $v | quote }}
+            {{- end }}
+    {{- end }}
       {{- include "opencrvs.imagePullSecrets" (dict "root" . "service" .Values.postgres) | nindent 6 }}
       containers:
       - name: restore-runner

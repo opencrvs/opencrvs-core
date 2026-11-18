@@ -344,6 +344,7 @@ The toolkit and the country configuration template work with any container regis
 
 ### Improvements
 
+- Review auth_mode secret management for OpenCRVS helm chart [#14234](https://github.com/opencrvs/opencrvs-core/issues/14234)
 - Roles no longer need a `label`. Nothing read it: the client names roles with the `event.history.role` message in `client.csv`, keyed by role id. The data seeder no longer rejects a role without a `label`, and ignores one that is still there. Country configurations can delete `label` from each role in `src/api/roles/roles.ts`, and the `userRole.*` rows it pointed to in `countryconfig.csv`. A role id that `event.history.role` does not list is shown as "Unknown". [#13981](https://github.com/opencrvs/opencrvs-core/issues/13981)
 - Refresh workqueues faster after an action on a record: only the searches the action can change are fetched again, instead of every search cached in the session [#14013](https://github.com/opencrvs/opencrvs-core/pull/14013)
 - Open the form page directly when changing a value on the declaration review page, without a confirmation dialog [#13975](https://github.com/opencrvs/opencrvs-core/issues/13975)
@@ -351,12 +352,14 @@ The toolkit and the country configuration template work with any container regis
 - `environment:init` now checks the container registry username, token and repository against the registry before storing them, instead of leaving a bad value to fail at image-pull time during deployment. If the username/token is rejected, the repository is not found (it may be empty) or the registry cannot be reached, the reason is shown and you choose whether to continue without validation. Existing GitHub secrets cannot be read back, so validation is skipped unless all four values are entered in that run. [#13412](https://github.com/opencrvs/opencrvs-core/issues/13412), [#14209](https://github.com/opencrvs/opencrvs-core/issues/14209)
 - `environment:init` now asks whether to enable monitoring, so environments that do not need their own monitoring stack (for example `qa-hotfix` on a cluster that already hosts `qa`) can switch it off without editing the generated YAML. The answer is stored as the GitHub environment variable `MONITORING_ENABLED` and drives `monitoring.enabled`, `otel.enabled` and Traefik tracing in the generated Helm values, so OpenTelemetry is on exactly when monitoring is. The Kibana credential questions are skipped when monitoring is disabled. Re-run `environment:init` for existing environments to create the variable; it defaults to enabled, which matches the previous behaviour. [#13377](https://github.com/opencrvs/opencrvs-core/issues/13377)
 - `environment:init` now asks about workflow approvals for every environment, not only production, and always stores the GitHub environment variable `APPROVAL_REQUIRED` (default `true` for production, `false` for other environments). `GH_APPROVERS` is asked whenever approvals are enabled. The infrastructure workflows require manual approval unless `APPROVAL_REQUIRED` is `false`, so re-run `environment:init` for existing non-production environments (or set the variable by hand) before updating the infrastructure repository.
+- Upgrade Node.js to 22.23.4, a Node.js security release. This applies to every core image and to CI.
 
 ### Bug fixes
 
 - The loading screens of the client now show the country logo from `COUNTRY_LOGO` in the application config. Before, they always showed the OpenCRVS logo. The client gets the logo from the `/content/country-logo` endpoint of the country config. [#14180](https://github.com/opencrvs/opencrvs-core/issues/14180)
 - Keep a 24px gutter beside a `Content` card at every width, so the workqueue and other card pages no longer sit flush against the side navigation and the browser window on screens narrower than the card's maximum [#13391](https://github.com/opencrvs/opencrvs-core/issues/13391)
 - Show images from the declaration and from the print form on the certificate preview. Files from `FILE` and `FILE_WITH_OPTIONS` fields reached the certificate as relative paths, so the browser did not find them in its cache and showed a broken image [#14187](https://github.com/opencrvs/opencrvs-core/issues/14187)
+- Store the signature that an administrator attaches when they create a user. Before, the client did not upload the file, and the user was saved with a path to a file that did not exist. Other sessions showed a broken image on the "Edit details" page of the user and on certificates. Now the user editor chooses the id of the new user, uploads the signature to `users/<id>/`, and sends the id to `user.create`. `user.create` accepts an optional `id`, and rejects the request if the signature file does not exist yet. Users that were created with a signature before this fix have no stored file, so an administrator must add their signature again. To find these users: `SELECT id FROM app.users WHERE signature_path LIKE 'users/tmp-%';` [#14350](https://github.com/opencrvs/opencrvs-core/issues/14350)
 
 ### Security
 
@@ -369,12 +372,29 @@ The toolkit and the country configuration template work with any container regis
 - The utilities image now includes `minio-client` and GNU `coreutils`. The S3 backup and restore jobs of the dependencies chart installed them with `apk` on every run, which fails without access to a package repository. [#14293](https://github.com/opencrvs/opencrvs-core/pull/14293)
 - Fix monitoring alerts that never fired or were never delivered: "Successful SSH login", backup and restore errors, and service errors. After upgrading, restart the `filebeat` DaemonSet and the `elastalert` Deployment. [#14343](https://github.com/opencrvs/opencrvs-core/pull/14343)
 - Fix ElastAlert notifications being blocked by the default-deny egress network policy. [#14343](https://github.com/opencrvs/opencrvs-core/pull/14343)
+- `npx @opencrvs/toolkit upgrade` removes `COPY typings ./typings` from a v2.0 country config's `Dockerfile`. The Tiltfile it installs no longer sends `typings/` to the image build, so `tilt up` stopped at `[runner 6/6] COPY typings ./typings`. If you already upgraded with 2.1.0, delete that line from your `Dockerfile` [#14050](https://github.com/opencrvs/opencrvs-core/issues/14050)
 
-## 2.1.1
+## 2.1.2
 
 ### Improvements
 
-- Apply fix for pgbackrest maintainance process [#14035](https://github.com/opencrvs/opencrvs-core/pull/14035)
+- Upgrade Node.js to 22.23.4, a Node.js security release. This applies to every core image and to CI.
+
+## 2.1.1
+
+### Security
+
+- Fixes a critical security vulnerability. Details will be published in a security advisory.
+
+### Bug fixes
+
+- Postgres with differential backup or restore enabled no longer fails to start once its pinned pgBackRest version is superseded. The container installs pgBackRest on every start, and the PostgreSQL apt repository keeps only the latest releases, so after 2.59.0 was dropped from it the `postgres-0` pod and the restore runner could not start. They now also install from the PostgreSQL archive repository, which keeps every release, so the version in `postgres.pgbackrest_version` stays installable and keeps matching the backup server. [#14038](https://github.com/opencrvs/opencrvs-core/issues/14038)
+
+  **Deployment notes:**
+
+  - If outbound traffic from the cluster is limited to an allowlist, add `apt-archive.postgresql.org` (HTTPS).
+
+- A differential Postgres restore can now reach the backup server: the restore runner pod has the SSH key with the permissions pgBackRest needs, and is allowed through the network policies. `environment:init` now also sets the variables a differential restore needs. [#13992](https://github.com/opencrvs/opencrvs-core/pull/13992)
 
 ## 2.1.0
 
