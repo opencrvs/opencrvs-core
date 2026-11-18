@@ -18,7 +18,7 @@ export const LOGIN_URL =
 export const AUTH_URL =
   process.env.NODE_ENV === 'development'
     ? 'http://localhost:4040'
-    : SCHEME + '://gateway.' + DOMAIN + '/auth'
+    : SCHEME + '://login.' + DOMAIN + '/api/auth'
 
 export const CLIENT_URL =
   process.env.NODE_ENV === 'development'
@@ -28,7 +28,7 @@ export const CLIENT_URL =
 export const GATEWAY_HOST =
   process.env.NODE_ENV === 'development'
     ? 'http://localhost:7070'
-    : SCHEME + '://gateway.' + DOMAIN
+    : SCHEME + '://register.' + DOMAIN + '/api'
 
 export const METABASE_URL =
   process.env.NODE_ENV === 'development'

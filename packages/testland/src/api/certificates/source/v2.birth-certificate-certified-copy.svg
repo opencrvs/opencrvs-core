@@ -13,23 +13,21 @@ Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencr
   <rect width="595" height="842" fill="white" />
   <text fill="#222222" xml:space="preserve" style="white-space: pre" font-family="Noto Sans"
     font-size="8" letter-spacing="0px">
-    <tspan x="220.625" y="678.552">&#x2028;</tspan>
-    <tspan x="61" y="691.352">{{ $lookup $metadata "modifiedAt"}}</tspan>
-    {{#ifCond ($lookup $metadata "legalStatuses.REGISTERED.createdAtLocation.name") '!==' undefined }}<tspan x="61" y="701.352">{{$intlWithParams 'certificates.birth.printedCertificateCount'
+    <tspan x="61" y="682">{{ $lookup $metadata "modifiedAt"}}</tspan>
+    {{#ifCond ($lookup $metadata "legalStatuses.REGISTERED.createdAtLocation.name") '!==' undefined }}<tspan x="61" y="692">{{$intlWithParams 'certificates.birth.printedCertificateCount'
       'copiesPrintedForTemplate' ($lookup $metadata "copiesPrintedForTemplate")}}</tspan>{{/ifCond}}
   </text>
   <text fill="#222222" xml:space="preserve" style="white-space: pre" font-family="Noto Sans"
     font-size="8" font-weight="600" letter-spacing="0px">
-    <tspan x="61" y="678.552">Date of certification / Date de certification</tspan>
+    <tspan x="61" y="670">Date of certification / Date de certification</tspan>
   </text>
   <text fill="#222222" xml:space="preserve" style="white-space: pre" font-family="Noto Sans"
     font-size="8" letter-spacing="0px">
-    <tspan x="220.727" y="712.552">&#x2028;</tspan>
-    <tspan x="61" y="725.352">{{$join ", " ($lookup $metadata 'updatedAtLocation.name') ($lookup $metadata 'updatedAtLocation.district') ($lookup $metadata 'updatedAtLocation.province') ($lookup $metadata 'updatedAtLocation.country')}}</tspan>
+    <tspan x="301" y="682">{{$join ", " ($lookup $metadata 'updatedAtLocation.name') ($lookup $metadata 'updatedAtLocation.district') ($lookup $metadata 'updatedAtLocation.province') ($lookup $metadata 'updatedAtLocation.country')}}</tspan>
   </text>
   <text fill="#222222" xml:space="preserve" style="white-space: pre" font-family="Noto Sans"
     font-size="8" font-weight="600" letter-spacing="0px">
-    <tspan x="61" y="712.552">Place of certification / Lieu de certification</tspan>
+    <tspan x="301" y="670">Place of certification / Lieu de certification</tspan>
   </text>
   <!--<text
   fill="#222222" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="8"
@@ -43,18 +41,20 @@ Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencr
   {{#ifCond ($or ($lookup ($action 'REGISTER') 'annotation.book-number') ($lookup ($action 'REGISTER') 'annotation.page-number')) '!==' undefined }}
   <text fill="#222222" xml:space="preserve" style="white-space: pre" font-family="Noto Sans"
   font-size="8" font-weight="600" letter-spacing="0px">
-    <tspan x="61" y="747.104">Register book entry</tspan>
+    <tspan x="301" y="696">Register book entry</tspan>
   </text>
   <text fill="#222222" xml:space="preserve" style="white-space: pre" font-family="Noto Sans"
   font-size="8" letter-spacing="0.5px">
-    <tspan x="61" y="759.104">Book: {{$lookup ($action 'REGISTER') 'annotation.book-number'}}, page: {{$lookup ($action 'REGISTER') 'annotation.page-number'}}</tspan>
+    <tspan x="301" y="706">Book: {{$lookup ($action 'REGISTER') 'annotation.book-number'}}, page: {{$lookup ($action 'REGISTER') 'annotation.page-number'}}</tspan>
   </text>
   {{/ifCond}}
-  <path d="M324.42 741L532.999 741.984" stroke="#CCCCCC" stroke-width="0.782258"
+  <path d="M61 759H213M222 759H374M383 759H535" stroke="#CCCCCC" stroke-width="0.782258"
     stroke-dasharray="3.13 1.56" />
   <text fill="#222222" xml:space="preserve" style="white-space: pre" font-family="Noto Sans"
     font-size="8" letter-spacing="0px">
-    <tspan x="387.936" y="754.656">Certified by: {{ $lookup $metadata "assignedTo.name"}}</tspan>
+    <tspan x="61" y="770">Signature of informant</tspan>
+    <tspan x="222" y="770">Declared by: {{$lookup $metadata 'legalStatuses.DECLARED.createdBy.name'}}</tspan>
+    <tspan x="383" y="770">Certified by: {{ $lookup $metadata "assignedTo.name"}}</tspan>
   </text>
   <g clip-path="url(#clip0_946_2501)">
     <text fill="#8D8D8D" xml:space="preserve" style="white-space: pre" font-family="Noto Sans"
@@ -569,8 +569,18 @@ Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencr
     </clipPath>
   </defs>
   <image x="506.287" y="784" width="34.7131" height="35" xlink:href="{{qrCode}}" />
+  {{#if ($lookup ($action 'DECLARE') 'annotation.review.signature')}}
+  <image data-testid="informant-signature" x="61" y="712" width="152" height="44"
+    xlink:href="{{$lookup ($action 'DECLARE') 'annotation.review.signature'}}" />
+  {{/if}}
+  {{#if ($lookup ($action 'DECLARE') 'createdBySignature')}}
+  <image data-testid="declarer-signature" x="222" y="712" width="152" height="44"
+    xlink:href="{{$lookup ($action 'DECLARE') 'createdBySignature'}}" />
+  {{/if}}
   {{#ifCond (lookup (lookup ($action 'PRINT_CERTIFICATE') 'annotation') 'collector.requesterId') '!==' 'PRINT_IN_ADVANCE'}}
-  <image data-testid="registrar-signature" id="image0_946_2501" x="331.453" y="670" width="194.513" height="68"
+  {{#if ($lookup ($action 'ASSIGN') 'createdBySignature')}}
+  <image data-testid="registrar-signature" id="image0_946_2501" x="383" y="712" width="152" height="44"
     xlink:href="{{$lookup ($action 'ASSIGN') 'createdBySignature'}}" />
+  {{/if}}
   {{/ifCond}}
 </svg>

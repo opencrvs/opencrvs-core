@@ -586,7 +586,7 @@ export async function findRecordsByQuery({
     .map((eventIndex: EncodedEventIndex) => {
       // Each hit is decoded and secured with the version its record was created under.
       const eventConfig = getConfigForRecord(versionedEventConfigs, eventIndex)
-      const decodedEventIndex = decodeEventIndex(eventConfig, eventIndex)
+      const decodedEventIndex = decodeEventIndex(eventIndex)
       const eventIndexWithoutLocationHierarchy =
         getEventIndexWithoutLocationHierarchy(eventConfig, decodedEventIndex)
 

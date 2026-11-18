@@ -66,8 +66,7 @@ echo
 echo "Installing Docker and Node for example, is outside the scope of this script."
 sleep_if_non_ci 10
 echo
-echo "As part of this script, we checkout another GIT repo: A country configuration module into the folder next to this one called: 'opencrvs-countryconfig'. We do this to make it easy for you to try OpenCRVS.  If you are developing your own country configuration, you should follow our forking instructions at https://documentation.opencrvs.org."
-[ -d "../opencrvs-countryconfig" ] && echo "Enter your sudo password to delete the existing country configuration to reset OpenCRVS to factory settings." && sudo rm -r ../opencrvs-countryconfig
+echo "OpenCRVS Core includes Testland, a reference country configuration in packages/testland. This script starts Testland together with Core.  To develop your own country configuration, run: npm create @opencrvs/countryconfig.  Then start Core with: pnpm dev --no-testland.  For more information, read https://documentation.opencrvs.org."
 
 sleep_if_non_ci 10
 echo
@@ -97,9 +96,11 @@ if [[ $(docker ps -aq) ]] ; then
   docker stop $(docker ps -aq)
   sleep_if_non_ci 5
 fi
+# Remove old containers so they don't reuse mounts to the deleted data/ dir
+docker compose -p opencrvs -f docker-compose.deps.yml -f docker-compose.dev-deps.yml down --remove-orphans 2>/dev/null || true
 
 echo
-openCRVSPorts=( 3447 9200 27017 6379 4444 3040 5050 2020 7070 1050 3030 3000 3020 2525 2021 3535 3536 9050)
+source "$(dirname "${BASH_SOURCE[0]}")/development-environment/ports.sh"
 for x in "${openCRVSPorts[@]}"
 do
    :
@@ -149,18 +150,26 @@ echo
 echo -e "\033[32m::::::::::::: Please enter your sudo password when prompted :::::::::::::\033[0m"
 echo
 if [ -d "data" ] ; then sudo rm -r data ; fi
+mkdir -p .secrets
 openssl genrsa -out .secrets/private-key.pem 2048 && openssl rsa -pubout -in .secrets/private-key.pem -out .secrets/public-key.pem
 mkdir -p data/elasticsearch
 chmod 775 data/elasticsearch
 
 mkdir -p data/rustfs
-chmod 775 data/rustfs
+# rustfs/rustfs runs as uid 10001, so the host directory must be world-writable
+chmod 777 data/rustfs
 mkdir -p data/postgres
 chmod 775 data/postgres
+mkdir -p data/backups
+chmod 775 data/backups
+# mosip-api keeps its record-only tokens in SQLite. better-sqlite3 does not
+# create the directory itself.
+mkdir -p data/sqlite
+chmod 775 data/sqlite
 
 echo -e "\033[32m:::::::::::::::::::: Building OpenCRVS dependencies ::::::::::::::::::::\033[0m"
 echo
-echo "This can take some time on slow connections.  Docker is downloading ElasticSearch docker images.  These are large files.  Then it will build them."
+echo "This can take some time on slow connections.  Docker is downloading the ElasticSearch, Postgres, Redis and RustFS images.  Some of these are large files."
 echo
 if [ $OS == "MAC" ]; then
  export LOCAL_IP=host-gateway
@@ -174,11 +183,10 @@ if [[ $CI == "true" ]]; then
 fi
 
 DOCKER_STARTED=1
-echo "wait-on tcp:3447" && wait-on -l tcp:3447
 echo "wait-on http://localhost:9200" && wait-on -l http://localhost:9200
 echo "wait-on tcp:9200" && wait-on -l tcp:9200
-echo "wait-on tcp:27017" && wait-on -l tcp:27017
 echo "wait-on tcp:6379" && wait-on -l tcp:6379
+echo "wait-on tcp:5432" && wait-on -l tcp:5432
 echo "wait-on tcp:3535" && wait-on -l tcp:3535
 
 
@@ -195,9 +203,5 @@ tmux send-keys -t opencrvs "bash development-environment/summary.sh" C-m
 tmux split-window -h -l '30%'
 tmux send-keys -t opencrvs "LANGUAGES=en && pnpm start" C-m
 tmux set -p @mytitle "opencrvs-core"
-tmux split-window -v
-tmux set -p @mytitle "opencrvs-countryconfig"
-DIR=$(cd "$(dirname "$0")"; pwd)
-tmux send-keys -t opencrvs "bash development-environment/setup-countryconfig.sh $DIR" C-m
 tmux setw -g mouse on
 tmux attach -t opencrvs

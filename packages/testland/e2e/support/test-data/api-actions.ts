@@ -198,6 +198,20 @@ export async function validateViaApi(token: string, eventId: string) {
 }
 
 /**
+ * Assigns the event to the token's user and registers it. Use it when the
+ * user who declared the record is not the user who registers it.
+ */
+export async function registerViaApi(token: string, eventId: string) {
+  await assignToSelf(token, eventId)
+  await getClient(token).event.actions.register.request.mutate({
+    eventId,
+    transactionId: uuidv4(),
+    declaration: {},
+    annotation: {}
+  })
+}
+
+/**
  * Requests a correction on a registered event via API, as the user owning
  * `token`. The event is left unassigned so another user can pick it up.
  *

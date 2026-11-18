@@ -105,9 +105,14 @@ helm upgrade --install opencrvs oci://ghcr.io/opencrvs/opencrvs-services \
             <td>Secret with the admin password of Elasticsearch (key <code>ELASTIC_PASSWORD</code>). OpenCRVS connects as <code>elastic</code> and creates the users that it needs. Copy it from the dependencies chart, or let the chart create it from <code>elasticsearch.admin_password</code>.</td>
         </tr>
         <tr>
+            <td>elasticsearch.use_default_credentials</td>
+            <td>false</td>
+            <td><strong>UNSAFE for production.</strong> Used when the chart creates the users secret and the URLs secret. <code>true</code>: the password of each user is the same as its username, for example <code>search</code>. <code>false</code>: random passwords. Use <code>true</code> for local development only, and always with Tilt: <code>helm template</code> renders random passwords again on each run. The chart accepts <code>true</code> only when <code>env.OPENCRVS_ENVIRONMENT</code> is <code>local</code>. See <a href="#authentication-configuration">Authentication configuration</a>.</td>
+        </tr>
+        <tr>
             <td>elasticsearch.urls_secret</td>
             <td>elasticsearch-opencrvs-urls</td>
-            <td>Secret with Elasticsearch URLs, usernames and passwords of OpenCRVS users. The chart creates it with random passwords when it does not exist. See <a href="#authentication-configuration">Authentication configuration</a>.</td>
+            <td>Secret with Elasticsearch URLs, usernames and passwords of OpenCRVS users. The chart creates it when it does not exist, with random passwords or default ones (see <code>elasticsearch.use_default_credentials</code>). See <a href="#authentication-configuration">Authentication configuration</a>.</td>
         </tr>
        <tr>
             <th>s3.{}</th>
@@ -175,9 +180,14 @@ helm upgrade --install opencrvs oci://ghcr.io/opencrvs/opencrvs-services \
             <td>Secret with the Postgres admin user and password (keys <code>POSTGRES_USER</code> and <code>POSTGRES_PASSWORD</code>). OpenCRVS connects with it and creates the databases and users that it needs. Copy it from the dependencies chart, or let the chart create it from <code>postgres.admin_*</code>.</td>
         </tr>
         <tr>
+            <td>postgres.use_default_credentials</td>
+            <td>false</td>
+            <td><strong>UNSAFE for production.</strong> Used when the chart creates the users secret and the URLs secret. <code>true</code>: the password of each user is the same as its username, for example <code>events_app</code>. <code>false</code>: random passwords. Use <code>true</code> for local development only, and always with Tilt: <code>helm template</code> renders random passwords again on each run. The chart accepts <code>true</code> only when <code>env.OPENCRVS_ENVIRONMENT</code> is <code>local</code>. See <a href="#authentication-configuration">Authentication configuration</a>.</td>
+        </tr>
+        <tr>
             <td>postgres.urls_secret</td>
             <td>postgres-urls</td>
-            <td>Secret with Postgres URLs, usernames and passwords of OpenCRVS users. The chart creates it with random passwords when it does not exist. See <a href="#authentication-configuration">Authentication configuration</a>.</td>
+            <td>Secret with Postgres URLs, usernames and passwords of OpenCRVS users. The chart creates it when it does not exist, with random passwords or default ones (see <code>postgres.use_default_credentials</code>). See <a href="#authentication-configuration">Authentication configuration</a>.</td>
         </tr>
        <tr>
             <th>redis.{}</th>
@@ -710,14 +720,18 @@ OpenCRVS has more then 10 microservices that require authentication to multiple 
 
 Authentication is always enabled. The `auth_mode` value is removed from `postgres`, `elasticsearch` and `redis`. The chart follows the same rules for each datastore:
 
-| Datastore     | Secret that the chart reads                     | If the secret does not exist                                                                 |
-| ------------- | ----------------------------------------------- | -------------------------------------------------------------------------------------------- |
-| S3            | `s3.users_secret`                               | The chart creates it from `s3.admin_username` and `s3.admin_password`, or fails.             |
-| Postgres      | `postgres.admin_user_secret_name`               | The chart creates it from `postgres.admin_username` and `postgres.admin_password`, or fails. |
-| Postgres      | `postgres.users_secret`, `postgres.urls_secret` | The chart generates random passwords for the OpenCRVS users and creates both secrets.        |
-| Elasticsearch | `elasticsearch.admin_user_secret_name`          | The chart creates it from `elasticsearch.admin_password`, or fails.                          |
-| Elasticsearch | `elasticsearch.users_secret`, `urls_secret`     | The chart generates random passwords for the OpenCRVS users and creates both secrets.        |
-| Redis         | `redis.users_secret`                            | The chart does not create it. Copy it from the dependencies chart.                           |
+| Datastore     | Secret that the chart reads                     | If the secret does not exist                                                                       |
+| ------------- | ----------------------------------------------- | -------------------------------------------------------------------------------------------------- |
+| S3            | `s3.users_secret`                               | The chart creates it from `s3.admin_username` and `s3.admin_password`, or fails.                   |
+| Postgres      | `postgres.admin_user_secret_name`               | The chart creates it from `postgres.admin_username` and `postgres.admin_password`, or fails.       |
+| Postgres      | `postgres.users_secret`, `postgres.urls_secret` | The chart creates both secrets, with random passwords or default ones (`use_default_credentials`). |
+| Elasticsearch | `elasticsearch.admin_user_secret_name`          | The chart creates it from `elasticsearch.admin_password`, or fails.                                |
+| Elasticsearch | `elasticsearch.users_secret`, `urls_secret`     | The chart creates both secrets, with random passwords or default ones (`use_default_credentials`). |
+| Redis         | `redis.users_secret`                            | The chart does not create it. Copy it from the dependencies chart.                                 |
+
+> [!WARNING]
+>
+> **`use_default_credentials: true` is UNSAFE. Never use it in production.** The password of each user is the same as its username, so anyone can guess it. Use it for local development with Tilt only. The chart accepts `postgres.use_default_credentials: true` and `elasticsearch.use_default_credentials: true` only when `env.OPENCRVS_ENVIRONMENT` is `local`. In any other environment, `helm template`, `helm install` and `helm upgrade` fail. The default is `false`.
 
 The chart never changes an existing secret. For Postgres and Elasticsearch, the on-deploy jobs use the admin secret to create or update the users of OpenCRVS. The migration jobs also need it. `helm install` and `helm upgrade` fail if the admin secret and the `admin_*` values are missing. `helm template` cannot read the cluster, so it does not fail: it renders the secrets only when you give the values.
 

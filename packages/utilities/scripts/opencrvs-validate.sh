@@ -65,7 +65,7 @@ Options:
                                   Required for postdeploy and all modes.
   --cert-endpoint <endpoint>      Internal TLS endpoint to fetch the SSL
                                   certificate from. Accepts host:port or URL.
-                                  Defaults to gateway.<domain>:443.
+                                  Defaults to register.<domain>:443.
   --monitoring-enabled <bool>     Include kibana.<domain> checks when true.
                                   Defaults to MONITORING_ENABLED or true.
   --allow-insecure-https <bool>   Allow HTTPS checks to use certificates signed
@@ -688,7 +688,6 @@ configure_public_domains() {
   s3_public_url="$(strip_scheme "${S3_PUBLIC_URL:-rustfs.$DOMAIN}")"
 
   PUBLIC_DOMAINS=(
-    "gateway.$DOMAIN"
     "login.$DOMAIN"
     "register.$DOMAIN"
     "countryconfig.$DOMAIN"
@@ -755,7 +754,7 @@ fi
 normalise_configuration
 
 if [ "$MODE" != "predeploy" ]; then
-  CERT_ENDPOINT="${CERT_ENDPOINT:-gateway.$DOMAIN:443}"
+  CERT_ENDPOINT="${CERT_ENDPOINT:-register.$DOMAIN:443}"
   configure_public_domains
 fi
 

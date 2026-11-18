@@ -25,6 +25,13 @@ elasticsearch:
   # An existing secret is never changed.
   # admin_password:
   admin_user_secret_name: elasticsearch-admin-user
+  # The chart creates the users secret and the URLs secret when they do not exist.
+  # !!! UNSAFE: NEVER USE `use_default_credentials: true` IN PRODUCTION !!!
+  # use_default_credentials: true  the password of each user is the same as its username, for example `search`.
+  #   Anyone can guess it. Use it for local development only, with Tilt. `helm template` always renders the same secrets, which Tilt needs.
+  #   The chart accepts it only when env.OPENCRVS_ENVIRONMENT is `local`. Otherwise the render fails.
+  # use_default_credentials: false the passwords are random. `helm template` renders new passwords each time.
+  use_default_credentials: false
   urls_secret: elasticsearch-opencrvs-urls
   # INTERNAL USAGE ONLY: DON'T MODIFY THIS SECTION
   # List of users to create and grant authorization to Elasticsearch.
@@ -33,7 +40,7 @@ elasticsearch:
   # - <PLACEHOLDER>_ELASTIC_USERNAME
   # - <PLACEHOLDER>_ELASTIC_PASSWORD
   # If <USERNAME> is not provided, then random username is generated.
-  # Password is always generated randomly.
+  # The password is random, or the same as the username when use_default_credentials is true.
   # Values are stored in secret named `elasticsearch-opencrvs-users`.
   auth_users:
     - SEARCH:search
@@ -77,7 +84,13 @@ postgres:
   # and `admin_password`. Both are required, because the administrator must already exist in Postgres: the chart cannot make up
   # a name. `helm install` and `helm upgrade` fail without them. `helm template` cannot read the cluster, so it renders the
   # secret only with them. An existing secret is never changed.
-  # The chart creates the users secret and the URLs secret with random passwords when they do not exist.
+  # The chart creates the users secret and the URLs secret when they do not exist.
+  # !!! UNSAFE: NEVER USE `use_default_credentials: true` IN PRODUCTION !!!
+  # use_default_credentials: true  the password of each user is the same as its username, for example `events_app`.
+  #   Anyone can guess it. Use it for local development only, with Tilt. `helm template` always renders the same secrets, which Tilt needs.
+  #   The chart accepts it only when env.OPENCRVS_ENVIRONMENT is `local`. Otherwise the render fails.
+  # use_default_credentials: false the passwords are random. `helm template` renders new passwords each time.
+  use_default_credentials: false
   # admin_username:
   # admin_password:
   admin_user_secret_name: postgres-admin-user
@@ -277,8 +290,6 @@ env:
   NODE_ENV: production
   S3_BUCKET: ocrvs
   # LOG_LEVEL: debug
-  # Application performance monitoring service URL.
-  # APN_SERVICE_URL: http://dependencies_apm-server:8200
 
   # Sentry DSN (Data Source Name) configuration for error tracking.
   # Note: The SENTRY_DSN should be defined at the global level of environment variables.
@@ -411,8 +422,6 @@ gateway:
   port: 7070
   image:
     name: ocrvs-gateway
-  network_policy:
-    ingress_mode: private
   env:
     CHECK_INVALID_TOKEN: 'true'
     CONFIG_SMS_CODE_EXPIRY_SECONDS: '600'
