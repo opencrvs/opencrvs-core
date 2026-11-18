@@ -37,7 +37,6 @@ import { Event } from '@countryconfig/events/utils'
 
 export const deathEvent = defineConfig({
   id: Event.Death,
-  declaration: DEATH_DECLARATION_FORM,
   label: {
     defaultMessage: 'Death',
     description: 'This is what this event is referred as in the system',
@@ -221,6 +220,7 @@ export const deathEvent = defineConfig({
           'This is shown as the action name anywhere the user can trigger the action from',
         id: 'event.death.action.declare.label'
       },
+      declaration: DEATH_DECLARATION_FORM,
       review: DEATH_DECLARATION_REVIEW,
       deduplication: {
         id: 'death-deduplication',

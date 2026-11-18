@@ -40,7 +40,6 @@ import {
 
 export const birthEvent = defineConfig({
   id: Event.Birth,
-  declaration: BIRTH_DECLARATION_FORM,
   label: {
     defaultMessage: 'Birth',
     description: 'This is what this event is referred as in the system',
@@ -308,6 +307,7 @@ export const birthEvent = defineConfig({
           'This is shown as the action name anywhere the user can trigger the action from',
         id: 'event.birth.action.declare.label'
       },
+      declaration: BIRTH_DECLARATION_FORM,
       review: BIRTH_DECLARATION_REVIEW,
       deduplication: {
         id: 'birth-deduplication',

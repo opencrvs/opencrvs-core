@@ -23,7 +23,8 @@ import {
   getActionAnnotationFields,
   getCurrentEventState,
   getDeclarationFields,
-  Location
+  Location,
+  resolveEventConfig
 } from '@opencrvs/toolkit/events'
 
 import { ExpressionBuilder, Kysely } from 'kysely'
@@ -38,7 +39,7 @@ import { Event } from '@countryconfig/events/utils/types'
  * You can exclude events from analytics by setting 'analytics' property to 'false' in the event config.
  */
 const analyticsEventConfigs = eventConfigs.filter(
-  (event) => event.analytics === true
+  (event) => resolveEventConfig(event).analytics === true
 )
 
 function findEventConfig(eventType: string) {
@@ -172,12 +173,12 @@ async function upsertAnalyticsEventActions(
           ...event,
           actions: actionsFromStartToCurrentPoint
         },
-        eventConfig
+        resolveEventConfig(eventConfig)
       )
 
       const { type, ...act } = action
 
-      const actionConfig = eventConfig.actions.find((a) => a.type === type)
+      const actionConfig = resolveEventConfig(eventConfig).actions.find((a) => a.type === type)
 
       const annotation = actionConfig
         ? pickAnnotationAnalyticsFields(
@@ -206,9 +207,9 @@ async function upsertAnalyticsEventActions(
             action,
             pickDeclarationAnalyticsFields(
               actionAtCurrentPoint.declaration,
-              eventConfig
+              resolveEventConfig(eventConfig)
             ),
-            eventConfig
+            resolveEventConfig(eventConfig)
           )
         )
       }
