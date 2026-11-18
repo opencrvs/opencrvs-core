@@ -25,9 +25,9 @@ import {
   ActionType,
   ActionUpdate,
   AsyncRejectActionDocument,
-  DisplayableAction,
   EventConfig,
   EventDocument,
+  EventIndex,
   EventInput,
   EventStatus,
   FieldType,
@@ -97,6 +97,21 @@ function getValidFileValue(
   return validFieldValue.data
 }
 
+/** Throws tRPC HTTP 409 if the status and the flags of the event do not allow the action. */
+function throwConflictIfActionNotAvailable(
+  event: EventIndex,
+  actionType: ActionType
+) {
+  const allowedActions = getAvailableActionsForEvent(event)
+
+  if (!allowedActions.includes(actionType)) {
+    throw new TRPCError({
+      code: 'CONFLICT',
+      message: `Action '${actionType}' cannot be performed on an event in '${event.status}' state with [${event.flags.join(', ')}] flags. Available actions: ${allowedActions.join(', ')}.`
+    })
+  }
+}
+
 /**
  * Ensure that an action is allowed depending on the current event state. This does two checks:
  * 1. Check that the action is allowed in the current event status and flags
@@ -119,15 +134,7 @@ export async function throwConflictIfActionNotAllowed(
 
   const eventIndex = getCurrentEventState(event, eventConfiguration)
 
-  const allowedActions: DisplayableAction[] =
-    getAvailableActionsForEvent(eventIndex)
-
-  if (!allowedActions.includes(actionType)) {
-    throw new TRPCError({
-      code: 'CONFLICT',
-      message: `Action '${actionType}' cannot be performed on an event in '${eventIndex.status}' state with [${eventIndex.flags.join(', ')}] flags. Available actions: ${allowedActions.join(', ')}.`
-    })
-  }
+  throwConflictIfActionNotAvailable(eventIndex, actionType)
 
   const actionConfig = getActionConfig({
     actionType,
@@ -326,6 +333,30 @@ export function buildAction(
 }
 
 /**
+ * Stores the requested action of a new action request.
+ *
+ * The event is locked while it is checked and the action is stored. Of two requests that
+ * arrive together, the second one waits, sees the requested action of the first and gets
+ * 409: an event has at most one requested action waiting for its outcome.
+ */
+async function addRequestedAction(
+  input: ActionInputWithType,
+  user: TrpcUserContext,
+  configuration: EventConfig
+) {
+  await eventsRepo.transaction(async (trx) => {
+    const event = await eventsRepo.getEventByIdWithLockInTrx(input.eventId, trx)
+    const eventIndex = getCurrentEventState(event, configuration)
+    throwConflictIfActionNotAvailable(eventIndex, input.type)
+
+    await eventsRepo.createActionInTrx(
+      buildAction(input, ActionStatus.Requested, user),
+      trx
+    )
+  })
+}
+
+/**
  * Persists a new action for an event in the database.
  *
  * @param input - The action payload including type and related data.
@@ -370,7 +401,11 @@ export async function addAction(
     }
   }
 
-  await eventsRepo.createAction(buildAction(input, status, user))
+  if (status === ActionStatus.Requested) {
+    await addRequestedAction(input, user, configuration)
+  } else {
+    await eventsRepo.createAction(buildAction(input, status, user))
+  }
 
   // We want to unassign only if:
   // - ActionStatus is not requested
@@ -410,7 +445,7 @@ export async function addAction(
   return updatedEvent
 }
 
-/** @returns false for drafts and READ actions, which never change the EventIndex. */
+/** False for drafts and READ actions. Created events stay unindexed and only they can be deleted, so flagged duplicates exist. */
 function isEventIndexable(event: EventDocument, actionType: ActionType) {
   return (
     actionType !== ActionType.READ &&
@@ -555,7 +590,9 @@ export async function addAsyncRejectAction(
   }
 
   const updatedEvent = await getEventById(eventId)
-  await indexEvent(updatedEvent, configuration, waitFor)
+  if (isEventIndexable(updatedEvent, type)) {
+    await indexEvent(updatedEvent, configuration, waitFor)
+  }
   await draftsRepo.deleteDraftsByEventId(eventId)
 
   return updatedEvent
