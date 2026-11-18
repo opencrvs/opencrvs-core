@@ -3734,10 +3734,6 @@ components:
         type:
           type: string
           const: READ
-        dialogCopy:
-          description: Not supported. No dialog of this action shows copy from the
-            configuration.
-          not: {}
         review:
           type: object
           properties:
@@ -14806,10 +14802,6 @@ components:
         type:
           type: string
           const: ASSIGN
-        dialogCopy:
-          description: Not supported. No dialog of this action shows copy from the
-            configuration.
-          not: {}
       required:
         - label
         - type
@@ -14839,10 +14831,6 @@ components:
         type:
           type: string
           const: UNASSIGN
-        dialogCopy:
-          description: Not supported. No dialog of this action shows copy from the
-            configuration.
-          not: {}
       required:
         - label
         - type
@@ -14874,10 +14862,6 @@ components:
         type:
           type: string
           const: DELETE
-        dialogCopy:
-          description: Not supported. No dialog of this action shows copy from the
-            configuration.
-          not: {}
       required:
         - label
         - flags
@@ -15271,10 +15255,6 @@ components:
         type:
           type: string
           const: DUPLICATE_DETECTED
-        dialogCopy:
-          description: Not supported. No dialog of this action shows copy from the
-            configuration.
-          not: {}
       required:
         - flags
         - type
@@ -15308,10 +15288,6 @@ components:
         type:
           type: string
           const: MARK_AS_DUPLICATE
-        dialogCopy:
-          description: Not supported. No dialog of this action shows copy from the
-            configuration.
-          not: {}
       required:
         - label
         - flags
@@ -15344,10 +15320,6 @@ components:
         type:
           type: string
           const: MARK_AS_NOT_DUPLICATE
-        dialogCopy:
-          description: Not supported. No dialog of this action shows copy from the
-            configuration.
-          not: {}
       required:
         - label
         - flags
@@ -15483,10 +15455,6 @@ components:
           additionalProperties: false
           description: Configuration of the form used for system actions beyond
             declaration, supporting a wider range of page types.
-        dialogCopy:
-          description: Not supported. No dialog of this action shows copy from the
-            configuration.
-          not: {}
       required:
         - label
         - flags
@@ -15654,10 +15622,6 @@ components:
           additionalProperties: false
           description: Configuration of the form used for system actions beyond
             declaration, supporting a wider range of page types.
-        dialogCopy:
-          description: Not supported. No dialog of this action shows copy from the
-            configuration.
-          not: {}
       required:
         - label
         - flags
@@ -15691,10 +15655,6 @@ components:
         type:
           type: string
           const: APPROVE_CORRECTION
-        dialogCopy:
-          description: Not supported. No dialog of this action shows copy from the
-            configuration.
-          not: {}
       required:
         - label
         - flags
@@ -15727,10 +15687,6 @@ components:
         type:
           type: string
           const: REJECT_CORRECTION
-        dialogCopy:
-          description: Not supported. No dialog of this action shows copy from the
-            configuration.
-          not: {}
       required:
         - label
         - flags
