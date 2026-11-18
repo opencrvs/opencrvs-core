@@ -8,14 +8,9 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { QueryClient } from '@tanstack/react-query'
 import { PersistedClient } from '@tanstack/react-query-persist-client'
 import { storage } from '@client/storage'
-import {
-  createIDBPersister,
-  purgeLegacyLocationListQueries,
-  trpcOptionsProxy
-} from './trpc'
+import { createIDBPersister } from './trpc'
 
 const STORE = 'persister-test'
 const LARGE_KEY = `react-query-large-query-storage-${STORE}`
@@ -115,35 +110,5 @@ describe('createIDBPersister', () => {
     )
 
     expect(largeWrites()).toHaveLength(0)
-  })
-})
-
-describe('purgeLegacyLocationListQueries', () => {
-  it('removes list entries keyed with input and keeps the shared entries', () => {
-    const queryClient = new QueryClient()
-    const sharedLocations = trpcOptionsProxy.locations.list.queryKey()
-    const legacyLocations = trpcOptionsProxy.locations.list.queryKey({
-      isActive: undefined
-    })
-    const sharedAreas = trpcOptionsProxy.administrativeAreas.list.queryKey()
-    const legacyAreas = trpcOptionsProxy.administrativeAreas.list.queryKey({
-      ids: undefined
-    })
-
-    for (const key of [
-      sharedLocations,
-      legacyLocations,
-      sharedAreas,
-      legacyAreas
-    ]) {
-      queryClient.setQueryData(key, [])
-    }
-
-    purgeLegacyLocationListQueries(queryClient)
-
-    expect(queryClient.getQueryData(sharedLocations)).toBeDefined()
-    expect(queryClient.getQueryData(sharedAreas)).toBeDefined()
-    expect(queryClient.getQueryData(legacyLocations)).toBeUndefined()
-    expect(queryClient.getQueryData(legacyAreas)).toBeUndefined()
   })
 })

@@ -99,18 +99,29 @@ export function useLocations() {
   const trpc = useTRPC()
   return {
     getLocations: {
-      useSuspenseQuery: () => {
+      useSuspenseQuery: ({
+        isActive,
+        locationIds,
+        locationType
+      }: {
+        isActive?: boolean
+        locationIds?: UUID[]
+        locationType?: string
+      } = {}) => {
         // We intentionally remove `queryFn` here because we already set a global default
         // via `setQueryDefaults`. Passing it again would override caching/persistence.
-        // The `...rest` spread carries the query key and things like staleTime, gcTime, enabled, etc.
-        // Do not pass an input to `queryOptions()`. An input changes the key,
-        // so the hook stops sharing the cache entry that `PrefetchQueries`
-        // fills and the list is fetched and stored twice. Filter `rows` instead.
+        // The `...rest` spread carries over things like staleTime, gcTime, enabled, etc.
+        // Then we re-attach the queryKey explicitly so React Query can identify this cache.
         const { queryFn, ...rest } =
           trpcOptionsProxy.locations.list.queryOptions()
 
         return useSuspenseQuery({
           ...rest,
+          queryKey: trpc.locations.list.queryKey({
+            isActive,
+            locationIds,
+            locationType
+          }),
           select: (data) =>
             (data as unknown as SyncedCache<ClientLocation>).rows
         }).data
