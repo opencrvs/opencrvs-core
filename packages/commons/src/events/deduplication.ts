@@ -51,7 +51,7 @@ export function field(fieldId: string) {
         type: 'strict',
         options
       }) satisfies ClauseInput,
-     /**
+    /**
      * Creates a date range matcher that finds records where date field fall within a specified range.
      *
      * By default, matches against the field specified in `field()` (e.g., 'mother.dob').
@@ -61,7 +61,7 @@ export function field(fieldId: string) {
      * @param options.days - Number of days before and after the target date to search (creates a ±days range)
      * @param options.pivot - Optional. Distance in days where relevance scoring drops by 50%. Defaults to ⌊(days * 2) / 3⌋
      * @param options.boost - Optional. Scoring boost multiplier for matching results. Defaults to 1
-     * @param options.matchAgainst - Optional. Additional field to match against. When provided,
+     * @param options.matchAgainst - Optional. Additional field to match against, or a list of fields matched with OR. When provided,
      * the query matches if the field fall within the date range. The default field is always excluded in the search in that case.
      *
      * @returns A clause that matches records where at least one of the specified date field is within the range

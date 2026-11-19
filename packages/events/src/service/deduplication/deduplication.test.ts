@@ -18,6 +18,7 @@ import {
   Clause,
   getDeclarationFields,
   FieldType,
+  getEventConfigForRecord,
   PlainDate,
   toVersionedEventConfig,
   withDeclarationField
@@ -721,5 +722,75 @@ describe('deduplication across versions', () => {
         ChildOnboardingEvent
       ])
     ).toThrow(`Field with id ${OLDER_FIELD_ID} not found in any version`)
+  })
+
+  it('finds duplicates of both versions when the first name moved from a TEXT field into a NAME field', async () => {
+    const OLDER_FIRSTNAME_ID = 'child.firstname'
+    const {
+      versions: [base],
+      ...eventLevel
+    } = toVersionedEventConfig(ChildOnboardingEvent)
+    const versionedConfig = {
+      ...eventLevel,
+      versions: [
+        withDeclarationField(base, {
+          id: OLDER_FIRSTNAME_ID,
+          type: FieldType.TEXT,
+          label: {
+            id: 'child.firstname.label',
+            defaultMessage: 'First name',
+            description: 'Field that only the older version has'
+          }
+        }),
+        { ...base, id: 'v2', effectiveFrom: '2020-01-01' }
+      ]
+    }
+
+    const recordOfV1 = eventQueryDataGenerator({
+      id: getUUID(),
+      type: ChildOnboardingEvent.id,
+      declaration: { [OLDER_FIRSTNAME_ID]: 'John' }
+    })
+    const recordOfV2 = eventQueryDataGenerator({
+      id: getUUID(),
+      type: ChildOnboardingEvent.id,
+      configVersionId: 'v2',
+      declaration: { 'child.name': { firstname: 'John', surname: 'Doe' } }
+    })
+    for (const record of [recordOfV1, recordOfV2]) {
+      await getOrCreateClient().update({
+        index: getEventIndexName(ChildOnboardingEvent.id),
+        id: record.id,
+        body: {
+          doc: encodeEventIndex(
+            record,
+            getEventConfigForRecord(versionedConfig, record)
+          ),
+          doc_as_upsert: true
+        },
+        refresh: 'wait_for'
+      })
+    }
+
+    const matches = await searchForDuplicates({
+      eventIndex: eventQueryDataGenerator({
+        id: getUUID(),
+        type: ChildOnboardingEvent.id,
+        configVersionId: 'v2',
+        declaration: { 'child.name': { firstname: 'John', surname: 'Smith' } }
+      }),
+      deduplication: DeduplicationConfig.parse({
+        ...LEGACY_BIRTH_DEDUPLICATION_RULES,
+        query: field('child.name.firstname').fuzzyMatches({
+          matchAgainst: ['child.name.firstname', OLDER_FIRSTNAME_ID]
+        })
+      }),
+      versionedConfig,
+      today: '2025-01-01' as PlainDate
+    })
+
+    expect(matches.map(({ event }) => event.id).sort()).toEqual(
+      [recordOfV1.id, recordOfV2.id].sort()
+    )
   })
 })
