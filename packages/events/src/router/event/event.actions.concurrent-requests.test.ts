@@ -14,7 +14,10 @@ import { ActionStatus, ActionType, getUUID } from '@opencrvs/commons'
 import { getCurrentEventState } from '@opencrvs/commons/events'
 import { tennisClubMembershipEvent } from '@opencrvs/commons/fixtures'
 import {
+  CONFIRMATION_SCOPES,
+  TEST_SYSTEM_ID,
   createEvent,
+  createSystemTestClient,
   createTestClient,
   setupTestCase
 } from '@events/tests/utils'
@@ -228,6 +231,7 @@ describe('An event has at most one requested action', () => {
 
 describe('A requested action left without an outcome', () => {
   test('refuses a new DECLARE while the failed request is pending', async () => {
+    // keepAssignment expects a synchronous answer, so the user stays assigned after the failure
     const { declare } = await setup()
 
     mockConfirmations(() => 500)
@@ -242,24 +246,59 @@ describe('A requested action left without an outcome', () => {
     { type: ActionType.DECLARE, actions: [] },
     { type: ActionType.REGISTER, actions: [ActionType.DECLARE] }
   ] as const)(
-    'a retry of a failed $type is not sent again and stays retryable',
+    'a failed $type stays requested, unassigns the user and is not sent again',
     async ({ type, actions }) => {
-      const { client, event, declare, register } = await setup([...actions])
-      const request = type === ActionType.DECLARE ? declare : register
-      const failed = getUUID()
+      const { client, generator, event } = await setup([...actions])
+      const transactionId = getUUID()
+      const request = async () =>
+        type === ActionType.DECLARE
+          ? client.event.actions.declare.request({
+              ...generator.event.actions.declare(event.id),
+              transactionId
+            })
+          : client.event.actions.register.request({
+              ...generator.event.actions.register(event.id),
+              transactionId
+            })
 
+      // Handled like an asynchronous response
       mockConfirmations(() => 500)
-      await expect(request(failed)).rejects.toThrow()
+      const response = await request()
+      expect(statuses(response.actions, type)).toEqual([ActionStatus.Requested])
+      expect(response.actions.at(-1)?.type).toBe(ActionType.UNASSIGN)
 
-      // Not a conflict: the client keeps the request in its Outbox and retries it
+      // The retry is refused, so it leaves the client's Outbox
       const calls = mockConfirmations()
-      await expect(request(failed)).rejects.toMatchObject({
-        code: 'INTERNAL_SERVER_ERROR'
-      })
+      await expect(request()).rejects.toMatchObject({ code: 'CONFLICT' })
       expect(calls[type]).toBeUndefined()
 
-      const stored = await client.event.get({ eventId: event.id })
-      expect(statuses(stored.actions, type)).toEqual([ActionStatus.Requested])
+      // Country config resolves the action
+      const countryConfig = createSystemTestClient(
+        TEST_SYSTEM_ID,
+        CONFIRMATION_SCOPES
+      )
+      const requested = response.actions.find(
+        (action) =>
+          action.type === type && action.status === ActionStatus.Requested
+      )
+      const accept =
+        type === ActionType.DECLARE
+          ? countryConfig.event.actions.declare.accept({
+              ...generator.event.actions.declare(event.id),
+              transactionId: getUUID(),
+              actionId: requested?.id ?? ''
+            })
+          : countryConfig.event.actions.register.accept({
+              ...generator.event.actions.register(event.id),
+              transactionId: getUUID(),
+              actionId: requested?.id ?? '',
+              registrationNumber: 'ABC1234567'
+            })
+      const accepted = await accept
+      expect(statuses(accepted.actions, type)).toEqual([
+        ActionStatus.Requested,
+        ActionStatus.Accepted
+      ])
     }
   )
 

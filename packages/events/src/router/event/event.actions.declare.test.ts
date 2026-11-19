@@ -515,7 +515,7 @@ describe('Declare action', () => {
     expect(firstResponse).toEqual(secondResponse)
   })
 
-  test(`DECLARE action that failed in country config is not sent again on a retry`, async () => {
+  test(`DECLARE that fails in country config stays requested and is not sent again`, async () => {
     const spy = vi.fn()
     mswServer.use(
       http.post(
@@ -530,17 +530,22 @@ describe('Declare action', () => {
       encodeScope({ type: 'record.declare' })
     ])
 
-    const data = generator.event.actions.declare(eventId, {
-      keepAssignment: true
-    })
+    const data = generator.event.actions.declare(eventId)
 
-    await expect(client.event.actions.declare.request(data)).rejects.toThrow()
+    // Handled like an asynchronous response: the user is unassigned and country config
+    // needs to accept or reject the requested action
+    const response = await client.event.actions.declare.request(data)
+    expect(response.actions.slice(-2)).toEqual([
+      expect.objectContaining({
+        type: ActionType.DECLARE,
+        status: ActionStatus.Requested
+      }),
+      expect.objectContaining({ type: ActionType.UNASSIGN })
+    ])
 
-    // The retry keeps failing with a retryable error until country config accepts or
-    // rejects the requested action, so the client keeps it in its Outbox
-    await expect(
-      client.event.actions.declare.request(data)
-    ).rejects.toMatchObject({ code: 'INTERNAL_SERVER_ERROR' })
+    await expect(client.event.actions.declare.request(data)).rejects.toThrow(
+      'You are not assigned to this event'
+    )
     expect(spy).toHaveBeenCalledTimes(1)
   })
 })
@@ -1205,7 +1210,7 @@ describe('3rd party integration confirmation behaviour', () => {
     ).toBeDefined()
   })
 
-  test('Keeps assignment when integration responds with 500', async () => {
+  test('Unassigns when integration responds with 500', async () => {
     mockActionApi(ActionType.DECLARE, 500)
 
     const { generator, user } = await setupTestCase()
@@ -1214,12 +1219,8 @@ describe('3rd party integration confirmation behaviour', () => {
 
     const event = await client.event.create(generator.event.create())
 
-    await expect(
-      client.event.actions.declare.request(
-        generator.event.actions.declare(event.id)
-      )
-    ).rejects.toThrow(
-      'Unexpected failure from country config action confirmation API'
+    await client.event.actions.declare.request(
+      generator.event.actions.declare(event.id)
     )
 
     const eventAfterFailure = await client.event.get({ eventId: event.id })
@@ -1231,6 +1232,6 @@ describe('3rd party integration confirmation behaviour', () => {
 
     expect(currentState.flags).toEqual(['declare:requested'])
     expect(currentState.status).toEqual(EventStatus.enum.CREATED)
-    expect(currentState.assignedTo).toEqual(user.id)
+    expect(currentState.assignedTo).toEqual(undefined)
   })
 })

@@ -441,11 +441,10 @@ describe('Request and confirmation flow', () => {
 
       mockRegisterActionApi(500)
 
-      await expect(
-        client.event.actions.register.request(
-          generator.event.actions.register(eventId)
-        )
-      ).rejects.matchSnapshot()
+      // Handled like an asynchronous response: the action stays requested
+      await client.event.actions.register.request(
+        generator.event.actions.register(eventId)
+      )
 
       const registeredEvent = await client.event.get({ eventId })
 
@@ -561,10 +560,7 @@ describe('Request and confirmation flow', () => {
         )
         await client.event.actions.assignment.assign(assignmentInput)
 
-        // Repeating the request while it waits for country config does not send it again
-        await expect(
-          client.event.actions.register.request(data)
-        ).rejects.toMatchObject({ code: 'INTERNAL_SERVER_ERROR' })
+        await client.event.actions.register.request(data)
 
         await client.event.actions.assignment.unassign({
           eventId,
@@ -2194,7 +2190,7 @@ describe('3rd party integration confirmation behaviour', () => {
     expect(currentState.assignedTo).toEqual(undefined)
   })
 
-  test('Keeps assignment when integration responds with 500', async () => {
+  test('Unassigns when integration responds with 500', async () => {
     mockActionApi(ActionType.REGISTER, 500)
 
     const { generator, user } = await setupTestCase()
@@ -2207,12 +2203,8 @@ describe('3rd party integration confirmation behaviour', () => {
       generator.event.actions.declare(event.id, { keepAssignment: true })
     )
 
-    await expect(
-      client.event.actions.register.request(
-        generator.event.actions.register(event.id)
-      )
-    ).rejects.toThrow(
-      'Unexpected failure from country config action confirmation API'
+    await client.event.actions.register.request(
+      generator.event.actions.register(event.id)
     )
 
     const eventAfterFailure = await client.event.get({ eventId: event.id })
@@ -2224,6 +2216,6 @@ describe('3rd party integration confirmation behaviour', () => {
 
     expect(currentState.flags).toEqual(['register:requested'])
     expect(currentState.status).toEqual(EventStatus.enum.DECLARED)
-    expect(currentState.assignedTo).toEqual(user.id)
+    expect(currentState.assignedTo).toEqual(undefined)
   })
 })

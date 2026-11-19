@@ -290,16 +290,33 @@ export async function defaultRequestHandler(
     setBearerForToken(eventActionToken)
   )
 
-  // If we get an unexpected failure response, we just return HTTP 500. Event stays in 'requested' / pending.
+  // An unexpected failure is handled like the async flow below: the action stays requested, the
+  // user is unassigned and country config needs to accept or reject the action. It is not sent
+  // to country config again, since the user who made the request is not the one to resolve it.
   if (responseStatus === ActionConfirmationResponse.UnexpectedFailure) {
-    throw new TRPCError({
-      code: 'INTERNAL_SERVER_ERROR',
-      message: 'Unexpected failure from country config action confirmation API'
-    })
+    logger.error(
+      {
+        eventId: event.id,
+        actionType: input.type,
+        transactionId: input.transactionId
+      },
+      'Unexpected failure from country config action confirmation API. The action stays requested.'
+    )
+
+    if (expectSynchronousResponse) {
+      throw new TRPCError({
+        code: 'INTERNAL_SERVER_ERROR',
+        message:
+          'Unexpected failure from country config action confirmation API'
+      })
+    }
   }
 
   // For Async flow, we just return the event with the requested action and ensure it is indexed
-  if (responseStatus === ActionConfirmationResponse.RequiresProcessing) {
+  if (
+    responseStatus === ActionConfirmationResponse.RequiresProcessing ||
+    responseStatus === ActionConfirmationResponse.UnexpectedFailure
+  ) {
     if (expectSynchronousResponse) {
       throw new TRPCError({
         code: 'INTERNAL_SERVER_ERROR',
@@ -462,17 +479,7 @@ export function getDefaultActionProcedures(
           token
         })
 
-        // A repeat of a stored request (same transaction id) is never sent to country config again.
         if (existingAction) {
-          // Still waiting for country config. Not a conflict (409): the client drops a request
-          // from its Outbox on a conflict, but keeps retrying it on other errors.
-          if (existingAction.status === ActionStatus.Requested) {
-            throw new TRPCError({
-              code: 'INTERNAL_SERVER_ERROR',
-              message: `Action ${existingAction.id} is waiting for country config to accept or reject it`
-            })
-          }
-
           return ctx.event
         }
 

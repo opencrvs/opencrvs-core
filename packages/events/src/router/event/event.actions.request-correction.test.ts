@@ -176,7 +176,7 @@ describe('3rd party integration confirmation behaviour', () => {
     ).toBeDefined()
   })
 
-  test('Keeps assignment when integration responds with 500', async () => {
+  test('Unassigns when integration responds with 500', async () => {
     mockActionApi(ActionType.REQUEST_CORRECTION, 500)
 
     const { generator, user } = await setupTestCase()
@@ -192,12 +192,8 @@ describe('3rd party integration confirmation behaviour', () => {
       generator.event.actions.register(event.id, { keepAssignment: true })
     )
 
-    await expect(
-      client.event.actions.correction.request.request(
-        generator.event.actions.correction.request(event.id)
-      )
-    ).rejects.toThrow(
-      'Unexpected failure from country config action confirmation API'
+    await client.event.actions.correction.request.request(
+      generator.event.actions.correction.request(event.id)
     )
 
     const eventAfterFailure = await client.event.get({ eventId: event.id })
@@ -209,6 +205,6 @@ describe('3rd party integration confirmation behaviour', () => {
 
     expect(currentState.flags).toEqual(['request_correction:requested'])
     expect(currentState.status).toEqual(EventStatus.enum.REGISTERED)
-    expect(currentState.assignedTo).toEqual(user.id)
+    expect(currentState.assignedTo).toEqual(undefined)
   })
 })
