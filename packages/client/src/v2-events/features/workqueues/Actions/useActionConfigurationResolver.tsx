@@ -113,7 +113,9 @@ export function useEventActionConfigurationResolver(event: EventIndex) {
         areDuplicatesAvailable
       })
 
-      const actionConfig = getActionConfig({ eventConfiguration, actionType })
+      const actionConfig = getActionConfig<
+        WorkqueueCtaType | ClientSpecificAction
+      >({ eventConfiguration, actionType })
 
       return {
         label: actionConfig?.label ?? actionLabels[actionType],

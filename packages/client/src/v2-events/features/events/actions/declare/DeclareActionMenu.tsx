@@ -13,8 +13,8 @@ import { v4 as uuid } from 'uuid'
 import {
   ActionType,
   EventDocument,
-  getActionFormFields,
-  getActionConfig
+  findActionDialogCopy,
+  getActionFormFields
 } from '@opencrvs/commons/client'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
 import {
@@ -45,16 +45,6 @@ function getDeclarationActions(
     confirmAction
   }: ReviewPageState
 ): ActionMenuItem[] {
-  const actionConfig = getActionConfig({
-    eventConfiguration,
-    actionType: ActionType.DECLARE
-  })
-
-  const dialogCopy =
-    actionConfig && 'dialogCopy' in actionConfig
-      ? actionConfig.dialogCopy
-      : null
-
   const eventId = event.id
 
   const actions = [
@@ -64,7 +54,10 @@ function getDeclarationActions(
       onClick: async () =>
         confirmAction({
           confirmLabel: actionLabels[ActionType.REGISTER],
-          supportingCopy: dialogCopy?.register,
+          dialogCopy: findActionDialogCopy(
+            eventConfiguration,
+            ActionType.REGISTER
+          ),
           // Combined declare+register shows only REGISTER's dialog fields
           fields: getActionFormFields(eventConfiguration, ActionType.REGISTER),
           title: {
@@ -91,7 +84,10 @@ function getDeclarationActions(
       onClick: async () =>
         confirmAction({
           confirmLabel: actionLabels[ActionType.DECLARE],
-          supportingCopy: dialogCopy?.declare,
+          dialogCopy: findActionDialogCopy(
+            eventConfiguration,
+            ActionType.DECLARE
+          ),
           fields: getActionFormFields(eventConfiguration, ActionType.DECLARE),
           title: {
             id: 'review.declare.confirmModal.title',

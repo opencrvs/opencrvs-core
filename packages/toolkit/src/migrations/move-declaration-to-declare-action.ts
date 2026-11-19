@@ -53,11 +53,12 @@ import {
   findProperty,
   indentationOf,
   insertAt,
-  isOnlyComments,
   isToolkitDefineConfigCall,
   layoutOf,
   location,
   mayBeAction,
+  reindent,
+  removeProperty,
   restOfLine,
   TextEdit
 } from './utils'
@@ -134,18 +135,13 @@ function insertIntoDeclareAction(
   // continuation lines re-indented from the property's indentation to the
   // anchor's
   const oldIndent = indentationOf(property)
-  const reindent = (lines: string) =>
-    lines
-      .split('\n')
-      .map((line, index) =>
-        index > 0 && line.startsWith(oldIndent)
-          ? indent + line.slice(oldIndent.length)
-          : line
-      )
-      .join('\n')
 
   if (anchorLayout.ownsLines) {
-    const moved = reindent(text.slice(layout.start, property.getEnd()))
+    const moved = reindent(
+      text.slice(layout.start, property.getEnd()),
+      oldIndent,
+      indent
+    )
     const position =
       anchorLayout.end + restOfLine(text, anchorLayout.end).length
     const insertion = `\n${indent}${moved}${anchorLayout.hasComma ? ',' : ''}${layout.trailingComment}`
@@ -174,57 +170,10 @@ function insertIntoDeclareAction(
   const separator = isMultiLine ? `,\n${indent}` : ', '
 
   return [
-    insertAt(anchor.getEnd(), `${separator}${reindent(property.getText(true))}`)
-  ]
-}
-
-/**
- * Returns the edits removing the property together with the comma separating
- * it from its neighbours and, when it is on lines of its own, those lines.
- */
-function removeFromConfig(
-  property: PropertyAssignment | ShorthandPropertyAssignment
-): TextEdit[] {
-  const text = property.getSourceFile().getFullText()
-  const layout = layoutOf(property)
-  // The comma before the property, past any comments, which ts-morph lists
-  // as siblings
-  const previousComma = property
-    .getPreviousSiblings()
-    .find((sibling) => !isOnlyComments(sibling.getText()))
-    ?.asKind(SyntaxKind.CommaToken)
-
-  if (layout.ownsLines) {
-    const lines = {
-      start: text.lastIndexOf('\n', layout.start - 1),
-      end: layout.end + restOfLine(text, layout.end).length,
-      text: ''
-    }
-
-    // The last property: drop the comma before it too
-    return !layout.hasComma && previousComma
-      ? [
-          lines,
-          {
-            start: previousComma.getStart(),
-            end: previousComma.getEnd(),
-            text: ''
-          }
-        ]
-      : [lines]
-  }
-
-  if (layout.hasComma) {
-    return [{ start: property.getFullStart(), end: layout.end, text: '' }]
-  }
-
-  // The last property: drop the comma before it instead
-  return [
-    {
-      start: (previousComma ?? property).getStart(),
-      end: property.getEnd(),
-      text: ''
-    }
+    insertAt(
+      anchor.getEnd(),
+      `${separator}${reindent(property.getText(true), oldIndent, indent)}`
+    )
   ]
 }
 
@@ -284,7 +233,7 @@ export function moveDeclarationToDeclareAction(sourceFile: SourceFile): number {
 
     edits.push(
       ...insertIntoDeclareAction(declareAction, declaration),
-      ...removeFromConfig(declaration)
+      ...removeProperty(declaration)
     )
     changes++
   }
