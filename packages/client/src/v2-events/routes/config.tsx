@@ -24,6 +24,9 @@ import { APPLICATION_VERSION } from '@client/utils/constants'
 import { errorMessages, buttonMessages } from '@client/i18n/messages'
 import { buildLoginUrl } from '@client/components/VersionMismatchModal'
 import { useLocations } from '@client/v2-events/hooks/useLocations'
+// Registers the query defaults that `PrefetchQueries` uses for the administrative area list.
+// eslint-disable-next-line import/no-unassigned-import
+import '@client/v2-events/hooks/useAdministrativeAreas'
 import * as V1_LEGACY_ROUTES from '@client/navigation/routes'
 import { Debug } from '@client/v2-events/features/debug/debug'
 import { router as correctionRequestRouter } from '@client/v2-events/features/events/actions/correct/request/router'
@@ -82,28 +85,15 @@ function PrefetchQueries() {
   const { prefetch } = useWorkqueues()
 
   useEffect(() => {
-    {
-      const locationsQuery = trpcOptionsProxy.locations.list.queryOptions()
-
-      const administrativeAreasQuery =
-        trpcOptionsProxy.administrativeAreas.list.queryOptions()
-
-      // only fetch if we don't already have it cached
-      if (!queryClient.getQueryData(locationsQuery.queryKey)) {
-        void queryClient.prefetchQuery({
-          queryKey: locationsQuery.queryKey,
-          queryFn: locationsQuery.queryFn
-        })
-      }
-
-      // only fetch if we don't already have it cached
-      if (!queryClient.getQueryData(administrativeAreasQuery.queryKey)) {
-        void queryClient.prefetchQuery({
-          queryKey: administrativeAreasQuery.queryKey,
-          queryFn: administrativeAreasQuery.queryFn
-        })
-      }
-    }
+    // No `queryFn`: the defaults from `setQueryDefaults` build the cached Map
+    // that the list hooks read from the same key. A fresh cache is not
+    // fetched again.
+    void queryClient.prefetchQuery({
+      queryKey: trpcOptionsProxy.locations.list.queryKey()
+    })
+    void queryClient.prefetchQuery({
+      queryKey: trpcOptionsProxy.administrativeAreas.list.queryKey()
+    })
     void prefetch()
     // NOTE: Using anything else than prefetch will trigger load for each render. Destructure rather than passing entire object.
   }, [prefetch])

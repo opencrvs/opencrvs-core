@@ -15,7 +15,7 @@ import {
   toClientAdministrativeArea,
   UUID
 } from '@opencrvs/commons/client'
-import { trpcOptionsProxy, useTRPC } from '@client/v2-events/trpc'
+import { trpcOptionsProxy } from '@client/v2-events/trpc'
 import { setQueryDefaults } from '../features/events/useEvents/procedures/utils'
 
 setQueryDefaults(trpcOptionsProxy.administrativeAreas.list, {
@@ -43,31 +43,22 @@ setQueryDefaults(trpcOptionsProxy.administrativeAreas.list, {
 })
 
 export function useAdministrativeAreas() {
-  const trpc = useTRPC()
   return {
     getAdministrativeAreas: {
-      useSuspenseQuery: ({
-        isActive,
-        ids
-      }: {
-        isActive?: boolean
-        ids?: UUID[]
-      } = {}) => {
+      useSuspenseQuery: () => {
         // We intentionally remove `queryFn` here because we already set a global default
         // via `setQueryDefaults`. Passing it again would override caching/persistence.
-        // The `...rest` spread carries over things like staleTime, gcTime, enabled, etc.
-        // Then we re-attach the queryKey explicitly so React Query can identify this cache.
-
+        // The `...rest` spread carries the query key and things like staleTime, gcTime, enabled, etc.
+        // Do not pass an input to `queryOptions()`. An input changes the key,
+        // so the hook stops sharing the cache entry that `PrefetchQueries`
+        // fills and the list is fetched and stored twice. Filter the result instead.
         const { queryFn, ...rest } =
           trpcOptionsProxy.administrativeAreas.list.queryOptions()
 
-        return useSuspenseQuery({
-          ...rest,
-          queryKey: trpc.administrativeAreas.list.queryKey({
-            isActive,
-            ids
-          })
-        }).data as unknown as Map<UUID, ClientAdministrativeArea>
+        return useSuspenseQuery(rest).data as unknown as Map<
+          UUID,
+          ClientAdministrativeArea
+        >
       }
     }
   }
