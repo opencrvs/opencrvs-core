@@ -294,7 +294,7 @@ export const deathEvent = defineConfig({
           'Approving this declaration confirms it as legally accepted and eligible for registration.',
         description:
           'This is the supporting copy for the Validate declaration -action',
-        id: 'event.death.custom.action.validate-declaration.supportingCopy'
+        id: 'event.death.custom.action.validate-declaration.dialogCopy'
       },
       conditionals: [
         {
@@ -353,7 +353,7 @@ export const deathEvent = defineConfig({
         id: 'event.death.action.register.label'
       },
       dialogCopy: {
-        id: 'event.death.action.register.supportingCopy',
+        id: 'event.death.action.register.dialogCopy',
         description: 'Confirmation text for the register action',
         defaultMessage:
           'Registering this death event will create an official civil registration record. Please ensure all details are correct before proceeding.'

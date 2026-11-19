@@ -63,7 +63,6 @@ const quickActions = {
 
 interface ModalConfig {
   label?: MessageDescriptor
-  dialogCopy?: MessageDescriptor
   confirmButtonType?: ButtonType
   confirmButtonLabel?: MessageDescriptor
   fields?: FieldConfig[]
@@ -106,11 +105,13 @@ const DefaultIcons = {
 function QuickActionModal({
   close,
   config,
+  dialogCopy,
   eventId,
   eventConfiguration
 }: {
   close: (result: ModalResult) => void
   config: ModalConfig & { label: MessageDescriptor }
+  dialogCopy?: MessageDescriptor
   eventId: UUID
   eventConfiguration: EventConfig
 }) {
@@ -192,11 +193,11 @@ function QuickActionModal({
       onClose={() => close({ result: false })}
     >
       <Stack alignItems="left" direction="column" gap={16}>
-        {config.dialogCopy && (
+        {dialogCopy && (
           <TranslationTextWithFormatModifier
             color="supportingCopy"
             element="p"
-            message={config.dialogCopy}
+            message={dialogCopy}
             variant="reg16"
           />
         )}
@@ -246,9 +247,9 @@ export function useQuickActionModal(
             actionConfig && 'form' in actionConfig
               ? actionConfig.form
               : undefined,
-          ...config.modal,
-          dialogCopy: dialogCopy ?? config.modal.dialogCopy
+          ...config.modal
         }}
+        dialogCopy={dialogCopy}
         eventConfiguration={eventConfiguration}
         eventId={eventIndex.id}
       />
@@ -304,10 +305,10 @@ export function useCustomActionModal(
         config={{
           ...customActionConfigBase,
           label: actionConfig.label,
-          dialogCopy: actionConfig.dialogCopy,
           fields: actionConfig.form,
           icon: isValidIcon(actionConfig.icon) ? actionConfig.icon : undefined
         }}
+        dialogCopy={actionConfig.dialogCopy}
         eventConfiguration={eventConfiguration}
         eventId={eventId}
       />

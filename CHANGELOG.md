@@ -366,7 +366,7 @@ The feature is experimental. Its UI is not a supported feature in 2.2. It can ch
 
 #### `REVOKED` status with revoke and reinstate registration actions
 
-Added `EventStatus.REVOKED` and two core actions, `ActionType.REVOKE_REGISTRATION` and `ActionType.REINSTATE_REGISTRATION`, that move a record between `REGISTERED` and `REVOKED`, guarded by new `record.revoke-registration` and `record.reinstate-registration` scopes. Existing environments need a reindex for the new `legalStatuses.REVOKED` field. [#4569](https://github.com/opencrvs/opencrvs-core/issues/4569)
+Added `EventStatus.REVOKED` and two core actions, `ActionType.REVOKE_REGISTRATION` and `ActionType.REINSTATE_REGISTRATION`, that move a record between `REGISTERED` and `REVOKED`, guarded by new `record.revoke-registration` and `record.reinstate-registration` scopes. Existing environments need a reindex for the new `legalStatuses.REVOKED` field. The confirmation dialogs of these actions show only the `dialogCopy` of the action, and core gives no default copy. [#4569](https://github.com/opencrvs/opencrvs-core/issues/4569)
 
 #### Exclude statuses in workqueue and search queries
 

@@ -211,7 +211,7 @@ export const adoptionEvent = defineConfig({
         id: 'event.adoption.action.register.label'
       },
       dialogCopy: {
-        id: 'event.adoption.action.register.supportingCopy',
+        id: 'event.adoption.action.register.dialogCopy',
         description: 'Confirmation text for the register action',
         defaultMessage:
           'Registering this adoption will create an official civil registration record and seal the original birth record.'

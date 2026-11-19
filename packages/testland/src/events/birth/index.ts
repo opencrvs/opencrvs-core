@@ -616,7 +616,7 @@ const birthVersion = ({
           'Validating this declaration confirms it meets all requirements and is eligible for registration.',
         description:
           'This is the supporting copy for the Validate declaration -action',
-        id: 'event.birth.custom.action.validate-declaration.supportingCopy'
+        id: 'event.birth.custom.action.validate-declaration.dialogCopy'
       },
       conditionals: [
         {
@@ -737,7 +737,7 @@ const birthVersion = ({
           'Issuing a certified copy confirms that an official document is being released.',
         description:
           'This is the confirmation text for the issue certified copy action',
-        id: 'event.birth.action.issue-certified-copy.supportingCopy'
+        id: 'event.birth.action.issue-certified-copy.dialogCopy'
       },
       form: [
         {
@@ -814,7 +814,7 @@ const birthVersion = ({
         defaultMessage:
           'Escalating this declaration will forward it to the chosen authority for further review and decision.',
         description: 'This is the confirmation text for the escalate action',
-        id: 'event.birth.action.escalate.supportingCopy'
+        id: 'event.birth.action.escalate.dialogCopy'
       },
       conditionals: [
         {
@@ -908,7 +908,7 @@ const birthVersion = ({
           'Your feedback will be recorded and shared with relevant officers to guide further action on this declaration.',
         description:
           'This is the confirmation text for the provincial registrar feedback action',
-        id: 'event.birth.action.provincial-registrar-feedback.supportingCopy'
+        id: 'event.birth.action.provincial-registrar-feedback.dialogCopy'
       },
       label: {
         defaultMessage: 'Provincial registrar feedback',
@@ -962,7 +962,7 @@ const birthVersion = ({
           'Your feedback will be officially recorded and may influence the final decision on the declaration.',
         description:
           'This is the confirmation text for the registrar general feedback action',
-        id: 'event.birth.action.registrar-general-feedback.supportingCopy'
+        id: 'event.birth.action.registrar-general-feedback.dialogCopy'
       },
       form: [
         {
@@ -1010,7 +1010,7 @@ const birthVersion = ({
           'The registration is withdrawn and any certificate issued from it stops being valid. This is recorded on the record permanently.',
         description:
           'This is the confirmation text for the revoke registration action',
-        id: 'event.birth.action.revoke-registration.supportingCopy'
+        id: 'event.birth.action.revoke-registration.dialogCopy'
       },
       auditHistoryLabel: {
         defaultMessage: 'Revoked',
@@ -1067,7 +1067,7 @@ const birthVersion = ({
           'This will restore a previously revoked registration to active status.',
         description:
           'This is the confirmation text for the reinstate registration action',
-        id: 'event.birth.action.reinstate-registration.supportingCopy'
+        id: 'event.birth.action.reinstate-registration.dialogCopy'
       },
       auditHistoryLabel: {
         defaultMessage: 'Registration reinstated',
@@ -1110,7 +1110,7 @@ const birthVersion = ({
           'The registration is withdrawn and any certificate issued from it stops being valid. This is recorded on the record permanently.',
         description:
           'This is the confirmation text for the revoke registration action',
-        id: 'event.birth.action.revoke-registration.supportingCopy'
+        id: 'event.birth.action.revoke-registration.dialogCopy'
       },
       // Records revoked with the custom action are still REGISTERED
       conditionals: [
@@ -1139,6 +1139,13 @@ const birthVersion = ({
         id: 'event.birth.action.reinstate-registration.label'
       },
       icon: 'ArchiveTray',
+      dialogCopy: {
+        defaultMessage:
+          'This will restore a previously revoked registration to active status.',
+        description:
+          'This is the confirmation text for the reinstate registration action',
+        id: 'event.birth.action.reinstate-registration.dialogCopy'
+      },
       form: [
         {
           id: 'reason',
@@ -1178,7 +1185,7 @@ const birthVersion = ({
         id: 'event.birth.action.register.label'
       },
       dialogCopy: {
-        id: 'event.birth.action.register.supportingCopy',
+        id: 'event.birth.action.register.dialogCopy',
         description: 'Confirmation text for the register action',
         defaultMessage:
           "Registering this birth event will create an official civil registration record. Please ensure all details are correct before proceeding.<br></br><br></br><strong>WARNING!</strong>: By clicking 'Register', you confirm that you have reviewed the record alongside supporting documentation in the Record tab. The record will proceed to be <strong>legally registered</strong> via the outbox. Further amends after registration can only be made via a legal correction process."

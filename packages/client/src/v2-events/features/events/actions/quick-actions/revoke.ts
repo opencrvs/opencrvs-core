@@ -18,13 +18,6 @@ export const revoke: QuickActionConfig = {
       defaultMessage: 'Revoke this registration',
       description: 'Title of the revoke registration confirmation modal'
     },
-    dialogCopy: {
-      id: 'event.action.revokeRegistration.modal.supportingCopy',
-      defaultMessage:
-        'The registration is withdrawn and any certificate issued from it stops being valid. This is recorded on the record permanently.',
-      description:
-        'Supporting copy of the revoke registration confirmation modal'
-    },
     confirmButtonType: 'negative',
     confirmButtonLabel: {
       id: 'buttons.revoke',
