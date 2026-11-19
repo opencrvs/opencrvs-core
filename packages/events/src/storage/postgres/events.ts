@@ -11,7 +11,7 @@
 
 import { CamelCasePlugin, Kysely, PostgresDialect } from 'kysely'
 import { Pool, types } from 'pg'
-import { Settings, DateTime } from 'luxon'
+import { Settings } from 'luxon'
 import Cursor from 'pg-cursor'
 import { env } from '@events/environment'
 import Schema from './events/schema/Database'
@@ -21,9 +21,14 @@ import Schema from './events/schema/Database'
 // `ISO 8601`: 2025-06-16T12:55:51.507Z
 //                                 ^^^ (We set Z for UTC timezone)
 Settings.defaultZone = 'utc'
-types.setTypeParser(types.builtins.TIMESTAMPTZ, (str) =>
-  DateTime.fromSQL(str).toISO()
-)
+
+// pg's built-in parser (postgres-date): string -> Date
+const parseTimestamptz = types.getTypeParser(types.builtins.TIMESTAMPTZ)
+
+types.setTypeParser(types.builtins.TIMESTAMPTZ, (str) => {
+  const date = parseTimestamptz(str)
+  return date instanceof Date ? date.toISOString() : null
+})
 
 let db: Kysely<Schema> | undefined
 let pool: Pool | undefined
