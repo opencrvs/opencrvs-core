@@ -12,7 +12,7 @@ import * as z from 'zod/v4'
 import { EventConfig, VersionedEventConfig } from './EventConfig'
 import { ClauseOutput } from './DeduplicationConfig'
 import { everyVersionHasOneDeclareAction, findAllFields } from './utils'
-import { findFieldOfPath } from './fieldPath'
+import { findFieldOfPath, findFieldPartOfPath } from './fieldPath'
 
 /** The fields that a deduplication query reads or matches against. */
 function getClauseFieldPaths(clause: ClauseOutput): string[] {
@@ -25,6 +25,17 @@ function getClauseFieldPaths(clause: ClauseOutput): string[] {
   return [clause.fieldId, ...[clause.options.matchAgainst ?? []].flat()]
 }
 
+/** The fields that the deduplication configs of `versions` use. */
+function getDeduplicationPaths(versions: EventConfig[]) {
+  return versions
+    .flatMap((version) => version.actions)
+    .flatMap((action) =>
+      'deduplication' in action && action.deduplication
+        ? getClauseFieldPaths(action.deduplication.query)
+        : []
+    )
+}
+
 /** The fields that advanced search and the deduplication configs of `versions` use. */
 function getSearchedFieldPaths(
   advancedSearch: VersionedEventConfig['advancedSearch'],
@@ -33,14 +44,51 @@ function getSearchedFieldPaths(
   const searchPaths = advancedSearch
     .flatMap((section) => section.fields)
     .flatMap((field) => [field.fieldId, ...(field.config.searchFields ?? [])])
-  const deduplicationPaths = versions
-    .flatMap((version) => version.actions)
-    .flatMap((action) =>
-      'deduplication' in action && action.deduplication
-        ? getClauseFieldPaths(action.deduplication.query)
-        : []
-    )
-  return [...searchPaths, ...deduplicationPaths]
+  return [...searchPaths, ...getDeduplicationPaths(versions)]
+}
+
+/**
+ * Rejects a path in a deduplication config that names no field of any version, or
+ * that is both a field id and a part of another field. Each version's deduplication
+ * can match the fields of the other versions.
+ *
+ * @param versions the event config of each version of `event`
+ */
+export function validateDeduplicationFieldPaths(
+  event: Pick<EventConfig, 'id'>,
+  versions: EventConfig[],
+  ctx: Pick<z.RefinementCtx<unknown>, 'addIssue'>
+) {
+  if (!everyVersionHasOneDeclareAction(versions)) {
+    return
+  }
+
+  const fields = versions.flatMap(findAllFields)
+  const paths = [...new Set(getDeduplicationPaths(versions))]
+
+  const unknownPaths = paths.filter(
+    (path) => findFieldOfPath(path, fields) === undefined
+  )
+  if (unknownPaths.length > 0) {
+    ctx.addIssue({
+      code: 'custom',
+      message: `Deduplication of event ${event.id} uses paths that name no field of any version: ${unknownPaths.join(', ')}.`,
+      path: ['versions']
+    })
+  }
+
+  const ambiguousPaths = paths.filter(
+    (path) =>
+      fields.some(({ id }) => id === path) &&
+      findFieldPartOfPath(path, fields) !== undefined
+  )
+  if (ambiguousPaths.length > 0) {
+    ctx.addIssue({
+      code: 'custom',
+      message: `Deduplication of event ${event.id} has paths that are both a field id and a part of another field: ${ambiguousPaths.join(', ')}. Change the id of one of these fields.`,
+      path: ['versions']
+    })
+  }
 }
 
 /**
