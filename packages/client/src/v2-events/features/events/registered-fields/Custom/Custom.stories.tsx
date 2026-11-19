@@ -17,8 +17,8 @@ import { FieldType, tennisClubMembershipEvent } from '@opencrvs/commons/client'
 import { FormFieldGenerator } from '@client/v2-events/components/forms/FormFieldGenerator'
 import { FormFieldGeneratorPropsWithoutRef } from '@client/v2-events/components/forms/FormFieldGenerator/FormFieldGenerator'
 import { TRPCProvider } from '@client/v2-events/trpc'
-import { withValidatorContext } from '../../../../../.storybook/decorators'
-import { Review } from '../components/Review'
+import { withValidatorContext } from '../../../../../../.storybook/decorators'
+import { Review } from '../../components/Review'
 
 const meta: Meta<FormFieldGeneratorPropsWithoutRef> = {
   title: 'Inputs/Custom',
@@ -33,16 +33,23 @@ const meta: Meta<FormFieldGeneratorPropsWithoutRef> = {
           http.get('/test.js?import', () => {
             return HttpResponse.text(
               `
-               import React from 'react';
-               console.log('React', React)
-               export function Input(props) {
-                console.log({props})
-                const [count, setCount] = React.useState(props.value);
-                return React.createElement('button', { onClick: () => setCount(count + 1) }, 'Clicked ' + count + ' times');
-               }
+               export default function ({ React }) {
+                 function Input(props) {
+                   const [count, setCount] = React.useState(props.value ?? 0);
+                   return React.createElement('button', {
+                     type: 'button',
+                     onClick: () => {
+                       setCount(count + 1);
+                       props.onChange(count + 1);
+                     }
+                   }, 'Clicked ' + count + ' times');
+                 }
 
-               export function Output({value}) {
-                 return React.createElement('div', null, 'Here is the value: ' + value);
+                 function Output({ value }) {
+                   return React.createElement('div', null, 'Here is the value: ' + value);
+                 }
+
+                 return { Input, Output };
                }
                `,
               {

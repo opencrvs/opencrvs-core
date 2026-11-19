@@ -103,6 +103,7 @@ import { createClient } from '@opencrvs/toolkit/api'
 import { getBearerToken } from '@countryconfig/utils'
 import { getLocationsQaRoutes } from './qa-tools/locations.routes'
 import { getAdministrativeAreasQaRoutes } from './qa-tools/administrative-areas.routes'
+import { buildCustomFields, CUSTOM_FIELDS_OUTDIR } from './custom-fields/build'
 import { Event } from './events/utils/types'
 import { syncReferenceData } from './data-seeding/reference-data/reference-data'
 import { causeOfDeathSearchHandler } from './data-seeding/reference-data/handler'
@@ -516,6 +517,22 @@ export async function createServer() {
 
   server.route({
     method: 'GET',
+    path: '/static/custom-fields/{param*}',
+    handler: {
+      directory: {
+        path: CUSTOM_FIELDS_OUTDIR,
+        index: false
+      }
+    },
+    options: {
+      auth: false,
+      tags: ['api', 'static'],
+      description: 'Serves custom form field modules built by buildCustomFields'
+    }
+  })
+
+  server.route({
+    method: 'GET',
     path: '/static/{param*}',
     handler: {
       directory: {
@@ -871,6 +888,7 @@ export async function createServer() {
   }
 
   async function start() {
+    await buildCustomFields()
     await server.start()
     if (env.ANALYTICS_DATABASE_URL) {
       await syncLocationLevels()
