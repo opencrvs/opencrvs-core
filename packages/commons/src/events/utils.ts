@@ -257,7 +257,7 @@ export function getActionFormFields(
  * The EDIT action gives one copy for each of its dialogs, so for edit flow dialogs, you should read `dialogCopy` of the EDIT action instead.
  * The action type alone does not find a CUSTOM action, so read `dialogCopy` of the custom action config that matches its `customActionType`.
  */
-export function getActionDialogCopy(
+export function findActionDialogCopy(
   eventConfiguration: EventConfig,
   actionType: Exclude<
     ActionType,

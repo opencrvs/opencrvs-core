@@ -13,7 +13,7 @@ import { v4 as uuid } from 'uuid'
 import {
   ActionType,
   EventDocument,
-  getActionDialogCopy,
+  findActionDialogCopy,
   getActionFormFields,
   getActionConfig,
   isValidIcon
@@ -62,7 +62,7 @@ function getNotificationActions(
     onClick: async () =>
       confirmAction({
         confirmLabel: actionLabels[ActionType.NOTIFY],
-        dialogCopy: getActionDialogCopy(eventConfiguration, ActionType.NOTIFY),
+        dialogCopy: findActionDialogCopy(eventConfiguration, ActionType.NOTIFY),
         fields: getActionFormFields(eventConfiguration, ActionType.NOTIFY),
         title: {
           id: 'review.notify.confirmModal.title',

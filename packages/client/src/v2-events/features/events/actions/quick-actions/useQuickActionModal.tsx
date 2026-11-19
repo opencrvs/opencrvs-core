@@ -26,7 +26,7 @@ import {
   FieldConfig,
   FieldUpdateValue,
   getActionConfig,
-  getActionDialogCopy,
+  findActionDialogCopy,
   runFieldValidations,
   UUID,
   getCurrentEventState,
@@ -234,7 +234,7 @@ export function useQuickActionModal(
     const config = quickActions[actionType]
     const label = actionLabels[actionType]
     const actionConfig = getActionConfig({ actionType, eventConfiguration })
-    const dialogCopy = getActionDialogCopy(eventConfiguration, actionType)
+    const dialogCopy = findActionDialogCopy(eventConfiguration, actionType)
 
     const { result, values } = await openModal<ModalResult>((close) => (
       <QuickActionModal

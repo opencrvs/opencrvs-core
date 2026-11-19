@@ -13,7 +13,7 @@ import { v4 as uuid } from 'uuid'
 import {
   ActionType,
   EventDocument,
-  getActionDialogCopy,
+  findActionDialogCopy,
   getActionFormFields
 } from '@opencrvs/commons/client'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
@@ -54,7 +54,7 @@ function getDeclarationActions(
       onClick: async () =>
         confirmAction({
           confirmLabel: actionLabels[ActionType.REGISTER],
-          dialogCopy: getActionDialogCopy(
+          dialogCopy: findActionDialogCopy(
             eventConfiguration,
             ActionType.REGISTER
           ),
@@ -84,7 +84,7 @@ function getDeclarationActions(
       onClick: async () =>
         confirmAction({
           confirmLabel: actionLabels[ActionType.DECLARE],
-          dialogCopy: getActionDialogCopy(
+          dialogCopy: findActionDialogCopy(
             eventConfiguration,
             ActionType.DECLARE
           ),
