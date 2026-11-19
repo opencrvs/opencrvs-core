@@ -18,6 +18,7 @@ import {
 import { ActionType, WorkqueueActionType } from './ActionType'
 import { InherentFlags } from './Flag'
 import {
+  everyVersionHasOneDeclareAction,
   findAllFields,
   getDeclarationFields,
   getDeclarationPages
