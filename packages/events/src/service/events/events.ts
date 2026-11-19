@@ -56,7 +56,6 @@ import {
 import { indexEvent } from '@events/service/indexing/indexing'
 import * as draftsRepo from '@events/storage/postgres/events/drafts'
 import * as eventsRepo from '@events/storage/postgres/events/events'
-import { getValidatorContext } from '@events/router/middleware/validate/utils'
 
 export class EventNotFoundError extends TRPCError {
   constructor(id: string) {
@@ -145,12 +144,10 @@ export async function throwConflictIfActionNotAllowed(
     return
   }
 
-  const context = await getValidatorContext({
-    token,
-    event: { document: event, state: eventIndex }
-  })
-  const actionIsEnabled = isActionEnabled(actionConfig, eventIndex, context)
-  const actionIsAvailable = isActionVisible(actionConfig, eventIndex, context)
+  const form = { declaration: eventIndex.declaration, annotation: {} }
+  const context = { eventDocument: event, eventConfig: eventConfiguration }
+  const actionIsEnabled = isActionEnabled(actionConfig, form, context)
+  const actionIsAvailable = isActionVisible(actionConfig, form, context)
 
   if (!actionIsEnabled || !actionIsAvailable) {
     throw new TRPCError({

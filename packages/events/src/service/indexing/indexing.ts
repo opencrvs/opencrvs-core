@@ -37,7 +37,6 @@ import {
   getEventConfigForRecord,
   logger,
   RecordScopeV2,
-  TokenWithBearer,
   VersionedEventConfig
 } from '@opencrvs/commons'
 import {
@@ -46,7 +45,6 @@ import {
   getOrCreateClient
 } from '@events/storage/elasticsearch'
 import { primeAdministrativeHierarchyCache } from '@events/storage/postgres/administrative-hierarchy/locations'
-import { getValidatorContext } from '@events/router/middleware/validate/utils'
 import { TrpcUserContext } from '../../context'
 import {
   collectLocationIds,
@@ -532,23 +530,19 @@ export async function findRecordsByQuery({
   eventConfigs,
   versionedEventConfigs,
   user,
-  acceptedScopes,
-  token
+  acceptedScopes
 }: {
   search: SearchQuery
   eventConfigs: EventConfig[]
   versionedEventConfigs: VersionedEventConfig[]
   user: TrpcUserContext
   acceptedScopes: RecordScopeV2[]
-  token: TokenWithBearer
 }) {
   const esClient = getOrCreateClient()
   const { query, limit, offset } = search
   const resolvedScopes = acceptedScopes.map((scope) =>
     resolveRecordActionScopeToIds(scope, user)
   )
-
-  const validatorContext = await getValidatorContext({ token })
 
   const esQuery = withFlagsFilter({
     query: withJurisdictionFilters({
@@ -593,8 +587,7 @@ export async function findRecordsByQuery({
       return dropSecuredDeclarationFields(
         eventConfig,
         eventIndexWithoutLocationHierarchy,
-        // @TODO: This is not a full context. It will require fetching every EventDocument. https://github.com/opencrvs/opencrvs-core/issues/13530
-        validatorContext
+        { eventIndex: eventIndexWithoutLocationHierarchy }
       )
     })
 
