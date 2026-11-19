@@ -38,9 +38,9 @@ import { Event } from '@countryconfig/events/utils/types'
 /**
  * You can exclude events from analytics by setting 'analytics' property to 'false' in the event config.
  */
-const analyticsEventConfigs = eventConfigs.filter(
-  (event) => resolveEventConfig(event).analytics === true
-)
+const analyticsEventConfigs = eventConfigs
+  .map(resolveEventConfig)
+  .filter((event) => event.analytics === true)
 
 function findEventConfig(eventType: string) {
   return analyticsEventConfigs.find((event) => event.id === eventType)
@@ -173,12 +173,12 @@ async function upsertAnalyticsEventActions(
           ...event,
           actions: actionsFromStartToCurrentPoint
         },
-        resolveEventConfig(eventConfig)
+        eventConfig
       )
 
       const { type, ...act } = action
 
-      const actionConfig = resolveEventConfig(eventConfig).actions.find((a) => a.type === type)
+      const actionConfig = eventConfig.actions.find((a) => a.type === type)
 
       const annotation = actionConfig
         ? pickAnnotationAnalyticsFields(
@@ -207,9 +207,9 @@ async function upsertAnalyticsEventActions(
             action,
             pickDeclarationAnalyticsFields(
               actionAtCurrentPoint.declaration,
-              resolveEventConfig(eventConfig)
+              eventConfig
             ),
-            resolveEventConfig(eventConfig)
+            eventConfig
           )
         )
       }

@@ -391,6 +391,10 @@ The toolkit and the country configuration template work with any container regis
 1. Update `.github/TEMPLATES/secret-migration.yaml`, `github-to-k8s-sync-env.yml` and `deploy-opencrvs.yml` from [opencrvs/infrastructure](https://github.com/opencrvs/infrastructure). The secrets are copied to the new names on the next deployment.
 2. Add `publish-to-registry.yml` from the template to your country configuration repository. **Do not delete `publish-to-dockerhub.yml`**: replace its content with the template's deprecated version, because release branches such as `release/2.1.1` still use it.
 
+#### Measure late registration from the declaration date
+
+Date rules could only compare with today, so a record declared on time became late when a registrar reviewed or corrected it after the deadline. Date rules can now compare with the date of an action on the record, for example `field('child.dob').isAfter().days(365).beforeAction(event.firstAction(ActionType.NOTIFY, ActionType.DECLARE))`. Use `event.firstAction(...)` or `event.lastAction(...)` with one or more action types, and `.beforeAction(...)` or `.afterAction(...)` after `isAfter().days(n)` or `isBefore().days(n)`. Only accepted actions count. Until one exists, the rule compares with today. To get the same behaviour, replace `.inPast()` with `.beforeAction(...)` in your late registration rules. [#14329](https://github.com/opencrvs/opencrvs-core/issues/14329)
+
 ### Improvements
 
 - Review auth_mode secret management for OpenCRVS helm chart [#14234](https://github.com/opencrvs/opencrvs-core/issues/14234)

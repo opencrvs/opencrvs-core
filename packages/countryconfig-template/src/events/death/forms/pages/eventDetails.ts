@@ -28,7 +28,8 @@ import {
   getNestedFieldValidators,
   DEATH_REGISTRATION_TARGET_DAYS,
   createSelectOptions,
-  emptyMessage
+  emptyMessage,
+  LATE_REGISTRATION_ANCHOR
 } from '@countryconfig/events/utils'
 
 const MannerDeathType = {
@@ -190,7 +191,7 @@ export const eventDetails = defineFormPage({
               field('eventDetails.date')
                 .isAfter()
                 .days(DEATH_REGISTRATION_TARGET_DAYS)
-                .inPast()
+                .beforeAction(LATE_REGISTRATION_ANCHOR)
             ),
             field('eventDetails.date').isBefore().now()
           )

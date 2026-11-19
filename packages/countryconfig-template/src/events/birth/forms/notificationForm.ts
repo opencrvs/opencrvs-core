@@ -17,7 +17,10 @@ import {
   FieldConfigInput,
   PageTypes
 } from '@opencrvs/toolkit/events'
-import { BIRTH_LATE_REGISTRATION_TARGET_DAYS } from '@countryconfig/events/utils'
+import {
+  BIRTH_LATE_REGISTRATION_TARGET_DAYS,
+  LATE_REGISTRATION_ANCHOR
+} from '@countryconfig/events/utils'
 import {
   child,
   typeOfBirthOptions,
@@ -95,7 +98,7 @@ const differentFields: FieldConfigInput[] = [
         validator: field('child.dob')
           .isAfter()
           .days(BIRTH_LATE_REGISTRATION_TARGET_DAYS)
-          .inPast()
+          .beforeAction(LATE_REGISTRATION_ANCHOR)
       }
     ],
     label: {

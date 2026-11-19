@@ -8,7 +8,17 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
+import { ActionType, event } from '@opencrvs/toolkit/events'
 
 export const BIRTH_REGISTRATION_TARGET_DAYS = 30
 export const BIRTH_LATE_REGISTRATION_TARGET_DAYS = 365
 export const DEATH_REGISTRATION_TARGET_DAYS = 45
+
+/**
+ * Late registration is measured from the first notification or declaration,
+ * so a record does not become late while it is validated, registered or corrected.
+ */
+export const LATE_REGISTRATION_ANCHOR = event.firstAction(
+  ActionType.NOTIFY,
+  ActionType.DECLARE
+)

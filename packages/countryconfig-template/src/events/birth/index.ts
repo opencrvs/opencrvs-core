@@ -35,7 +35,8 @@ import { BIRTH_NOTIFICATION_FORM } from './forms/notificationForm'
 import { dedupConfig } from './dedupConfig'
 import {
   Event,
-  BIRTH_LATE_REGISTRATION_TARGET_DAYS
+  BIRTH_LATE_REGISTRATION_TARGET_DAYS,
+  LATE_REGISTRATION_ANCHOR
 } from '@countryconfig/events/utils'
 
 export const birthEvent = defineConfig({
@@ -328,7 +329,7 @@ export const birthEvent = defineConfig({
               field('child.dob')
                 .isAfter()
                 .days(BIRTH_LATE_REGISTRATION_TARGET_DAYS)
-                .inPast()
+                .beforeAction(LATE_REGISTRATION_ANCHOR)
             ),
             field('child.dob').isBefore().now()
           )

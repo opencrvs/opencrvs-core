@@ -73,10 +73,12 @@ export function isPotentialDuplicate(actions: Action[]): boolean {
   }, false)
 }
 
+/** `event` holds only the actions up to and including `action`. */
 function isFlagConditionMet(
   conditional: JSONSchema,
   form: EventState,
-  action: Action
+  action: Action,
+  event: EventDocument
 ) {
   const now = isValid(parseISO(action.createdAt))
     ? formatISO(parseISO(action.createdAt), { representation: 'date' })
@@ -86,6 +88,7 @@ function isFlagConditionMet(
     $form: form,
     $now: now,
     $online: true,
+    $event: event,
     $user: {
       sub: '',
       exp: '',
@@ -134,7 +137,9 @@ function actionConfigRemovesFlag(
   const form = { ...declaration, ...annotation }
 
   return removeOperations.some(({ conditional }) =>
-    conditional ? isFlagConditionMet(conditional, form, action) : true
+    conditional
+      ? isFlagConditionMet(conditional, form, action, eventUpToThisAction)
+      : true
   )
 }
 
@@ -272,11 +277,14 @@ export function resolveEventCustomFlags(
     }
 
     const form = { ...declarations[idx], ...annotation }
+    const eventUpToThisAction = { ...event, actions: actions.slice(0, idx + 1) }
 
     const flagsWithMetConditions = (actionConfig.flags ?? []).filter(
       ({ conditional }) =>
         // If conditional is not provided, the flag is resolved
-        conditional ? isFlagConditionMet(conditional, form, action) : true
+        conditional
+          ? isFlagConditionMet(conditional, form, action, eventUpToThisAction)
+          : true
     )
 
     const addedFlags = flagsWithMetConditions
