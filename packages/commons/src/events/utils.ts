@@ -255,10 +255,14 @@ export function getActionFormFields(
 /**
  * Returns the copy of the confirmation dialog of the action, or `undefined` when the action gives none.
  * The EDIT action gives one copy for each of its dialogs, so for edit flow dialogs, you should read `dialogCopy` of the EDIT action instead.
+ * The action type alone does not find a CUSTOM action, so read `dialogCopy` of the custom action config that matches its `customActionType`.
  */
 export function getActionDialogCopy(
   eventConfiguration: EventConfig,
-  actionType: Exclude<ActionType, typeof ActionType.EDIT>
+  actionType: Exclude<
+    ActionType,
+    typeof ActionType.EDIT | typeof ActionType.CUSTOM
+  >
 ): TranslationConfig | undefined {
   const actionConfig = getActionConfig({ eventConfiguration, actionType })
 
