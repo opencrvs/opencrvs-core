@@ -8,6 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
+/* eslint-disable max-lines */
 import { defineConfig } from './defineConfig'
 import {
   INITIAL_EVENT_CONFIG_VERSION_ID,
@@ -493,31 +494,31 @@ describe('defineConfig()', () => {
         )
       })
 
+      const ANY_FIRST_NAME_ID = 'applicant.anyFirstName'
+
+      function searchingAnyFirstName(searchFields: string[]) {
+        return [
+          ...advancedSearch,
+          {
+            title: advancedSearch[1].title,
+            fields: [
+              {
+                fieldId: ANY_FIRST_NAME_ID,
+                fieldType: 'field' as const,
+                type: FieldType.TEXT,
+                label: {
+                  id: 'anyFirstName.label',
+                  defaultMessage: 'First name',
+                  description: 'Search field over several fields'
+                },
+                config: { type: 'fuzzy' as const, searchFields }
+              }
+            ]
+          }
+        ]
+      }
+
       it('should accept a part of a field in searchFields when a version has the field', () => {
-        const ANY_FIRST_NAME_ID = 'applicant.anyFirstName'
-
-        function searchingAnyFirstName(searchFields: string[]) {
-          return [
-            ...advancedSearch,
-            {
-              title: advancedSearch[1].title,
-              fields: [
-                {
-                  fieldId: ANY_FIRST_NAME_ID,
-                  fieldType: 'field' as const,
-                  type: FieldType.TEXT,
-                  label: {
-                    id: 'anyFirstName.label',
-                    defaultMessage: 'First name',
-                    description: 'Search field over several fields'
-                  },
-                  config: { type: 'fuzzy' as const, searchFields }
-                }
-              ]
-            }
-          ]
-        }
-
         expect(() =>
           defineConfig({
             id: eventId,
@@ -547,6 +548,31 @@ describe('defineConfig()', () => {
             `Invalid AdvancedSearch field IDs for event ${eventId}: ${ANY_FIRST_NAME_ID}`
           )
         }
+      })
+
+      it('should reject a path in searchFields that is both a field id and a part of another field', () => {
+        const PATH = 'applicant.name.firstname'
+        // v1 has a TEXT field with the id of a part of the NAME field `applicant.name`
+        const v1WithFieldOfPartId = withDeclarationField(v1, {
+          id: PATH,
+          type: FieldType.TEXT,
+          label: {
+            id: 'firstname.label',
+            defaultMessage: 'First name',
+            description: 'Field whose id is a part of another field'
+          }
+        })
+
+        expect(() =>
+          defineConfig({
+            id: eventId,
+            label,
+            advancedSearch: searchingAnyFirstName([PATH]),
+            versions: [v1WithFieldOfPartId, v2]
+          })
+        ).toThrow(
+          `searchFields of event ${eventId} has paths that are both a field id and a part of another field: ${PATH}.`
+        )
       })
 
       it('should check a defaultValue against the newest version that has the field', () => {

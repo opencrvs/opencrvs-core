@@ -39,6 +39,7 @@ const PAST = '2010-01-01'
 const FUTURE = '2999-01-01'
 const EXTRA_FIELD_ID = 'applicant.extra'
 const NICKNAME_FIELD_ID = 'applicant.nickname'
+const ALIAS_FIELD_ID = 'applicant.alias'
 const CUSTOM_ACTION_TYPE = 'VERSIONS_TEST_ACTION'
 const SECURED_FIELD_ID = 'applicant.address'
 
@@ -129,6 +130,22 @@ function versionWithNickname(
       id: 'event.tennis-club-membership.action.declare.form.section.who.field.nickname.label',
       defaultMessage: 'Nickname',
       description: 'Field that only one version has'
+    }
+  })
+}
+
+/** A version whose declaration has a NAME field that the other versions do not have. */
+function versionWithAlias(
+  id: string,
+  effectiveFrom?: string
+): EventConfigVersion {
+  return withDeclarationField(version(id, effectiveFrom), {
+    id: ALIAS_FIELD_ID,
+    type: FieldType.NAME,
+    label: {
+      id: 'event.tennis-club-membership.action.declare.form.section.who.field.alias.label',
+      defaultMessage: 'Alias',
+      description: 'Name field that only one version has'
     }
   })
 }
@@ -417,5 +434,51 @@ describe('the event configuration version of a record', () => {
     ])
 
     expect(counts).toEqual({ recent: 1 })
+  })
+
+  test('search finds records of both versions when a TEXT field is replaced by a part of a NAME field', async () => {
+    await useVersions(versionWithNickname('v1'), versionWithAlias('v2', FUTURE))
+    const { user, generator } = await setupTestCase()
+    const client = createTestClient(user, SEARCH_SCOPES)
+
+    const recordOfV1 = await client.event.create(generator.event.create())
+    const declareV1 = generator.event.actions.declare(recordOfV1.id)
+    await client.event.actions.declare.request({
+      ...declareV1,
+      declaration: { ...declareV1.declaration, [NICKNAME_FIELD_ID]: 'Ace' }
+    })
+
+    await useVersions(versionWithNickname('v1'), versionWithAlias('v2', PAST))
+    const recordOfV2 = await client.event.create(generator.event.create())
+    const declareV2 = generator.event.actions.declare(recordOfV2.id)
+    await client.event.actions.declare.request({
+      ...declareV2,
+      declaration: {
+        ...declareV2.declaration,
+        [ALIAS_FIELD_ID]: { firstname: 'Ace', surname: 'Smith' }
+      }
+    })
+
+    // The query that the client builds for `searchFields: ['applicant.nickname', 'applicant.alias.firstname']`
+    const { results } = await client.event.search({
+      query: {
+        type: 'and',
+        clauses: [
+          {
+            type: 'or',
+            clauses: [NICKNAME_FIELD_ID, `${ALIAS_FIELD_ID}.firstname`].map(
+              (fieldId) => ({
+                eventType: TENNIS_CLUB_MEMBERSHIP,
+                data: { [fieldId]: { type: 'fuzzy', term: 'Ace' } }
+              })
+            )
+          }
+        ]
+      }
+    })
+
+    expect(results.map(({ id }) => id).sort()).toEqual(
+      [recordOfV1.id, recordOfV2.id].sort()
+    )
   })
 })
