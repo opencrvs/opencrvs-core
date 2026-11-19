@@ -60,7 +60,6 @@ const actionConfirmationForm = z
     'Fields rendered on the action confirmation dialog. Submitted values are stored in the action annotation and shown in the audit history.'
   )
 
-/** Copy of the confirmation dialog of an action. */
 const dialogCopy = TranslationConfig.optional().describe(
   'Text shown at the top of the confirmation dialog of the action.'
 )
@@ -174,9 +173,7 @@ const DeclareConfig = DeclarationActionBase.extend(
       'Configuration of the review page fields.'
     ),
     form: actionConfirmationForm,
-    dialogCopy: dialogCopy.describe(
-      'Text shown at the top of the confirmation dialog of the declare action. The notify and register dialogs on the review page show the `dialogCopy` of the NOTIFY and REGISTER actions.'
-    )
+    dialogCopy
   }).shape
 )
 
@@ -216,13 +213,13 @@ const EditActionConfig = ActionConfigBase.extend(
     type: z.literal(ActionType.EDIT),
     dialogCopy: z.object({
       notify: TranslationConfig.describe(
-        'Confirmation text for the notify with edits action'
+        "Confirmation text for the 'Notify with edits' action"
       ),
       declare: TranslationConfig.describe(
-        'Confirmation text for the declare with edits action'
+        "Confirmation text for the 'Declare with edits' action"
       ),
       register: TranslationConfig.describe(
-        'Confirmation text for the register with edits action'
+        "Confirmation text for the 'Register with edits' action"
       )
     })
   }).shape
@@ -240,9 +237,7 @@ const RegisterConfig = DeclarationActionBase.extend(
   z.object({
     type: z.literal(ActionType.REGISTER),
     form: actionConfirmationForm,
-    dialogCopy: dialogCopy.describe(
-      'Text shown at the top of the confirmation dialog of the register action. The register dialog on the review page of the declare action also shows it.'
-    )
+    dialogCopy
   }).shape
 )
 
