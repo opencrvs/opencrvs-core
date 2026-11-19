@@ -89,6 +89,18 @@ export function getDeclaration(configuration: EventConfig) {
   return declareAction.declaration
 }
 
+/**
+ * The fields of a version are not known without its one DECLARE action. A missing or
+ * extra DECLARE action is reported by `validateExactlyOneDeclareAction`.
+ */
+export function everyVersionHasOneDeclareAction(versions: EventConfig[]) {
+  return versions.every(
+    (version) =>
+      version.actions.filter(({ type }) => type === ActionType.DECLARE)
+        .length === 1
+  )
+}
+
 export function getDeclarationPages(configuration: EventConfig) {
   return getDeclaration(configuration).pages
 }

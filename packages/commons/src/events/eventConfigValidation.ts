@@ -19,11 +19,13 @@ import {
 import { ActionType, WorkqueueActionType } from './ActionType'
 import { InherentFlags } from './Flag'
 import {
+  everyVersionHasOneDeclareAction,
   findAllFields,
   getDeclarationFields,
   getDeclarationPages
 } from './utils'
 import { FieldType } from './FieldType'
+import { findFieldOfPath, findFieldPartOfPath } from './fieldPath'
 import { mapFieldTypeToZod } from './FieldTypeMapping'
 import { EventFieldId } from './AdvancedSearchConfig'
 import { isFieldReference } from '../conditionals/conditionals'
@@ -46,18 +48,6 @@ const SEARCH_DEFAULT_VALUE_FIELD_TYPES = [
 ]
 
 /**
- * The fields of a version are not known without its one DECLARE action. A missing or
- * extra DECLARE action is reported by `validateExactlyOneDeclareAction`.
- */
-function everyVersionHasOneDeclareAction(versions: EventConfig[]) {
-  return versions.every(
-    (version) =>
-      version.actions.filter(({ type }) => type === ActionType.DECLARE)
-        .length === 1
-  )
-}
-
-/**
  * Rejects advanced search fields that match a field of none of the `versions`, nor a
  * metadata field. A field that only some versions have can still be searched.
  */
@@ -70,9 +60,8 @@ export function validateAdvancedSearchFieldIds(
     return
   }
 
-  const fieldIds = versions.flatMap((version) =>
-    findAllFields(version).map((field) => field.id)
-  )
+  const fields = versions.flatMap(findAllFields)
+  const fieldIds = fields.map((field) => field.id)
 
   const invalidFields = event.advancedSearch.flatMap((section) =>
     // Check if the fieldId is not in the fieldIds array
@@ -84,7 +73,9 @@ export function validateAdvancedSearchFieldIds(
           (EventFieldId.options as string[]).includes(field.fieldId) ||
           (field.config.searchFields &&
             field.config.searchFields.length > 0 &&
-            field.config.searchFields.every((sf) => fieldIds.includes(sf)))
+            field.config.searchFields.every(
+              (sf) => findFieldOfPath(sf, fields) !== undefined
+            ))
         )
     )
   )
@@ -96,6 +87,25 @@ export function validateAdvancedSearchFieldIds(
   Invalid AdvancedSearch field IDs for event ${event.id}: ${invalidFields
     .map((f) => f.fieldId)
     .join(', ')}`,
+      path: ['advancedSearch']
+    })
+  }
+
+  const ambiguousPaths = event.advancedSearch
+    .flatMap((section) => section.fields)
+    .flatMap((field) => field.config.searchFields ?? [])
+    .filter(
+      (path) =>
+        fieldIds.includes(path) &&
+        findFieldPartOfPath(path, fields) !== undefined
+    )
+
+  if (ambiguousPaths.length > 0) {
+    ctx.addIssue({
+      code: 'custom',
+      message: `searchFields of event ${event.id} has paths that are both a field id and a part of another field: ${[
+        ...new Set(ambiguousPaths)
+      ].join(', ')}. Change the id of one of these fields.`,
       path: ['advancedSearch']
     })
   }

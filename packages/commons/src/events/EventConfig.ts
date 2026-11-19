@@ -35,6 +35,10 @@ import {
   validateNotificationForm,
   validateVersionList
 } from './eventConfigValidation'
+import {
+  validateDeduplicationFieldPaths,
+  validateSearchedFieldTypes
+} from './searchedFieldTypes'
 
 export const EventFieldReference = z
   .object({ $$event: EventMetadataDateFieldIdInput })
@@ -231,6 +235,7 @@ export const EventConfig: z.ZodType<EventConfig, EventConfigSchemaInput> =
     .superRefine((event, ctx) => {
       validateEventConfig(event, ctx)
       validateAdvancedSearchFieldIds(event, [event], ctx)
+      validateDeduplicationFieldPaths(event, [event], ctx)
       validateAdvancedSearchDefaultValues(event, [event], ctx)
     })
     .meta({
@@ -572,6 +577,8 @@ export const VersionedEventConfig: z.ZodType<
     validateVersionList(config, ctx)
     validateEachVersion(ctx, versionConfigs, validateEventConfig)
     validateAdvancedSearchFieldIds(config, versionConfigs, ctx)
+    validateSearchedFieldTypes(config, versionConfigs, ctx)
+    validateDeduplicationFieldPaths(config, versionConfigs, ctx)
     validateAdvancedSearchDefaultValues(
       config,
       [...config.versions]
