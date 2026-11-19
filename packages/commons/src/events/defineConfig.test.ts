@@ -633,30 +633,30 @@ describe('defineConfig()', () => {
         )
       })
 
-      it('should reject a field whose type differs between versions when deduplication uses it', () => {
-        const withDeduplicationOnNickname = (version: typeof v1) => ({
+      /** Adds a deduplication rule to the DECLARE action of `version` that matches on `fieldId`. */
+      function withDeduplicationOn(version: typeof v1, fieldId: string) {
+        return {
           ...version,
           actions: version.actions.map((action) =>
             action.type === ActionType.DECLARE
               ? {
                   ...action,
                   deduplication: {
-                    id: 'nickname',
+                    id: 'test',
                     label: {
-                      id: 'deduplication.nickname',
-                      defaultMessage: 'Same nickname',
-                      description: 'Deduplication on the nickname'
+                      id: 'deduplication.test',
+                      defaultMessage: 'Test deduplication',
+                      description: 'Deduplication of the test'
                     },
-                    query: {
-                      type: 'strict' as const,
-                      fieldId: NICKNAME_FIELD_ID
-                    }
+                    query: { type: 'strict' as const, fieldId }
                   }
                 }
               : action
           )
-        })
+        }
+      }
 
+      it('should reject a field whose type differs between versions when deduplication uses it', () => {
         expect(() =>
           defineConfig({
             id: eventId,
@@ -664,13 +664,50 @@ describe('defineConfig()', () => {
             advancedSearch,
             versions: [
               withDeclarationField(v1, nicknameField(FieldType.TEXT)),
-              withDeduplicationOnNickname(
-                withDeclarationField(v2, nicknameField(FieldType.NUMBER))
+              withDeduplicationOn(
+                withDeclarationField(v2, nicknameField(FieldType.NUMBER)),
+                NICKNAME_FIELD_ID
               )
             ]
           })
         ).toThrow(
           `Field ${NICKNAME_FIELD_ID} is a TEXT field in version ${v1.id} and a NUMBER field in version ${v2.id}.`
+        )
+      })
+
+      it('should reject a deduplication field that no version has', () => {
+        expect(() =>
+          defineConfig({
+            id: eventId,
+            label,
+            advancedSearch,
+            versions: [v1, withDeduplicationOn(v2, 'applicant.name.fristname')]
+          })
+        ).toThrow('applicant.name.fristname')
+      })
+
+      it('should reject a deduplication path that is both a field id and a part of another field', () => {
+        const PATH = 'applicant.name.firstname'
+        // v1 has a TEXT field with the id of a part of the NAME field `applicant.name`
+        const v1WithFieldOfPartId = withDeclarationField(v1, {
+          id: PATH,
+          type: FieldType.TEXT,
+          label: {
+            id: 'firstname.label',
+            defaultMessage: 'First name',
+            description: 'Field whose id is a part of another field'
+          }
+        })
+
+        expect(() =>
+          defineConfig({
+            id: eventId,
+            label,
+            advancedSearch,
+            versions: [v1WithFieldOfPartId, withDeduplicationOn(v2, PATH)]
+          })
+        ).toThrow(
+          `Deduplication of event ${eventId} has paths that are both a field id and a part of another field: ${PATH}.`
         )
       })
     })
