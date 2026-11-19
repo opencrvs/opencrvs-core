@@ -15168,7 +15168,12 @@ components:
                   default: 1
                   type: number
                 matchAgainst:
-                  type: string
+                  anyOf:
+                    - type: string
+                    - minItems: 1
+                      type: array
+                      items:
+                        type: string
               required:
                 - fuzziness
                 - boost
@@ -15196,7 +15201,12 @@ components:
                 value:
                   type: string
                 matchAgainst:
-                  type: string
+                  anyOf:
+                    - type: string
+                    - minItems: 1
+                      type: array
+                      items:
+                        type: string
               required:
                 - boost
               additionalProperties: false
@@ -15223,7 +15233,12 @@ components:
                   default: 1
                   type: number
                 matchAgainst:
-                  type: string
+                  anyOf:
+                    - type: string
+                    - minItems: 1
+                      type: array
+                      items:
+                        type: string
               required:
                 - days
                 - boost
