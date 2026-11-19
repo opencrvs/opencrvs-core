@@ -8,6 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
+import { TRPCError } from '@trpc/server'
 import {
   ActionType,
   ActionStatus,
@@ -43,16 +44,17 @@ export function declareActionProcedures() {
       .mutation(async ({ ctx, input }) => {
         const { token, user, existingAction } = ctx
 
-        // If an action exists but is not in the REQUESTED state,
-        // then we consider the action to have been fully handled already.
-        // For future reference, it would also make sense to have the pending state
-        // of the country config HTTP request be persisted in the database
-        // so that even if you ran the request twice consecutively, it would not
-        // trigger two country config requests in parallel.
-        if (
-          existingAction &&
-          existingAction.status !== ActionStatus.Requested
-        ) {
+        // A repeat of a stored request (same transaction id) is never sent to country config again.
+        if (existingAction) {
+          // Still waiting for country config. Not a conflict (409): the client drops a request
+          // from its Outbox on a conflict, but keeps retrying it on other errors.
+          if (existingAction.status === ActionStatus.Requested) {
+            throw new TRPCError({
+              code: 'INTERNAL_SERVER_ERROR',
+              message: `Action ${existingAction.id} is waiting for country config to accept or reject it`
+            })
+          }
+
           return ctx.event
         }
 

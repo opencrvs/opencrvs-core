@@ -561,7 +561,10 @@ describe('Request and confirmation flow', () => {
         )
         await client.event.actions.assignment.assign(assignmentInput)
 
-        await client.event.actions.register.request(data)
+        // Repeating the request while it waits for country config does not send it again
+        await expect(
+          client.event.actions.register.request(data)
+        ).rejects.toMatchObject({ code: 'INTERNAL_SERVER_ERROR' })
 
         await client.event.actions.assignment.unassign({
           eventId,

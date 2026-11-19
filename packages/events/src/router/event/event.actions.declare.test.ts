@@ -515,7 +515,7 @@ describe('Declare action', () => {
     expect(firstResponse).toEqual(secondResponse)
   })
 
-  test(`DECLARE action can be resubmitted after it fails in country config`, async () => {
+  test(`DECLARE action that failed in country config is not sent again on a retry`, async () => {
     const spy = vi.fn()
     mswServer.use(
       http.post(
@@ -535,17 +535,13 @@ describe('Declare action', () => {
     })
 
     await expect(client.event.actions.declare.request(data)).rejects.toThrow()
-    mswServer.use(
-      http.post(
-        `${env.COUNTRY_CONFIG_URL}/trigger/events/tennis-club-membership/actions/DECLARE`,
-        () => {
-          spy()
-          return HttpResponse.json()
-        }
-      )
-    )
-    await client.event.actions.declare.request(data)
-    expect(spy).toHaveBeenCalledTimes(2)
+
+    // The retry keeps failing with a retryable error until country config accepts or
+    // rejects the requested action, so the client keeps it in its Outbox
+    await expect(
+      client.event.actions.declare.request(data)
+    ).rejects.toMatchObject({ code: 'INTERNAL_SERVER_ERROR' })
+    expect(spy).toHaveBeenCalledTimes(1)
   })
 })
 

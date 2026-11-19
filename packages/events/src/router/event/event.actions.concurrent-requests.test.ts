@@ -227,48 +227,41 @@ describe('An event has at most one requested action', () => {
 })
 
 describe('A requested action left without an outcome', () => {
-  test('refuses a new DECLARE, and the retry of the failed request completes', async () => {
-    const { client, event, declare } = await setup()
-    const failed = getUUID()
+  test('refuses a new DECLARE while the failed request is pending', async () => {
+    const { declare } = await setup()
 
     mockConfirmations(() => 500)
-    await expect(declare(failed)).rejects.toThrow()
+    await expect(declare()).rejects.toThrow()
 
-    // A new submission (new transaction id) is refused while the failed request is pending
     const calls = mockConfirmations()
     await expect(declare()).rejects.toMatchObject({ code: 'CONFLICT' })
     expect(calls[ActionType.DECLARE]).toBeUndefined()
-
-    // The retry of the failed request (same transaction id) completes it
-    const response = await declare(failed)
-    expect(calls[ActionType.DECLARE]).toBe(1)
-    expect(statuses(response.actions, ActionType.DECLARE)).toEqual([
-      ActionStatus.Requested,
-      ActionStatus.Accepted
-    ])
-
-    const stored = await client.event.get({ eventId: event.id })
-    const state = getCurrentEventState(stored, tennisClubMembershipEvent)
-    expect(state.status).toBe('DECLARED')
-    expect(state.flags).not.toContain('declare:requested')
   })
 
-  test('a failed REGISTER is completed by its retry', async () => {
-    const { client, event, register } = await setup([ActionType.DECLARE])
-    const failed = getUUID()
+  test.each([
+    { type: ActionType.DECLARE, actions: [] },
+    { type: ActionType.REGISTER, actions: [ActionType.DECLARE] }
+  ] as const)(
+    'a retry of a failed $type is not sent again and stays retryable',
+    async ({ type, actions }) => {
+      const { client, event, declare, register } = await setup([...actions])
+      const request = type === ActionType.DECLARE ? declare : register
+      const failed = getUUID()
 
-    mockConfirmations(() => 500)
-    await expect(register(failed)).rejects.toThrow()
+      mockConfirmations(() => 500)
+      await expect(request(failed)).rejects.toThrow()
 
-    const calls = mockConfirmations()
-    await register(failed)
-    expect(calls[ActionType.REGISTER]).toBe(1)
+      // Not a conflict: the client keeps the request in its Outbox and retries it
+      const calls = mockConfirmations()
+      await expect(request(failed)).rejects.toMatchObject({
+        code: 'INTERNAL_SERVER_ERROR'
+      })
+      expect(calls[type]).toBeUndefined()
 
-    const stored = await client.event.get({ eventId: event.id })
-    const state = getCurrentEventState(stored, tennisClubMembershipEvent)
-    expect(state.status).toBe('REGISTERED')
-    expect(state.flags).not.toContain('register:requested')
-  })
+      const stored = await client.event.get({ eventId: event.id })
+      expect(statuses(stored.actions, type)).toEqual([ActionStatus.Requested])
+    }
+  )
 
   test('an action with an outcome is not sent again on a retry', async () => {
     const { register } = await setup([ActionType.DECLARE])

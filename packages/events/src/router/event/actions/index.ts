@@ -263,37 +263,23 @@ export async function defaultRequestHandler(
     input.keepAssignmentIfRejected
   ].some((i) => !!i)
 
-  // A retry: the request was made before with the same transaction id and its requested
-  // action is stored, for example because the country config call failed. Send that action
-  // again instead of storing a new one, which the stored one would refuse.
-  const isRetry = event.actions.some(
-    (action) =>
-      action.status === ActionStatus.Requested &&
-      action.transactionId === input.transactionId &&
-      action.type === input.type
+  await throwConflictIfActionNotAllowed(
+    input.eventId,
+    input.type,
+    token,
+    'customActionType' in input ? input.customActionType : undefined,
+    event
   )
-
-  if (!isRetry) {
-    await throwConflictIfActionNotAllowed(
-      input.eventId,
-      input.type,
-      token,
-      'customActionType' in input ? input.customActionType : undefined,
-      event
-    )
-  }
 
   const eventActionToken = await getServiceToken()
 
-  const eventWithRequestedAction = isRetry
-    ? event
-    : await addAction(input, {
-        eventId: event.id,
-        user,
-        token,
-        status: ActionStatus.Requested,
-        configuration
-      })
+  const eventWithRequestedAction = await addAction(input, {
+    eventId: event.id,
+    user,
+    token,
+    status: ActionStatus.Requested,
+    configuration
+  })
 
   const requestedAction = getPendingAction(eventWithRequestedAction.actions)
 
@@ -476,12 +462,17 @@ export function getDefaultActionProcedures(
           token
         })
 
-        // An action with an outcome has been handled already. A requested action without one
-        // is a retry of a request whose confirmation failed, so it is sent again.
-        if (
-          existingAction &&
-          existingAction.status !== ActionStatus.Requested
-        ) {
+        // A repeat of a stored request (same transaction id) is never sent to country config again.
+        if (existingAction) {
+          // Still waiting for country config. Not a conflict (409): the client drops a request
+          // from its Outbox on a conflict, but keeps retrying it on other errors.
+          if (existingAction.status === ActionStatus.Requested) {
+            throw new TRPCError({
+              code: 'INTERNAL_SERVER_ERROR',
+              message: `Action ${existingAction.id} is waiting for country config to accept or reject it`
+            })
+          }
+
           return ctx.event
         }
 
