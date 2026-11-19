@@ -12,6 +12,8 @@ import { Client } from 'pg'
 import { inject, vi } from 'vitest'
 import {
   getDeclarationFields,
+  getVersionIndexSegment,
+  INITIAL_EVENT_CONFIG_VERSION_ID,
   TENNIS_CLUB_MEMBERSHIP
 } from '@opencrvs/commons/events'
 import { tennisClubMembershipEvent } from '@opencrvs/commons/fixtures'
@@ -20,10 +22,10 @@ import {
   resetServer as resetEventsPostgresServer
 } from '@events/storage/postgres/events'
 
-import { createIndex } from '@events/service/indexing/indexing'
+import { createVersionIndex } from '@events/service/indexing/indexing'
 import {
   getReindexingStatusIndexName,
-  getTemporaryIndexName
+  getTemporaryVersionIndexName
 } from '@events/storage/__mocks__/elasticsearch'
 import { getOrCreateClient } from '@events/storage/elasticsearch'
 import { mswServer } from './msw'
@@ -36,19 +38,23 @@ vi.mock('@events/storage/elasticsearch')
 let previousId: string | null = null
 
 async function resetESServer() {
-  const { getEventIndexName, getEventAliasName } = await import(
-    // @ts-expect-error - "Cannot find module '@events/storage/elasticsearch' or its corresponding type declarations."
-    '@events/storage/elasticsearch'
-  )
+  const { getEventIndexName, getEventVersionIndexName, getEventAliasName } =
+    await import(
+      // @ts-expect-error - "Cannot find module '@events/storage/elasticsearch' or its corresponding type declarations."
+      '@events/storage/elasticsearch'
+    )
   const id = Date.now() + Math.random()
 
   getEventIndexName.mockImplementation((type: string) => type + '_' + id)
+  getEventVersionIndexName.mockImplementation(
+    (type: string, versionId: string) =>
+      `${getEventIndexName(type)}_${getVersionIndexSegment(versionId)}`
+  )
   getEventAliasName.mockReturnValue('events_' + id)
   getReindexingStatusIndexName.mockReturnValue('reindexing_status_' + id)
-  getTemporaryIndexName.mockImplementation(
-    (eventType: string, timestamp: number) => {
-      return `${getEventIndexName(eventType)}_${timestamp}`
-    }
+  getTemporaryVersionIndexName.mockImplementation(
+    (eventType: string, versionId: string, timestamp: number) =>
+      `${getEventVersionIndexName(eventType, versionId)}_${timestamp}`
   )
 
   const client = getOrCreateClient()
@@ -75,8 +81,9 @@ async function resetESServer() {
   })
 
   // Create concrete indices
-  await createIndex(
-    getEventIndexName(TENNIS_CLUB_MEMBERSHIP),
+  await createVersionIndex(
+    TENNIS_CLUB_MEMBERSHIP,
+    INITIAL_EVENT_CONFIG_VERSION_ID,
     getDeclarationFields(tennisClubMembershipEvent)
   )
 }

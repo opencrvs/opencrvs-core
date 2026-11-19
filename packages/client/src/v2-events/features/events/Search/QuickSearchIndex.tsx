@@ -15,7 +15,10 @@ import { useTypedSearchParams } from 'react-router-typesafe-routes/dom'
 import { mandatoryColumns, ActionType } from '@opencrvs/commons/client'
 import { SearchResultComponent } from '@client/v2-events/features/events/Search/SearchResult/SearchResult'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
-import { useEventConfigurations } from '@client/v2-events/features/events/useEventConfiguration'
+import {
+  useEventConfigurations,
+  useSearchableFields
+} from '@client/v2-events/features/events/useEventConfiguration'
 import { withSuspense } from '@client/v2-events/components/withSuspense'
 import { ROUTES } from '@client/v2-events/routes'
 import { buildQuickSearchQuery, deserializeSearchParams } from './utils'
@@ -25,8 +28,12 @@ function QuickSearchComponent({ term }: { term: string }) {
   const [typedSearchParams] = useTypedSearchParams(ROUTES.V2.SEARCH)
   const { searchEvent } = useEvents()
   const eventConfigurations = useEventConfigurations()
+  const getSearchableFields = useSearchableFields()
 
-  const query = buildQuickSearchQuery(term, eventConfigurations)
+  const query = buildQuickSearchQuery(
+    term,
+    eventConfigurations.flatMap(({ id }) => getSearchableFields(id))
+  )
   const queryData = searchEvent.useSuspenseQuery(
     {
       query,

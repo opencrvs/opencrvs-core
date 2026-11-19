@@ -29,8 +29,11 @@ import {
   validatePlaceOfEvent,
   validateDateOfEvent,
   validateAdvancedSearchConfig,
+  validateAdvancedSearchDefaultValues,
+  validateAdvancedSearchFieldIds,
   validateExactlyOneDeclareAction,
-  validateNotificationForm
+  validateNotificationForm,
+  validateVersionList
 } from './eventConfigValidation'
 
 export const EventFieldReference = z
@@ -224,11 +227,17 @@ export function validateEventConfig(
 }
 
 export const EventConfig: z.ZodType<EventConfig, EventConfigSchemaInput> =
-  _EventConfigBase.superRefine(validateEventConfig).meta({
-    id: 'EventConfig',
-    description:
-      'Configuration defining an event type registered in OpenCRVS (for example birth or death).'
-  })
+  _EventConfigBase
+    .superRefine((event, ctx) => {
+      validateEventConfig(event, ctx)
+      validateAdvancedSearchFieldIds(event, [event], ctx)
+      validateAdvancedSearchDefaultValues(event, [event], ctx)
+    })
+    .meta({
+      id: 'EventConfig',
+      description:
+        'Configuration defining an event type registered in OpenCRVS (for example birth or death).'
+    })
 
 type EventLevelField = keyof typeof eventLevelFields
 
@@ -356,6 +365,14 @@ export function getEventConfigOfVersion(
   return toEventConfig(config, getConfigVersion(config, versionId))
 }
 
+/**
+ * @returns `versionId` as it appears in the name of the version's search index:
+ * lower-cased, with every character other than a-z, 0-9, '-' and '_' replaced by '_'.
+ */
+export function getVersionIndexSegment(versionId: string) {
+  return versionId.toLowerCase().replace(/[^a-z0-9_-]/g, '_')
+}
+
 /** Orders versions by `effectiveFrom`, earliest first. */
 export function byEffectiveFrom(a: EventConfigVersion, b: EventConfigVersion) {
   return a.effectiveFrom.localeCompare(b.effectiveFrom)
@@ -409,6 +426,25 @@ export function resolveEffectiveVersion(
   timeZone: string
 ): EventConfigVersion | undefined {
   return findVersionInEffectOn(config, toPlainDateInTimeZone(now, timeZone))
+}
+
+/**
+ * @returns the configuration of each version, in the order to look up a field in: the
+ * version in effect on `date`, a date in the country's time zone, first. Then older
+ * versions, newest first. Versions that take effect later come last, earliest first.
+ */
+export function getEventConfigsInLookupOrder(
+  config: VersionedEventConfig,
+  date: PlainDate
+): EventConfig[] {
+  const inEffect = getVersionsInEffectOn(config, date)
+  const later = config.versions
+    .filter((version) => !inEffect.includes(version))
+    .sort(byEffectiveFrom)
+
+  return [...inEffect.reverse(), ...later].map((version) =>
+    toEventConfig(config, version)
+  )
 }
 
 /**
@@ -475,47 +511,6 @@ export function resolveEventConfig(config: VersionedEventConfig): EventConfig {
 }
 
 /**
- * Versions are told apart by `id` and by `effectiveFrom`: no two versions may share
- * either, and at most one may omit `effectiveFrom` (effective from the beginning of time).
- */
-function validateVersionList(
-  config: VersionedEventConfig,
-  ctx: z.RefinementCtx<VersionedEventConfig>
-) {
-  const ids = new Set<string>()
-  /** Id of the first version with each `effectiveFrom` */
-  const versionIdByEffectiveFrom = new Map<string, string>()
-
-  config.versions.forEach((version, index) => {
-    if (ids.has(version.id)) {
-      ctx.addIssue({
-        code: 'custom',
-        message: `Event '${config.id}' has more than one version with id '${version.id}'. Each version must have a different id.`,
-        path: ['versions', index, 'id']
-      })
-    }
-    ids.add(version.id)
-
-    const sameEffectiveFromId = versionIdByEffectiveFrom.get(
-      version.effectiveFrom
-    )
-    if (sameEffectiveFromId !== undefined) {
-      const versionIds = `'${sameEffectiveFromId}', '${version.id}'`
-      ctx.addIssue({
-        code: 'custom',
-        message:
-          version.effectiveFrom !== DEFAULT_EFFECTIVE_FROM
-            ? `Event '${config.id}' has more than one version with \`effectiveFrom\` '${version.effectiveFrom}' (${versionIds}). Each version must have a different \`effectiveFrom\`.`
-            : `Event '${config.id}' has more than one version without \`effectiveFrom\` (${versionIds}). At most one version may omit it.`,
-        path: ['versions', index, 'effectiveFrom']
-      })
-    } else {
-      versionIdByEffectiveFrom.set(version.effectiveFrom, version.id)
-    }
-  })
-}
-
-/**
  * Runs `validate` on the configuration of each version (`events[i]` is that of
  * `versions[i]`). Issues on a field of the version are reported under that version.
  * Issues on a field shared by every version (e.g. `advancedSearch`) are reported once,
@@ -571,11 +566,19 @@ export const VersionedEventConfig: z.ZodType<
       )
   })
   .superRefine((config, ctx) => {
+    const versionConfigs = config.versions.map((version) =>
+      toEventConfig(config, version)
+    )
     validateVersionList(config, ctx)
-    validateEachVersion(
-      ctx,
-      config.versions.map((version) => toEventConfig(config, version)),
-      validateEventConfig
+    validateEachVersion(ctx, versionConfigs, validateEventConfig)
+    validateAdvancedSearchFieldIds(config, versionConfigs, ctx)
+    validateAdvancedSearchDefaultValues(
+      config,
+      [...config.versions]
+        .sort(byEffectiveFrom)
+        .reverse()
+        .map((version) => toEventConfig(config, version)),
+      ctx
     )
   })
   .meta({

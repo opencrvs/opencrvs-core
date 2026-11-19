@@ -27,15 +27,14 @@ import {
   createTestClient,
   setupScopeTestFixture
 } from '@events/tests/utils'
-import { createIndex } from '@events/service/indexing/indexing'
-import { getEventIndexName } from '@events/storage/elasticsearch'
+import { createEventIndex } from '@events/tests/createEventIndex'
 
 test(
   'Check scopes against event.actions.correction.approve',
   { timeout: 120000 },
   async () => {
-    await createIndex(
-      getEventIndexName('tennis-club-membership_premium'),
+    await createEventIndex(
+      'tennis-club-membership_premium',
       getDeclarationFields(tennisClubMembershipEvent)
     )
 
