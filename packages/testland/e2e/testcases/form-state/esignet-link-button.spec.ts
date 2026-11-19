@@ -39,7 +39,7 @@ test('E-Signet LINK_BUTTON inserts and locks informant data', async ({
     await goToSection(page, 'informant')
 
     await page.locator('#informant____relation').click()
-    await page.getByText('Brother', { exact: true }).click()
+    await page.getByText('Legal guardian', { exact: true }).click()
 
     await authenticateInformantWithESignet(page)
 

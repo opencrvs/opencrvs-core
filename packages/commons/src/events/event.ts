@@ -9,7 +9,13 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { defineConditional, flag, status } from '../conditionals/conditionals'
+import {
+  ActionDateReference,
+  ActionMatcher,
+  defineConditional,
+  flag,
+  status
+} from '../conditionals/conditionals'
 import {
   createEventFieldConfig,
   NonSearchableEventMetadataTimeFieldIdInput,
@@ -42,6 +48,26 @@ function eventFn(
   | AdvancedSearchConfig
   | { $$event: NonSearchableEventMetadataTimeFieldIdInput } {
   return createEventFieldConfig(fieldId)
+}
+
+/**
+ * An action type, or a matcher for a custom action. A bare `ActionType.CUSTOM`
+ * is not allowed because it would match every custom action.
+ */
+type ActionAnchor =
+  | Exclude<ActionType, typeof ActionType.CUSTOM>
+  | ActionMatcher
+
+function actionDateReference(
+  match: ActionAnchor[],
+  occurrence: 'first' | 'last'
+): ActionDateReference {
+  return {
+    $action: {
+      match: match.map((m) => (typeof m === 'string' ? { type: m } : m)),
+      occurrence
+    }
+  }
 }
 
 // Attach conditional helpers directly to the function
@@ -181,6 +207,18 @@ const event = Object.assign(eventFn, {
       $event: field
     }
   },
+  /**
+   * References the date of the first action matching any of the given types,
+   * e.g. `field('child.dob').isAfter().days(30).beforeAction(event.firstAction(ActionType.DECLARE))`.
+   * Until a matching action exists, the comparison uses $now.
+   */
+  firstAction: (first: ActionAnchor, ...rest: ActionAnchor[]) =>
+    actionDateReference([first, ...rest], 'first'),
+  /**
+   * Like {@link event.firstAction}, but references the most recent matching action.
+   */
+  lastAction: (first: ActionAnchor, ...rest: ActionAnchor[]) =>
+    actionDateReference([first, ...rest], 'last'),
   /**
    * Checks if the event currently has the given status.
    * @param eventStatus - The status to check for.

@@ -27,7 +27,7 @@ import { ROUTES } from '@client/v2-events/routes/routes'
 import { routesConfig } from '@client/v2-events/routes/config'
 import { testDataGenerator } from '@client/tests/test-data-generators'
 import { mockOfflineData } from '@client/tests/mock-offline-data'
-import { createTemporaryId } from '@client/v2-events/utils'
+import { getUUID } from '@opencrvs/commons/client'
 import { useEventFormData } from '@client/v2-events/features/events/useEventFormData'
 import * as V1_LEGACY_ROUTES from '@client/navigation/routes'
 
@@ -175,8 +175,7 @@ export const CreateUserOfficePickerRestrictedByAdministrativeArea: StoryObj = {
     userRole: TestUserRole.enum.LOCAL_SYSTEM_ADMIN,
     reactRouter: {
       router: routesConfig,
-      initialPath: ROUTES.V2.SETTINGS.USER.EDIT.buildPath({
-        userId: createTemporaryId(),
+      initialPath: ROUTES.V2.SETTINGS.USER.NEW.EDIT.buildPath({
         pageId: 'user.office'
       })
     },
@@ -240,8 +239,7 @@ export const CreateUserOfficePickerUnrestrictedForNationalAdmin: StoryObj = {
     userRole: TestUserRole.enum.NATIONAL_SYSTEM_ADMIN,
     reactRouter: {
       router: routesConfig,
-      initialPath: ROUTES.V2.SETTINGS.USER.EDIT.buildPath({
-        userId: createTemporaryId(),
+      initialPath: ROUTES.V2.SETTINGS.USER.NEW.EDIT.buildPath({
         pageId: 'user.office'
       })
     },
@@ -292,8 +290,7 @@ export const RegistrationOfficeIncludesHospitals: StoryObj = {
   parameters: {
     reactRouter: {
       router: routesConfig,
-      initialPath: ROUTES.V2.SETTINGS.USER.EDIT.buildPath({
-        userId: createTemporaryId(),
+      initialPath: ROUTES.V2.SETTINGS.USER.NEW.EDIT.buildPath({
         pageId: 'user.office'
       })
     }
@@ -332,8 +329,7 @@ export const InvalidPhoneNumberShowsValidationError: StoryObj = {
     chromatic: { disableSnapshot: true },
     reactRouter: {
       router: routesConfig,
-      initialPath: ROUTES.V2.SETTINGS.USER.EDIT.buildPath({
-        userId: createTemporaryId(),
+      initialPath: ROUTES.V2.SETTINGS.USER.NEW.EDIT.buildPath({
         pageId: 'user.details'
       })
     }
@@ -376,8 +372,7 @@ export const EmptyNameAfterTouchingBlocksContinue: StoryObj = {
     chromatic: { disableSnapshot: true },
     reactRouter: {
       router: routesConfig,
-      initialPath: ROUTES.V2.SETTINGS.USER.EDIT.buildPath({
-        userId: createTemporaryId(),
+      initialPath: ROUTES.V2.SETTINGS.USER.NEW.EDIT.buildPath({
         pageId: 'user.details'
       })
     }
@@ -447,9 +442,7 @@ export const ClearedEmailNormalisedToUndefined: StoryObj = {
     chromatic: { disableSnapshot: true },
     reactRouter: {
       router: routesConfig,
-      initialPath: ROUTES.V2.SETTINGS.USER.REVIEW.buildPath({
-        userId: createTemporaryId()
-      })
+      initialPath: ROUTES.V2.SETTINGS.USER.NEW.REVIEW.buildPath({})
     },
     msw: {
       handlers: {
@@ -512,9 +505,7 @@ export const ClearedPhoneNumberNormalisedToUndefined: StoryObj = {
     chromatic: { disableSnapshot: true },
     reactRouter: {
       router: routesConfig,
-      initialPath: ROUTES.V2.SETTINGS.USER.REVIEW.buildPath({
-        userId: createTemporaryId()
-      })
+      initialPath: ROUTES.V2.SETTINGS.USER.NEW.REVIEW.buildPath({})
     },
     msw: {
       handlers: {
@@ -561,14 +552,19 @@ export const ClearedPhoneNumberNormalisedToUndefined: StoryObj = {
   }
 }
 
+/*
+ * The id of the new user is in the user form store, not in the URL. The editor
+ * uploads files of the new user, for example the signature, under this id
+ * before the user exists.
+ */
+const newUserId = getUUID()
+
 export const AllFieldsAreIncludedInCreatePayload: StoryObj = {
   parameters: {
     chromatic: { disableSnapshot: true },
     reactRouter: {
       router: routesConfig,
-      initialPath: ROUTES.V2.SETTINGS.USER.REVIEW.buildPath({
-        userId: createTemporaryId()
-      })
+      initialPath: ROUTES.V2.SETTINGS.USER.NEW.REVIEW.buildPath({})
     },
     msw: {
       handlers: {
@@ -584,6 +580,7 @@ export const AllFieldsAreIncludedInCreatePayload: StoryObj = {
   },
   beforeEach: () => {
     createUserSpy.mockReset()
+    useUserFormState.setState({ newUserId })
     useUserFormState.getState().setUserForm({
       phoneNumber: mockUser.mobile,
       signature: {
@@ -615,6 +612,7 @@ export const AllFieldsAreIncludedInCreatePayload: StoryObj = {
         await waitFor(() =>
           expect(createUserSpy).toHaveBeenCalledWith(
             expect.objectContaining({
+              id: newUserId,
               mobile: mockUser.mobile,
               email: 'test@opencrvs.org',
               fullHonorificName: 'Dr. Test User',
@@ -754,8 +752,7 @@ export const SignatureRequiredForRegistrar: StoryObj = {
     chromatic: { disableSnapshot: true },
     reactRouter: {
       router: routesConfig,
-      initialPath: ROUTES.V2.SETTINGS.USER.EDIT.buildPath({
-        userId: createTemporaryId(),
+      initialPath: ROUTES.V2.SETTINGS.USER.NEW.EDIT.buildPath({
         pageId: 'user.details'
       })
     },
@@ -828,8 +825,7 @@ export const SignaturePreviewRestoredAfterBackNavigation: StoryObj = {
     chromatic: { disableSnapshot: true },
     reactRouter: {
       router: routesConfig,
-      initialPath: ROUTES.V2.SETTINGS.USER.EDIT.buildPath({
-        userId: createTemporaryId(),
+      initialPath: ROUTES.V2.SETTINGS.USER.NEW.EDIT.buildPath({
         pageId: 'user.details'
       })
     },
@@ -899,8 +895,7 @@ export const SignatureNotRequiredForCommunityLeader: StoryObj = {
     chromatic: { disableSnapshot: true },
     reactRouter: {
       router: routesConfig,
-      initialPath: ROUTES.V2.SETTINGS.USER.EDIT.buildPath({
-        userId: createTemporaryId(),
+      initialPath: ROUTES.V2.SETTINGS.USER.NEW.EDIT.buildPath({
         pageId: 'user.details'
       })
     },
@@ -1048,8 +1043,7 @@ export const NewUserCreationAllowedInJurisdiction: StoryObj = {
     userRole: TestUserRole.enum.NATIONAL_SYSTEM_ADMIN,
     reactRouter: {
       router: routesConfig,
-      initialPath: ROUTES.V2.SETTINGS.USER.EDIT.buildPath({
-        userId: createTemporaryId(),
+      initialPath: ROUTES.V2.SETTINGS.USER.NEW.EDIT.buildPath({
         pageId: 'user.details'
       })
     }
@@ -1089,8 +1083,7 @@ export const NewUserCreationBlockedWithoutScope: StoryObj = {
     userRole: TestUserRole.enum.REGISTRATION_AGENT,
     reactRouter: {
       router: routesConfig,
-      initialPath: ROUTES.V2.SETTINGS.USER.EDIT.buildPath({
-        userId: createTemporaryId(),
+      initialPath: ROUTES.V2.SETTINGS.USER.NEW.EDIT.buildPath({
         pageId: 'user.details'
       })
     }
@@ -1138,8 +1131,7 @@ export const NewUserCreationBlockedOutsideJurisdiction: StoryObj = {
     userRole: TestUserRole.enum.LOCAL_SYSTEM_ADMIN,
     reactRouter: {
       router: routesConfig,
-      initialPath: ROUTES.V2.SETTINGS.USER.EDIT.buildPath({
-        userId: createTemporaryId(),
+      initialPath: ROUTES.V2.SETTINGS.USER.NEW.EDIT.buildPath({
         pageId: 'user.details'
       })
     },
@@ -1726,9 +1718,7 @@ export const CreateUserShowsSuccessToast: StoryObj = {
     chromatic: { disableSnapshot: true },
     reactRouter: {
       router: routesConfig,
-      initialPath: ROUTES.V2.SETTINGS.USER.REVIEW.buildPath({
-        userId: createTemporaryId()
-      })
+      initialPath: ROUTES.V2.SETTINGS.USER.NEW.REVIEW.buildPath({})
     },
     msw: {
       handlers: {
@@ -1825,9 +1815,7 @@ export const CreateUserShowsErrorToastOnUnknownFailure: StoryObj = {
     chromatic: { disableSnapshot: true },
     reactRouter: {
       router: routesConfig,
-      initialPath: ROUTES.V2.SETTINGS.USER.REVIEW.buildPath({
-        userId: createTemporaryId()
-      })
+      initialPath: ROUTES.V2.SETTINGS.USER.NEW.REVIEW.buildPath({})
     },
     msw: {
       handlers: {

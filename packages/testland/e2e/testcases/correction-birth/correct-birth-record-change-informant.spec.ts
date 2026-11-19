@@ -62,7 +62,6 @@ test('Correct record - change informant type', async ({ page }) => {
       number: faker.location.buildingNumber(),
       zipCode: faker.location.zipCode()
     },
-    maritalStatus: 'Widowed',
     educationLevel: 'Primary'
   }
 
@@ -106,7 +105,6 @@ test('Correct record - change informant type', async ({ page }) => {
         'mother.nationality': 'FAR',
         'mother.idType': 'NATIONAL_ID',
         'mother.nid': faker.string.numeric(10),
-        'mother.maritalStatus': 'SINGLE',
         'mother.educationalAttainment': 'NO_SCHOOLING',
         'mother.occupation': 'Housewife',
         'mother.previousBirths': 0

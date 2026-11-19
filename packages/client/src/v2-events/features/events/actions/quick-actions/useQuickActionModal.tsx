@@ -26,6 +26,7 @@ import {
   FieldConfig,
   FieldUpdateValue,
   getActionConfig,
+  findActionDialogCopy,
   runFieldValidations,
   UUID,
   getCurrentEventState,
@@ -62,7 +63,6 @@ const quickActions = {
 
 interface ModalConfig {
   label?: MessageDescriptor
-  supportingCopy?: MessageDescriptor
   confirmButtonType?: ButtonType
   confirmButtonLabel?: MessageDescriptor
   fields?: FieldConfig[]
@@ -105,11 +105,13 @@ const DefaultIcons = {
 function QuickActionModal({
   close,
   config,
+  dialogCopy,
   eventId,
   eventConfiguration
 }: {
   close: (result: ModalResult) => void
   config: ModalConfig & { label: MessageDescriptor }
+  dialogCopy?: MessageDescriptor
   eventId: UUID
   eventConfiguration: EventConfig
 }) {
@@ -191,11 +193,11 @@ function QuickActionModal({
       onClose={() => close({ result: false })}
     >
       <Stack alignItems="left" direction="column" gap={16}>
-        {config.supportingCopy && (
+        {dialogCopy && (
           <TranslationTextWithFormatModifier
             color="supportingCopy"
             element="p"
-            message={config.supportingCopy}
+            message={dialogCopy}
             variant="reg16"
           />
         )}
@@ -232,7 +234,7 @@ export function useQuickActionModal(
     const config = quickActions[actionType]
     const label = actionLabels[actionType]
     const actionConfig = getActionConfig({ actionType, eventConfiguration })
-    const supportingCopy = actionConfig?.supportingCopy
+    const dialogCopy = findActionDialogCopy(eventConfiguration, actionType)
 
     const { result, values } = await openModal<ModalResult>((close) => (
       <QuickActionModal
@@ -245,9 +247,9 @@ export function useQuickActionModal(
             actionConfig && 'form' in actionConfig
               ? actionConfig.form
               : undefined,
-          ...config.modal,
-          supportingCopy: supportingCopy ?? config.modal.supportingCopy
+          ...config.modal
         }}
+        dialogCopy={dialogCopy}
         eventConfiguration={eventConfiguration}
         eventId={eventIndex.id}
       />
@@ -303,10 +305,10 @@ export function useCustomActionModal(
         config={{
           ...customActionConfigBase,
           label: actionConfig.label,
-          supportingCopy: actionConfig.supportingCopy,
           fields: actionConfig.form,
           icon: isValidIcon(actionConfig.icon) ? actionConfig.icon : undefined
         }}
+        dialogCopy={actionConfig.dialogCopy}
         eventConfiguration={eventConfiguration}
         eventId={eventId}
       />

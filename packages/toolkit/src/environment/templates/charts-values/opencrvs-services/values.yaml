@@ -36,18 +36,15 @@ otel:
   exporter_otlp_endpoint: "opentelemetry-collector.opencrvs-deps-{{env}}.svc.cluster.local:4317"
 
 elasticsearch:
-  auth_mode: auto
   host: elasticsearch.opencrvs-deps-{{env}}.svc.cluster.local
 
 s3:
   host: rustfs-0.rustfs.opencrvs-deps-{{env}}.svc.cluster.local
 
 redis:
-  auth_mode: use_secret
   host: redis-0.redis.opencrvs-deps-{{env}}.svc.cluster.local
 
 postgres:
-  auth_mode: auto
   host: postgres-0.postgres.opencrvs-deps-{{env}}.svc.cluster.local
 
 platform:

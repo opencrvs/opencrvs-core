@@ -46,7 +46,7 @@ test('5. Birth declaration case - 5', async ({ page }) => {
       number: faker.location.buildingNumber(),
       postcodeOrZip: faker.location.zipCode()
     },
-    informantType: 'Brother',
+    informantType: 'Legal guardian',
     informantEmail: faker.internet.email(),
     informant: {
       name: {
@@ -90,7 +90,6 @@ test('5. Birth declaration case - 5', async ({ page }) => {
         addressLine3: faker.location.buildingNumber(),
         postcodeOrZip: faker.location.zipCode()
       },
-      maritalStatus: 'Separated',
       levelOfEducation: 'Tertiary'
     },
     father: {
@@ -281,11 +280,6 @@ test('5. Birth declaration case - 5', async ({ page }) => {
         .locator('#postcodeOrZip')
         .fill(declaration.mother.address.postcodeOrZip)
 
-      await page.locator('#mother____maritalStatus').click()
-      await page
-        .getByText(declaration.mother.maritalStatus, { exact: true })
-        .click()
-
       await page.locator('#mother____educationalAttainment').click()
       await page
         .getByText(declaration.mother.levelOfEducation, { exact: true })
@@ -449,14 +443,6 @@ test('5. Birth declaration case - 5', async ({ page }) => {
        */
       await expect(page.getByTestId('mother.nationality-value')).toHaveText(
         declaration.mother.nationality
-      )
-
-      /*
-       * Expected result: should include
-       * - Mother's Marital status
-       */
-      await expect(page.getByTestId('mother.maritalStatus-value')).toHaveText(
-        declaration.mother.maritalStatus
       )
 
       /*

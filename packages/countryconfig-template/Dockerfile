@@ -1,4 +1,4 @@
-FROM node:22.22.3-alpine AS deps
+FROM node:22.23.4-alpine AS deps
 # The pnpm version is pinned by the packageManager field in package.json
 RUN corepack enable pnpm
 
@@ -11,7 +11,7 @@ COPY package.json pnpm-lock.yaml .pnpmfile.cjs ./
 
 RUN pnpm install --frozen-lockfile
 
-FROM node:22-alpine AS runner
+FROM node:22.23.4-alpine AS runner
 # The pnpm version is pinned by the packageManager field in package.json
 RUN corepack enable pnpm
 

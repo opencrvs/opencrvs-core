@@ -52,7 +52,7 @@ describe('EventIndex utils', () => {
   })
 
   test('decodes EventIndex', () => {
-    const decodedEventIndex = decodeEventIndex(eventConfig, encodedEventIndex)
+    const decodedEventIndex = decodeEventIndex(encodedEventIndex)
     expect(decodedEventIndex.declaration).toEqual({
       'applicant.name': {
         firstname: 'John',

@@ -186,6 +186,22 @@ export const ROUTES = {
                   from: string()
                 }
               }),
+              NEW: route(
+                'new',
+                {
+                  searchParams: {
+                    from: string()
+                  }
+                },
+                {
+                  REVIEW: route('review'),
+                  EDIT: route('edit/:pageId', {
+                    params: {
+                      pageId: string()
+                    }
+                  })
+                }
+              ),
               VIEW: route(':userId/view', {
                 params: {
                   userId: uuid().defined()

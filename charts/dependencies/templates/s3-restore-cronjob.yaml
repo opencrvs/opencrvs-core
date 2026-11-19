@@ -37,12 +37,12 @@ spec:
                 - name: S3_ADMIN_ACCESS_KEY
                   valueFrom:
                     secretKeyRef:
-                      name: s3-opencrvs-users
+                      name: {{ .Values.rustfs.admin_user_secret_name }}
                       key: S3_ADMIN_ACCESS_KEY
                 - name: S3_ADMIN_SECRET_KEY
                   valueFrom:
                     secretKeyRef:
-                      name: s3-opencrvs-users
+                      name: {{ .Values.rustfs.admin_user_secret_name }}
                       key: S3_ADMIN_SECRET_KEY
                 - name: S3_ENDPOINT
                   value: http://rustfs:{{ .Values.rustfs.port }}

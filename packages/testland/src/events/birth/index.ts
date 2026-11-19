@@ -15,6 +15,8 @@ import {
   defineConfig,
   DocumentMimeType,
   event,
+  EventConfigVersionInput,
+  TranslationConfig,
   EventStatus,
   field,
   FieldType,
@@ -27,30 +29,98 @@ import {
   user
 } from '@opencrvs/toolkit/events'
 import {
-  BIRTH_DECLARATION_FORM,
-  BIRTH_DECLARATION_REVIEW
+  birthDeclarationForm,
+  birthDeclarationReview
 } from './forms/declaration'
 import { advancedSearchBirth } from './advancedSearch'
 
 import { BIRTH_CERTIFICATE_COLLECTOR_FORM } from './forms/printForm'
-import { PlaceOfBirth } from './forms/pages/child'
-import { CORRECTION_FORM } from './forms/correctionForm'
-import { BIRTH_NOTIFICATION_FORM } from './forms/notificationForm'
+import { PlaceOfBirth, TypeOfBirth } from './forms/pages/child'
+import { birthCorrectionForm } from './forms/correctionForm'
+import { birthNotificationForm } from './forms/notificationForm'
 import { dedupConfig } from './dedupConfig'
 import * as verifiableCredentialActions from '@countryconfig/verifiable-credentials/issue-birth-credential-action'
 import {
   Event,
-  BIRTH_LATE_REGISTRATION_TARGET_DAYS
+  BIRTH_LATE_REGISTRATION_TARGET_DAYS,
+  LATE_REGISTRATION_ANCHOR
 } from '@countryconfig/events/utils'
+import { BIRTH_V2_EFFECTIVE_FROM, BirthVersion } from './versions'
 
-export const birthEvent = defineConfig({
-  id: Event.Birth,
-  declaration: BIRTH_DECLARATION_FORM,
+type CustomActionInput = Extract<
+  EventConfigVersionInput['actions'][number],
+  { type: typeof ActionType.CUSTOM }
+>
+
+/*
+ * Custom actions that only one version has, so that we can check that a record
+ * offers the actions of its own version only. They have no form.
+ */
+const INITIAL_ONLY_ACTION: CustomActionInput = {
+  type: ActionType.CUSTOM,
+  customActionType: 'INITIAL_ONLY_ACTION',
   label: {
-    defaultMessage: 'Birth',
-    description: 'This is what this event is referred as in the system',
-    id: 'event.birth.label'
+    defaultMessage: 'Initial only action',
+    description:
+      "Label of a custom action that only version 'initial' of the birth event has",
+    id: 'event.birth.custom.action.initial-only-action.label'
   },
+  auditHistoryLabel: {
+    defaultMessage: 'Initial only action',
+    description:
+      "Audit history label of a custom action that only version 'initial' of the birth event has",
+    id: 'event.birth.custom.action.initial-only-action.audit-history-label'
+  },
+  form: []
+}
+
+const V2_ONLY_ACTION: CustomActionInput = {
+  type: ActionType.CUSTOM,
+  customActionType: 'V2_ONLY_ACTION',
+  label: {
+    defaultMessage: 'V2 only action',
+    description:
+      "Label of a custom action that only version 'v2' of the birth event has",
+    id: 'event.birth.custom.action.v2-only-action.label'
+  },
+  auditHistoryLabel: {
+    defaultMessage: 'V2 only action',
+    description:
+      "Audit history label of a custom action that only version 'v2' of the birth event has",
+    id: 'event.birth.custom.action.v2-only-action.audit-history-label'
+  },
+  form: [],
+  // The action shows only for a multiple birth. 'child.birthType' is a field
+  // that only version 'v2' has, so QA can check that an action can depend on
+  // a field of its own version.
+  conditionals: [
+    {
+      type: ConditionalType.SHOW,
+      conditional: and(
+        not(field('child.birthType').isFalsy()),
+        not(field('child.birthType').isEqualTo(TypeOfBirth.SINGLE))
+      )
+    }
+  ]
+}
+
+interface BirthVersionInput {
+  id: BirthVersion
+  label: TranslationConfig
+  effectiveFrom?: string
+  /** Custom actions that only this version has */
+  versionActions: CustomActionInput[]
+}
+
+const birthVersion = ({
+  id,
+  label,
+  effectiveFrom,
+  versionActions
+}: BirthVersionInput): EventConfigVersionInput => ({
+  id,
+  label,
+  effectiveFrom,
   dateOfEvent: field('child.dob'),
   placeOfEvent: field('child.birthLocationId'),
   title: {
@@ -371,7 +441,8 @@ export const birthEvent = defineConfig({
     'SEAL',
     'UNSEAL',
     // Also orders the custom revoke, which no role can perform any more
-    'REVOKE_REGISTRATION'
+    'REVOKE_REGISTRATION',
+    ...versionActions.map(({ customActionType }) => customActionType)
   ],
   actions: [
     {
@@ -382,7 +453,7 @@ export const birthEvent = defineConfig({
           'This is shown as the action name anywhere the user can trigger the action from',
         id: 'event.birth.action.Read.label'
       },
-      review: BIRTH_DECLARATION_REVIEW
+      review: birthDeclarationReview(id)
     },
     {
       type: ActionType.NOTIFY,
@@ -392,7 +463,13 @@ export const birthEvent = defineConfig({
           'This is shown as the action name anywhere the user can trigger the action from',
         id: 'event.birth.action.notify.label'
       },
-      notificationForm: BIRTH_NOTIFICATION_FORM,
+      dialogCopy: {
+        id: 'event.birth.action.declare.notify.copy',
+        defaultMessage:
+          'You are about to formally notify the relevant Registration Office that a new birth event has occurred. Please confirm that the information provided is accurate before proceeding.',
+        description: 'Confirmation text for the notify action'
+      },
+      notificationForm: birthNotificationForm(id),
       review: {
         title: {
           defaultMessage:
@@ -418,6 +495,7 @@ export const birthEvent = defineConfig({
     },
     {
       type: ActionType.DECLARE,
+      declaration: birthDeclarationForm(id),
       label: {
         defaultMessage: 'Declare',
         description:
@@ -436,7 +514,7 @@ export const birthEvent = defineConfig({
           }
         }
       ],
-      review: BIRTH_DECLARATION_REVIEW,
+      review: birthDeclarationReview(id),
       deduplication: {
         id: 'birth-deduplication',
         label: {
@@ -456,7 +534,7 @@ export const birthEvent = defineConfig({
               field('child.dob')
                 .isAfter()
                 .days(BIRTH_LATE_REGISTRATION_TARGET_DAYS)
-                .inPast()
+                .beforeAction(LATE_REGISTRATION_ANCHOR)
             ),
             field('child.dob').isBefore().now()
           )
@@ -472,24 +550,10 @@ export const birthEvent = defineConfig({
         }
       ],
       dialogCopy: {
-        notify: {
-          id: 'event.birth.action.declare.notify.copy',
-          defaultMessage:
-            'You are about to formally notify the relevant Registration Office that a new birth event has occurred. Please confirm that the information provided is accurate before proceeding.',
-          description: 'Confirmation text for the notify action'
-        },
-        declare: {
-          id: 'event.birth.action.declare.declare.copy',
-          defaultMessage:
-            'You are about to formally declare this birth event. Once declared, the record will enter the verification and approval process.',
-          description: 'Confirmation text for the declare action'
-        },
-        register: {
-          id: 'event.birth.action.declare.register.copy',
-          defaultMessage:
-            '<strong>WARNING!</strong>: By clicking "Register", you confirm that you have reviewed the record alongside supporting documentation in the Record tab. The record will proceed to be <strong>legally registered</strong> via the outbox. Further amends after registration can only be made via a legal correction process.',
-          description: 'Confirmation text for the register action'
-        }
+        id: 'event.birth.action.declare.declare.copy',
+        defaultMessage:
+          'You are about to formally declare this birth event. Once declared, the record will enter the verification and approval process.',
+        description: 'Confirmation text for the declare action'
       }
     },
     {
@@ -502,7 +566,10 @@ export const birthEvent = defineConfig({
       },
       flags: [
         { id: 'validated', operation: 'remove' },
-        { id: 'approval-required-for-late-registration', operation: 'remove' },
+        {
+          id: 'approval-required-for-late-registration',
+          operation: 'remove'
+        },
         {
           id: 'escalated-to-provincial-registrar',
           operation: 'remove',
@@ -545,12 +612,12 @@ export const birthEvent = defineConfig({
           'This is shown as the action name anywhere the user can trigger the action from',
         id: 'event.birth.custom.action.validate-declaration.label'
       },
-      supportingCopy: {
+      dialogCopy: {
         defaultMessage:
           'Validating this declaration confirms it meets all requirements and is eligible for registration.',
         description:
           'This is the supporting copy for the Validate declaration -action',
-        id: 'event.birth.custom.action.validate-declaration.supportingCopy'
+        id: 'event.birth.custom.action.validate-declaration.dialogCopy'
       },
       conditionals: [
         {
@@ -649,7 +716,7 @@ export const birthEvent = defineConfig({
           'The label to show in audit history for the approve action',
         id: 'event.birth.action.approve.audit-history-label'
       },
-      supportingCopy: {
+      dialogCopy: {
         defaultMessage:
           'Approving this declaration confirms it as legally accepted and eligible for registration.',
         description: 'This is the confirmation text for the approve action',
@@ -666,12 +733,12 @@ export const birthEvent = defineConfig({
           'This is shown as the action name anywhere the user can trigger the action from',
         id: 'event.birth.action.issue-certified-copy.label'
       },
-      supportingCopy: {
+      dialogCopy: {
         defaultMessage:
           'Issuing a certified copy confirms that an official document is being released.',
         description:
           'This is the confirmation text for the issue certified copy action',
-        id: 'event.birth.action.issue-certified-copy.supportingCopy'
+        id: 'event.birth.action.issue-certified-copy.dialogCopy'
       },
       form: [
         {
@@ -744,11 +811,11 @@ export const birthEvent = defineConfig({
           'This is shown when the escalate action can be triggered from the action from',
         id: 'event.birth.action.escalate.label'
       },
-      supportingCopy: {
+      dialogCopy: {
         defaultMessage:
           'Escalating this declaration will forward it to the chosen authority for further review and decision.',
         description: 'This is the confirmation text for the escalate action',
-        id: 'event.birth.action.escalate.supportingCopy'
+        id: 'event.birth.action.escalate.dialogCopy'
       },
       conditionals: [
         {
@@ -837,12 +904,12 @@ export const birthEvent = defineConfig({
       type: ActionType.CUSTOM,
       customActionType: 'PROVINCIAL_REGISTER_FEEDBACK',
       icon: 'ChatText',
-      supportingCopy: {
+      dialogCopy: {
         defaultMessage:
           'Your feedback will be recorded and shared with relevant officers to guide further action on this declaration.',
         description:
           'This is the confirmation text for the provincial registrar feedback action',
-        id: 'event.birth.action.provincial-registrar-feedback.supportingCopy'
+        id: 'event.birth.action.provincial-registrar-feedback.dialogCopy'
       },
       label: {
         defaultMessage: 'Provincial registrar feedback',
@@ -891,12 +958,12 @@ export const birthEvent = defineConfig({
           'This is shown when the registrar general feedback can be triggered from the action from',
         id: 'event.birth.action.registrar-general-feedback.label'
       },
-      supportingCopy: {
+      dialogCopy: {
         defaultMessage:
           'Your feedback will be officially recorded and may influence the final decision on the declaration.',
         description:
           'This is the confirmation text for the registrar general feedback action',
-        id: 'event.birth.action.registrar-general-feedback.supportingCopy'
+        id: 'event.birth.action.registrar-general-feedback.dialogCopy'
       },
       form: [
         {
@@ -939,12 +1006,12 @@ export const birthEvent = defineConfig({
         id: 'event.birth.action.revoke-registration.label'
       },
       icon: 'Briefcase',
-      supportingCopy: {
+      dialogCopy: {
         defaultMessage:
           'The registration is withdrawn and any certificate issued from it stops being valid. This is recorded on the record permanently.',
         description:
           'This is the confirmation text for the revoke registration action',
-        id: 'event.birth.action.revoke-registration.supportingCopy'
+        id: 'event.birth.action.revoke-registration.dialogCopy'
       },
       auditHistoryLabel: {
         defaultMessage: 'Revoked',
@@ -996,12 +1063,12 @@ export const birthEvent = defineConfig({
         id: 'event.birth.action.reinstate-registration.label'
       },
       icon: 'ArchiveTray',
-      supportingCopy: {
+      dialogCopy: {
         defaultMessage:
           'This will restore a previously revoked registration to active status.',
         description:
           'This is the confirmation text for the reinstate registration action',
-        id: 'event.birth.action.reinstate-registration.supportingCopy'
+        id: 'event.birth.action.reinstate-registration.dialogCopy'
       },
       auditHistoryLabel: {
         defaultMessage: 'Registration reinstated',
@@ -1039,12 +1106,12 @@ export const birthEvent = defineConfig({
         id: 'event.birth.action.revoke-registration.label'
       },
       icon: 'Briefcase',
-      supportingCopy: {
+      dialogCopy: {
         defaultMessage:
           'The registration is withdrawn and any certificate issued from it stops being valid. This is recorded on the record permanently.',
         description:
           'This is the confirmation text for the revoke registration action',
-        id: 'event.birth.action.revoke-registration.supportingCopy'
+        id: 'event.birth.action.revoke-registration.dialogCopy'
       },
       // Records revoked with the custom action are still REGISTERED
       conditionals: [
@@ -1073,6 +1140,13 @@ export const birthEvent = defineConfig({
         id: 'event.birth.action.reinstate-registration.label'
       },
       icon: 'ArchiveTray',
+      dialogCopy: {
+        defaultMessage:
+          'This will restore a previously revoked registration to active status.',
+        description:
+          'This is the confirmation text for the reinstate registration action',
+        id: 'event.birth.action.reinstate-registration.dialogCopy'
+      },
       form: [
         {
           id: 'reason',
@@ -1095,7 +1169,7 @@ export const birthEvent = defineConfig({
           'This is shown as the action name anywhere the user can trigger the action from',
         id: 'event.birth.action.reject.label'
       },
-      supportingCopy: {
+      dialogCopy: {
         id: 'rejectModal.description',
         defaultMessage:
           'Rejecting this declaration will return it to the submitter for updates. Please ensure a valid reason for rejection has been recorded.',
@@ -1111,8 +1185,8 @@ export const birthEvent = defineConfig({
           'This is shown as the action name anywhere the user can trigger the action from',
         id: 'event.birth.action.register.label'
       },
-      supportingCopy: {
-        id: 'event.birth.action.register.supportingCopy',
+      dialogCopy: {
+        id: 'event.birth.action.register.dialogCopy',
         description: 'Confirmation text for the register action',
         defaultMessage:
           "Registering this birth event will create an official civil registration record. Please ensure all details are correct before proceeding.<br></br><br></br><strong>WARNING!</strong>: By clicking 'Register', you confirm that you have reviewed the record alongside supporting documentation in the Record tab. The record will proceed to be <strong>legally registered</strong> via the outbox. Further amends after registration can only be made via a legal correction process."
@@ -1248,7 +1322,7 @@ export const birthEvent = defineConfig({
       conditionals: [
         { type: ConditionalType.SHOW, conditional: not(flag('revoked')) }
       ],
-      correctionForm: CORRECTION_FORM
+      correctionForm: birthCorrectionForm(id)
     },
     {
       type: ActionType.REJECT_CORRECTION,
@@ -1289,7 +1363,7 @@ export const birthEvent = defineConfig({
           'This is shown as the action name anywhere the user can trigger the action from',
         id: 'event.birth.action.archive.label'
       },
-      supportingCopy: {
+      dialogCopy: {
         id: 'recordAudit.archive.confirmation.body',
         defaultMessage:
           'Archiving will remove this declaration from active processing while retaining it for record purposes. Archived declarations cannot be modified unless reinstated.',
@@ -1304,7 +1378,7 @@ export const birthEvent = defineConfig({
           'This is shown as the action name anywhere the user can trigger the action from',
         id: 'event.birth.action.unarchive.label'
       },
-      supportingCopy: {
+      dialogCopy: {
         id: 'recordAudit.unarchive.confirmation.body',
         defaultMessage:
           'This record will become active again and will be able to progress through registration.',
@@ -1458,7 +1532,40 @@ export const birthEvent = defineConfig({
           conditional: flag('sealed')
         }
       ]
-    }
-  ],
-  advancedSearch: advancedSearchBirth
+    },
+    ...versionActions
+  ]
+})
+
+export const birthEvent = defineConfig({
+  id: Event.Birth,
+  label: {
+    defaultMessage: 'Birth',
+    description: 'This is what this event is referred as in the system',
+    id: 'event.birth.label'
+  },
+  advancedSearch: advancedSearchBirth,
+  versions: [
+    birthVersion({
+      id: BirthVersion.INITIAL,
+      label: {
+        defaultMessage: 'Initial',
+        description:
+          'Name of the birth form version that was in use before 1 September 2026',
+        id: 'event.birth.version.initial.label'
+      },
+      versionActions: [INITIAL_ONLY_ACTION]
+    }),
+    birthVersion({
+      id: BirthVersion.V2,
+      label: {
+        defaultMessage: 'V2',
+        description:
+          'Name of the birth form version that is in use from 1 September 2026',
+        id: 'event.birth.version.v2.label'
+      },
+      effectiveFrom: BIRTH_V2_EFFECTIVE_FROM,
+      versionActions: [V2_ONLY_ACTION]
+    })
+  ]
 })
