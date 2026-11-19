@@ -575,12 +575,7 @@ describe('defineConfig()', () => {
         )
       })
 
-      it('should check a defaultValue against the newest version that has the field', () => {
-        const textInV1 = withDeclarationField(v1, nicknameField(FieldType.TEXT))
-        const numberInV1 = withDeclarationField(
-          v1,
-          nicknameField(FieldType.NUMBER)
-        )
+      it('should check a defaultValue against the field of the version that has it', () => {
         const numberInV2 = withDeclarationField(
           v2,
           nicknameField(FieldType.NUMBER)
@@ -591,7 +586,7 @@ describe('defineConfig()', () => {
             id: eventId,
             label,
             advancedSearch: searchingNickname('Ace'),
-            versions: [numberInV1, v2WithExtraField]
+            versions: [v1, v2WithExtraField]
           })
         ).not.toThrow()
 
@@ -600,9 +595,66 @@ describe('defineConfig()', () => {
             id: eventId,
             label,
             advancedSearch: searchingNickname('Ace'),
-            versions: [textInV1, numberInV2]
+            versions: [v1, numberInV2]
           })
         ).toThrow('which is not a valid NUMBER value.')
+      })
+
+      it('should reject a field whose type differs between versions when search uses it, naming both versions', () => {
+        expect(() =>
+          defineConfig({
+            id: eventId,
+            label,
+            advancedSearch: searchingNickname(),
+            versions: [
+              withDeclarationField(v1, nicknameField(FieldType.TEXT)),
+              withDeclarationField(v2, nicknameField(FieldType.NUMBER))
+            ]
+          })
+        ).toThrow(
+          `Field ${NICKNAME_FIELD_ID} is a TEXT field in version ${v1.id} and a NUMBER field in version ${v2.id}.`
+        )
+      })
+
+      it('should reject a field whose type differs between versions when deduplication uses it', () => {
+        const withDeduplicationOnNickname = (version: typeof v1) => ({
+          ...version,
+          actions: version.actions.map((action) =>
+            action.type === ActionType.DECLARE
+              ? {
+                  ...action,
+                  deduplication: {
+                    id: 'nickname',
+                    label: {
+                      id: 'deduplication.nickname',
+                      defaultMessage: 'Same nickname',
+                      description: 'Deduplication on the nickname'
+                    },
+                    query: {
+                      type: 'strict' as const,
+                      fieldId: NICKNAME_FIELD_ID
+                    }
+                  }
+                }
+              : action
+          )
+        })
+
+        expect(() =>
+          defineConfig({
+            id: eventId,
+            label,
+            advancedSearch,
+            versions: [
+              withDeclarationField(v1, nicknameField(FieldType.TEXT)),
+              withDeduplicationOnNickname(
+                withDeclarationField(v2, nicknameField(FieldType.NUMBER))
+              )
+            ]
+          })
+        ).toThrow(
+          `Field ${NICKNAME_FIELD_ID} is a TEXT field in version ${v1.id} and a NUMBER field in version ${v2.id}.`
+        )
       })
     })
 

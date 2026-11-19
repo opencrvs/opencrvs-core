@@ -35,6 +35,7 @@ import {
   validateNotificationForm,
   validateVersionList
 } from './eventConfigValidation'
+import { validateSearchedFieldTypes } from './searchedFieldTypes'
 
 export const EventFieldReference = z
   .object({ $$event: EventMetadataDateFieldIdInput })
@@ -572,6 +573,7 @@ export const VersionedEventConfig: z.ZodType<
     validateVersionList(config, ctx)
     validateEachVersion(ctx, versionConfigs, validateEventConfig)
     validateAdvancedSearchFieldIds(config, versionConfigs, ctx)
+    validateSearchedFieldTypes(config, versionConfigs, ctx)
     validateAdvancedSearchDefaultValues(
       config,
       [...config.versions]

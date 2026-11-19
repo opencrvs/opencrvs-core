@@ -19,6 +19,7 @@ import {
 import { ActionType, WorkqueueActionType } from './ActionType'
 import { InherentFlags } from './Flag'
 import {
+  everyVersionHasOneDeclareAction,
   findAllFields,
   getDeclarationFields,
   getDeclarationPages
@@ -45,18 +46,6 @@ const SEARCH_DEFAULT_VALUE_FIELD_TYPES = [
   FieldType.NUMBER,
   FieldType.DATE
 ]
-
-/**
- * The fields of a version are not known without its one DECLARE action. A missing or
- * extra DECLARE action is reported by `validateExactlyOneDeclareAction`.
- */
-function everyVersionHasOneDeclareAction(versions: EventConfig[]) {
-  return versions.every(
-    (version) =>
-      version.actions.filter(({ type }) => type === ActionType.DECLARE)
-        .length === 1
-  )
-}
 
 /**
  * Rejects advanced search fields that match a field of none of the `versions`, nor a
