@@ -35,14 +35,6 @@ export const ActionConfigBase = z.object({
     .optional()
     .default([])
     .describe('Flag actions which are executed when the action is performed.'),
-  // Rejects the key of v2.1 that zod would otherwise drop without an error. Should be removed in v2.3.
-  supportingCopy: z
-    .never({
-      error:
-        '`supportingCopy` was removed in v2.2. Run `opencrvs upgrade`: it renames `supportingCopy` to `dialogCopy`, or removes it from the actions whose dialog does not show it.'
-    })
-    .optional()
-    .describe('Removed in v2.2. Use `dialogCopy`.'),
   /**
    * Icon representing the action.
    *

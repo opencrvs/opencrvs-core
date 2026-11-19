@@ -190,42 +190,22 @@ describe('dialogCopy', () => {
   }
 
   it('accepts one message on an action whose dialog shows it', () => {
-    const res = ActionConfig.safeParse({
-      type: ActionType.UNARCHIVE,
-      label,
-      dialogCopy
-    })
-
-    expect(res.success).toBe(true)
+    expect(
+      ActionConfig.validate({
+        type: ActionType.UNARCHIVE,
+        label,
+        dialogCopy
+      })
+    ).toBe(true)
   })
 
   it('drops `dialogCopy` from an action whose dialogs show no copy from the configuration', () => {
-    const res = ActionConfig.safeParse({
+    const actionConfig = ActionConfig.parse({
       type: ActionType.DELETE,
       label,
       dialogCopy
     })
 
-    expect(res.success).toBe(true)
-    expect(res.data).not.toHaveProperty('dialogCopy')
+    expect(actionConfig).not.toHaveProperty('dialogCopy')
   })
-
-  it.each([ActionType.UNARCHIVE, ActionType.DELETE])(
-    'rejects `supportingCopy` of v2.1 on the %s action, and names the codemod that changes it',
-    (type) => {
-      const res = ActionConfig.safeParse({
-        type,
-        label,
-        supportingCopy: dialogCopy
-      })
-
-      expect(res.error?.issues).toMatchObject([
-        {
-          path: ['supportingCopy'],
-          message:
-            '`supportingCopy` was removed in v2.2. Run `opencrvs upgrade`: it renames `supportingCopy` to `dialogCopy`, or removes it from the actions whose dialog does not show it.'
-        }
-      ])
-    }
-  )
 })

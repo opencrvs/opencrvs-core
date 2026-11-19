@@ -344,7 +344,7 @@ The `DECLARE` action no longer gives copy for the notify and register dialogs of
 
 **Change in behaviour:** before 2.2, the register dialog of the declaration review page showed `dialogCopy.register` of the `DECLARE` action, and the register dialog of the action menu showed `supportingCopy` of the `REGISTER` action. Now both dialogs show the `dialogCopy` of the `REGISTER` action. If your config gives both, make sure that the copy of the `REGISTER` action fits both dialogs.
 
-**Country configs must change the old keys.** A config with `supportingCopy` fails validation, and so does a `DECLARE` action whose `dialogCopy` has `notify`, `declare` and `register`. `opencrvs upgrade` changes them for you. Its `move-supporting-copy-to-dialog-copy` codemod:
+**Country configs must change the old keys.** A `DECLARE` action whose `dialogCopy` has `notify`, `declare` and `register` fails validation. `opencrvs upgrade` changes them for you. Its `move-supporting-copy-to-dialog-copy` codemod:
 
 - renames `supportingCopy` to `dialogCopy`, and removes the `supportingCopy` that no dialog showed
 - gives the `declare` copy of the `DECLARE` action as its `dialogCopy`, and moves the `notify` and `register` copy to the `NOTIFY` and `REGISTER` actions. When one of these actions already gives copy, the codemod keeps that copy. When the event has no `NOTIFY` action, the codemod removes the `notify` copy, because an event without a `NOTIFY` action cannot be notified.
