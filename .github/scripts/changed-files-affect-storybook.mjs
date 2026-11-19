@@ -23,8 +23,8 @@
  * Cross-package source mapping: `@opencrvs/commons` stats entries point
  * at compiled output and are mapped back to their source paths so that
  * diffs against the `src/` tree match. Packages the client resolves
- * directly to source (`@opencrvs/components` via its exports map,
- * `@gateway/*` and `@events/*` via `tsconfigPaths`) need no mapping —
+ * directly to source (`@opencrvs/components` and `@opencrvs/events` via
+ * their exports maps, `@events/*` via `tsconfigPaths`) need no mapping —
  * backend-only changes there will not appear in stats because type-only
  * imports get erased.
  *
