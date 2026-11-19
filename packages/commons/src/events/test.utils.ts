@@ -27,6 +27,7 @@ import {
   getEventValidatorContext,
   ValidatorContext
 } from '../conditionals/validate'
+import { ActionFormConditionalContext } from '../conditionals/validate-v2'
 import {
   ApproveCorrectionActionInput,
   ArchiveActionInput,
@@ -103,6 +104,27 @@ import { defineConfig } from './defineConfig'
 import { toNotificationForm } from './toNotificationForm'
 import { V2_DEFAULT_MOCK_ADMINISTRATIVE_AREAS_MAP } from './mocks.test.utils'
 
+/**
+ * @TODO: Placeholder context to generate test data without a stored event or a user.
+ * Before the strict context, these callers passed an empty context (`{}`).
+ * The user has no role and no scopes, so user conditionals are false, as before.
+ * The event document has only the CREATE action, because the event state cannot be calculated without it.
+ * We handle this case separately.
+ */
+export function generateEmptyTestValidatorContext(
+  configuration: EventConfig
+): ActionFormConditionalContext {
+  return {
+    user: { sub: '', scope: [], userType: TokenUserType.enum.user },
+    leafAdminStructureLocationIds: [],
+    // eslint-disable-next-line @typescript-eslint/no-use-before-define
+    eventDocument: generateEventDocument({
+      configuration,
+      actions: [{ type: ActionType.CREATE }]
+    }),
+    eventConfig: configuration
+  }
+}
 /**
  * IANA timezone used in testing. Used for queries that expect similar results independent of the users location (e.g. when event was registered.)
  * Since we query by range, providing UTC offset will result to different results when DST changes during the range.
@@ -415,12 +437,12 @@ export function generateActionDeclarationInput(
     return omitHiddenPaginatedFields(
       declarationConfig,
       {
-        ...declaration,
-        ...overrides
+        declaration: { ...declaration, ...overrides },
+        annotation: {}
       },
-      {}, // Intentionally empty. Allow generating fields with custom conditionals.
+      generateEmptyTestValidatorContext(configuration),
       true
-    )
+    ).declaration
   }
 
   // eslint-disable-next-line no-console
@@ -458,10 +480,14 @@ function generateActionAnnotationInput(
 
   const annotation = fieldConfigsToActionPayload(annotationFields, rng)
 
+  // The annotation is generated without a declaration, as before.
+  const form = { declaration: {}, annotation }
+  const context = generateEmptyTestValidatorContext(configuration)
+
   const visibleVerificationPageIds = getVisibleVerificationPageIds(
     findRecordActionPages(configuration, action),
-    annotation,
-    {}
+    form,
+    context
   )
 
   const visiblePageVerificationMap = visibleVerificationPageIds.reduce(
@@ -474,9 +500,9 @@ function generateActionAnnotationInput(
 
   const fieldBasedPayload = omitHiddenFields(
     annotationFields,
-    annotation,
-    {} // Intentionally empty. Allow generating fields with custom conditionals.
-  )
+    form,
+    context
+  ).annotation
 
   return {
     ...fieldBasedPayload,

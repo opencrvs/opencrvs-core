@@ -13,7 +13,6 @@ import {
   ActionType,
   ConditionalType,
   errorMessages,
-  eventQueryDataGenerator,
   field,
   FieldConfig,
   FieldType,
@@ -25,7 +24,6 @@ import {
   user
 } from '@opencrvs/commons'
 import { tennisClubMembershipEvent } from '@opencrvs/commons/fixtures'
-import { getEventValidatorContext } from '@opencrvs/commons/events'
 import { getFieldErrors, validateNotifyAction } from './index'
 
 export const testContext = {
@@ -35,12 +33,21 @@ export const testContext = {
     role: TestUserRole.enum.LOCAL_REGISTRAR,
     userType: TokenUserType.enum.user
   },
-  leafAdminStructureLocationIds: []
+  leafAdminStructureLocationIds: [],
+  eventDocument: generateEventDocument({
+    configuration: tennisClubMembershipEvent,
+    actions: [{ type: ActionType.CREATE }]
+  }),
+  eventConfig: tennisClubMembershipEvent
 }
 
 describe('getFieldErrors()', () => {
   it('should return an empty array there are no fields to validate', () => {
-    const errors = getFieldErrors([], {}, {})
+    const errors = getFieldErrors(
+      [],
+      { declaration: {}, annotation: {} },
+      testContext
+    )
     expect(errors).toEqual([])
   })
 
@@ -59,7 +66,7 @@ describe('getFieldErrors()', () => {
           }
         }
       ],
-      {},
+      { declaration: {}, annotation: {} },
       testContext
     )
     expect(errors).toMatchSnapshot()
@@ -80,7 +87,7 @@ describe('getFieldErrors()', () => {
           }
         }
       ],
-      { 'test.checkbox': true },
+      { declaration: { 'test.checkbox': true }, annotation: {} },
       testContext
     )
 
@@ -108,7 +115,7 @@ describe('getFieldErrors()', () => {
           ]
         }
       ],
-      { 'test.checkbox': true },
+      { declaration: { 'test.checkbox': true }, annotation: {} },
       testContext
     )
 
@@ -136,7 +143,7 @@ describe('getFieldErrors()', () => {
           ]
         }
       ],
-      {},
+      { declaration: {}, annotation: {} },
       testContext
     )
 
@@ -164,7 +171,7 @@ describe('getFieldErrors()', () => {
           ]
         }
       ],
-      {},
+      { declaration: {}, annotation: {} },
       testContext
     )
 
@@ -191,7 +198,7 @@ describe('getFieldErrors()', () => {
           ]
         }
       ],
-      {},
+      { declaration: {}, annotation: {} },
       testContext
     )
 
@@ -219,7 +226,10 @@ describe('getFieldErrors()', () => {
         }
       ],
       {
-        'test.text': 'some value'
+        declaration: {
+          'test.text': 'some value'
+        },
+        annotation: {}
       },
       testContext
     )
@@ -248,8 +258,11 @@ describe('getFieldErrors()', () => {
           ]
         }
       ],
-      { 'test.checkbox': true },
-      { ...testContext, baseFormState: { 'test.text': 'helloooo' } }
+      {
+        declaration: { 'test.text': 'helloooo' },
+        annotation: { 'test.checkbox': true }
+      },
+      testContext
     )
 
     expect(errors).toMatchSnapshot()
@@ -291,7 +304,10 @@ describe('getFieldErrors()', () => {
           ]
         }
       ],
-      { 'test.input': 'not empty', 'test.text': 'helloooo' },
+      {
+        declaration: { 'test.input': 'not empty', 'test.text': 'helloooo' },
+        annotation: {}
+      },
       testContext
     )
 
@@ -314,7 +330,7 @@ describe('getFieldErrors()', () => {
         description: 'Test Field Description'
       },
       conditionals: [
-        { type: ConditionalType.SHOW, conditional: flag('sealed') }
+        { type: ConditionalType.SHOW, conditional: flag('rejected') }
       ]
     }
 
@@ -323,17 +339,20 @@ describe('getFieldErrors()', () => {
       actions: [{ type: ActionType.CREATE }, { type: ActionType.DECLARE }]
     })
 
+    const rejectedDocument = generateEventDocument({
+      configuration: tennisClubMembershipEvent,
+      actions: [
+        { type: ActionType.CREATE },
+        { type: ActionType.DECLARE },
+        { type: ActionType.REJECT }
+      ]
+    })
+
     it('accepts a value when the event carries the flag that makes the field visible', () => {
       const errors = getFieldErrors(
         [flaggedField],
-        { 'test.input': 'not empty' },
-        {
-          ...testContext,
-          event: {
-            document,
-            state: eventQueryDataGenerator({ flags: ['sealed'] })
-          }
-        }
+        { declaration: { 'test.input': 'not empty' }, annotation: {} },
+        { ...testContext, eventDocument: rejectedDocument }
       )
 
       expect(errors).toEqual([])
@@ -342,11 +361,8 @@ describe('getFieldErrors()', () => {
     it('rejects a value when the event does not carry the flag', () => {
       const errors = getFieldErrors(
         [flaggedField],
-        { 'test.input': 'not empty' },
-        {
-          ...testContext,
-          event: { document, state: eventQueryDataGenerator({ flags: [] }) }
-        }
+        { declaration: { 'test.input': 'not empty' }, annotation: {} },
+        { ...testContext, eventDocument: document }
       )
 
       expect(errors).toEqual([
@@ -383,7 +399,7 @@ describe('getFieldErrors()', () => {
           ]
         }
       ],
-      { 'test.input': 'not hello!' },
+      { declaration: { 'test.input': 'not hello!' }, annotation: {} },
       testContext
     )
 
@@ -414,7 +430,7 @@ describe('getFieldErrors()', () => {
           ]
         }
       ],
-      { 'test.input': 'helloooo' },
+      { declaration: { 'test.input': 'helloooo' }, annotation: {} },
       testContext
     )
 
@@ -678,7 +694,8 @@ describe('NOTIFY review field validation', () => {
       declaration: { 'applicant.name': declaration['applicant.name'] },
       context: {
         ...testContext,
-        event: getEventValidatorContext(document, eventConfig)
+        eventDocument: document,
+        eventConfig
       }
     })
 
@@ -941,7 +958,8 @@ describe('NOTIFY notification form validation', () => {
       declaration: { 'applicant.email': 'notifier@example.com' },
       context: {
         ...testContext,
-        event: getEventValidatorContext(document, eventConfig)
+        eventDocument: document,
+        eventConfig
       }
     })
 
