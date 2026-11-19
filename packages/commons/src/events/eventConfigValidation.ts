@@ -23,7 +23,7 @@ import {
   getDeclarationPages
 } from './utils'
 import { FieldType } from './FieldType'
-import { FieldConfig } from './FieldConfig'
+import { findFieldOfPath, findFieldPartOfPath } from './fieldPath'
 import { mapFieldTypeToZod } from './FieldTypeMapping'
 import { EventFieldId } from './AdvancedSearchConfig'
 import { isFieldReference } from '../conditionals/conditionals'
@@ -44,39 +44,6 @@ const SEARCH_DEFAULT_VALUE_FIELD_TYPES = [
   FieldType.NUMBER,
   FieldType.DATE
 ]
-
-/** Whether a value of `schema` can have a property at `keys`, such as `['firstname']` for a name. */
-function schemaHasPath(schema: z.core.$ZodType, keys: string[]): boolean {
-  if (keys.length === 0) {
-    return true
-  }
-  if (schema instanceof z.ZodOptional || schema instanceof z.ZodNullable) {
-    return schemaHasPath(schema.unwrap(), keys)
-  }
-  if (schema instanceof z.ZodUnion) {
-    return schema.options.some((option) => schemaHasPath(option, keys))
-  }
-  if (schema instanceof z.ZodObject) {
-    const [key, ...rest] = keys
-    return (
-      Object.hasOwn(schema.shape, key) && schemaHasPath(schema.shape[key], rest)
-    )
-  }
-  return false
-}
-
-/** Whether `path` is the id of one of `fields`, or a part of its value, such as `child.name.firstname`. */
-function isFieldOrFieldPart(path: string, fields: FieldConfig[]) {
-  return fields.some(
-    (field) =>
-      path === field.id ||
-      (path.startsWith(`${field.id}.`) &&
-        schemaHasPath(
-          mapFieldTypeToZod(field),
-          path.slice(field.id.length + 1).split('.')
-        ))
-  )
-}
 
 /**
  * Rejects advanced search fields that match a field of none of the `versions`, nor a
@@ -101,8 +68,8 @@ export function validateAdvancedSearchFieldIds(
           (EventFieldId.options as string[]).includes(field.fieldId) ||
           (field.config.searchFields &&
             field.config.searchFields.length > 0 &&
-            field.config.searchFields.every((sf) =>
-              isFieldOrFieldPart(sf, fields)
+            field.config.searchFields.every(
+              (sf) => findFieldOfPath(sf, fields) !== undefined
             ))
         )
     )
@@ -115,6 +82,25 @@ export function validateAdvancedSearchFieldIds(
   Invalid AdvancedSearch field IDs for event ${event.id}: ${invalidFields
     .map((f) => f.fieldId)
     .join(', ')}`,
+      path: ['advancedSearch']
+    })
+  }
+
+  const ambiguousPaths = event.advancedSearch
+    .flatMap((section) => section.fields)
+    .flatMap((field) => field.config.searchFields ?? [])
+    .filter(
+      (path) =>
+        fieldIds.includes(path) &&
+        findFieldPartOfPath(path, fields) !== undefined
+    )
+
+  if (ambiguousPaths.length > 0) {
+    ctx.addIssue({
+      code: 'custom',
+      message: `searchFields of event ${event.id} has paths that are both a field id and a part of another field: ${[
+        ...new Set(ambiguousPaths)
+      ].join(', ')}. Change the id of one of these fields.`,
       path: ['advancedSearch']
     })
   }
