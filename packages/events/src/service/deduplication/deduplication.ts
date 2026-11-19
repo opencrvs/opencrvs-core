@@ -15,12 +15,14 @@ import { DateTime } from 'luxon'
 import {
   EventIndex,
   DeduplicationConfig,
+  Clause,
   ClauseOutput,
   FieldValue,
   EventConfig,
   FieldType,
   extractPotentialDuplicatesFromActions,
   EventDocument,
+  findFieldOfPath,
   getAllUniqueFields,
   getEventConfigForRecord,
   getEventConfigsInLookupOrder,
@@ -119,13 +121,35 @@ export function generateElasticsearchQuery(
     }
   }
 
+  const { matchAgainst: matchAgainstOption } = queryInput.options
+  // A list of fields matches when any one of them matches.
+  if (Array.isArray(matchAgainstOption)) {
+    return generateElasticsearchQuery(
+      eventIndex,
+      {
+        type: 'or',
+        clauses: matchAgainstOption.map((matchAgainst) =>
+          Clause.parse({
+            ...queryInput,
+            options: { ...queryInput.options, matchAgainst }
+          })
+        )
+      },
+      eventConfigs
+    )
+  }
+
   function resolveFieldPath(fieldId: string): string {
-    // When several versions have the field, `find` takes it from the first one: the record's own version.
-    const fieldConfig = getOrThrow(
-      eventConfigs.flatMap(getAllUniqueFields).find(({ id }) => id === fieldId),
+    // When several versions have the field, the first one is taken: the record's own version.
+    const { field: fieldConfig, part } = getOrThrow(
+      findFieldOfPath(fieldId, eventConfigs.flatMap(getAllUniqueFields)),
       `Field with id ${fieldId} not found in any version of event ${eventIndex.type}`
     )
-    const encodedFieldId = encodeFieldId(fieldId)
+    const encodedFieldId = encodeFieldId(fieldConfig.id)
+    // A part of a field, such as `child.name.firstname`, is read and matched as it is.
+    if (part.length > 0) {
+      return [encodedFieldId, ...part].join('.')
+    }
     if (fieldConfig.type == FieldType.NAME) {
       return nameQueryKey(encodedFieldId)
     }
@@ -135,7 +159,7 @@ export function generateElasticsearchQuery(
     return encodedFieldId
   }
 
-  const matchAgainst = queryInput.options.matchAgainst ?? queryInput.fieldId
+  const matchAgainst = matchAgainstOption ?? queryInput.fieldId
   const queryKey = declarationReference(resolveFieldPath(matchAgainst))
   const queryValue = get(
     eventIndex.declaration,
