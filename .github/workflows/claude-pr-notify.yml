@@ -1,0 +1,156 @@
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at https://mozilla.org/MPL/2.0/.
+#
+# OpenCRVS is also distributed under the terms of the Civil Registration
+# & Healthcare Disclaimer located at http://opencrvs.org/license.
+#
+# Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
+
+# Phase C of the "assign an issue to Claude" automation — the PR outcome handler.
+# See .github/claude-automation/README.md.
+#
+# Trigger: a check suite completes on a Claude-authored branch (`claude/*`).
+# It evaluates the PR's whole check rollup and does one of:
+#   • all green   → post the PR link to Slack, once.
+#   • still running → nothing (a later suite will re-fire this).
+#   • only the e2e check failed → treat as possibly flaky: re-run the feature-env
+#     deploy (which re-runs e2e) until the e2e has run E2E_MAX_ATTEMPTS times for
+#     this commit, then treat it as a real failure.
+#   • any non-e2e check failed, or e2e failed after its retries → real failure:
+#     label the PR `claude:fix-needed`, which hands off to the self-heal workflow.
+#
+# The e2e attempt count is derived from the feature-env workflow's own run history
+# for the PR head SHA, so it self-resets when a new commit is pushed — no counters
+# to maintain.
+
+name: Claude PR outcome
+
+on:
+  check_suite:
+    types: [completed]
+
+jobs:
+  evaluate:
+    if: >
+      startsWith(github.event.check_suite.head_branch, 'claude/') &&
+      github.event.check_suite.pull_requests[0] != null
+    runs-on: ubuntu-26.04
+    timeout-minutes: 10
+    concurrency:
+      group: claude-outcome-${{ github.event.check_suite.pull_requests[0].number }}
+      cancel-in-progress: false
+    permissions:
+      contents: read
+      checks: read
+      actions: read
+      pull-requests: write
+    steps:
+      - name: Evaluate checks and act
+        env:
+          GH_TOKEN: ${{ secrets.CLAUDE_BOT_TOKEN }}
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+          REPO: ${{ github.repository }}
+          PR: ${{ github.event.check_suite.pull_requests[0].number }}
+          # Total times the e2e should run for one commit before a failure is "real".
+          E2E_MAX_ATTEMPTS: '3'
+          # The flaky check, and the workflow that (re)runs it.
+          E2E_JOB: listen-e2e
+          DEPLOY_WORKFLOW: deploy-to-feature-environment.yml
+        run: |
+          set -euo pipefail
+
+          pr=$(gh pr view "$PR" --repo "$REPO" \
+            --json number,title,url,labels,headRefName,headRefOid,statusCheckRollup)
+
+          labels=$(echo "$pr" | jq -r '[.labels[].name]')
+          has_label() { echo "$labels" | jq -e --arg l "$1" 'index($l) != null' >/dev/null; }
+
+          if has_label "claude:notified"; then
+            echo "Already notified for PR #$PR."; exit 0
+          fi
+
+          # Overall state of the check rollup: pending / failed / green.
+          state=$(echo "$pr" | jq -r '
+            (.statusCheckRollup // []) as $c
+            | if ($c|length)==0 then "pending"
+              elif any($c[];
+                (.__typename=="CheckRun" and .status!="COMPLETED")
+                or (.__typename=="StatusContext" and ((.state//"")|ascii_upcase|IN("PENDING","EXPECTED")))
+              ) then "pending"
+              elif any($c[];
+                (.__typename=="CheckRun" and ((.conclusion//"")|ascii_upcase|IN("FAILURE","CANCELLED","TIMED_OUT","ACTION_REQUIRED","STARTUP_FAILURE")))
+                or (.__typename=="StatusContext" and ((.state//"")|ascii_upcase|IN("FAILURE","ERROR")))
+              ) then "failed"
+              else "green" end')
+          echo "PR #$PR rollup state: $state"
+
+          if [ "$state" = "pending" ]; then
+            echo "Checks still running — waiting."; exit 0
+          fi
+
+          if [ "$state" = "green" ]; then
+            gh pr edit "$PR" --repo "$REPO" \
+              --remove-label "claude:checks-failed" --remove-label "claude:fix-needed" 2>/dev/null || true
+            if [ -z "${SLACK_WEBHOOK_URL:-}" ]; then
+              echo "SLACK_WEBHOOK_URL not set; skipping Slack." >&2; exit 0
+            fi
+            title=$(echo "$pr" | jq -r '.title'); url=$(echo "$pr" | jq -r '.url')
+            # TODO: replace with the team's final template (keep it one line, \n for breaks).
+            text=$(printf ':rocket: *Claude opened a PR and it is green*\n*PR:* <%s|%s>\nAll checks passed — ready for review.' "$url" "$title")
+            jq -n --arg t "$text" '{text:$t}' \
+              | curl -sSf -X POST -H 'Content-type: application/json' --data @- "$SLACK_WEBHOOK_URL"
+            gh pr edit "$PR" --repo "$REPO" --add-label "claude:notified" || true
+            echo "Notified Slack for PR #$PR."; exit 0
+          fi
+
+          # --- state == failed -------------------------------------------------
+          # Which checks are failing, and are any of them NOT the e2e job?
+          failing=$(echo "$pr" | jq -c '[ (.statusCheckRollup // [])[]
+            | select(
+                (.__typename=="CheckRun" and ((.conclusion//"")|ascii_upcase|IN("FAILURE","CANCELLED","TIMED_OUT","ACTION_REQUIRED","STARTUP_FAILURE")))
+                or (.__typename=="StatusContext" and ((.state//"")|ascii_upcase|IN("FAILURE","ERROR")))
+              )
+            | (.name // .context) ]')
+          failing_list=$(echo "$failing" | jq -r 'join(", ")')
+          non_e2e=$(echo "$failing" | jq --arg job "$E2E_JOB" '[ .[] | select(. != $job) ] | length')
+
+          flag_for_fix() {
+            echo "Real failure on PR #$PR: $failing_list"
+            gh pr edit "$PR" --repo "$REPO" --add-label "claude:checks-failed" || true
+            # Re-add fix-needed cleanly so the self-heal workflow gets a fresh `labeled` event.
+            gh pr edit "$PR" --repo "$REPO" --remove-label "claude:fix-needed" 2>/dev/null || true
+            gh pr edit "$PR" --repo "$REPO" --add-label "claude:fix-needed" || true
+            gh pr comment "$PR" --repo "$REPO" \
+              --body "❌ Failing checks: ${failing_list}. Handing to Claude to investigate and fix." || true
+          }
+
+          if [ "$non_e2e" -gt 0 ]; then
+            flag_for_fix; exit 0
+          fi
+
+          # Only the e2e check failed → maybe flaky. Count its runs for THIS commit.
+          sha=$(echo "$pr" | jq -r '.headRefOid')
+          branch=$(echo "$pr" | jq -r '.headRefName')
+          runs=$(gh run list --repo "$REPO" --workflow "$DEPLOY_WORKFLOW" \
+            --branch "$branch" --limit 40 --json databaseId,headSha,status,conclusion)
+          in_progress=$(echo "$runs" | jq --arg s "$sha" '[.[]|select(.headSha==$s and .status!="completed")]|length')
+          completed=$(echo "$runs" | jq --arg s "$sha" '[.[]|select(.headSha==$s and .status=="completed")]|length')
+          echo "Feature-env runs for $sha: completed=$completed in_progress=$in_progress"
+
+          if [ "$in_progress" -gt 0 ]; then
+            echo "A feature-env deploy is already running for this commit — waiting."; exit 0
+          fi
+
+          if [ "$completed" -lt "$E2E_MAX_ATTEMPTS" ]; then
+            attempt=$((completed + 1))
+            echo "e2e failed and looks possibly flaky — re-running ($attempt/$E2E_MAX_ATTEMPTS)."
+            gh workflow run "$DEPLOY_WORKFLOW" --repo "$REPO" \
+              -f pr_number="$PR" -f keep_e2e=false
+            gh pr comment "$PR" --repo "$REPO" \
+              --body "♻️ e2e check failed; it is sometimes flaky. Re-running the feature-environment e2e (attempt ${attempt}/${E2E_MAX_ATTEMPTS}) before treating this as a real failure." || true
+            exit 0
+          fi
+
+          echo "e2e failed $completed times for this commit — treating as a real failure."
+          flag_for_fix
