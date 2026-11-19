@@ -11,6 +11,8 @@
     "declarationMap": true,
     "rootDir": "./src",
     "outDir": "dist",
+    // The configurator's server imports its sibling files with their .ts extension, as the browser build wants.
+    "rewriteRelativeImportExtensions": true,
     "paths": {
       "@opencrvs/commons/conditionals": [
         "../commons/src/conditionals/conditionals.ts"
@@ -34,5 +36,14 @@
   },
   "references": [{ "path": "../commons/tsconfig-commonjs.json" }],
   "include": ["src/**/*.ts"],
-  "exclude": ["**/node_modules/**", "dist"]
+  "exclude": [
+    "**/node_modules/**",
+    "dist",
+    "src/configurator/ui",
+    "src/configurator/tests",
+    "src/configurator/scripts",
+    "src/configurator/server/fakeGitHub.ts",
+    "src/configurator/vite.config.ts",
+    "src/configurator/yamlForms.ts"
+  ]
 }

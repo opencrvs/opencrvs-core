@@ -23,6 +23,11 @@ import {
   runEnvironmentUpgrade,
   runEnvironmentUsers
 } from './environment'
+import {
+  runConfiguratorInit,
+  runConfiguratorUpdateWorkflows,
+  runConfiguratorUpgrade
+} from './configurator'
 import { runVerifyEndpoints } from './verify/endpoints'
 
 const args = process.argv.slice(2)
@@ -32,6 +37,7 @@ Usage: opencrvs <command>
 
 Commands:
   environment            Manage deployment environments
+  configurator           Manage deployment environments in the browser
   upgrade                Upgrade an existing environment
   verify-endpoints       Verify the locally-running country config exposes the
                          expected endpoints, keeps secured ones locked down and
@@ -94,6 +100,8 @@ function main() {
   switch (command) {
     case 'environment':
       return handleEnvironment()
+    case 'configurator':
+      return handleConfigurator()
     case 'upgrade':
       return handleUpgrade()
     case 'verify-endpoints':
@@ -159,6 +167,67 @@ async function runEnvironmentCommand(
       error instanceof Error ? error.message : error
     )
     process.exit(1)
+  }
+}
+
+async function handleConfigurator() {
+  const subcommand = args[1]
+  const subcommandArgs = args.slice(2)
+
+  if (!subcommand || subcommand === '--help' || subcommand === '-h') {
+    console.log(
+      `
+Usage: opencrvs configurator <subcommand>
+
+Run it from the root of an OpenCRVS infrastructure repository.
+
+Subcommands:
+  init [--port <port>] [--host <host>]
+                    Create or update environments in the browser. Serves the
+                    configurator on http://localhost:4173 until stopped.
+                    In a container pass --host 0.0.0.0 and publish the port on
+                    the host's loopback only.
+  upgrade           Move the inventories of an old repository layout to
+                    environments/<name>/inventory.yml, then update the workflows
+  update-workflows [--dry-run]
+                    Set the environments the GitHub workflows offer to the ones
+                    found in environments/
+    `.trim()
+    )
+    process.exit(0)
+  }
+
+  const runConfiguratorCommand = async (
+    operation: string,
+    command: () => Promise<void>
+  ) => {
+    try {
+      await command()
+    } catch (error) {
+      console.error(
+        `Configurator ${operation} failed:`,
+        error instanceof Error ? error.message : error
+      )
+      process.exit(1)
+    }
+  }
+
+  switch (subcommand) {
+    case 'init':
+      return runConfiguratorCommand('initialisation', () =>
+        runConfiguratorInit(subcommandArgs)
+      )
+    case 'upgrade':
+      return runConfiguratorCommand('environment upgrade', () =>
+        runConfiguratorUpgrade()
+      )
+    case 'update-workflows':
+      return runConfiguratorCommand('workflow update', () =>
+        runConfiguratorUpdateWorkflows(subcommandArgs)
+      )
+    default:
+      console.error(`Unknown subcommand: configurator ${subcommand}`)
+      process.exit(1)
   }
 }
 

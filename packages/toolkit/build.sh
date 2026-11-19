@@ -78,6 +78,14 @@ fi
 # Build CLI
 npx esbuild src/cli.ts --bundle --platform=node --format=cjs --outdir=./dist --allow-overwrite --packages=external --banner:js="#!/usr/bin/env node"
 cp -R src/environment/templates dist/templates
+
+# Build the page of `opencrvs configurator init`, and copy next to it what its
+# server reads at run time: the form bindings and the file templates.
+npx vite build --config src/configurator/vite.config.ts
+mkdir -p dist/configurator-assets/forms
+cp src/configurator/forms/bindings.yml dist/configurator-assets/forms/
+cp -R src/configurator/templates dist/configurator-assets/templates
+
 chmod +x ./dist/cli.js
 
 echo "Build completed successfully."
