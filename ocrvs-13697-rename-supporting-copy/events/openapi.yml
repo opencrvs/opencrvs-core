@@ -14758,9 +14758,7 @@ components:
           items:
             $ref: "#/components/schemas/FieldConfig"
         dialogCopy:
-          description: Text shown at the top of the confirmation dialog of the declare
-            action. The notify and register dialogs on the review page show the
-            `dialogCopy` of the NOTIFY and REGISTER actions.
+          description: Text shown at the top of the confirmation dialog of the action.
           $ref: "#/components/schemas/TranslationConfigOutput"
       required:
         - label
@@ -15075,9 +15073,7 @@ components:
           items:
             $ref: "#/components/schemas/FieldConfig"
         dialogCopy:
-          description: Text shown at the top of the confirmation dialog of the register
-            action. The register dialog on the review page of the declare action
-            also shows it.
+          description: Text shown at the top of the confirmation dialog of the action.
           $ref: "#/components/schemas/TranslationConfigOutput"
       required:
         - label
@@ -15380,13 +15376,13 @@ components:
           type: object
           properties:
             notify:
-              description: Confirmation text for the notify with edits action
+              description: Confirmation text for the 'Notify with edits' action
               $ref: "#/components/schemas/TranslationConfigOutput"
             declare:
-              description: Confirmation text for the declare with edits action
+              description: Confirmation text for the 'Declare with edits' action
               $ref: "#/components/schemas/TranslationConfigOutput"
             register:
-              description: Confirmation text for the register with edits action
+              description: Confirmation text for the 'Register with edits' action
               $ref: "#/components/schemas/TranslationConfigOutput"
           required:
             - notify
