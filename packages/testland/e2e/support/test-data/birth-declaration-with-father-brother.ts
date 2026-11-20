@@ -180,7 +180,7 @@ export async function createDeclaration(
   const eventId = createResponse.id as string
   const trackingId = createResponse.trackingId
 
-  const file = await uploadFile(getSignatureFile(), token)
+  const file = await uploadFile(getSignatureFile(), token, eventId)
 
   const annotation = {
     'review.comment': 'My comment',

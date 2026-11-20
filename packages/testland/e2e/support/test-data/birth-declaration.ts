@@ -197,7 +197,7 @@ export async function createDeclaration(
 
   const eventId = createResponse.id as string
 
-  const filename = await uploadFile(getSignatureFile(), token)
+  const filename = await uploadFile(getSignatureFile(), token, eventId)
 
   const annotation = {
     'review.comment': 'My comment',
@@ -329,7 +329,7 @@ export async function notifyAndDeclare(
 
   const eventId = createResponse.id as string
 
-  const filename = await uploadFile(getSignatureFile(), token)
+  const filename = await uploadFile(getSignatureFile(), token, eventId)
 
   const annotation = {
     'review.comment': 'My comment',

@@ -13,7 +13,7 @@ exports[`Returns events based on the updatedAt column 1`] = `
     "applicant.email": "test@opencrvs.org",
     "applicant.image": {
       "originalFilename": "abcd.png",
-      "path": "4f095fc4-4312-4de2-aa38-86dcc0f71044.png",
+      "path": "events/[sanitized]/4f095fc4-4312-4de2-aa38-86dcc0f71044.png",
       "type": "image/png",
     },
     "applicant.name": {
@@ -59,7 +59,7 @@ exports[`Returns events based on the updatedAt column 2`] = `
     "applicant.email": "test@opencrvs.org",
     "applicant.image": {
       "originalFilename": "abcd.png",
-      "path": "4f095fc4-4312-4de2-aa38-86dcc0f71044.png",
+      "path": "events/[sanitized]/4f095fc4-4312-4de2-aa38-86dcc0f71044.png",
       "type": "image/png",
     },
     "applicant.name": {
@@ -107,7 +107,7 @@ exports[`Returns relevant events in right order 1`] = `
       "applicant.email": "test@opencrvs.org",
       "applicant.image": {
         "originalFilename": "abcd.png",
-        "path": "4f095fc4-4312-4de2-aa38-86dcc0f71044.png",
+        "path": "events/[sanitized]/4f095fc4-4312-4de2-aa38-86dcc0f71044.png",
         "type": "image/png",
       },
       "applicant.name": {
@@ -153,7 +153,7 @@ exports[`Returns relevant events in right order 1`] = `
       "applicant.email": "test@opencrvs.org",
       "applicant.image": {
         "originalFilename": "abcd.png",
-        "path": "4f095fc4-4312-4de2-aa38-86dcc0f71044.png",
+        "path": "events/[sanitized]/4f095fc4-4312-4de2-aa38-86dcc0f71044.png",
         "type": "image/png",
       },
       "applicant.name": {
@@ -588,7 +588,7 @@ exports[`User only sees tennis club membership events within their jurisdiction 
       "applicant.email": "test@opencrvs.org",
       "applicant.image": {
         "originalFilename": "abcd.png",
-        "path": "4f095fc4-4312-4de2-aa38-86dcc0f71044.png",
+        "path": "events/[sanitized]/4f095fc4-4312-4de2-aa38-86dcc0f71044.png",
         "type": "image/png",
       },
       "applicant.name": {
@@ -632,7 +632,7 @@ exports[`User only sees tennis club membership events within their jurisdiction 
       "applicant.email": "test@opencrvs.org",
       "applicant.image": {
         "originalFilename": "abcd.png",
-        "path": "4f095fc4-4312-4de2-aa38-86dcc0f71044.png",
+        "path": "events/[sanitized]/4f095fc4-4312-4de2-aa38-86dcc0f71044.png",
         "type": "image/png",
       },
       "applicant.name": {
@@ -681,7 +681,7 @@ exports[`User only sees tennis club membership events within their jurisdiction 
       "applicant.email": "test@opencrvs.org",
       "applicant.image": {
         "originalFilename": "abcd.png",
-        "path": "4f095fc4-4312-4de2-aa38-86dcc0f71044.png",
+        "path": "events/[sanitized]/4f095fc4-4312-4de2-aa38-86dcc0f71044.png",
         "type": "image/png",
       },
       "applicant.name": {
@@ -725,7 +725,7 @@ exports[`User only sees tennis club membership events within their jurisdiction 
       "applicant.email": "test@opencrvs.org",
       "applicant.image": {
         "originalFilename": "abcd.png",
-        "path": "4f095fc4-4312-4de2-aa38-86dcc0f71044.png",
+        "path": "events/[sanitized]/4f095fc4-4312-4de2-aa38-86dcc0f71044.png",
         "type": "image/png",
       },
       "applicant.name": {
@@ -769,7 +769,7 @@ exports[`User only sees tennis club membership events within their jurisdiction 
       "applicant.email": "test@opencrvs.org",
       "applicant.image": {
         "originalFilename": "abcd.png",
-        "path": "4f095fc4-4312-4de2-aa38-86dcc0f71044.png",
+        "path": "events/[sanitized]/4f095fc4-4312-4de2-aa38-86dcc0f71044.png",
         "type": "image/png",
       },
       "applicant.name": {
@@ -817,7 +817,7 @@ exports[`User with "location" scope can see events from other offices based on t
     "applicant.email": "test@opencrvs.org",
     "applicant.image": {
       "originalFilename": "abcd.png",
-      "path": "4f095fc4-4312-4de2-aa38-86dcc0f71044.png",
+      "path": "events/[sanitized]/4f095fc4-4312-4de2-aa38-86dcc0f71044.png",
       "type": "image/png",
     },
     "applicant.name": {
@@ -862,7 +862,7 @@ exports[`User with "location" scope only sees events created by system user to t
     "applicant.dobUnknown": true,
     "applicant.image": {
       "originalFilename": "abcd.png",
-      "path": "4f095fc4-4312-4de2-aa38-86dcc0f71044.png",
+      "path": "events/[sanitized]/4f095fc4-4312-4de2-aa38-86dcc0f71044.png",
       "type": "image/png",
     },
     "applicant.name": {
@@ -910,7 +910,7 @@ exports[`User with "location" scope only sees events from their primary office 1
     "applicant.email": "test@opencrvs.org",
     "applicant.image": {
       "originalFilename": "abcd.png",
-      "path": "4f095fc4-4312-4de2-aa38-86dcc0f71044.png",
+      "path": "events/[sanitized]/4f095fc4-4312-4de2-aa38-86dcc0f71044.png",
       "type": "image/png",
     },
     "applicant.name": {

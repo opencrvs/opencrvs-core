@@ -94,7 +94,7 @@ test('Check scopes against user.update with non-location payload', async () => {
             role: updatedRole,
             id: userTargeted.id,
             signature: {
-              path: 'string',
+              path: `users/${userTargeted.id}/signature.png`,
               originalFilename: 'string',
               type: 'string'
             }

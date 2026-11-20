@@ -13,8 +13,11 @@ import { TRPCError } from '@trpc/server'
 import {
   ActionType,
   createPrng,
+  DocumentPath,
   encodeScope,
-  generateEventDocument
+  EventDocument,
+  generateEventDocument,
+  getUUID
 } from '@opencrvs/commons'
 import { tennisClubMembershipEvent } from '@opencrvs/commons/fixtures'
 import {
@@ -105,5 +108,106 @@ describe('bulkImport', () => {
     expect([events[0].id, events[1].id].sort()).toEqual(
       [event1.id, event2.id].sort()
     )
+  })
+
+  describe('file binding', () => {
+    async function importEvents(events: EventDocument[]) {
+      return createSystemTestClient(TEST_SYSTEM_ID, [
+        encodeScope({ type: 'record.import' })
+      ]).event.bulkImport(events)
+    }
+
+    function eventWithFiles(
+      userId: string,
+      files: {
+        image: (eventId: string) => string
+        signature: (eventId: string) => string
+      },
+      rng = createPrng(901)
+    ) {
+      const eventId = getUUID()
+      const event = generateEventDocument({
+        configuration: tennisClubMembershipEvent,
+        rng,
+        actions: [
+          { type: ActionType.CREATE, user: { id: userId } },
+          {
+            type: ActionType.DECLARE,
+            user: { id: userId },
+            declarationOverrides: {
+              'applicant.image': {
+                type: 'image/png',
+                originalFilename: 'image.png',
+                path: files.image(eventId) as DocumentPath
+              }
+            }
+          }
+        ],
+        defaults: { id: eventId }
+      })
+
+      return {
+        ...event,
+        actions: event.actions.map((action) => ({
+          ...action,
+          createdBySignature: files.signature(eventId) as DocumentPath
+        }))
+      }
+    }
+
+    test("accepts the record's own files, legacy keys and the author's signature", async () => {
+      const { user } = await setupTestCase()
+
+      await expect(
+        importEvents([
+          eventWithFiles(user.id, {
+            image: (eventId) => `events/${eventId}/${getUUID()}.png`,
+            signature: () => `users/${user.id}/${getUUID()}.png`
+          }),
+          eventWithFiles(
+            user.id,
+            {
+              image: () => `${getUUID()}.png`,
+              signature: () => `${getUUID()}.png`
+            },
+            createPrng(902)
+          )
+        ])
+      ).resolves.not.toThrow()
+    })
+
+    test.each([
+      [
+        "an image under another record's prefix",
+        { image: () => `events/${getUUID()}/${getUUID()}.png` }
+      ],
+      [
+        "an image under a user's prefix",
+        { image: () => `users/${getUUID()}/${getUUID()}.png` }
+      ],
+      [
+        "a signature under another user's prefix",
+        { signature: () => `users/${getUUID()}/${getUUID()}.png` }
+      ],
+      [
+        "a signature under another record's prefix",
+        { signature: () => `events/${getUUID()}/${getUUID()}.png` }
+      ],
+      [
+        'a path that escapes its prefix',
+        { image: (eventId: string) => `events/${eventId}/../${getUUID()}.png` }
+      ]
+    ])('rejects %s', async (_, overrides) => {
+      const { user } = await setupTestCase()
+      const event = eventWithFiles(user.id, {
+        image: (eventId) => `events/${eventId}/${getUUID()}.png`,
+        signature: () => `users/${user.id}/${getUUID()}.png`,
+        ...overrides
+      })
+
+      await expect(importEvents([event])).rejects.toMatchObject({
+        code: 'BAD_REQUEST'
+      })
+    })
   })
 })
