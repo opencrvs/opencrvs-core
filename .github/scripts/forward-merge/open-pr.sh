@@ -7,13 +7,13 @@
 #
 # Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
 
-# Makes the merges that git can do alone for one hop from plan.sh, pushes the
+# Makes the merges that git can do alone for the hop from plan.sh, pushes the
 # forward-merge branch, and opens its PR or comments on the open one. When a
-# merge conflicts, the PR asks for approval of the resolve-conflicts job.
+# merge conflicts, the PR asks for approval of the Resolve conflicts job.
 #
 # Run it locally with DRY_RUN=true to see what it would push and open:
 #   DRY_RUN=true GITHUB_REPOSITORY=opencrvs/opencrvs-core SOURCE_BRANCH=release/1.9.x \
-#   HOP='<one entry of plan.sh hops>' bash .github/scripts/forward-merge/open-pr.sh
+#   HOP='<plan.sh hop>' bash .github/scripts/forward-merge/open-pr.sh
 set -euo pipefail
 source "$(dirname "$0")/lib.sh"
 
@@ -62,7 +62,7 @@ else
   if [ "$replanned" = true ]; then
     next="Re-run the forward-merge workflow from \`$SOURCE_BRANCH\` so a reviewer can approve Claude Code resolving them."
   else
-    next="Claude Code resolves them once a reviewer approves the \`resolve-conflicts\` job in [this run]($RUN_URL). If \`$target\` shouldn't get these changes, reject it and close this PR; no Claude tokens are spent."
+    next="Claude Code resolves them once a reviewer approves the **Resolve conflicts** job in [this run]($RUN_URL). If \`$target\` shouldn't get these changes, reject it and close this PR; no Claude tokens are spent."
   fi
   status="**Merging \`$conflict_merging\` conflicts in these files:**
 
@@ -93,6 +93,13 @@ if [ -n "$open_pr" ]; then
   exit 0
 fi
 
+# Merging the PR pushes to the target, which runs the workflow for its next line.
+next_hop=""
+if [ "$target" != develop ]; then
+  # shellcheck disable=SC2016 # literal Markdown backticks
+  next_hop=$(printf ' Merging it starts the forward merge of `%s` into the next line.' "$target")
+fi
+
 pr_body="Carries $missing commits from \`$SOURCE_BRANCH\` that \`$target\` doesn't have yet.
 
 $status
@@ -104,7 +111,7 @@ Before merging:
 - [ ] CHANGELOG.md: the \`$SOURCE_BRANCH\` entries that apply to \`$target\` are under its own version.
 - [ ] Merge with **Create a merge commit**. Squash or rebase drops the link to \`$SOURCE_BRANCH\`, so the next run offers the same commits again.
 
-New commits on \`$SOURCE_BRANCH\` are merged into this branch while the PR is open.
+New commits on \`$SOURCE_BRANCH\` are merged into this branch while the PR is open.$next_hop
 
 Opened by the forward-merge workflow ([run]($RUN_URL)). CI starts once someone pushes to this branch."
 
