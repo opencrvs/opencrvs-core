@@ -119,6 +119,28 @@ function throwConflictIfActionNotAvailable(
 }
 
 /**
+ * Returns the event without the requested action that this request stored before (same
+ * transaction id and type), for example when country config failed and the client sends the
+ * request again. The check for one requested action then refuses only other requests.
+ */
+export function withoutOwnRequestedAction(
+  event: EventDocument,
+  input: Pick<ActionInputWithType, 'transactionId' | 'type'>
+): EventDocument {
+  return {
+    ...event,
+    actions: event.actions.filter(
+      (action) =>
+        !(
+          action.status === ActionStatus.Requested &&
+          action.transactionId === input.transactionId &&
+          action.type === input.type
+        )
+    )
+  }
+}
+
+/**
  * Ensure that an action is allowed depending on the current event state. This does two checks:
  * 1. Check that the action is allowed in the current event status and flags
  * 2. Check that any conditionals defined for the action are met
@@ -356,7 +378,8 @@ export function buildAction(
  *
  * The event is locked while it is checked and the action is stored. Of two requests that
  * arrive together, the second one waits, sees the requested action of the first and gets
- * 409: an event has at most one requested action waiting for its outcome.
+ * 409: an event has at most one requested action waiting for its outcome. A request sent
+ * again with the same transaction id is not refused: the insert keeps its stored action.
  */
 async function addRequestedAction(
   input: ActionInputWithType,
@@ -365,7 +388,10 @@ async function addRequestedAction(
 ) {
   await eventsRepo.transaction(async (trx) => {
     const event = await eventsRepo.getEventByIdWithLockInTrx(input.eventId, trx)
-    const eventIndex = getCurrentEventState(event, configuration)
+    const eventIndex = getCurrentEventState(
+      withoutOwnRequestedAction(event, input),
+      configuration
+    )
     throwConflictIfActionNotAvailable(eventIndex, input.type)
 
     await eventsRepo.createActionInTrx(
