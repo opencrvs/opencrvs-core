@@ -55,6 +55,7 @@ import {
   addAction,
   addAsyncRejectAction,
   throwConflictIfActionNotAllowed,
+  withoutOwnRequestedAction,
   processAction
 } from '@events/service/events/events'
 import { getEventConfigurationForRecord } from '@events/service/config/config'
@@ -263,37 +264,26 @@ export async function defaultRequestHandler(
     input.keepAssignmentIfRejected
   ].some((i) => !!i)
 
-  // A retry: the request was made before with the same transaction id and its requested
-  // action is stored, for example because the country config call failed. Send that action
-  // again instead of storing a new one, which the stored one would refuse.
-  const isRetry = event.actions.some(
-    (action) =>
-      action.status === ActionStatus.Requested &&
-      action.transactionId === input.transactionId &&
-      action.type === input.type
+  // A request sent again with the same transaction id (for example after a country config
+  // failure) is not refused because of its own requested action. The insert keeps the stored
+  // action, and it is sent to country config again.
+  await throwConflictIfActionNotAllowed(
+    input.eventId,
+    input.type,
+    token,
+    'customActionType' in input ? input.customActionType : undefined,
+    withoutOwnRequestedAction(event, input)
   )
-
-  if (!isRetry) {
-    await throwConflictIfActionNotAllowed(
-      input.eventId,
-      input.type,
-      token,
-      'customActionType' in input ? input.customActionType : undefined,
-      event
-    )
-  }
 
   const eventActionToken = await getServiceToken()
 
-  const eventWithRequestedAction = isRetry
-    ? event
-    : await addAction(input, {
-        eventId: event.id,
-        user,
-        token,
-        status: ActionStatus.Requested,
-        configuration
-      })
+  const eventWithRequestedAction = await addAction(input, {
+    eventId: event.id,
+    user,
+    token,
+    status: ActionStatus.Requested,
+    configuration
+  })
 
   const requestedAction = getPendingAction(eventWithRequestedAction.actions)
 
@@ -477,7 +467,7 @@ export function getDefaultActionProcedures(
         })
 
         // An action with an outcome has been handled already. A requested action without one
-        // is a retry of a request whose confirmation failed, so it is sent again.
+        // goes on, so a retry is sent to country config again (as in declare and custom).
         if (
           existingAction &&
           existingAction.status !== ActionStatus.Requested
