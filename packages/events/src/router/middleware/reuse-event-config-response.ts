@@ -36,15 +36,13 @@ export const reuseEventConfigResponse: MiddlewareFunction<
   TrpcContext,
   TrpcContext,
   unknown
-> = async ({ next, ctx }) => {
+> = async ({ next }) => {
   // Configurations are only cached in production.
   if (!env.isProduction) {
     return next()
   }
 
-  const configurations = await getInMemoryVersionedEventConfigurations(
-    ctx.token
-  )
+  const configurations = await getInMemoryVersionedEventConfigurations()
 
   if (cached?.configurations === configurations) {
     // Waits for the cached or still-rebuilding response instead of building another.

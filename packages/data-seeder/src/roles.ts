@@ -15,12 +15,12 @@ import {
   validateRole,
   VersionedEventConfig
 } from '@opencrvs/commons'
-import fetch from 'node-fetch'
 import { env } from './environment'
 import { ListSchema, describeParseFailure, readString } from './parse-seed-data'
 import { formatUnwrittenFailure } from './seed-failure'
 import { raise } from './utils'
 import { Read } from './read'
+import { fetchCountryConfig } from './country-config'
 
 export interface ParsedRole {
   position: number
@@ -137,18 +137,13 @@ export function parseRoles(
   }
 }
 
-export async function readRoles(token: string): Promise<RoleRead> {
+export async function readRoles(): Promise<RoleRead> {
   const rolesUrl = joinUrl(env.COUNTRY_CONFIG_HOST, 'config/roles')
   const eventsUrl = joinUrl(env.COUNTRY_CONFIG_HOST, 'config/events')
 
   const [rolesResponse, eventsResponse] = await Promise.all([
-    fetch(rolesUrl),
-    fetch(eventsUrl, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-        'Content-Type': 'application/json'
-      }
-    })
+    fetchCountryConfig(rolesUrl),
+    fetchCountryConfig(eventsUrl)
   ])
 
   if (!rolesResponse.ok) {

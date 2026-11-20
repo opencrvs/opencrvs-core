@@ -403,9 +403,7 @@ export const userRouter = router({
     .query(async ({ input }) => getUsersById(input)),
   search: searchUsersRoute(userAndSystemProcedure.use(canSearchUsers)),
   roles: router({
-    list: userOnlyProcedure.query(async ({ ctx }) =>
-      getInMemoryRoles(ctx.token)
-    )
+    list: userOnlyProcedure.query(async () => getInMemoryRoles())
   }),
   changePassword: userOnlyProcedure
     .input(
