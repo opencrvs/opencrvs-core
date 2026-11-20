@@ -14,7 +14,10 @@ import { ActionStatus, ActionType, getUUID } from '@opencrvs/commons'
 import { getCurrentEventState } from '@opencrvs/commons/events'
 import { tennisClubMembershipEvent } from '@opencrvs/commons/fixtures'
 import {
+  CONFIRMATION_SCOPES,
+  TEST_SYSTEM_ID,
   createEvent,
+  createSystemTestClient,
   createTestClient,
   setupTestCase
 } from '@events/tests/utils'
@@ -278,6 +281,46 @@ describe('A requested action left without an outcome', () => {
     await register(transactionId)
     await register(transactionId)
     expect(calls[ActionType.REGISTER]).toBe(1)
+  })
+})
+
+describe('The outcome of a requested action', () => {
+  test('of two concurrent accepts of the same action, one is stored and the other is refused', async () => {
+    const { client, generator, event } = await setup()
+    mockConfirmations(() => 202)
+
+    const response = await client.event.actions.declare.request(
+      generator.event.actions.declare(event.id)
+    )
+    const requested = response.actions.find(
+      (action) =>
+        action.type === ActionType.DECLARE &&
+        action.status === ActionStatus.Requested
+    )
+
+    const countryConfig = createSystemTestClient(
+      TEST_SYSTEM_ID,
+      CONFIRMATION_SCOPES
+    )
+    const accept = async () =>
+      countryConfig.event.actions.declare.accept({
+        ...generator.event.actions.declare(event.id),
+        transactionId: getUUID(),
+        actionId: requested?.id ?? ''
+      })
+
+    const results = await Promise.allSettled([accept(), accept()])
+    expect(results.filter((r) => r.status === 'fulfilled')).toHaveLength(1)
+    const [refused] = results.filter(
+      (r): r is PromiseRejectedResult => r.status === 'rejected'
+    )
+    expect(refused.reason).toMatchObject({ code: 'CONFLICT' })
+
+    const stored = await client.event.get({ eventId: event.id })
+    expect(statuses(stored.actions, ActionType.DECLARE)).toEqual([
+      ActionStatus.Requested,
+      ActionStatus.Accepted
+    ])
   })
 })
 
