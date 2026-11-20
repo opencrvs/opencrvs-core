@@ -87,7 +87,10 @@ setQueryDefaults(trpcOptionsProxy.user.list, {
     const cachedUserMap = new Map(
       queryClient
         .getQueriesData<inferOutput<typeof trpcOptionsProxy.user.list>>({
-          queryKey: trpcOptionsProxy.user.list.queryKey()
+          queryKey: trpcOptionsProxy.user.list.queryKey(),
+          // An invalidated query holds out-of-date users (e.g. after an
+          // avatar change), so they are fetched again instead of reused
+          predicate: (query) => !query.state.isInvalidated
         })
         .flatMap(([, data]) => data ?? [])
         .map((user) => [user.id as string, user])
