@@ -20,6 +20,9 @@ vi.mock('../../logger', () => ({
 }))
 // The MOSIP entry in INTEGRATIONS is built from these at module load
 vi.mock('../../constants', () => ({
+  // No country config client, so MOSIP is the only integration.
+  COUNTRY_CONFIG_CLIENT_ID: '',
+  COUNTRY_CONFIG_CLIENT_SECRET: '',
   MOSIP_INTEGRATION_CLIENT_ID: '5f10f0e9-dafa-48d6-b5e6-551809efa0ab',
   MOSIP_INTEGRATION_CLIENT_SECRET: '7514fe5f-6401-429b-8ac3-1f1c3dc40359',
   EVENTS_URL: 'http://events:5555/'
