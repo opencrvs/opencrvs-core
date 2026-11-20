@@ -1,5 +1,7 @@
 # Changelog
 
+## 1.9.24
+
 ## 1.9.23
 
 ### Bug fixes
