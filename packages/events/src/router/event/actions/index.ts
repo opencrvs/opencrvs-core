@@ -263,23 +263,37 @@ export async function defaultRequestHandler(
     input.keepAssignmentIfRejected
   ].some((i) => !!i)
 
-  await throwConflictIfActionNotAllowed(
-    input.eventId,
-    input.type,
-    token,
-    'customActionType' in input ? input.customActionType : undefined,
-    event
+  // A retry: the request was made before with the same transaction id and its requested
+  // action is stored, for example because the country config call failed. Send that action
+  // again instead of storing a new one, which the stored one would refuse.
+  const isRetry = event.actions.some(
+    (action) =>
+      action.status === ActionStatus.Requested &&
+      action.transactionId === input.transactionId &&
+      action.type === input.type
   )
+
+  if (!isRetry) {
+    await throwConflictIfActionNotAllowed(
+      input.eventId,
+      input.type,
+      token,
+      'customActionType' in input ? input.customActionType : undefined,
+      event
+    )
+  }
 
   const eventActionToken = await getServiceToken()
 
-  const eventWithRequestedAction = await addAction(input, {
-    eventId: event.id,
-    user,
-    token,
-    status: ActionStatus.Requested,
-    configuration
-  })
+  const eventWithRequestedAction = isRetry
+    ? event
+    : await addAction(input, {
+        eventId: event.id,
+        user,
+        token,
+        status: ActionStatus.Requested,
+        configuration
+      })
 
   const requestedAction = getPendingAction(eventWithRequestedAction.actions)
 
@@ -290,33 +304,16 @@ export async function defaultRequestHandler(
     setBearerForToken(eventActionToken)
   )
 
-  // An unexpected failure is handled like the async flow below: the action stays requested, the
-  // user is unassigned and country config needs to accept or reject the action. It is not sent
-  // to country config again, since the user who made the request is not the one to resolve it.
+  // If we get an unexpected failure response, we just return HTTP 500. Event stays in 'requested' / pending.
   if (responseStatus === ActionConfirmationResponse.UnexpectedFailure) {
-    logger.error(
-      {
-        eventId: event.id,
-        actionType: input.type,
-        transactionId: input.transactionId
-      },
-      'Unexpected failure from country config action confirmation API. The action stays requested.'
-    )
-
-    if (expectSynchronousResponse) {
-      throw new TRPCError({
-        code: 'INTERNAL_SERVER_ERROR',
-        message:
-          'Unexpected failure from country config action confirmation API'
-      })
-    }
+    throw new TRPCError({
+      code: 'INTERNAL_SERVER_ERROR',
+      message: 'Unexpected failure from country config action confirmation API'
+    })
   }
 
   // For Async flow, we just return the event with the requested action and ensure it is indexed
-  if (
-    responseStatus === ActionConfirmationResponse.RequiresProcessing ||
-    responseStatus === ActionConfirmationResponse.UnexpectedFailure
-  ) {
+  if (responseStatus === ActionConfirmationResponse.RequiresProcessing) {
     if (expectSynchronousResponse) {
       throw new TRPCError({
         code: 'INTERNAL_SERVER_ERROR',
@@ -479,7 +476,12 @@ export function getDefaultActionProcedures(
           token
         })
 
-        if (existingAction) {
+        // An action with an outcome has been handled already. A requested action without one
+        // is a retry of a request whose confirmation failed, so it is sent again.
+        if (
+          existingAction &&
+          existingAction.status !== ActionStatus.Requested
+        ) {
           return ctx.event
         }
 

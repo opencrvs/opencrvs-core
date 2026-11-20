@@ -14,10 +14,7 @@ import { ActionStatus, ActionType, getUUID } from '@opencrvs/commons'
 import { getCurrentEventState } from '@opencrvs/commons/events'
 import { tennisClubMembershipEvent } from '@opencrvs/commons/fixtures'
 import {
-  CONFIRMATION_SCOPES,
-  TEST_SYSTEM_ID,
   createEvent,
-  createSystemTestClient,
   createTestClient,
   setupTestCase
 } from '@events/tests/utils'
@@ -230,77 +227,48 @@ describe('An event has at most one requested action', () => {
 })
 
 describe('A requested action left without an outcome', () => {
-  test('refuses a new DECLARE while the failed request is pending', async () => {
-    // keepAssignment expects a synchronous answer, so the user stays assigned after the failure
-    const { declare } = await setup()
+  test('refuses a new DECLARE, and the retry of the failed request completes', async () => {
+    const { client, event, declare } = await setup()
+    const failed = getUUID()
 
     mockConfirmations(() => 500)
-    await expect(declare()).rejects.toThrow()
+    await expect(declare(failed)).rejects.toThrow()
 
+    // A new submission (new transaction id) is refused while the failed request is pending
     const calls = mockConfirmations()
     await expect(declare()).rejects.toMatchObject({ code: 'CONFLICT' })
     expect(calls[ActionType.DECLARE]).toBeUndefined()
+
+    // The retry of the failed request (same transaction id) completes it
+    const response = await declare(failed)
+    expect(calls[ActionType.DECLARE]).toBe(1)
+    expect(statuses(response.actions, ActionType.DECLARE)).toEqual([
+      ActionStatus.Requested,
+      ActionStatus.Accepted
+    ])
+
+    const stored = await client.event.get({ eventId: event.id })
+    const state = getCurrentEventState(stored, tennisClubMembershipEvent)
+    expect(state.status).toBe('DECLARED')
+    expect(state.flags).not.toContain('declare:requested')
   })
 
-  test.each([
-    { type: ActionType.DECLARE, actions: [] },
-    { type: ActionType.REGISTER, actions: [ActionType.DECLARE] }
-  ] as const)(
-    'a failed $type stays requested, unassigns the user and is not sent again',
-    async ({ type, actions }) => {
-      const { client, generator, event } = await setup([...actions])
-      const transactionId = getUUID()
-      const request = async () =>
-        type === ActionType.DECLARE
-          ? client.event.actions.declare.request({
-              ...generator.event.actions.declare(event.id),
-              transactionId
-            })
-          : client.event.actions.register.request({
-              ...generator.event.actions.register(event.id),
-              transactionId
-            })
+  test('a failed REGISTER is completed by its retry', async () => {
+    const { client, event, register } = await setup([ActionType.DECLARE])
+    const failed = getUUID()
 
-      // Handled like an asynchronous response
-      mockConfirmations(() => 500)
-      const response = await request()
-      expect(statuses(response.actions, type)).toEqual([ActionStatus.Requested])
-      expect(response.actions.at(-1)?.type).toBe(ActionType.UNASSIGN)
+    mockConfirmations(() => 500)
+    await expect(register(failed)).rejects.toThrow()
 
-      // The retry is refused, so it leaves the client's Outbox
-      const calls = mockConfirmations()
-      await expect(request()).rejects.toMatchObject({ code: 'CONFLICT' })
-      expect(calls[type]).toBeUndefined()
+    const calls = mockConfirmations()
+    await register(failed)
+    expect(calls[ActionType.REGISTER]).toBe(1)
 
-      // Country config resolves the action
-      const countryConfig = createSystemTestClient(
-        TEST_SYSTEM_ID,
-        CONFIRMATION_SCOPES
-      )
-      const requested = response.actions.find(
-        (action) =>
-          action.type === type && action.status === ActionStatus.Requested
-      )
-      const accept =
-        type === ActionType.DECLARE
-          ? countryConfig.event.actions.declare.accept({
-              ...generator.event.actions.declare(event.id),
-              transactionId: getUUID(),
-              actionId: requested?.id ?? ''
-            })
-          : countryConfig.event.actions.register.accept({
-              ...generator.event.actions.register(event.id),
-              transactionId: getUUID(),
-              actionId: requested?.id ?? '',
-              registrationNumber: 'ABC1234567'
-            })
-      const accepted = await accept
-      expect(statuses(accepted.actions, type)).toEqual([
-        ActionStatus.Requested,
-        ActionStatus.Accepted
-      ])
-    }
-  )
+    const stored = await client.event.get({ eventId: event.id })
+    const state = getCurrentEventState(stored, tennisClubMembershipEvent)
+    expect(state.status).toBe('REGISTERED')
+    expect(state.flags).not.toContain('register:requested')
+  })
 
   test('an action with an outcome is not sent again on a retry', async () => {
     const { register } = await setup([ActionType.DECLARE])

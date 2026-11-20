@@ -369,7 +369,7 @@ describe('3rd party integration confirmation behaviour', () => {
     ).toBeDefined()
   })
 
-  test('Unassigns when integration responds with 500', async () => {
+  test('Keeps assignment when integration responds with 500', async () => {
     mockActionApi(ActionType.ARCHIVE, 500)
 
     const { generator, user } = await setupTestCase()
@@ -382,8 +382,12 @@ describe('3rd party integration confirmation behaviour', () => {
       generator.event.actions.declare(event.id, { keepAssignment: true })
     )
 
-    await client.event.actions.archive.request(
-      generator.event.actions.archive(event.id)
+    await expect(
+      client.event.actions.archive.request(
+        generator.event.actions.archive(event.id)
+      )
+    ).rejects.toThrow(
+      'Unexpected failure from country config action confirmation API'
     )
 
     const eventAfterFailure = await client.event.get({ eventId: event.id })
@@ -395,6 +399,6 @@ describe('3rd party integration confirmation behaviour', () => {
 
     expect(currentState.flags).toEqual(['archive:requested'])
     expect(currentState.status).toEqual(EventStatus.enum.DECLARED)
-    expect(currentState.assignedTo).toEqual(undefined)
+    expect(currentState.assignedTo).toEqual(user.id)
   })
 })

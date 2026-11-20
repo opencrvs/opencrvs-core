@@ -515,7 +515,7 @@ describe('Declare action', () => {
     expect(firstResponse).toEqual(secondResponse)
   })
 
-  test(`DECLARE that fails in country config stays requested and is not sent again`, async () => {
+  test(`DECLARE action can be resubmitted after it fails in country config`, async () => {
     const spy = vi.fn()
     mswServer.use(
       http.post(
@@ -530,23 +530,22 @@ describe('Declare action', () => {
       encodeScope({ type: 'record.declare' })
     ])
 
-    const data = generator.event.actions.declare(eventId)
+    const data = generator.event.actions.declare(eventId, {
+      keepAssignment: true
+    })
 
-    // Handled like an asynchronous response: the user is unassigned and country config
-    // needs to accept or reject the requested action
-    const response = await client.event.actions.declare.request(data)
-    expect(response.actions.slice(-2)).toEqual([
-      expect.objectContaining({
-        type: ActionType.DECLARE,
-        status: ActionStatus.Requested
-      }),
-      expect.objectContaining({ type: ActionType.UNASSIGN })
-    ])
-
-    await expect(client.event.actions.declare.request(data)).rejects.toThrow(
-      'You are not assigned to this event'
+    await expect(client.event.actions.declare.request(data)).rejects.toThrow()
+    mswServer.use(
+      http.post(
+        `${env.COUNTRY_CONFIG_URL}/trigger/events/tennis-club-membership/actions/DECLARE`,
+        () => {
+          spy()
+          return HttpResponse.json()
+        }
+      )
     )
-    expect(spy).toHaveBeenCalledTimes(1)
+    await client.event.actions.declare.request(data)
+    expect(spy).toHaveBeenCalledTimes(2)
   })
 })
 
@@ -1210,7 +1209,7 @@ describe('3rd party integration confirmation behaviour', () => {
     ).toBeDefined()
   })
 
-  test('Unassigns when integration responds with 500', async () => {
+  test('Keeps assignment when integration responds with 500', async () => {
     mockActionApi(ActionType.DECLARE, 500)
 
     const { generator, user } = await setupTestCase()
@@ -1219,8 +1218,12 @@ describe('3rd party integration confirmation behaviour', () => {
 
     const event = await client.event.create(generator.event.create())
 
-    await client.event.actions.declare.request(
-      generator.event.actions.declare(event.id)
+    await expect(
+      client.event.actions.declare.request(
+        generator.event.actions.declare(event.id)
+      )
+    ).rejects.toThrow(
+      'Unexpected failure from country config action confirmation API'
     )
 
     const eventAfterFailure = await client.event.get({ eventId: event.id })
@@ -1232,6 +1235,6 @@ describe('3rd party integration confirmation behaviour', () => {
 
     expect(currentState.flags).toEqual(['declare:requested'])
     expect(currentState.status).toEqual(EventStatus.enum.CREATED)
-    expect(currentState.assignedTo).toEqual(undefined)
+    expect(currentState.assignedTo).toEqual(user.id)
   })
 })

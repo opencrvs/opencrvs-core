@@ -503,14 +503,18 @@ describe('event.actions.custom', () => {
       ).toBeDefined()
     })
 
-    test('Unassigns when integration responds with 500', async () => {
+    test('Keeps assignment when integration responds with 500', async () => {
       mockActionApi(ActionType.CUSTOM, 500)
 
-      const { client, payload } = await initialiseTest([
+      const { client, payload, user } = await initialiseTest([
         `type=record.custom-action&event=${TENNIS_CLUB_MEMBERSHIP}&customActionTypes=${CUSTOM_ACTION_TYPE}`
       ])
 
-      await client.event.actions.custom.request(payload)
+      await expect(
+        client.event.actions.custom.request(payload)
+      ).rejects.toThrow(
+        'Unexpected failure from country config action confirmation API'
+      )
 
       const eventAfterFailure = await client.event.get({
         eventId: payload.eventId
@@ -523,7 +527,7 @@ describe('event.actions.custom', () => {
 
       expect(currentState.flags).toEqual(['custom:requested'])
       expect(currentState.status).toEqual(EventStatus.enum.DECLARED)
-      expect(currentState.assignedTo).toEqual(undefined)
+      expect(currentState.assignedTo).toEqual(user.id)
     })
   })
 })
