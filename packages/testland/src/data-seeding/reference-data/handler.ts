@@ -12,11 +12,20 @@ import { getClient } from './postgres'
 import Hapi from '@hapi/hapi'
 import * as z from 'zod/v4'
 import { UUID } from '@opencrvs/toolkit/events'
+import { sql } from 'kysely'
 
 export const Icd10CodeRecord = z.object({
   id: UUID,
   label: z.string(),
   code: z.string().nullish(),
+  ucLabel: z.string(),
+  chapterNo: z.string().nullish(),
+  chapterRange: z.string().nullish(),
+  chapterName: z.string().nullish(),
+  subchapterCode: z.string().nullish(),
+  subchapterName: z.string().nullish(),
+  ncdCdInjuries: z.string().nullish(),
+  illDefined: z.string().nullable(),
   validUntil: z.iso.datetime().nullable()
 })
 
@@ -39,22 +48,30 @@ export async function causeOfDeathSearchHandler(
   try {
     const rows = await db
       .selectFrom('icd10')
-      .select(['id', 'label'])
+      .select([
+        'id',
+        'label',
+        sql<number>`similarity(label, ${terms})`.as('score')
+      ])
       .where((eb) =>
         eb.and([
-          eb('label', 'ilike', likeTerm),
+          eb.or([
+            eb('label', 'ilike', likeTerm),
+            sql<boolean>`label % ${terms}`
+          ]),
           eb.or([
             eb('valid_until', 'is', null),
             eb('valid_until', '>', new Date())
           ])
         ])
       )
+      .orderBy('score desc')
       .limit(50)
       .execute()
 
     return h.response({ results: rows }).code(200)
   } catch (err) {
-    request.log(['error'], err instanceof Error ? err : String(err))
+    request.log(['error'], err instanceof Error ? err.message : String(err))
     return h.response({ error: 'Internal server error' }).code(500)
   }
 }
