@@ -166,6 +166,7 @@ jobs:
           prompt: |
             Follow the instructions in .github/scripts/renovate-prescreen/prompt.md.
             The facts file is .renovate-prescreen/facts.json.
+          # The schema is in single quotes. Do not put a "'" in schema.json.
           claude_args: |
             --json-schema '${{ env.schema }}'
             --allowedTools "Read,Grep,Glob"

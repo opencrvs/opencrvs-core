@@ -37,12 +37,15 @@ const result = JSON.parse(readFileSync(resultPath, 'utf8'))
 function clean(text) {
   return String(text ?? '')
     .replace(/\r?\n+/g, ' ')
-    .replace(/\|/g, '\\|')
     .split(/(`[^`]*`)/)
     .map((part, index) =>
       // Odd parts are code spans. GitHub shows code as text: it does not read
       // mentions, links or HTML in code, so "`@nx/devkit`" stays as it is.
-      index % 2 === 1 ? part : escapeMentions(escapeMarkup(part))
+      // A pipe in a code span still ends the table cell, so escape it. A code
+      // span cannot escape a backslash, so a "\|" in code stays a risk.
+      index % 2 === 1
+        ? part.replace(/\|/g, '\\|')
+        : escapeMentions(escapeMarkup(part))
     )
     .join('')
     .trim()
@@ -54,6 +57,8 @@ function clean(text) {
  */
 function escapeMarkup(text) {
   return text
+    .replace(/\\/g, '\\\\')
+    .replace(/\|/g, '\\|')
     .replace(/&/g, '&amp;')
     .replace(/</g, '&lt;')
     .replace(/>/g, '&gt;')

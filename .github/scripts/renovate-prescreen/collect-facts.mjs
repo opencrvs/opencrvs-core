@@ -171,7 +171,7 @@ function lastPublishOf(packument) {
 async function fetchPackument(packageName) {
   try {
     const response = await fetch(
-      `https://registry.npmjs.org/${packageName.replace('/', '%2F')}`
+      `https://registry.npmjs.org/${packageName.replaceAll('/', '%2F')}`
     )
     if (!response.ok) {
       return { error: `npm registry returned ${response.status}` }
