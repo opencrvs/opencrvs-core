@@ -53,7 +53,7 @@ import { withSuspense } from '@client/v2-events/components/withSuspense'
 import { buttonMessages } from '@client/i18n/messages'
 import { useValidatorContext } from '@client/v2-events/hooks/useValidatorContext'
 import { useDialogFormState } from '@client/v2-events/hooks/useDialogFormState'
-import { Output } from './Output'
+import { Output, isEmptyValue } from './Output'
 import { DocumentViewer } from './DocumentViewer'
 import { TranslationTextWithFormatModifier } from './TranslationTextWithFormatModifier'
 
@@ -326,8 +326,9 @@ function FormReview({
           const hasMandatoryFields = page.fields.some(
             (field) => !!field.required
           )
-          const hasAnyCompletedField = page.fields.some(
-            (field) => form[field.id] != null && form[field.id] !== ''
+          // Only fields shown on review count towards expanding
+          const hasAnyCompletedField = displayedFields.some(
+            (field) => !isEmptyValue(field, form[field.id])
           )
 
           return (

@@ -16,6 +16,11 @@ import {
   FieldValue,
   eventQueryDataGenerator,
   Clause,
+  ActionType,
+  ClauseInput,
+  EventConfig,
+  FieldType,
+  PageTypes,
   getDeclarationFields
 } from '@opencrvs/commons'
 import { ChildOnboardingEvent } from '@opencrvs/commons/fixtures'
@@ -284,6 +289,90 @@ describe('deduplication query input conversion', () => {
         ChildOnboardingEvent
       )
     ).toMatchSnapshot()
+  })
+
+  describe('falsy field values', () => {
+    const eventConfigWithNumberField = {
+      ...ChildOnboardingEvent,
+      actions: ChildOnboardingEvent.actions.map((action) =>
+        action.type === ActionType.DECLARE
+          ? {
+              ...action,
+              declaration: {
+                ...action.declaration,
+                pages: [
+                  ...action.declaration.pages,
+                  {
+                    id: 'extra',
+                    type: PageTypes.enum.FORM,
+                    requireCompletionToContinue: false,
+                    title: {
+                      id: 'extra',
+                      defaultMessage: 'Extra',
+                      description: ''
+                    },
+                    fields: [
+                      {
+                        id: 'child.previousBirths',
+                        type: FieldType.NUMBER,
+                        label: {
+                          id: 'previousBirths',
+                          defaultMessage: 'Previous births',
+                          description: ''
+                        }
+                      }
+                    ]
+                  }
+                ]
+              }
+            }
+          : action
+      )
+    } satisfies EventConfig
+
+    function queryFor(
+      declaration: Record<string, FieldValue>,
+      clause: ClauseInput,
+      eventConfig: EventConfig = ChildOnboardingEvent
+    ) {
+      return generateElasticsearchQuery(
+        encodeEventIndex(
+          eventQueryDataGenerator({ type: eventConfig.id, declaration }),
+          eventConfig
+        ),
+        Clause.parse(clause),
+        eventConfig
+      )
+    }
+
+    it('matches a number field whose value is 0', () => {
+      expect(
+        queryFor(
+          { 'child.previousBirths': 0 },
+          field('child.previousBirths').strictMatches(),
+          eventConfigWithNumberField
+        )
+      ).toEqual({
+        match_phrase: { 'declaration.child____previousBirths': '0' }
+      })
+    })
+
+    it('matches a checkbox whose value is false', () => {
+      expect(
+        queryFor(
+          { 'mother.dobUnknown': false },
+          field('mother.dobUnknown').strictMatches()
+        )
+      ).toEqual({
+        match_phrase: { 'declaration.mother____dobUnknown': 'false' }
+      })
+    })
+
+    it('treats an empty string as an absent value', () => {
+      expect(
+        queryFor({ 'mother.nid': '' }, field('mother.nid').strictMatches())
+      ).toBeNull()
+    })
   })
 
   it('should convert exactNamedChild to strict query', () => {

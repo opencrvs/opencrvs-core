@@ -61,6 +61,15 @@ describe('EventIndex utils', () => {
       'applicant.dob': '1990-01-01'
     })
   })
+
+  test('encodes a cleared name field as null', () => {
+    const encoded = encodeEventIndex(
+      eventQueryDataGenerator({ declaration: { 'applicant.name': null } }),
+      eventConfig
+    )
+
+    expect(encoded.declaration).toEqual({ applicant____name: null })
+  })
 })
 
 describe('resolveRecordActionScopeToIds()', () => {

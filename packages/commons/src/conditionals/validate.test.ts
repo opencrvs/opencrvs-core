@@ -345,6 +345,47 @@ describe('runFieldValidations with customClientValidator', () => {
   })
 })
 
+describe('runFieldValidations on a cleared (null) value', () => {
+  const nameField = (required: boolean): FieldConfig => ({
+    type: FieldType.NAME,
+    id: 'member.name',
+    label: { id: 'member.name.label', defaultMessage: 'Name', description: '' },
+    required,
+    validation: [
+      {
+        validator: field('member.name').get('firstname').isValidEnglishName(),
+        message: {
+          id: 'error.invalidName',
+          defaultMessage: 'Invalid name',
+          description: ''
+        }
+      }
+    ]
+  })
+
+  it('skips validation of an optional field', () => {
+    expect(
+      runFieldValidations({
+        field: nameField(false),
+        value: null,
+        form: { 'member.name': null },
+        context: {}
+      })
+    ).toEqual([])
+  })
+
+  it('still reports a required field', () => {
+    expect(
+      runFieldValidations({
+        field: nameField(true),
+        value: null,
+        form: { 'member.name': null },
+        context: {}
+      })
+    ).not.toEqual([])
+  })
+})
+
 describe('areConditionsMet', () => {
   const flagConditional = {
     type: ConditionalType.SHOW,
