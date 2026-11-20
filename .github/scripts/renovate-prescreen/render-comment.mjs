@@ -41,10 +41,10 @@ function clean(text) {
     .map((part, index) =>
       // Odd parts are code spans. GitHub shows code as text: it does not read
       // mentions, links or HTML in code, so "`@nx/devkit`" stays as it is.
-      // A pipe in a code span still ends the table cell, so escape it. A code
-      // span cannot escape a backslash, so a "\|" in code stays a risk.
+      // A pipe in a code span still ends the table cell, so escape it. Escape
+      // backslashes first so an input "\|" cannot leave "|" effectively raw.
       index % 2 === 1
-        ? part.replace(/\|/g, '\\|')
+        ? part.replace(/\\/g, '\\\\').replace(/\|/g, '\\|')
         : escapeMentions(escapeMarkup(part))
     )
     .join('')
