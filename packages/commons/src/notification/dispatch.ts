@@ -11,35 +11,33 @@
 
 import { joinUrl } from '../url'
 import { logger } from '../logger'
+import { CoreSigningKey, withCoreSignature } from '../request-signing/signature'
 import { TriggerEvent, TriggerPayload } from './UserNotifications'
 
 /*
- * Every event carries an Authorization header. Interactive flows forward the
- * acting user's token; the background announcement worker fetches a service
- * token first (see getServiceToken in the events service). This lets country
- * configs require authentication on all `/trigger/user/*` routes.
+ * Core signs every event (see `withCoreSignature`) and sends no user token, so
+ * country configs can accept `/trigger/user/*` from core alone with
+ * `auth: 'core'`.
  */
 export async function triggerUserEventNotification<T extends TriggerEvent>({
   event,
   payload,
   countryConfigUrl,
-  authHeader
+  signingKey
 }: {
   event: T
   payload: TriggerPayload[T]
   countryConfigUrl: string
-  authHeader: { Authorization: string }
+  signingKey: CoreSigningKey
 }): Promise<Response> {
+  const url = joinUrl(countryConfigUrl, `trigger/user/${event}`)
   const response = await fetch(
-    joinUrl(countryConfigUrl, `trigger/user/${event}`),
-    {
+    url,
+    withCoreSignature(signingKey, url, {
       method: 'POST',
       body: JSON.stringify(payload),
-      headers: {
-        'Content-Type': 'application/json',
-        ...authHeader
-      }
-    }
+      headers: { 'Content-Type': 'application/json' }
+    })
   )
 
   /*

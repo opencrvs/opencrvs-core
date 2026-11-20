@@ -18,6 +18,7 @@ import {
 } from '@auth/features/retrievalSteps/verifyUser/service'
 import { recordAnonymousUserAuditEvent } from '@auth/features/authenticate/service'
 import { triggerUserEventNotification } from '@opencrvs/commons'
+import { coreSigningKey } from '@auth/request-signing'
 
 const fetch = fetchAny as fetchAny.FetchMock
 
@@ -94,17 +95,14 @@ describe('username reminder', () => {
         }
       })
       /*
-       * The Authorization header is asserted explicitly: `/sendUserName` is
-       * itself unauthenticated, so there is no incoming token to forward. If
-       * this handler stops minting one, country config rejects the trigger
-       * with a 401 and the user silently never receives their username.
+       * The signing key is asserted explicitly: without it country config
+       * rejects the trigger with a 403 and the user silently never receives
+       * their username.
        */
       expect(triggerUserEventNotification).toHaveBeenCalledWith(
         expect.objectContaining({
           event: 'username-reminder',
-          authHeader: {
-            Authorization: expect.stringMatching(/^Bearer \S+$/)
-          }
+          signingKey: coreSigningKey
         })
       )
     })

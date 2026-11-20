@@ -698,8 +698,7 @@ export async function createServer() {
     path: '/trigger/telemetry',
     handler: telemetryHandler,
     options: {
-      // Authenticated with the default JWT strategy; the handler additionally
-      // requires an OpenCRVS system token (see the handler).
+      auth: 'core',
       tags: ['api', 'triggers'],
       validate: {
         payload: telemetrySchema
@@ -714,6 +713,7 @@ export async function createServer() {
     path: '/trigger/system/ready',
     handler: systemReadyHandler,
     options: {
+      auth: 'core',
       tags: ['api', 'integration'],
       description:
         'Called by events on startup. Registers integrations in the events service using the provided bootstrap token.'
