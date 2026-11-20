@@ -600,7 +600,7 @@ test('Persists all create-endpoint fields to database', async () => {
     data: { customKey: 'customValue' },
     signature: {
       originalFilename: 'signature.png',
-      path: 'signatures/test-sig.png',
+      path: 'users/tmp-1c0e0fd5-55d3-4d4c-9a8b-0f6d2a5b7e11/test-sig.png',
       type: 'image/png'
     }
   })
@@ -614,7 +614,7 @@ test('Persists all create-endpoint fields to database', async () => {
     fullHonorificName: 'Dr. Jane Doe',
     device: 'iPhone 15',
     data: { customKey: 'customValue' },
-    signature: 'signatures/test-sig.png'
+    signature: 'users/tmp-1c0e0fd5-55d3-4d4c-9a8b-0f6d2a5b7e11/test-sig.png'
   })
 
   const dbUser = await eventsDb
@@ -633,6 +633,45 @@ test('Persists all create-endpoint fields to database', async () => {
     fullHonorificName: 'Dr. Jane Doe',
     device: 'iPhone 15',
     data: { customKey: 'customValue' },
-    signaturePath: 'signatures/test-sig.png'
+    signaturePath: 'users/tmp-1c0e0fd5-55d3-4d4c-9a8b-0f6d2a5b7e11/test-sig.png'
+  })
+})
+
+describe('Signature path', () => {
+  async function createWithSignature(path: string) {
+    const { user } = await setupTestCase()
+    const client = createTestClient(user, [
+      encodeScope({ type: 'user.create' })
+    ])
+
+    return client.user.create({
+      name: { firstname: 'Sig', surname: 'Nature' },
+      role: user.role,
+      primaryOfficeId: user.primaryOfficeId,
+      email: `signature-${getUUID()}@opencrvs.org`,
+      signature: { originalFilename: 'sig.png', path, type: 'image/png' }
+    })
+  }
+
+  test('accepts a signature uploaded under a temporary user id', async () => {
+    const path = `users/tmp-${getUUID()}/${getUUID()}.png`
+
+    await expect(createWithSignature(path)).resolves.toMatchObject({
+      signature: path
+    })
+  })
+
+  test.each([
+    ['a record attachment', () => `events/${getUUID()}/${getUUID()}.png`],
+    ["another user's file", () => `users/${getUUID()}/${getUUID()}.png`],
+    ['a bare key', () => `${getUUID()}.png`],
+    ['a traversal', () => `users/tmp-${getUUID()}/../x.png`]
+  ])('rejects %s', async (_, makePath) => {
+    await expect(createWithSignature(makePath())).rejects.toMatchObject(
+      new TRPCError({
+        code: 'BAD_REQUEST',
+        message: "Signature must be a file under the user's own users/ path"
+      })
+    )
   })
 })

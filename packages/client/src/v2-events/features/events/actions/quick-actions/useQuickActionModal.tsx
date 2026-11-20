@@ -195,6 +195,7 @@ function QuickActionModal({
           />
         )}
         <FormFieldGenerator
+          attachmentPath={`events/${eventId}/`}
           eventConfig={eventConfiguration}
           fields={config.fields ?? []}
           id={'quick-action-modal-form'}

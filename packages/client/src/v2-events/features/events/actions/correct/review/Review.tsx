@@ -75,6 +75,7 @@ export function Review() {
   return (
     <FormLayout route={ROUTES.V2.EVENTS.REVIEW_CORRECTION}>
       <ReviewComponent.Body
+        attachmentPath={`events/${eventId}/`}
         banner={
           <ReviewCorrection
             correctionRequestAction={correctionRequestAction}

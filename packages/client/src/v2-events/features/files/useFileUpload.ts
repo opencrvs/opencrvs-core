@@ -14,14 +14,22 @@ import { v4 as uuid } from 'uuid'
 import {
   DocumentPath,
   FullDocumentPath,
-  joinUrlPaths,
-  joinValues
+  joinValues,
+  UUID
 } from '@opencrvs/commons/client'
 import { getToken } from '@client/utils/authUtils'
 import { fetchFileFromUrl } from '@client/utils/imageUtils'
-import { cacheFile, removeCached } from '@client/v2-events/cache'
+import {
+  cacheFile,
+  findFileCache,
+  removeCached
+} from '@client/v2-events/cache'
 import { resolveTemporaryIdInPath } from '@client/v2-events/features/events/useEvents/temporary-id'
-import { queryClient } from '@client/v2-events/trpc'
+import {
+  isExpectedAccessError,
+  queryClient,
+  trpcClient
+} from '@client/v2-events/trpc'
 
 interface UploadFileParams {
   file: File
@@ -108,27 +116,131 @@ async function deleteFile({ filename }: { filename: string }): Promise<void> {
 export const UPLOAD_MUTATION_KEY = 'uploadFile'
 const DELETE_MUTATION_KEY = 'deleteFile'
 
-async function getPresignedUrl(filePath: DocumentPath | FullDocumentPath) {
-  const url = joinUrlPaths('/api/presigned-url', filePath)
+/**
+ * The record or user whose files are signed together. The server signs every
+ * file the owner names in one call, keyed by the path it stores.
+ */
+export type FileOwner = { eventId: UUID } | { userId: UUID }
 
-  const response = await fetch(url, {
-    method: 'GET',
-    headers: {
-      Authorization: `Bearer ${getToken()}`
-    }
-  })
+async function presignOwnerFiles(
+  owner: FileOwner
+): Promise<Record<string, string>> {
+  if ('eventId' in owner) {
+    return await trpcClient.event.files.presign.query({
+      eventId: owner.eventId
+    })
+  }
 
-  const res = await response.json()
-  return res
+  return await trpcClient.user.files.presign.query({ userIds: [owner.userId] })
 }
 
-export async function precacheFile(path: DocumentPath | FullDocumentPath) {
-  const presignedUrl = (await getPresignedUrl(path)).presignedURL
+/**
+ *
+ * returns already cached file urls in absolute format.
+ */
+async function getCachedUrls(cache: Cache) {
+  const requests = await cache.keys()
+  return new Set(requests.map((req) => req.url))
+}
 
-  const file = await fetchFileFromUrl(presignedUrl, path)
+function toAbsoluteUrl(url: string) {
+  return new URL(url, window.location.origin).href
+}
 
-  if (file) {
-    await cacheFile({ url: path, file })
+/**
+ * Downloads each path from its presigned URL and caches it under the path.
+ * Paths the server didn't sign are skipped.
+ */
+async function cachePresigned(urls: Record<string, string>, paths: string[]) {
+  await Promise.all(
+    paths.map(async (path) => {
+      const presignedUrl = urls[path] as string | undefined
+
+      if (!presignedUrl) {
+        return
+      }
+
+      const file = await fetchFileFromUrl(presignedUrl, path)
+
+      if (file) {
+        await cacheFile({ url: path, file })
+      }
+    })
+  )
+}
+
+function warnUnlessExpected(error: unknown) {
+  if (!isExpectedAccessError(error)) {
+    // eslint-disable-next-line no-console
+    console.warn('Failed to precache file', error)
+  }
+}
+
+/**
+ * Precaches the owner's files that are not cached already, signing them in
+ * one call, and only when at least one is missing.
+ */
+export async function precacheFiles(
+  paths: (DocumentPath | FullDocumentPath)[],
+  owner: FileOwner
+) {
+  if (paths.length === 0) {
+    return
+  }
+
+  const cache = await findFileCache()
+
+  if (!cache) {
+    return
+  }
+
+  const cachedUrls = await getCachedUrls(cache)
+
+  const missingFiles = paths.filter(
+    (path) => !cachedUrls.has(toAbsoluteUrl(path))
+  )
+
+  if (missingFiles.length === 0) {
+    return
+  }
+
+  try {
+    await cachePresigned(await presignOwnerFiles(owner), missingFiles)
+  } catch (error) {
+    warnUnlessExpected(error)
+  }
+}
+
+/**
+ * Precaches the avatars of several users (e.g. a list's) that are not cached
+ * already, signing them in one call. Signatures are left out: a list shows
+ * none, and they would otherwise land on the device of everyone who may read
+ * those users.
+ */
+export async function precacheUserAvatars(userIds: UUID[]) {
+  if (userIds.length === 0) {
+    return
+  }
+
+  const cache = await findFileCache()
+
+  if (!cache) {
+    return
+  }
+
+  try {
+    const urls = await trpcClient.user.files.presign.query({
+      userIds,
+      avatarsOnly: true
+    })
+    const cachedUrls = await getCachedUrls(cache)
+    const missingFiles = Object.keys(urls).filter(
+      (path) => !cachedUrls.has(toAbsoluteUrl(path))
+    )
+
+    await cachePresigned(urls, missingFiles)
+  } catch (error) {
+    warnUnlessExpected(error)
   }
 }
 

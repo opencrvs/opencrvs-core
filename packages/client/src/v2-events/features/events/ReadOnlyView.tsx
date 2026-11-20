@@ -147,6 +147,7 @@ function ReadonlyViewContent({ eventId }: { eventId: UUID }) {
     <ReviewComponent.Body
       readonlyMode
       annotation={annotation}
+      attachmentPath={`events/${eventId}/`}
       form={eventStateWithDraft.declaration}
       formConfig={formConfig}
       reviewFields={fields}

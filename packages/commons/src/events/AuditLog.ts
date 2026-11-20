@@ -148,6 +148,14 @@ const AttachmentUploadEntrySchema = AuditLogEntryBase.extend({
   responseSummary: z.object({ fileUrl: z.string() })
 })
 
+// ── Record documents ───────────────────────────────────────────────────────────
+
+const EventFilesPresignEntrySchema = AuditLogEntryBase.extend({
+  operation: z.literal('event.files.presign'),
+  requestData: z.object({ eventId: z.string() }),
+  responseSummary: z.object({ files: z.array(z.string()) })
+})
+
 // ── User operations ────────────────────────────────────────────────────────────
 
 const subjectOnly = z.object({ subjectId: z.string() })
@@ -227,6 +235,7 @@ export const AuditLogEntrySchema = z.discriminatedUnion('operation', [
   IntegrationDeleteEntrySchema,
   IntegrationRefreshSecretEntrySchema,
   AttachmentUploadEntrySchema,
+  EventFilesPresignEntrySchema,
   UserCreateEntrySchema,
   UserReasonEntrySchema,
   UserSubjectOnlyEntrySchema,

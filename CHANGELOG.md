@@ -2,6 +2,17 @@
 
 ## 2.0.7
 
+### Security
+
+- Fixes a security vulnerability. Details will be published in a security advisory.
+
+### Breaking changes
+
+- The gateway's `GET /presigned-url/{filePath*}` route is removed. Use `event.files.presign({ eventId })` for a record's files, or `user.files.presign({ userIds })` (users only) for avatars and signatures. Both return presigned URLs keyed by the stored path.
+- Upload record attachments with `path: events/{eventId}/`.
+- Actions and drafts may only name files stored under their record's `events/{eventId}/`, or files the record already names. Imported records may also name pre-2.0 keys and their author's own signature. Any other file is rejected with `400`.
+- `user.create`, `user.update` and `user.changeAvatar` only accept a signature or avatar stored under the user's own `users/` path.
+
 ### Bug fixes
 
 - Two submissions of an action on the same record arriving at the same time no longer leave the record failing every later request with `Expected exactly one pending action`. A record now has at most one action request waiting for the country config: a request made meanwhile, including a second declaration or notification, is refused with a conflict error. A request whose confirmation failed completes when it is retried with the same transaction id, for every action, not only declare. The record's declaration and registration details come from the request that was accepted. [#13901](https://github.com/opencrvs/opencrvs-core/issues/13901)

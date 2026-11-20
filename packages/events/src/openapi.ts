@@ -42,7 +42,7 @@ export const openApiDocument = generateOpenApiDocument(appRouter, {
               path: {
                 type: 'string',
                 description:
-                  'Optional path in S3 where the file should be stored'
+                  'Path in S3 where the file should be stored. Record attachments must use events/{eventId}/, or no action can name them.'
               },
               transactionId: {
                 type: 'string',

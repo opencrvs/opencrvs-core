@@ -92,6 +92,7 @@ export function Review() {
     >
       <ReviewComponent.Body
         annotation={annotation}
+        attachmentPath={`events/${eventId}/`}
         form={form}
         formConfig={formConfig}
         reviewFields={reviewConfig.fields}

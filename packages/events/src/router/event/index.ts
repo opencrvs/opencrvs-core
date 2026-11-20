@@ -65,13 +65,17 @@ import {
 } from '@events/service/reindex/status'
 import { markAsDuplicate } from '@events/service/events/actions/mark-as-duplicate'
 import { markNotDuplicate } from '@events/service/events/actions/mark-not-duplicate'
-import { cleanupUnreferencedFiles } from '@events/service/files'
+import {
+  assertFilesBelongToEvent,
+  cleanupUnreferencedFiles
+} from '@events/service/files'
 import { writeAuditLog } from '@events/storage/postgres/events/auditLog'
 import { getDuplicateEvents } from '../../service/deduplication/deduplication'
 import { declareActionProcedures } from './actions/declare'
 import { getDefaultActionProcedures } from './actions'
 import { customActionProcedures } from './actions/custom'
 import { createAndNotifyProcedure } from './actions/createAndNotify'
+import { filesRouter } from './files'
 
 export const eventRouter = router({
   /*
@@ -291,6 +295,8 @@ export const eventRouter = router({
           ctx.event
         )
 
+        assertFilesBelongToEvent(ctx.event, input)
+
         const previousDraft = await draftsRepo.findLatestDraftForAction(
           eventId,
           user.id,
@@ -323,6 +329,7 @@ export const eventRouter = router({
         return currentDraft
       })
   }),
+  files: filesRouter,
   actions: router({
     notify: router(getDefaultActionProcedures(ActionType.NOTIFY)),
     createAndNotify: router(createAndNotifyProcedure()),

@@ -523,6 +523,7 @@ const ReviewUserComponent = () => {
         </Toast>
       )}
       <ReviewComponent.Body
+        attachmentPath={`users/${userId}/`}
         form={formState as Record<string, FieldValue>}
         formConfig={formConfig}
         reviewFields={[]}

@@ -61,7 +61,9 @@ const DEFAULT_LIST_SIZE = 10
 const OPERATIONS_TO_HIDE = [
   'event.search',
   'event.actions.assign.request',
-  'event.actions.unassign.request'
+  'event.actions.unassign.request',
+  // Written each time a record's documents load; kept for investigations only
+  'event.files.presign'
 ]
 
 const TableDiv = styled.div`
