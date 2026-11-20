@@ -139,13 +139,25 @@ jobs:
           echo "BRANCH_NAME=$(echo ${{ github.head_ref }})" >> $GITHUB_ENV
       - name: Get e2e branch
         id: get_e2e_branch
-        # ls-remote should provide list of branches. When none are found, it should be empty string.
+        # A PR uses e2e's branch of the same name, else the line it targets:
+        # release/X.Y.x, or that line's newest release/X.Y.<patch> while e2e has
+        # no line branch, else develop. A forward-merge PR always tests against
+        # its target line, never a same-named e2e branch.
+        env:
+          HEAD_REF: ${{ github.head_ref }}
+          BASE_REF: ${{ github.base_ref }}
         run: |
-          e2e_repo_url="https://github.com/opencrvs/e2e.git"
-          if [ -n "$(git ls-remote --heads "$e2e_repo_url" "refs/heads/${{ github.head_ref }}")" ]; then
-            e2e_branch=${{ github.head_ref }}
-          elif [ -n "$(git ls-remote --heads "$e2e_repo_url" "refs/heads/${{ github.base_ref }}")" ]; then
-            e2e_branch="${{ github.base_ref }}"
+          heads=$(git ls-remote --heads "https://github.com/opencrvs/e2e.git" | sed 's|.*refs/heads/||')
+          has() { [ -n "$1" ] && grep -qxF -- "$1" <<< "$heads"; }
+
+          if [[ $HEAD_REF != forward-merge/* ]] && has "$HEAD_REF"; then
+            e2e_branch=$HEAD_REF
+          elif has "$BASE_REF"; then
+            e2e_branch=$BASE_REF
+          elif [[ $BASE_REF =~ ^release/([0-9]+)\.([0-9]+)\.x$ ]] && \
+            latest=$(grep -E "^release/${BASH_REMATCH[1]}\.${BASH_REMATCH[2]}\.[0-9]+$" <<< "$heads" | sort -t. -k3 -n | tail -1) && \
+            [ -n "$latest" ]; then
+            e2e_branch=$latest
           else
             e2e_branch="develop"
           fi
@@ -186,7 +198,7 @@ jobs:
             core.setOutput('stack', slugify('${{ env.BRANCH_NAME }}'));
 
   trigger-build:
-    if: ${{ (github.event_name == 'workflow_dispatch') || (!contains(github.actor, 'bot') && github.event.pull_request.head.repo.fork == false) }}
+    if: ${{ (github.event_name == 'workflow_dispatch') || ((!contains(github.actor, 'bot') || startsWith(github.head_ref, 'forward-merge/')) && github.event.pull_request.head.repo.fork == false) }}
     needs: generate_stack_name_and_branch
     uses: ./.github/workflows/build-images-from-branch.yml
     with:

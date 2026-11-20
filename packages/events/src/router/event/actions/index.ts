@@ -229,21 +229,37 @@ export async function defaultRequestHandler(
   // @TODO: Could this be typed with the actual input schema, or could these actually be anything?
   actionConfirmationResponseSchema?: z.ZodObject<z.ZodRawShape>
 ) {
-  await throwConflictIfActionNotAllowed(
-    input.eventId,
-    input.type,
-    token,
-    'customActionType' in input ? input.customActionType : undefined,
-    event
+  // A retry: the request was made before with the same transaction id and its requested
+  // action is stored, for example because the country config call failed. Send that action
+  // again instead of storing a new one, which the stored one would refuse.
+  const isRetry = event.actions.some(
+    (action) =>
+      action.status === ActionStatus.Requested &&
+      action.transactionId === input.transactionId &&
+      action.type === input.type
   )
 
-  const eventWithRequestedAction = await addAction(input, {
-    eventId: event.id,
-    user,
-    token,
-    status: ActionStatus.Requested,
-    configuration
-  })
+  // The stored requested action of a retry makes the action unavailable, so only a new request
+  // is checked here. addAction checks the status and flags again while the event is locked.
+  if (!isRetry) {
+    await throwConflictIfActionNotAllowed(
+      input.eventId,
+      input.type,
+      token,
+      'customActionType' in input ? input.customActionType : undefined,
+      event
+    )
+  }
+
+  const eventWithRequestedAction = isRetry
+    ? event
+    : await addAction(input, {
+        eventId: event.id,
+        user,
+        token,
+        status: ActionStatus.Requested,
+        configuration
+      })
 
   const requestedAction = getPendingAction(eventWithRequestedAction.actions)
 
@@ -386,7 +402,12 @@ export function getDefaultActionProcedures(
           eventType: event.type
         })
 
-        if (existingAction) {
+        // An action with an outcome has been handled already. A requested action without one
+        // is a retry of a request whose confirmation failed, so it is sent again.
+        if (
+          existingAction &&
+          existingAction.status !== ActionStatus.Requested
+        ) {
           return ctx.event
         }
 

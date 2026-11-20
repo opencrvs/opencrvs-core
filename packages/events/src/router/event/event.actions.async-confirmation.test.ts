@@ -18,6 +18,10 @@ import {
 } from '@events/tests/utils'
 import { mswServer } from '@events/tests/msw'
 import { env } from '@events/environment'
+import {
+  getEventIndexName,
+  getOrCreateClient
+} from '@events/storage/elasticsearch'
 
 function mockDeclareApi(status: number) {
   return mswServer.use(
@@ -137,4 +141,30 @@ describe('Async confirmation - keepAssignment flags on accept', () => {
 
     expect(response.actions.at(-1)?.type).not.toEqual(ActionType.UNASSIGN)
   })
+})
+
+test('async reject of an undeclared event does not index it', async () => {
+  const { user, generator } = await setupTestCase()
+  const client = createTestClient(user)
+  const esClient = getOrCreateClient()
+  const event = await client.event.create(generator.event.create())
+
+  mockDeclareApi(202)
+
+  const requestResponse = await client.event.actions.declare.request(
+    generator.event.actions.declare(event.id)
+  )
+
+  const actionId = getDeclareActionId(requestResponse.actions)
+  const ccClient = createCountryConfigClient(user, event.id, actionId)
+
+  await ccClient.event.actions.declare.reject({
+    eventId: event.id,
+    actionId,
+    transactionId: getUUID()
+  })
+
+  await expect(
+    esClient.exists({ index: getEventIndexName(event.type), id: event.id })
+  ).resolves.toBe(false)
 })

@@ -1,6 +1,6 @@
 # Changelog
 
-## 2.0.7 Release Candidate
+## 2.0.7
 
 ### Security
 
@@ -12,6 +12,14 @@
 - Upload record attachments with `path: events/{eventId}/`.
 - Actions and drafts may only name files stored under their record's `events/{eventId}/`, or files the record already names. Imported records may also name pre-2.0 keys and their author's own signature. Any other file is rejected with `400`.
 - `user.create`, `user.update` and `user.changeAvatar` only accept a signature or avatar stored under the user's own `users/` path.
+
+### Bug fixes
+
+- Two submissions of an action on the same record arriving at the same time no longer leave the record failing every later request with `Expected exactly one pending action`. A record now has at most one action request waiting for the country config: a request made meanwhile, including a second declaration or notification, is refused with a conflict error. A request whose confirmation failed completes when it is retried with the same transaction id, for every action, not only declare. The record's declaration and registration details come from the request that was accepted. [#13901](https://github.com/opencrvs/opencrvs-core/issues/13901)
+- Fetching the potential duplicates of a record no longer fails with an `event_actions_event_id_fkey` foreign key violation when one of them has been deleted, which can happen on deployments that index undeclared records. The duplicates that still exist are returned. [#13906](https://github.com/opencrvs/opencrvs-core/issues/13906)
+- A deduplication rule that matches on a number field with the value `0`, or on an unticked checkbox, now matches as configured. The clause was treated as having no value and dropped, and inside an `and` that switched off the whole rule. An empty text value still counts as no value. [#13897](https://github.com/opencrvs/opencrvs-core/issues/13897)
+- Saving a declaration no longer fails when a name field has no value, for example the father's name when the informant's relationship hides the father section. The events service returned an error (`Cannot convert undefined or null to object`) and the draft was not saved. [#13896](https://github.com/opencrvs/opencrvs-core/issues/13896)
+- Deduplication no longer logs a warning for every clause whose field is empty on a record, which is expected when a rule offers alternatives such as date of birth or age; those lines are now debug level. When a whole rule resolves to no query, so no duplicate search runs, the events service logs one warning naming the rule, the event and its type. [#13898](https://github.com/opencrvs/opencrvs-core/issues/13898)
 
 ## 2.0.6
 
