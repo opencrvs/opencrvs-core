@@ -54,6 +54,8 @@ import {
   UUID,
   getDeclarationFieldById,
   ActionFormConditionalContext,
+  AnnotationFormValues,
+  DeclarationFormValues,
   FormValues
 } from '@opencrvs/commons/events'
 
@@ -76,8 +78,10 @@ export function getFieldErrors(
   form: FormValues,
   context: ActionFormConditionalContext
 ) {
-  // The values are read the same way as `$form`. `fields` decides which of them are checked.
-  const data = { ...form.declaration, ...form.annotation }
+  // The conditionals of annotation fields read the declaration too, so the form holds both.
+  // Only the annotation values are checked against the annotation fields.
+  const data =
+    form.annotation === undefined ? form.declaration : form.annotation
 
   const visibleFields = fields.filter((field) =>
     isFieldVisible(field, form, context)
@@ -288,7 +292,7 @@ function validateActionAnnotation({
       context.eventConfig
     ).declaration,
     annotation
-  }
+  } satisfies AnnotationFormValues
 
   const pages = findRecordActionPages(eventConfig, actionType)
 
@@ -332,7 +336,7 @@ function validateCustomAction({
       context.eventConfig
     ).declaration,
     annotation
-  }
+  } satisfies AnnotationFormValues
   return getFieldErrors(customActionFields, form, context)
 }
 
@@ -388,7 +392,10 @@ export function validateNotifyAction({
   const completeDeclaration = deepDropNulls(mergedDeclaration)
 
   // Review field conditionals commonly depend on declaration values
-  const annotationForm = { declaration: completeDeclaration, annotation }
+  const annotationForm = {
+    declaration: completeDeclaration,
+    annotation
+  } satisfies AnnotationFormValues
 
   const annotationErrors = Object.entries(annotation).flatMap(
     ([key, value]) => {
@@ -433,7 +440,7 @@ export function validateNotifyAction({
 
       const fieldErrors = runStructuralValidations({
         field: { ...field, required: false },
-        form: { declaration },
+        form: { declaration } satisfies DeclarationFormValues,
         context,
         actionType: ActionType.NOTIFY
       })
