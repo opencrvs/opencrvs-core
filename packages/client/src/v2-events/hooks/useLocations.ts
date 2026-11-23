@@ -75,7 +75,7 @@ setQueryDefaults(trpcOptionsProxy.locations.getLocationHierarchy, {
       throw new Error('queryFn is not a function')
     }
 
-    return await queryOptions.queryFn(...params)
+    return queryOptions.queryFn(...params)
   },
   staleTime: 1000 * 60 * 60 * 24
 })

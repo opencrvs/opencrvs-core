@@ -170,7 +170,7 @@ export function useEventCustomAction<T extends CustomMutationKeys>(
           params.event as EventDocument,
           eventConfiguration
         ).declaration
-      } else if (needsOriginalDeclaration && localEvent) {
+      } else if (needsOriginalDeclaration) {
         originalDeclaration = getCurrentEventState(
           localEvent,
           eventConfiguration
@@ -187,9 +187,7 @@ export function useEventCustomAction<T extends CustomMutationKeys>(
           declarationDiff: params.declaration,
           validatorContext: {
             ...validatorContext,
-            event:
-              localEvent &&
-              getEventValidatorContext(localEvent, eventConfiguration)
+            event: getEventValidatorContext(localEvent, eventConfiguration)
           }
         })
       })
