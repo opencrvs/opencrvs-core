@@ -66,7 +66,7 @@ export type EventIndexConditionalContext = {
 /**
  *  NOTE: Always prefer @see EventDocumentConditionalContext over @see EventIndexConditionalContext.
  *  Some functionality like Event summary and action menu depend on declaration coming from event.search endpoint.
- *  event.search might not have all the properties available, if field has secured: true. When
+ *  event.search might not have all the properties available when field has secured: true.
  */
 export type EventConditionalContext =
   | EventDocumentConditionalContext

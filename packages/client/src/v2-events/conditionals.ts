@@ -34,7 +34,6 @@ import {
   ValidatorContext,
   areConditionsMet as areConditionsMetV2,
   dropSecuredDeclarationFields as dropSecuredDeclarationFieldsV2,
-  getVisibleVerificationPageIds as getVisibleVerificationPageIdsV2,
   isActionAvailable as isActionAvailableV2,
   isActionEnabled as isActionEnabledV2,
   isActionVisible as isActionVisibleV2,
@@ -131,18 +130,6 @@ export function areConditionsMet(
     conditions,
     toFormValues(values, context),
     getFormConditionalContext(context, event)
-  )
-}
-
-export function getVisibleVerificationPageIds(
-  pages: PageConfig[],
-  annotation: ActionUpdate,
-  context: ValidatorContext
-) {
-  return getVisibleVerificationPageIdsV2(
-    pages,
-    toFormValues(annotation, context),
-    getFormConditionalContext(context)
   )
 }
 

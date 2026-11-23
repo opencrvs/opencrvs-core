@@ -42,7 +42,14 @@ describe('sealed birth records', () => {
     })
 
     const unsecured = declarationFields
-      .filter((field) => !isFieldSecured(field, sealedEvent, {}))
+      .filter(
+        (field) =>
+          !isFieldSecured(
+            field,
+            { declaration: sealedEvent.declaration },
+            { eventIndex: sealedEvent }
+          )
+      )
       .map(({ id }) => id)
 
     expect(unsecured).toEqual([])
@@ -55,7 +62,14 @@ describe('sealed birth records', () => {
     })
 
     const readable = declarationFields
-      .filter((field) => !isFieldSecured(field, unsealedEvent, {}))
+      .filter(
+        (field) =>
+          !isFieldSecured(
+            field,
+            { declaration: unsealedEvent.declaration },
+            { eventIndex: unsealedEvent }
+          )
+      )
       .map(({ id }) => id)
 
     // Fields the search results and workqueues are built from stay readable
