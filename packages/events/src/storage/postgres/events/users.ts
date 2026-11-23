@@ -29,10 +29,12 @@ export interface SecurityQuestion {
 /**
  * The field each unique constraint on the user tables protects. Only the name
  * of the tripped constraint says which value was the duplicate, so the map is
- * keyed by it. Constraints absent here — the primary keys, `users_legacy_id_key`
- * — are none of a caller's business and stay unmapped.
+ * keyed by it. `users_pkey` is here because `user.create` accepts an id from
+ * the caller. Constraints absent here, for example `user_credentials_pkey` and
+ * `users_legacy_id_key`, are none of a caller's business and stay unmapped.
  */
 const UNIQUE_CONSTRAINT_FIELDS: Record<string, string> = {
+  users_pkey: 'id',
   users_email_key: 'email',
   users_mobile_key: 'mobile',
   user_credentials_username_key: 'username'

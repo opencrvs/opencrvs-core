@@ -34,13 +34,6 @@ spec:
           env:
             - name: POSTGRES_HOST
               value: {{ .Values.postgres.host }}
-          # FIXME: Double check property name "managed"
-          {{- if eq .Values.postgres.auth_mode "disabled" }}
-            - name: PGPASSWORD
-              value: postgres
-            - name: POSTGRES_USER
-              value: postgres
-          {{- else if eq .Values.postgres.auth_mode "auto" }}
             - name: PGPASSWORD
               valueFrom:
                 secretKeyRef:
@@ -51,7 +44,6 @@ spec:
                 secretKeyRef:
                   key: POSTGRES_USER
                   name: {{ .Values.postgres.admin_user_secret_name }}
-          {{- end }}
             - name: POSTGRES_DB
               value: {{ .Values.postgres.events_db | replace "-" "_" }}
             - name: EVENTS_APP_ROLE
@@ -65,14 +57,14 @@ spec:
                   name: {{ .Values.postgres.users_secret }}
                   key: EVENTS_MIGRATOR_POSTGRES_USER
         - name: cleanup-s3
-          image: {{ include "opencrvs.imageReference" .Values.s3 }}
+          image: {{ include "opencrvs.image" (dict "root" . "service" .Values.utilities) }}
           command: ["/bin/bash", "-c"]
           args:
             - |
               S3_BUCKET=${S3_BUCKET:-ocrvs}
               echo "Running S3 cleanup script..."
-              mc alias set store $S3_ENDPOINT ${S3_ADMIN_ACCESS_KEY} ${S3_ADMIN_SECRET_KEY}
-              mc rm --recursive --force store/$S3_BUCKET
+              mcli alias set store $S3_ENDPOINT ${S3_ADMIN_ACCESS_KEY} ${S3_ADMIN_SECRET_KEY}
+              mcli rm --recursive --force store/$S3_BUCKET
               echo "Cleanup complete!"
           env:
             - name: S3_ENDPOINT
@@ -112,16 +104,11 @@ spec:
                 done
               done
           env:
-          {{- if eq .Values.elasticsearch.auth_mode "disabled" }}
-            - name: ELASTICSEARCH_HOST
-              value: "{{ .Values.elasticsearch.host }}:{{ .Values.elasticsearch.port }}"
-          {{- else if or (eq .Values.elasticsearch.auth_mode "auto") (eq .Values.elasticsearch.auth_mode "use_secret") }}
             - name: ELASTICSEARCH_HOST
               valueFrom:
                 secretKeyRef:
                   key: SEARCH_ELASTIC_HOST
                   name: {{ .Values.elasticsearch.urls_secret }}
-          {{- end }}
           {{- include "render-env-vars" (dict "service_name" "data_cleanup" "Values" .Values) }}
       restartPolicy: "OnFailure"
 

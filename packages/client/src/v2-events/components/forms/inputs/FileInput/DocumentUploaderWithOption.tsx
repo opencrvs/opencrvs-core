@@ -23,6 +23,7 @@ import {
 } from '@opencrvs/commons/client'
 import { ErrorText } from '@opencrvs/components'
 import { useFileUpload } from '@client/v2-events/features/files/useFileUpload'
+import { toFileUrl } from '@client/v2-events/cache'
 import { Select } from '@client/v2-events/features/events/registered-fields/Select'
 import { buttonMessages, formMessages as messages } from '@client/i18n/messages'
 import { useIntlWithFormData } from '@client/v2-events/messages/utils'
@@ -341,7 +342,7 @@ function toCertificateVariables(value: FileFieldWithOptionValue | undefined) {
     return value.reduce(
       (acc, file) => ({
         ...acc,
-        [file.option]: file.path
+        [file.option]: toFileUrl(file.path)
       }),
       {}
     )

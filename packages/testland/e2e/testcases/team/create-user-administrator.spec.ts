@@ -12,6 +12,7 @@ import { test, expect } from '@playwright/test'
 import { loginWithNewUser, continueForm, login } from '@e2e/support/helpers'
 import { faker } from '@faker-js/faker'
 import { CREDENTIALS } from '@e2e/support/constants'
+import { getExpectedUsername } from '@e2e/support/test-data/api-actions'
 
 test('1. Create and update user -1', async ({ page, browser }) => {
   const userinfo = {
@@ -32,10 +33,15 @@ test('1. Create and update user -1', async ({ page, browser }) => {
     role: 'Hospital Official'
   }
 
-  const username = `${userinfo.firstName[0]}.${userinfo.surname}`.toLowerCase()
+  const username = getExpectedUsername({
+    firstname: userinfo.firstName,
+    surname: userinfo.surname
+  })
   const fullname = `${userinfo.firstName} ${userinfo.surname}`
-  const updatedUsername =
-    `${updatedUserInfo.firstName[0]}.${updatedUserInfo.surname}`.toLowerCase()
+  const updatedUsername = getExpectedUsername({
+    firstname: updatedUserInfo.firstName,
+    surname: updatedUserInfo.surname
+  })
   const updatedFullname = `${updatedUserInfo.firstName} ${updatedUserInfo.surname}`
 
   await test.step('1.1 User creation started by local system admin', async () => {

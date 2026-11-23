@@ -28,7 +28,8 @@ import {
   ActionStatus,
   eventAttachmentPath,
   withDeclaration,
-  getDeclaration
+  getDeclaration,
+  INITIAL_EVENT_CONFIG_VERSION_ID
 } from '@opencrvs/commons/client'
 import type { EventDocument, UUID } from '@opencrvs/commons/client'
 
@@ -809,6 +810,7 @@ const mockEventWithNid: EventDocument = {
   type: tennisClubMembershipEvent.id,
   id: BASE_DECL_EVENT_ID,
   trackingId: 'NIDTEST',
+  configVersionId: INITIAL_EVENT_CONFIG_VERSION_ID,
   createdAt: '2025-01-01T00:00:00.000Z',
   updatedAt: '2025-01-01T00:00:01.000Z',
   actions: [

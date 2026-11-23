@@ -8,12 +8,16 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { Page, expect } from '@playwright/test'
+import { Locator, Page, expect } from '@playwright/test'
 import { v4 as uuidv4 } from 'uuid'
 import { createClient } from '@opencrvs/toolkit/api'
-import { ensureAssignedToUser, selectAction } from '@e2e/support/utils'
+import {
+  ensureAssignedToFullName,
+  ensureAssignedToUser,
+  selectAction
+} from '@e2e/support/utils'
 import { formatV2ChildName } from '@e2e/support/birth/helpers'
-import { CREDENTIALS, GATEWAY_HOST } from '@e2e/support/constants'
+import { CLIENT_URL, CREDENTIALS, GATEWAY_HOST } from '@e2e/support/constants'
 
 export async function selectCertificationType(page: Page, type: string) {
   await page
@@ -47,6 +51,44 @@ export async function navigateToCertificatePrintAction(
 
   await ensureAssignedToUser(page, username)
   await selectAction(page, 'Print')
+}
+
+/**
+ * Searches for the birth record, assigns it to the user with the full name
+ * and opens the Print action. Use it for a user that the test creates, who
+ * has no entry in `CREDENTIALS`.
+ */
+export async function openPrintAction(
+  page: Page,
+  declaration: Parameters<typeof formatV2ChildName>[0],
+  userFullName: string
+) {
+  await page.goto(CLIENT_URL)
+  await page
+    .getByRole('textbox', { name: 'Search for a record' })
+    .fill(formatV2ChildName(declaration))
+
+  await page.getByRole('button', { name: 'Search' }).click()
+  await openRecordByTitle(page, formatV2ChildName(declaration))
+  await ensureAssignedToFullName(page, userFullName)
+  await selectAction(page, 'Print')
+}
+
+/**
+ * Fetches the file that an <image> of the certificate preview links, in the
+ * same way as the browser does, and checks that the file is an image.
+ */
+export async function expectImageToRender(image: Locator) {
+  const href = await image.getAttribute('xlink:href')
+
+  expect(href, 'The certificate links the image').toBeTruthy()
+
+  const contentType = await image.page().evaluate(async (url) => {
+    const response = await fetch(url)
+    return response.headers.get('content-type')
+  }, href ?? '')
+
+  expect(contentType).toMatch(/^image\//)
 }
 
 export function getRowByTitle(page: Page, title: string) {

@@ -62,7 +62,6 @@ test(' Correct record - 3', async ({ page }) => {
       number: faker.location.buildingNumber(),
       zipCode: faker.location.zipCode()
     },
-    maritalStatus: 'Widowed',
     educationLevel: 'Primary'
   }
   const updatedChildDetails = {
@@ -121,7 +120,6 @@ test(' Correct record - 3', async ({ page }) => {
         'mother.nationality': 'FAR',
         'mother.idType': 'NATIONAL_ID',
         'mother.nid': faker.string.numeric(10),
-        'mother.maritalStatus': 'SINGLE',
         'mother.educationalAttainment': 'NO_SCHOOLING',
         'mother.occupation': 'Housewife',
         'mother.previousBirths': 0,
@@ -134,7 +132,6 @@ test(' Correct record - 3', async ({ page }) => {
         'father.idType': 'NATIONAL_ID',
         'father.nid': faker.string.numeric(10),
         'father.nationality': 'FAR',
-        'father.maritalStatus': 'SINGLE',
         'father.educationalAttainment': 'NONE',
         'father.occupation': 'Unemployed',
         'father.addressSameAs': 'YES'
@@ -565,47 +562,6 @@ test(' Correct record - 3', async ({ page }) => {
         ).toBeVisible()
       }) // <-- Add this closing brace for test('3.4.6 Change usual place of residence')
 
-      await test.step('3.4.7 Change marital status', async () => {
-        await page.getByTestId('change-button-mother.maritalStatus').click()
-
-        /*
-         * Expected result: should
-         * - redirect to mother's details page
-         * - focus on mother's marital status
-         */
-        await expectInUrl(page, 'correction')
-        await expectInUrl(page, 'mother')
-        await expectInUrl(page, '#mother____maritalStatus')
-
-        await page.locator('#mother____maritalStatus').click()
-        await page.getByText(updatedMotherDetails.maritalStatus).click()
-
-        await page.getByRole('button', { name: 'Go to review' }).click()
-
-        /*
-         * Expected result: should
-         * - redirect to review page
-         * - show previous marital status with strikethrough
-         * - show updated marital status
-         */
-        await expectInUrl(page, 'correction')
-        await expectInUrl(page, 'review')
-
-        await expect(
-          await page
-            .getByTestId('mother.maritalStatus-value')
-            .getByRole('deletion')
-        ).toHaveText(declaration['mother.maritalStatus'], {
-          ignoreCase: true
-        })
-
-        await expect(
-          await page
-            .getByTestId('mother.maritalStatus-value')
-            .getByText(updatedMotherDetails.maritalStatus)
-        ).toBeVisible()
-      })
-
       await test.step('3.4.8 Change level of education', async () => {
         await page
           .getByTestId('change-button-mother.educationalAttainment')
@@ -870,13 +826,6 @@ test(' Correct record - 3', async ({ page }) => {
 
     await visible(
       page.locator('#listTable-corrections-table-mother'),
-      'Marital Status',
-      'Single',
-      'Widowed'
-    )
-
-    await visible(
-      page.locator('#listTable-corrections-table-mother'),
       'Level of education',
       'No schooling',
       'Primary'
@@ -1048,12 +997,6 @@ test(' Correct record - 3', async ({ page }) => {
         ).toBeVisible()
       }
 
-      await visible(
-        page.locator('#listTable-corrections-table-mother'),
-        'Marital Status',
-        'Single',
-        'Widowed'
-      )
       await visible(
         page.locator('#listTable-corrections-table-mother'),
         'Level of education',

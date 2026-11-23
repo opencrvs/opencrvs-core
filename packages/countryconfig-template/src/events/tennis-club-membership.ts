@@ -1174,7 +1174,6 @@ const TENNIS_CLUB_MEMBERSHIP_CERTIFICATE_COLLECTOR_FORM = defineActionForm({
 
 export const tennisClubMembershipEvent = defineConfig({
   id: Event.TENNIS_CLUB_MEMBERSHIP,
-  declaration: TENNIS_CLUB_DECLARATION_FORM,
   label: {
     defaultMessage: 'Tennis club membership application',
     description: 'This is what this event is referred as in the system',
@@ -1284,6 +1283,7 @@ export const tennisClubMembershipEvent = defineConfig({
           'This is shown as the action name anywhere the user can trigger the action from',
         id: 'event.tennis-club-membership.action.declare.label'
       },
+      declaration: TENNIS_CLUB_DECLARATION_FORM,
       review: TENNIS_CLUB_DECLARATION_REVIEW
     },
     {

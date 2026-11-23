@@ -64,7 +64,6 @@ test('Birth declaration case - Conditional Hidden Fields Removal', async ({
         },
         'father.detailsNotAvailable': false,
         'father.addressSameAs': 'YES',
-        'mother.maritalStatus': 'WIDOWED',
         'mother.educationalAttainment': 'SECOND_LEVEL',
         'mother.occupation': 'House Wife'
       },

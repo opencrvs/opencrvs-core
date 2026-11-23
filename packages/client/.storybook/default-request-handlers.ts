@@ -2221,6 +2221,21 @@ export const handlers = {
       })
     })
   ],
+  countryLogo: [
+    http.get('/api/countryconfig/content/country-logo', () => {
+      // The country config serves the logo as an image, not as a data URL
+      const [header, base64] =
+        mockOfflineData.config.COUNTRY_LOGO.file.split(',')
+      const mimeType = header.match(/^data:(.+);base64$/)?.[1] ?? 'image/png'
+      const bytes = Uint8Array.from(atob(base64), (char) => char.charCodeAt(0))
+
+      return new HttpResponse(bytes, {
+        headers: {
+          'Content-Type': mimeType
+        }
+      })
+    })
+  ],
   forms: [
     http.get('/api/forms', () => {
       return HttpResponse.json(forms.forms)

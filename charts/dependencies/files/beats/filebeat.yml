@@ -29,8 +29,18 @@ processors:
       format: offset
   - add_host_metadata:
       netinfo.enabled: true
-
   - decode_json_fields:
+    # Only decode messages that look like JSON objects, so plain-text logs
+    # from pods are left untouched instead of getting a parse error key.
+    #   match:     {"level":30,"msg":"request completed"}
+    #              {"level":30}   (leading whitespace is allowed)
+    #   non-match: 2026-11-06 10:00:00 LOG:  checkpoint starting
+    #              [INFO] {"not":"at line start"}
+      when:
+        and:
+          - has_fields: ['kubernetes.pod.name']
+          - regexp:
+              message: '^\s*\{'
       fields: ['message']
       process_array: false
       max_depth: 1
@@ -38,6 +48,18 @@ processors:
       expand_keys: true
       overwrite_keys: true
       add_error_key: true
+
+  # Link logs to traces: pino's OpenTelemetry instrumentation writes trace_id and
+  # span_id, while the ECS fields Kibana APM looks up for its Logs tab are
+  # trace.id and span.id
+  - rename:
+      fields:
+        - from: trace_id
+          to: trace.id
+        - from: span_id
+          to: span.id
+      ignore_missing: true
+      fail_on_error: false
 
   # Map Numeric log levels to names
   - script:
@@ -156,7 +178,6 @@ processors:
       fields:
         - agent
         - ecs
-        - input
         - host.ip
         - host.mac
         - host.os
@@ -179,7 +200,6 @@ processors:
         - container.runtime
         - time
         - kubernetes.node.name
-        - kubernetes.container.name
         - kubernetes.labels.pod-template-hash
         - level
       ignore_missing: true

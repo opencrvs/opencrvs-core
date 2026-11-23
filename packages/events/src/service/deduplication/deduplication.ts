@@ -26,7 +26,6 @@ import {
 import {
   getAcceptedScopesFromToken,
   getCurrentEventState,
-  getEventConfigById,
   isPlainDate,
   logger,
   userCanAccessEventWithScopes
@@ -48,7 +47,7 @@ import {
 import { TrpcContext } from '../../context'
 import { getEventsAuditTrailed } from '../../storage/postgres/events/events'
 import { getEventById } from '../events/events'
-import { getInMemoryEventConfigurations } from '../config/config'
+import { getEventConfigurationForRecord } from '../config/config'
 
 /**
  * If the value referenced in a query is missing, the query resolves to null
@@ -258,7 +257,7 @@ export async function searchForDuplicates(
     }
     return {
       score: hit._score || 0,
-      event: decodeEventIndex(eventConfig, hit._source)
+      event: decodeEventIndex(hit._source)
     }
   })
 }
@@ -282,12 +281,13 @@ export async function assertCanReviewDuplicatesOf(
   const acceptedScopes = getAcceptedScopesFromToken(ctx.token, [
     'record.review-duplicates'
   ])
-  const eventConfigs = await getInMemoryEventConfigurations(ctx.token)
-
   const access = await Promise.all(
     duplicateEventIds.map(async (duplicateEventId) => {
       const duplicate = await getEventById(duplicateEventId)
-      const eventConfig = getEventConfigById(eventConfigs, duplicate.type)
+      const eventConfig = await getEventConfigurationForRecord({
+        event: duplicate,
+        token: ctx.token
+      })
 
       const eventIndexWithLocationHierarchy =
         await getEventIndexWithAdministrativeHierarchy(

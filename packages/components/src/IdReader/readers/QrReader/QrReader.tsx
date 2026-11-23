@@ -20,7 +20,7 @@ import { Stack } from '../../../Stack'
 import { Text } from '../../../Text'
 import { ErrorHandler, ScannableQrReader } from '../../types'
 import { useWindowSize } from '../../../hooks'
-import { getTheme } from '../../../theme'
+import { getTheme } from '../../../tokens'
 
 const ScannerBox = styled(Box)`
   background: ${({ theme }) => theme.colors.background};

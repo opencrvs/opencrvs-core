@@ -23,7 +23,7 @@ import {
 } from '@opencrvs/commons/client'
 import { useTRPC } from '@client/v2-events/trpc'
 import { useDrafts } from '../../drafts/useDrafts'
-import { useEventConfigurations } from '../useEventConfiguration'
+import { useEventConfigurationResolver } from '../useEventConfiguration'
 import { useGetEvent } from './procedures/get'
 import { useOutbox } from './outbox'
 import { useCreateEvent } from './procedures/create'
@@ -41,7 +41,7 @@ import {
 
 function getEventWithDraftOrThrow(
   id: string,
-  eventConfigs: EventConfig[],
+  findEventConfiguration: (event: EventDocument) => EventConfig | undefined,
   maybeDraft: Draft | undefined
 ): { event: EventDocument; draft: Draft; configuration: EventConfig } {
   const event = findLocalEventDocument(id)
@@ -51,8 +51,8 @@ function getEventWithDraftOrThrow(
   }
 
   const configuration = getOrThrow(
-    eventConfigs.find(({ id: cfgId }) => cfgId === event.type),
-    `Event configuration not found for ${event.type}`
+    findEventConfiguration(event),
+    `Event configuration not found for ${event.type}, version ${event.configVersionId}`
   )
 
   return { event, draft: maybeDraft, configuration }
@@ -74,14 +74,14 @@ export function useEvents() {
   const trpc = useTRPC()
   const getEvent = useGetEvent()
   const assignMutation = useEventAction(trpc.event.actions.assignment.assign)
-  const eventConfigs = useEventConfigurations()
+  const findEventConfiguration = useEventConfigurationResolver()
   const { useRemoteDraftByEventId } = useDrafts()
 
   /** The result for a record the server has not indexed yet, from its draft. */
   function buildDraftedResult(id: string, maybeDraft: Draft | undefined) {
     const { event, draft, configuration } = getEventWithDraftOrThrow(
       id,
-      eventConfigs,
+      findEventConfiguration,
       maybeDraft
     )
     return buildDraftedEventResult(event, draft, configuration)

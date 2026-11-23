@@ -9,7 +9,6 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { createServer } from '@documents/server'
-import { toDocumentPath } from '@opencrvs/commons'
 
 import { readFileSync } from 'fs'
 import * as jwt from 'jsonwebtoken'
@@ -289,40 +288,5 @@ describe('fileUploadHandler', () => {
 
     const { contentType } = await getObject(`${transactionId}.jfif`)
     expect(contentType).toBe('image/jpeg')
-  })
-})
-
-describe('verify document uploader handler', () => {
-  let server: any
-  const token = jwt.sign({ scope: [] }, readFileSync('./test/cert.key'), {
-    algorithm: 'RS256',
-    issuer: 'opencrvs:auth-service',
-    audience: 'opencrvs:documents-user',
-    subject: '123123'
-  })
-
-  beforeEach(async () => {
-    server = await createServer()
-  })
-
-  it('returns ok for valid request', async () => {
-    const res = await server.server.inject({
-      method: 'POST',
-      url: '/upload',
-      payload: {
-        fileData:
-          'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAlwAAAK8CAYAAAA6WGEyAAAABHNCSVQICAgIfAhkiAAAABl0RVh0U29mdHdhcmUAZ25vbWUtc2NyZWVuc2h'
-      },
-      headers: {
-        Authorization: `Bearer ${token}`
-      }
-    })
-
-    expect(res.statusCode).toBe(200)
-    const { refUrl } = JSON.parse(res.payload)
-    expect(await getObject(toDocumentPath(refUrl))).toMatchObject({
-      contentType: 'image/png',
-      metadata: { 'created-by': '123123' }
-    })
   })
 })

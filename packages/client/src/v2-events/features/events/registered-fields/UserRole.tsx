@@ -11,7 +11,6 @@
 import React from 'react'
 import { useIntl } from 'react-intl'
 import { useSelector } from 'react-redux'
-import { useTypedParams } from 'react-router-typesafe-routes/dom'
 import {
   getAcceptedScopesByType,
   getAvailableRolesForUserUpdatePayload,
@@ -25,9 +24,8 @@ import { useRoles, formatUserRole } from '@client/v2-events/hooks/useRoles'
 import { withSuspense } from '@client/v2-events/components/withSuspense'
 import { getScope, getUserDetails } from '@client/profile/profileSelectors'
 import { useLocations } from '@client/v2-events/hooks/useLocations'
-import { isTemporaryId } from '@client/v2-events/utils'
-import { ROUTES } from '@client/v2-events/routes'
 import { useUserFormState } from '@client/views/SysAdmin/Team/user/userEditor/useUserFormState'
+import { useIsNewUser } from '@client/views/SysAdmin/Team/user/userEditor/useUserEditorRoutes'
 import { StringifierContext } from './RegisteredField'
 import { Select, SelectInputProps } from './Select'
 
@@ -40,7 +38,7 @@ function UserRoleInputWithLocation({
   const [roles] = listRoles.useSuspenseQuery()
 
   const { getLocationHierarchy } = useLocations()
-  const { userId } = useTypedParams(ROUTES.V2.SETTINGS.USER.EDIT)
+  const isNewUser = useIsNewUser()
 
   const currentUser = useSelector(getUserDetails)
   const userScopes = useSelector(getScope) || []
@@ -50,8 +48,6 @@ function UserRoleInputWithLocation({
   }
 
   const locationHierarchy = getLocationHierarchy.useSuspenseQuery(locationId)
-
-  const isNewUser = isTemporaryId(userId)
 
   const acceptedScopes = getAcceptedScopesByType({
     acceptedScopes: [isNewUser ? 'user.create' : 'user.edit'],

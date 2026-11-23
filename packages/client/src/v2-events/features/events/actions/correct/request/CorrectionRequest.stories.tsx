@@ -22,6 +22,7 @@ import {
   createPrng,
   Draft,
   EventState,
+  INITIAL_EVENT_CONFIG_VERSION_ID,
   UUID
 } from '@opencrvs/commons/client'
 import { ROUTES } from '@client/v2-events/routes'
@@ -96,6 +97,7 @@ const registerActionPair = generateActionDocuments({
 
 const eventCorrectionAgeToDob = {
   trackingId: generateUuid(prng),
+  configVersionId: INITIAL_EVENT_CONFIG_VERSION_ID,
   type: tennisClubMembershipEvent.id,
   id: generateUuid(prng),
   createdAt: new Date().toISOString(),
@@ -148,6 +150,7 @@ export const SummaryChangingDobToAge: Story = {
 
 const eventCorrectionDobToAge = {
   trackingId: generateUuid(prng),
+  configVersionId: INITIAL_EVENT_CONFIG_VERSION_ID,
   type: tennisClubMembershipEvent.id,
   id: generateUuid(prng),
   createdAt: new Date().toISOString(),
@@ -200,6 +203,7 @@ export const SummaryChangingAgeToDob: Story = {
 
 const eventCorrectionAddress = {
   trackingId: generateUuid(prng),
+  configVersionId: INITIAL_EVENT_CONFIG_VERSION_ID,
   type: ChildOnboardingEvent.id,
   id: generateUuid(prng),
   createdAt: new Date().toISOString(),

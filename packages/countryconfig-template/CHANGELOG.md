@@ -5,11 +5,17 @@
 ### Breaking changes
 
 - Edit rights now depend on the record's status. Every `record.edit` scope sets the `status` option: `['NOTIFIED']` for roles holding `record.notify`, `['NOTIFIED', 'DECLARED']` for roles holding `record.declare`. A role holding `record.notify` must not hold `record.declare` or a `record.edit` that can match a DECLARED record. A `record.edit` with no `status` matches every status, and `notifiedBy: 'user'` still matches after the notification is declared, so the notifier could edit the declaration. Role scopes are served from `/config/roles`, so no data migration is needed. [#13983](https://github.com/opencrvs/opencrvs-core/issues/13983)
+- `supportingCopy` is renamed to `dialogCopy` on the birth and death actions, and each confirmation dialog shows the `dialogCopy` of the action that it submits. The `notify` copy of the birth `DECLARE` action moves to its `NOTIFY` action, and the `DECLARE` actions keep only their `declare` copy. The `REGISTER` actions already give copy, so the register dialog of the review page now shows that copy. `opencrvs upgrade` makes these changes in your config. The `event.birth.action.declare.register.copy` and `event.death.action.declare.register.copy` rows in `src/translations/countryconfig.csv` are no longer used, and the template removes them. `opencrvs upgrade` does not change `countryconfig.csv`, so remove these rows yourself. The template also renames the translation keys of its dialog copy from `.supportingCopy` to `.dialogCopy`, for example `event.birth.action.register.dialogCopy`. Your config can keep its own keys. [#13697](https://github.com/opencrvs/opencrvs-core/issues/13697)
 
 ### New features
 
 - Birth has its own notification form (`src/events/birth/forms/notificationForm.ts`) on an explicit `NOTIFY` action.
 - Death has an explicit `NOTIFY` action, with its declaration form and review made optional through `toNotificationForm` and `toNotificationReview`.
+
+### Improvements
+
+- Moved `roles.ts` and the `/config/roles` handler from `src/data-seeding/roles/` to `src/api/roles/`. Roles are configuration served from `/config/roles`, not seed data. The endpoint is unchanged; if you have edited `roles.ts`, carry your changes over to the new location. [#13981](https://github.com/opencrvs/opencrvs-core/issues/13981)
+- Removed `label` from the roles in `src/api/roles/roles.ts`, and the `userRole.*` rows it pointed to from `src/translations/countryconfig.csv`. Nothing read them: roles are named by the `event.history.role` message in `client.csv`, keyed by role id. You can delete them from your own roles and `countryconfig.csv`; leaving them in does no harm. [#13981](https://github.com/opencrvs/opencrvs-core/issues/13981)
 
 ## 2.1.0 Release Candidate
 

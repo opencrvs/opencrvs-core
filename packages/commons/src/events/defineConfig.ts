@@ -11,13 +11,14 @@
 
 import * as z from 'zod/v4'
 import {
-  DEFAULT_EVENT_CONFIG_VERSION_ID,
+  INITIAL_EVENT_CONFIG_VERSION_ID,
   EventConfig,
   EventConfigInput,
   VersionedEventConfig,
   VersionedEventConfigInput
 } from './EventConfig'
 import { ActionType } from './ActionType'
+import { toPlainDateInTimeZone } from './PlainDate'
 import {
   validateDeclarationGivenExactlyOnce,
   validateExactlyOneDeclareAction
@@ -78,7 +79,10 @@ function validateNoVersionFieldsAtTopLevel(
     })
 }
 
-/** An event configured without `versions` is a single version, effective from the beginning of time. */
+/**
+ * An event configured without `versions` is a single version, effective from the
+ * beginning of time, with the label of the event.
+ */
 function toVersionedInput(
   config: EventConfigInput | VersionedEventConfigInput
 ): z.input<typeof VersionedEventConfig> {
@@ -92,7 +96,37 @@ function toVersionedInput(
     id,
     label,
     advancedSearch,
-    versions: [{ ...version, id: DEFAULT_EVENT_CONFIG_VERSION_ID }]
+    versions: [{ ...version, id: INITIAL_EVENT_CONFIG_VERSION_ID, label }]
+  }
+}
+
+/** The westernmost time zone, UTC−12: the last to begin each day. */
+const WESTERNMOST_TIME_ZONE = 'Etc/GMT+12'
+
+/**
+ * An event must have a version in effect today, so that it can be declared once it
+ * is configured, and core can rely on one being in effect. Versions take effect at
+ * midnight in the country's time zone (`SYSTEM_IANA_TIMEZONE`), which is not at hand
+ * here, so today is taken in UTC−12: a version in effect there is in effect in every
+ * country. East of it, a version taking effect on the country's today is rejected
+ * until UTC−12 catches up, up to 26 hours later in UTC+14. To stay clear of it,
+ * schedule an event's only version a day ahead.
+ */
+function validateVersionInEffectToday(
+  config: VersionedEventConfig,
+  ctx: Pick<z.RefinementCtx<unknown>, 'addIssue'>
+) {
+  const today = toPlainDateInTimeZone(new Date(), WESTERNMOST_TIME_ZONE)
+  const isAnyVersionInEffect = config.versions.some(
+    ({ effectiveFrom }) => effectiveFrom <= today
+  )
+
+  if (!isAnyVersionInEffect) {
+    ctx.addIssue({
+      code: 'custom',
+      message: `Event '${config.id}' has no version in effect today (${today}, UTC−12, the last time zone to begin the day). At least one version must omit \`effectiveFrom\` or take effect on or before that date.`,
+      path: ['versions']
+    })
   }
 }
 
@@ -111,11 +145,12 @@ const EventConfigDefinition = z
   })
   .transform(toVersionedInput)
   .pipe(VersionedEventConfig)
+  .superRefine(validateVersionInEffectToday)
 
 /**
  * Validates an event configuration. Accepts an event with `versions`, or, as before
  * versioning, an event without them, which is taken as a single version with id
- * `default`, effective from the beginning of time.
+ * `initial`, effective from the beginning of time.
  */
 export const defineConfig = (
   config: EventConfigInput | VersionedEventConfigInput

@@ -12,8 +12,8 @@ The service is configured with `S3_*` environment variables. It checks and does 
 | `S3_PUBLIC_ENDPOINT` | `http://localhost:3535`, required when `NODE_ENV` is `production` | URL, with the protocol, that browsers use. Presigned URLs are signed for it. Set it even when it is the same as `S3_ENDPOINT`. |
 | `S3_BUCKET`          | `ocrvs`                                                           | The bucket. The events migration reads it too, to strip it from stored paths, so give both the same value.                     |
 | `S3_BUCKET_REGION`   | `local`                                                           | Region of the bucket.                                                                                                          |
-| `S3_ACCESS_KEY`      | `minioadmin`                                                      |                                                                                                                                |
-| `S3_SECRET_KEY`      | `minioadmin`                                                      |                                                                                                                                |
+| `S3_ACCESS_KEY`      | `rustfsadmin`                                                     |                                                                                                                                |
+| `S3_SECRET_KEY`      | `rustfsadmin`                                                     |                                                                                                                                |
 
 The defaults match the store that `docker-compose.dev-deps.yml` starts for development. The Helm chart sets these settings from its `s3` values.
 
@@ -33,4 +33,4 @@ When you move to another store, or upgrade the one you have, check these yoursel
 
 - **The capabilities in the ADR.** Upload a large file, delete a prefix that holds more than 1000 files through the service, and open an attachment in the client.
 - **CORS.** Browsers fetch presigned URLs, so the store must allow cross-origin reads from the client's origin.
-- **Backups.** The backup, restore and data-cleanup jobs in `charts` are written for MinIO.
+- **Backups.** The backup, restore and data-cleanup jobs in `charts` are written for RustFS.

@@ -1,0 +1,173 @@
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at https://mozilla.org/MPL/2.0/.
+#
+# OpenCRVS is also distributed under the terms of the Civil Registration
+# & Healthcare Disclaimer located at http://opencrvs.org/license.
+#
+# Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
+
+# Carries each release line's changes into every newer line and develop, so a
+# fix made on an older line also reaches the newer ones. Conflicts are resolved
+# by Claude Code only after a reviewer approves the resolve-conflicts job, so
+# no tokens are spent on a line that shouldn't get the changes. Pushes use
+# GITHUB_TOKEN, so CI starts on these PRs only once a person pushes to them.
+# The logic lives in .github/scripts/forward-merge/, which runs locally too.
+name: Release - Forward-merge release lines
+
+on:
+  push:
+    branches:
+      - 'release/*.x'
+  workflow_dispatch:
+    inputs:
+      from:
+        type: string
+        required: true
+        description: 'Release line to start from, e.g. 1.9.x'
+      dry_run:
+        type: boolean
+        default: false
+        description: 'Only report what would be pushed and opened'
+
+# Each job asks for what it needs.
+permissions: {}
+
+jobs:
+  plan:
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: read
+      pull-requests: read
+    outputs:
+      source: ${{ steps.plan.outputs.source }}
+      reviewers: ${{ steps.plan.outputs.reviewers }}
+      hops: ${{ steps.plan.outputs.hops }}
+      conflicted: ${{ steps.plan.outputs.conflicted }}
+    steps:
+      # Full commit history for the trial merges, file contents only as needed.
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+          filter: blob:none
+          persist-credentials: false
+
+      - name: Try the merge into each newer line
+        id: plan
+        env:
+          GH_TOKEN: ${{ github.token }}
+          # the line typed into a manual run, or the line that was pushed to
+          REQUESTED_LINE: ${{ inputs.from || github.ref_name }}
+          BEFORE: ${{ github.event.before }}
+        run: bash .github/scripts/forward-merge/plan.sh
+
+  # Pushes the merges git can do alone, and opens a PR (or comments on the
+  # open one) for every newer line.
+  forward-merge:
+    needs: plan
+    if: needs.plan.outputs.hops != '[]'
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: write
+      pull-requests: write
+    strategy:
+      fail-fast: false
+      matrix:
+        hop: ${{ fromJSON(needs.plan.outputs.hops) }}
+    # one run per PR at a time, so two pushes in a row update it in order
+    concurrency:
+      group: forward-merge-${{ needs.plan.outputs.source }}-${{ matrix.hop.target }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+          filter: blob:none
+          persist-credentials: false
+
+      - name: Push and open or update the PR into ${{ matrix.hop.target }}
+        env:
+          SOURCE_BRANCH: ${{ needs.plan.outputs.source }}
+          HOP: ${{ toJSON(matrix.hop) }}
+          REVIEWERS: ${{ needs.plan.outputs.reviewers }}
+          DRY_RUN: ${{ inputs.dry_run == true }}
+          GH_TOKEN: ${{ github.token }}
+        run: bash .github/scripts/forward-merge/open-pr.sh
+
+  # Waits for a reviewer to approve, in the forward-merge-claude environment,
+  # before Claude spends tokens on a merge.
+  resolve-conflicts:
+    needs: [plan, forward-merge]
+    # runs even if the PR job of another line failed
+    if: ${{ !cancelled() && needs.plan.outputs.conflicted != '[]' && inputs.dry_run != true }}
+    runs-on: ubuntu-24.04
+    environment: forward-merge-claude
+    permissions:
+      contents: write
+      pull-requests: write
+    strategy:
+      fail-fast: false
+      matrix:
+        hop: ${{ fromJSON(needs.plan.outputs.conflicted) }}
+    # a newer run's job replaces one still waiting for approval
+    concurrency:
+      group: forward-merge-claude-${{ needs.plan.outputs.source }}-${{ matrix.hop.target }}
+    env:
+      SOURCE_BRANCH: ${{ needs.plan.outputs.source }}
+      TARGET_BRANCH: ${{ matrix.hop.target }}
+      PR_BRANCH: ${{ matrix.hop.pr_branch }}
+      MERGING: ${{ matrix.hop.conflict_merging }}
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+          filter: blob:none
+          persist-credentials: false
+
+      - name: Start the merge of ${{ matrix.hop.conflict_merging }}
+        id: merge
+        run: bash .github/scripts/forward-merge/resolve.sh start
+
+      - name: Resolve the conflicts with Claude
+        if: steps.merge.outputs.needed == 'true' && steps.merge.outputs.conflicts != '[]'
+        # if Claude fails, the next step asks for a merge by hand
+        continue-on-error: true
+        uses: anthropics/claude-code-action@4fa93a88de49bbef68b10eb15aabedf28ca0e1ed # v1.0.271
+        with:
+          claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+          # The action needs a token. Claude can't push or call GitHub with it:
+          # its tools are limited to editing files and local, read-only or
+          # staging git commands.
+          github_token: ${{ github.token }}
+          # resolve.sh start saved the target's settings; --setting-sources user
+          # skips the working tree's copy, which can hold conflict markers
+          settings: ${{ runner.temp }}/claude-settings.json
+          claude_args: >-
+            --setting-sources user
+            --max-turns 200
+            --allowedTools "Read,Edit,Write,Glob,Grep,Bash(git status:*),Bash(git diff:*),Bash(git log:*),Bash(git show:*),Bash(git ls-files:*),Bash(git add:*),Bash(git rm:*),Bash(git checkout --ours:*),Bash(git checkout --theirs:*)"
+          prompt: |
+            A git merge is in progress in this repository, OpenCRVS core: `${{ matrix.hop.conflict_merging }}` is being merged into `${{ matrix.hop.pr_branch }}`. That branch carries the release line `${{ needs.plan.outputs.source }}` into the newer line `${{ matrix.hop.target }}`, and will be merged into `${{ matrix.hop.target }}` after review.
+
+            These files have conflicts: ${{ join(fromJSON(steps.merge.outputs.conflicts), ', ') }}
+
+            Resolve every conflict. The result must keep `${{ matrix.hop.target }}`'s code and behaviour and add the changes `${{ needs.plan.outputs.source }}` made since the two lines split:
+            - Use `git log` and `git show` on both sides to understand what each change is for before choosing.
+            - When a change from `${{ needs.plan.outputs.source }}` touches code that is different on `${{ matrix.hop.target }}`, apply the same fix to `${{ matrix.hop.target }}`'s code. If it doesn't apply there at all, leave it out.
+            - package.json files: keep `${{ matrix.hop.target }}`'s "version" values; merge the other fields.
+            - CHANGELOG.md: keep `${{ matrix.hop.target }}`'s sections and headings. Add the entries `${{ needs.plan.outputs.source }}` added under `${{ matrix.hop.target }}`'s topmost section, leaving out entries for changes that were left out.
+            - A file that one side deleted: keep it deleted unless the other side's change is still needed.
+
+            Remove every conflict marker and `git add` (or `git rm`) each resolved file. Do not commit, push, or abort the merge.
+
+            Finally, write a short Markdown summary to `${{ runner.temp }}/resolution.md`: one bullet per file saying what you kept and why, and a separate list of anything a reviewer should check closely.
+
+      - name: Push the resolution
+        if: steps.merge.outputs.needed == 'true'
+        env:
+          CONFLICTS: ${{ steps.merge.outputs.conflicts }}
+          RESOLUTION_FILE: ${{ runner.temp }}/resolution.md
+        run: bash .github/scripts/forward-merge/resolve.sh finish

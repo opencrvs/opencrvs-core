@@ -16,7 +16,6 @@ import { AppRouter } from '@client/v2-events/trpc'
 import { ROUTES, routesConfig } from '@client/v2-events/routes'
 import { testDataGenerator } from '@client/tests/test-data-generators'
 import { mockOfflineData } from '@client/tests/mock-offline-data'
-import { createTemporaryId } from '@client/v2-events/utils'
 import { useUserFormState } from './useUserFormState'
 
 const tRPCMsw = createTRPCMsw<AppRouter>({
@@ -82,8 +81,7 @@ export const UserDetailsEmailDelivery: StoryObj = {
   parameters: {
     reactRouter: {
       router: routesConfig,
-      initialPath: ROUTES.V2.SETTINGS.USER.EDIT.buildPath({
-        userId: createTemporaryId(),
+      initialPath: ROUTES.V2.SETTINGS.USER.NEW.EDIT.buildPath({
         pageId: 'user.details'
       })
     }
@@ -105,8 +103,7 @@ export const UserDetailsSmsDelivery: StoryObj = {
   parameters: {
     reactRouter: {
       router: routesConfig,
-      initialPath: ROUTES.V2.SETTINGS.USER.EDIT.buildPath({
-        userId: createTemporaryId(),
+      initialPath: ROUTES.V2.SETTINGS.USER.NEW.EDIT.buildPath({
         pageId: 'user.details'
       })
     }
@@ -128,9 +125,7 @@ export const ReviewWithEmptyFields: StoryObj = {
   parameters: {
     reactRouter: {
       router: routesConfig,
-      initialPath: ROUTES.V2.SETTINGS.USER.REVIEW.buildPath({
-        userId: createTemporaryId()
-      })
+      initialPath: ROUTES.V2.SETTINGS.USER.NEW.REVIEW.buildPath({})
     }
   },
   beforeEach: () => {

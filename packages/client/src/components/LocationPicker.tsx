@@ -13,15 +13,11 @@ import {
   MapPin,
   Location as LocationIcon,
   Cross
-} from '@opencrvs/components/lib/icons'
+} from '@opencrvs/components/icons'
 import { createSearchOptions } from '@client/utils/locationUtils'
-import {
-  ISearchLocation,
-  LocationSearch
-} from '@opencrvs/components/lib/LocationSearch'
+import { ISearchLocation, LocationSearch, colors } from '@opencrvs/components'
 import { buttonMessages, constantsMessages } from '@client/i18n/messages'
-import { CircleButton } from '@opencrvs/components/lib/buttons'
-import { colors } from '@opencrvs/components/lib/colors'
+import { CircleButton } from '@opencrvs/components/legacy'
 import {
   PickerButton,
   ModalContainer as CommonModalContainer,

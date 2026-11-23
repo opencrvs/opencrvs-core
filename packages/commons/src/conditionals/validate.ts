@@ -14,10 +14,19 @@ import Ajv from 'ajv/dist/2019'
 import addFormats from 'ajv-formats'
 import * as z from 'zod/v4'
 import { $ZodIssue } from 'zod/v4/core'
-import { formatISO, isAfter, isBefore } from 'date-fns'
+import { formatISO, isAfter, isBefore, parseISO } from 'date-fns'
 
-import { ConditionalParameters, JSONSchema } from './conditionals'
-import { ActionUpdate, EventState } from '../events/ActionDocument'
+import {
+  ActionDateReference,
+  ConditionalParameters,
+  isActionDateReference,
+  JSONSchema
+} from './conditionals'
+import {
+  ActionStatus,
+  ActionUpdate,
+  EventState
+} from '../events/ActionDocument'
 import { ConditionalType, FieldConditional } from '../events/Conditional'
 import { FieldConfig } from '../events/FieldConfig'
 import {
@@ -31,7 +40,11 @@ import {
   AgeValue
 } from '../events/FieldValue'
 import { TranslationConfig } from '../events/TranslationConfig'
-import { EncodedScope, ITokenPayload, TokenUserType } from '../authentication'
+import {
+  EncodedScope,
+  ITokenPayload,
+  TokenUserType
+} from '../users/authentication'
 import { UUID } from '../uuid'
 import {
   ageToDate,
@@ -100,6 +113,38 @@ function resolveDataPath(
   }
 
   return current
+}
+
+function resolveActionDate(
+  event: EventDocument | undefined,
+  { match, occurrence }: ActionDateReference['$action']
+): string | undefined {
+  const actions = event?.actions ?? []
+  const dates = actions
+    .filter(({ status }) => status === ActionStatus.Accepted)
+    .filter((action) =>
+      match.some(
+        ({ type, customActionType }) =>
+          action.type === type &&
+          (!customActionType ||
+            ('customActionType' in action &&
+              action.customActionType === customActionType))
+      )
+    )
+    // An async accept is a second row with the time of the accept. Use the
+    // time of the original request, as getActionUpdateMetadata does.
+    .map(
+      (action) =>
+        (action.originalActionId &&
+          actions.find(({ id }) => id === action.originalActionId)
+            ?.createdAt) ||
+        action.createdAt
+    )
+    .sort()
+
+  const date = occurrence === 'first' ? dates[0] : dates[dates.length - 1]
+
+  return date && formatISO(parseISO(date), { representation: 'date' })
 }
 
 /** Returns today's date as a {@link PlainDate} (YYYY-MM-DD), device-local. */
@@ -217,6 +262,10 @@ export function runClientFunction(
  *       }
  *    }
  * }
+ *
+ * The reference date can also be the date of an action on the event, resolved
+ * against $event. Until such an action exists, it defaults to $now:
+ *   "referenceDate": { "$action": { "match": [{ "type": "DECLARE" }], "occurrence": "first" } }
  */
 ajv.addKeyword({
   keyword: 'daysFromDate',
@@ -228,7 +277,7 @@ ajv.addKeyword({
     schema: {
       days: number
       clause: 'after' | 'before'
-      referenceDate?: string | { $data: string }
+      referenceDate?: string | { $data: string } | ActionDateReference
     },
     data: string,
     _: unknown,
@@ -257,6 +306,11 @@ ajv.addKeyword({
     }
 
     let referenceDate = schema.referenceDate
+
+    if (isActionDateReference(referenceDate)) {
+      const rootData = dataContext.rootData as { $event?: EventDocument }
+      referenceDate = resolveActionDate(rootData.$event, referenceDate.$action)
+    }
 
     if (
       referenceDate &&

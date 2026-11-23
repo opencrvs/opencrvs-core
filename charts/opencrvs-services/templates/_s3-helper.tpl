@@ -12,7 +12,7 @@ S3_ENDPOINT: {{ include "s3-endpoint" . }}
 URL that browsers use to reach the S3 object store. Presigned document URLs are
 signed for it.
 
-`s3.public_endpoint` wins. Without it, the address is the `minio` subdomain of
+`s3.public_endpoint` wins. Without it, the address is the `rustfs` subdomain of
 `hostname`, where the dependencies chart exposes its object store, so it follows
 `subdomain_separator` and `ingress.ssl_enabled` the same way that chart does.
 
@@ -20,7 +20,7 @@ Usage:
 S3_PUBLIC_ENDPOINT: {{ include "s3-public-endpoint" . }}
 */}}
 {{- define "s3-public-endpoint" -}}
-{{- .Values.s3.public_endpoint | default (include "render-external-url" (dict "service_name" "minio" "Values" .Values)) -}}
+{{- .Values.s3.public_endpoint | default (include "render-external-url" (dict "service_name" "rustfs" "Values" .Values)) -}}
 {{- end -}}
 
 {{/*
