@@ -85,7 +85,7 @@ import { declareActionProcedures } from './actions/declare'
 import { getDefaultActionProcedures } from './actions'
 import { customActionProcedures } from './actions/custom'
 import { createAndNotifyProcedure } from './actions/createAndNotify'
-import { fileRouter, filesRouter } from './files'
+import { filesRouter } from './files'
 
 export const eventRouter = router({
   /*
@@ -352,7 +352,6 @@ export const eventRouter = router({
         return currentDraft
       })
   }),
-  file: fileRouter,
   files: filesRouter,
   actions: router({
     notify: router(getDefaultActionProcedures(ActionType.NOTIFY)),

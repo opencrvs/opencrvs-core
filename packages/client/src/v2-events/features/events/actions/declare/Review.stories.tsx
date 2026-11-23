@@ -366,11 +366,6 @@ export const ReviewShowsFilesFromDraft: Story = {
           })
         ],
         files: [
-          tRPCMsw.event.file.getPresignedUrl.query(({ filePath }) => {
-            return {
-              presignedURL: `http://localhost:3535/ocrvs/${filePath}`
-            }
-          }),
           http.get('/:id', () => {
             return new HttpResponse(TestImage.Fish, {
               headers: {

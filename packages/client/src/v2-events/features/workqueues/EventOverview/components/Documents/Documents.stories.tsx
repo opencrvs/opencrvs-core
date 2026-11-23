@@ -460,9 +460,6 @@ function handlersFor(event: EventDocument) {
       // Resolve the on-demand download's user + file precaching (see
       // PRESIGNED_FILE_URL) so it never hangs waiting on the network.
       tRPCMsw.user.list.query(() => [refData.user.localRegistrar().summary]),
-      tRPCMsw.event.file.getPresignedUrl.query(() => ({
-        presignedURL: PRESIGNED_FILE_URL
-      })),
       http.get(PRESIGNED_FILE_URL, () =>
         HttpResponse.arrayBuffer(ONE_PX_PNG.buffer, {
           headers: { 'Content-Type': 'image/png' }

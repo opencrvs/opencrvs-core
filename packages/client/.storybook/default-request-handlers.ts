@@ -355,11 +355,6 @@ export const handlers = {
     })
   ],
   files: [
-    tRPCMsw.event.file.getPresignedUrl.query(() => {
-      return {
-        presignedURL: 'http://localhost:3535/ocrvs/tree.svg'
-      }
-    }),
     http.post('/api/upload', async (req) => {
       const formData = await req.request.formData()
 
