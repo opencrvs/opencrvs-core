@@ -22,7 +22,6 @@ import {
   getCurrentEventState,
   getDeclaration,
   getDeclarationFields,
-  isFieldDisplayedOnReview,
   ValidatorContext
 } from '@opencrvs/commons/client'
 import { Table } from '@opencrvs/components'
@@ -39,6 +38,7 @@ import {
   getChangedDeclarationDiff,
   hasFieldChanged
 } from '@client/v2-events/features/events/useEvents/procedures/actions/declarationDiff'
+import { isFieldDisplayedOnReview } from '@client/v2-events/conditionals'
 
 const TableHeader = styled.th`
   text-transform: uppercase;

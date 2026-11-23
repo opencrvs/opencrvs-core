@@ -22,14 +22,11 @@ import {
   getActionConfig,
   getAcceptedActions,
   getActionFormFields,
-  runFieldValidations,
   flattenFormState,
-  omitHiddenFields,
   FieldConfig,
   FieldUpdateValue,
   EventState,
   EventConfig,
-  isActionEnabled,
   AttachmentPath,
   eventAttachmentPath
 } from '@opencrvs/commons/client'
@@ -49,6 +46,11 @@ import {
   hasDeclarationFieldChanged,
   hasFieldChanged
 } from '@client/v2-events/features/events/useEvents/procedures/actions/declarationDiff'
+import {
+  isActionEnabled,
+  omitHiddenFields,
+  runFieldValidations
+} from '@client/v2-events/conditionals'
 import { useActionAnnotation } from '../../useActionAnnotation'
 import { useEventFormData } from '../../useEventFormData'
 import { TranslationTextWithFormatModifier } from '../../components/TranslationTextWithFormatModifier'

@@ -182,7 +182,7 @@ export function buildCertificateTemplateConditionalParameters(
  * Secured: whether a field is secured and removed from event.search payload.
  * Accepts EventIndex over EventDocument since it is never available to it.
  */
-export type SecuredConditionalContext = EventConditionalContext
+export type SecuredConditionalContext = EventIndexConditionalContext
 
 export type SecuredConditionalParameters = CommonConditionalParameters
 

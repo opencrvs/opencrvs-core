@@ -17,8 +17,7 @@ import {
   dangerouslyGetCurrentEventStateWithDrafts,
   EventIndex,
   applyDraftToEventIndex,
-  deepDropNulls,
-  dropSecuredDeclarationFields
+  deepDropNulls
 } from '@opencrvs/commons/client'
 import { Content, ContentSize } from '@opencrvs/components'
 import { EventIcon } from '@client/v2-events/components/EventIcon'
@@ -29,6 +28,7 @@ import { withSuspense } from '@client/v2-events/components/withSuspense'
 import { flattenEventIndex, getUsersFullName } from '@client/v2-events/utils'
 import { useEventTitle } from '@client/v2-events/features/events/useEvents/useEventTitle'
 import { useValidatorContext } from '@client/v2-events/hooks/useValidatorContext'
+import { dropSecuredDeclarationFields } from '@client/v2-events/conditionals'
 import { useDrafts } from '../../drafts/useDrafts'
 import { DuplicateWarning } from '../../events/actions/dedup/DuplicateWarning'
 import { DuplicateReviewUnavailable } from '../../events/actions/dedup/DuplicateReviewUnavailable'

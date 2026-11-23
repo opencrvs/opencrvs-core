@@ -27,13 +27,10 @@ import {
   buildClientFunctionContext,
   runClientFunction,
   ClientFunctionContext,
-  isFieldEnabled,
   ValidatorContext,
-  isFieldVisible,
   findAllFields,
   flattenFieldReference,
   getDeclaration,
-  omitHiddenPaginatedFields,
   HiddenFieldTypes,
   AttachmentPath
 } from '@opencrvs/commons/client'
@@ -44,6 +41,11 @@ import {
 import { useOnlineStatus } from '@client/utils'
 import { useDefaultValue } from '@client/v2-events/hooks/useDefaultValue'
 import { useEventFormData } from '@client/v2-events/features/events/useEventFormData'
+import {
+  isFieldEnabled,
+  isFieldVisible,
+  omitHiddenPaginatedFields
+} from '@client/v2-events/conditionals'
 import {
   makeFormikFieldIdsOpenCRVSCompatible,
   resolveSyncedFieldValue

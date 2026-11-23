@@ -22,8 +22,6 @@ import {
   generateTransactionId,
   getActionConfig,
   getCurrentEventState,
-  isActionEnabled,
-  isActionVisible,
   RequestedCorrectionAction,
   ValidatorContext
 } from '@opencrvs/commons/client'
@@ -45,6 +43,10 @@ import { useActionAnnotation } from '@client/v2-events/features/events/useAction
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
 import { CorrectionDetails } from '@client/v2-events/features/events/actions/correct/request/Summary/CorrectionDetails'
 import { useUserAllowedActions } from '@client/v2-events/features/workqueues/Actions/useUserAllowedActions'
+import {
+  isActionEnabled,
+  isActionVisible
+} from '@client/v2-events/conditionals'
 import { useEventConfigurationForRecord } from '../../../useEventConfiguration'
 
 const reviewCorrectionMessages = defineMessages({

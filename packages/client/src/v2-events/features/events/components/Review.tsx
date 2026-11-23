@@ -33,11 +33,6 @@ import {
   FieldUpdateValue,
   FormConfig,
   getDeclaration,
-  isFieldDisplayedOnReview,
-  isPageVisible,
-  omitHiddenFields,
-  omitHiddenPaginatedFields,
-  runFieldValidations,
   FieldTypesToHideInReview,
   ValidatorContext,
   flattenFormState,
@@ -53,6 +48,13 @@ import { withSuspense } from '@client/v2-events/components/withSuspense'
 import { buttonMessages } from '@client/i18n/messages'
 import { useValidatorContext } from '@client/v2-events/hooks/useValidatorContext'
 import { useDialogFormState } from '@client/v2-events/hooks/useDialogFormState'
+import {
+  isFieldDisplayedOnReview,
+  isPageVisible,
+  omitHiddenFields,
+  omitHiddenPaginatedFields,
+  runFieldValidations
+} from '@client/v2-events/conditionals'
 import { Output } from './Output'
 import { DocumentViewer } from './DocumentViewer'
 import { TranslationTextWithFormatModifier } from './TranslationTextWithFormatModifier'

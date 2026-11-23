@@ -11,13 +11,13 @@
 
 import formatISO from 'date-fns/formatISO'
 import {
-  areCertificateConditionsMet,
   ConditionalParameters,
   EventDocument,
   EventState,
   FieldConfig,
   FieldType,
-  getEventWithCompleteAcceptedActions
+  getEventWithCompleteAcceptedActions,
+  validate
 } from '@opencrvs/commons/client'
 import { useAppConfig } from '@client/v2-events/hooks/useAppConfig'
 import { useOnlineStatus } from '../../../utils'
@@ -44,9 +44,9 @@ export const useCertificateTemplateSelectorFieldConfig = (
       template.event === eventType &&
       template.isV2Template &&
       (!template.conditionals ||
-        areCertificateConditionsMet(
-          template.conditionals,
-          declarationWithEventMetadata
+        // @TODO: use areCertificateConditionsMet when completing https://github.com/opencrvs/opencrvs-core/issues/14485
+        template.conditionals.every((condition) =>
+          validate(condition.conditional, declarationWithEventMetadata)
         ))
   )
 

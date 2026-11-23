@@ -17,12 +17,12 @@ import {
   buildClientFunctionContext,
   flattenFieldReference,
   isCodeToEvaluate,
-  isFieldVisible,
   runClientFunction,
   FieldType,
   ValidatorContext
 } from '@opencrvs/commons/client'
 import { resolveSyncedFieldValue } from '@client/v2-events/components/forms/FormFieldGenerator/utils'
+import { isFieldVisible } from '@client/v2-events/conditionals'
 import { useDefaultValue } from './useDefaultValue'
 
 export function computeInitialValues(

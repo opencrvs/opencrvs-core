@@ -10,7 +10,6 @@
  */
 import { useSelector } from 'react-redux'
 import {
-  isActionAvailable,
   ActionType,
   TokenUserType,
   getCurrentEventState,
@@ -22,6 +21,7 @@ import { getUserDetails } from '@client/profile/profileSelectors'
 import { useValidatorContext } from '@client/v2-events/hooks/useValidatorContext'
 import { useEventFormData } from '@client/v2-events/features/events/useEventFormData'
 import { useActionAnnotation } from '@client/v2-events/features/events/useActionAnnotation'
+import { isActionAvailable } from '@client/v2-events/conditionals'
 import { useEventConfigurationForRecord } from '../useEventConfiguration'
 
 /**
