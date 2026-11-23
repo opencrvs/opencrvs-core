@@ -13,6 +13,7 @@
 // workspace packages (@opencrvs/commons, @opencrvs/events) are inlined from
 // their source; every other package stays an import, so it has to be a
 // dependency a consumer installs with the toolkit.
+import { isBuiltin } from 'node:module'
 import path from 'node:path'
 import { defineConfig } from 'rolldown'
 import { dts } from 'rolldown-plugin-dts'
@@ -26,7 +27,7 @@ const packageName = (id) =>
     .slice(0, id.startsWith('@') ? 2 : 1)
     .join('/')
 
-/** Fails the build when an emitted declaration imports a package the toolkit does not depend on. */
+/** Fails the build when an emitted declaration imports a package that is not a dependency or a peer dependency of the toolkit. */
 const dependenciesOnly = {
   name: 'dependencies-only',
   generateBundle(_, bundle) {
@@ -37,9 +38,15 @@ const dependenciesOnly = {
         /(?:from |import\()"([^".][^"]*)"/g
       )
       for (const [, id] of specifiers) {
-        if (packageName(id) in pkg.dependencies) continue
+        const name = packageName(id)
+        if (
+          isBuiltin(id) ||
+          name in pkg.dependencies ||
+          name in pkg.peerDependencies
+        )
+          continue
         this.error(
-          `${chunk.fileName} imports '${id}', which is not in the toolkit's dependencies`
+          `${chunk.fileName} imports '${id}', which is not in the toolkit's dependencies or peer dependencies`
         )
       }
     }

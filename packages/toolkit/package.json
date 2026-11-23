@@ -60,6 +60,14 @@
     "zod": "^4.6.5",
     "zod-openapi": "^5.4.6"
   },
+  "peerDependencies": {
+    "@hapi/hapi": "^20.0.1 || ^21.0.0"
+  },
+  "peerDependenciesMeta": {
+    "@hapi/hapi": {
+      "optional": true
+    }
+  },
   "devDependencies": {
     "@opencrvs/commons": "workspace:*",
     "@opencrvs/events": "workspace:*",
