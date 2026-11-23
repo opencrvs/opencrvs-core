@@ -53,7 +53,7 @@ async function getNotifyOnlySystemClientToken() {
     `Bearer ${systemAdminToken}`
   )
   const integration = await integrationClient.integrations.create.mutate({
-    name: `Notify-only client ${uuidv4()}`,
+    name: `Test Notifier ${faker.string.alphanumeric(6)}`,
     scopes: [
       'type=record.create',
       'type=record.search',
