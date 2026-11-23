@@ -36,6 +36,14 @@ Write everything a person reads (chat replies, PRs, issues, commits, code commen
 
 `docs/coding-standards/README.md`: read it before you write or review code. It names the area page for each type of change: services, countries, database, tests, client, infrastructure.
 
+## Pull requests
+After you open a PR or push to a PR branch, do not stop.
+1. Run `gh pr checks --watch` and wait until all checks complete.
+2. If a check fails, read the log (`gh run view --log-failed`), fix the root cause and push.
+3. Read new review comments (`gh api repos/{owner}/{repo}/pulls/<n>/comments`) and fix the clear issues.
+4. Repeat until all checks pass. After 10 rounds, stop and report the status.
+Do not change, skip or weaken tests to make them pass.
+
 ## Agent skills
 
 ### Domain docs
