@@ -1,0 +1,8 @@
+// The published toolkit declarations. It lives here and not in packages/toolkit
+// because rolldown-plugin-dts emits with rootDir set to this file's directory,
+// which has to contain the commons and events sources the declarations follow.
+{
+  "extends": "./toolkit/tsconfig.json",
+  "include": ["toolkit/src/**/*.ts"],
+  "exclude": ["**/*.test.ts"]
+}

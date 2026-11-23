@@ -76,7 +76,7 @@ export function useUserEditConfig(
     } satisfies UserContext,
     acceptedScopes,
     userLocation: {
-      primaryOfficeId: locationId,
+      primaryOfficeId: locationId as UUID,
       administrativeHierarchy: locationHierarchy ?? []
     }
   })

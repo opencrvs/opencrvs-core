@@ -60,6 +60,7 @@ import {
   Type
 } from 'ts-morph'
 import path from 'path'
+import { getToolkitRoot } from '../toolkit-package'
 
 const EVENT_CONFIG_TYPE_NAME = 'EventConfig'
 const VERSIONED_EVENT_CONFIG_TYPE_NAME = 'VersionedEventConfig'
@@ -424,10 +425,10 @@ async function main() {
   const project = new Project({
     tsConfigFilePath,
     skipAddingFilesFromTsConfig: false,
-    // The events module of this toolkit, next to the migrations in `dist`
+    // The events module of this toolkit
     compilerOptions: withToolkitEventsAt(
       getCompilerOptionsFromTsConfig(tsConfigFilePath).options,
-      path.resolve(__dirname, '../events')
+      path.join(getToolkitRoot(), 'dist', 'events')
     )
   })
 

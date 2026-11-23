@@ -9,8 +9,6 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 /* eslint-disable no-console */
-import fs from 'fs'
-import path from 'path'
 import { runUpgrade } from './migrations'
 import {
   checkUpgradePath,
@@ -24,6 +22,7 @@ import {
   runEnvironmentUsers
 } from './environment'
 import { runVerifyEndpoints } from './verify/endpoints'
+import { getToolkitVersion } from './toolkit-package'
 
 const args = process.argv.slice(2)
 
@@ -162,17 +161,6 @@ async function runEnvironmentCommand(
   }
 }
 
-/**
- * Returns the toolkit's own version, e.g. `2.2.0`. Both `src/cli.ts` and the
- * bundled `dist/cli.js` sit one level below the toolkit's `package.json`.
- */
-function readToolkitVersion(): string {
-  const packageJson = JSON.parse(
-    fs.readFileSync(path.join(__dirname, '..', 'package.json'), 'utf-8')
-  )
-  return packageJson.version
-}
-
 async function handleUpgrade() {
   const upgradeArgs = args.slice(1)
 
@@ -188,7 +176,7 @@ async function handleUpgrade() {
     process.exit(1)
   }
 
-  const toolkitVersion = readToolkitVersion()
+  const toolkitVersion = getToolkitVersion()
   const upgradePath = checkUpgradePath(
     findCountryConfigToolkitVersion(process.cwd()),
     toolkitVersion

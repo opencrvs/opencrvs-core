@@ -22,8 +22,8 @@ import {
   Location,
   UserWithResolvedHierarchy
 } from './locations'
-import { RecordScopeV2, UserScopeV2 } from 'src/users/scopes'
-import { UUID } from 'src/uuid'
+import { RecordScopeV2, UserScopeV2 } from '../users/scopes'
+import { UUID } from '../uuid'
 
 describe('canAccessEventWithScope()', () => {
   const rng = createPrng(83429)
