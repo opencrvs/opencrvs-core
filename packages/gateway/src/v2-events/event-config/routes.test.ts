@@ -53,10 +53,12 @@ describe('events proxy', () => {
     'internal/user.get',
     'internal/',
     'internal',
+    'initialisation/user.create',
+    'initialisation',
     'event.get/../internal/user.get',
     './internal/locations.get'
   ])(
-    'does not forward the internal router of the events service: %s',
+    'does not forward the routers that only other services call: %s',
     (path) => {
       const { h, error } = callHandler(path)
       expect(error).toMatchObject({ output: { statusCode: 404 } })
@@ -64,7 +66,7 @@ describe('events proxy', () => {
     }
   )
 
-  it.each(['internalNotes.get', 'events/search'])(
+  it.each(['internalNotes.get', 'initialisationStatus', 'events/search'])(
     'forwards a path that only starts with the same letters: %s',
     (path) => {
       expect(proxy(path).pathname).toBe(`/${path}`)

@@ -14,16 +14,15 @@ import { ServerRoute } from '@hapi/hapi'
 import { logger } from '@opencrvs/commons'
 
 /**
- * The events service serves `internalRouter` under this path, see
- * `packages/events/src/server.ts`. Only other services call it, directly on
- * the events service, so the gateway does not forward it.
+ * The events service serves `internalRouter` and `initialisationRouter` under
+ * these paths, see `packages/events/src/server.ts`. Only other services call
+ * them, directly on the events service, so the gateway does not forward them.
  */
-const INTERNAL_ROUTER_PATH = '/internal'
+const SERVICE_ROUTER_PATHS = ['/internal', '/initialisation']
 
-function isInternalRouterPath(pathname: string) {
-  return (
-    pathname === INTERNAL_ROUTER_PATH ||
-    pathname.startsWith(`${INTERNAL_ROUTER_PATH}/`)
+function isServiceRouterPath(pathname: string) {
+  return SERVICE_ROUTER_PATHS.some(
+    (path) => pathname === path || pathname.startsWith(`${path}/`)
   )
 }
 
@@ -39,7 +38,7 @@ export const trpcProxy = [
       uri.pathname = req.params.path
 
       // The URL resolves `..` and `.`, so check the path after it does
-      if (isInternalRouterPath(uri.pathname)) {
+      if (isServiceRouterPath(uri.pathname)) {
         throw notFound()
       }
 

@@ -13,6 +13,7 @@ import { bool, cleanEnv, str, url } from 'envalid'
 export const env = cleanEnv(process.env, {
   COUNTRY_CONFIG_HOST: url({ devDefault: 'http://localhost:3040' }),
   GATEWAY_HOST: url({ devDefault: 'http://localhost:7070' }),
+  EVENTS_URL: url({ devDefault: 'http://localhost:5555/' }),
   SUPER_USER_PASSWORD: str({ devDefault: 'password' }),
   ACTIVATE_USERS: bool({ devDefault: true })
 })
