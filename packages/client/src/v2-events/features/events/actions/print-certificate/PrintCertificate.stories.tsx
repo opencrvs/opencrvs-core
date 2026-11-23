@@ -84,7 +84,6 @@ const registeredEvent = generateEventDocument({
   actions: [
     { type: ActionType.CREATE },
     { type: ActionType.DECLARE },
-    { type: ActionType.VALIDATE },
     { type: ActionType.REGISTER },
     { type: ActionType.PRINT_CERTIFICATE }
   ]

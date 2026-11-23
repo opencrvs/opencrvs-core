@@ -54,7 +54,12 @@ function createEventCreationMutation<P extends DecorateMutationProcedure<any>>(
   return async (params: inferInput<P>) =>
     defaultMutationFn({
       ...params,
-      declaration: params.declaration
+      declaration: params.declaration,
+      // createdAtLocation is set on the server side based on the user's primary office,
+      // so we can set it to null here, but we need to include it in the param to optimistically
+      // update the createdAtLocation in onMutate function — some scope actions depend on a valid
+      // createdAtLocation, so it must be present in the optimistic event payload
+      createdAtLocation: null
     })
 }
 
@@ -82,7 +87,8 @@ setMutationDefaults(trpcOptionsProxy.event.create, {
           createdBy: loggedInUserId,
           createdByUserType: 'user',
           createdByRole: loggedInUserId,
-          createdAtLocation: '00000000-0000-0000-0000-000000000000' as UUID,
+          createdAtLocation: (newEvent.createdAtLocation ??
+            '00000000-0000-0000-0000-000000000000') as UUID,
           declaration: {},
           status: ActionStatus.Accepted,
           transactionId: getUUID()
@@ -95,7 +101,8 @@ setMutationDefaults(trpcOptionsProxy.event.create, {
           assignedTo: loggedInUserId,
           createdByUserType: 'user',
           createdByRole: loggedInUserRole,
-          createdAtLocation: '00000000-0000-0000-0000-000000000000' as UUID,
+          createdAtLocation: (newEvent.createdAtLocation ??
+            '00000000-0000-0000-0000-000000000000') as UUID,
           declaration: {},
           status: ActionStatus.Accepted,
           transactionId: getUUID()

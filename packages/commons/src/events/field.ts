@@ -16,6 +16,7 @@ import {
 import { createFieldConfig } from '../field-config/field-configuration'
 import { FieldConditional } from './Conditional'
 import { TranslationConfig } from './TranslationConfig'
+import { JurisdictionReference } from '../users/userReferences'
 import {
   ComputedDefaultValue,
   SelectOption,
@@ -65,6 +66,7 @@ export function field(
     conditionals?: FieldConditional[]
     validations?: ValidationConfig[]
     searchCriteriaLabelPrefix?: TranslationConfig
+    allowedLocations?: JurisdictionReference
   } = {}
 ) {
   return {

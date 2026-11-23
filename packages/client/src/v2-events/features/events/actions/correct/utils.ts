@@ -16,7 +16,6 @@ import {
   isMetaAction,
   EventDocument,
   ActionType,
-  FieldValue,
   ValidatorContext,
   deepMerge,
   omitHiddenFields,
@@ -26,19 +25,18 @@ import {
   isFieldDisplayedOnReview,
   getCurrentEventState,
   ActionDocument,
-  getAcceptedActions
+  getAcceptedActions,
+  FieldUpdateValue,
+  deepDropNulls
 } from '@opencrvs/commons/client'
-import {
-  EventHistoryActionDocument,
-  EventHistoryDocument
-} from './useActionForHistory'
+import { EventHistoryActionDocument } from './useActionForHistory'
 
 /**
  * Function we use for checking whether a field value has changed.
  * For objects we need to ignore undefined values since the form might create them.
  * @returns whether the two field values are equal when ignoring undefined values
  */
-export function isEqualFieldValue<T extends FieldValue>(a: T, b: T) {
+export function isEqualFieldValue<T extends FieldUpdateValue>(a: T, b: T) {
   if (typeof a === 'object' && typeof b === 'object') {
     return _.isEqual(_.omitBy(a, _.isUndefined), _.omitBy(b, _.isUndefined))
   }
@@ -60,7 +58,9 @@ export function hasFieldChanged(
   // Ensure that if previous value is 'undefined' and current value is 'null'
   // it doesn't get detected as a value change
   const bothNil = _.isNil(prevValue) && _.isNil(currValue)
-  const valueHasChanged = !isEqualFieldValue(prevValue, currValue) && !bothNil
+  const valueHasChanged =
+    !isEqualFieldValue(deepDropNulls(prevValue), deepDropNulls(currValue)) &&
+    !bothNil
 
   return isVisible && valueHasChanged
 }
@@ -92,7 +92,7 @@ export function isLastActionCorrectionRequest(event: EventDocument) {
   return lastWriteAction.type === ActionType.REQUEST_CORRECTION
 }
 
-function aggregateAnnotations(actions: EventHistoryActionDocument[]) {
+export function aggregateAnnotations(actions: EventHistoryActionDocument[]) {
   return actions.reduce((ann, sortedAction) => {
     return deepMerge(ann, sortedAction.annotation ?? {})
   }, {} as EventState)

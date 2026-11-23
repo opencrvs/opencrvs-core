@@ -17,28 +17,26 @@ import {
   getCurrentEventState
 } from '@opencrvs/commons/events'
 import * as middleware from '@events/router/middleware'
-import { requiresAnyOfScopes } from '@events/router/middleware'
-import { systemProcedure } from '@events/router/trpc'
-import { getEventById, processAction } from '@events/service/events/events'
+import { userOnlyProcedure } from '@events/router/trpc'
+import { processAction } from '@events/service/events/events'
 import {
   defaultRequestHandler,
   getDefaultActionProcedures
 } from '@events/router/event/actions'
 import { getInMemoryEventConfigurations } from '@events/service/config/config'
 import { searchForDuplicates } from '@events/service/deduplication/deduplication'
+import { writeAuditLog } from '@events/storage/postgres/events/auditLog'
 
 export function declareActionProcedures() {
-  const requireScopesMiddleware = requiresAnyOfScopes(
-    [],
+  const requireScopesMiddleware = middleware.canAccessEventWithScopes(
     ACTION_SCOPE_MAP[ActionType.DECLARE]
   )
 
   return {
     ...getDefaultActionProcedures(ActionType.DECLARE),
-    request: systemProcedure
+    request: userOnlyProcedure
       .use(requireScopesMiddleware)
       .input(DeclareActionInput)
-      .use(middleware.eventTypeAuthorization)
       .use(middleware.requireAssignment)
       .use(middleware.validateAction)
       .output(EventDocument)
@@ -59,7 +57,7 @@ export function declareActionProcedures() {
         }
 
         const configs = await getInMemoryEventConfigurations(token)
-        const event = await getEventById(input.eventId)
+        const event = ctx.event
 
         const config = configs.find((c) => c.id === event.type)
 
@@ -77,6 +75,19 @@ export function declareActionProcedures() {
           config
         )
 
+        await writeAuditLog({
+          clientId: user.id,
+          clientType: user.type,
+          operation: 'event.actions.declare.request',
+          requestData: {
+            eventId: input.eventId,
+            actionType: ActionType.DECLARE,
+            eventType: declaredEvent.type,
+            trackingId: declaredEvent.trackingId,
+            transactionId: input.transactionId
+          }
+        })
+
         const dedupConfig = config.actions.find(
           (action) => action.type === input.type
         )?.deduplication
@@ -84,6 +95,7 @@ export function declareActionProcedures() {
         if (!dedupConfig) {
           return declaredEvent
         }
+
         const declaredEventState = getCurrentEventState(declaredEvent, config)
         const duplicates = await searchForDuplicates(
           declaredEventState,
@@ -91,11 +103,10 @@ export function declareActionProcedures() {
           config
         )
 
-        const updatedEvent = await getEventById(input.eventId)
-
         if (duplicates.length > 0) {
           return processAction(
             {
+              waitFor: input.waitFor,
               type: ActionType.DUPLICATE_DETECTED,
               transactionId: input.transactionId,
               eventId: input.eventId,
@@ -109,7 +120,7 @@ export function declareActionProcedures() {
               }
             },
             {
-              event: updatedEvent,
+              eventId: declaredEvent.id,
               user,
               token,
               status: ActionStatus.Accepted,
@@ -117,6 +128,7 @@ export function declareActionProcedures() {
             }
           )
         }
+
         return declaredEvent
       })
   }

@@ -89,6 +89,7 @@ export function Pages() {
       {modal}
       <PagesComponent
         hideBackToReview
+        attachmentPath={`events/${eventId}/`}
         eventConfig={configuration}
         formData={annotation}
         formPages={formPages.map((page) => {
@@ -117,7 +118,7 @@ export function Pages() {
                 eventId,
                 pageId: nextPageId
               },
-              { workqueue: searchParams.workqueue }
+              { backTo: searchParams.backTo }
             )
           )
         }}
@@ -127,7 +128,7 @@ export function Pages() {
               { eventId },
               {
                 templateId: String(annotation[CERT_TEMPLATE_ID]),
-                workqueue: searchParams.workqueue
+                backTo: searchParams.backTo
               }
             )
           )

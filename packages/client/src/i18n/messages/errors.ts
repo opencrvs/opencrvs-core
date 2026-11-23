@@ -26,7 +26,6 @@ interface IErrorMessages
   registrationQueryError: MessageDescriptor
   unauthorized: MessageDescriptor
   userQueryError: MessageDescriptor
-  userQueryRateLimitError: MessageDescriptor
   loadingDeclarations: MessageDescriptor
   noDeclaration: MessageDescriptor
   waitingForConnection: MessageDescriptor
@@ -109,12 +108,6 @@ const messagesToDefine: IErrorMessages = {
     defaultMessage: 'An error occurred while loading system users',
     description: 'The text when error ocurred loading system users',
     id: 'system.user.queryError'
-  },
-  userQueryRateLimitError: {
-    defaultMessage: 'Too many requests. Please wait before retrying.',
-    description:
-      'Error text shown when the user list query is rate limited (HTTP 429)',
-    id: 'system.user.queryRateLimitError'
   },
   loadingDeclarations: {
     defaultMessage: 'Loading declarations...',

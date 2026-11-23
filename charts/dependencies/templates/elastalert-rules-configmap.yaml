@@ -1,0 +1,16 @@
+{{- if .Values.monitoring.enabled }}
+apiVersion: v1
+data:
+{{- range $path, $file := .Files.Glob "files/elastalert/rules/*" }}
+    {{ base $path }}: |
+{{ toString $file | indent 8 }}
+{{- end }}
+kind: ConfigMap
+metadata:
+  labels:
+    app: elasticsearch
+  annotations:
+    "helm.sh/hook": pre-install,pre-upgrade
+    "helm.sh/hook-weight": "0"
+  name: elastalert-rules
+{{- end }}

@@ -11,7 +11,7 @@
 
 import { joinUrl } from '../url'
 import { NameFieldValue } from '../events'
-import { z } from 'zod'
+import * as z from 'zod/v4'
 
 export const TriggerEvent = {
   USER_CREATED: 'user-created',
@@ -19,6 +19,7 @@ export const TriggerEvent = {
   USERNAME_REMINDER: 'username-reminder',
   RESET_PASSWORD: 'reset-password',
   RESET_PASSWORD_BY_ADMIN: 'reset-password-by-admin',
+  RESEND_INVITE: 'resend-invite',
   TWO_FA: '2fa',
   ALL_USER_NOTIFICATION: 'all-user-notification',
   CHANGE_PHONE_NUMBER: 'change-phone-number',
@@ -65,6 +66,10 @@ export const TriggerPayload = {
       role: z.string()
     })
   }),
+  [TriggerEvent.RESEND_INVITE]: BasePayload.extend({
+    username: z.string(),
+    temporaryPassword: z.string()
+  }),
   [TriggerEvent.TWO_FA]: BasePayload.extend({
     code: z.string()
   }),
@@ -84,6 +89,12 @@ export type TriggerPayload = {
   [K in TriggerEvent]: z.infer<(typeof TriggerPayload)[K]>
 }
 
+/*
+ * Every event carries an Authorization header. Interactive flows forward the
+ * acting user's token; the background announcement worker fetches an anonymous
+ * token first (see getAnonymousToken in the events service). This lets country
+ * configs require authentication on all `/triggers/user/*` routes.
+ */
 export async function triggerUserEventNotification<T extends TriggerEvent>({
   event,
   payload,
@@ -94,7 +105,7 @@ export async function triggerUserEventNotification<T extends TriggerEvent>({
   payload: TriggerPayload[T]
   countryConfigUrl: string
   authHeader: { Authorization: string }
-}) {
+}): Promise<Response> {
   return await fetch(joinUrl(countryConfigUrl, `triggers/user/${event}`), {
     method: 'POST',
     body: JSON.stringify(payload),

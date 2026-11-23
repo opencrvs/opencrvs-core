@@ -8,16 +8,24 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
+import { Readable } from 'stream'
+import { TRPCError } from '@trpc/server'
 import fetch from 'node-fetch'
+import { zfd } from 'zod-form-data'
+import * as z from 'zod/v4'
+import FormData from 'form-data'
 import {
-  FullDocumentPath,
+  ActionValues,
+  DocumentPath,
   getFilePathsFromEvent,
+  getFilePathsFromValues,
   joinUrlPaths,
+  parseDocumentPath,
   EventDocument
 } from '@opencrvs/commons'
 import { env } from '@events/environment'
 
-export async function deleteFile(path: FullDocumentPath, token: string) {
+export async function deleteFile(path: DocumentPath | string, token: string) {
   const res = await fetch(
     new URL(joinUrlPaths('/files', path), env.DOCUMENTS_URL),
     {
@@ -30,7 +38,7 @@ export async function deleteFile(path: FullDocumentPath, token: string) {
 
   return res.ok
 }
-export async function fileExists(path: FullDocumentPath, token: string) {
+export async function fileExists(path: DocumentPath | string, token: string) {
   const res = await fetch(
     new URL(joinUrlPaths('/files', path), env.DOCUMENTS_URL),
     {
@@ -52,6 +60,40 @@ export async function fileExists(path: FullDocumentPath, token: string) {
   return true
 }
 
+/**
+ * Presigns every path in one request, keyed by path. documents-service signs
+ * whatever it's given, so callers must only pass paths the caller may read.
+ */
+export async function presignFiles(
+  paths: DocumentPath[],
+  token: string
+): Promise<Record<DocumentPath, string>> {
+  if (paths.length === 0) {
+    return {}
+  }
+
+  const res = await fetch(new URL('/presigned-urls', env.DOCUMENTS_URL), {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: token
+    },
+    body: JSON.stringify({ filenames: paths })
+  })
+
+  if (!res.ok) {
+    throw new Error(`Failed to presign files: ${res.status} ${res.statusText}`)
+  }
+
+  // documents-service answers in the order it was asked
+  const urls = (await res.json()) as string[]
+
+  return Object.fromEntries(paths.map((path, i) => [path, urls[i]])) as Record<
+    DocumentPath,
+    string
+  >
+}
+
 export async function listFiles(path: string, token: string) {
   const res = await fetch(
     new URL(joinUrlPaths('/list-files', path), env.DOCUMENTS_URL),
@@ -67,7 +109,7 @@ export async function listFiles(path: string, token: string) {
     throw new Error(`Failed to list files in ${path}`)
   }
 
-  return res.json() as Promise<string[]>
+  return res.json() as Promise<DocumentPath[]>
 }
 
 export async function cleanupUnreferencedFiles(
@@ -82,6 +124,109 @@ export async function cleanupUnreferencedFiles(
   )
 
   return Promise.all(
-    filesToDelete.map(async (file: string) => deleteFile(file, token))
+    filesToDelete.map(async (file: DocumentPath) => deleteFile(file, token))
   )
+}
+
+/**
+ * Throws unless every file the values name is stored under the record's own
+ * prefix, or is already named by the record (e.g. a pre-2.0 key carried over
+ * by a correction). A record's readers can presign every file it names, so a
+ * record must not be able to name anyone else's.
+ */
+export function assertFilesBelongToEvent(
+  event: EventDocument,
+  values: ActionValues
+) {
+  const namedByRecord = getFilePathsFromEvent(event)
+
+  // Files the record already names are carried over as they are (e.g. a
+  // pre-2.0 key in a correction), so only new ones are checked
+  const newFiles = getFilePathsFromValues(values).filter(
+    (path) => !namedByRecord.includes(path)
+  )
+
+  for (const path of newFiles) {
+    const file = parseDocumentPath(path)
+
+    if (file?.kind !== 'event' || file.eventId !== event.id) {
+      throw new TRPCError({
+        code: 'BAD_REQUEST',
+        message: `File does not belong to this record: ${path}`
+      })
+    }
+  }
+}
+
+/**
+ * An imported record has no stored state to compare against, so it may name
+ * only its own attachments and pre-2.0 keys. An action's signature may also be
+ * one of its author's own files.
+ */
+export function assertImportedFilesBelongToEvent(event: EventDocument) {
+  function assertPath(path: string, signedBy?: string) {
+    const file = parseDocumentPath(path)
+    const allowed =
+      file?.kind === 'legacy' ||
+      (file?.kind === 'event' && file.eventId === event.id) ||
+      (file?.kind === 'user' && file.userId === signedBy)
+
+    if (!allowed) {
+      throw new TRPCError({
+        code: 'BAD_REQUEST',
+        message: `File does not belong to this record: ${path}`
+      })
+    }
+  }
+
+  for (const action of event.actions) {
+    getFilePathsFromValues({
+      declaration: 'declaration' in action ? action.declaration : {},
+      annotation: 'annotation' in action ? action.annotation : undefined
+    }).forEach((path) => assertPath(path))
+
+    if ('createdBySignature' in action && action.createdBySignature) {
+      assertPath(action.createdBySignature, action.createdBy)
+    }
+  }
+}
+
+export const AttachmentInput = zfd.formData({
+  file: zfd.file(),
+  transactionId: zfd.text(),
+  path: zfd.text(z.string().min(1).optional())
+})
+
+export async function uploadFile(
+  input: z.infer<typeof AttachmentInput>,
+  token: string
+): Promise<string> {
+  const form = new FormData()
+  form.append(
+    'file',
+    Readable.from(Buffer.from(await input.file.arrayBuffer())),
+    {
+      filename: input.file.name,
+      contentType: input.file.type
+    }
+  )
+  form.append('transactionId', input.transactionId)
+  if (input.path) {
+    form.append('path', input.path)
+  }
+
+  const res = await fetch(new URL('/files', env.DOCUMENTS_URL).toString(), {
+    method: 'POST',
+    headers: {
+      ...form.getHeaders(),
+      Authorization: token
+    },
+    body: form
+  })
+
+  if (!res.ok) {
+    throw new Error(`File upload failed: ${res.status} ${res.statusText}`)
+  }
+
+  return res.text()
 }

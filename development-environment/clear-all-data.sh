@@ -20,11 +20,8 @@ db.getSiblingDB('hearth-dev').dropDatabase();\
 db.getSiblingDB('events').dropDatabase();\
 db.getSiblingDB('openhim-dev').dropDatabase();\
 db.getSiblingDB('user-mgnt').dropDatabase();\
-db.getSiblingDB('application-config').dropDatabase();\
 db.getSiblingDB('metrics').dropDatabase();\
-db.getSiblingDB('config').dropDatabase();\
-db.getSiblingDB('performance').dropDatabase();\
-db.getSiblingDB('webhooks').dropDatabase();"
+db.getSiblingDB('performance').dropDatabase();"
 
 curl -s "http://localhost:9200/_cat/indices?h=index" | while read -r index; do
   echo "Deleting index: $index"

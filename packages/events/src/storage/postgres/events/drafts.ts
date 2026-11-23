@@ -9,15 +9,21 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { sql } from 'kysely'
-import z from 'zod'
-import { ActionStatus, Draft, TokenUserType, UUID } from '@opencrvs/commons'
+import { Kysely, sql } from 'kysely'
+import * as z from 'zod/v4'
+import {
+  ActionStatus,
+  ActionType,
+  Draft,
+  TokenUserType,
+  UUID
+} from '@opencrvs/commons'
 import { getClient } from '@events/storage/postgres/events'
 import {
   EventActionDrafts,
   NewEventActionDrafts
 } from './schema/app/EventActionDrafts'
-import ActionType from './schema/app/ActionType'
+import Schema from './schema/Database'
 
 function toDraftDocument(draft: EventActionDrafts): Draft {
   return Draft.parse({
@@ -29,7 +35,7 @@ function toDraftDocument(draft: EventActionDrafts): Draft {
       transactionId: draft.transactionId,
       createdAt: draft.createdAt,
       createdBy: draft.createdBy,
-      createdByRole: draft.createdByRole,
+      createdByRole: draft.createdByRole ?? undefined,
       createdByUserType: draft.createdByUserType as TokenUserType,
       createdAtLocation: draft.createdAtLocation,
       declaration: draft.declaration,
@@ -107,4 +113,31 @@ export async function deleteDraftsByEventId(eventId: UUID) {
     .deleteFrom('eventActionDrafts')
     .where('eventId', '=', eventId)
     .execute()
+}
+
+export async function deleteDraftsByUserIdInTrx(
+  trx: Kysely<Schema>,
+  userId: string
+) {
+  return trx
+    .deleteFrom('eventActionDrafts')
+    .where('createdBy', '=', userId)
+    .execute()
+}
+
+/**
+ * The drafts one user has saved for one record.
+ */
+export async function getDraftsByEventIdAndUserId(
+  eventId: UUID,
+  createdBy: string
+) {
+  const drafts = await getClient()
+    .selectFrom('eventActionDrafts')
+    .where('eventId', '=', eventId)
+    .where('createdBy', '=', createdBy)
+    .selectAll()
+    .execute()
+
+  return z.array(Draft).parse(drafts.map(toDraftDocument) satisfies Draft[])
 }

@@ -27,15 +27,14 @@ import {
 import { queries } from '@client/profile/queries'
 import * as changeLanguageActions from '@client/i18n/actions'
 import { EMPTY_STRING } from '@client/utils/constants'
-import { serviceApi } from '@client/profile/serviceApi'
 import { IStoreState } from '@client/store'
-import { ITokenPayload } from '@opencrvs/commons/client'
+import { ITokenPayload, User } from '@opencrvs/commons/client'
 
 export type ProfileState = {
   authenticated: boolean
   tokenPayload: ITokenPayload | null
   userDetailsFetched: boolean
-  userDetails: UserDetails | null
+  userDetails: User | null
   nonce: string
 }
 
@@ -74,19 +73,15 @@ export const profileReducer: LoopReducer<
             Cmd.run(
               (getState: () => IStoreState) => {
                 if (shouldRedirectBack) {
-                  const baseUrl = window.location.origin
-                  const restUrl = window.location.href.replace(baseUrl, '')
-                  const redirectToURL = new URL(
-                    restUrl === '/'
+                  const redirectUrl = window.location.pathname
+                  const params =
+                    redirectUrl === '/'
                       ? `?lang=${getState().i18n.language}`
-                      : `?lang=${getState().i18n.language}&redirectTo=${restUrl}`,
-                    window.config.LOGIN_URL
-                  ).toString()
-
-                  window.location.assign(redirectToURL)
+                      : `?lang=${getState().i18n.language}&redirectTo=${redirectUrl}`
+                  window.location.assign(`/login${params}`)
                 } else {
                   window.location.assign(
-                    `${window.config.LOGIN_URL}?lang=${getState().i18n.language}`
+                    `/login?lang=${getState().i18n.language}`
                   )
                 }
               },
@@ -132,29 +127,18 @@ export const profileReducer: LoopReducer<
         ])
       )
     case actions.SET_USER_DETAILS:
-      const result = action.payload
-      const data = result && result.data
-
-      if (data && data.getUser) {
-        const userDetails = data.getUser
-
-        return loop(
-          {
-            ...state,
-            userDetailsFetched: true,
-            userDetails
-          },
-          Cmd.list([
-            Cmd.run(() => storeUserDetails(userDetails)),
-            Cmd.action(actions.userDetailsAvailable(userDetails))
-          ])
-        )
-      } else {
-        return {
+      const userDetails = action.payload
+      return loop(
+        {
           ...state,
-          userDetailsFetched: false
-        }
-      }
+          userDetailsFetched: true,
+          userDetails
+        },
+        Cmd.list([
+          Cmd.run(() => storeUserDetails(userDetails)),
+          Cmd.action(actions.userDetailsAvailable(userDetails))
+        ])
+      )
     case actions.MODIFY_USER_DETAILS:
       const modifiedDetails = action.payload
       if (state.userDetails) {
@@ -197,7 +181,7 @@ export const profileReducer: LoopReducer<
         state.tokenPayload &&
         (!userDetailsCollection ||
           'systemRole' in userDetailsCollection ||
-          userDetailsCollection.userMgntUserID !== state.tokenPayload.sub)
+          userDetailsCollection.id !== state.tokenPayload.sub)
       ) {
         return loop(
           {
@@ -210,37 +194,28 @@ export const profileReducer: LoopReducer<
           })
         )
       } else {
+        const immediateCmd = Cmd.action(
+          actions.userDetailsAvailable(userDetailsCollection!)
+        )
+        // Use the cached value immediately so offline data loading is not delayed,
+        // but also re-fetch from the server so stale fields (e.g. primaryOfficeId
+        // changed by an admin) are corrected without requiring a re-login.
         return loop(
           {
             ...state,
             userDetails: userDetailsCollection
           },
-          Cmd.action(actions.userDetailsAvailable(userDetailsCollection!))
+          state.tokenPayload
+            ? Cmd.list([
+                immediateCmd,
+                Cmd.run(queries.fetchUserDetails, {
+                  successActionCreator: actions.setUserDetails,
+                  args: [state.tokenPayload.sub]
+                })
+              ])
+            : immediateCmd
         )
       }
-    case actions.SEND_VERIFY_CODE:
-      const { notificationEvent, phoneNumber, email } = action.payload
-      if (state.tokenPayload && notificationEvent && (phoneNumber || email)) {
-        return loop(
-          {
-            ...state
-          },
-          Cmd.run(serviceApi.sendVerifyCode, {
-            successActionCreator: actions.SendVerifyCodeSuccess,
-            args: [action.payload]
-          })
-        )
-      }
-      return state
-    case actions.SEND_VERIFY_CODE_COMPLETED:
-      const successPayload = action.payload
-      if (
-        state.tokenPayload &&
-        (!successPayload || successPayload.userId === state.tokenPayload.sub)
-      ) {
-        return { ...state, nonce: successPayload.nonce }
-      }
-      return state
 
     default:
       return state

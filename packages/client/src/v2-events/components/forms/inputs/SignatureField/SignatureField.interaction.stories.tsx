@@ -1,3 +1,4 @@
+/* eslint-disable max-lines */
 /*
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -19,13 +20,17 @@ import { createTRPCMsw, httpLink } from '@vafanassieff/msw-trpc'
 import { http, HttpResponse } from 'msw'
 import {
   ActionType,
+  DocumentPath,
   FieldType,
   generateEventDocument,
   generateTranslationConfig,
   MimeType,
   tennisClubMembershipEvent
 } from '@opencrvs/commons/client'
-import { FormFieldGenerator } from '@client/v2-events/components/forms/FormFieldGenerator'
+import {
+  FormFieldGenerator,
+  type FormFieldGeneratorHandle
+} from '@client/v2-events/components/forms/FormFieldGenerator'
 import { AppRouter, TRPCProvider } from '@client/v2-events/trpc'
 import { TestImage } from '@client/v2-events/features/events/fixtures'
 import { shouldBypassLock } from '@client/utils/lockBypass'
@@ -98,6 +103,8 @@ async function drawSignature(canvas: HTMLCanvasElement) {
 const StyledFormFieldGenerator = styled(FormFieldGenerator)`
   width: '400px';
 `
+
+const noDuplicateErrorFormRef = React.createRef<FormFieldGeneratorHandle>()
 const tRPCMsw = createTRPCMsw<AppRouter>({
   links: [
     httpLink({
@@ -148,12 +155,12 @@ export const SignatureFileUpload: StoryObj<typeof StyledFormFieldGenerator> = {
           })
         ],
         files: [
-          http.get('/api/presigned-url/:filePath*', (req) => {
-            return HttpResponse.json({
-              presignedURL: `http://localhost:3535/ocrvs/${req.params.filePath}`
-            })
+          http.post('/api/upload', (req) => {
+            return HttpResponse.text(
+              `uploaded-image-${new Date().getTime()}.jpg`
+            )
           }),
-          http.get('http://localhost:3535/ocrvs/:eventId/:id', () => {
+          http.get('/:id', () => {
             return new HttpResponse(TestImage.Fish, {
               headers: {
                 'Content-Type': 'image/svg+xml',
@@ -230,7 +237,9 @@ export const SignatureFileUpload: StoryObj<typeof StyledFormFieldGenerator> = {
  *
  * Renders all three uploaders on the same form and checks each Upload
  * button in turn. Asserts via `shouldBypassLock()` — the same call
- * `ProtectedPage` would make on a visibility transition.
+ * `ProtectedPage` would make on a visibility transition. Single-shot:
+ * the second call must return `false` so a later real background still
+ * triggers the PIN.
  */
 export const UploadButtonsArmLockBypass: StoryObj<
   typeof StyledFormFieldGenerator
@@ -413,39 +422,36 @@ export const SignatureCanvasUpload: StoryObj<typeof StyledFormFieldGenerator> =
             })
           ],
           files: [
-            http.get('/api/presigned-url/:filePath*', (req) => {
-              return HttpResponse.json({
-                presignedURL: `http://localhost:3535/ocrvs/${req.params.filePath}`
-              })
-            }),
             http.post('/api/upload', () => {
               return HttpResponse.text(
                 `uploaded-image-${new Date().getTime()}.jpg`
               )
             }),
-            http.get('http://localhost:3535/ocrvs/:id', async () => {
-              spies.getImage++
+
+            http.get('/:id', async (request) => {
+              const { id } = request.params
               const response = await fetch(signaturePngBase64)
               const binary = new Uint8Array(await response.arrayBuffer())
 
-              return new HttpResponse(binary, {
-                headers: {
-                  'Content-Type': MimeType.enum['image/png'],
-                  'Cache-Control': 'no-cache'
-                }
-              })
-            }),
-            http.get('http://localhost:3535/ocrvs/:eventId/:id', async () => {
-              spies.getImage++
-              const response = await fetch(signaturePngBase64)
-              const binary = new Uint8Array(await response.arrayBuffer())
-
-              return new HttpResponse(binary, {
-                headers: {
-                  'Content-Type': MimeType.enum['image/png'],
-                  'Cache-Control': 'no-cache'
-                }
-              })
+              // condition here is just to differentiate that the same mock serves two different requests.
+              // It is hard to differentiate at path level after we removed /ocrvs/ from the url.
+              if (id && typeof id === 'string' && id.startsWith('signature')) {
+                spies.getImage++
+                return new HttpResponse(binary, {
+                  headers: {
+                    'Content-Type': MimeType.enum['image/png'],
+                    'Cache-Control': 'no-cache'
+                  }
+                })
+              } else {
+                spies.getImage++
+                return new HttpResponse(binary, {
+                  headers: {
+                    'Content-Type': MimeType.enum['image/png'],
+                    'Cache-Control': 'no-cache'
+                  }
+                })
+              }
             })
           ]
         }
@@ -464,9 +470,12 @@ export const SignatureCanvasUpload: StoryObj<typeof StyledFormFieldGenerator> =
           )
 
           await canvas.findByText('Signature')
-
-          await canvas.findByText(
-            'By signing this document with an electronic signature, I agree that such signature will be valid as handwritten signatures to the extent allowed by the laws of Farajaland.'
+          await waitFor(async () =>
+            expect(
+              canvas.getByText(
+                'By signing this document with an electronic signature, I agree that such signature will be valid as handwritten signatures to the extent allowed by the laws of Farajaland.'
+              )
+            ).toBeVisible()
           )
 
           await canvas.findByRole('button', {
@@ -509,12 +518,91 @@ export const SignatureCanvasUpload: StoryObj<typeof StyledFormFieldGenerator> =
     }
   }
 
+/**
+ * Regression test for: duplicate "Required" error appearing after deleting a signature.
+ *
+ * Root cause: SignatureFieldInput had its own local <InputError> that rendered
+ * "Required" when local `touched` was true (set by the delete button's onClick)
+ * and the field was empty. At the same time, InputField was already rendering
+ * "Required" from Formik's meta.error + meta.touched — producing two identical
+ * error messages simultaneously.
+ *
+ * Fix: removed all local "Required" rendering from SignatureFieldInput. InputField
+ * is now the sole error renderer for validation errors.
+ */
+export const NoDuplicateErrorAfterDelete: StoryObj<
+  typeof StyledFormFieldGenerator
+> = {
+  name: 'No duplicate "Required" error after deleting signature',
+  parameters: {
+    layout: 'centered',
+    chromatic: { disableSnapshot: true },
+    reactRouter: {
+      router: {
+        path: '/event/:eventId',
+        element: (
+          <StyledFormFieldGenerator
+            ref={noDuplicateErrorFormRef}
+            fields={[
+              {
+                id: 'storybook.signature',
+                type: FieldType.SIGNATURE,
+                required: true,
+                configuration: {
+                  maxFileSize: 1 * 1024 * 1024,
+                  acceptedFileTypes: [MimeType.enum['image/png']]
+                },
+                signaturePromptLabel: generateTranslationConfig('Signature'),
+                label: generateTranslationConfig('Upload signature')
+              }
+            ]}
+            formTouched={{ 'storybook.signature': true }}
+            formValues={{
+              'storybook.signature': {
+                path: 'signature-test.png' as DocumentPath,
+                originalFilename: 'signature-test.png',
+                type: MimeType.enum['image/png']
+              }
+            }}
+            id="my-form"
+            validatorContext={getTestValidatorContext()}
+          />
+        )
+      },
+      initialPath: '/event/123-abcd-213'
+    }
+  },
+  play: async ({ canvasElement, step }) => {
+    const canvas = within(canvasElement)
+
+    await step('Signature preview is visible', async () => {
+      await canvas.findByAltText('Signature')
+    })
+
+    await step('Delete the signature', async () => {
+      await userEvent.click(
+        await canvas.findByRole('button', { name: 'Delete' })
+      )
+    })
+
+    await step('Trigger validation via submit', () => {
+      noDuplicateErrorFormRef.current?.submit()
+    })
+
+    await step('Exactly one Required error — no duplicate', async () => {
+      await waitFor(async () =>
+        expect(canvas.getAllByText('Required')).toHaveLength(1)
+      )
+    })
+  }
+}
+
 export const ToCertificateVariables: StoryObj<typeof FormFieldGenerator> = {
   name: 'Certificate Variables',
   parameters: { layout: 'centered' },
   render: function Component() {
     const withValue = SignatureField.toCertificateVariables({
-      path: 'events/birth-123/signature.png',
+      path: 'events/birth-123/signature.png' as DocumentPath,
       originalFilename: 'signature.png',
       type: MimeType.enum['image/png']
     })
@@ -532,7 +620,7 @@ export const ToCertificateVariables: StoryObj<typeof FormFieldGenerator> = {
     const canvas = within(canvasElement)
 
     await expect(await canvas.findByTestId('with-value')).toHaveTextContent(
-      'http://localhost:3535/events/birth-123/signature.png'
+      '/events/birth-123/signature.png'
     )
     await expect(await canvas.findByTestId('with-undefined')).toHaveTextContent(
       ''

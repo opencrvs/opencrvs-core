@@ -12,20 +12,14 @@
 import { useMutation, useSuspenseQuery } from '@tanstack/react-query'
 import { create } from 'zustand'
 import { createJSONStorage, persist } from 'zustand/middleware'
-import {
-  ActionDocument,
-  deepDropNulls,
-  Draft,
-  UUID
-} from '@opencrvs/commons/client'
+import { deepDropNulls, Draft, UUID } from '@opencrvs/commons/client'
 import { storage } from '@client/storage'
 import {
   clearPendingDraftCreationRequests,
   findLocalEventDocument,
   refetchDraftsList,
   refetchAllSearchQueries,
-  setDraftData,
-  updateLocalEventIndex
+  setDraftData
 } from '@client/v2-events/features/events/useEvents/api'
 import {
   createEventActionMutationFn,
@@ -36,7 +30,7 @@ import {
 import { queryClient, trpcOptionsProxy, useTRPC } from '@client/v2-events/trpc'
 import { createTemporaryId, isTemporaryId } from '@client/v2-events/utils'
 import { getFilepathsFromActionDocument } from '../files/cache'
-import { precacheFile } from '../files/useFileUpload'
+import { precacheFiles } from '../files/useFileUpload'
 
 /*
  * Overrides the default behaviour of "api.event.draft.list"
@@ -55,19 +49,27 @@ setQueryDefaults(trpcOptionsProxy.event.draft.list, {
     const response = await queryOptions.queryFn(...params)
     const drafts = response.map((draft) => Draft.parse(draft))
 
-    const filenames = drafts.flatMap((draft) =>
-      getFilepathsFromActionDocument([draft.action])
+    // One presign call per record; precacheFiles catches its own errors
+    await Promise.all(
+      drafts.map(async (draft) =>
+        precacheFiles(getFilepathsFromActionDocument([draft.action]), {
+          eventId: draft.eventId
+        })
+      )
     )
-
-    await Promise.all(filenames.map(async (filename) => precacheFile(filename)))
 
     const missingEventsToDownload = drafts
       .filter((event) => !findLocalEventDocument(event.eventId))
       .map(async (draft) =>
         queryClient.prefetchQuery({
-          queryKey: trpcOptionsProxy.event.get.queryKey(draft.eventId),
-          queryFn: trpcOptionsProxy.event.get.queryOptions(draft.eventId)
-            .queryFn
+          queryKey: trpcOptionsProxy.event.get.queryKey({
+            eventId: draft.eventId,
+            waitFor: false
+          }),
+          queryFn: trpcOptionsProxy.event.get.queryOptions({
+            eventId: draft.eventId,
+            waitFor: false
+          }).queryFn
         })
       )
 

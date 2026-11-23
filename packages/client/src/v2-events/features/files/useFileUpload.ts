@@ -11,27 +11,29 @@
 
 import { useMutation } from '@tanstack/react-query'
 import { v4 as uuid } from 'uuid'
-import { useParams } from 'react-router-dom'
 import {
   DocumentPath,
   FullDocumentPath,
-  joinUrlPaths,
-  joinValues
+  joinValues,
+  UUID
 } from '@opencrvs/commons/client'
 import { getToken } from '@client/utils/authUtils'
-import { queryClient } from '@client/v2-events/trpc'
+import { fetchFileFromUrl } from '@client/utils/imageUtils'
 import {
   cacheFile,
-  getFullDocumentPath,
-  getUnsignedFileUrl,
+  findFileCache,
   removeCached
 } from '@client/v2-events/cache'
-import { fetchFileFromUrl } from '@client/utils/imageUtils'
-import { waitUntilEventIsCreated } from '../events/useEvents/procedures/utils'
+import { resolveTemporaryIdInPath } from '@client/v2-events/features/events/useEvents/temporary-id'
+import {
+  isExpectedAccessError,
+  queryClient,
+  trpcClient
+} from '@client/v2-events/trpc'
 
 interface UploadFileParams {
   file: File
-  eventId: string
+  path: string
   meta: {
     transactionId: string
     referenceId: string
@@ -40,14 +42,18 @@ interface UploadFileParams {
 
 async function uploadFile({
   file,
-  eventId,
+  path,
   meta
 }: UploadFileParams): Promise<{ url: string }> {
   const formData = new FormData()
   formData.append('file', file)
   formData.append('transactionId', meta.transactionId)
-
-  formData.append('path', eventId)
+  /*
+   * The path is derived from the event id, which is still temporary when the file is
+   * attached before the event has synced (e.g. offline). Actions referring to the file
+   * are sent with the canonical id, so the file must be stored under it, too.
+   */
+  formData.append('path', resolveTemporaryIdInPath(path))
 
   const response = await fetch('/api/upload', {
     method: 'POST',
@@ -61,7 +67,7 @@ async function uploadFile({
     throw new Error('File upload failed')
   }
 
-  return response
+  return { url: await response.text() }
 }
 
 /**
@@ -72,7 +78,14 @@ async function uploadFile({
  *
  */
 async function deleteFile({ filename }: { filename: string }): Promise<void> {
-  const response = await fetch('/api/files/' + filename, {
+  /*
+   * The path is derived from the event id, which is still temporary when the file is
+   * attached before the event has synced (e.g. offline). Actions referring to the file
+   * are sent with the canonical id, so the file must be stored under it, too.
+   */
+  const filePath = resolveTemporaryIdInPath(filename)
+
+  const response = await fetch('/api/files/' + filePath, {
     method: 'DELETE',
     headers: {
       Authorization: `Bearer ${getToken()}`
@@ -100,32 +113,134 @@ async function deleteFile({ filename }: { filename: string }): Promise<void> {
   return
 }
 
-const UPLOAD_MUTATION_KEY = 'uploadFile'
+export const UPLOAD_MUTATION_KEY = 'uploadFile'
 const DELETE_MUTATION_KEY = 'deleteFile'
 
-async function getPresignedUrl(filePath: FullDocumentPath) {
-  const url = joinUrlPaths('/api/presigned-url', filePath)
+/**
+ * The record or user whose files are signed together. The server signs every
+ * file the owner names in one call, keyed by the path it stores.
+ */
+export type FileOwner = { eventId: UUID } | { userId: UUID }
 
-  const response = await fetch(url, {
-    method: 'GET',
-    headers: {
-      Authorization: `Bearer ${getToken()}`
-    }
-  })
+async function presignOwnerFiles(
+  owner: FileOwner
+): Promise<Record<string, string>> {
+  if ('eventId' in owner) {
+    return await trpcClient.event.files.presign.query({
+      eventId: owner.eventId
+    })
+  }
 
-  const res = await response.json()
-  return res
+  return await trpcClient.user.files.presign.query({ userIds: [owner.userId] })
 }
 
-export async function precacheFile(path: FullDocumentPath) {
-  const presignedUrl = (await getPresignedUrl(path)).presignedURL
+/**
+ *
+ * returns already cached file urls in absolute format.
+ */
+async function getCachedUrls(cache: Cache) {
+  const requests = await cache.keys()
+  return new Set(requests.map((req) => req.url))
+}
 
-  const file = await fetchFileFromUrl(presignedUrl, path)
+function toAbsoluteUrl(url: string) {
+  return new URL(url, window.location.origin).href
+}
 
-  if (file) {
-    const url = getUnsignedFileUrl(path)
+/**
+ * Downloads each path from its presigned URL and caches it under the path.
+ * Paths the server didn't sign are skipped.
+ */
+async function cachePresigned(urls: Record<string, string>, paths: string[]) {
+  await Promise.all(
+    paths.map(async (path) => {
+      const presignedUrl = urls[path] as string | undefined
 
-    await cacheFile({ url, file })
+      if (!presignedUrl) {
+        return
+      }
+
+      const file = await fetchFileFromUrl(presignedUrl, path)
+
+      if (file) {
+        await cacheFile({ url: path, file })
+      }
+    })
+  )
+}
+
+function warnUnlessExpected(error: unknown) {
+  if (!isExpectedAccessError(error)) {
+    // eslint-disable-next-line no-console
+    console.warn('Failed to precache file', error)
+  }
+}
+
+/**
+ * Precaches the owner's files that are not cached already, signing them in
+ * one call, and only when at least one is missing.
+ */
+export async function precacheFiles(
+  paths: (DocumentPath | FullDocumentPath)[],
+  owner: FileOwner
+) {
+  if (paths.length === 0) {
+    return
+  }
+
+  const cache = await findFileCache()
+
+  if (!cache) {
+    return
+  }
+
+  const cachedUrls = await getCachedUrls(cache)
+
+  const missingFiles = paths.filter(
+    (path) => !cachedUrls.has(toAbsoluteUrl(path))
+  )
+
+  if (missingFiles.length === 0) {
+    return
+  }
+
+  try {
+    await cachePresigned(await presignOwnerFiles(owner), missingFiles)
+  } catch (error) {
+    warnUnlessExpected(error)
+  }
+}
+
+/**
+ * Precaches the avatars of several users (e.g. a list's) that are not cached
+ * already, signing them in one call. Signatures are left out: a list shows
+ * none, and they would otherwise land on the device of everyone who may read
+ * those users.
+ */
+export async function precacheUserAvatars(userIds: UUID[]) {
+  if (userIds.length === 0) {
+    return
+  }
+
+  const cache = await findFileCache()
+
+  if (!cache) {
+    return
+  }
+
+  try {
+    const urls = await trpcClient.user.files.presign.query({
+      userIds,
+      avatarsOnly: true
+    })
+    const cachedUrls = await getCachedUrls(cache)
+    const missingFiles = Object.keys(urls).filter(
+      (path) => !cachedUrls.has(toAbsoluteUrl(path))
+    )
+
+    await cachePresigned(urls, missingFiles)
+  } catch (error) {
+    warnUnlessExpected(error)
   }
 }
 
@@ -155,33 +270,29 @@ interface Options {
   onSuccess?: (data: {
     originalFilename: string
     type: string
-    path: FullDocumentPath
+    path: DocumentPath
     id: string
   }) => void
 }
 
-export function useFileUpload(fieldId: string, options: Options = {}) {
-  // Introduce `eventId` to the params to allow uploading files related to a specific event.
-  // Main goal is to allow uploading files in the context of an event, which is helpful when we need to clean up orphans.
-  // Start with good enough: Components do not need to pass `eventId` explicitly, it is automatically derived from the URL params without forcing low-level components to know about events concept.
-  const { eventId } = useParams()
-
-  if (!eventId) {
-    throw new Error("`eventId` not found in URL params. Can't upload files")
-  }
-
+export function useFileUpload(
+  path: string,
+  uniqueIdentifier: string,
+  options: Options = {}
+) {
   const upload = useMutation({
-    mutationFn: waitUntilEventIsCreated(async (variables: UploadFileParams) =>
-      uploadFile({ ...variables, meta: { ...variables.meta } })
-    ),
-    mutationKey: [UPLOAD_MUTATION_KEY, fieldId],
-    onMutate: async ({ file, meta, eventId: dir }: UploadFileParams) => {
+    mutationFn: async (variables: UploadFileParams) =>
+      uploadFile({ ...variables, meta: { ...variables.meta } }),
+    mutationKey: [UPLOAD_MUTATION_KEY, uniqueIdentifier],
+    onMutate: async ({ file, meta }: UploadFileParams) => {
       const extension = file.name.split('.').pop()
       const temporaryFilename = `${meta.transactionId}.${extension}`
-      const filePathWithDirectory = joinValues([dir, temporaryFilename], '/')
-      const path = getFullDocumentPath(filePathWithDirectory)
-      const url = getUnsignedFileUrl(path)
-      await cacheFile({ url, file })
+      const filePath = joinValues(
+        [path.replace(/\/$/, ''), temporaryFilename],
+        '/'
+      ) as DocumentPath
+
+      await cacheFile({ url: filePath, file })
 
       // NOTE: In the long run, client should not reverse-engineer the file path.
       // It should be read from the server response.
@@ -189,7 +300,7 @@ export function useFileUpload(fieldId: string, options: Options = {}) {
         ...file,
         originalFilename: file.name,
         type: file.type,
-        path,
+        path: filePath,
         id: meta.referenceId
       })
     }
@@ -197,9 +308,9 @@ export function useFileUpload(fieldId: string, options: Options = {}) {
 
   const del = useMutation({
     mutationFn: deleteFile,
-    mutationKey: [DELETE_MUTATION_KEY, fieldId],
+    mutationKey: [DELETE_MUTATION_KEY, uniqueIdentifier],
     onSuccess: (data, { filename }) => {
-      void removeCached(filename)
+      void removeCached(filename as DocumentPath)
     }
   })
 
@@ -213,15 +324,39 @@ export function useFileUpload(fieldId: string, options: Options = {}) {
      * @param file - The file to be uploaded.
      * @param referenceId An optional identifier for the file. Allows the caller to track the file when its upload completes.
      */
-    uploadFile: (file: File, referenceId = 'default') => {
-      return upload.mutate({
-        file,
-        eventId,
-        meta: {
-          transactionId: uuid(),
-          referenceId
-        }
-      })
+    uploadFile: (
+      file: File,
+      referenceId = 'default',
+      mutateOptions: Parameters<typeof upload.mutate>[1] = {}
+    ) => {
+      return upload.mutate(
+        {
+          file,
+          path,
+          meta: {
+            transactionId: uuid(),
+            referenceId
+          }
+        },
+        mutateOptions
+      )
+    },
+    uploadFileAsync: async (
+      file: File,
+      referenceId = 'default',
+      mutateOptions: Parameters<typeof upload.mutate>[1] = {}
+    ) => {
+      return upload.mutateAsync(
+        {
+          file,
+          path,
+          meta: {
+            transactionId: uuid(),
+            referenceId
+          }
+        },
+        mutateOptions
+      )
     }
   }
 }

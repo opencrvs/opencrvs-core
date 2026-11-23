@@ -1,0 +1,195 @@
+{{- if .Values.monitoring.enabled }}
+---
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: metricbeat
+  labels:
+    app: metricbeat
+spec:
+  selector:
+    matchLabels:
+      app: metricbeat
+  template:
+    metadata:
+      labels:
+        app: metricbeat
+    spec:
+      serviceAccountName: metricbeat
+      initContainers:
+        - name: wait-kibana
+          image: curlimages/curl
+          command: ["sh", "-c"]
+          args:
+            - |
+              for i in $(seq 1 30); do
+                curl -sSf http://kibana.{{ .Release.Namespace }}.svc.cluster.local:5601 && exit 0
+                echo "Waiting for kibana..."
+                sleep 2
+              done
+              echo "Kibana did not become available" >&2
+              exit 1
+      containers:
+        - name: metricbeat
+          image: {{ .Values.metricbeat.image }}
+          securityContext:
+            runAsUser: 0
+            privileged: true
+            capabilities:
+              add:
+                - SYS_PTRACE
+                - SYS_ADMIN
+                - NET_ADMIN
+                - DAC_READ_SEARCH
+          args: [
+            "-e",
+            "-c", "/etc/metricbeat.yml"
+          ]
+          env:
+            # Elasticsearch integration
+            - name: ELASTICSEARCH_HOST
+              {{- $elastic_host := default (printf "elasticsearch-0.elasticsearch.%s.svc.cluster.local" $.Release.Namespace) $.Values.elasticsearch.host }}
+              value: http://{{ $elastic_host }}:9200
+            - name: ELASTICSEARCH_USERNAME
+              value: 'elastic'
+            - name: ELASTICSEARCH_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.elasticsearch.admin_user_secret_name }}
+                  key: ELASTIC_PASSWORD
+            # Kibana integration
+            - name: KIBANA_HOST
+              value: http://kibana.{{ .Release.Namespace }}.svc.cluster.local:5601
+            - name: KIBANA_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.kibana.users_secret }}
+                  key: KIBANA_USERNAME
+            - name: KIBANA_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.kibana.users_secret }}
+                  key: KIBANA_PASSWORD
+            - name: BEATS_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: elasticsearch-opencrvs-users
+                  key: METRICBEAT_ELASTIC_USERNAME
+            - name: BEATS_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: elasticsearch-opencrvs-users
+                  key: METRICBEAT_ELASTIC_PASSWORD
+            - name: NODE_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: spec.nodeName
+            - name: NODE_IP
+              valueFrom:
+                fieldRef:
+                  fieldPath: status.hostIP
+          volumeMounts:
+            - name: metricbeat-config
+              mountPath: /etc/metricbeat.yml
+              subPath: metricbeat.yml
+              readOnly: true
+            - name: metricbeat-ilm-config
+              mountPath: /usr/share/metricbeat/rollover-policy.json
+              subPath: metricbeat-rollover-policy.json
+              readOnly: true
+            - name: proc
+              mountPath: /hostfs/proc
+              readOnly: true
+            - name: cgroup
+              mountPath: /hostfs/sys/fs/cgroup
+              readOnly: true
+            - name: hostfs
+              mountPath: /hostfs
+              readOnly: true
+          resources:
+            limits:
+              memory: 300Mi
+              cpu: 200m
+            requests:
+              memory: 100Mi
+              cpu: 50m
+      volumes:
+        - name: metricbeat-config
+          configMap:
+            name: {{ .Values.metricbeat.custom_config_configmap | default "metricbeat-config" }}
+        - name: metricbeat-ilm-config
+          configMap:
+            name: {{ .Values.metricbeat.custom_ilm_configmap | default "metricbeat-ilm-config" }}
+        - name: proc
+          hostPath:
+            path: /proc
+        - name: cgroup
+          hostPath:
+            path: /sys/fs/cgroup
+        - name: hostfs
+          hostPath:
+             path: /
+             type: Directory
+---
+# Give appropriate RBAC to Metricbeat
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: metricbeat
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: metricbeat
+rules:
+- apiGroups: [""]
+  resources:
+  - nodes
+  - namespaces
+  - events
+  - pods
+  - services
+  - endpoints
+  - persistentvolumes
+  - persistentvolumeclaims
+  - configmaps
+  verbs: ["get", "list", "watch"]
+- apiGroups: ["batch"]
+  resources:
+  - jobs
+  verbs: ["get", "list", "watch"]
+- apiGroups: ["extensions"]
+  resources:
+  - replicasets
+  verbs: ["get", "list", "watch"]
+- apiGroups: ["apps"]
+  resources:
+  - statefulsets
+  - deployments
+  - replicasets
+  verbs: ["get", "list", "watch"]
+- apiGroups:
+  - ""
+  resources:
+  - nodes/stats
+  verbs:
+  - get
+- nonResourceURLs:
+  - /metrics
+  verbs:
+  - get
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: metricbeat
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: metricbeat
+subjects:
+- kind: ServiceAccount
+  name: metricbeat
+  namespace: {{ .Release.Namespace }}
+{{- end }}

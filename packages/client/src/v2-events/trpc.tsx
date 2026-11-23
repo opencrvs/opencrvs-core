@@ -31,6 +31,7 @@ import React from 'react'
 import superjson from 'superjson'
 import { getUUID } from '@opencrvs/commons/client'
 import { getToken } from '@client/utils/authUtils'
+import { CACHE_VERSION } from '@client/utils/constants'
 import { storage } from '@client/storage'
 
 const { TRPCProvider: TRPCProviderRaw, useTRPC } =
@@ -39,8 +40,8 @@ const { TRPCProvider: TRPCProviderRaw, useTRPC } =
 export { AppRouter, useTRPC }
 
 function getTrpcClient() {
-  // In storybook tests, we use httpLink as msw-trpc does not support httpBatchLink
-  if (import.meta.env.STORYBOOK === 'true') {
+  // In storybook and vitest tests, we use httpLink as msw-trpc does not support httpBatchLink
+  if (import.meta.env.STORYBOOK === 'true' || import.meta.env.MODE === 'test') {
     return createTRPCClient<AppRouter>({
       links: [
         loggerLink({
@@ -204,9 +205,15 @@ export function TRPCProvider({
       client={queryClient}
       persistOptions={{
         persister: createIDBPersister(storeIdentifier),
-        buster: 'persisted-indexed-db',
+        buster: `persisted-indexed-db-v${CACHE_VERSION}`,
         maxAge: Infinity,
         dehydrateOptions: {
+          shouldDehydrateQuery: (query) => {
+            if (query.meta?.noCache === true) {
+              return false
+            }
+            return query.state.status === 'success'
+          },
           shouldDehydrateMutation: (mutation) => {
             if (mutation.state.status === 'error') {
               const error = mutation.state.error
@@ -236,5 +243,20 @@ export function TRPCProvider({
         {!waitForClientRestored || queriesRestored ? children : null}
       </TRPCProviderRaw>
     </PersistQueryClientProvider>
+  )
+}
+
+export function hasConflict(error: unknown) {
+  if (error instanceof TRPCClientError) {
+    return error.data.code === 'CONFLICT'
+  }
+  return false
+}
+
+/** True when a tRPC call failed because the caller lacks access, or the target doesn't exist — not a bug. */
+export function isExpectedAccessError(error: unknown) {
+  return (
+    error instanceof TRPCClientError &&
+    [401, 403, 404].includes(error.data?.httpStatus)
   )
 }

@@ -1,0 +1,10 @@
+{{- if .Values.monitoring.enabled }}
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: apm-server-config
+data:
+  apm-server.yml: |
+{{ .Files.Get "files/apm-server/apm-server.yml" | indent 4 }}
+{{- end }}

@@ -15,7 +15,6 @@ import { storage } from '@client/storage'
 import { createStore } from '@client/store'
 import * as React from 'react'
 import { createRoot } from 'react-dom/client'
-import { SubmissionController } from '@client/SubmissionController'
 import { createBrowserRouter } from 'react-router-dom'
 import WebFont from 'webfontloader'
 import { App, routesConfig } from './App'
@@ -57,5 +56,3 @@ void navigator.serviceWorker.ready.then(() => {
   console.debug('Service worker is ready')
   root.render(<App router={router} store={store} />)
 })
-
-new SubmissionController(store).start()

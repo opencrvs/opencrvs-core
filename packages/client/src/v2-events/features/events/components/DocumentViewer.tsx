@@ -13,7 +13,6 @@ import { defineMessages, useIntl, IntlShape } from 'react-intl'
 import styled from 'styled-components'
 import React from 'react'
 import { isNil } from 'lodash'
-import { Link } from '@opencrvs/components'
 import {
   EventState,
   FormConfig,
@@ -21,7 +20,6 @@ import {
   isFileFieldWithOptionType,
   FieldType
 } from '@opencrvs/commons/client'
-import { getUnsignedFileUrl } from '@client/v2-events/cache'
 import {
   DocumentViewer as DocumentViewerComponent,
   DocumentViewerOptionValue
@@ -69,7 +67,7 @@ function getFileOptions(
         {
           value: {
             filename: field.value.path,
-            url: getUnsignedFileUrl(field.value.path),
+            url: field.value.path,
             id: field.config.id
           },
           label
@@ -96,7 +94,7 @@ function getFileOptions(
           return {
             value: {
               filename: formVal.path,
-              url: getUnsignedFileUrl(formVal.path),
+              url: formVal.path,
               id: `${field.config.id}-${formVal.option}`
             },
             label: `${fieldLabel} (${optionLabel})`
@@ -140,31 +138,21 @@ const reviewMessages = defineMessages({
     defaultMessage: 'No supporting documents',
     description: 'Zero documents text',
     id: 'review.documents.zeroDocumentsTextForAnySection'
-  },
-  editDocuments: {
-    defaultMessage: 'Add attachment',
-    description: 'Edit documents text',
-    id: 'review.documents.editDocuments'
   }
 })
 
 export function DocumentViewer({
   form,
   formConfig,
-  onEdit,
   showInMobile,
-  disabled,
   comparisonView
 }: {
   formConfig: FormConfig
   form: EventState
-  onEdit: () => void
   showInMobile?: boolean
-  disabled?: boolean
   comparisonView?: boolean
 }) {
   const intl = useIntl()
-
   const fileOptions = getFileOptions(form, formConfig, intl)
 
   return (
@@ -176,17 +164,6 @@ export function DocumentViewer({
         {fileOptions.length === 0 && (
           <ZeroDocument id={`zero_document`}>
             {intl.formatMessage(reviewMessages.zeroDocumentsTextForAnySection)}
-            {!disabled && (
-              <Link
-                id="edit-document"
-                onClick={(e) => {
-                  e.stopPropagation()
-                  onEdit()
-                }}
-              >
-                {intl.formatMessage(reviewMessages.editDocuments)}
-              </Link>
-            )}
           </ZeroDocument>
         )}
       </DocumentViewerComponent>

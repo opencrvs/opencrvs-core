@@ -11,13 +11,14 @@
 import React from 'react'
 import styled from 'styled-components'
 
-export const HeaderContainer = styled.tr`
+export const HeaderContainer = styled.tr<{
+  fontVariant: HeaderFontVariant
+}>`
   th {
-    border-bottom: 1px solid ${({ theme }) => theme.colors.grey200};
-    padding: 12px 0;
+    border-bottom: 2px solid ${({ theme }) => theme.colors.grey200};
+    padding: 20px 0;
     text-align: left;
-    color: ${({ theme }) => theme.colors.grey400};
-    ${({ theme }) => theme.fonts.bold12};
+    ${({ theme, fontVariant }) => theme.fonts[fontVariant ?? 'reg16']};
 
     @media screen and (max-width: 768px) {
       display: none;
@@ -36,19 +37,26 @@ export const HeaderContainer = styled.tr`
 
   th:last-child {
     min-width: 80px;
-    padding: 8px 8px;
+    padding: 20px 8px;
     text-align: right;
   }
 `
+type HeaderFontVariant = 'reg12' | 'reg14' | 'reg16' | 'reg18' | 'h4' | 'h3'
 
 type HeaderProps = {
   id?: string
   value: React.ReactNode
   label: React.ReactNode
+  fontVariant?: HeaderFontVariant
 }
 
-export const Header = ({ id, value, label }: HeaderProps) => (
-  <HeaderContainer id={id}>
+export const Header = ({
+  id,
+  value,
+  label,
+  fontVariant = 'reg16'
+}: HeaderProps) => (
+  <HeaderContainer id={id} fontVariant={fontVariant}>
     <th>{label}</th>
     <th>{value}</th>
     <th></th>

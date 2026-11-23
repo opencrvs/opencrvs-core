@@ -24,6 +24,7 @@ export function Hamburger() {
     <>
       <Button
         aria-label="Toggle menu"
+        data-testid="toggle-menu"
         size="medium"
         type="icon"
         onClick={toggleMenu}

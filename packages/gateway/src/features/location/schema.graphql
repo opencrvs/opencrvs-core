@@ -42,6 +42,3 @@ type Location { # -> Location (mostly the same property name except:)
   hierarchy: [Location!]
 }
 
-type Query {
-  isLeafLevelLocation(locationId: String!): Boolean!
-}

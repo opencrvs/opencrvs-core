@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { z } from 'zod'
+import * as z from 'zod/v4'
 
 export const SerializedUserField = z.object({
   $userField: z.enum([
@@ -21,9 +21,10 @@ export const SerializedUserField = z.object({
     'firstname',
     'middlename',
     'surname',
-    'district',
-    'province',
-    'primaryOfficeId'
+    'signature',
+    'avatar',
+    'primaryOfficeId',
+    'administrativeAreaId'
   ]),
   $location: z.string().optional()
 })

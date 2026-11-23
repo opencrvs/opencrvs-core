@@ -9,25 +9,27 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import React from 'react'
+import React, { useMemo } from 'react'
 
 import {
   useTypedParams,
   useTypedSearchParams
 } from 'react-router-typesafe-routes/dom'
 import { useIntl } from 'react-intl'
-import { Link } from 'react-router-dom'
 import styled from 'styled-components'
 import { FloatingActionButton } from '@opencrvs/components/lib/buttons'
 import { PlusTransparentWhite } from '@opencrvs/components/lib/icons'
+import { precompileActionSchemas } from '@opencrvs/commons/client'
 import { useEventConfigurations } from '@client/v2-events/features/events/useEventConfiguration'
 
 import { ROUTES } from '@client/v2-events/routes'
 import { useWorkqueue } from '@client/v2-events/hooks/useWorkqueue'
 import { CoreWorkqueues } from '@client/v2-events/utils'
-import { SearchResultComponent } from '../events/Search/SearchResult'
+import { SearchResultComponent } from '../events/Search/SearchResult/SearchResult'
 import { useCountryConfigWorkqueueConfigurations } from '../events/useCountryConfigWorkqueueConfigurations'
 import { useOutbox } from '../events/useEvents/outbox'
+import { useEventFormNavigation } from '../events/useEventFormNavigation'
+import { useUserMayCreateEvents } from '../../layouts/workqueues'
 import { Outbox } from './Outbox'
 import { Draft } from './Draft'
 
@@ -39,11 +41,19 @@ const FabContainer = styled.div`
     display: none;
   }
 `
-
 function ConfigurableWorkqueue({ workqueueSlug }: { workqueueSlug: string }) {
   const [searchParams] = useTypedSearchParams(ROUTES.V2.WORKQUEUES.WORKQUEUE)
   const eventConfigs = useEventConfigurations()
+
+  // If actions are not precompiled, every rendered item pays the cost of resolving action configuration conditionals, which can be expensive when there are many items in a list view.
+  precompileActionSchemas(eventConfigs)
+
   const workqueues = useCountryConfigWorkqueueConfigurations()
+  const workqueueConfig = workqueues.find(({ slug }) => slug === workqueueSlug)
+
+  if (!workqueueConfig) {
+    throw new Error('Workqueue configuration not found for' + workqueueSlug)
+  }
 
   const { getResult } = useWorkqueue(workqueueSlug)
   const outbox = useOutbox()
@@ -54,23 +64,22 @@ function ConfigurableWorkqueue({ workqueueSlug }: { workqueueSlug: string }) {
   }).useSuspenseQuery()
 
   const { total, results } = data
-  const events = results.filter(
-    (event) => !outbox.find(({ id }) => id === event.id)
-  )
 
   const intl = useIntl()
-  const workqueueConfig = workqueues.find(({ slug }) => slug === workqueueSlug)
+
+  const events = useMemo(
+    () => results.filter((event) => !outbox.find(({ id }) => id === event.id)),
+    [results, outbox]
+  )
 
   if (!workqueueConfig) {
     throw new Error('Workqueue configuration not found for' + workqueueSlug)
   }
 
-  const actions = workqueueConfig.actions.map(({ type }) => type)
-
   return (
     <SearchResultComponent
-      key={`${workqueueSlug}-${outbox.length}`}
-      actions={actions}
+      key={workqueueSlug}
+      action={workqueueConfig.action}
       columns={workqueueConfig.columns}
       emptyMessage={workqueueConfig.emptyMessage}
       eventConfigs={eventConfigs}
@@ -93,21 +102,29 @@ function WorkqueueContent() {
   if (workqueueSlug === CoreWorkqueues.DRAFT) {
     return <Draft />
   }
-  return <ConfigurableWorkqueue workqueueSlug={workqueueSlug} />
+  /*
+   * Key by slug so switching workqueues remounts the data component and the search query.
+   */
+  return (
+    <ConfigurableWorkqueue key={workqueueSlug} workqueueSlug={workqueueSlug} />
+  )
 }
 
 export function WorkqueueContainer() {
+  const { createNewDeclaration } = useEventFormNavigation()
+  const mayCreateEvents = useUserMayCreateEvents()
   return (
     <>
       <WorkqueueContent />
-      <FabContainer>
-        <Link to={ROUTES.V2.EVENTS.CREATE.path}>
+      {mayCreateEvents && (
+        <FabContainer>
           <FloatingActionButton
             icon={() => <PlusTransparentWhite />}
             id="new_event_declaration"
+            onClick={createNewDeclaration}
           />
-        </Link>
-      </FabContainer>
+        </FabContainer>
+      )}
     </>
   )
 }

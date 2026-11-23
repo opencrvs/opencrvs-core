@@ -15,10 +15,10 @@ import {
   FileFieldValue,
   MimeType,
   File as FileConfig,
-  SignatureField as SignatureFieldConfig
+  SignatureField as SignatureFieldConfig,
+  DocumentPath
 } from '@opencrvs/commons/client'
 import { useFileUpload } from '@client/v2-events/features/files/useFileUpload'
-import { getFullDocumentPath } from '@client/v2-events/cache'
 import { buttonMessages } from '@client/i18n/messages'
 import { useImageEditorModal } from '@client/v2-events/components/ImageEditorModal'
 import { useImageProcessing } from '@client/utils/imageUtils'
@@ -37,6 +37,7 @@ function FileInput({
   label,
   error,
   touched,
+  filePath,
   disabled,
   maxImageSize
 }: {
@@ -48,18 +49,28 @@ function FileInput({
   name: string
   description?: string
   error?: string
+  filePath: string
   label: string
   touched?: boolean
   disabled?: boolean
   maxImageSize?: FileConfig['configuration']['maxImageSize']
 }) {
   const [file, setFile] = React.useState(value)
+
+  // Keep local state in sync with the value coming from the form store.
+  // On back-navigation the field re-mounts before Formik has re-initialised, so
+  // it first renders with an empty value and only receives the real value on a
+  // later render. Without this sync the uploaded file would never re-appear.
+  React.useEffect(() => {
+    setFile(value)
+  }, [value])
+
   const [modal, openModal] = useImageEditorModal({
     targetSize: maxImageSize?.targetSize
   })
   const { processImageFile } = useImageProcessing()
 
-  const { uploadFile } = useFileUpload(name, {
+  const { uploadFile } = useFileUpload(filePath, name, {
     onSuccess: ({ path, originalFilename, type }) => {
       setFile({
         path,
@@ -94,7 +105,7 @@ function FileInput({
     }
 
     setFile({
-      path: getFullDocumentPath(processedFile.name),
+      path: processedFile.name as DocumentPath,
       originalFilename: processedFile.name,
       type: processedFile.type
     })
@@ -165,7 +176,7 @@ function stringify(value: FileFieldValue | undefined) {
   const parsed = FileFieldValue.safeParse(value)
 
   if (parsed.success) {
-    return new URL(parsed.data.path, window.config.MINIO_BASE_URL).href
+    return parsed.data.path
   }
 
   return ''

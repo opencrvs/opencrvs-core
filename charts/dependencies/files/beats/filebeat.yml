@@ -1,0 +1,188 @@
+# filebeat.inputs:
+# - type: container
+#   enabled: true
+#   paths:
+#     - /var/log/containers/*.log
+
+#   # Place JSON fields at top-level of event.
+#   json.keys_under_root: true
+#   # Add error key if JSON decoding fails.
+#   json.add_error_key: true
+#========================== Filebeat autodiscover ==============================
+
+# FIXME: Switch to autodiscover
+filebeat.autodiscover:
+  providers:
+    - type: kubernetes
+      hints.enabled: true
+
+filebeat.modules:
+  - module: system
+    syslog:
+      enabled: true
+    auth:
+      enabled: true
+#================================ Processors ===================================
+processors:
+  - add_kubernetes_metadata: ~
+  - add_locale:
+      format: offset
+  - add_host_metadata:
+      netinfo.enabled: true
+
+  - decode_json_fields:
+      fields: ['message']
+      process_array: false
+      max_depth: 1
+      target: ''
+      expand_keys: true
+      overwrite_keys: true
+      add_error_key: true
+
+  # Map Numeric log levels to names
+  - script:
+      lang: javascript
+      source: >
+        function process(event) {
+          var level = event.Get("level");
+          if (level) {
+            var levelNum = typeof level === "string" ? parseInt(level) : level;
+            var levelName =
+              levelNum === 30 ? "info" :
+              levelNum === 50 ? "error" :
+              levelNum === 40 ? "warn" :
+              levelNum === 20 ? "debug" :
+              levelNum === 60 ? "fatal" :
+              levelNum === 10 ? "trace" : "unknown";
+
+            // Set the mapped fields
+            event.Put("log.level", levelName);
+          }
+        }
+  # Process nginx events to set log level based on HTTP status code
+  - script:
+      lang: javascript
+      source: >
+        function process(event) {
+          var status = parseInt(event.Get("http.response.status_code"), 10);
+
+          if (isNaN(status)) {
+            return;
+          }
+          var levelName =
+            status >= 500 ? "error" :
+            status >= 400 ? "warn" : "info";
+
+          event.Put("log.level", levelName);
+        }
+  # FIXES:
+  # - message field contains not parsed JSON:
+  #   - nodejs (alls core services): Set message field to msg if present
+  #   - nginx (client, login): Set message field from url.original
+  # - Kubernetes correlation: host.name to pod name, container.name,
+  #   service.name, service.environment, and orchestrator info
+  - script:
+      lang: javascript
+      source: >
+        function process(event) {
+          if (event.Get("msg") !== null) {
+            event.Put("message", event.Get("msg"));
+          } else if (event.Get("url.original") !== null) {
+            event.Put("message", event.Get("url.original"));
+          }
+          // Kubernetes correlation
+          var k8s = event.Get("kubernetes");
+          if (typeof k8s === 'object' && k8s !== null) {
+            if (k8s.pod && k8s.pod.name) {
+              event.Put("host.name", k8s.pod.name);
+            }
+            // Ensure container info is properly set
+            if (k8s.container && k8s.container.name) {
+              event.Put("container.name", k8s.container.name);
+            }
+            if (k8s.labels && k8s.labels["service_name"]) {
+              event.Put("service.name", k8s.labels["service_name"]);
+            }
+            if (k8s.labels && k8s.labels["environment"]) {
+              event.Put("service.environment", k8s.labels["environment"]);
+            }
+            // Set orchestrator info
+            event.Put("orchestrator.type", "kubernetes");
+            if (k8s.namespace) {
+              event.Put("orchestrator.namespace", k8s.namespace);
+            }
+            if(k8s.container && ["backup", "restore"].indexOf(k8s.container.name) > 0){
+              var msg = event.Get("message") || "";
+              var level = "info"; // default
+
+              if (/error|fail|fatal/i.test(msg)) {
+                level = "error";
+              } else if (/warn|warning/i.test(msg)) {
+                level = "warn";
+              } else if (/debug/i.test(msg)) {
+                level = "debug";
+              }
+              event.Put("log.level", level);
+            }
+          }
+        }
+  - drop_fields:
+      fields:
+        - agent
+        - ecs
+        - input
+        - host.ip
+        - host.mac
+        - host.os
+        - host.architecture
+        - host.containerized
+        - log.file.device_id
+        - log.file.inode
+        - log.file.fingerprint
+        - log.offset
+        - kubernetes.node.uid
+        - kubernetes.namespace_uid
+        - kubernetes.namespace_labels
+        - kubernetes.node.labels
+        - kubernetes.pod.uid
+        - container.id
+        - stream
+        - event.timezone
+        - pid
+        - req.remotePort
+        - container.runtime
+        - time
+        - kubernetes.node.name
+        - kubernetes.container.name
+        - kubernetes.labels.pod-template-hash
+        - level
+      ignore_missing: true
+#========================== Elasticsearch output ===============================
+output.elasticsearch:
+  hosts: ['${ELASTICSEARCH_HOST}']
+  username: ${ELASTICSEARCH_USERNAME}
+  password: ${ELASTICSEARCH_PASSWORD}
+
+#============================== Dashboards =====================================
+setup.dashboards:
+  enabled: true
+
+#============================== Kibana =========================================
+setup.kibana:
+  host: '${KIBANA_HOST}'
+  username: ${ELASTICSEARCH_USERNAME}
+  password: ${ELASTICSEARCH_PASSWORD}
+
+#============================== Xpack Monitoring ===============================
+monitoring:
+  enabled: true
+  elasticsearch:
+
+#============================== Index lifecycle management ===============================
+setup.ilm.enabled: true
+setup.ilm.policy_name: 'beat-opencrvs-rollover-policy'
+setup.ilm.policy_file: /usr/share/filebeat/rollover-policy.json
+setup.ilm.check_exists: true
+setup.ilm.overwrite: true
+
+logging.level: info
