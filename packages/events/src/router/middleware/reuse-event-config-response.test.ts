@@ -9,6 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
+import { randomUUID } from 'node:crypto'
 import { expect, test, vi, type Mock } from 'vitest'
 import { getInMemoryEventConfigurations } from '@events/service/config/config'
 import { reuseEventConfigResponse } from './reuse-event-config-response'
@@ -27,7 +28,7 @@ type MiddlewareOptions = Parameters<typeof reuseEventConfigResponse>[0]
 
 // The middleware keeps its response across calls, so every test uses its own configuration array.
 function useNewConfigurations() {
-  const configurations = [{ id: crypto.randomUUID() }]
+  const configurations = [{ id: randomUUID() }]
   mockedGetConfigurations.mockResolvedValue(configurations)
   return configurations
 }
