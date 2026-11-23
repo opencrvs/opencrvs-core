@@ -10,10 +10,11 @@
  */
 
 import { execFileSync } from 'child_process'
-import { existsSync, mkdtempSync, readdirSync, readFileSync, rmSync } from 'fs'
+import { existsSync, mkdtempSync, readdirSync, rmSync } from 'fs'
 import { tmpdir } from 'os'
 import path from 'path'
 import { candidateRefs } from '../translations/template'
+import { getToolkitVersion } from '../toolkit-package'
 
 const CORE_REPO_URL = 'https://github.com/opencrvs/opencrvs-core.git'
 const TEMPLATE_SUBPATH = 'packages/countryconfig-template'
@@ -50,10 +51,7 @@ export async function findTemplateDir() {
     return templateDir
   }
   // 1. Find github ref version based on toolkit.
-  const { version } = JSON.parse(
-    readFileSync(path.join(__dirname, '..', 'package.json'), 'utf-8')
-  )
-  const [major, minor] = version.split('.')
+  const [major, minor] = getToolkitVersion().split('.')
   const [githubRef] = await candidateRefs(`${major}.${minor}`)
 
   // 2. create temporary directory where templates are downloaded

@@ -68,21 +68,22 @@ const outName = (file) => path.relative('src', file).replace(/\.ts$/, '')
 const scriptNames = new Set(scripts.map(outName))
 
 /**
- * Fails the build when a module that reads files next to itself through
- * `__dirname` lands outside dist/, where those files are copied.
+ * Fails the build when src/environment/templates.ts lands outside dist/. It
+ * reads dist/templates through `__dirname`. Other code finds the toolkit's
+ * files through src/toolkit-package.ts.
  */
 const dirnameAtRoot = {
   name: 'dirname-at-root',
   generateBundle(_, bundle) {
-    const modules = ['src/cli.ts', 'src/environment/templates.ts'].map((file) =>
-      path.join(import.meta.dirname, file)
+    const templates = path.join(
+      import.meta.dirname,
+      'src/environment/templates.ts'
     )
     for (const chunk of Object.values(bundle)) {
       if (chunk.type !== 'chunk' || !chunk.fileName.includes('/')) continue
-      const moduleId = modules.find((id) => chunk.moduleIds.includes(id))
-      if (!moduleId) continue
+      if (!chunk.moduleIds.includes(templates)) continue
       this.error(
-        `${chunk.fileName} contains ${path.relative(import.meta.dirname, moduleId)}, which resolves files from __dirname, so it must be emitted directly in dist/`
+        `${chunk.fileName} contains src/environment/templates.ts, which reads dist/templates through __dirname, so it must be emitted directly in dist/`
       )
     }
   }
