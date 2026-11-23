@@ -19,7 +19,8 @@ import {
 } from '@opencrvs/toolkit/events'
 import {
   BIRTH_LATE_REGISTRATION_TARGET_DAYS,
-  securePageWhileSealed
+  securePageWhileSealed,
+  LATE_REGISTRATION_ANCHOR
 } from '@countryconfig/events/utils'
 import {
   childPage,
@@ -103,7 +104,7 @@ function differentFields(version: BirthVersion): FieldConfigInput[] {
           validator: field('child.dob')
             .isAfter()
             .days(BIRTH_LATE_REGISTRATION_TARGET_DAYS)
-            .inPast()
+            .beforeAction(LATE_REGISTRATION_ANCHOR)
         }
       ],
       label: {

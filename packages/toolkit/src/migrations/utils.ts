@@ -18,6 +18,8 @@ import {
   CallExpression,
   Node,
   ObjectLiteralExpression,
+  PropertyAssignment,
+  ShorthandPropertyAssignment,
   SourceFile,
   SyntaxKind,
   Type
@@ -135,7 +137,7 @@ export function restOfLine(text: string, position: number) {
   return text.slice(position, lineEnd === -1 ? text.length : lineEnd)
 }
 
-export function isOnlyComments(text: string) {
+function isOnlyComments(text: string) {
   return /^\s*(?:\/\/.*|\/\*.*?\*\/\s*)*$/.test(text)
 }
 
@@ -294,4 +296,107 @@ export function addToolkitImport(sourceFile: SourceFile, name: string) {
   toolkitImport.replaceWithText(
     `import ${specifiers} from '${TOOLKIT_EVENTS_MODULE}'`
   )
+}
+
+/** Re-indents the lines after the first from the indentation `from` to `to`. */
+export function reindent(text: string, from: string, to: string) {
+  return text
+    .split('\n')
+    .map((line, index) =>
+      index > 0 && line.startsWith(from) ? to + line.slice(from.length) : line
+    )
+    .join('\n')
+}
+
+/**
+ * Returns the edit inserting the properties into the action after its `label`,
+ * or after its `type` when it has no `label`, in the action's own layout: on
+ * lines of their own at the anchor's indentation, or inline when the action is
+ * on one line.
+ */
+export function insertIntoAction(
+  action: ObjectLiteralExpression,
+  properties: string[]
+): TextEdit[] {
+  // `type` is always there: it is how the action was found
+  const anchor =
+    action.getProperty('label') ?? action.getPropertyOrThrow('type')
+
+  const text = action.getSourceFile().getFullText()
+  const anchorLayout = layoutOf(anchor)
+  const indent = indentationOf(anchor)
+
+  if (anchorLayout.ownsLines) {
+    const position =
+      anchorLayout.end + restOfLine(text, anchorLayout.end).length
+    const lines = properties.map((property) => `\n${indent}${property}`)
+
+    if (anchorLayout.hasComma) {
+      return [insertAt(position, `${lines.join(',')},`)]
+    }
+
+    // The anchor was the last property: it needs a comma now
+    return position === anchor.getEnd()
+      ? [insertAt(position, `,${lines.join(',')}`)]
+      : [insertAt(anchor.getEnd(), ','), insertAt(position, lines.join(','))]
+  }
+
+  const separator = action.getText().includes('\n') ? `,\n${indent}` : ', '
+
+  return [
+    insertAt(
+      anchor.getEnd(),
+      properties.map((property) => `${separator}${property}`).join('')
+    )
+  ]
+}
+
+/**
+ * Returns the edits removing the property together with the comma separating
+ * it from its neighbours and, when it is on lines of its own, those lines.
+ */
+export function removeProperty(
+  property: PropertyAssignment | ShorthandPropertyAssignment
+): TextEdit[] {
+  const text = property.getSourceFile().getFullText()
+  const layout = layoutOf(property)
+  // The comma before the property, past any comments, which ts-morph lists
+  // as siblings
+  const previousComma = property
+    .getPreviousSiblings()
+    .find((sibling) => !isOnlyComments(sibling.getText()))
+    ?.asKind(SyntaxKind.CommaToken)
+
+  if (layout.ownsLines) {
+    const lines = {
+      start: text.lastIndexOf('\n', layout.start - 1),
+      end: layout.end + restOfLine(text, layout.end).length,
+      text: ''
+    }
+
+    // The last property: drop the comma before it too
+    return !layout.hasComma && previousComma
+      ? [
+          lines,
+          {
+            start: previousComma.getStart(),
+            end: previousComma.getEnd(),
+            text: ''
+          }
+        ]
+      : [lines]
+  }
+
+  if (layout.hasComma) {
+    return [{ start: property.getFullStart(), end: layout.end, text: '' }]
+  }
+
+  // The last property: drop the comma before it instead
+  return [
+    {
+      start: (previousComma ?? property).getStart(),
+      end: property.getEnd(),
+      text: ''
+    }
+  ]
 }
