@@ -17,7 +17,7 @@ import {
   Declaration
 } from '@e2e/support/test-data/birth-declaration'
 import { navigateToCertificatePrintAction } from '@e2e/support/print-certificate/birth/helpers'
-import { expectInUrl } from '@e2e/support/utils'
+import { expectInUrl, waitForPersistedEvent } from '@e2e/support/utils'
 import { REQUIRED_VALIDATION_ERROR } from '@e2e/support/birth/helpers'
 
 test('Print certificate', async ({ page }) => {
@@ -56,6 +56,7 @@ test('Print certificate', async ({ page }) => {
     })
 
     await test.step('2.3 Click continue after selecting requester type and template type', async () => {
+      await waitForPersistedEvent(page)
       await page.reload()
       await page.locator('#collector____requesterId').click()
       const selectOptionsLabels = [
