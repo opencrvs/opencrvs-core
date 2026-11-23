@@ -15,15 +15,15 @@ import {
   field,
   defineFormPage,
   FieldConfigInput,
-  PageTypes,
-  or
+  PageTypes
 } from '@opencrvs/toolkit/events'
 import {
   BIRTH_LATE_REGISTRATION_TARGET_DAYS,
-  securePageWhileSealed
+  securePageWhileSealed,
+  LATE_REGISTRATION_ANCHOR
 } from '@countryconfig/events/utils'
 import {
-  child,
+  childPage,
   typeOfBirthOptions,
   attendantAtBirthOptions
 } from './pages/child'
@@ -32,7 +32,9 @@ import {
   invalidNameValidator,
   MAX_NAME_LENGTH
 } from '../validators'
-import { PHONE_NUMBER_REGEX } from './pages/informant'
+import { motherPage } from './pages/mother'
+import { BirthVersion } from '../versions'
+import { connectToMOSIPIdReader } from '@countryconfig/events/mosip'
 
 /**
  * Child fields captured on a birth notification. The fields are taken from the
@@ -49,209 +51,233 @@ const NOTIFICATION_CHILD_FIELD_IDS = [
 ]
 
 // Fields directly picked from the declaration form.
-const pickedFields = child.fields.filter(({ id }) =>
-  NOTIFICATION_CHILD_FIELD_IDS.includes(id)
-)
+function pickedFields(version: BirthVersion) {
+  return childPage(version).fields.filter(({ id }) =>
+    NOTIFICATION_CHILD_FIELD_IDS.includes(id)
+  )
+}
 
 // Fields which are different on the notification form.
-const differentFields: FieldConfigInput[] = [
-  {
-    id: 'child.name',
-    type: FieldType.NAME,
-    required: true,
-    configuration: {
-      name: {
-        firstname: { required: false },
-        surname: { required: true }
-      },
-      maxLength: MAX_NAME_LENGTH
-    },
-    hideLabel: true,
-    label: {
-      defaultMessage: "Child's name",
-      description: 'This is the label for the field',
-      id: 'event.birth.action.declare.form.section.child.field.name.label'
-    },
-    validation: [invalidNameValidator('child.name')]
-  },
-  // For notification, dont allow late registration.
-  {
-    id: 'child.dob',
-    analytics: true,
-    type: FieldType.DATE,
-    required: true,
-    secured: true,
-    validation: [
-      {
-        message: {
-          defaultMessage: 'Must be a valid Birthdate',
-          description: 'This is the error message for invalid date',
-          id: 'event.birth.action.declare.form.section.child.field.dob.error'
-        },
-        validator: field('child.dob').isBefore().now()
-      },
-      {
-        message: {
-          defaultMessage: 'Late registration is not allowed',
-          description: 'This is the error message for late registration',
-          id: 'event.birth.action.notify.form.section.child.field.dob.error'
-        },
-        validator: field('child.dob')
-          .isAfter()
-          .days(BIRTH_LATE_REGISTRATION_TARGET_DAYS)
-          .inPast()
-      }
-    ],
-    label: {
-      defaultMessage: 'Date of birth',
-      description: 'This is the label for the field',
-      id: 'event.birth.action.declare.form.section.child.field.dob.label'
-    }
-  },
-  // This field is required on the notification form, but optional on the declaration form.
-  {
-    id: 'child.birthType',
-    analytics: true,
-    type: FieldType.SELECT,
-    required: true,
-    label: {
-      defaultMessage: 'Type of birth',
-      description: 'This is the label for the field',
-      id: 'event.birth.action.declare.form.section.child.field.birthType.label'
-    },
-    options: typeOfBirthOptions
-  },
-  // This field is required on the notification form, but optional on the declaration form.
-  {
-    id: 'child.attendantAtBirth',
-    type: FieldType.SELECT,
-    analytics: true,
-    required: true,
-    label: {
-      defaultMessage: 'Attendant at birth',
-      description: 'This is the label for the field',
-      id: 'event.birth.action.declare.form.section.child.field.attendantAtBirth.label'
-    },
-    options: attendantAtBirthOptions
-  }
-]
-
-const childPage = defineFormPage({
-  id: 'child',
-  type: PageTypes.enum.FORM,
-  title: {
-    defaultMessage: "Child's details",
-    description: 'Form section title for Child',
-    id: 'form.birth.child.title'
-  },
-  fields: [...differentFields, ...pickedFields]
-})
-
-const mothersPage = defineFormPage({
-  id: 'mother',
-  type: PageTypes.enum.FORM,
-  title: {
-    defaultMessage: "Mother's details",
-    description: 'Form section title for mothers details',
-    id: 'form.section.mother.title'
-  },
-  fields: [
+function differentFields(version: BirthVersion): FieldConfigInput[] {
+  return [
     {
-      id: 'mother.name',
+      id: 'child.name',
       type: FieldType.NAME,
       required: true,
-      configuration: farajalandNameConfig,
+      configuration: {
+        name: {
+          firstname: { required: false },
+          surname: { required: true }
+        },
+        maxLength: MAX_NAME_LENGTH
+      },
       hideLabel: true,
       label: {
-        defaultMessage: "Mother's name",
+        defaultMessage: "Child's name",
         description: 'This is the label for the field',
-        id: 'event.birth.action.declare.form.section.mother.field.name.label'
+        id: 'event.birth.action.declare.form.section.child.field.name.label'
       },
-      validation: [invalidNameValidator('mother.name')]
+      validation: [invalidNameValidator('child.name')]
     },
+    // For notification, dont allow late registration.
     {
-      id: 'mother.dob',
-      type: 'DATE',
+      id: 'child.dob',
+      analytics: true,
+      type: FieldType.DATE,
       required: true,
       secured: true,
-      analytics: true,
       validation: [
         {
           message: {
-            defaultMessage: 'Must be a valid birth date',
+            defaultMessage: 'Must be a valid Birthdate',
             description: 'This is the error message for invalid date',
-            id: 'event.birth.action.declare.form.section.person.field.dob.error'
+            id: 'event.birth.action.declare.form.section.child.field.dob.error'
           },
-          validator: field('mother.dob').isBefore().now()
+          validator: field('child.dob').isBefore().now()
         },
         {
           message: {
-            defaultMessage:
-              "Birth date must be 18 years before child's birth date",
-            description:
-              "This is the error message for a birth date after child's birth date",
-            id: 'event.birth.action.declare.form.section.person.dob.afterChild'
+            defaultMessage: 'Late registration is not allowed',
+            description: 'This is the error message for late registration',
+            id: 'event.birth.action.notify.form.section.child.field.dob.error'
           },
-          validator: field('mother.dob')
-            .isBefore()
-            .days(6570)
-            .fromDate(field('child.dob'))
+          validator: field('child.dob')
+            .isAfter()
+            .days(BIRTH_LATE_REGISTRATION_TARGET_DAYS)
+            .beforeAction(LATE_REGISTRATION_ANCHOR)
         }
       ],
       label: {
         defaultMessage: 'Date of birth',
         description: 'This is the label for the field',
-        id: 'event.birth.action.declare.form.section.person.field.dob.label'
+        id: 'event.birth.action.declare.form.section.child.field.dob.label'
       }
     },
+    // This field is required on the notification form, but optional on the declaration form.
+    ...(version === BirthVersion.V2
+      ? [
+          {
+            id: 'child.birthType',
+            analytics: true,
+            type: FieldType.SELECT,
+            required: true,
+            label: {
+              defaultMessage: 'Type of birth',
+              description: 'This is the label for the field',
+              id: 'event.birth.action.declare.form.section.child.field.birthType.label'
+            },
+            options: typeOfBirthOptions
+          }
+        ]
+      : []),
+    // This field is required on the notification form, but optional on the declaration form.
     {
-      id: 'informant.phoneNo',
-      type: FieldType.PHONE,
-      required: false,
-      secured: true,
-      label: {
-        defaultMessage: 'Phone number',
-        description: 'This is the label for the field',
-        id: 'event.birth.action.declare.form.section.informant.field.phoneNo.label'
-      },
-      validation: [
-        {
-          message: {
-            defaultMessage:
-              'Must be a valid 10 digit number that starts with 0(7|9)',
-            description:
-              'The error message that appears on phone numbers where the first two characters must be 07 or 09, and length must be 10',
-            id: 'event.birth.action.declare.form.section.informant.field.phoneNo.error'
-          },
-          validator: or(
-            field('informant.phoneNo').matches(PHONE_NUMBER_REGEX),
-            field('informant.phoneNo').isFalsy()
-          )
-        }
-      ]
-    },
-    {
-      id: 'informant.email',
-      type: FieldType.EMAIL,
+      id: 'child.attendantAtBirth',
+      type: FieldType.SELECT,
+      analytics: true,
       required: true,
-      secured: true,
       label: {
-        defaultMessage: 'Email',
+        defaultMessage: 'Attendant at birth',
         description: 'This is the label for the field',
-        id: 'event.birth.action.declare.form.section.informant.field.email.label'
+        id: 'event.birth.action.declare.form.section.child.field.attendantAtBirth.label'
       },
-      configuration: {
-        maxLength: 255
-      }
+      options: attendantAtBirthOptions
     }
   ]
-})
+}
 
-export const BIRTH_NOTIFICATION_FORM = defineDeclarationForm({
-  label: {
-    defaultMessage: 'Birth notification form',
-    id: 'event.birth.action.notify.form.label',
-    description: 'This is what the birth notification form is referred as'
-  },
-  pages: [securePageWhileSealed(childPage), securePageWhileSealed(mothersPage)]
-})
+/**
+ * Mother's identity fields are picked from the declaration form, including the
+ * MOSIP / E-Signet integration. `requireMotherDetails` in their conditionals is
+ * always true here, as the notification form has neither the informant's
+ * relation nor the "details not available" checkbox.
+ */
+const pickMotherFields = (version: BirthVersion, ids: string[]) =>
+  motherPage(version).fields.filter(({ id }) => ids.includes(id))
+
+function motherIdReaderFields(version: BirthVersion) {
+  return pickMotherFields(version, [
+    'mother.verified',
+    'mother.query-params',
+    'mother.verify-nid-http-fetch',
+    'mother.fetch-loader',
+    'mother.id-reader'
+  ])
+}
+
+// The ID type is optional on a notification, so notifications without the
+// mother's ID stay valid. Once a type is chosen, its ID number is required.
+function motherIdFields(version: BirthVersion) {
+  return pickMotherFields(version, [
+    'mother.idType',
+    'mother.nid',
+    'mother.passport',
+    'mother.brn'
+  ]).map((f) => (f.id === 'mother.idType' ? { ...f, required: false } : f))
+}
+
+function notificationChildPage(version: BirthVersion) {
+  return defineFormPage({
+    id: 'child',
+    type: PageTypes.enum.FORM,
+    title: {
+      defaultMessage: "Child's details",
+      description: 'Form section title for Child',
+      id: 'form.birth.child.title'
+    },
+    fields: [...differentFields(version), ...pickedFields(version)]
+  })
+}
+
+function mothersPage(version: BirthVersion) {
+  return defineFormPage({
+    id: 'mother',
+    type: PageTypes.enum.FORM,
+    title: {
+      defaultMessage: "Mother's details",
+      description: 'Form section title for mothers details',
+      id: 'form.section.mother.title'
+    },
+    fields: [
+      ...motherIdReaderFields(version),
+      connectToMOSIPIdReader(
+        {
+          id: 'mother.name',
+          type: FieldType.NAME,
+          required: true,
+          configuration: farajalandNameConfig,
+          hideLabel: true,
+          label: {
+            defaultMessage: "Mother's name",
+            description: 'This is the label for the field',
+            id: 'event.birth.action.declare.form.section.mother.field.name.label'
+          },
+          validation: [invalidNameValidator('mother.name')]
+        },
+        {
+          valuePath: 'data.name',
+          disableIf: ['pending', 'verified', 'authenticated']
+        }
+      ),
+      connectToMOSIPIdReader(
+        {
+          id: 'mother.dob',
+          type: 'DATE',
+          required: true,
+          secured: true,
+          analytics: true,
+          validation:
+            version === BirthVersion.V2
+              ? [
+                  {
+                    message: {
+                      defaultMessage: 'Must be a valid birth date',
+                      description: 'This is the error message for invalid date',
+                      id: 'event.birth.action.declare.form.section.person.field.dob.error'
+                    },
+                    validator: field('mother.dob').isBefore().now()
+                  },
+                  {
+                    message: {
+                      defaultMessage:
+                        "Birth date must be 18 years before child's birth date",
+                      description:
+                        "This is the error message for a birth date after child's birth date",
+                      id: 'event.birth.action.declare.form.section.person.dob.afterChild'
+                    },
+                    validator: field('mother.dob')
+                      .isBefore()
+                      .days(6570)
+                      .fromDate(field('child.dob'))
+                  }
+                ]
+              : [],
+          label: {
+            defaultMessage: 'Date of birth',
+            description: 'This is the label for the field',
+            id: 'event.birth.action.declare.form.section.person.field.dob.label'
+          }
+        },
+        {
+          valuePath: 'data.birthDate',
+          disableIf: ['pending', 'verified', 'authenticated']
+        }
+      ),
+      ...motherIdFields(version)
+    ]
+  })
+}
+
+export function birthNotificationForm(version: BirthVersion) {
+  return defineDeclarationForm({
+    label: {
+      defaultMessage: 'Birth notification form',
+      id: 'event.birth.action.notify.form.label',
+      description: 'This is what the birth notification form is referred as'
+    },
+    pages: [
+      securePageWhileSealed(notificationChildPage(version)),
+      securePageWhileSealed(mothersPage(version))
+    ]
+  })
+}

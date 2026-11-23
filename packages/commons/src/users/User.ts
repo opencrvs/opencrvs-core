@@ -12,7 +12,7 @@
 import { DocumentPath } from '../documents'
 import * as z from 'zod/v4'
 import { UUID } from '../uuid'
-import { TokenUserType } from '../authentication'
+import { TokenUserType } from './authentication'
 import {
   EmailValue,
   FieldValue,
@@ -80,6 +80,10 @@ export const CreateUserInput = User.pick({
   data: true
 })
   .extend({
+    /**
+     * The id of the new user. If the input has no id, the server creates one.
+     */
+    id: UUID.optional(),
     username: z.undefined().optional(),
     password: z.undefined().optional(),
     signature: FileFieldValue.optional()

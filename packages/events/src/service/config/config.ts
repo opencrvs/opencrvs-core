@@ -13,15 +13,19 @@ import fetch from 'node-fetch'
 import { array } from 'zod'
 import {
   ApplicationConfig,
-  getOrThrow,
+  EventDocument,
+  getEventConfigById,
+  getEventConfigForRecord,
   logger,
-  resolveEventConfig,
+  resolveEventConfigInTimeZone,
   Role,
   TokenWithBearer,
+  validateRoles,
   VersionedEventConfig,
   WorkqueueConfig
 } from '@opencrvs/commons'
 import { env } from '@events/environment'
+
 /**
  * Configuration is served from countryconfig, which can be deployed
  * independently of the events service (e.g. a Kubernetes rollout that updates
@@ -110,38 +114,74 @@ export const getInMemoryVersionedEventConfigurations = createTtlConfigCache(
   getEventConfigurations
 )
 
+export async function getApplicationConfig() {
+  const res = await fetch(
+    new URL('/config/application', env.COUNTRY_CONFIG_URL),
+    { headers: { 'Content-Type': 'application/json' } }
+  )
+
+  if (!res.ok) {
+    throw new Error(`Failed to fetch application config: ${res.status}`)
+  }
+
+  return ApplicationConfig.parse(await res.json())
+}
+
 /**
- * @returns the configuration of each event, at the version that applies (see `resolveEventConfig`).
+ * @returns application configuration, cached in production for up to
+ * `EVENT_CONFIG_CACHE_TTL_MS` (always fresh in development).
+ */
+const getInMemoryApplicationConfig = createTtlConfigCache(
+  'application configuration',
+  async () => getApplicationConfig()
+)
+
+/** @returns the country's time zone (IANA), in which configuration versions take effect. */
+export async function getCountryTimeZone(token: TokenWithBearer) {
+  return (await getInMemoryApplicationConfig(token)).SYSTEM_IANA_TIMEZONE
+}
+
+/**
+ * @returns the configuration of each event, at the version in effect today in the
+ * country's time zone. For a record, use `getEventConfigurationForRecord` instead.
  */
 export async function getInMemoryEventConfigurations(token: TokenWithBearer) {
-  const configurations = await getInMemoryVersionedEventConfigurations(token)
-  return configurations.map(resolveEventConfig)
+  const [configurations, timeZone] = await Promise.all([
+    getInMemoryVersionedEventConfigurations(token),
+    getCountryTimeZone(token)
+  ])
+  return configurations.map((config) =>
+    resolveEventConfigInTimeZone(config, timeZone)
+  )
 }
 
-async function findEventConfigurationById({
+export async function getVersionedEventConfigurationById({
   eventType,
   token
 }: {
   eventType: string
   token: TokenWithBearer
 }) {
-  const configurations = await getInMemoryEventConfigurations(token)
-  return configurations.find((config) => config.id === eventType)
+  return getEventConfigById(
+    await getInMemoryVersionedEventConfigurations(token),
+    eventType
+  )
 }
 
-export async function getEventConfigurationById({
-  eventType,
+/**
+ * @returns the configuration of the version `event` is stamped with: every action on
+ * a record uses the version it was created under.
+ */
+export async function getEventConfigurationForRecord({
+  event,
   token
 }: {
-  eventType: string
+  event: Pick<EventDocument, 'type' | 'configVersionId'>
   token: TokenWithBearer
 }) {
-  return getOrThrow(
-    await findEventConfigurationById({
-      eventType,
-      token
-    }),
-    `No configuration found for event type: ${eventType}`
+  return getEventConfigForRecord(
+    await getVersionedEventConfigurationById({ eventType: event.type, token }),
+    event
   )
 }
 
@@ -172,7 +212,7 @@ export const getInMemoryWorkqueueConfigurations = createTtlConfigCache(
   getWorkqueueConfigurations
 )
 
-export async function getRoles() {
+async function getRoles(token: TokenWithBearer) {
   const res = await fetch(new URL('/config/roles', env.COUNTRY_CONFIG_URL), {
     headers: {
       'Content-Type': 'application/json'
@@ -183,18 +223,13 @@ export async function getRoles() {
     throw new Error('Failed to fetch roles config')
   }
 
-  return array(Role).parse(await res.json())
+  const eventConfigurations =
+    await getInMemoryVersionedEventConfigurations(token)
+  const roles = array(Role).parse(await res.json())
+
+  validateRoles(roles, eventConfigurations)
+
+  return roles
 }
 
-export async function getApplicationConfig() {
-  const res = await fetch(
-    new URL('/config/application', env.COUNTRY_CONFIG_URL),
-    { headers: { 'Content-Type': 'application/json' } }
-  )
-
-  if (!res.ok) {
-    throw new Error(`Failed to fetch application config: ${res.status}`)
-  }
-
-  return ApplicationConfig.parse(await res.json())
-}
+export const getInMemoryRoles = createTtlConfigCache('roles', getRoles)

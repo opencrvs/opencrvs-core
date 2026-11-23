@@ -11,9 +11,7 @@
 
 import React from 'react'
 import styled from 'styled-components'
-import { Icon } from '@opencrvs/components/lib/Icon'
-import { Button } from '@opencrvs/components/lib/Button'
-import { Text } from '@opencrvs/components/lib/Text'
+import { Icon, Button, Text } from '@opencrvs/components'
 import { InfoBox as InfoBoxConfig } from '@opencrvs/commons/client'
 
 type InfoBoxType = InfoBoxConfig['type']
@@ -103,7 +101,11 @@ export function InfoBox({
   return (
     <Container $background={background} $type={type} data-testid={dataTestId}>
       <IconBlock $background={background} $type={type}>
-        <Icon color={accentColor[type]} name={icon ?? DEFAULT_ICON} size="large" />
+        <Icon
+          color={accentColor[type]}
+          name={icon ?? DEFAULT_ICON}
+          size="large"
+        />
       </IconBlock>
       <Heading>{heading}</Heading>
       {description && <Description>{description}</Description>}

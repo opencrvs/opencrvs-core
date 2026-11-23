@@ -13,8 +13,7 @@ import React from 'react'
 import styled from 'styled-components'
 import { defineMessage, useIntl } from 'react-intl'
 import { useTypedParams } from 'react-router-typesafe-routes/dom'
-import { Icon } from '@opencrvs/components/lib/Icon'
-import { Text } from '@opencrvs/components'
+import { Icon, Text } from '@opencrvs/components'
 import {
   ActionType,
   ActionStatus,

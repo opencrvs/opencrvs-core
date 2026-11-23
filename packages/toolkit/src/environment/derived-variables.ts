@@ -179,5 +179,12 @@ export const derivedVariables = [
     valueType: 'VARIABLE',
     type: 'disabled',
     scope: 'ENVIRONMENT'
+  },
+  {
+    name: 'RUSTFS_HOST_DATA_PATH',
+    valueLabel: 'RUSTFS_HOST_DATA_PATH',
+    valueType: 'VARIABLE',
+    type: 'disabled',
+    scope: 'ENVIRONMENT'
   }
 ] as const

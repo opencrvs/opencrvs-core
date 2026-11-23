@@ -13,8 +13,7 @@ import styled from 'styled-components'
 import { defineMessages, IntlShape, useIntl } from 'react-intl'
 import { useNavigate } from 'react-router-dom'
 import format from 'date-fns/format'
-import { Table } from '@opencrvs/components/lib/Table'
-import { Text } from '@opencrvs/components/lib/Text'
+import { Table, Text, ColumnContentAlignment, Link } from '@opencrvs/components'
 import {
   Action,
   ActionType,
@@ -33,10 +32,9 @@ import {
   PlainDate,
   toPlainDate
 } from '@opencrvs/commons/client'
-import { ColumnContentAlignment, Link } from '@opencrvs/components'
 import { makeFormFieldIdFormikCompatible } from '@client/v2-events/components/forms/utils'
 import { messages as correctionMessages } from '@client/i18n/messages/views/correction'
-import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
+import { useEventConfigurationForRecord } from '@client/v2-events/features/events/useEventConfiguration'
 import {
   isEmptyValue,
   Output
@@ -221,7 +219,7 @@ export function CorrectionDetails({
   validatorContext: ValidatorContext
 }) {
   const intl = useIntl()
-  const { eventConfiguration } = useEventConfiguration(event.type)
+  const { eventConfiguration } = useEventConfigurationForRecord(event)
 
   const navigate = useNavigate()
   const { getUserDetails } = useUserDetails()

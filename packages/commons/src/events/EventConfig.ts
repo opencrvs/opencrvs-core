@@ -21,6 +21,8 @@ import { Conditional } from './Conditional'
 import type { JSONSchema } from '../conditionals/conditionals'
 import { AvailableIcons } from '../icons'
 import { ActionType } from './ActionType'
+import { PlainDate, toPlainDateInTimeZone } from './PlainDate'
+import { getOrThrow } from '../utils'
 import {
   validateActionOrder,
   validateActionFlags,
@@ -110,6 +112,8 @@ export type EventConfigVersionInput = Omit<
 > & {
   /** Identifier of the version, unique within the event (e.g. "birth-v2"). */
   id: string
+  /** Name of the version, which the UI shows wherever it names the version. For example, `{event.configVersionLabel}` in the event summary. */
+  label: TranslationConfig
   /** Date (YYYY-MM-DD) from which this version is effective. Without one, effective from the beginning of time. */
   effectiveFrom?: string
 }
@@ -228,8 +232,11 @@ export const EventConfig: z.ZodType<EventConfig, EventConfigSchemaInput> =
 
 type EventLevelField = keyof typeof eventLevelFields
 
-/** Id of the version of an event configured without `versions`. */
-export const DEFAULT_EVENT_CONFIG_VERSION_ID = 'default'
+/**
+ * Id of the version of an event configured without `versions`, i.e. the configuration
+ * before versioning. Records created before versioning are stamped with it.
+ */
+export const INITIAL_EVENT_CONFIG_VERSION_ID = 'initial'
 
 /** `effectiveFrom` of a version configured without one. */
 export const DEFAULT_EFFECTIVE_FROM = '0001-01-01'
@@ -237,6 +244,8 @@ export const DEFAULT_EFFECTIVE_FROM = '0001-01-01'
 /** One version of an event: what the event looks like from `effectiveFrom` on. */
 export type EventConfigVersion = Omit<EventConfig, EventLevelField> & {
   id: string
+  /** Name of the version. A version configured without `versions` has the label of the event. */
+  label: TranslationConfig
   /** Date (YYYY-MM-DD) from which this version is effective. '0001-01-01' when configured without one. */
   effectiveFrom: string
 }
@@ -258,6 +267,9 @@ const _EventConfigVersion: z.ZodType<
     .describe(
       'Identifier of the version, unique within the event (e.g. "birth-v2").'
     ),
+  label: TranslationConfig.describe(
+    'Name of the version, which the UI shows wherever it names the version. For example, "{event.configVersionLabel}" in the event summary.'
+  ),
   effectiveFrom: z.iso
     .date()
     .default(DEFAULT_EFFECTIVE_FROM)
@@ -281,7 +293,7 @@ const resolvedConfigs = new WeakMap<
  * version of the event. The same event and version give the same object, so caches
  * keyed on the configuration keep working.
  */
-export function getEventConfigOfVersion(
+export function toEventConfig(
   config: VersionedEventConfig,
   version: EventConfigVersion
 ): EventConfig {
@@ -295,7 +307,12 @@ export function getEventConfigOfVersion(
     return cached
   }
 
-  const { id: _id, effectiveFrom: _effectiveFrom, ...fields } = version
+  const {
+    id: _id,
+    label: _label,
+    effectiveFrom: _effectiveFrom,
+    ...fields
+  } = version
   const resolved: EventConfig = {
     ...fields,
     id: config.id,
@@ -306,12 +323,155 @@ export function getEventConfigOfVersion(
   return resolved
 }
 
+/** @returns the version with id `versionId`, or undefined when it is not configured. */
+export function findConfigVersion(
+  config: VersionedEventConfig,
+  versionId: string
+): EventConfigVersion | undefined {
+  return config.versions.find(({ id }) => id === versionId)
+}
+
 /**
- * @returns the configuration of the version of the event that applies.
- * @TODO: always the first version until the version is resolved from the record (#13602).
+ * @returns the version with id `versionId`.
+ * @throws when that version is not configured.
+ */
+export function getConfigVersion(
+  config: VersionedEventConfig,
+  versionId: string
+): EventConfigVersion {
+  return getOrThrow(
+    findConfigVersion(config, versionId),
+    `Event '${config.id}' has no version '${versionId}'`
+  )
+}
+
+/**
+ * @returns the configuration of the version with id `versionId`.
+ * @throws when the version is not configured.
+ */
+export function getEventConfigOfVersion(
+  config: VersionedEventConfig,
+  versionId: string
+): EventConfig {
+  return toEventConfig(config, getConfigVersion(config, versionId))
+}
+
+/** Orders versions by `effectiveFrom`, earliest first. */
+export function byEffectiveFrom(a: EventConfigVersion, b: EventConfigVersion) {
+  return a.effectiveFrom.localeCompare(b.effectiveFrom)
+}
+
+/**
+ * @returns the versions that took effect on or before `date`. Earliest first, so the
+ * last one is the version in effect on `date`.
+ */
+function getVersionsInEffectOn(
+  config: VersionedEventConfig,
+  date: PlainDate
+): EventConfigVersion[] {
+  return config.versions
+    .filter(({ effectiveFrom }) => effectiveFrom <= date)
+    .sort(byEffectiveFrom)
+}
+
+/**
+ * @returns the version with the latest `effectiveFrom` not after `date`. Undefined
+ * when every version takes effect later.
+ */
+function findVersionInEffectOn(
+  config: VersionedEventConfig,
+  date: PlainDate
+): EventConfigVersion | undefined {
+  return getVersionsInEffectOn(config, date).at(-1)
+}
+
+/**
+ * @returns the versions that took effect on or before the date of `now` in `timeZone`,
+ * the country's time zone.
+ * Earliest first, so the last one is the version in effect at `now`.
+ */
+export function getVersionsInEffect(
+  config: VersionedEventConfig,
+  now: Date,
+  timeZone: string
+): EventConfigVersion[] {
+  return getVersionsInEffectOn(config, toPlainDateInTimeZone(now, timeZone))
+}
+
+/**
+ * @returns the version in effect at `now`: the one with the latest `effectiveFrom` not
+ * after the date of `now` in `timeZone`, the country's time zone, since versions take
+ * effect at its midnight. Undefined when every version takes effect later.
+ */
+export function resolveEffectiveVersion(
+  config: VersionedEventConfig,
+  now: Date,
+  timeZone: string
+): EventConfigVersion | undefined {
+  return findVersionInEffectOn(config, toPlainDateInTimeZone(now, timeZone))
+}
+
+/**
+ * @returns the configuration of the version a record is stamped with, like
+ * `getEventConfigForRecord`, or undefined when that version is not configured.
+ */
+export function findEventConfigForRecord(
+  config: VersionedEventConfig,
+  record: { configVersionId: string }
+): EventConfig | undefined {
+  const version = findConfigVersion(config, record.configVersionId)
+  return version && toEventConfig(config, version)
+}
+
+/**
+ * @returns the configuration of the version a record is stamped with.
+ * @throws when the record's version is no longer configured.
+ */
+export function getEventConfigForRecord(
+  config: VersionedEventConfig,
+  record: { configVersionId: string }
+): EventConfig {
+  return getEventConfigOfVersion(config, record.configVersionId)
+}
+
+/**
+ * @returns the configuration of the version in effect on `date`, a date in the
+ * country's time zone. For a record, use `getEventConfigForRecord` instead.
+ * @throws when no version is in effect on that date, which `defineConfig` rules out.
+ */
+export function resolveEventConfigOnDate(
+  config: VersionedEventConfig,
+  date: PlainDate
+): EventConfig {
+  return toEventConfig(
+    config,
+    getOrThrow(
+      findVersionInEffectOn(config, date),
+      `Event '${config.id}' has no version in effect on ${date}`
+    )
+  )
+}
+
+/**
+ * @returns the configuration of the version in effect on the date of `now` (today by
+ * default) in `timeZone`, the country's time zone. For a record, use
+ * `getEventConfigForRecord` instead.
+ * @throws when no version is in effect on that date, which `defineConfig` rules out.
+ */
+export function resolveEventConfigInTimeZone(
+  config: VersionedEventConfig,
+  timeZone: string,
+  now: Date = new Date()
+): EventConfig {
+  return resolveEventConfigOnDate(config, toPlainDateInTimeZone(now, timeZone))
+}
+
+/**
+ * @returns the configuration of the version in effect today in UTC. For country config
+ * code with no time zone at hand; core code uses `resolveEventConfigInTimeZone`.
  */
 export function resolveEventConfig(config: VersionedEventConfig): EventConfig {
-  return getEventConfigOfVersion(config, config.versions[0])
+  return resolveEventConfigInTimeZone(config, 'UTC')
 }
 
 /**
@@ -407,16 +567,14 @@ export const VersionedEventConfig: z.ZodType<
       .array(_EventConfigVersion)
       .min(1)
       .describe(
-        `Versions of the event configuration, each effective from its \`effectiveFrom\`. An event configured without versions has a single version, with id '${DEFAULT_EVENT_CONFIG_VERSION_ID}' and \`effectiveFrom\` '${DEFAULT_EFFECTIVE_FROM}'.`
+        `Versions of the event configuration, each effective from its \`effectiveFrom\`. An event configured without versions has a single version, with id '${INITIAL_EVENT_CONFIG_VERSION_ID}' and \`effectiveFrom\` '${DEFAULT_EFFECTIVE_FROM}'.`
       )
   })
   .superRefine((config, ctx) => {
     validateVersionList(config, ctx)
     validateEachVersion(
       ctx,
-      config.versions.map((version) =>
-        getEventConfigOfVersion(config, version)
-      ),
+      config.versions.map((version) => toEventConfig(config, version)),
       validateEventConfig
     )
   })

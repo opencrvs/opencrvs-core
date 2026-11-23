@@ -28,14 +28,20 @@ import {
   isFileFieldWithOptionType,
   TranslationConfig
 } from '@opencrvs/commons/client'
-import { Content, ContentSize } from '@opencrvs/components/lib/Content'
-import { ITableRow, Table } from '@opencrvs/components/lib/Table'
-import { Link, Pagination, Text } from '@opencrvs/components'
-import { Spinner } from '@opencrvs/components/lib/Spinner'
+import {
+  Content,
+  ContentSize,
+  ITableRow,
+  Table,
+  Link,
+  Pagination,
+  Text,
+  Spinner
+} from '@opencrvs/components'
 import { ActionType } from '@opencrvs/commons/client'
 import { messages as eventOverviewMessages } from '@client/v2-events/layouts/EventOverview'
 import { ROUTES } from '@client/v2-events/routes'
-import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
+import { useEventConfigurationForRecord } from '@client/v2-events/features/events/useEventConfiguration'
 import { DocumentPreview } from '@client/v2-events/components/forms/inputs/FileInput/DocumentPreview'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
 import { useOnlineStatus } from '@client/utils'
@@ -266,7 +272,7 @@ function DocumentNameCell({
 function DocumentsContent({ event }: { event: EventDocument }) {
   const intl = useIntl()
   const [currentPageNumber, setCurrentPageNumber] = useState(1)
-  const { eventConfiguration } = useEventConfiguration(event.type)
+  const { eventConfiguration } = useEventConfigurationForRecord(event)
 
   const { acceptedActions, entries } = useMemo(() => {
     const actions = getAcceptedActions(event)

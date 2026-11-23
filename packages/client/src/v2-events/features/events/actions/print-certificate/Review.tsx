@@ -54,7 +54,7 @@ import { useLocations } from '@client/v2-events/hooks/useLocations'
 import { getUserIdsFromActions } from '@client/v2-events/utils'
 import { useActionAnnotation } from '@client/v2-events/features/events/useActionAnnotation'
 import { validationErrorsInActionFormExist } from '@client/v2-events/components/forms/validation'
-import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
+import { useEventConfigurationForRecord } from '@client/v2-events/features/events/useEventConfiguration'
 import { useOnlineStatus } from '@client/utils'
 import { getUserDetails } from '@client/profile/profileSelectors'
 import { useUserAllowedActions } from '@client/v2-events/features/workqueues/Actions/useUserAllowedActions'
@@ -171,7 +171,7 @@ export function Review() {
     actions: { assignment }
   } = useEvents()
   const fullEvent = getEvent.useGetEventFromCache(eventId)
-  const { eventConfiguration } = useEventConfiguration(fullEvent.type)
+  const { eventConfiguration } = useEventConfigurationForRecord(fullEvent)
   const fullEventIndex = getCurrentEventState(fullEvent, eventConfiguration)
   const validatorContext = useValidatorContext(fullEvent)
 

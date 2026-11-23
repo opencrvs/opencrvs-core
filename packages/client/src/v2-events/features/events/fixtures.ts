@@ -21,7 +21,8 @@ import {
   EventStatus,
   TENNIS_CLUB_MEMBERSHIP,
   UUID,
-  getUUID
+  getUUID,
+  INITIAL_EVENT_CONFIG_VERSION_ID
 } from '@opencrvs/commons/client'
 import { testDataGenerator } from '@client/tests/test-data-generators'
 import { CACHE_NAME } from '@client/v2-events/cache'
@@ -39,6 +40,7 @@ export const storybookEventId = UUID.parse(
 export const tennisClubMembershipEventIndex: EventIndex = {
   id: getUUID(),
   type: TENNIS_CLUB_MEMBERSHIP,
+  configVersionId: INITIAL_EVENT_CONFIG_VERSION_ID,
   trackingId: 'TEST12',
   status: EventStatus.enum.CREATED,
   createdAt: '2023-03-01T00:00:00.000Z',
@@ -74,6 +76,7 @@ export const tennisClubMembershipEventDocument: EventDocument = {
   type: TENNIS_CLUB_MEMBERSHIP,
   id: 'c5d9d901-00bf-4631-89dc-89ca5060cb52' as UUID,
   trackingId: 'TEST12',
+  configVersionId: INITIAL_EVENT_CONFIG_VERSION_ID,
   createdAt: '2025-01-23T05:30:02.615Z',
   updatedAt: '2025-01-23T05:35:27.689Z',
   actions: [
@@ -261,6 +264,35 @@ export const tennisClubMembershipEventWithRevokeAndReinstate: EventDocument = {
     revokeRegistrationAction,
     reinstateRegistrationAction
   ]
+}
+
+const eventWithPrintCertificateId = 'c5d6e7f8-00bf-4631-89dc-89ca506c5d9f' as UUID
+
+const printCertificateAction: ActionDocument = {
+  id: '7d5f6a7b-8c9d-4e4f-8a3b-4c5d6e7f8a9b' as UUID,
+  status: ActionStatus.Accepted,
+  declaration: {},
+  annotation: {
+    'collector.requesterId': 'OTHER',
+    'collector.OTHER.signedAffidavit': {
+      path: `events/${eventWithPrintCertificateId}/affidavit.png` as DocumentPath,
+      originalFilename: 'affidavit.png',
+      type: 'image/png'
+    }
+  },
+  type: ActionType.PRINT_CERTIFICATE,
+  createdBy: localRegistrarId,
+  createdByRole: 'LOCAL_REGISTRAR',
+  createdByUserType: 'user',
+  createdAt: '2025-01-28T05:35:27.689Z',
+  createdAtLocation: '028d2c85-ca31-426d-b5d1-2cef545a4902' as UUID,
+  transactionId: 'aasdk342-asdkj3423-kn234k31'
+}
+
+export const tennisClubMembershipEventWithPrintCertificate: EventDocument = {
+  ...tennisClubMembershipEventDocument,
+  id: eventWithPrintCertificateId,
+  actions: [...tennisClubMembershipEventDocument.actions, printCertificateAction]
 }
 
 export const TestImage = {

@@ -36,6 +36,11 @@
   {{- end }}
             - name: OTEL_DEPLOYMENT_ENVIRONMENT
               value: {{ $deployment_environment | quote }}
+  {{- /* Optional: pin service.name instead of deriving it from package.json */}}
+  {{- with .service_name }}
+            - name: OTEL_SERVICE_NAME
+              value: {{ . | quote }}
+  {{- end }}
             - name: OTEL_TRACES_EXPORTER
               value: "otlp"
             - name: OTEL_METRICS_EXPORTER

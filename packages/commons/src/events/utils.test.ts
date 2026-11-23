@@ -20,7 +20,7 @@ import {
   EventState
 } from './ActionDocument'
 import { EventDocument } from './EventDocument'
-import { EventConfig } from './EventConfig'
+import { EventConfig, INITIAL_EVENT_CONFIG_VERSION_ID } from './EventConfig'
 import { ActionConfig } from './ActionConfig'
 import { ActionType } from './ActionType'
 import {
@@ -42,7 +42,7 @@ import {
   getPendingAction,
   omitHiddenPaginatedFields
 } from './utils'
-import { TokenUserType } from '../authentication'
+import { TokenUserType } from '../users/authentication'
 import {
   createPrng,
   field,
@@ -707,6 +707,7 @@ describe('getCompleteActionAnnotation', () => {
     createdAt: '2023-01-01T00:00:00Z',
     updatedAt: '2023-01-01T00:00:00Z',
     trackingId: 'tracking-id-1',
+    configVersionId: INITIAL_EVENT_CONFIG_VERSION_ID,
     actions: []
   }
 
@@ -826,6 +827,7 @@ describe('getCompleteActionContent', () => {
     createdAt: '2023-01-01T00:00:00Z',
     updatedAt: '2023-01-01T00:00:00Z',
     trackingId: 'tracking-id-1',
+    configVersionId: INITIAL_EVENT_CONFIG_VERSION_ID,
     actions: []
   }
 
@@ -1165,6 +1167,7 @@ describe('getDeclarationAfterEachAction', () => {
     id: 'event-id' as UUID,
     type: tennisClubMembershipEvent.id,
     trackingId: 'TEST12',
+    configVersionId: INITIAL_EVENT_CONFIG_VERSION_ID,
     createdAt: '2025-01-01T00:00:00.000Z',
     updatedAt: '2025-01-01T00:00:08.000Z',
     actions: [

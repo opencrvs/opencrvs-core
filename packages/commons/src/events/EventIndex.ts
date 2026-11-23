@@ -15,7 +15,7 @@ import { ContainsFlags } from './Flag'
 import { EventState } from './ActionDocument'
 
 import { TENNIS_CLUB_MEMBERSHIP } from './Constants'
-import { TokenUserType } from '../authentication'
+import { TokenUserType } from '../users/authentication'
 import { SelectDateRangeValue } from './FieldValue'
 
 export { ContainsFlags } from './Flag'

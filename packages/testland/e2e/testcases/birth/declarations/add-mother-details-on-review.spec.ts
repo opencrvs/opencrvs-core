@@ -57,7 +57,10 @@ test('Add mother details on review', async ({ page }) => {
 
   await test.step('Declaration by RO (via API): grandmother as informant, mother details not available', async () => {
     const token = await getToken(CREDENTIALS.REGISTRATION_OFFICER_VILLAGE)
-    const base = await getDeclaration({ token, informantRelation: 'BROTHER' })
+    const base = await getDeclaration({
+      token,
+      informantRelation: 'LEGAL_GUARDIAN'
+    })
     const village = base['mother.address'].administrativeArea
     const {
       'mother.name': _motherName,

@@ -11,13 +11,14 @@
 import * as objectHash from 'object-hash'
 import { EventDocument } from '../events/EventDocument'
 import { ActionUpdate, EventState } from '../events/ActionDocument'
-import { ITokenPayload as TokenPayload } from '../authentication'
+import { ITokenPayload as TokenPayload } from '../users/authentication'
 import { PartialSchema as AjvJSONSchemaType } from 'ajv/dist/types/json-schema'
 import { userSerializer } from '../events/serializers/user/serializer'
 import { omitKeyDeep } from '../utils'
 import { UUID } from '../uuid'
 import { todayDateTimeValueSerializer } from '../events/serializers/date/serializer'
 import { EventStatus } from '../events/EventMetadata'
+import type { ActionType } from '../events/ActionType'
 import { CodeToEvaluate, FieldReference } from '../events/FieldConfig'
 import { userReferenceFunctions } from '../users/userReferences'
 import type { ClientFunctionContext } from './validate'
@@ -269,6 +270,30 @@ export function isEventFieldReference(
 }
 
 /**
+ * Matches an action by type. A custom action must always name its
+ * `customActionType`, so that it does not match every custom action.
+ */
+export type ActionMatcher =
+  | { type: typeof ActionType.CUSTOM; customActionType: string }
+  | {
+      type: Exclude<ActionType, typeof ActionType.CUSTOM>
+      customActionType?: never
+    }
+
+export type ActionDateReference = {
+  $action: {
+    match: ActionMatcher[]
+    occurrence: 'first' | 'last'
+  }
+}
+
+export function isActionDateReference(
+  value: unknown
+): value is ActionDateReference {
+  return typeof value === 'object' && value !== null && '$action' in value
+}
+
+/**
  * This function will output JSONSchema which looks for example like this:
  * @example
  * {
@@ -459,7 +484,7 @@ export function createFieldConditionals(fieldId: string) {
     field: FieldReference,
     days: number,
     clause: 'before' | 'after',
-    referenceDate?: string
+    referenceDate?: string | ActionDateReference
   ) => ({
     type: 'object',
     properties: {
@@ -546,7 +571,11 @@ export function createFieldConditionals(fieldId: string) {
           },
           fromNow: () => {
             return defineFormConditional(getDayRange(this, days, 'after'))
-          }
+          },
+          beforeAction: (action: ActionDateReference) =>
+            defineFormConditional(getDayRange(this, -days, 'after', action)),
+          afterAction: (action: ActionDateReference) =>
+            defineFormConditional(getDayRange(this, days, 'after', action))
         }),
         date: (date: string | FieldReference) => {
           if (isFieldReference(date)) {
@@ -595,7 +624,11 @@ export function createFieldConditionals(fieldId: string) {
           },
           fromNow: () => {
             return defineFormConditional(getDayRange(this, -days, 'before'))
-          }
+          },
+          beforeAction: (action: ActionDateReference) =>
+            defineFormConditional(getDayRange(this, -days, 'before', action)),
+          afterAction: (action: ActionDateReference) =>
+            defineFormConditional(getDayRange(this, days, 'before', action))
         }),
         date: (date: `${string}-${string}-${string}` | FieldReference) => {
           if (isFieldReference(date)) {

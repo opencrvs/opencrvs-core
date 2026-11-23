@@ -181,3 +181,31 @@ describe('READ action config', () => {
     expect(res.success).toBe(false)
   })
 })
+
+describe('dialogCopy', () => {
+  const dialogCopy = {
+    defaultMessage: 'Copy of the dialog',
+    description: 'Copy of the confirmation dialog',
+    id: 'events.actionConfig.test.dialogCopy'
+  }
+
+  it('accepts one message on an action whose dialog shows it', () => {
+    expect(
+      ActionConfig.validate({
+        type: ActionType.UNARCHIVE,
+        label,
+        dialogCopy
+      })
+    ).toBe(true)
+  })
+
+  it('drops `dialogCopy` from an action whose dialogs show no copy from the configuration', () => {
+    const actionConfig = ActionConfig.parse({
+      type: ActionType.DELETE,
+      label,
+      dialogCopy
+    })
+
+    expect(actionConfig).not.toHaveProperty('dialogCopy')
+  })
+})

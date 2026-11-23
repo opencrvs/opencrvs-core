@@ -10,12 +10,6 @@
       value: {{ .Values.postgres.host }}
     - name: POSTGRES_PORT
       value: "5432"
-    {{- if eq .Values.postgres.auth_mode "disabled" }}
-    - name: POSTGRES_USER
-      value: postgres
-    - name: POSTGRES_PASSWORD
-      value: postgres
-    {{- else }}
     - name: POSTGRES_USER
       valueFrom:
         secretKeyRef:
@@ -26,7 +20,6 @@
         secretKeyRef:
           name: {{ .Values.postgres.admin_user_secret_name }}
           key: POSTGRES_PASSWORD
-    {{- end }}
     - name: EVENTS_APP_ROLE
       valueFrom:
         secretKeyRef:

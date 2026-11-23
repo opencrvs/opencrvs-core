@@ -8,10 +8,6 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-
-export { appRouter } from './router'
+// The router that the gateway exposes to the client. The routers that only
+// other services call are in ./service.ts, so that the client cannot import them.
 export type { AppRouter } from './router'
-export { internalRouter } from './internalRouter'
-export type { InternalRouter } from './internalRouter'
-export { initialisationRouter } from './initialisation'
-export type { InitialisationRouter } from './initialisation'

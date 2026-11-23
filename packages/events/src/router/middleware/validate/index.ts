@@ -57,7 +57,7 @@ import {
   StrictValidatorContext
 } from '@opencrvs/commons/events'
 
-import { getEventConfigurationById } from '@events/service/config/config'
+import { getEventConfigurationForRecord } from '@events/service/config/config'
 import { RequestNotFoundError } from '@events/service/events/actions/correction'
 import { getEventById } from '@events/service/events/events'
 import { locationExists } from '@events/storage/postgres/administrative-hierarchy/locations'
@@ -597,8 +597,8 @@ export const validateRequestAction: MiddlewareFunction<
   ActionInputWithType
 > = async ({ input, next, ctx }) => {
   const event = await getEventById(input.eventId)
-  const eventConfig = await getEventConfigurationById({
-    eventType: event.type,
+  const eventConfig = await getEventConfigurationForRecord({
+    event: event,
     token: ctx.token
   })
 
@@ -632,8 +632,8 @@ export const validateAcceptAction: MiddlewareFunction<
   ActionInputWithType
 > = async ({ input, next, ctx }) => {
   const event = await getEventById(input.eventId)
-  const eventConfig = await getEventConfigurationById({
-    eventType: event.type,
+  const eventConfig = await getEventConfigurationForRecord({
+    event: event,
     token: ctx.token
   })
 

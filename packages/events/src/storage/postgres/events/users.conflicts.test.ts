@@ -47,6 +47,23 @@ function newUser(officeId: UUID, overrides: Partial<NewUsers> = {}) {
   }
 }
 
+test('a duplicate id on create is a conflict naming the id', async () => {
+  const { user } = await setupTestCase()
+  const first = newUser(user.primaryOfficeId)
+  await createUserWithCredentials(first.user, first.cred)
+
+  // `user.create` accepts an id from the caller, so a duplicate id is the
+  // caller's to fix.
+  const second = newUser(user.primaryOfficeId, { id: first.user.id })
+
+  await expect(
+    createUserWithCredentials(second.user, second.cred)
+  ).rejects.toMatchObject({
+    code: 'CONFLICT',
+    message: 'A user with the same id already exists'
+  })
+})
+
 test('a duplicate email on create is a conflict naming the email', async () => {
   const { user } = await setupTestCase()
   const first = newUser(user.primaryOfficeId)
@@ -128,18 +145,25 @@ test('a duplicate username on update is a conflict naming the username', async (
 
 test('a unique violation on an unmapped constraint is left alone', async () => {
   const { user } = await setupTestCase()
+  const credentialsId = getUUID()
   const first = newUser(user.primaryOfficeId)
-  await createUserWithCredentials(first.user, first.cred)
+  await createUserWithCredentials(first.user, {
+    ...first.cred,
+    id: credentialsId
+  })
 
-  // `users_pkey` guards nothing a caller supplied, so it is deliberately absent
-  // from the mapping and must surface as the raw driver error rather than a
-  // conflict blaming a field the caller can do nothing about.
-  const second = newUser(user.primaryOfficeId, { id: first.user.id })
+  // `user_credentials_pkey` guards nothing a caller supplied, so it is
+  // deliberately absent from the mapping and must surface as the raw driver
+  // error rather than a conflict blaming a field the caller can do nothing about.
+  const second = newUser(user.primaryOfficeId)
 
   await expect(
-    createUserWithCredentials(second.user, second.cred)
+    createUserWithCredentials(second.user, {
+      ...second.cred,
+      id: credentialsId
+    })
   ).rejects.toMatchObject({
     code: '23505',
-    constraint: 'users_pkey'
+    constraint: 'user_credentials_pkey'
   })
 })

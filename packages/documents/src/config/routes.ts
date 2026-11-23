@@ -11,7 +11,6 @@
 import * as Hapi from '@hapi/hapi'
 import {
   fileUploadHandler,
-  documentUploadHandler,
   fileExistsHandler
 } from '@documents/features/uploadDocument/handler'
 import { vsExportUploaderHandler } from '@documents/features/uploadVSExportFile/handler'
@@ -84,15 +83,6 @@ export const getRoutes = () => {
           multipart: true,
           output: 'stream'
         }
-      }
-    },
-    // upload a document
-    {
-      method: 'POST',
-      path: '/upload',
-      handler: documentUploadHandler,
-      options: {
-        tags: ['api']
       }
     },
     // upload svg

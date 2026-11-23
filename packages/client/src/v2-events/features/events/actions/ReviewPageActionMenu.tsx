@@ -39,7 +39,7 @@ import { useSaveAndExitModal } from '@client/v2-events/components/SaveAndExitMod
 import { validationErrorsInActionFormExist } from '@client/v2-events/components/forms/validation'
 import { useActionAnnotation } from '../useActionAnnotation'
 import { useEventFormData } from '../useEventFormData'
-import { useEventConfiguration } from '../useEventConfiguration'
+import { useEventConfigurationForRecord } from '../useEventConfiguration'
 import { ActionMenuDropdown, ActionMenuItem } from './ActionMenuDropdown'
 
 type ReviewPageActionType = typeof ActionType.DECLARE | typeof ActionType.NOTIFY
@@ -49,7 +49,7 @@ interface ConfirmableAction {
   /** Label of the modal's confirm button */
   confirmLabel: MessageDescriptor
   title: MessageDescriptor
-  supportingCopy?: MessageDescriptor
+  dialogCopy?: MessageDescriptor
   /** Fields shown in the modal */
   fields: FieldConfig[]
   onConfirm: (values: AcceptActionModalResult['values']) => void
@@ -78,7 +78,7 @@ function useReviewPageActions(
     deleteDeclaration,
     modal: deleteDeclarationModal
   } = useEventFormNavigation()
-  const { eventConfiguration } = useEventConfiguration(event.type)
+  const { eventConfiguration } = useEventConfigurationForRecord(event)
   const validatorContext = useValidatorContext(event)
   const declaration = useEventFormData((state) => state.getFormValues())
   const { getAnnotation } = useActionAnnotation()
@@ -128,7 +128,7 @@ function useReviewPageActions(
           attachmentPath={eventAttachmentPath(eventId)}
           close={close}
           copy={{
-            supportingCopy: action.supportingCopy,
+            dialogCopy: action.dialogCopy,
             title: action.title,
             onConfirm: action.confirmLabel
           }}

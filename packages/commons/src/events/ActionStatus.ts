@@ -12,9 +12,9 @@
 /**
  * Deliberately dependency-free (aside from language builtins) so that files
  * like Flag.ts can depend on ActionStatus without being pulled into the
- * commons/scopes.ts <-> commons/authentication.ts import cycle that
+ * commons/users/scopes.ts <-> commons/users/authentication.ts import cycle that
  * ActionDocument.ts participates in (it imports TokenUserType from
- * '../authentication').
+ * '../users/authentication').
  */
 export const ActionStatus = {
   Requested: 'Requested',

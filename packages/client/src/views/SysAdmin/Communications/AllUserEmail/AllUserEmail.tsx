@@ -10,10 +10,8 @@
  */
 import React, { useState } from 'react'
 import { useIntl } from 'react-intl'
-import { Content } from '@opencrvs/components/lib/Content'
-import { messages } from '@client/i18n/messages/views/config'
-import { buttonMessages, constantsMessages } from '@client/i18n/messages'
 import {
+  Content,
   InputField,
   TextArea,
   TextInput,
@@ -21,6 +19,8 @@ import {
   Icon,
   Dialog
 } from '@opencrvs/components'
+import { messages } from '@client/i18n/messages/views/config'
+import { buttonMessages, constantsMessages } from '@client/i18n/messages'
 import styled from 'styled-components'
 import { useMutation } from '@tanstack/react-query'
 import { useDispatch } from 'react-redux'

@@ -36,7 +36,7 @@ import {
 import { isTemporaryId, recordAnchorDate } from '@client/v2-events/utils'
 import { useSaveAndExitModal } from '@client/v2-events/components/SaveAndExitModal'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
-import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
+import { useEventConfigurationForRecord } from '@client/v2-events/features/events/useEventConfiguration'
 import { useValidatorContext } from '@client/v2-events/hooks/useValidatorContext'
 import { makeFormFieldIdFormikCompatible } from '@client/v2-events/components/forms/utils'
 import { useIntlFormatMessageWithFlattenedParams } from '@client/v2-events/messages/utils'
@@ -73,9 +73,8 @@ export function ActionFlowPages({
   const event = events.getEvent.useGetEventFromCache(eventId)
   const validatorContext = useValidatorContext(event)
 
-  const { eventConfiguration: configuration } = useEventConfiguration(
-    event.type
-  )
+  const { eventConfiguration: configuration } =
+    useEventConfigurationForRecord(event)
   const pages = getActionForm(configuration, actionType).pages
 
   const currentPageId = pages.find((p) => p.id === pageId)?.id || pages[0]?.id
@@ -182,7 +181,7 @@ export function ActionFlowReview({
   const { formatMessage } = useIntlFormatMessageWithFlattenedParams()
   const event = events.getEvent.useGetEventFromCache(eventId)
   const validatorContext = useValidatorContext(event)
-  const { eventConfiguration: config } = useEventConfiguration(event.type)
+  const { eventConfiguration: config } = useEventConfigurationForRecord(event)
   const formConfig = getActionForm(config, actionType)
   const reviewConfig = getActionReview(config, actionType)
 

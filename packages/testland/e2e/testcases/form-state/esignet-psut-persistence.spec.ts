@@ -125,11 +125,6 @@ test.describe('E-Signet PSUT persistence', () => {
       await page.locator('#father____addressSameAs_YES').check()
     }
 
-    if (await page.locator('#father____maritalStatus').isVisible()) {
-      await page.locator('#father____maritalStatus').click()
-      await page.getByText('Single', { exact: true }).click()
-    }
-
     if (await page.locator('#father____educationalAttainment').isVisible()) {
       await page.locator('#father____educationalAttainment').click()
       await page.getByText('No schooling', { exact: true }).click()

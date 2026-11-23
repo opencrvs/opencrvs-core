@@ -98,7 +98,7 @@ interface EditActionModalResult {
 
 function EditActionModal({
   title,
-  supportingCopy,
+  dialogCopy,
   close,
   fields = [],
   eventConfiguration,
@@ -110,7 +110,7 @@ function EditActionModal({
   /** Record the action is taken on, for fields that act on it, e.g. a print button. */
   event?: EventDocument
   title: MessageDescriptor
-  supportingCopy?: MessageDescriptor
+  dialogCopy?: MessageDescriptor
   close: (result: EditActionModalResult) => void
   fields?: FieldConfig[]
   eventConfiguration: EventConfig
@@ -164,12 +164,12 @@ function EditActionModal({
       width={800}
       onClose={() => close({ confirmed: false })}
     >
-      {supportingCopy && (
+      {dialogCopy && (
         <Stack>
           <TranslationTextWithFormatModifier
             color="grey500"
             element="p"
-            message={supportingCopy}
+            message={dialogCopy}
             variant="reg16"
           />
         </Stack>
@@ -254,10 +254,7 @@ function useEditActions(event: EventDocument) {
     reviewFields: reviewConfig.fields
   })
 
-  const dialogCopy =
-    actionConfig && 'dialogCopy' in actionConfig
-      ? actionConfig.dialogCopy
-      : null
+  const dialogCopy = actionConfig?.dialogCopy
 
   return {
     modals: [modal],
@@ -273,13 +270,13 @@ function useEditActions(event: EventDocument) {
                   attachmentPath={eventAttachmentPath(event.id)}
                   close={close}
                   declaration={declaration}
+                  dialogCopy={dialogCopy?.register}
                   event={event}
                   eventConfiguration={eventConfiguration}
                   fields={getActionFormFields(
                     eventConfiguration,
                     ActionType.REGISTER
                   )}
-                  supportingCopy={dialogCopy?.register}
                   title={messages.editAndRegisterLabel}
                 />
               )
@@ -313,13 +310,13 @@ function useEditActions(event: EventDocument) {
                   attachmentPath={eventAttachmentPath(event.id)}
                   close={close}
                   declaration={declaration}
+                  dialogCopy={dialogCopy?.declare}
                   event={event}
                   eventConfiguration={eventConfiguration}
                   fields={getActionFormFields(
                     eventConfiguration,
                     ActionType.DECLARE
                   )}
-                  supportingCopy={dialogCopy?.declare}
                   title={messages.editAndDeclareLabel}
                 />
               )
@@ -355,13 +352,13 @@ function useEditActions(event: EventDocument) {
                   attachmentPath={eventAttachmentPath(event.id)}
                   close={close}
                   declaration={declaration}
+                  dialogCopy={dialogCopy?.notify}
                   event={event}
                   eventConfiguration={eventConfiguration}
                   fields={getActionFormFields(
                     eventConfiguration,
                     ActionType.NOTIFY
                   )}
-                  supportingCopy={dialogCopy?.notify}
                   title={messages.editAndNotifyLabel}
                 />
               )

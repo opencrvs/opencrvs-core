@@ -21,7 +21,7 @@ import AsyncSelect, { AsyncProps } from 'react-select/async'
 import { List, RowComponentProps } from 'react-window'
 import styled from 'styled-components'
 import { useIntl } from 'react-intl'
-import { Icon } from '@opencrvs/components/lib/Icon'
+import { Icon } from '@opencrvs/components'
 import { formMessages } from '@client/i18n/messages'
 import { Option } from '../../../utils'
 

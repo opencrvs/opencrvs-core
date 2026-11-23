@@ -81,7 +81,9 @@ export async function fillNotificationMotherPage(
 
   await fillDate(page, inputs.mother.birthDate)
 
-  await page.locator('#informant____email').fill(inputs.informantEmail)
+  await page.locator('#mother____idType').click()
+  await page.getByText(inputs.mother.identifier.type, { exact: true }).click()
+  await page.locator('#mother____nid').fill(inputs.mother.identifier.id)
 }
 
 /** Fills the whole notification form and continues to its review page. */

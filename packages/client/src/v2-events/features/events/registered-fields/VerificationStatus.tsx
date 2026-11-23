@@ -18,9 +18,9 @@ import {
   Pill,
   Dialog,
   Stack,
-  Text
+  Text,
+  IconName
 } from '@opencrvs/components'
-import * as SupportedIcons from '@opencrvs/components/lib/Icon/all-icons'
 import {
   VerificationStatus as VerificationStatusField,
   VerificationStatusValue
@@ -53,7 +53,7 @@ const ICON_FOR_STATUS = {
   authenticated: 'Fingerprint',
   failed: 'X',
   pending: 'CircleWavyQuestion'
-} as const satisfies Record<string, keyof typeof SupportedIcons>
+} as const satisfies Record<string, IconName>
 
 const messages = {
   verified: idVerificationMessages.verified,

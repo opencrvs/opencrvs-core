@@ -9,13 +9,15 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { Button } from '@opencrvs/components/lib/Button'
+import { Button, Spinner } from '@opencrvs/components'
 import { Avatar } from '@client/components/Avatar'
 import { constantsMessages } from '@client/i18n/messages'
 import { useOnlineStatus } from '@client/utils'
-import { Spinner } from '@opencrvs/components/lib/Spinner'
-import { Download, Downloaded } from '@opencrvs/components/lib/icons'
-import { ConnectionError } from '@opencrvs/components/lib/icons/ConnectionError'
+import {
+  Download,
+  Downloaded,
+  ConnectionError
+} from '@opencrvs/components/icons'
 import React from 'react'
 import { useIntl } from 'react-intl'
 import ReactTooltip from 'react-tooltip'

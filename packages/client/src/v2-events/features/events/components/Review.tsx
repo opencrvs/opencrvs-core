@@ -14,7 +14,7 @@ import React, { useState } from 'react'
 import { defineMessages, MessageDescriptor, useIntl } from 'react-intl'
 import { useSelector } from 'react-redux'
 import styled from 'styled-components'
-import { CountryLogo } from '@opencrvs/components/lib/icons'
+import { CountryLogo } from '@opencrvs/components/icons'
 import {
   Accordion,
   Button,
@@ -626,7 +626,7 @@ function AcceptActionModal({
   copy: {
     onConfirm: MessageDescriptor
     title: MessageDescriptor
-    supportingCopy?: MessageDescriptor
+    dialogCopy?: MessageDescriptor
   }
   close: (result: AcceptActionModalResult | null) => void
   action: string
@@ -698,11 +698,11 @@ function AcceptActionModal({
       onClose={() => close(null)}
     >
       <Stack alignItems="left" direction="column" gap={16}>
-        {copy.supportingCopy && (
+        {copy.dialogCopy && (
           <TranslationTextWithFormatModifier
             color="supportingCopy"
             element="p"
-            message={copy.supportingCopy}
+            message={copy.dialogCopy}
             variant="reg16"
           />
         )}
@@ -728,7 +728,7 @@ export interface RejectActionModalResult {
 
 function RejectActionModal({
   close,
-  supportingCopy,
+  dialogCopy,
   fields = [],
   eventConfiguration,
   attachmentPath,
@@ -738,7 +738,7 @@ function RejectActionModal({
   /** Record the action is taken on, for fields that act on it, e.g. a print button. */
   event?: EventDocument
   close: (result: RejectActionModalResult | null) => void
-  supportingCopy?: MessageDescriptor
+  dialogCopy?: MessageDescriptor
   fields?: FieldConfig[]
   eventConfiguration: EventConfig
 }) {
@@ -798,7 +798,7 @@ function RejectActionModal({
     >
       <Stack alignItems="left" direction="column">
         <Text color="grey500" element="p" variant="reg16">
-          {supportingCopy ? intl.formatMessage(supportingCopy) : null}
+          {dialogCopy ? intl.formatMessage(dialogCopy) : null}
         </Text>
         <TextArea
           data-testid="reject-reason"

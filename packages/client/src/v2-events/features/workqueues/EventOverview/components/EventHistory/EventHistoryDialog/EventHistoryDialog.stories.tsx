@@ -28,7 +28,8 @@ import {
   generateRandomDatetime,
   DocumentPath,
   FieldType,
-  generateTranslationConfig
+  generateTranslationConfig,
+  INITIAL_EVENT_CONFIG_VERSION_ID
 } from '@opencrvs/commons/client'
 import { testDataGenerator } from '@client/tests/test-data-generators'
 import { getTestValidatorContext } from '../../../../../../../../.storybook/decorators'
@@ -96,6 +97,7 @@ const fullEvent = {
     }
   ],
   trackingId: 'ABCD123',
+  configVersionId: INITIAL_EVENT_CONFIG_VERSION_ID,
   updatedAt: '2021-01-01',
   createdAt: '2021-01-01'
 }
@@ -209,6 +211,7 @@ export const Declared: Story = {
 
 const eventWhenRegisterUpdatesDeclaration = {
   trackingId: generateUuid(prng),
+  configVersionId: INITIAL_EVENT_CONFIG_VERSION_ID,
   type: tennisClubMembershipEvent.id,
   actions: [createAction, ...declareActionPair, ...registerActionPair],
   createdAt: createActionCreatedAt,
@@ -276,6 +279,7 @@ const eventWithRegisterDialogFormAnnotation = {
     registerActionWithDialogFormAnnotation
   ],
   trackingId: 'ABCD123',
+  configVersionId: INITIAL_EVENT_CONFIG_VERSION_ID,
   updatedAt: '2021-01-01',
   createdAt: '2021-01-01'
 }
@@ -401,6 +405,7 @@ export const Certified: Story = {
         }
       ],
       trackingId: 'ABCD123',
+      configVersionId: INITIAL_EVENT_CONFIG_VERSION_ID,
       updatedAt: '2021-01-01',
       createdAt: '2021-01-01'
     }
@@ -452,6 +457,7 @@ export const CertifiedBySomeoneElse: Story = {
         }
       ],
       trackingId: 'ABCD123',
+      configVersionId: INITIAL_EVENT_CONFIG_VERSION_ID,
       updatedAt: '2021-01-01',
       createdAt: '2021-01-01'
     }
@@ -487,6 +493,7 @@ export const RequestCorrection: Story = {
         requestCorrectionAction
       ],
       trackingId: 'ABCD123',
+      configVersionId: INITIAL_EVENT_CONFIG_VERSION_ID,
       updatedAt: '2021-01-01',
       createdAt: '2021-01-01'
     }
@@ -541,6 +548,7 @@ export const RecordCorrected: Story = {
         }
       ],
       trackingId: 'ABCD123',
+      configVersionId: INITIAL_EVENT_CONFIG_VERSION_ID,
       updatedAt: '2021-01-01',
       createdAt: '2021-01-01'
     }
@@ -630,6 +638,7 @@ const eventWithEditClearingNumberField = {
     editActionClearingAge
   ],
   trackingId: 'EDIT123',
+  configVersionId: INITIAL_EVENT_CONFIG_VERSION_ID,
   updatedAt: '2021-01-01',
   createdAt: '2021-01-01'
 }
