@@ -16,10 +16,15 @@ import { defineMessages, useIntl, IntlShape } from 'react-intl'
 import { useSelector } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
 import { useTypedParams } from 'react-router-typesafe-routes/dom'
-import { Link, Pagination } from '@opencrvs/components'
-import { ColumnContentAlignment } from '@opencrvs/components/lib/common-types'
-import { Icon } from '@opencrvs/components/lib/Icon'
-import { Table } from '@opencrvs/components/lib/Table'
+import {
+  Link,
+  Pagination,
+  ColumnContentAlignment,
+  Icon,
+  Table,
+  Content,
+  ContentSize
+} from '@opencrvs/components'
 import {
   Action,
   ActionDocument,
@@ -35,7 +40,6 @@ import {
   todayISO,
   toPlainDate
 } from '@opencrvs/commons/client'
-import { Content, ContentSize } from '@opencrvs/components/lib/Content'
 import { ROUTES } from '@client/v2-events/routes'
 import { useModal } from '@client/v2-events/hooks/useModal'
 import * as routes from '@client/navigation/routes'
@@ -48,7 +52,7 @@ import {
 } from '@client/v2-events/features/events/actions/correct/useActionForHistory'
 import { usePermissions } from '@client/hooks/useAuthorization'
 import { useValidatorContext } from '@client/v2-events/hooks/useValidatorContext'
-import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
+import { useEventConfigurationForRecord } from '@client/v2-events/features/events/useEventConfiguration'
 import { useUserDetails } from '@client/v2-events/hooks/useUserDetails'
 import { resolveLocationName } from '@client/v2-events/utils'
 import { getOfflineData } from '@client/offline/selectors'
@@ -59,7 +63,7 @@ import { EventHistoryDialog } from './EventHistoryDialog/EventHistoryDialog'
 const eventHistoryStatusMessage = {
   id: 'events.history.status',
   defaultMessage:
-    '{status, select, Rejected {{action, select, REGISTER {Registration failed} other {Rejected}}} other {{action, select, CREATE {Draft} NOTIFY {Notified} EDIT {Edited} VALIDATE {Validated} DRAFT {Draft} DECLARE {Declared} REGISTER {Registered} PRINT_CERTIFICATE {Certified} REJECT {Rejected} ARCHIVE {Archived} UNARCHIVE {Unarchived} DUPLICATE_DETECTED {Flagged as potential duplicate} MARK_AS_DUPLICATE {Marked as a duplicate} CORRECTED {Record corrected} REQUEST_CORRECTION {Correction requested} APPROVE_CORRECTION {Correction approved} REJECT_CORRECTION {Correction rejected} READ {Viewed} ASSIGN {Assigned} UNASSIGN {Unassigned} other {Unknown}}}}'
+    '{status, select, Rejected {{action, select, REGISTER {Registration failed} other {Rejected}}} other {{action, select, CREATE {Draft} NOTIFY {Notified} EDIT {Edited} VALIDATE {Validated} DRAFT {Draft} DECLARE {Declared} REGISTER {Registered} PRINT_CERTIFICATE {Certified} REJECT {Rejected} ARCHIVE {Archived} UNARCHIVE {Unarchived} REVOKE_REGISTRATION {Registration revoked} REINSTATE_REGISTRATION {Registration reinstated} DUPLICATE_DETECTED {Flagged as potential duplicate} MARK_AS_DUPLICATE {Marked as a duplicate} CORRECTED {Record corrected} REQUEST_CORRECTION {Correction requested} APPROVE_CORRECTION {Correction approved} REJECT_CORRECTION {Correction rejected} READ {Viewed} ASSIGN {Assigned} UNASSIGN {Unassigned} other {Unknown}}}}'
 }
 
 const LargeGreyedInfo = styled.div`
@@ -333,7 +337,13 @@ const TwoLineCell = styled.div`
   flex-direction: column;
 `
 
-function WhenCell({ isoDate, muted }: { isoDate: string; muted?: boolean }) {
+export function WhenCell({
+  isoDate,
+  muted
+}: {
+  isoDate: string
+  muted?: boolean
+}) {
   const intl = useIntl()
   const date = new Date(isoDate)
   const dateText = format(
@@ -366,7 +376,7 @@ function SystemByCell() {
   )
 }
 
-function ActionByCell({
+export function ActionByCell({
   action,
   muted
 }: {
@@ -444,7 +454,7 @@ function EventHistory({ fullEvent }: { fullEvent: EventDocument }) {
   const [currentPageNumber, setCurrentPageNumber] = React.useState(1)
 
   const validatorContext = useValidatorContext(fullEvent)
-  const { eventConfiguration } = useEventConfiguration(fullEvent.type)
+  const { eventConfiguration } = useEventConfigurationForRecord(fullEvent)
 
   const intl = useIntl()
   const theme = useTheme()
@@ -463,8 +473,9 @@ function EventHistory({ fullEvent }: { fullEvent: EventDocument }) {
   const history = extractHistoryActions(fullEvent)
   const allActions = fullEvent.actions as ActionDocument[]
 
+  // The backend returns actions oldest first, so reversing shows latest first
   const visibleHistory = [...history]
-    .sort((a, b) => a.createdAt.localeCompare(b.createdAt))
+    .reverse()
     .filter(({ type }) => type !== ActionType.CREATE)
 
   const onHistoryRowClick = (

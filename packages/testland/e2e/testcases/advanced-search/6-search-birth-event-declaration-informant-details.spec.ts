@@ -8,39 +8,35 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { expect, test, type Page } from '@playwright/test'
+import { expect, test } from '@playwright/test'
 import { getToken, login } from '@e2e/support/helpers'
 import { createDeclaration } from '@e2e/support/test-data/birth-declaration-with-father-brother'
 import { CREDENTIALS } from '@e2e/support/constants'
 import { getMonthFormatted } from '@e2e/support/advanced-search/helper'
 import { assertTexts, expectInUrl, type } from '@e2e/support/utils'
 
-test.describe
-  .serial("Advanced Search - Birth Event Declaration - Informant's details", () => {
-  let page: Page
+test("Advanced Search - Birth Event Declaration - Informant's details", async ({
+  page
+}) => {
   let [yyyy, mm, dd] = ['', '', '']
-  let record: Awaited<ReturnType<typeof createDeclaration>>
+  const token = await getToken(CREDENTIALS.REGISTRAR)
+  const record = await createDeclaration(
+    token,
+    {},
+    'REGISTER',
+    'HEALTH_FACILITY'
+  )
+  ;[yyyy, mm, dd] = record.declaration['informant.dob'].split('-')
 
-  test.beforeAll(async ({ browser }) => {
-    page = await browser.newPage()
-    const token = await getToken(CREDENTIALS.REGISTRAR)
-    record = await createDeclaration(token, {}, 'REGISTER', 'HEALTH_FACILITY')
-    ;[yyyy, mm, dd] = record.declaration['informant.dob'].split('-')
-  })
-
-  test.afterAll(async () => {
-    await page.close()
-  })
-
-  test('2.1 - Validate log in and load search page', async () => {
+  await test.step('2.1 - Validate log in and load search page', async () => {
     await login(page)
     await page.click('#searchType')
     await expectInUrl(page, 'advanced-search')
     await page.getByText('Birth').click()
   })
 
-  test.describe.serial("2.5 - Validate search by Informant's details", () => {
-    test('2.5.1 - Validate filling name and dob filters', async () => {
+  await test.step("2.5 - Validate search by Informant's details", async () => {
+    await test.step('2.5.1 - Validate filling name and dob filters', async () => {
       await page.getByText('Informant details').click()
 
       await type(
@@ -55,7 +51,7 @@ test.describe
       await type(page, '[data-testid="informant____dob-yyyy"]', yyyy)
     })
 
-    test('2.5.2 - Validate search and show results', async () => {
+    await test.step('2.5.2 - Validate search and show results', async () => {
       await page.click('#search')
       await expect(page).toHaveURL(/.*\/search-result/)
       expect(page.url()).toContain(`informant.dob=${yyyy}-${mm}-${dd}`)
@@ -86,7 +82,7 @@ test.describe
       ).toBeVisible()
     })
 
-    test('2.5.3 - Validate clicking on the search edit button', async () => {
+    await test.step('2.5.3 - Validate clicking on the search edit button', async () => {
       await page.getByRole('button', { name: 'Edit', exact: true }).click()
       await expect(page).toHaveURL(/.*\/advanced-search/)
       expect(page.url()).toContain(`informant.dob=${yyyy}-${mm}-${dd}`)
@@ -112,7 +108,7 @@ test.describe
       )
     })
 
-    test('2.5.4 - Validate informant.dob range input', async () => {
+    await test.step('2.5.4 - Validate informant.dob range input', async () => {
       const informantDOBRangeButton = page.locator(
         '#informant____dob-date_range_button'
       )

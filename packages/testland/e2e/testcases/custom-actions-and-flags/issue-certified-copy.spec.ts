@@ -8,7 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { test, expect, type Page } from '@playwright/test'
+import { test, expect } from '@playwright/test'
 import { getToken, login, searchFromSearchBar } from '@e2e/support/helpers'
 import { CREDENTIALS } from '@e2e/support/constants'
 import {
@@ -29,23 +29,12 @@ import {
   printAndExpectPopup
 } from '@e2e/support/print-certificate/birth/helpers'
 
-test.describe.serial('Issue Certified Copy', () => {
-  let page: Page
-  let declaration: Declaration
-  let childName: string
-
-  test.beforeAll(async ({ browser }) => {
-    page = await browser.newPage()
-    const token = await getToken(CREDENTIALS.REGISTRAR)
-    declaration = (await createDeclaration(token)).declaration
-    childName = formatV2ChildName(declaration)
-  })
-
-  test.afterAll(async () => {
-    await page.close()
-  })
-  test.describe('Print in advance', async () => {
-    test('Navigate to the declaration review page', async () => {
+test('Issue Certified Copy', async ({ page }) => {
+  const token = await getToken(CREDENTIALS.REGISTRAR)
+  const declaration = (await createDeclaration(token)).declaration
+  const childName = formatV2ChildName(declaration)
+  await test.step('Print in advance', async () => {
+    await test.step('Navigate to the declaration review page', async () => {
       await login(page, CREDENTIALS.REGISTRATION_OFFICER)
       await navigateToWorkqueue(page, 'Pending certification')
       await openRecordByTitle(page, childName)
@@ -59,17 +48,17 @@ test.describe.serial('Issue Certified Copy', () => {
           .getByText('Pending first certificate issuance')
       ).toBeVisible()
     })
-    test('Navigate to print', async () => {
+    await test.step('Navigate to print', async () => {
       await selectAction(page, 'Print')
     })
 
-    test('Template type should be selected by default', async () => {
+    await test.step('Template type should be selected by default', async () => {
       await expect(
         page.locator('#certificateTemplateId').getByText('Birth Certificate')
       ).toBeVisible()
     })
 
-    test('Clicking continue without selecting requester type should display validation error', async () => {
+    await test.step('Clicking continue without selecting requester type should display validation error', async () => {
       await page.getByRole('button', { name: 'Continue' }).click()
 
       await expect(
@@ -79,7 +68,7 @@ test.describe.serial('Issue Certified Copy', () => {
       ).toBeVisible()
     })
 
-    test('Clicking continue after selecting requester type and template type', async () => {
+    await test.step('Clicking continue after selecting requester type and template type', async () => {
       await expect(
         page.locator('#certificateTemplateId').getByText('Birth Certificate')
       ).toBeVisible()
@@ -99,11 +88,11 @@ test.describe.serial('Issue Certified Copy', () => {
       await page.getByRole('button', { name: 'Continue' }).click()
     })
 
-    test('Print', async () => {
+    await test.step('Print', async () => {
       await printAndExpectPopup(page)
     })
 
-    test('Ensure "Certified copy printed in advance of issuance" flag appears on record', async () => {
+    await test.step('Ensure "Certified copy printed in advance of issuance" flag appears on record', async () => {
       await searchFromSearchBar(page, childName)
       const Flags = page.getByTestId('flags').filter({ hasText: 'Flags' })
       await expect(
@@ -112,8 +101,8 @@ test.describe.serial('Issue Certified Copy', () => {
       await page.getByTestId('exit-event').click()
     })
   })
-  test.describe('Print issuance', async () => {
-    test('Navigate to the declaration review page', async () => {
+  await test.step('Print issuance', async () => {
+    await test.step('Navigate to the declaration review page', async () => {
       await navigateToWorkqueue(page, 'Pending issuance')
       await openRecordByTitle(page, childName)
       await expect(page.getByText('Registered')).toBeVisible()
@@ -125,11 +114,11 @@ test.describe.serial('Issue Certified Copy', () => {
       ).toBeVisible()
     })
 
-    test('Navigate to print', async () => {
+    await test.step('Navigate to print', async () => {
       await selectAction(page, 'Issue certified copy')
     })
 
-    test('Click continue without selecting requester type', async () => {
+    await test.step('Click continue without selecting requester type', async () => {
       await expect(
         page.getByRole('heading', {
           name: 'Issue certified copy?',
@@ -139,7 +128,7 @@ test.describe.serial('Issue Certified Copy', () => {
       await expect(page.getByRole('button', { name: 'Confirm' })).toBeDisabled()
     })
 
-    test('Click continue after selecting collector type and template type', async () => {
+    await test.step('Click continue after selecting collector type and template type', async () => {
       await page.getByText('Select', { exact: true }).click()
       const selectOptionsLabels = ['Mother', 'Father', 'Someone else']
 
@@ -157,7 +146,7 @@ test.describe.serial('Issue Certified Copy', () => {
       await page.getByRole('button', { name: 'Confirm' }).click()
     })
 
-    test('Search The record and check the No Flag', async () => {
+    await test.step('Search The record and check the No Flag', async () => {
       await searchFromSearchBar(page, childName)
       const Flags = page.getByTestId('flags').filter({ hasText: 'Flags' })
       await expect(Flags.getByText('No flags')).toBeVisible()

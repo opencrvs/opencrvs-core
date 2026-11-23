@@ -26,12 +26,22 @@ import {
   defineConditional,
   never,
   now,
-  FieldConfig
+  FieldConfig,
+  toNotificationForm,
+  toNotificationReview
 } from '@opencrvs/toolkit/events'
 import { getMOSIPIntegrationFields } from './mosip'
 
 import { MAX_NAME_LENGTH } from './birth/validators'
 import { Event } from './utils/types'
+
+/**
+ * Age-based membership rules are measured against the date the application was
+ * first declared, so they don't drift as the record is validated, registered or corrected.
+ */
+const MEMBERSHIP_AGE_ANCHOR = event.firstAction(ActionType.DECLARE)
+const SENIOR_AGE_DAYS = 365 * 60 + 15
+const JUNIOR_AGE_DAYS = 365 * 18
 
 function applicantAddressFields() {
   const isDomesticAddress = field('applicant.address')
@@ -487,8 +497,8 @@ const TENNIS_CLUB_DECLARATION_FORM = defineDeclarationForm({
       type: PageTypes.enum.FORM,
       conditional: field('applicant.dob')
         .isBefore()
-        .days(365 * 60 + 15)
-        .inPast(),
+        .days(SENIOR_AGE_DAYS)
+        .beforeAction(MEMBERSHIP_AGE_ANCHOR),
       title: {
         id: 'event.tennis-club-membership.action.declare.form.section.senior-pass.title',
         defaultMessage: 'Assign senior pass for applicant',
@@ -1253,7 +1263,6 @@ const TENNIS_CLUB_MEMBERSHIP_CERTIFICATE_COLLECTOR_FORM = defineActionForm({
 
 export const tennisClubMembershipEvent = defineConfig({
   id: Event.TENNIS_CLUB_MEMBERSHIP,
-  declaration: TENNIS_CLUB_DECLARATION_FORM,
   label: {
     defaultMessage: 'Tennis club membership application',
     description: 'This is what this event is referred as in the system',
@@ -1270,6 +1279,18 @@ export const tennisClubMembershipEvent = defineConfig({
     description:
       'This is a fallback title if actual title resolves to empty string'
   },
+  flags: [
+    {
+      id: 'junior-member',
+      label: {
+        id: 'event.tennis-club-membership.flag.junior-member',
+        defaultMessage: 'Junior member',
+        description:
+          'Flag label for an applicant who was under 18 when the application was declared'
+      },
+      requiresAction: false
+    }
+  ],
   summary: {
     fields: [
       {
@@ -1345,6 +1366,17 @@ export const tennisClubMembershipEvent = defineConfig({
       review: TENNIS_CLUB_DECLARATION_REVIEW
     },
     {
+      type: ActionType.NOTIFY,
+      label: {
+        defaultMessage: 'Notify',
+        description:
+          'This is shown as the action name anywhere the user can trigger the action from',
+        id: 'event.tennis-club-membership.action.notify.label'
+      },
+      notificationForm: toNotificationForm(TENNIS_CLUB_DECLARATION_FORM),
+      review: toNotificationReview(TENNIS_CLUB_DECLARATION_REVIEW)
+    },
+    {
       type: ActionType.DECLARE,
       label: {
         defaultMessage: 'Declare',
@@ -1352,6 +1384,7 @@ export const tennisClubMembershipEvent = defineConfig({
           'This is shown as the action name anywhere the user can trigger the action from',
         id: 'event.tennis-club-membership.action.declare.label'
       },
+      declaration: TENNIS_CLUB_DECLARATION_FORM,
       review: TENNIS_CLUB_DECLARATION_REVIEW
     },
     {
@@ -1361,7 +1394,17 @@ export const tennisClubMembershipEvent = defineConfig({
         description:
           'This is shown as the action name anywhere the user can trigger the action from',
         id: 'event.tennis-club-membership.action.register.label'
-      }
+      },
+      flags: [
+        {
+          id: 'junior-member',
+          operation: 'add',
+          conditional: field('applicant.dob')
+            .isAfter()
+            .days(JUNIOR_AGE_DAYS)
+            .beforeAction(MEMBERSHIP_AGE_ANCHOR)
+        }
+      ]
     },
     {
       type: ActionType.PRINT_CERTIFICATE,
@@ -1614,7 +1657,8 @@ export const tennisClubMembershipEvent = defineConfig({
       fields: [
         field('applicant.name', {
           validations: [],
-          conditionals: []
+          conditionals: [],
+          defaultValue: false
         }).fuzzy(),
         field('applicant.dob').range()
       ]
@@ -1626,7 +1670,7 @@ export const tennisClubMembershipEvent = defineConfig({
         id: 'event.tennis-club-membership.search.recommender'
       },
       fields: [
-        field('recommender.name').fuzzy(),
+        field('recommender.name', { defaultValue: false }).fuzzy(),
         {
           fieldId: 'recommender.id',
           fieldType: 'field',

@@ -67,6 +67,7 @@ export function field(
     validations?: ValidationConfig[]
     searchCriteriaLabelPrefix?: TranslationConfig
     allowedLocations?: JurisdictionReference
+    defaultValue?: boolean | string | number
   } = {}
 ) {
   return {

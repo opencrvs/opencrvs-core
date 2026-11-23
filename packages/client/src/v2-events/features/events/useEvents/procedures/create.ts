@@ -22,15 +22,16 @@ import {
   EventInput,
   UUID,
   AssignedAction,
-  getTokenPayload
+  getTokenPayload,
+  getOrThrow
 } from '@opencrvs/commons/client'
 
 import {
-  refetchAllSearchQueries,
   setEventData,
   updateLocalEventIndex
 } from '@client/v2-events/features/events/useEvents/api'
 import { queryClient, useTRPC, trpcOptionsProxy } from '@client/v2-events/trpc'
+import { localDraftStore } from '@client/v2-events/features/drafts/useDrafts'
 
 import { createTemporaryId } from '@client/v2-events/utils'
 import { setMutationDefaults } from './utils'
@@ -78,6 +79,11 @@ setMutationDefaults(trpcOptionsProxy.event.create, {
       type: newEvent.type,
       trackingId: '', // Tracking ID is generated on the server side, so optimistic event can use an empty string as a placeholder
       transactionId: newEvent.transactionId,
+      // The client creates a record under the version in effect today, so it always has one
+      configVersionId: getOrThrow(
+        newEvent.configVersionId,
+        `Event '${newEvent.type}' is created without a configuration version`
+      ),
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
       actions: [
@@ -118,14 +124,21 @@ setMutationDefaults(trpcOptionsProxy.event.create, {
 
     return optimisticEvent
   },
-  onSuccess: async (response, _variables, context) => {
+  onSuccess: (response, _variables, context) => {
     setEventData(response.id, response)
     setEventData(context.transactionId, response)
-    // Explicitly update local event index to make it accessible when created in offline mode.
+    // Seed the local by-id index under both ids so the record stays resolvable
+    // when it was created offline: `setEventData` only writes `event.get`.
     updateLocalEventIndex(response.id, response)
     updateLocalEventIndex(context.transactionId, response)
 
-    await refetchAllSearchQueries()
+    // A local draft saved before the event synced still points to the temporary id.
+    const { draft, setDraft } = localDraftStore.getState()
+    if (draft?.eventId === context.transactionId) {
+      setDraft({ ...draft, eventId: response.id })
+    }
+
+    // A CREATED event is never indexed, so no search can change.
   },
   meta: { actionType: ActionType.CREATE }
 })

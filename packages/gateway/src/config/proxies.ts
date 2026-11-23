@@ -17,9 +17,9 @@ export const authProxy = {
   token: {
     method: 'POST',
     path: '/auth/token',
-    handler: (req, h) =>
+    handler: (_, h) =>
       h.proxy({
-        uri: AUTH_URL + `/token${req.url.search}`
+        uri: AUTH_URL + '/token'
       }),
     options: {
       auth: false,

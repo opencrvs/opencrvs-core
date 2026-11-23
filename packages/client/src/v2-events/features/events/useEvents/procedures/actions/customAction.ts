@@ -17,12 +17,15 @@ import {
   getEventValidatorContext
 } from '@opencrvs/commons/client'
 import * as customApi from '@client/v2-events/custom-api'
-import { useEventConfigurations } from '@client/v2-events/features/events/useEventConfiguration'
+import { useEventConfigurationResolver } from '@client/v2-events/features/events/useEventConfiguration'
 import {
   deleteLocalEvent,
   findLocalEventDocument
 } from '@client/v2-events/features/events/useEvents/api'
-import { getCleanedDeclarationDiff } from '@client/v2-events/features/events/useEvents/procedures/actions/declarationDiff'
+import {
+  getCleanedDeclarationDiff,
+  getSubmissionForm
+} from '@client/v2-events/features/events/useEvents/procedures/actions/declarationDiff'
 import { updateEventOptimistically } from '@client/v2-events/features/events/useEvents/procedures/actions/utils'
 import {
   deleteLocalEventAndToastOnDuplicate,
@@ -34,7 +37,7 @@ import { waitUntilEventIsCreated } from '@client/v2-events/features/events/useEv
 import { queryClient } from '@client/v2-events/trpc'
 import { useValidatorContext } from '@client/v2-events/hooks/useValidatorContext'
 
-type CustomMutationKeys = keyof typeof customApi
+export type CustomMutationKeys = keyof typeof customApi
 
 const customMutationKeys = {
   registerOnDeclare: [['registerOnDeclare']],
@@ -128,7 +131,7 @@ queryClient.setMutationDefaults(customMutationKeys.makeCorrectionOnRequest, {
 export function useEventCustomAction<T extends CustomMutationKeys>(
   mutationName: T
 ) {
-  const eventConfigurations = useEventConfigurations()
+  const findEventConfiguration = useEventConfigurationResolver()
 
   const validatorContext = useValidatorContext()
   const mutationKey = customMutationKeys[mutationName]
@@ -141,9 +144,8 @@ export function useEventCustomAction<T extends CustomMutationKeys>(
     mutate: (params: Omit<CustomMutationTypes[T], 'eventConfiguration'>) => {
       const localEvent = findLocalEventDocument(params.eventId)
 
-      const eventConfiguration = eventConfigurations.find(
-        (event) => event.id === localEvent?.type
-      )
+      const eventConfiguration =
+        localEvent && findEventConfiguration(localEvent)
 
       if (!eventConfiguration) {
         throw new Error('Event configuration not found')
@@ -180,6 +182,7 @@ export function useEventCustomAction<T extends CustomMutationKeys>(
         eventConfiguration,
         declaration: getCleanedDeclarationDiff({
           eventConfiguration,
+          form: getSubmissionForm(eventConfiguration, mutationName),
           originalDeclaration,
           declarationDiff: params.declaration,
           validatorContext: {

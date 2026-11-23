@@ -17,7 +17,9 @@ import {
 } from '@opencrvs/commons/client'
 import { resolveEventValidatorContext } from './useValidatorContext'
 
-const configs = [tennisClubMembershipEvent]
+function findEventConfiguration() {
+  return tennisClubMembershipEvent
+}
 
 function documentWithActions(actions: ActionType[]) {
   return generateEventDocument({
@@ -28,13 +30,15 @@ function documentWithActions(actions: ActionType[]) {
 
 describe('resolveEventValidatorContext', () => {
   it('returns undefined when there is no event', () => {
-    expect(resolveEventValidatorContext(configs)).toBeUndefined()
+    expect(resolveEventValidatorContext(findEventConfiguration)).toBeUndefined()
   })
 
   it('returns undefined when no configuration matches the event type', () => {
     const document = documentWithActions([ActionType.CREATE])
 
-    expect(resolveEventValidatorContext([], document)).toBeUndefined()
+    expect(
+      resolveEventValidatorContext(() => undefined, document)
+    ).toBeUndefined()
   })
 
   it('pairs the document with its aggregated state', () => {
@@ -43,7 +47,10 @@ describe('resolveEventValidatorContext', () => {
       ActionType.DECLARE
     ])
 
-    const resolved = resolveEventValidatorContext(configs, document)
+    const resolved = resolveEventValidatorContext(
+      findEventConfiguration,
+      document
+    )
 
     expect(resolved?.document).toBe(document)
     expect(resolved?.state.id).toBe(document.id)
@@ -55,20 +62,27 @@ describe('resolveEventValidatorContext', () => {
    * `state.flags`, so an unresolved state silently evaluates as unflagged.
    */
   it('resolves flags from the action history', () => {
-    const notified = documentWithActions([ActionType.CREATE, ActionType.NOTIFY])
-    const declared = documentWithActions([
+    const rejected = documentWithActions([
       ActionType.CREATE,
-      ActionType.NOTIFY,
+      ActionType.DECLARE,
+      ActionType.REJECT
+    ])
+    const redeclared = documentWithActions([
+      ActionType.CREATE,
+      ActionType.DECLARE,
+      ActionType.REJECT,
       ActionType.DECLARE
     ])
 
     expect(
-      resolveEventValidatorContext(configs, notified)?.state.flags
-    ).toEqual(expect.arrayContaining([InherentFlags.INCOMPLETE]))
+      resolveEventValidatorContext(findEventConfiguration, rejected)?.state
+        .flags
+    ).toEqual(expect.arrayContaining([InherentFlags.REJECTED]))
 
-    // DECLARE clears INCOMPLETE, so the same flag must not linger.
+    // DECLARE clears REJECTED, so the same flag must not linger.
     expect(
-      resolveEventValidatorContext(configs, declared)?.state.flags
-    ).not.toContain(InherentFlags.INCOMPLETE)
+      resolveEventValidatorContext(findEventConfiguration, redeclared)?.state
+        .flags
+    ).not.toContain(InherentFlags.REJECTED)
   })
 })

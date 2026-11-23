@@ -21,18 +21,22 @@ import { vi } from 'vitest'
 import {
   ActionStatus,
   ActionType,
+  createEmptyDraft,
   EventDocument,
   EventInput,
   getUUID,
   TENNIS_CLUB_MEMBERSHIP,
-  tennisClubMembershipEvent,
-  UUID
+  UUID,
+  versionedTennisClubMembershipEvent,
+  INITIAL_EVENT_CONFIG_VERSION_ID
 } from '@opencrvs/commons/client'
 import { AppRouter, queryClient, TRPCProvider } from '@client/v2-events/trpc'
 import { storage } from '@client/storage'
 import { createTestStore } from '@client/tests/util'
 import { checkAuth } from '@client/profile/profileActions'
+import { localDraftStore } from '@client/v2-events/features/drafts/useDrafts'
 import { useEvents } from './useEvents'
+import { waitUntilEventIsCreated } from './procedures/utils'
 
 const serverSpy = vi.fn()
 
@@ -64,6 +68,7 @@ const createHandler = trpcHandler(async ({ request }) => {
     type: TENNIS_CLUB_MEMBERSHIP,
     id: '_REAL_UUID_' as UUID,
     trackingId: 'TEST12',
+    configVersionId: INITIAL_EVENT_CONFIG_VERSION_ID,
     createdAt: new Date('2024-12-05T18:37:31.295Z').toISOString(),
     updatedAt: new Date('2024-12-05T18:37:31.295Z').toISOString(),
     actions: [
@@ -113,7 +118,7 @@ const server = setupServer(
   ),
 
   tRPCMsw.event.config.get.query(() => {
-    return [tennisClubMembershipEvent]
+    return [versionedTennisClubMembershipEvent]
   }),
 
   tRPCMsw.administrativeAreas.list.query(() => [])
@@ -126,7 +131,7 @@ afterAll(() => server.close())
 interface TestContext {
   eventsHook: RenderHookResult<ReturnType<typeof useEvents>, {}>
   createEventHook: RenderHookResult<
-    ReturnType<ReturnType<typeof useEvents>['createEvent']>,
+    ReturnType<ReturnType<typeof useEvents>['useCreateEvent']>,
     {}
   >
   declareHook: RenderHookResult<
@@ -162,9 +167,12 @@ beforeEach<TestContext>(async (testContext) => {
   await waitFor(() => expect(eventsHook.result.current).not.toBeNull(), {
     timeout: 3000
   })
-  const createHook = renderHook(() => eventsHook.result.current.createEvent(), {
-    wrapper
-  })
+  const createHook = renderHook(
+    () => eventsHook.result.current.useCreateEvent(),
+    {
+      wrapper
+    }
+  )
 
   const declareHookHook = renderHook(
     () => eventsHook.result.current.actions.declare,
@@ -189,7 +197,8 @@ describe('events that have unsynced actions', () => {
     await Promise.resolve(
       createEventHook.result.current.mutate({
         type: TENNIS_CLUB_MEMBERSHIP,
-        transactionId: '_TEST_TRANSACTION_'
+        transactionId: '_TEST_TRANSACTION_',
+        configVersionId: INITIAL_EVENT_CONFIG_VERSION_ID
       })
     )
 
@@ -210,7 +219,8 @@ describe('events that have unsynced actions', () => {
   }) => {
     await createEventHook.result.current.mutateAsync({
       type: TENNIS_CLUB_MEMBERSHIP,
-      transactionId: '_TEST_TRANSACTION_'
+      transactionId: '_TEST_TRANSACTION_',
+      configVersionId: INITIAL_EVENT_CONFIG_VERSION_ID
     })
     // Wait for backend to sync
     await waitFor(() =>
@@ -229,5 +239,63 @@ describe('events that have unsynced actions', () => {
     await waitFor(() => {
       expect(getHook.result.current.data).toBeTruthy()
     })
+  })
+
+  test<TestContext>('local draft saved under the temporary id moves to the real id when the event is synced', async ({
+    createEventHook
+  }) => {
+    localDraftStore
+      .getState()
+      .setDraft(
+        createEmptyDraft(
+          '_TEST_TRANSACTION_' as UUID,
+          getUUID(),
+          ActionType.DECLARE
+        )
+      )
+
+    await createEventHook.result.current.mutateAsync({
+      type: TENNIS_CLUB_MEMBERSHIP,
+      transactionId: '_TEST_TRANSACTION_',
+      configVersionId: INITIAL_EVENT_CONFIG_VERSION_ID
+    })
+
+    expect(localDraftStore.getState().draft?.eventId).toBe('_REAL_UUID_')
+  })
+
+  test<TestContext>('file paths with the temporary id are resolved when the event id is already real', async ({
+    createEventHook
+  }) => {
+    await createEventHook.result.current.mutateAsync({
+      type: TENNIS_CLUB_MEMBERSHIP,
+      transactionId: 'tmp-test-event',
+      configVersionId: INITIAL_EVENT_CONFIG_VERSION_ID
+    })
+
+    const send =
+      vi.fn<
+        (params: { eventId: string; declaration: object }) => Promise<void>
+      >()
+    send.mockResolvedValue()
+    await waitUntilEventIsCreated(send)({
+      eventId: '_REAL_UUID_',
+      declaration: {
+        'applicant.image': {
+          path: 'events/tmp-test-event/photo.png',
+          originalFilename: 'photo.png',
+          type: 'image/png'
+        }
+      }
+    })
+
+    expect(send).toHaveBeenCalledWith(
+      expect.objectContaining({
+        declaration: {
+          'applicant.image': expect.objectContaining({
+            path: 'events/_REAL_UUID_/photo.png'
+          })
+        }
+      })
+    )
   })
 })

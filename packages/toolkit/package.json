@@ -1,6 +1,6 @@
 {
   "name": "@opencrvs/toolkit",
-  "version": "2.1.3",
+  "version": "2.2.0",
   "description": "OpenCRVS toolkit for building country configurations",
   "license": "MPL-2.0",
   "bin": {
@@ -13,7 +13,9 @@
     "./events": "./dist/events/index.js",
     "./telemetry": "./dist/telemetry/index.js",
     "./scopes": "./dist/scopes/index.js",
+    "./roles": "./dist/roles/index.js",
     "./authentication": "./dist/authentication/index.js",
+    "./request-signing": "./dist/request-signing/index.js",
     "./events/deduplication": "./dist/events/deduplication.js",
     "./conditionals": "./dist/conditionals/index.js",
     "./notification": "./dist/notification/index.js"
@@ -22,6 +24,7 @@
     "build": "./build.sh",
     "build:all": "pnpm -w exec lerna run build --include-dependencies --scope @opencrvs/toolkit",
     "test": "vitest run",
+    "test:watch": "vitest",
     "test:compilation": "tsc --noEmit"
   },
   "repository": {
@@ -29,6 +32,7 @@
     "url": "git+https://github.com/opencrvs/opencrvs-core.git"
   },
   "dependencies": {
+    "@hapi/boom": "^10.0.1",
     "@inquirer/prompts": "^8.3.0",
     "@octokit/core": "4.2.1",
     "@trpc/client": "11.4.3",
@@ -52,7 +56,7 @@
     "superjson": "1.9.0-0",
     "ts-morph": "^27.0.2",
     "uuid": "^9.0.0",
-    "zod": "^4.4.3",
+    "zod": "^4.6.5",
     "zod-openapi": "^5.4.6"
   },
   "devDependencies": {
@@ -69,6 +73,6 @@
   },
   "moduleNameMapper": {
     "@opencrvs/commons/events": "@opencrvs/commons/build/dist/common/events/index.js",
-    "@opencrvs/commons/scopes": "@opencrvs/commons/build/dist/common/scopes.js"
+    "@opencrvs/commons/scopes": "@opencrvs/commons/build/dist/common/users/scopes.js"
   }
 }

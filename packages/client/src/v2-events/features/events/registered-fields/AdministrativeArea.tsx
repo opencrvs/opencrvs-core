@@ -55,27 +55,20 @@ function useUserAdministrativeAreaHierarchy() {
   const { getLocations } = useLocations()
   const locations = getLocations.useSuspenseQuery()
   const userLocationId = userDetails?.primaryOfficeId
+  const location = userLocationId
+    ? locations.get(UUID.parse(userLocationId))
+    : undefined
 
-  if (!userLocationId) {
-    return []
-  }
-
-  const location = locations.get(UUID.parse(userLocationId))
-
-  if (!location) {
-    return []
-  }
-
-  const hierarchy = useMemo(
+  return useMemo(
     () =>
-      getAdministrativeAreaHierarchy(
-        location.administrativeAreaId,
-        administrativeAreas
-      ),
-    [location.administrativeAreaId, administrativeAreas]
+      location
+        ? getAdministrativeAreaHierarchy(
+            location.administrativeAreaId,
+            administrativeAreas
+          )
+        : [],
+    [location, administrativeAreas]
   )
-
-  return hierarchy
 }
 
 /**

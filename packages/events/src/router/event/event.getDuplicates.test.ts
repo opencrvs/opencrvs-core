@@ -20,7 +20,8 @@ import {
   generateUuid,
   InherentFlags,
   UUID,
-  encodeScope
+  encodeScope,
+  toVersionedEventConfig
 } from '@opencrvs/commons'
 import { tennisClubMembershipEventWithDedupCheck } from '@opencrvs/commons/fixtures'
 import {
@@ -128,7 +129,9 @@ test('Returns single duplicate when found', async () => {
 
   mswServer.use(
     http.get(`${env.COUNTRY_CONFIG_URL}/config/events`, () => {
-      return HttpResponse.json([tennisClubMembershipWithDedupCheckConfig])
+      return HttpResponse.json(
+        [tennisClubMembershipWithDedupCheckConfig].map(toVersionedEventConfig)
+      )
     })
   )
 
@@ -219,7 +222,9 @@ test('Returns multiple duplicates when found', async () => {
 
   mswServer.use(
     http.get(`${env.COUNTRY_CONFIG_URL}/config/events`, () => {
-      return HttpResponse.json([tennisClubMembershipWithDedupCheckConfig])
+      return HttpResponse.json(
+        [tennisClubMembershipWithDedupCheckConfig].map(toVersionedEventConfig)
+      )
     })
   )
 
@@ -335,7 +340,9 @@ async function setupInaccessibleMatch() {
 
   mswServer.use(
     http.get(`${env.COUNTRY_CONFIG_URL}/config/events`, () => {
-      return HttpResponse.json([tennisClubMembershipWithDedupCheckConfig])
+      return HttpResponse.json(
+        [tennisClubMembershipWithDedupCheckConfig].map(toVersionedEventConfig)
+      )
     })
   )
 

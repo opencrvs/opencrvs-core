@@ -20,7 +20,11 @@ import {
   EventConfig,
   FieldType,
   generateEventDocument,
-  UUID
+  UUID,
+  withDeclaration,
+  getDeclaration,
+  getDeclarationPages,
+  toVersionedEventConfig
 } from '@opencrvs/commons/client'
 import { localDraftStore } from '@client/v2-events/features/drafts/useDrafts'
 import { ROUTES, routesConfig } from '@client/v2-events/routes'
@@ -85,12 +89,14 @@ const INACTIVATED_AREA: AdministrativeArea = {
 function buildEventConfig(
   adminAreaConfiguration: Record<string, boolean>
 ): EventConfig {
-  return {
-    ...ChildOnboardingEvent,
-    dateOfEvent: { $$field: 'child.dob', $$subfield: [] },
-    declaration: {
-      ...ChildOnboardingEvent.declaration,
-      pages: ChildOnboardingEvent.declaration.pages.map((page) =>
+  return withDeclaration(
+    {
+      ...ChildOnboardingEvent,
+      dateOfEvent: { $$field: 'child.dob', $$subfield: [] }
+    },
+    {
+      ...getDeclaration(ChildOnboardingEvent),
+      pages: getDeclarationPages(ChildOnboardingEvent).map((page) =>
         page.id === 'child'
           ? {
               ...page,
@@ -116,7 +122,7 @@ function buildEventConfig(
           : page
       )
     }
-  }
+  )
 }
 
 function buildStoryParams(eventConfig: EventConfig) {
@@ -127,7 +133,11 @@ function buildStoryParams(eventConfig: EventConfig) {
 
   const mswConfig = {
     handlers: {
-      events: [tRPCMsw.event.config.get.query(() => [eventConfig])],
+      events: [
+        tRPCMsw.event.config.get.query(() => [
+          toVersionedEventConfig(eventConfig)
+        ])
+      ],
       event: [
         tRPCMsw.event.get.query(() => freshDraftEvent),
         tRPCMsw.event.search.query(() => ({ results: [], total: 0 }))

@@ -10,8 +10,8 @@
  */
 import { useIntl } from 'react-intl'
 import { useSelector } from 'react-redux'
-import { useTypedParams } from 'react-router-typesafe-routes/dom'
 import {
+  ActionType,
   always,
   EncodedScope,
   EventConfig,
@@ -33,8 +33,8 @@ import { messages } from '@client/i18n/messages/views/userForm'
 import { useRoles, formatUserRole } from '@client/v2-events/hooks/useRoles'
 import { getScope, getUserDetails } from '@client/profile/profileSelectors'
 import { useLocations } from '@client/v2-events/hooks/useLocations'
-import { emptyMessage, isTemporaryId } from '@client/v2-events/utils'
-import { ROUTES } from '@client/v2-events/routes/routes'
+import { emptyMessage } from '@client/v2-events/utils'
+import { useIsNewUser } from '@client/views/SysAdmin/Team/user/userEditor/useUserEditorRoutes'
 
 export function useUserEditConfig(
   locationId: UUID | undefined,
@@ -46,7 +46,7 @@ export function useUserEditConfig(
   const [roles] = listRoles.useSuspenseQuery()
 
   const { getLocationHierarchy } = useLocations()
-  const { userId } = useTypedParams(ROUTES.V2.SETTINGS.USER.EDIT)
+  const isNewUser = useIsNewUser()
 
   const currentUser = useSelector(getUserDetails)
   const userScopes = useSelector(getScope) || []
@@ -58,8 +58,6 @@ export function useUserEditConfig(
   const locationHierarchy = getLocationHierarchy.useQuery(locationId as UUID, {
     enabled: !!locationId
   })
-
-  const isNewUser = isTemporaryId(userId)
 
   const acceptedScopes = getAcceptedScopesByType({
     acceptedScopes: [isNewUser ? 'user.create' : 'user.edit'],
@@ -99,123 +97,132 @@ export function useUserEditConfig(
         flags: [],
         title: emptyMessage,
         label: emptyMessage,
-        declaration: {
-          label: emptyMessage,
-          pages: [
-            {
-              id: 'user.office',
-              title: messages.registrationOffice,
-              type: PageTypes.enum.FORM,
-              requireCompletionToContinue: true,
-              fields: [
+        actions: [
+          {
+            type: ActionType.DECLARE,
+            label: emptyMessage,
+            flags: [],
+            review: { title: emptyMessage, fields: [] },
+            declaration: {
+              label: emptyMessage,
+              pages: [
                 {
-                  id: 'primaryOfficeId',
-                  type: FieldType.LOCATION,
-                  required: true,
-                  configuration: {
-                    activeOnly: true,
-                    allowedLocations: user.jurisdiction(
-                      user
-                        .scope(isNewUser ? 'user.create' : 'user.edit')
-                        .attribute('accessLevel')
-                    )
-                  },
-                  label: messages.registrationOffice
-                }
-              ]
-            },
-            {
-              id: 'user.details',
-              title: messages.userDetails,
-              type: PageTypes.enum.FORM,
-              requireCompletionToContinue: true,
-              fields: [
-                {
-                  id: 'name',
-                  type: FieldType.NAME,
-                  required: true,
-                  hideLabel: true,
-                  label: messages.fullName
-                },
-                {
-                  id: 'phoneNumber',
-                  type: FieldType.PHONE,
-                  required:
-                    window.config.USER_NOTIFICATION_DELIVERY_METHOD === 'sms',
-                  label: messages.phoneNumber,
-                  validation: [
+                  id: 'user.office',
+                  title: messages.registrationOffice,
+                  type: PageTypes.enum.FORM,
+                  requireCompletionToContinue: true,
+                  fields: [
                     {
-                      message: messages.phoneNumberFormat,
-                      validator: or(
-                        field('phoneNumber').matches(
-                          String(window.config.PHONE_NUMBER_PATTERN)
-                        ),
-                        field('phoneNumber').isFalsy()
-                      )
+                      id: 'primaryOfficeId',
+                      type: FieldType.LOCATION,
+                      required: true,
+                      configuration: {
+                        activeOnly: true,
+                        allowedLocations: user.jurisdiction(
+                          user
+                            .scope(isNewUser ? 'user.create' : 'user.edit')
+                            .attribute('accessLevel')
+                        )
+                      },
+                      label: messages.registrationOffice
                     }
                   ]
                 },
                 {
-                  id: 'email',
-                  type: FieldType.EMAIL,
-                  required:
-                    window.config.USER_NOTIFICATION_DELIVERY_METHOD === 'email',
-                  label: messages.email
+                  id: 'user.details',
+                  title: messages.userDetails,
+                  type: PageTypes.enum.FORM,
+                  requireCompletionToContinue: true,
+                  fields: [
+                    {
+                      id: 'name',
+                      type: FieldType.NAME,
+                      required: true,
+                      hideLabel: true,
+                      label: messages.fullName
+                    },
+                    {
+                      id: 'phoneNumber',
+                      type: FieldType.PHONE,
+                      required:
+                        window.config.USER_NOTIFICATION_DELIVERY_METHOD ===
+                        'sms',
+                      label: messages.phoneNumber,
+                      validation: [
+                        {
+                          message: messages.phoneNumberFormat,
+                          validator: or(
+                            field('phoneNumber').matches(
+                              String(window.config.PHONE_NUMBER_PATTERN)
+                            ),
+                            field('phoneNumber').isFalsy()
+                          )
+                        }
+                      ]
+                    },
+                    {
+                      id: 'email',
+                      type: FieldType.EMAIL,
+                      required:
+                        window.config.USER_NOTIFICATION_DELIVERY_METHOD ===
+                        'email',
+                      label: messages.email
+                    },
+                    {
+                      id: 'fullHonorificName',
+                      type: FieldType.TEXT,
+                      required: false,
+                      label: messages.fullHonorificName
+                    },
+                    {
+                      id: 'divider',
+                      type: FieldType.DIVIDER,
+                      label: emptyMessage
+                    },
+                    {
+                      id: 'role',
+                      type: FieldType.SELECT,
+                      required: true,
+                      label: messages.labelRole,
+                      options: roleOptions
+                    },
+                    {
+                      id: 'device',
+                      type: FieldType.TEXT,
+                      required: false,
+                      label: messages.userDevice
+                    },
+                    ...additionalFields
+                  ]
                 },
                 {
-                  id: 'fullHonorificName',
-                  type: FieldType.TEXT,
-                  required: false,
-                  label: messages.fullHonorificName
-                },
-                {
-                  id: 'divider',
-                  type: FieldType.DIVIDER,
-                  label: emptyMessage
-                },
-                {
-                  id: 'role',
-                  type: FieldType.SELECT,
-                  required: true,
-                  label: messages.labelRole,
-                  options: roleOptions
-                },
-                {
-                  id: 'device',
-                  type: FieldType.TEXT,
-                  required: false,
-                  label: messages.userDevice
-                },
-                ...additionalFields
-              ]
-            },
-            {
-              id: 'user.signature',
-              title: messages.userSignatureAttachmentTitle,
-              requireCompletionToContinue: true,
-              type: PageTypes.enum.FORM,
-              conditional: hasScope(
-                selectedRole?.scopes ?? [],
-                'profile.electronic-signature'
-              )
-                ? always()
-                : never(),
-              fields: [
-                {
-                  id: 'signature',
-                  type: FieldType.SIGNATURE,
-                  required: true,
-                  label: messages.userSignatureAttachment,
-                  signaturePromptLabel: messages.userSignatureAttachment,
-                  configuration: {
-                    maxFileSize: 123456
-                  }
+                  id: 'user.signature',
+                  title: messages.userSignatureAttachmentTitle,
+                  requireCompletionToContinue: true,
+                  type: PageTypes.enum.FORM,
+                  conditional: hasScope(
+                    selectedRole?.scopes ?? [],
+                    'profile.electronic-signature'
+                  )
+                    ? always()
+                    : never(),
+                  fields: [
+                    {
+                      id: 'signature',
+                      type: FieldType.SIGNATURE,
+                      required: true,
+                      label: messages.userSignatureAttachment,
+                      signaturePromptLabel: messages.userSignatureAttachment,
+                      configuration: {
+                        maxFileSize: 123456
+                      }
+                    }
+                  ]
                 }
               ]
             }
-          ]
-        },
-        actions: []
+          }
+        ]
       }) satisfies EventConfig
   }
 }

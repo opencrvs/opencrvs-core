@@ -13,8 +13,7 @@ import React from 'react'
 import styled from 'styled-components'
 import { defineMessage, useIntl } from 'react-intl'
 import { useTypedParams } from 'react-router-typesafe-routes/dom'
-import { Icon } from '@opencrvs/components/lib/Icon'
-import { Text } from '@opencrvs/components'
+import { Icon, Text } from '@opencrvs/components'
 import {
   ActionType,
   ActionStatus,
@@ -57,7 +56,7 @@ export function EditPageBanner() {
   const { eventId } = useTypedParams(ROUTES.V2.EVENTS.EDIT.PAGES)
   const intl = useIntl()
   const events = useEvents()
-  const event = events.getEvent.getFromCache(eventId)
+  const event = events.getEvent.useGetEventFromCache(eventId)
   const { getLocations } = useLocations()
   const locations = getLocations.useSuspenseQuery()
 

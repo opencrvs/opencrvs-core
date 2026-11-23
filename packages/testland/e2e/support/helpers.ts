@@ -157,11 +157,22 @@ export async function getAuthTokens(
   }
 }
 
+const tokenCache = new Map<string, { token: string; expiresAt: number }>()
+
+/**
+ * Returns token from cache if already present.
+ */
 export async function getToken(
   username: string,
   password: string = TEST_USER_PASSWORD
 ) {
-  return (await getAuthTokens(username, password)).token
+  const cached = tokenCache.get(username)
+  if (cached && cached.expiresAt > Date.now()) {
+    return cached.token
+  }
+  const token = (await getAuthTokens(username, password)).token
+  tokenCache.set(username, { token, expiresAt: Date.now() + 8 * 60_000 })
+  return token
 }
 
 export async function getClientToken(client_id: string, client_secret: string) {
@@ -388,6 +399,30 @@ export const drawSignature = async (
 }
 
 /**
+ * Fills the review page's comment and informant signature, unless they are already filled in.
+ */
+export async function signReview(
+  page: Page,
+  comment: string = faker.lorem.sentence()
+) {
+  const commentInput = page.locator('#review____comment')
+  if (!(await commentInput.inputValue())) {
+    await commentInput.fill(comment)
+  }
+
+  const signButton = page.getByRole('button', { name: 'Sign', exact: true })
+  if (await signButton.isVisible()) {
+    await signButton.click()
+    await drawSignature(page, 'review____signature_canvas_element', false)
+    await page
+      .locator('#review____signature_modal')
+      .getByRole('button', { name: 'Apply' })
+      .click()
+    await expect(page.getByRole('dialog')).not.toBeVisible()
+  }
+}
+
+/**
   Opens the record audit view of a record with given trackingId or name
  */
 export const auditRecord = async ({
@@ -453,9 +488,18 @@ export async function expectRowValueWithChangeButton(
   await expect(page.getByTestId(`change-button-${fieldName}`)).toBeVisible()
 }
 
+/** Assert that a review row has no value (and no validation error) but can be changed */
+export async function expectEmptyRowWithChangeButton(
+  page: Page,
+  fieldName: string
+) {
+  await expect(page.getByTestId(`${fieldName}-value`)).toHaveText('')
+  await expect(page.getByTestId(`change-button-${fieldName}`)).toBeVisible()
+}
+
 export async function switchEventTab(
   page: Page,
-  tab: 'Audit' | 'Record' | 'Summary'
+  tab: 'Audit' | 'Record' | 'Summary' | 'Documents'
 ) {
   await page.getByRole('button', { name: tab, exact: true }).click()
 }
@@ -517,7 +561,7 @@ const actionTitleToApiCallMap = {
   Declare: ['event.actions.declare'],
   Register: ['event.actions.register'],
   Validate: ['event.actions.custom'],
-  'Delete declaration': ['event.delete'],
+  'Delete draft': ['event.delete'],
   'Save & Exit': ['event.draft.create'],
   'Declare with edits': ['event.actions.edit', 'event.actions.declare'],
   'Notify with edits': ['event.actions.edit', 'event.actions.notify'],
@@ -527,6 +571,8 @@ const actionTitleToApiCallMap = {
     'event.actions.register'
   ]
 }
+
+const ACTION_RESPONSE_TIMEOUT = 60_000
 
 /**
  * Attaches response listeners for the given URL fragments, fires the trigger that
@@ -556,7 +602,10 @@ export async function waitForActionResponses(
   let mainDone = false
   const main = Promise.all(
     urls.map((url) =>
-      page.waitForResponse((res) => res.url().includes(url) && res.ok())
+      // add arbitrary timeout to prevent indefinite hanging in failure situations
+      page.waitForResponse((res) => res.url().includes(url) && res.ok(), {
+        timeout: ACTION_RESPONSE_TIMEOUT
+      })
     )
   ).then(() => {
     mainDone = true
@@ -572,7 +621,9 @@ export async function waitForActionResponses(
           res.ok() &&
           res.request().method() === 'POST' &&
           (res.request().postData()?.includes(eventId) ?? false) &&
-          mainDone
+          mainDone,
+        // add arbitrary timeout to prevent indefinite hanging in failure situations
+        { timeout: ACTION_RESPONSE_TIMEOUT }
       )
     )
   }
@@ -617,7 +668,7 @@ export async function triggerDeclarationAction(
     | 'Declare'
     | 'Register'
     | 'Validate'
-    | 'Delete declaration'
+    | 'Delete draft'
     | 'Save & Exit'
     | 'Declare with edits'
     | 'Notify with edits'
@@ -767,8 +818,8 @@ export const randomPastDate = (daysBack = 14) => {
  * The Organisation page paginates its location list client-side (10 items
  * per page) once a level has more than 10 children — e.g. locations created
  * directly via the API can push a previously first-page entry onto a later
- * page. Since tests in the same `test.describe.serial` block share one page
- * instance, a prior test may have already paged forward past where the
+ * page. Since the steps of a test share one page
+ * instance, a prior step may have already paged forward past where the
  * target actually is — so this first resets to page 1 (clicking 'Previous
  * page' until disabled), then clicks 'Next page' until `locator` becomes
  * visible or that button is disabled (no more pages), then asserts on it.

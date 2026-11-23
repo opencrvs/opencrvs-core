@@ -22,11 +22,7 @@
       "dependsOn": ["^build"],
       "cache": true,
       "inputs": ["production", "^production"],
-      "outputs": [
-        "{projectRoot}/build",
-        "{projectRoot}/lib",
-        "{projectRoot}/dist"
-      ]
+      "outputs": ["{projectRoot}/build", "{projectRoot}/dist"]
     },
     "build:types": {
       "dependsOn": ["^build"],

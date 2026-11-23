@@ -40,7 +40,7 @@ import { ROUTES } from '@client/v2-events/routes'
 import { NavigationStack } from '@client/v2-events/components/NavigationStack'
 import { useUserAllowedActions } from '@client/v2-events/features/workqueues/Actions/useUserAllowedActions'
 import { useToastAndRedirect } from '@client/v2-events/features/events/useToastAndRedirect'
-import { useEventConfiguration } from '../../useEventConfiguration'
+import { useEventConfigurationForRecord } from '../../useEventConfiguration'
 import {
   AvailableActionTypes,
   getAnnotationForActionType,
@@ -90,7 +90,7 @@ function shouldReuseHistoricalAnnotation(
  *
  * @param actionType Action type of the declaration action
  * @param event Event document
- * @param configuration Event configuration
+ * @param eventConfiguration Event configuration
  *
  * If the action is not allowed for the event, redirect the user to overview page.
  * Or throws an error if the user does not have permission to perform the action.
@@ -98,10 +98,9 @@ function shouldReuseHistoricalAnnotation(
 function useActionGuard(
   actionType: AvailableActionTypes,
   event: EventDocument,
-  configuration: EventConfig
+  eventConfiguration: EventConfig
 ) {
-  const eventState = getCurrentEventState(event, configuration)
-
+  const eventState = getCurrentEventState(event, eventConfiguration)
   const availableActions = getAvailableActionsForEvent(eventState)
   const { isActionAllowed } = useUserAllowedActions(eventState)
   const { redirectToEventOverviewPage } = useToastAndRedirect()
@@ -135,15 +134,8 @@ function useActionGuard(
     )
   }
 
-  // In the declare flow, user is allowed if they have permission for either DECLARE or NOTIFY;
-  // otherwise strict permission by action type.
-  const isPermitted =
-    actionType === ActionType.DECLARE
-      ? isActionAllowed(ActionType.DECLARE) ||
-        isActionAllowed(ActionType.NOTIFY)
-      : isActionAllowed(actionType)
-
-  if (!isPermitted) {
+  // Notifiers have their own notify flow, so permission is strictly by action type.
+  if (!isActionAllowed(actionType)) {
     throw new Error(
       `User does not have permission to perform action ${actionType} on event ${event.id}`
     )
@@ -168,16 +160,14 @@ function DeclarationActionComponent({
   event: EventDocument
 }>) {
   const eventId = event.id
-  const { setLocalDraft, getLocalDraftOrDefault, getRemoteDraftByEventId } =
+  const { setLocalDraft, getLocalDraftOrDefault, useRemoteDraftByEventId } =
     useDrafts()
 
-  const { eventConfiguration: configuration } = useEventConfiguration(
-    event.type
-  )
+  const { eventConfiguration } = useEventConfigurationForRecord(event)
 
-  useActionGuard(actionType, event, configuration)
+  useActionGuard(actionType, event, eventConfiguration)
 
-  const remoteDraft = getRemoteDraftByEventId(event.id)
+  const remoteDraft = useRemoteDraftByEventId(event.id)
 
   const activeRemoteDraft = remoteDraft
     ? findActiveDraftForEvent(event, remoteDraft)
@@ -243,9 +233,9 @@ function DeclarationActionComponent({
     : localDraftWithAdjustedTimestamp
 
   const eventStateWithDraftApplied = applyDraftToEventIndex(
-    getCurrentEventState(event, configuration),
+    getCurrentEventState(event, eventConfiguration),
     mergedDraft,
-    configuration
+    eventConfiguration
   )
 
   const actionAnnotation = useMemo(() => {
@@ -270,8 +260,12 @@ function DeclarationActionComponent({
       return {}
     }
 
-    return getAnnotationForActionType({ event, actionType: previousActionType })
-  }, [event, actionType])
+    return getAnnotationForActionType({
+      event,
+      eventConfiguration,
+      actionType: previousActionType
+    })
+  }, [event, eventConfiguration, actionType])
 
   useEffect(() => {
     // Use the form values from the zustand state, so that filled form state is not lost

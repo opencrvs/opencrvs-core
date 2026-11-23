@@ -82,6 +82,55 @@ describe('getAvailableActionsForEvent()', () => {
     expect(actions).toMatchSnapshot()
   })
 
+  it(`should allow REVOKE_REGISTRATION for "${EventStatus.enum.REGISTERED}" status with no flags`, () => {
+    const actions = getAvailableActionsForEvent({
+      status: EventStatus.enum.REGISTERED,
+      flags: []
+    } as unknown as EventIndex)
+
+    expect(actions).toContain(ActionType.REVOKE_REGISTRATION)
+    expect(actions).not.toContain(ActionType.REINSTATE_REGISTRATION)
+  })
+
+  it(`should not allow REVOKE_REGISTRATION for "${EventStatus.enum.REGISTERED}" status with ${InherentFlags.CORRECTION_REQUESTED} flag`, () => {
+    const actions = getAvailableActionsForEvent({
+      status: EventStatus.enum.REGISTERED,
+      flags: [InherentFlags.CORRECTION_REQUESTED]
+    } as EventIndex)
+
+    expect(actions).not.toContain(ActionType.REVOKE_REGISTRATION)
+  })
+
+  it(`should not allow REVOKE_REGISTRATION for "${EventStatus.enum.REGISTERED}" status while a revoke request is pending`, () => {
+    const actions = getAvailableActionsForEvent({
+      status: EventStatus.enum.REGISTERED,
+      flags: [(ActionType.REVOKE_REGISTRATION + ':requested').toLowerCase()]
+    } as EventIndex)
+
+    expect(actions).not.toContain(ActionType.REVOKE_REGISTRATION)
+  })
+
+  it(`should only allow READ and REINSTATE_REGISTRATION for "${EventStatus.enum.REVOKED}" status`, () => {
+    const actions = getAvailableActionsForEvent({
+      status: EventStatus.enum.REVOKED,
+      flags: []
+    } as unknown as EventIndex)
+
+    expect(actions).toEqual([
+      ActionType.READ,
+      ActionType.REINSTATE_REGISTRATION
+    ])
+  })
+
+  it(`should not allow REINSTATE_REGISTRATION for "${EventStatus.enum.REVOKED}" status while a reinstate request is pending`, () => {
+    const actions = getAvailableActionsForEvent({
+      status: EventStatus.enum.REVOKED,
+      flags: [(ActionType.REINSTATE_REGISTRATION + ':requested').toLowerCase()]
+    } as EventIndex)
+
+    expect(actions).toEqual([ActionType.READ])
+  })
+
   it(`should return the correct actions for "${EventStatus.enum.REGISTERED}" status with ${InherentFlags.CORRECTION_REQUESTED} flag`, () => {
     expect(
       getAvailableActionsForEvent({

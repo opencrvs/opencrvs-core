@@ -45,8 +45,8 @@ const modalMessages = defineMessages({
   },
   deleteDeclarationDescription: {
     id: 'register.form.modal.description.deleteDeclarationConfirm',
-    defaultMessage: `Are you certain you want to delete this draft declaration form? Please note, this action can't be undone.`,
-    description: 'Description for delete declaration confirmation modal'
+    defaultMessage: 'Are you sure you want to delete this draft?',
+    description: 'Description for delete draft confirmation modal'
   }
 })
 
@@ -76,8 +76,8 @@ export function useEventFormNavigation() {
   const navigate = useNavigate()
 
   const events = useEvents()
-  const { getDisplayableDrafts, setLocalDraft } = useDrafts()
-  const displayableDrafts = getDisplayableDrafts()
+  const { useDisplayableDrafts, setLocalDraft } = useDrafts()
+  const displayableDrafts = useDisplayableDrafts()
 
   const deleteEvent = events.deleteEvent.useMutation()
 

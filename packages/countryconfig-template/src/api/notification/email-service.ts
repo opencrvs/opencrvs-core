@@ -85,8 +85,9 @@ export const sendEmail = async (params: {
       )
     }
 
-    if (error.response) {
-      logger.error(error.response.body)
+    const sendError = error as { response?: { body?: unknown } }
+    if (sendError.response) {
+      logger.error(sendError.response.body)
     }
   }
 }

@@ -30,7 +30,12 @@ import {
   DisplayableAction,
   writeActions
 } from './ActionType'
-import { EventConfig } from './EventConfig'
+import {
+  byEffectiveFrom,
+  EventConfig,
+  toEventConfig,
+  VersionedEventConfig
+} from './EventConfig'
 import { FieldConfig, FieldReference } from './FieldConfig'
 import {
   Action,
@@ -52,11 +57,12 @@ import { getUUID, UUID } from '../uuid'
 import {
   ActionConfig,
   actionConfigTypes,
-  ActionConfigTypes
+  ActionConfigTypes,
+  DeclareActionConfig
 } from './ActionConfig'
-import { FormConfig } from './FormConfig'
+import { DeclarationFormConfig, FormConfig } from './FormConfig'
 import { getOrThrow } from '../utils'
-import { TokenUserType } from '../authentication'
+import { TokenUserType } from '../users/authentication'
 import {
   PlainDate,
   plainDateToLocalDate,
@@ -64,6 +70,7 @@ import {
 } from './FieldValue'
 import { subDays, subYears, format } from 'date-fns'
 import { FieldType } from './FieldType'
+import { TranslationConfig } from './TranslationConfig'
 import { EventIndex } from './EventIndex'
 
 /* eslint-disable max-lines */
@@ -73,18 +80,104 @@ export function ageToDate(age: number, asOfDate: PlainDate) {
   return PlainDate.parse(format(subYears(date, age), 'yyyy-MM-dd'))
 }
 
-export function getDeclarationFields(
-  configuration: EventConfig
-): FieldConfig[] {
-  return configuration.declaration.pages.flatMap(({ fields }) => fields)
+export function getDeclaration(configuration: EventConfig) {
+  const declareAction = configuration.actions.find(
+    (action): action is DeclareActionConfig =>
+      action.type === ActionType.DECLARE
+  )
+
+  if (!declareAction) {
+    throw new Error(
+      `Event '${configuration.id}' has no ${ActionType.DECLARE} action to read the declaration from`
+    )
+  }
+
+  return declareAction.declaration
 }
 
 export function getDeclarationPages(configuration: EventConfig) {
-  return configuration.declaration.pages
+  return getDeclaration(configuration).pages
 }
 
-export function getDeclaration(configuration: EventConfig) {
-  return configuration.declaration
+export function getDeclarationFields(
+  configuration: EventConfig
+): FieldConfig[] {
+  return getDeclarationPages(configuration).flatMap(({ fields }) => fields)
+}
+
+/**
+ * @returns the declaration fields of every version of the event, one per id: what any
+ * record of the event can hold, whichever version it was created under. Where versions
+ * define an id differently, the newest version's field is kept.
+ *
+ * Used to build the search index mapping: records of every version share one index per
+ * event, so its mapping must hold the fields of all of them. Goes away once each version
+ * gets its own index (#14335).
+ * Known limitation: a field id must keep its type in every version until #14335.
+ */
+export function getDeclarationFieldsOfAllVersions(
+  config: VersionedEventConfig
+): FieldConfig[] {
+  const oldestFirst = [...config.versions].sort(byEffectiveFrom)
+  const fieldsById = new Map(
+    oldestFirst.flatMap((version) =>
+      getDeclarationFields(toEventConfig(config, version)).map(
+        (field) => [field.id, field] as const
+      )
+    )
+  )
+  return [...fieldsById.values()]
+}
+
+/**
+ * @returns the notification form of the NOTIFY action, or undefined when the event has no NOTIFY action.
+ */
+function findNotificationForm(configuration: EventConfig) {
+  const notifyAction = configuration.actions.find(
+    (action) => action.type === ActionType.NOTIFY
+  )
+
+  return notifyAction?.type === ActionType.NOTIFY
+    ? notifyAction.notificationForm
+    : undefined
+}
+
+/**
+ * @returns the notification form configured on the NOTIFY action.
+ * @throws when the event has no NOTIFY action.
+ */
+export function getNotificationForm(
+  configuration: EventConfig
+): DeclarationFormConfig {
+  const notificationForm = findNotificationForm(configuration)
+  if (!notificationForm) {
+    throw new Error(
+      `Event '${configuration.id}' has no ${ActionType.NOTIFY} action.`
+    )
+  }
+
+  return notificationForm
+}
+
+export function getNotificationFields(
+  configuration: EventConfig
+): FieldConfig[] {
+  return getNotificationForm(configuration).pages.flatMap(
+    ({ fields }) => fields
+  )
+}
+
+/**
+ * Form a user fills in to submit the given action:
+ * the notification form for NOTIFY, the declaration form for DECLARE.
+ */
+export function getActionForm(
+  configuration: EventConfig,
+  actionType: typeof ActionType.NOTIFY | typeof ActionType.DECLARE
+) {
+  return actionType === ActionType.NOTIFY
+    ? getNotificationForm(configuration)
+    : getDeclaration(configuration)
 }
 
 export function isActionConfigType(
@@ -94,34 +187,33 @@ export function isActionConfigType(
   return actionConfigTypes.has(type as any)
 }
 
-// @TODO: see if we can make this function generic so it returns a typed ActionConfig based on the given actionType (e.g. `Extract<ActionConfig, { type: T }>`),
-// instead of the current wide `ActionConfig | undefined`. Note NOTIFY's fallback to DECLARE needs special-casing in the return type, since it can resolve to a DeclareConfig.
-// Perhaps this function should also throw an error if the action config is not found.
-export function getActionConfig({
+/**
+ * Returns the config of the action of the given type, typed as the config of that type.
+ * For a client-specific action, which has no config, it returns `undefined`.
+ * @TODO: Perhaps this function should throw an error if the action config is not found.
+ */
+export function getActionConfig<T extends DisplayableAction>({
   eventConfiguration,
   actionType,
   customActionType
 }: {
   eventConfiguration: EventConfig
-  actionType: DisplayableAction
+  actionType: T
   customActionType?: string
-}): ActionConfig | undefined {
-  // Notify uses its own config when present, otherwise falls back to declare
-  if (actionType === ActionType.NOTIFY) {
-    return (
-      eventConfiguration.actions.find((a) => a.type === ActionType.NOTIFY) ??
-      eventConfiguration.actions.find((a) => a.type === ActionType.DECLARE)
-    )
-  }
+}): Extract<ActionConfig, { type: T }> | undefined {
+  return eventConfiguration.actions.find(
+    (a): a is Extract<ActionConfig, { type: T }> => {
+      // We can have multiple custom actions configured, we specify the custom action with 'customActionType'
+      if (a.type === ActionType.CUSTOM && customActionType) {
+        return (
+          actionType === ActionType.CUSTOM &&
+          a.customActionType === customActionType
+        )
+      }
 
-  return eventConfiguration.actions.find((a) => {
-    // We can have multiple custom actions configured, we specify the custom action with 'customActionType'
-    if (a.type === ActionType.CUSTOM && customActionType) {
-      return a.customActionType === customActionType
+      return a.type === actionType
     }
-
-    return a.type === actionType
-  })
+  )
 }
 
 export function getCustomActionFields(
@@ -134,19 +226,11 @@ export function getCustomActionFields(
     actionType: ActionType.CUSTOM
   })
 
-  if (!actionConfig || actionConfig.type !== ActionType.CUSTOM) {
-    return []
-  }
-
-  return actionConfig.form
+  return actionConfig?.form ?? []
 }
 
 /**
  * Returns the fields configured for an action's confirmation dialog.
- *
- * Unlike review fields and supporting copy, NOTIFY does NOT fall back to the
- * DECLARE config here: dialog fields always come from the action's own
- * configuration entry.
  */
 export function getActionFormFields(
   eventConfiguration: EventConfig,
@@ -166,6 +250,25 @@ export function getActionFormFields(
   }
 
   return actionConfig.form
+}
+
+/**
+ * Returns the copy of the confirmation dialog of the action, or `undefined` when the action gives none.
+ * The EDIT action gives one copy for each of its dialogs, so for edit flow dialogs, you should read `dialogCopy` of the EDIT action instead.
+ * The action type alone does not find a CUSTOM action, so read `dialogCopy` of the custom action config that matches its `customActionType`.
+ */
+export function findActionDialogCopy(
+  eventConfiguration: EventConfig,
+  actionType: Exclude<
+    ActionType,
+    typeof ActionType.EDIT | typeof ActionType.CUSTOM
+  >
+): TranslationConfig | undefined {
+  const actionConfig = getActionConfig({ eventConfiguration, actionType })
+
+  return actionConfig && 'dialogCopy' in actionConfig
+    ? actionConfig.dialogCopy
+    : undefined
 }
 
 export function getPrintCertificatePages(configuration: EventConfig) {
@@ -640,7 +743,7 @@ export function flattenFieldReference(ref: FieldReference) {
 }
 
 export function isWriteAction(actionType: ActionType): boolean {
-  return writeActions.safeParse(actionType).success
+  return writeActions.validate(actionType)
 }
 
 /**
@@ -649,6 +752,8 @@ export function isWriteAction(actionType: ActionType): boolean {
 export const findAllFields = (config: EventConfig): FieldConfig[] => {
   return flattenDeep([
     ...getDeclarationFields(config),
+    ...(findNotificationForm(config)?.pages.flatMap(({ fields }) => fields) ??
+      []),
     ...getAllAnnotationFields(config)
   ])
 }
@@ -692,11 +797,14 @@ export function getMixedPath<T = unknown>(
   return isNil(result) ? defaultValue : result
 }
 
-export function getEventConfigById(eventConfigs: EventConfig[], id: string) {
-  const eventConfig = eventConfigs.find(
-    (eventConfiguration) => eventConfiguration.id === id
+export function getEventConfigById<T extends { id: string }>(
+  eventConfigs: T[],
+  id: string
+): T {
+  return getOrThrow(
+    eventConfigs.find((eventConfiguration) => eventConfiguration.id === id),
+    `No configuration found for event type: ${id}`
   )
-  return getOrThrow(eventConfig, `Event config for ${id} not found`)
 }
 
 export function timePeriodToDateRange(value: SelectDateRangeValue) {
@@ -868,12 +976,68 @@ export function getCompleteActionDeclaration<
   return deepMerge(declaration, action.declaration)
 }
 
-export function getAcceptedActions(event: EventDocument): ActionDocument[] {
-  return event.actions.filter(isAcceptedAction).map((action) => ({
+/**
+ * Completes an Accepted action's declaration and annotation with those of its
+ * original Requested action (the Accepted action's own values win).
+ */
+function completeAcceptedAction(
+  event: EventDocument,
+  action: ActionDocument
+): ActionDocument {
+  return {
     ...action,
     declaration: getCompleteActionDeclaration({}, event, action),
     annotation: getCompleteActionAnnotation(event, action)
-  }))
+  }
+}
+
+export function getAcceptedActions(event: EventDocument): ActionDocument[] {
+  return event.actions
+    .filter(isAcceptedAction)
+    .map((action) => completeAcceptedAction(event, action))
+}
+
+/**
+ * Returns the event with each Accepted action completed with the details of
+ * its original Requested action: who requested it, where, and the request's
+ * declaration, annotation and content (the Accepted action's own values win).
+ *
+ * `$event` conditionals match Accepted actions only, but an Accepted action
+ * does not carry everything its request did. A synchronous confirmation drops
+ * the request's annotation; an asynchronous `accept` is created by the system
+ * user and carries only what the country configuration sent. Without this,
+ * `event.hasAction(...).withTemplate(...)` / `.withFields(...)` would stop
+ * matching fields that matched the Requested action.
+ */
+export function getEventWithCompleteAcceptedActions(
+  event: EventDocument
+): EventDocument {
+  return {
+    ...event,
+    actions: event.actions.map((action) => {
+      if (!isAcceptedAction(action) || !action.originalActionId) {
+        return action
+      }
+      const requestedAction = event.actions.find(
+        ({ id }) => id === action.originalActionId
+      )
+      if (requestedAction?.status !== ActionStatus.Requested) {
+        return action
+      }
+      const content = getCompleteActionContent(event, action)
+      // Request and acceptance are the same action type, so the merged
+      // content keeps the action's shape.
+      return {
+        ...completeAcceptedAction(event, action),
+        // Who requested the action, as getActionUpdateMetadata resolves it.
+        createdBy: requestedAction.createdBy,
+        createdByRole: requestedAction.createdByRole,
+        createdByUserType: requestedAction.createdByUserType,
+        createdAtLocation: requestedAction.createdAtLocation,
+        ...(content ? { content } : {})
+      } as ActionDocument
+    })
+  }
 }
 
 // Action types that are not taken into the aggregate values

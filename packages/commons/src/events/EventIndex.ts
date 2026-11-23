@@ -15,7 +15,7 @@ import { ContainsFlags } from './Flag'
 import { EventState } from './ActionDocument'
 
 import { TENNIS_CLUB_MEMBERSHIP } from './Constants'
-import { TokenUserType } from '../authentication'
+import { TokenUserType } from '../users/authentication'
 import { SelectDateRangeValue } from './FieldValue'
 
 export { ContainsFlags } from './Flag'
@@ -88,6 +88,15 @@ export const AnyOfStatus = z
   })
   .meta({
     id: 'AnyOfStatus'
+  })
+
+export const NoneOfStatus = z
+  .object({
+    type: z.literal('noneOf'),
+    terms: z.array(EventStatus)
+  })
+  .meta({
+    id: 'NoneOfStatus'
   })
 
 export const Range = z
@@ -167,7 +176,7 @@ export const QueryExpression = z
   .object({
     id: z.optional(z.string()),
     eventType: z.string(),
-    status: z.optional(z.union([AnyOfStatus, ExactStatus])),
+    status: z.optional(z.union([AnyOfStatus, NoneOfStatus, ExactStatus])),
     createdAt: z.optional(DateCondition),
     updatedAt: z.optional(DateCondition),
     'legalStatuses.DECLARED.createdAtLocation': z.optional(Within).nullable(),
@@ -176,6 +185,7 @@ export const QueryExpression = z
     'legalStatuses.REGISTERED.createdAtLocation': z.optional(Within).nullable(),
     'legalStatuses.REGISTERED.createdByRole': z.optional(AnyOf),
     'legalStatuses.REGISTERED.registrationNumber': z.optional(Exact),
+    'legalStatuses.REVOKED.createdAtLocation': z.optional(Within).nullable(),
     createdAtLocation: z.optional(z.union([Within, Exact])),
     updatedAtLocation: z.optional(z.union([Within, Exact])),
     assignedTo: z.optional(Exact),

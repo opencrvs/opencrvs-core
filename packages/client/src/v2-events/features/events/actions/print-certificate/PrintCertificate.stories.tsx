@@ -15,9 +15,10 @@ import React from 'react'
 import { Outlet } from 'react-router-dom'
 import {
   ActionType,
-  generateActionDocument,
+  generateActionDocuments,
   generateEventDocument,
-  tennisClubMembershipEvent
+  tennisClubMembershipEvent,
+  versionedTennisClubMembershipEvent
 } from '@opencrvs/commons/client'
 import { tennisClubMembershipEventDocument } from '@client/v2-events/features/events/fixtures'
 import { ROUTES, routesConfig } from '@client/v2-events/routes'
@@ -55,7 +56,7 @@ export const CollectorForm: Story = {
       handlers: {
         events: [
           tRPCMsw.event.config.get.query(() => {
-            return [tennisClubMembershipEvent]
+            return [versionedTennisClubMembershipEvent]
           }),
           tRPCMsw.event.get.query(() => {
             return tennisClubMembershipEventDocument
@@ -66,7 +67,7 @@ export const CollectorForm: Story = {
   }
 }
 
-const printActionWithSelections = generateActionDocument({
+const printActionPairWithSelections = generateActionDocuments({
   configuration: tennisClubMembershipEvent,
   action: ActionType.PRINT_CERTIFICATE,
   defaults: {
@@ -91,7 +92,7 @@ const registeredEvent = generateEventDocument({
 
 const alreadyPrintedEvent = {
   ...registeredEvent,
-  actions: registeredEvent.actions.concat(printActionWithSelections)
+  actions: registeredEvent.actions.concat(printActionPairWithSelections)
 }
 
 export const FormSetup: Story = {

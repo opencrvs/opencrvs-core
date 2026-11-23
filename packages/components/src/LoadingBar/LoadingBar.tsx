@@ -53,8 +53,8 @@ const Progress = styled.div`
 export const LoadingBar = () => (
   <ProgressBackground>
     <img
-      src="/images/logo-90x90.svg"
-      alt="OpenCRVS Logo"
+      src="/api/countryconfig/content/country-logo"
+      alt="Country logo"
       width={90}
       height={90}
     />

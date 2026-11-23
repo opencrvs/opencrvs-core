@@ -17,8 +17,8 @@ import {
 } from 'react-router-typesafe-routes/dom'
 import { useIntl } from 'react-intl'
 import styled from 'styled-components'
-import { FloatingActionButton } from '@opencrvs/components/lib/buttons'
-import { PlusTransparentWhite } from '@opencrvs/components/lib/icons'
+import { FloatingActionButton } from '@opencrvs/components/legacy'
+import { PlusTransparentWhite } from '@opencrvs/components/icons'
 import { precompileActionSchemas } from '@opencrvs/commons/client'
 import { useEventConfigurations } from '@client/v2-events/features/events/useEventConfiguration'
 
@@ -82,7 +82,6 @@ function ConfigurableWorkqueue({ workqueueSlug }: { workqueueSlug: string }) {
       action={workqueueConfig.action}
       columns={workqueueConfig.columns}
       emptyMessage={workqueueConfig.emptyMessage}
-      eventConfigs={eventConfigs}
       queryData={events}
       title={intl.formatMessage(workqueueConfig.name)}
       totalResults={total}

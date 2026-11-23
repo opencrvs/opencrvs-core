@@ -73,10 +73,12 @@ export function isPotentialDuplicate(actions: Action[]): boolean {
   }, false)
 }
 
+/** `event` holds only the actions up to and including `action`. */
 function isFlagConditionMet(
   conditional: JSONSchema,
   form: EventState,
-  action: Action
+  action: Action,
+  event: EventDocument
 ) {
   const now = isValid(parseISO(action.createdAt))
     ? formatISO(parseISO(action.createdAt), { representation: 'date' })
@@ -86,6 +88,7 @@ function isFlagConditionMet(
     $form: form,
     $now: now,
     $online: true,
+    $event: event,
     $user: {
       sub: '',
       exp: '',
@@ -134,7 +137,9 @@ function actionConfigRemovesFlag(
   const form = { ...declaration, ...annotation }
 
   return removeOperations.some(({ conditional }) =>
-    conditional ? isFlagConditionMet(conditional, form, action) : true
+    conditional
+      ? isFlagConditionMet(conditional, form, action, eventUpToThisAction)
+      : true
   )
 }
 
@@ -161,15 +166,6 @@ const INHERENT_FLAG_RULES: InherentFlagRule[] = [
     flag: InherentFlags.CORRECTION_REQUESTED,
     setOn: [ActionType.REQUEST_CORRECTION],
     resetOn: [ActionType.APPROVE_CORRECTION, ActionType.REJECT_CORRECTION]
-  },
-  {
-    // INCOMPLETE mirrors the NOTIFIED status: set by NOTIFY, cleared by any
-    // other status-changing action (see getStatusFromActions). ARCHIVE/UNARCHIVE
-    // are deliberately excluded so the flag freezes across an archive/unarchive
-    // round trip and comes back exactly as it was.
-    flag: InherentFlags.INCOMPLETE,
-    setOn: [ActionType.NOTIFY],
-    resetOn: [ActionType.CREATE, ActionType.DECLARE, ActionType.REGISTER]
   },
   {
     flag: InherentFlags.REJECTED,
@@ -281,11 +277,14 @@ export function resolveEventCustomFlags(
     }
 
     const form = { ...declarations[idx], ...annotation }
+    const eventUpToThisAction = { ...event, actions: actions.slice(0, idx + 1) }
 
     const flagsWithMetConditions = (actionConfig.flags ?? []).filter(
       ({ conditional }) =>
         // If conditional is not provided, the flag is resolved
-        conditional ? isFlagConditionMet(conditional, form, action) : true
+        conditional
+          ? isFlagConditionMet(conditional, form, action, eventUpToThisAction)
+          : true
     )
 
     const addedFlags = flagsWithMetConditions
@@ -351,7 +350,7 @@ function getInherentFlags(
  *
  * Flags are determined by combining:
  *  - Action status flags (format 'ActionType:ActionStatus')
- *  - Inherent flags (e.g. incomplete, rejected, correction requested, potential duplicate, edit in progress)
+ *  - Inherent flags (e.g. rejected, correction requested, potential duplicate, edit in progress)
  *  - Event type-specific custom flags defined in the event configuration
  *
  * @param event - The EventDocument containing the action history and payload

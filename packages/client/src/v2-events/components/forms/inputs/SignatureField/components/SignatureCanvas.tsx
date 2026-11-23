@@ -14,7 +14,7 @@ import { useIntl } from 'react-intl'
 import * as React from 'react'
 import styled from 'styled-components'
 import SignatureCanvasImport from 'react-signature-canvas'
-import { Button } from '@opencrvs/components/lib/Button'
+import { Button } from '@opencrvs/components'
 import { messages } from '@client/i18n/messages/views/review'
 
 /*

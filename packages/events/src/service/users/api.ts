@@ -27,7 +27,8 @@ import {
   isUUID,
   logger,
   parseDocumentPath,
-  triggerUserEventNotification
+  triggerUserEventNotification,
+  TokenWithBearer
 } from '@opencrvs/commons'
 import { EventStatus, getStatusFromActions } from '@opencrvs/commons/events'
 import { env } from '@events/environment'
@@ -59,7 +60,7 @@ import * as eventsRepo from '@events/storage/postgres/events/events'
 import { deleteFilesByPrefix } from '@events/service/files'
 import { getClient } from '@events/storage/postgres/events'
 import Schema from '@events/storage/postgres/events/schema/Database'
-import { getRoles } from '../config/config'
+import { getInMemoryRoles } from '../config/config'
 import {
   generateRandomPassword,
   generateUsername,
@@ -460,10 +461,16 @@ export async function createUser(
   const usernameCandidate = input.username ?? generateUsername(input.name)
   const username = await findAvailableUsername(usernameCandidate)
   const resolvedUser = resolveCreateUserInput({ ...input, username })
-  // The user has no id yet, so only a temporary-id upload can be theirs
-  assertOwnSignaturePath(resolvedUser.signature?.path, { allowTemporary: true })
+  // Unless the id is given up front, the user has no id yet, so only a
+  // temporary-id upload can be theirs
+  assertOwnSignaturePath(resolvedUser.signature?.path, {
+    userId: resolvedUser.id,
+    allowTemporary: true
+  })
 
   const userPayload = {
+    // Undefined lets the database create the id.
+    id: resolvedUser.id,
     firstname: resolvedUser.name.firstname,
     surname: resolvedUser.name.surname,
     // Normalise to undefined for the same reason as mobile above.
@@ -681,7 +688,10 @@ export async function verifyPasswordById(
   }
 }
 
-export async function verifyUser(input: { mobile?: string; email?: string }) {
+export async function verifyUser(
+  input: { mobile?: string; email?: string },
+  token: TokenWithBearer
+) {
   const user = await getUserByMobileOrEmail(
     input.mobile ? { mobile: input.mobile } : { email: input.email ?? '' }
   )
@@ -697,7 +707,7 @@ export async function verifyUser(input: { mobile?: string; email?: string }) {
   const securityQuestionKey =
     questions[Math.floor(Math.random() * questions.length)].questionKey
 
-  const roles = await getRoles()
+  const roles = await getInMemoryRoles(token)
   const scope = roles.find((r) => r.id === user.role)?.scopes ?? []
 
   return {

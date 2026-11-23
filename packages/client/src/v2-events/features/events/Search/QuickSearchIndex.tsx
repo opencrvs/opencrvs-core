@@ -27,16 +27,18 @@ function QuickSearchComponent({ term }: { term: string }) {
   const eventConfigurations = useEventConfigurations()
 
   const query = buildQuickSearchQuery(term, eventConfigurations)
-  const queryData = searchEvent.useSuspenseQuery({
-    query,
-    ...typedSearchParams
-  })
+  const queryData = searchEvent.useSuspenseQuery(
+    {
+      query,
+      ...typedSearchParams
+    },
+    ['adhoc']
+  )
 
   return (
     <SearchResultComponent
       action={{ type: ActionType.READ }}
       columns={mandatoryColumns}
-      eventConfigs={eventConfigurations}
       queryData={queryData.results}
       title={intl.formatMessage(
         {

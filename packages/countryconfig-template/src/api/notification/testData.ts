@@ -16,7 +16,8 @@ import {
   ActionStatus,
   ActionType,
   CreatedAction,
-  EventDocument
+  EventDocument,
+  INITIAL_EVENT_CONFIG_VERSION_ID
 } from '@opencrvs/toolkit/events'
 import { TriggerEventPayloadPair } from './handler'
 import { Event } from '@countryconfig/events/utils'
@@ -441,7 +442,8 @@ const birthNotificationEvent: EventDocument = {
   createdAt: '2025-08-20T03:24:04.815Z',
   updatedAt: '2025-08-20T03:24:04.815Z',
   actions: [CreateAction, AssignAction, RequestBirthNotificationAction],
-  trackingId: 'PRZIB7'
+  trackingId: 'PRZIB7',
+  configVersionId: INITIAL_EVENT_CONFIG_VERSION_ID
 }
 
 const birthDeclarationEvent: EventDocument = {
@@ -450,7 +452,8 @@ const birthDeclarationEvent: EventDocument = {
   createdAt: '2025-08-20T03:24:04.815Z',
   updatedAt: '2025-08-20T03:24:04.815Z',
   actions: [CreateAction, AssignAction, RequestBirthDeclarationAction],
-  trackingId: 'PRZIB7'
+  trackingId: 'PRZIB7',
+  configVersionId: INITIAL_EVENT_CONFIG_VERSION_ID
 }
 
 const birthRegistrationEvent: EventDocument = {
@@ -464,7 +467,8 @@ const birthRegistrationEvent: EventDocument = {
     BirthDeclarationAction,
     RequestRegistrationAction
   ],
-  trackingId: 'PRZIB7'
+  trackingId: 'PRZIB7',
+  configVersionId: INITIAL_EVENT_CONFIG_VERSION_ID
 }
 
 const birthRejectionEvent: EventDocument = {
@@ -478,7 +482,8 @@ const birthRejectionEvent: EventDocument = {
     BirthDeclarationAction,
     RequestRejectionAction
   ],
-  trackingId: 'PRZIB7'
+  trackingId: 'PRZIB7',
+  configVersionId: INITIAL_EVENT_CONFIG_VERSION_ID
 }
 
 const deathNotificationEvent: EventDocument = {
@@ -487,7 +492,8 @@ const deathNotificationEvent: EventDocument = {
   createdAt: '2025-08-20T03:24:04.815Z',
   updatedAt: '2025-08-20T03:24:04.815Z',
   actions: [CreateAction, AssignAction, RequestDeathNotificationAction],
-  trackingId: 'PRZIB7'
+  trackingId: 'PRZIB7',
+  configVersionId: INITIAL_EVENT_CONFIG_VERSION_ID
 }
 
 const deathDeclarationEvent: EventDocument = {
@@ -496,7 +502,8 @@ const deathDeclarationEvent: EventDocument = {
   createdAt: '2025-08-20T03:24:04.815Z',
   updatedAt: '2025-08-20T03:24:04.815Z',
   actions: [CreateAction, AssignAction, RequestDeathDeclarationAction],
-  trackingId: 'PRZIB7'
+  trackingId: 'PRZIB7',
+  configVersionId: INITIAL_EVENT_CONFIG_VERSION_ID
 }
 
 const deathRegistrationEvent: EventDocument = {
@@ -510,7 +517,8 @@ const deathRegistrationEvent: EventDocument = {
     DeathDeclarationAction,
     RequestRegistrationAction
   ],
-  trackingId: 'PRZIB7'
+  trackingId: 'PRZIB7',
+  configVersionId: INITIAL_EVENT_CONFIG_VERSION_ID
 }
 
 const deathRejectionEvent: EventDocument = {
@@ -524,7 +532,8 @@ const deathRejectionEvent: EventDocument = {
     DeathDeclarationAction,
     RequestRejectionAction
   ],
-  trackingId: 'PRZIB7'
+  trackingId: 'PRZIB7',
+  configVersionId: INITIAL_EVENT_CONFIG_VERSION_ID
 }
 
 export const informantNotificationTestData: {

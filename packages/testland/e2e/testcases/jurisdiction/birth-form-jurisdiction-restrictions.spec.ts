@@ -13,6 +13,7 @@ import { expect, test, type Page } from '@playwright/test'
 import { login } from '@e2e/support/helpers'
 import { CREDENTIALS } from '@e2e/support/constants'
 import { openBirthDeclaration } from '@e2e/support/birth/helpers'
+import { startBirthNotification } from '@e2e/support/birth/notify'
 
 test.describe('Birth form - child place of birth jurisdiction restrictions', () => {
   let page: Page
@@ -27,7 +28,8 @@ test.describe('Birth form - child place of birth jurisdiction restrictions', () 
 
   test('Hospital Official should be able to only choose their own location as Health Institution', async () => {
     await login(page, CREDENTIALS.HOSPITAL_OFFICIAL)
-    await openBirthDeclaration(page)
+    // Hospital officials can only notify, so they get the notify flow
+    await startBirthNotification(page)
 
     await page.locator('#child____placeOfBirth').click()
     await page.getByText('Health Institution', { exact: true }).click()

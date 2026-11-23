@@ -10,11 +10,10 @@
  */
 
 import { Kysely, sql } from 'kysely'
-import * as z from 'zod/v4'
 import {
   ActionStatus,
-  ActionType,
-  Draft,
+  DraftInput,
+  RemoteDraft,
   TokenUserType,
   UUID
 } from '@opencrvs/commons'
@@ -25,8 +24,8 @@ import {
 } from './schema/app/EventActionDrafts'
 import Schema from './schema/Database'
 
-function toDraftDocument(draft: EventActionDrafts): Draft {
-  return Draft.parse({
+function toDraftDocument(draft: EventActionDrafts): RemoteDraft {
+  return RemoteDraft.parse({
     id: draft.id,
     transactionId: draft.transactionId,
     createdAt: draft.createdAt,
@@ -52,7 +51,10 @@ export async function createDraft(draft: NewEventActionDrafts) {
     .insertInto('eventActionDrafts')
     .values(draft)
     .onConflict((oc) =>
+      // A user has one draft per event: saving a draft of another action replaces it
       oc.columns(['eventId', 'createdBy']).doUpdateSet({
+        actionType: sql`EXCLUDED.action_type`,
+        transactionId: sql`EXCLUDED.transaction_id`,
         declaration: sql`EXCLUDED.declaration`,
         annotation: sql`EXCLUDED.annotation`,
         createdAt: sql`NOW()`
@@ -76,18 +78,17 @@ export async function getDraftsByUserId(createdBy: string) {
   const drafts = await db
     .selectFrom('eventActionDrafts')
     .where('createdBy', '=', createdBy)
+    .where('actionType', 'in', DraftInput.shape.type.options)
     .orderBy('createdAt', 'asc')
     .selectAll()
     .execute()
-  const draftDocuments = drafts.map(toDraftDocument)
-
-  return z.array(Draft).parse(draftDocuments satisfies Draft[])
+  return drafts.map(toDraftDocument)
 }
 
 export async function findLatestDraftForAction(
   eventId: UUID,
   createdBy: string,
-  actionType: ActionType
+  actionType: DraftInput['type']
 ) {
   const db = getClient()
   const draft = await db
@@ -100,8 +101,7 @@ export async function findLatestDraftForAction(
     .executeTakeFirst()
 
   if (draft) {
-    const draftDocument = toDraftDocument(draft)
-    return Draft.parse(draftDocument satisfies Draft)
+    return toDraftDocument(draft)
   }
 
   return undefined

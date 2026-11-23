@@ -24,6 +24,7 @@ import {
   getActionAnnotationFields,
   getDeclarationAfterEachAction,
   getDeclarationFields,
+  getEventConfigForRecord,
   Location
 } from '@opencrvs/toolkit/events'
 
@@ -36,21 +37,27 @@ import { precalculateBirthEvent } from '@countryconfig/analytics/analytics-preca
 import { Event } from '@countryconfig/events/utils/types'
 
 /**
- * You can exclude events from analytics by setting 'analytics' property to 'false' in the event config.
+ * @returns the configuration of the version that `event` was created under, or
+ * `undefined` when that version is not included in analytics. You can exclude
+ * events from analytics by setting 'analytics' property to 'false' in the event config.
  */
-const analyticsEventConfigs = eventConfigs.filter(
-  (event) => event.analytics === true
-)
+function findEventConfig(event: EventDocument) {
+  const versionedConfig = eventConfigs.find(({ id }) => id === event.type)
 
-function findEventConfig(eventType: string) {
-  return analyticsEventConfigs.find((event) => event.id === eventType)
+  if (!versionedConfig) {
+    return undefined
+  }
+
+  const config = getEventConfigForRecord(versionedConfig, event)
+
+  return config.analytics ? config : undefined
 }
 
-function getEventConfig(eventType: string) {
-  const config = findEventConfig(eventType)
+function getEventConfig(event: EventDocument) {
+  const config = findEventConfig(event)
 
   if (!config) {
-    throw new Error(`Unsupported event type: ${eventType}`)
+    throw new Error(`Unsupported event type: ${event.type}`)
   }
 
   return config
@@ -145,7 +152,7 @@ async function upsertAnalyticsEventActions(
 
   const allEventActions: ActionDocWithId[] = []
   for (const event of events) {
-    const eventConfig = getEventConfig(event.type)
+    const eventConfig = getEventConfig(event)
     const actions = event.actions.slice().sort((a, b) => {
       // CREATE type always comes first
       if (a.type === ActionType.CREATE && b.type !== ActionType.CREATE)
@@ -239,7 +246,7 @@ export async function importEvents(events: EventDocument[], trx: Kysely<any>) {
 }
 
 export async function importEvent(event: EventDocument, trx: Kysely<any>) {
-  const eventConfig = findEventConfig(event.type)
+  const eventConfig = findEventConfig(event)
   if (!eventConfig) {
     logger.warn(
       `Event with id "${event.id}" has unsupported event type "${event.type}". Record will not be written in the analytics database.`

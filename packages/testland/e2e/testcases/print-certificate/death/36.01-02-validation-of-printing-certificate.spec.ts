@@ -8,7 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { expect, test, type Page } from '@playwright/test'
+import { expect, test } from '@playwright/test'
 import { getToken, joinValuesWith, login } from '@e2e/support/helpers'
 import { CREDENTIALS } from '@e2e/support/constants'
 import {
@@ -20,26 +20,16 @@ import { REQUIRED_VALIDATION_ERROR } from '@e2e/support/birth/helpers'
 import { expectInUrl } from '@e2e/support/utils'
 import { faker } from '@faker-js/faker'
 
-test.describe.serial('Certified copies', () => {
-  let page: Page
-  let declaration: Declaration
+test('Certified copies', async ({ page }) => {
+  const token = await getToken(CREDENTIALS.REGISTRAR)
+  const res = await createDeclaration(token)
+  const declaration = res.declaration
 
-  test.beforeAll(async ({ browser }) => {
-    const token = await getToken(CREDENTIALS.REGISTRAR)
-    const res = await createDeclaration(token)
-    declaration = res.declaration
-    page = await browser.newPage()
-  })
-
-  test.afterAll(async () => {
-    await page.close()
-  })
-
-  test('1.0.1 Log in', async () => {
+  await test.step('1.0.1 Log in', async () => {
     await login(page)
   })
 
-  test('1.0.2 Click on "Print certificate" from action menu', async () => {
+  await test.step('1.0.2 Click on "Print certificate" from action menu', async () => {
     await page.getByRole('button', { name: 'Pending certification' }).click()
     await navigateToCertificatePrintAction(
       page,
@@ -48,14 +38,14 @@ test.describe.serial('Certified copies', () => {
     )
   })
 
-  test.describe('2.0 Validate "Certify record" page', async () => {
-    test('2.1 Click continue without selecting collector type and template type', async () => {
+  await test.step('2.0 Validate "Certify record" page', async () => {
+    await test.step('2.1 Click continue without selecting collector type and template type', async () => {
       await expect(
         page.locator('#certificateTemplateId').getByText('Death Certificate')
       ).toBeVisible()
     })
 
-    test('2.2 Click continue without selecting collector type', async () => {
+    await test.step('2.2 Click continue without selecting collector type', async () => {
       await page.getByRole('button', { name: 'Continue' }).click()
 
       await expect(
@@ -65,7 +55,7 @@ test.describe.serial('Certified copies', () => {
       ).toBeVisible()
     })
 
-    test('2.3 Click continue after selecting requester type and template type', async () => {
+    await test.step('2.3 Click continue after selecting requester type and template type', async () => {
       await page.reload()
       await page.locator('#collector____requesterId').click()
 
@@ -107,35 +97,24 @@ test.describe.serial('Certified copies', () => {
   })
 })
 
-test.describe.serial('Certified copies renders spouse age correctly', () => {
-  let page: Page
-  let declaration: Declaration
-
+test('Certified copies renders spouse age correctly', async ({ page }) => {
   const spouseAge = 25
+  const token = await getToken(CREDENTIALS.REGISTRAR)
+  const res = await createDeclaration(token, () => ({
+    'spouse.dobUnknown': true,
+    'spouse.age': {
+      age: spouseAge,
+      asOfDateRef: 'eventDetails.date'
+    },
+    'spouse.dob': undefined
+  }))
+  const declaration = res.declaration
 
-  test.beforeAll(async ({ browser }) => {
-    const token = await getToken(CREDENTIALS.REGISTRAR)
-    const res = await createDeclaration(token, () => ({
-      'spouse.dobUnknown': true,
-      'spouse.age': {
-        age: spouseAge,
-        asOfDateRef: 'eventDetails.date'
-      },
-      'spouse.dob': undefined
-    }))
-    declaration = res.declaration
-    page = await browser.newPage()
-  })
-
-  test.afterAll(async () => {
-    await page.close()
-  })
-
-  test('1.0.1 Log in', async () => {
+  await test.step('1.0.1 Log in', async () => {
     await login(page)
   })
 
-  test('1.0.2 Click on "Print certificate" from action menu', async () => {
+  await test.step('1.0.2 Click on "Print certificate" from action menu', async () => {
     await page.getByRole('button', { name: 'Pending certification' }).click()
     await navigateToCertificatePrintAction(
       page,
@@ -144,8 +123,8 @@ test.describe.serial('Certified copies renders spouse age correctly', () => {
     )
   })
 
-  test.describe('2.0 Validate "Certify record" page', async () => {
-    test('2.1 Ensure data content is visible for spouse', async () => {
+  await test.step('2.0 Validate "Certify record" page', async () => {
+    await test.step('2.1 Ensure data content is visible for spouse', async () => {
       await page.reload()
       await page.locator('#collector____requesterId').click()
       const selectOptionsLabels = [
@@ -184,11 +163,9 @@ test.describe.serial('Certified copies renders spouse age correctly', () => {
   })
 })
 
-test.describe
-  .serial('Certified copies renders non-spouse informant age correctly', () => {
-  let page: Page
-  let declaration: Declaration
-
+test('Certified copies renders non-spouse informant age correctly', async ({
+  page
+}) => {
   const informantAge = faker.number.int({ min: 18, max: 90 })
 
   const declarationOverrides = {
@@ -204,31 +181,23 @@ test.describe
     'informant.nid': faker.string.numeric(10),
     'informant.addressSameAs': 'YES'
   }
+  const token = await getToken(CREDENTIALS.REGISTRAR)
 
-  test.beforeAll(async ({ browser }) => {
-    const token = await getToken(CREDENTIALS.REGISTRAR)
+  const res = await createDeclaration(token, (mockDeclaration) => ({
+    ...declarationOverrides,
+    'informant.age': {
+      age: informantAge,
+      asOfDateRef: 'eventDetails.date'
+    }
+  }))
 
-    const res = await createDeclaration(token, (mockDeclaration) => ({
-      ...declarationOverrides,
-      'informant.age': {
-        age: informantAge,
-        asOfDateRef: 'eventDetails.date'
-      }
-    }))
+  const declaration = res.declaration
 
-    declaration = res.declaration
-    page = await browser.newPage()
-  })
-
-  test.afterAll(async () => {
-    await page.close()
-  })
-
-  test('1.0.1 Log in', async () => {
+  await test.step('1.0.1 Log in', async () => {
     await login(page)
   })
 
-  test('1.0.2 Click on "Print certificate" from action menu', async () => {
+  await test.step('1.0.2 Click on "Print certificate" from action menu', async () => {
     await page.getByRole('button', { name: 'Pending certification' }).click()
     await navigateToCertificatePrintAction(
       page,
@@ -237,8 +206,8 @@ test.describe
     )
   })
 
-  test.describe('2.0 Validate "Certify record" page', async () => {
-    test('2.1 Ensure data content is visible for informant', async () => {
+  await test.step('2.0 Validate "Certify record" page', async () => {
+    await test.step('2.1 Ensure data content is visible for informant', async () => {
       await page.reload()
       await page.locator('#collector____requesterId').click()
       const selectOptionsLabels = [
@@ -276,9 +245,9 @@ test.describe
       await page.getByText(joinValuesWith([informantAge, 'years'])).isVisible()
 
       await page.getByText('Nationality').isVisible()
-      await page
-        .getByText(declarationOverrides['informant.nationality'])
-        .isVisible()
+
+      // Previously matched by country code 'FAR' and it failed randomly when name was Farrel or similar.
+      await page.getByText('Farajaland', { exact: true }).isVisible()
     })
   })
 })

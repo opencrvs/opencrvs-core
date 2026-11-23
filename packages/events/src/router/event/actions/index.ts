@@ -25,6 +25,8 @@ import {
   RejectDeclarationActionInput,
   ArchiveActionInput,
   UnarchiveActionInput,
+  RevokeRegistrationActionInput,
+  ReinstateRegistrationActionInput,
   PrintCertificateActionInput,
   DeclareActionInput,
   ACTION_SCOPE_MAP,
@@ -55,7 +57,7 @@ import {
   throwConflictIfActionNotAllowed,
   processAction
 } from '@events/service/events/events'
-import { getEventConfigurationById } from '@events/service/config/config'
+import { getEventConfigurationForRecord } from '@events/service/config/config'
 import { TrpcUserContext } from '@events/context'
 import { getServiceToken } from '@events/service/auth'
 import { writeAuditLog } from '@events/storage/postgres/events/auditLog'
@@ -127,6 +129,14 @@ const ACTION_PROCEDURE_CONFIG = {
     ...defaultConfig,
     inputSchema: UnarchiveActionInput
   },
+  [ActionType.REVOKE_REGISTRATION]: {
+    ...defaultConfig,
+    inputSchema: RevokeRegistrationActionInput
+  },
+  [ActionType.REINSTATE_REGISTRATION]: {
+    ...defaultConfig,
+    inputSchema: ReinstateRegistrationActionInput
+  },
   [ActionType.PRINT_CERTIFICATE]: {
     ...defaultConfig,
     inputSchema: PrintCertificateActionInput
@@ -187,6 +197,9 @@ const AUDIT_LOG_OPERATION_MAP: Partial<
   [ActionType.REJECT]: 'event.actions.reject.request',
   [ActionType.ARCHIVE]: 'event.actions.archive.request',
   [ActionType.UNARCHIVE]: 'event.actions.unarchive.request',
+  [ActionType.REVOKE_REGISTRATION]: 'event.actions.revoke_registration.request',
+  [ActionType.REINSTATE_REGISTRATION]:
+    'event.actions.reinstate_registration.request',
   [ActionType.PRINT_CERTIFICATE]: 'event.actions.print_certificate.request',
   [ActionType.EDIT]: 'event.actions.edit.request',
   [ActionType.REQUEST_CORRECTION]: 'event.actions.correction.request.request',
@@ -458,9 +471,9 @@ export function getDefaultActionProcedures(
         const { eventId } = input
         const event = ctx.event
 
-        const eventConfiguration = await getEventConfigurationById({
-          token,
-          eventType: event.type
+        const eventConfiguration = await getEventConfigurationForRecord({
+          event: event,
+          token
         })
 
         // An action with an outcome has been handled already. A requested action without one
@@ -520,9 +533,9 @@ export function getDefaultActionProcedures(
       .mutation(async ({ ctx, input }) => {
         const { token, user, event, confirmationAction } = ctx
         const { actionId } = input
-        const configuration = await getEventConfigurationById({
-          token,
-          eventType: event.type
+        const configuration = await getEventConfigurationForRecord({
+          event: event,
+          token
         })
 
         if (confirmationAction) {
@@ -592,9 +605,9 @@ export function getDefaultActionProcedures(
           return getEventById(input.eventId)
         }
 
-        const configuration = await getEventConfigurationById({
-          token: ctx.token,
-          eventType: event.type
+        const configuration = await getEventConfigurationForRecord({
+          event: event,
+          token: ctx.token
         })
 
         return addAsyncRejectAction(

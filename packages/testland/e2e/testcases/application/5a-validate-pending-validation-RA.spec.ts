@@ -8,7 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { expect, test, type Page } from '@playwright/test'
+import { expect, test } from '@playwright/test'
 
 import { login, getToken } from '@e2e/support/helpers'
 import { CREDENTIALS } from '@e2e/support/constants'
@@ -28,30 +28,19 @@ import {
   openRecordByTitle
 } from '@e2e/support/print-certificate/birth/helpers'
 
-test.describe
-  .serial('5(a) Validate "Pending validation"-workqueue for RO', () => {
-  let page: Page
-  let declaration: Declaration
-  let eventId: string
+test('5(a) Validate "Pending validation"-workqueue for RO', async ({
+  page
+}) => {
+  const token = await getToken(CREDENTIALS.COMMUNITY_LEADER)
+  const res = await createDeclaration(token, undefined, ActionType.DECLARE)
+  const declaration = res.declaration
+  const eventId = res.eventId
 
-  test.beforeAll(async ({ browser }) => {
-    const token = await getToken(CREDENTIALS.COMMUNITY_LEADER)
-    const res = await createDeclaration(token, undefined, ActionType.DECLARE)
-    declaration = res.declaration
-    eventId = res.eventId
-
-    page = await browser.newPage()
-  })
-
-  test.afterAll(async () => {
-    await page.close()
-  })
-
-  test('5.0 Login', async () => {
+  await test.step('5.0 Login', async () => {
     await login(page, CREDENTIALS.REGISTRATION_OFFICER)
   })
 
-  test('5.1 Go to "Pending validation"-workqueue', async () => {
+  await test.step('5.1 Go to "Pending validation"-workqueue', async () => {
     await page.getByText('Pending validation').click()
     await expect(
       page.getByRole('button', { name: formatV2ChildName(declaration) })
@@ -61,7 +50,7 @@ test.describe
     )
   })
 
-  test('5.2 validate the list', async () => {
+  await test.step('5.2 validate the list', async () => {
     const header = page.getByTestId('workqueue-table-header')
     const columns = await header.locator(':scope > div').allInnerTexts()
     expect(columns).toStrictEqual([
@@ -82,7 +71,7 @@ test.describe
     )
   })
 
-  test('5.3 Click a name', async () => {
+  await test.step('5.3 Click a name', async () => {
     await openRecordByTitle(page, formatV2ChildName(declaration))
 
     await expectInUrl(
@@ -91,7 +80,7 @@ test.describe
     )
   })
 
-  test('5.4 Click "Validate"-action', async () => {
+  await test.step('5.4 Click "Validate"-action', async () => {
     await ensureAssignedToUser(page, CREDENTIALS.REGISTRATION_OFFICER)
     await selectAction(page, 'Validate')
 
@@ -106,7 +95,7 @@ test.describe
     ).toBeVisible()
   })
 
-  test('5.5 Complete validate action', async () => {
+  await test.step('5.5 Complete validate action', async () => {
     const validateResponse = page.waitForResponse(
       (res) =>
         res.url().includes('event.actions.custom') && res.status() === 200

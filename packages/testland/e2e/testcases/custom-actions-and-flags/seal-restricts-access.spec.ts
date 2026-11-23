@@ -57,7 +57,6 @@ test('Sealing a record hides it from local registrars and blocks all actions', a
   // openRecordByTitle's own collision-retry loop can take up to 60s under
   // load, and this flow's earlier steps alone can take ~75s - the default
   // 90s budget doesn't leave that loop room to actually do its job.
-  test.setTimeout(180_000)
 
   const page = await browser.newPage()
   let childName: string

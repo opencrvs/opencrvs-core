@@ -10,8 +10,8 @@
  */
 import React, { useState, useRef, useEffect } from 'react'
 import styled from 'styled-components'
-import { ITextInputProps, TextInput } from '../TextInput/TextInput'
-import { InputLabel } from '../InputField/InputLabel'
+import { ITextInputProps, TextInput } from '../TextInput'
+import { InputLabel } from '../InputField'
 
 const DateWrapper = styled.div`
   width: 100%;

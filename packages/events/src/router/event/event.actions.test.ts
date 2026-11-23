@@ -28,9 +28,14 @@ import {
   AddressType,
   deepMerge,
   encodeScope,
-  getDeclarationFields
+  getDeclarationFields,
+  withDeclaration,
+  toVersionedEventConfig
 } from '@opencrvs/commons'
-import { tennisClubMembershipEvent } from '@opencrvs/commons/fixtures'
+import {
+  tennisClubMembershipEvent,
+  versionedTennisClubMembershipEvent
+} from '@opencrvs/commons/fixtures'
 import {
   createEvent,
   createTestClient,
@@ -219,10 +224,13 @@ describe('Action drafts', () => {
   })
 })
 
-const multiFileConfig = {
-  ...tennisClubMembershipEvent,
-  id: 'death', // using existing event type id here, so that the user has the required scope to it
-  declaration: {
+const multiFileConfig = withDeclaration(
+  {
+    ...tennisClubMembershipEvent,
+    id: 'death', // using existing event type id here, so that the user has the required scope to it
+    advancedSearch: []
+  },
+  {
     label: generateTranslationConfig('File club form'),
     pages: [
       defineFormPage({
@@ -257,9 +265,8 @@ const multiFileConfig = {
         ]
       })
     ]
-  },
-  advancedSearch: []
-} satisfies EventConfig
+  }
+) satisfies EventConfig
 
 beforeEach(async () => {
   return createIndex(
@@ -278,7 +285,10 @@ describe('Action updates', () => {
 
     mswServer.use(
       http.get(`${env.COUNTRY_CONFIG_URL}/config/events`, () => {
-        return HttpResponse.json([multiFileConfig, tennisClubMembershipEvent])
+        return HttpResponse.json([
+          toVersionedEventConfig(multiFileConfig),
+          versionedTennisClubMembershipEvent
+        ])
       }),
       http.head(`${env.DOCUMENTS_URL}/files/:filePath*`, (req) => {
         fileExistsMock(

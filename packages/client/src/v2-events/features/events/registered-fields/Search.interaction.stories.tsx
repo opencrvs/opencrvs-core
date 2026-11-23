@@ -21,6 +21,7 @@ import {
   field,
   FieldType,
   FieldConfig,
+  INITIAL_EVENT_CONFIG_VERSION_ID,
   never
 } from '@opencrvs/commons/client'
 import { TRPCProvider } from '@client/v2-events/trpc'
@@ -152,6 +153,7 @@ const searchFields: FieldConfig[] = [
 const searchResult = {
   id: 'd65a1ecd-b26a-4520-b51c-bfdd43785471',
   type: 'birth',
+  configVersionId: INITIAL_EVENT_CONFIG_VERSION_ID,
   status: 'REGISTERED',
   legalStatuses: {
     DECLARED: {

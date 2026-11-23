@@ -16,9 +16,9 @@ metadata:
   name: application-ip-allowlist
 spec:
   ipAllowList:
-    # Admin console IPs are trusted for the MinIO API by definition, so
+    # Admin console IPs are trusted for the S3 API by definition, so
     # they are merged in here - otherwise an operator allowed into the
-    # admin consoles could be locked out of the MinIO API itself.
+    # admin consoles could be locked out of the S3 API itself.
     sourceRange:
       {{- concat .Values.ingress.application_allowlist (.Values.ingress.admin_console_allowlist | default list) | uniq | toYaml | nindent 6 }}
 {{- end }}

@@ -8,7 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { expect, test, type Page } from '@playwright/test'
+import { expect, test } from '@playwright/test'
 
 import { login, getToken } from '@e2e/support/helpers'
 import { CREDENTIALS } from '@e2e/support/constants'
@@ -20,26 +20,16 @@ import { navigateToCertificatePrintAction } from '@e2e/support/print-certificate
 import { expectInUrl } from '@e2e/support/utils'
 import { REQUIRED_VALIDATION_ERROR } from '@e2e/support/birth/helpers'
 
-test.describe.serial('Print certificate', () => {
-  let page: Page
-  let declaration: Declaration
+test('Print certificate', async ({ page }) => {
+  const token = await getToken(CREDENTIALS.REGISTRAR)
+  const res = await createDeclaration(token)
+  const declaration = res.declaration
 
-  test.beforeAll(async ({ browser }) => {
-    const token = await getToken(CREDENTIALS.REGISTRAR)
-    const res = await createDeclaration(token)
-    declaration = res.declaration
-    page = await browser.newPage()
-  })
-
-  test.afterAll(async () => {
-    await page.close()
-  })
-
-  test('1.0.1 Log in', async () => {
+  await test.step('1.0.1 Log in', async () => {
     await login(page)
   })
 
-  test('1.0.2 Click on "Print certificate" from action menu', async () => {
+  await test.step('1.0.2 Click on "Print certificate" from action menu', async () => {
     await page.getByRole('button', { name: 'Pending certification' }).click()
     await navigateToCertificatePrintAction(
       page,
@@ -48,14 +38,14 @@ test.describe.serial('Print certificate', () => {
     )
   })
 
-  test.describe('2.0 Validate "Certify record" page', async () => {
-    test('2.1 Template type should be selected by default', async () => {
+  await test.step('2.0 Validate "Certify record" page', async () => {
+    await test.step('2.1 Template type should be selected by default', async () => {
       await expect(
         page.locator('#certificateTemplateId').getByText('Birth Certificate')
       ).toBeVisible()
     })
 
-    test('2.2 Click continue without selecting requester type', async () => {
+    await test.step('2.2 Click continue without selecting requester type', async () => {
       await page.getByRole('button', { name: 'Continue' }).click()
 
       await expect(
@@ -65,7 +55,7 @@ test.describe.serial('Print certificate', () => {
       ).toBeVisible()
     })
 
-    test('2.3 Click continue after selecting requester type and template type', async () => {
+    await test.step('2.3 Click continue after selecting requester type and template type', async () => {
       await page.reload()
       await page.locator('#collector____requesterId').click()
       const selectOptionsLabels = [

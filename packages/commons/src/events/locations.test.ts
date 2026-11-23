@@ -11,6 +11,7 @@
 
 /* eslint-disable max-lines */
 import { createPrng, generateUuid, TestUserRole } from './test.utils'
+import { INITIAL_EVENT_CONFIG_VERSION_ID } from './EventConfig'
 import { SystemContext, UserContext } from '../users/User'
 import {
   AdministrativeArea,
@@ -21,7 +22,7 @@ import {
   Location,
   UserWithResolvedHierarchy
 } from './locations'
-import { RecordScopeV2, UserScopeV2 } from 'src/scopes'
+import { RecordScopeV2, UserScopeV2 } from 'src/users/scopes'
 import { UUID } from 'src/uuid'
 
 describe('canAccessEventWithScope()', () => {
@@ -35,6 +36,7 @@ describe('canAccessEventWithScope()', () => {
 
   const notifiedEvent = {
     type: 'birth',
+    configVersionId: INITIAL_EVENT_CONFIG_VERSION_ID,
     id: generateUuid(rng),
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString(),
@@ -60,6 +62,7 @@ describe('canAccessEventWithScope()', () => {
   const declaredEvent = {
     id: generateUuid(rng),
     type: 'birth',
+    configVersionId: INITIAL_EVENT_CONFIG_VERSION_ID,
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString(),
     status: 'DECLARED' as const,
@@ -347,6 +350,7 @@ describe('canAccessEventWithScope()', () => {
     describe('createdIn', () => {
       const undeclaredEvent = {
         type: 'birth',
+        configVersionId: INITIAL_EVENT_CONFIG_VERSION_ID,
         id: generateUuid(rng),
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString(),
@@ -515,10 +519,10 @@ describe('canAccessEventWithScope()', () => {
     test('should access event carrying one of the "anyOf" flags', () => {
       expect(
         canAccessEventWithScope(
-          { ...registeredEvent, flags: ['incomplete'] },
+          { ...registeredEvent, flags: ['correction-requested'] },
           {
             type: 'record.read',
-            options: { flags: { anyOf: ['incomplete', 'rejected'] } }
+            options: { flags: { anyOf: ['correction-requested', 'rejected'] } }
           },
           userContext
         )
@@ -531,7 +535,7 @@ describe('canAccessEventWithScope()', () => {
           { ...registeredEvent, flags: [] },
           {
             type: 'record.read',
-            options: { flags: { anyOf: ['incomplete', 'rejected'] } }
+            options: { flags: { anyOf: ['correction-requested', 'rejected'] } }
           },
           userContext
         )
@@ -541,10 +545,10 @@ describe('canAccessEventWithScope()', () => {
     test('should access event carrying all of the "allOf" flags', () => {
       expect(
         canAccessEventWithScope(
-          { ...registeredEvent, flags: ['incomplete', 'rejected'] },
+          { ...registeredEvent, flags: ['correction-requested', 'rejected'] },
           {
             type: 'record.read',
-            options: { flags: { allOf: ['incomplete', 'rejected'] } }
+            options: { flags: { allOf: ['correction-requested', 'rejected'] } }
           },
           userContext
         )
@@ -554,10 +558,10 @@ describe('canAccessEventWithScope()', () => {
     test('should not access event missing one of the "allOf" flags', () => {
       expect(
         canAccessEventWithScope(
-          { ...registeredEvent, flags: ['incomplete'] },
+          { ...registeredEvent, flags: ['correction-requested'] },
           {
             type: 'record.read',
-            options: { flags: { allOf: ['incomplete', 'rejected'] } }
+            options: { flags: { allOf: ['correction-requested', 'rejected'] } }
           },
           userContext
         )

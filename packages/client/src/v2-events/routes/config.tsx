@@ -24,10 +24,14 @@ import { APPLICATION_VERSION } from '@client/utils/constants'
 import { errorMessages, buttonMessages } from '@client/i18n/messages'
 import { buildLoginUrl } from '@client/components/VersionMismatchModal'
 import { useLocations } from '@client/v2-events/hooks/useLocations'
+// Registers the query defaults that `PrefetchQueries` uses for the administrative area list.
+// eslint-disable-next-line import/no-unassigned-import
+import '@client/v2-events/hooks/useAdministrativeAreas'
 import * as V1_LEGACY_ROUTES from '@client/navigation/routes'
 import { Debug } from '@client/v2-events/features/debug/debug'
 import { router as correctionRequestRouter } from '@client/v2-events/features/events/actions/correct/request/router'
 import { router as correctionReviewRouter } from '@client/v2-events/features/events/actions/correct/review/router'
+import * as Notify from '@client/v2-events/features/events/actions/notify'
 import * as Declare from '@client/v2-events/features/events/actions/declare'
 import * as Edit from '@client/v2-events/features/events/actions/edit'
 import { DeleteEventIndex } from '@client/v2-events/features/events/actions/delete'
@@ -73,6 +77,7 @@ import { SystemList } from '../../views/SysAdmin/Config/Systems/Systems'
 import AllUserEmail from '../../views/SysAdmin/Communications/AllUserEmail/AllUserEmail'
 import { EventHistoryIndex } from '../features/workqueues/EventOverview/components/EventHistory'
 import { PerformanceDashboard } from '../features/performance/Dashboard'
+import { Documents } from '../features/workqueues/EventOverview/components/Documents'
 import { ROUTES } from './routes'
 import { Toaster } from './Toaster'
 
@@ -80,28 +85,15 @@ function PrefetchQueries() {
   const { prefetch } = useWorkqueues()
 
   useEffect(() => {
-    {
-      const locationsQuery = trpcOptionsProxy.locations.list.queryOptions()
-
-      const administrativeAreasQuery =
-        trpcOptionsProxy.administrativeAreas.list.queryOptions()
-
-      // only fetch if we don't already have it cached
-      if (!queryClient.getQueryData(locationsQuery.queryKey)) {
-        void queryClient.prefetchQuery({
-          queryKey: locationsQuery.queryKey,
-          queryFn: locationsQuery.queryFn
-        })
-      }
-
-      // only fetch if we don't already have it cached
-      if (!queryClient.getQueryData(administrativeAreasQuery.queryKey)) {
-        void queryClient.prefetchQuery({
-          queryKey: administrativeAreasQuery.queryKey,
-          queryFn: administrativeAreasQuery.queryFn
-        })
-      }
-    }
+    // No `queryFn`: the defaults from `setQueryDefaults` build the cached Map
+    // that the list hooks read from the same key. A fresh cache is not
+    // fetched again.
+    void queryClient.prefetchQuery({
+      queryKey: trpcOptionsProxy.locations.list.queryKey()
+    })
+    void queryClient.prefetchQuery({
+      queryKey: trpcOptionsProxy.administrativeAreas.list.queryKey()
+    })
     void prefetch()
     // NOTE: Using anything else than prefetch will trigger load for each render. Destructure rather than passing entire object.
   }, [prefetch])
@@ -265,6 +257,10 @@ export const routesConfig = {
           element: <ReadonlyViewIndex />
         },
         {
+          path: ROUTES.V2.EVENTS.EVENT.DOCUMENTS.path,
+          element: <Documents />
+        },
+        {
           path: ROUTES.V2.EVENTS.EVENT.AUDIT.path,
           element: <EventHistoryIndex />
         }
@@ -277,6 +273,28 @@ export const routesConfig = {
     {
       path: ROUTES.V2.EVENTS.DELETE.path,
       element: <DeleteEventIndex />
+    },
+    {
+      path: ROUTES.V2.EVENTS.NOTIFY.path,
+      element: (
+        <DeclarationAction actionType={ActionType.NOTIFY}>
+          <Outlet />
+        </DeclarationAction>
+      ),
+      children: [
+        {
+          index: true,
+          element: <Notify.Pages />
+        },
+        {
+          path: ROUTES.V2.EVENTS.NOTIFY.PAGES.path,
+          element: <Notify.Pages />
+        },
+        {
+          path: ROUTES.V2.EVENTS.NOTIFY.REVIEW.path,
+          element: <Notify.Review />
+        }
+      ]
     },
     {
       path: ROUTES.V2.EVENTS.DECLARE.path,
@@ -389,6 +407,14 @@ export const routesConfig = {
     {
       path: ROUTES.V2.SETTINGS.USER.CREATE.path,
       element: <CreateNewUser />
+    },
+    {
+      path: ROUTES.V2.SETTINGS.USER.NEW.EDIT.path,
+      element: <EditUser />
+    },
+    {
+      path: ROUTES.V2.SETTINGS.USER.NEW.REVIEW.path,
+      element: <ReviewUser />
     },
     {
       path: ROUTES.V2.SETTINGS.USER.EDIT.path,

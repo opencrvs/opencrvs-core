@@ -25,6 +25,8 @@ mkdir -p ./dist/commons/events
 cp -r ../commons/build/dist/common/events/*.d.ts ./dist/commons/events
 mkdir -p ./dist/commons/events/state
 cp -r ../commons/build/dist/common/events/state/*.d.ts ./dist/commons/events/state
+mkdir -p ./dist/commons/users
+cp -r ../commons/build/dist/common/users/*.d.ts ./dist/commons/users
 
 # Build common conditionals
 npx esbuild src/conditionals/index.ts --bundle --format=cjs --outdir=./dist/conditionals --allow-overwrite --packages=external
@@ -33,11 +35,19 @@ cp -r ../commons/build/dist/common/conditionals/*.d.ts ./dist/commons/conditiona
 
 # Build common scopes
 npx esbuild src/scopes/index.ts --bundle --format=cjs --outdir=./dist/scopes --allow-overwrite --packages=external
-cp -r ../commons/build/dist/common/scopes.d.ts ./dist/scopes/index.d.ts
+cp -r ../commons/build/dist/common/users/scopes.d.ts ./dist/scopes/index.d.ts
+
+# Build common roles (.d.ts points at dist/commons/users, copied with the events types)
+npx esbuild src/roles/index.ts --bundle --format=cjs --outdir=./dist/roles --allow-overwrite --packages=external
 
 # Build common authentication
 npx esbuild src/authentication/index.ts --bundle --format=cjs --outdir=./dist/authentication --allow-overwrite --packages=external
-cp -r ../commons/build/dist/common/authentication.d.ts ./dist/authentication/index.d.ts
+cp -r ../commons/build/dist/common/users/authentication.d.ts ./dist/authentication/index.d.ts
+
+# Build core request signing (verification and the Hapi `core` auth strategy)
+npx esbuild src/request-signing/index.ts --bundle --platform=node --format=cjs --outdir=./dist/request-signing --allow-overwrite --packages=external
+mkdir -p ./dist/commons/request-signing
+cp -r ../commons/build/dist/common/request-signing/*.d.ts ./dist/commons/request-signing
 
 # Build api client
 npx esbuild src/api/index.ts --bundle --format=cjs --outdir=./dist/api --allow-overwrite --packages=external
@@ -59,8 +69,8 @@ mkdir -p ./dist/commons/application-config
 cp -r ../commons/build/dist/common/application-config.d.ts ./dist/commons/application-config/index.d.ts
 
 # Build migration CLI
-npx esbuild src/migrations/v2.1/index.ts --bundle --platform=node --format=cjs --outdir=./dist/migrations/v2.1 --allow-overwrite --packages=external --banner:js="#!/usr/bin/env node"
-chmod +x ./dist/migrations/v2.1/index.js
+npx esbuild src/migrations/index.ts --bundle --platform=node --format=cjs --outdir=./dist/migrations --allow-overwrite --packages=external --banner:js="#!/usr/bin/env node"
+chmod +x ./dist/migrations/index.js
 
 if [[ "$OSTYPE" == "darwin"* ]]; then
   sed -i '' 's|@opencrvs/events/build/types|../commons/api|g' dist/api/index.d.ts
@@ -73,16 +83,6 @@ fi
 # Build CLI
 npx esbuild src/cli.ts --bundle --platform=node --format=cjs --outdir=./dist --allow-overwrite --packages=external --banner:js="#!/usr/bin/env node"
 cp -R src/environment/templates dist/templates
-# Template files copied into country configs by the upgrade-tilt and
-# migrate-infrastructure-to-assets codemods. Image builds that use the toolkit as
-# a library (testland, mosip-api) do not copy the template in and do not need them.
-TEMPLATE_DIR=../countryconfig-template
-if [ -d "$TEMPLATE_DIR" ]; then
-  mkdir -p dist/templates/countryconfig-template
-  cp -R $TEMPLATE_DIR/Tiltfile $TEMPLATE_DIR/.tiltignore $TEMPLATE_DIR/tilt $TEMPLATE_DIR/assets $TEMPLATE_DIR/Dockerfile.assets dist/templates/countryconfig-template/
-else
-  echo "$TEMPLATE_DIR not found, 'opencrvs upgrade' will not be able to copy the template files"
-fi
 chmod +x ./dist/cli.js
 
 echo "Build completed successfully."

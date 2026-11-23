@@ -12,7 +12,7 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import { createTRPCMsw, httpLink } from '@vafanassieff/msw-trpc'
 import superjson from 'superjson'
-import { userEvent, within, screen, expect } from 'storybook/test'
+import { userEvent, within, screen, expect, waitFor } from 'storybook/test'
 import { toast } from 'react-hot-toast'
 import {
   ActionType,
@@ -29,8 +29,10 @@ import {
   generateEventDraftDocument,
   getCurrentEventState,
   generateActionDocument,
+  generateActionDocuments,
   getUUID,
-  user
+  user,
+  versionedTennisClubMembershipEvent
 } from '@opencrvs/commons/client'
 import { ROUTES, routesConfig } from '@client/v2-events/routes'
 import { useEventFormData } from '@client/v2-events/features/events/useEventFormData'
@@ -119,11 +121,11 @@ function declareReturningDuplicate() {
     ...eventDocument,
     actions: [
       ...eventDocument.actions,
-      generateActionDocument({
+      ...generateActionDocuments({
         configuration: tennisClubMembershipEvent,
         action: ActionType.EDIT
       }),
-      generateActionDocument({
+      ...generateActionDocuments({
         configuration: tennisClubMembershipEvent,
         action: ActionType.DECLARE
       }),
@@ -145,7 +147,7 @@ function editAccepted() {
     ...eventDocument,
     actions: [
       ...eventDocument.actions,
-      generateActionDocument({
+      ...generateActionDocuments({
         configuration: tennisClubMembershipEvent,
         action: ActionType.EDIT
       })
@@ -164,7 +166,7 @@ const meta: Meta<typeof ReviewIndex> = {
     // Clear any toast left over from a previous story so this test only asserts
     // on toasts raised by its own play function.
     toast.remove()
-    addLocalEventConfig(tennisClubMembershipEvent)
+    addLocalEventConfig(versionedTennisClubMembershipEvent)
     setEventData(eventId, eventDocument)
   }
 }
@@ -186,7 +188,7 @@ const duplicateHandlers = {
   ],
   events: [
     tRPCMsw.event.config.get.query(() => {
-      return [tennisClubMembershipEvent]
+      return [versionedTennisClubMembershipEvent]
     }),
     tRPCMsw.event.get.query(() => {
       return eventDocument
@@ -308,6 +310,85 @@ export const ShowToastOnDuplicateDetectedOnEditAndDeclare: Story = {
 
     await step('Toast is shown with duplicate detected message', async () => {
       await assertDuplicateToast()
+    })
+  }
+}
+
+// Declaration payloads the DECLARE mutation received, inspected by the story below.
+const declaredDeclarations: unknown[] = []
+
+function eventWithActions(...types: ActionType[]) {
+  return {
+    ...eventDocument,
+    actions: [
+      ...eventDocument.actions,
+      ...types.flatMap((type) =>
+        generateActionDocuments({
+          configuration: tennisClubMembershipEvent,
+          action: type
+        })
+      )
+    ] as ActionDocument[]
+  }
+}
+
+/**
+ * "Register with edits" runs EDIT, DECLARE and REGISTER. The Documents tab skips
+ * EDIT and lists files from the DECLARE that follows it, so DECLARE must carry the
+ * edited declaration too, not an empty one.
+ */
+export const SendsEditedDeclarationWithDeclareOnEditAndRegister: Story = {
+  parameters: {
+    reactRouter: {
+      router: routesConfig,
+      initialPath: ROUTES.V2.EVENTS.EDIT.REVIEW.buildPath({ eventId })
+    },
+    chromatic: { disableSnapshot: true },
+    msw: {
+      handlers: {
+        ...duplicateHandlers,
+        events: [
+          tRPCMsw.event.config.get.query(() => [
+            versionedTennisClubMembershipEvent
+          ]),
+          tRPCMsw.event.get.query(() => eventDocument),
+          tRPCMsw.event.actions.edit.request.mutation(() => editAccepted()),
+          tRPCMsw.event.actions.declare.request.mutation((payload) => {
+            declaredDeclarations.push(payload.declaration)
+            return eventWithActions(ActionType.EDIT, ActionType.DECLARE)
+          }),
+          tRPCMsw.event.actions.register.request.mutation(() =>
+            eventWithActions(
+              ActionType.EDIT,
+              ActionType.DECLARE,
+              ActionType.REGISTER
+            )
+          )
+        ]
+      }
+    }
+  },
+  play: async ({ canvasElement, step }) => {
+    const canvas = within(canvasElement)
+    declaredDeclarations.length = 0
+
+    await step('Register with edits', async () => {
+      const actionButton = await canvas.findByRole('button', { name: 'Action' })
+      useEventFormData.setState({ formValues: editedDeclaration })
+      await userEvent.click(actionButton)
+      await userEvent.click(await canvas.findByText('Register with edits'))
+      await userEvent.click(
+        await screen.findByRole('button', { name: 'Confirm' })
+      )
+    })
+
+    await step('DECLARE carries the edited declaration', async () => {
+      await waitFor(async () => expect(declaredDeclarations).toHaveLength(1), {
+        timeout: 10000
+      })
+      await expect(declaredDeclarations[0]).toMatchObject({
+        'applicant.name': editedDeclaration['applicant.name']
+      })
     })
   }
 }

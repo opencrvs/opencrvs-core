@@ -14,6 +14,7 @@ import { Action, ActionStatus } from '../ActionDocument'
 import { ActionType } from '../ActionType'
 import { EventConfig } from '../EventConfig'
 import { EventDocument } from '../EventDocument'
+import { event as eventConditionals } from '../event'
 import { field } from '../field'
 import { FieldType } from '../FieldType'
 import { PageTypes } from '../PageConfig'
@@ -36,6 +37,20 @@ const eventConfig: DeepPartial<EventConfig> = {
   actions: [
     {
       type: ActionType.DECLARE,
+      declaration: {
+        label: { id: '', defaultMessage: '', description: '' },
+        pages: [
+          {
+            id: 'first-page',
+            type: PageTypes.enum.FORM,
+            title: { id: '', defaultMessage: '', description: '' },
+            fields: [
+              { id: 'number-field', type: FieldType.NUMBER },
+              { id: 'text-field', type: FieldType.TEXT }
+            ]
+          }
+        ]
+      },
       flags: [
         {
           id: 'too-large-number-flag',
@@ -94,11 +109,6 @@ const eventConfig: DeepPartial<EventConfig> = {
       customActionType: 'VALIDATE_DECLARATION',
       flags: [{ id: InherentFlags.REJECTED, operation: 'remove' }]
     },
-    {
-      type: ActionType.CUSTOM,
-      customActionType: 'COMPLETE_NOTIFICATION',
-      flags: [{ id: InherentFlags.INCOMPLETE, operation: 'remove' }]
-    },
     { type: ActionType.PRINT_CERTIFICATE, flags: [] },
     {
       type: ActionType.MARK_AS_DUPLICATE,
@@ -135,21 +145,7 @@ const eventConfig: DeepPartial<EventConfig> = {
         { id: 'always-added-flag', operation: 'remove' }
       ]
     }
-  ],
-  declaration: {
-    label: { id: '', defaultMessage: '', description: '' },
-    pages: [
-      {
-        id: 'first-page',
-        type: PageTypes.enum.FORM,
-        title: { id: '', defaultMessage: '', description: '' },
-        fields: [
-          { id: 'number-field', type: FieldType.NUMBER },
-          { id: 'text-field', type: FieldType.TEXT }
-        ]
-      }
-    ]
-  }
+  ]
 }
 
 const now = new Date()
@@ -810,26 +806,13 @@ describe('resolveEventCustomFlags() – NOTIFY config isolation', () => {
       },
       {
         type: ActionType.DECLARE,
-        flags: [{ id: 'declare-only-flag', operation: 'add' }]
+        flags: [{ id: 'declare-only-flag', operation: 'add' }],
+        declaration: {
+          label: { id: '', defaultMessage: '', description: '' },
+          pages: []
+        }
       }
-    ],
-    declaration: {
-      label: { id: '', defaultMessage: '', description: '' },
-      pages: []
-    }
-  }
-
-  const configWithoutNotify: DeepPartial<EventConfig> = {
-    actions: [
-      {
-        type: ActionType.DECLARE,
-        flags: [{ id: 'declare-only-flag', operation: 'add' }]
-      }
-    ],
-    declaration: {
-      label: { id: '', defaultMessage: '', description: '' },
-      pages: []
-    }
+    ]
   }
 
   test('NOTIFY action uses NOTIFY flags when NOTIFY config is present', () => {
@@ -867,106 +850,75 @@ describe('resolveEventCustomFlags() – NOTIFY config isolation', () => {
     expect(flags).toContain('declare-only-flag')
     expect(flags).not.toContain('notify-only-flag')
   })
+})
 
-  test('NOTIFY action falls back to DECLARE flags when no NOTIFY config is present', () => {
+describe('resolveEventCustomFlags() – late registration against the declaration', () => {
+  const isLate = field('child.dob')
+    .isBefore()
+    .days(30)
+    .beforeAction(eventConditionals.firstAction(ActionType.DECLARE))
+
+  const lateRegistrationFlag = {
+    id: 'late-registration',
+    operation: 'add',
+    conditional: isLate
+  } as const
+
+  const lateRegistrationConfig: DeepPartial<EventConfig> = {
+    actions: [
+      {
+        type: ActionType.DECLARE,
+        declaration: {
+          label: { id: '', defaultMessage: '', description: '' },
+          pages: [
+            {
+              id: 'child',
+              type: PageTypes.enum.FORM,
+              title: { id: '', defaultMessage: '', description: '' },
+              fields: [{ id: 'child.dob', type: FieldType.DATE }]
+            }
+          ]
+        },
+        flags: [lateRegistrationFlag]
+      },
+      { type: ActionType.APPROVE_CORRECTION, flags: [lateRegistrationFlag] }
+    ]
+  }
+
+  const dob = '2026-01-01'
+
+  const declaredOn = (date: string): DeepPartial<Action> => ({
+    type: ActionType.DECLARE,
+    declaration: { 'child.dob': dob },
+    createdAt: `${date}T12:00:00.000Z`,
+    status: ActionStatus.Accepted
+  })
+
+  const correctionApprovedOn = (date: string): DeepPartial<Action> => ({
+    type: ActionType.APPROVE_CORRECTION,
+    requestId: 'some-request-id',
+    declaration: {},
+    createdAt: `${date}T12:00:00.000Z`,
+    status: ActionStatus.Accepted
+  })
+
+  test('does not add the flag when a record declared on time is corrected after the deadline', () => {
     const event: DeepPartial<EventDocument> = {
-      actions: [
-        {
-          type: ActionType.NOTIFY,
-          declaration: {},
-          createdAt: formatISO(now),
-          status: ActionStatus.Accepted
-        }
-      ]
+      actions: [declaredOn('2026-01-20'), correctionApprovedOn('2026-03-01')]
     }
 
     // @ts-expect-error - allow partial actions and event config
-    const flags = resolveEventCustomFlags(event, configWithoutNotify)
-    expect(flags).toContain('declare-only-flag')
-  })
-})
-
-describe('getEventFlags() – any inherent flag is clearable by action config', () => {
-  test('INCOMPLETE is present for a notified record', () => {
-    const event: DeepPartial<EventDocument> = {
-      actions: [
-        {
-          type: ActionType.NOTIFY,
-          declaration: {},
-          createdAt: formatISO(now),
-          status: ActionStatus.Accepted
-        }
-      ]
-    }
-
-    // @ts-expect-error - allow partial event document and event config
-    expect(getEventFlags(event, eventConfig)).toContain(
-      InherentFlags.INCOMPLETE
-    )
+    const flags = resolveEventCustomFlags(event, lateRegistrationConfig)
+    expect(flags).not.toContain('late-registration')
   })
 
-  test('INCOMPLETE survives an archive/unarchive round trip back to NOTIFIED', () => {
+  test('adds the flag when the record is declared after the deadline', () => {
     const event: DeepPartial<EventDocument> = {
-      actions: [
-        ActionType.NOTIFY,
-        ActionType.ARCHIVE,
-        ActionType.UNARCHIVE
-      ].map((type, idx) => ({
-        type,
-        declaration: {},
-        createdAt: formatISO(subDays(now, 3 - idx)),
-        status: ActionStatus.Accepted
-      }))
+      actions: [declaredOn('2026-02-15')]
     }
 
-    // @ts-expect-error - allow partial event document and event config
-    expect(getEventFlags(event, eventConfig)).toContain(
-      InherentFlags.INCOMPLETE
-    )
-  })
-
-  test('INCOMPLETE stays absent when a declared record is archived and unarchived', () => {
-    const event: DeepPartial<EventDocument> = {
-      actions: [
-        ActionType.DECLARE,
-        ActionType.ARCHIVE,
-        ActionType.UNARCHIVE
-      ].map((type, idx) => ({
-        type,
-        declaration: {},
-        createdAt: formatISO(subDays(now, 3 - idx)),
-        status: ActionStatus.Accepted
-      }))
-    }
-
-    // @ts-expect-error - allow partial event document and event config
-    expect(getEventFlags(event, eventConfig)).not.toContain(
-      InherentFlags.INCOMPLETE
-    )
-  })
-
-  test('INCOMPLETE is cleared by a custom action whose config removes it', () => {
-    const event: DeepPartial<EventDocument> = {
-      actions: [
-        {
-          type: ActionType.NOTIFY,
-          declaration: {},
-          createdAt: formatISO(subDays(now, 1)),
-          status: ActionStatus.Accepted
-        },
-        {
-          type: ActionType.CUSTOM,
-          customActionType: 'COMPLETE_NOTIFICATION',
-          declaration: {},
-          createdAt: formatISO(now),
-          status: ActionStatus.Accepted
-        }
-      ]
-    }
-
-    // @ts-expect-error - allow partial event document and event config
-    expect(getEventFlags(event, eventConfig)).not.toContain(
-      InherentFlags.INCOMPLETE
-    )
+    // @ts-expect-error - allow partial actions and event config
+    const flags = resolveEventCustomFlags(event, lateRegistrationConfig)
+    expect(flags).toContain('late-registration')
   })
 })

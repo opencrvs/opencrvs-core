@@ -76,5 +76,18 @@ export const errorMessages = defineMessages({
     defaultMessage: 'Please contact your administrator to be reassigned',
     description: "Description shown when a user's assigned office is inactive",
     id: 'error.officeInactiveDescription'
+  },
+  unknownConfigVersion: {
+    defaultMessage: 'This record cannot be opened',
+    description:
+      'Title shown when a record was created under a configuration version that is no longer configured',
+    id: 'error.unknownConfigVersion'
+  },
+  unknownConfigVersionDescription: {
+    defaultMessage:
+      'Record {trackingId} was created under version {version} of the {event} configuration, which is not available. Refresh the page; if this continues, please contact your system administrator.',
+    description:
+      'Description shown when a record was created under a configuration version that is no longer configured',
+    id: 'error.unknownConfigVersionDescription'
   }
 })

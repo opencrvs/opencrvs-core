@@ -223,19 +223,10 @@ export const deleteLabelAndIconAreConfigurable: StoryObj<typeof ActionMenu> = {
         await new Promise((resolve) => setTimeout(resolve, 2000))
         void canvas.getByTestId('action-dropdownMenu').click()
 
-        const list = await waitFor(() =>
-          document.querySelector('#action-Dropdown-Content')
-        )
+        const deleteItem = await canvas.findByText('Discard application')
+        await expect(canvas.queryByText('Delete')).not.toBeInTheDocument()
 
-        const items = list?.querySelectorAll('li')
-        if (!items || items.length < 2) {
-          throw new Error('Menu items not found')
-        }
-
-        await expect(items[1]).toHaveTextContent('Discard application')
-        await expect(items[1]).not.toHaveTextContent('Delete')
-
-        await userEvent.click(items[1])
+        await userEvent.click(deleteItem)
 
         const cancelDelete = await waitFor(() =>
           document.querySelector('#cancel_delete')

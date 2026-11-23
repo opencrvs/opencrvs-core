@@ -15,12 +15,16 @@ import { useTypedParams } from 'react-router-typesafe-routes/dom'
 import { useIntl } from 'react-intl'
 import { useSelector } from 'react-redux'
 import { onlineManager } from '@tanstack/react-query'
-import { Icon } from '@opencrvs/components/lib/Icon'
-import { LogoutNavigation } from '@opencrvs/components/lib/icons/LogoutNavigation'
-import { SettingsNavigation } from '@opencrvs/components/lib/icons/SettingsNavigation'
-import { LeftNavigation } from '@opencrvs/components/lib/SideNavigation/LeftNavigation'
-import { NavigationGroup } from '@opencrvs/components/lib/SideNavigation/NavigationGroup'
-import { NavigationItem } from '@opencrvs/components/lib/SideNavigation/NavigationItem'
+import {
+  Icon,
+  LeftNavigation,
+  NavigationGroup,
+  NavigationItem
+} from '@opencrvs/components'
+import {
+  LogoutNavigation,
+  SettingsNavigation
+} from '@opencrvs/components/icons'
 import { todayISO, WorkqueueConfig } from '@opencrvs/commons/client'
 import { buttonMessages } from '@client/i18n/messages'
 import { storage } from '@client/storage'
@@ -113,11 +117,11 @@ function SidebarComponent({
   const scopes = useSelector(getScope)
   const { getLocation } = useLocations()
 
-  const { getOutbox } = useEvents()
-  const outbox = getOutbox()
+  const { useOutbox } = useEvents()
+  const outbox = useOutbox()
 
-  const { getDisplayableDrafts } = useDrafts()
-  const drafts = getDisplayableDrafts()
+  const { useDisplayableDrafts } = useDrafts()
+  const drafts = useDisplayableDrafts()
 
   const workqueues = useCountryConfigWorkqueueConfigurations()
 

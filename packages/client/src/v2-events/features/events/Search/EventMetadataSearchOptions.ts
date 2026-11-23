@@ -44,6 +44,14 @@ export const statusOptions = [
     }
   },
   {
+    value: EventStatus.enum.REVOKED,
+    label: {
+      defaultMessage: 'Revoked',
+      description: 'Option for form field: status of record',
+      id: 'advancedSearch.form.recordStatusRevoked'
+    }
+  },
+  {
     value: EventStatus.enum.ARCHIVED,
     label: {
       defaultMessage: 'Archived',

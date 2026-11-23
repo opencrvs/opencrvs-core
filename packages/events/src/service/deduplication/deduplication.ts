@@ -19,7 +19,6 @@ import {
   FieldValue,
   EventConfig,
   getDeclarationFieldById,
-  PlainDate,
   FieldType,
   extractPotentialDuplicatesFromActions,
   EventDocument
@@ -27,7 +26,7 @@ import {
 import {
   getAcceptedScopesFromToken,
   getCurrentEventState,
-  getEventConfigById,
+  isPlainDate,
   logger,
   userCanAccessEventWithScopes
 } from '@opencrvs/commons'
@@ -48,7 +47,7 @@ import {
 import { TrpcContext } from '../../context'
 import { getEventsAuditTrailed } from '../../storage/postgres/events/events'
 import { EventNotFoundError, getEventById } from '../events/events'
-import { getInMemoryEventConfigurations } from '../config/config'
+import { getEventConfigurationForRecord } from '../config/config'
 
 /** `0` and `false` are values; an empty string means nothing was entered. */
 function isMissingQueryValue(value: unknown) {
@@ -188,14 +187,14 @@ export function generateElasticsearchQuery(
       }
     }
     case 'dateRange': {
-      const dateValue = PlainDate.safeParse(queryValue)
-      if (!dateValue.success) {
+      if (!isPlainDate(queryValue)) {
         logger.warn(
           queryValue,
           `Invalid query value for found for dateRange matching ${queryInput.fieldId}. Expected date in YYYY-MM-DD format`
         )
         return null
       }
+
       const pivot =
         queryInput.options.pivot ??
         Math.floor((queryInput.options.days * 2) / 3)
@@ -205,10 +204,10 @@ export function generateElasticsearchQuery(
             {
               range: {
                 [queryKey]: {
-                  gte: DateTime.fromISO(dateValue.data)
+                  gte: DateTime.fromISO(queryValue)
                     .minus({ days: queryInput.options.days })
                     .toISO(),
-                  lte: DateTime.fromISO(dateValue.data)
+                  lte: DateTime.fromISO(queryValue)
                     .plus({ days: queryInput.options.days })
                     .toISO()
                 }
@@ -220,7 +219,7 @@ export function generateElasticsearchQuery(
               distance_feature: {
                 field: queryKey,
                 pivot: `${pivot}d`,
-                origin: dateValue.data
+                origin: queryValue
               }
             }
           ]
@@ -272,7 +271,7 @@ export async function searchForDuplicates(
     }
     return {
       score: hit._score || 0,
-      event: decodeEventIndex(eventConfig, hit._source)
+      event: decodeEventIndex(hit._source)
     }
   })
 }
@@ -296,8 +295,6 @@ export async function assertCanReviewDuplicatesOf(
   const acceptedScopes = getAcceptedScopesFromToken(ctx.token, [
     'record.review-duplicates'
   ])
-  const eventConfigs = await getInMemoryEventConfigurations(ctx.token)
-
   const access = await Promise.all(
     duplicateEventIds.map(async (duplicateEventId) => {
       const duplicate = await getEventById(duplicateEventId).catch(
@@ -314,7 +311,10 @@ export async function assertCanReviewDuplicatesOf(
         return true
       }
 
-      const eventConfig = getEventConfigById(eventConfigs, duplicate.type)
+      const eventConfig = await getEventConfigurationForRecord({
+        event: duplicate,
+        token: ctx.token
+      })
 
       const eventIndexWithLocationHierarchy =
         await getEventIndexWithAdministrativeHierarchy(
