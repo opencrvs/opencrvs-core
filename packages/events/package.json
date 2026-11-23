@@ -85,6 +85,12 @@
         "./build/types/router/index.d.ts",
         "./src/router/index.ts"
       ]
+    },
+    "./router/service": {
+      "types": [
+        "./build/types/router/service.d.ts",
+        "./src/router/service.ts"
+      ]
     }
   },
   "lint-staged": {

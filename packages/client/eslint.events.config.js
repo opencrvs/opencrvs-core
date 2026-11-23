@@ -77,6 +77,8 @@ module.exports = defineConfig([
           patterns: [
             '@client/*',
             '@events/*',
+            // Types of the routers that only other services call
+            '@opencrvs/events/router/*',
             '!@client/v2-events',
             '!@client/components',
             '!@client/utils',
