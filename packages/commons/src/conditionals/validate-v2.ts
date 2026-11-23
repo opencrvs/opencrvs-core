@@ -18,14 +18,23 @@ import { EncodedScope, TokenUserType } from '../users/authentication'
 import { UUID } from '../uuid'
 import { isOnline, todayISO } from './validate'
 
+/** Declaration conditionals read only the declaration. */
+export type DeclarationFormValues = {
+  declaration: ActionUpdate
+  annotation?: never
+}
+
+/** Annotation conditionals read the declaration and the annotation. */
+export type AnnotationFormValues = {
+  declaration: ActionUpdate
+  annotation: ActionUpdate
+}
+
 /**
  * Conditional parameter $form is a combination of declaration and annotation.
  * If you are editing existing event declaration, include a version where current changes are merged in.
  */
-export type FormValues = {
-  declaration: ActionUpdate
-  annotation: ActionUpdate
-}
+export type FormValues = DeclarationFormValues | AnnotationFormValues
 
 /**
  * The user who performs the action.

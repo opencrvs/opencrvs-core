@@ -144,7 +144,7 @@ export async function throwConflictIfActionNotAllowed(
     return
   }
 
-  const form = { declaration: eventIndex.declaration, annotation: {} }
+  const form = { declaration: eventIndex.declaration }
   const context = { eventDocument: event, eventConfig: eventConfiguration }
   const actionIsEnabled = isActionEnabled(actionConfig, form, context)
   const actionIsAvailable = isActionVisible(actionConfig, form, context)

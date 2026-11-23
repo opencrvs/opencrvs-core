@@ -54,7 +54,8 @@ import {
 import {
   ActionFormConditionalContext,
   FormValues,
-  SecuredConditionalContext
+  SecuredConditionalContext,
+  AnnotationFormValues
 } from '../conditionals/validate-v2'
 import { Draft } from './Draft'
 import { EventDocument } from './EventDocument'
@@ -542,12 +543,12 @@ export function getVisibleVerificationPageIds(
  */
 export function omitHiddenAnnotationFields(
   actionConfig: ActionConfig,
-  form: FormValues,
+  form: AnnotationFormValues,
   context: ActionFormConditionalContext
 ): ActionUpdate {
   const annotationFields = getActionAnnotationFields(actionConfig)
 
-  return omitHiddenFields(annotationFields, form, context).annotation
+  return omitHiddenFields(annotationFields, form, context).annotation ?? {}
 }
 
 /**
@@ -1207,7 +1208,7 @@ export function dropSecuredDeclarationFields(
   context: SecuredConditionalContext
 ): EventIndex {
   const declarationFields = getDeclarationFields(eventConfig)
-  const form = { declaration: eventIndex.declaration, annotation: {} }
+  const form = { declaration: eventIndex.declaration }
   const securedFieldIds = new Set(
     declarationFields
       .filter((declarationField) =>

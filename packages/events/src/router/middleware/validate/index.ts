@@ -144,7 +144,7 @@ function getDeclarationFormErrors<T extends EventState | ActionUpdate>({
   // (e.g. when dob is unknown and user has send the age previously. Now they only send dob, without setting dob unknown to false).
   const { declaration: cleanedDeclaration } = omitHiddenPaginatedFields(
     form,
-    { declaration: completeDeclaration, annotation: {} },
+    { declaration: completeDeclaration },
     context
   )
 
@@ -166,7 +166,7 @@ function getDeclarationFormErrors<T extends EventState | ActionUpdate>({
   }
 
   // Validate declaration update against conditional rules, taking into account conditional pages.
-  const cleanedForm = { declaration: cleanedDeclaration, annotation: {} }
+  const cleanedForm = { declaration: cleanedDeclaration }
   const allVisiblePageFields = form.pages
     .filter((page) => isPageVisible(page, cleanedForm, context))
     .flatMap((page) => page.fields)
@@ -433,7 +433,7 @@ export function validateNotifyAction({
 
       const fieldErrors = runStructuralValidations({
         field: { ...field, required: false },
-        form: { declaration, annotation: {} },
+        form: { declaration },
         context,
         actionType: ActionType.NOTIFY
       })

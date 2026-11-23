@@ -67,7 +67,7 @@ export function toFormValues(
   // `baseFormState` holds values that the conditionals read in addition to the form values.
   // We are deprecating baseFormState in favor of typed contexts.
   return context.baseFormState === undefined
-    ? { declaration: values, annotation: {} }
+    ? { declaration: values }
     : { declaration: context.baseFormState, annotation: values }
 }
 
