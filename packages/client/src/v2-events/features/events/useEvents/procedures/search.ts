@@ -81,7 +81,7 @@ export function workqueueSearchKey(slug?: string) {
  * key would call `event.search.workqueue.<slug>`. This rebuilds the untagged
  * key before delegating to tRPC.
  */
-function fetchTaggedSearch(ctx: QueryFunctionContext) {
+async function fetchTaggedSearch(ctx: QueryFunctionContext) {
   // The {input, type} element is always present for event.search keys.
   const { input } = ctx.queryKey[1] as { input: SearchInput }
   const options = trpcOptionsProxy.event.search.queryOptions(input)

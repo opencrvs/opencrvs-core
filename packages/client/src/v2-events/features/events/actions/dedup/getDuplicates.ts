@@ -20,7 +20,7 @@ export function potentialDuplicatesQueryKey(eventId: string) {
   return ['event', 'potentialDuplicates', eventId] as const
 }
 
-function fetchPotentialDuplicates(eventId: string) {
+async function fetchPotentialDuplicates(eventId: string) {
   return trpcClient.event.getDuplicates.query({ eventId })
 }
 

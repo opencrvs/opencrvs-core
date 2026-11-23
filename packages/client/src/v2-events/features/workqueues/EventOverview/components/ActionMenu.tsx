@@ -171,7 +171,7 @@ export function ActionMenu({
     throw new Error(`Event ${eventId} not found`)
   }
 
-  const eventIndex = eventResults.results[0]
+  const eventIndex = eventResults.results.at(0)
 
   if (!eventIndex) {
     throw new Error(`Event ${eventId} not found`)

@@ -129,7 +129,7 @@ export async function getCache(cacheName: string) {
   return caches.open(cacheKey)
 }
 
-function getPresignedUrl(filePath: DocumentPath | FullDocumentPath) {
+async function getPresignedUrl(filePath: DocumentPath | FullDocumentPath) {
   return trpcClient.event.file.getPresignedUrl.query({ filePath })
 }
 
