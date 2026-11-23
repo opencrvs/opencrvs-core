@@ -13,11 +13,22 @@ import { trpcProxy } from '@gateway/v2-events/event-config/routes'
 
 const [{ handler }] = trpcProxy
 
-const proxy = (path: string, search = '') => {
+const callHandler = (path: string, search = '') => {
   const h = { proxy: jest.fn() }
-  handler.call(null, { params: { path }, url: { search } } as never, h as never)
-  return new URL(h.proxy.mock.calls[0][0].uri)
+  try {
+    handler.call(
+      null,
+      { params: { path }, url: { search } } as never,
+      h as never
+    )
+    return { h, error: undefined }
+  } catch (error) {
+    return { h, error }
+  }
 }
+
+const proxy = (path: string, search = '') =>
+  new URL(callHandler(path, search).h.proxy.mock.calls[0][0].uri)
 
 describe('events proxy', () => {
   it('forwards the path to the events service', () => {
@@ -37,4 +48,26 @@ describe('events proxy', () => {
   ])('never leaves the events service host: %s', (path) => {
     expect(proxy(path).host).toBe(new URL(env.EVENTS_URL).host)
   })
+
+  it.each([
+    'internal/user.get',
+    'internal/',
+    'internal',
+    'event.get/../internal/user.get',
+    './internal/locations.get'
+  ])(
+    'does not forward the internal router of the events service: %s',
+    (path) => {
+      const { h, error } = callHandler(path)
+      expect(error).toMatchObject({ output: { statusCode: 404 } })
+      expect(h.proxy).not.toHaveBeenCalled()
+    }
+  )
+
+  it.each(['internalNotes.get', 'events/search'])(
+    'forwards a path that only starts with the same letters: %s',
+    (path) => {
+      expect(proxy(path).pathname).toBe(`/${path}`)
+    }
+  )
 })
