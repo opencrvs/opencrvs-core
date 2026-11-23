@@ -245,6 +245,7 @@ export const RendersOnARouteWithoutAnEventId: StoryObj<{}> = {
         path: '/',
         element: (
           <StyledFormFieldGenerator
+            attachmentPath={null}
             fields={[
               {
                 id: 'storybook.name',
@@ -262,7 +263,10 @@ export const RendersOnARouteWithoutAnEventId: StoryObj<{}> = {
             id="my-form"
             validatorContext={getTestValidatorContext(
               TestUserRole.enum.LOCAL_REGISTRAR,
-              declaredEventDocument
+              {
+                event: declaredEventDocument,
+                eventConfig: tennisClubMembershipEvent
+              }
             )}
           />
         )

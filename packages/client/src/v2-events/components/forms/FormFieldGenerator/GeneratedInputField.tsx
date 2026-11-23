@@ -929,7 +929,7 @@ export const GeneratedInputField = <T extends FieldConfig>(
       <AlphaPrintButton.Input
         buttonLabel={field.config.configuration.buttonLabel}
         disabled={disabled}
-        event={requireEvent(validatorContext.event, name)}
+        event={requireEvent(validatorContext.event?.document, name)}
         id={name}
         template={field.config.configuration.template}
         onChange={(val) => onFieldValueChange(name, val)}
