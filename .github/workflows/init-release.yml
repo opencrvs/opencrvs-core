@@ -13,9 +13,9 @@
 # 2.0.3 on 2.0. The newest channel is the highest one with a published
 # release, and develop carries its work.
 #
-# The release branch is cut from the previous patch, or from develop for a
-# minor or major, and gets the version bump and CHANGELOG commits. Where it
-# merges depends on its channel:
+# The release branch is cut from the channel's hotfix line (release/X.Y.x)
+# for a patch, or from develop for a minor or major, and gets the version
+# bump and CHANGELOG commits. Where it merges depends on its channel:
 #
 #   the newest channel  one merge-back PR into develop, carrying the version
 #                       bump and the CHANGELOG entry
@@ -54,7 +54,7 @@ jobs:
           if [ "$z" = "0" ]; then
             echo "base_branch=develop" >> $GITHUB_OUTPUT
           else
-            echo "base_branch=release/$x.$y.$((z - 1))" >> $GITHUB_OUTPUT
+            echo "base_branch=release/$x.$y.x" >> $GITHUB_OUTPUT
           fi
 
       # Full history is required so lerna can traverse the commit graph.
@@ -162,7 +162,8 @@ jobs:
 
           git checkout -b "$RELEASE_BRANCH"
 
-          npx lerna exec "npm version --new-version $VERSION --no-git-tag-version"
+          # The hotfix line is bumped to the next unreleased version after each release, and npm fails on an unchanged version without --allow-same-version.
+          npx lerna exec "npm version $VERSION --no-git-tag-version --allow-same-version"
           npm version $VERSION --no-git-tag-version --allow-same-version
 
           # Bump helm chart version
@@ -210,17 +211,20 @@ jobs:
 
           # Prepend a "Release Candidate" section: sed drops the old
           # "# Changelog" header so it can be rewritten above the new one.
-          sed -i '1,2d' CHANGELOG.md
-          {
-            echo "# Changelog"
-            echo ""
-            echo "## $VERSION Release Candidate"
-            echo ""
-            cat CHANGELOG.md
-          } > CHANGELOG.new
-          mv CHANGELOG.new CHANGELOG.md
-          git add CHANGELOG.md
-          git commit -m "docs: update changelog for $VERSION release candidate"
+          # A hotfix line may already have a section for this version.
+          if ! grep -qxF "## $VERSION" CHANGELOG.md; then
+            sed -i '1,2d' CHANGELOG.md
+            {
+              echo "# Changelog"
+              echo ""
+              echo "## $VERSION Release Candidate"
+              echo ""
+              cat CHANGELOG.md
+            } > CHANGELOG.new
+            mv CHANGELOG.new CHANGELOG.md
+            git add CHANGELOG.md
+            git commit -m "docs: update changelog for $VERSION release candidate"
+          fi
 
           git push origin "$RELEASE_BRANCH"
 
