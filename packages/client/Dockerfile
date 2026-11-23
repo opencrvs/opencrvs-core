@@ -23,7 +23,7 @@ WORKDIR /app/packages/client
 COPY --chown=node:node packages/client /app/packages/client
 RUN pnpm install --frozen-lockfile && pnpm build
 
-FROM nginxinc/nginx-unprivileged:1.28-alpine-otel
+FROM nginx/nginx-unprivileged:1.31-alpine-otel
 
 USER root
 RUN sed -i '1iload_module modules/ngx_otel_module.so;' /etc/nginx/nginx.conf
