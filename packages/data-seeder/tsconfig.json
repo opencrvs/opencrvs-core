@@ -2,9 +2,8 @@
   "compilerOptions": {
     "skipLibCheck": true,
     "esModuleInterop": true,
-    "baseUrl": "./src",
     "paths": {
-      "@data-seeder/*": ["./*"]
+      "@data-seeder/*": ["./src/*"]
     },
     "target": "es6",
     "module": "node16",
@@ -20,7 +19,7 @@
     "strictNullChecks": true,
     "allowSyntheticDefaultImports": true,
     "noUnusedLocals": true,
-    "types": ["node", "fhir"]
+    "types": ["node"]
   },
   "include": ["src/**/*.ts", "typings"]
 }

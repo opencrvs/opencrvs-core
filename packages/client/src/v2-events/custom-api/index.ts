@@ -10,6 +10,7 @@
  */
 
 import {
+  ActionUpdate,
   EventState,
   getUUID,
   ActionType,
@@ -20,8 +21,7 @@ import {
   ArchiveActionInput,
   MarkAsDuplicateActionInput,
   ActionStatus,
-  ValidatorContext,
-  EditActionInput
+  ValidatorContext
 } from '@opencrvs/commons/client'
 import { trpcClient } from '@client/v2-events/trpc'
 
@@ -33,10 +33,13 @@ export interface CustomMutationParams {
   transactionId: string
   eventConfiguration: EventConfig
   annotation?: EventState
-}
-
-export interface EditRequestParams extends CustomMutationParams {
-  content: EditActionInput['content']
+  /**
+   * Values collected from the final action's confirmation dialog form
+   * (e.g. REGISTER's fields in a declare+register flow). Merged into the
+   * final action's annotation only, so intermediate actions don't store
+   * another action's dialog metadata.
+   */
+  targetActionAnnotation?: ActionUpdate
 }
 
 export interface CorrectionRequestParams extends CustomMutationParams {
@@ -45,7 +48,7 @@ export interface CorrectionRequestParams extends CustomMutationParams {
 }
 
 export interface ArchiveOnDuplicateParams extends CustomMutationParams {
-  content: ArchiveActionInput['content'] &
+  content: NonNullable<ArchiveActionInput['content']> &
     Partial<MarkAsDuplicateActionInput['content']>
 }
 
@@ -75,7 +78,8 @@ export async function registerOnDeclare({
   eventConfiguration,
   declaration,
   transactionId,
-  annotation
+  annotation,
+  targetActionAnnotation
 }: CustomMutationParams) {
   const declaredEvent = await trpcClient.event.actions.declare.request.mutate({
     declaration,
@@ -94,7 +98,7 @@ export async function registerOnDeclare({
 
   return trpcClient.event.actions.register.request.mutate({
     declaration: {},
-    annotation,
+    annotation: { ...annotation, ...targetActionAnnotation },
     eventId,
     transactionId
   })
@@ -105,16 +109,15 @@ export async function editAndRegister({
   declaration,
   transactionId,
   annotation,
-  content,
+  targetActionAnnotation,
   eventConfiguration
-}: EditRequestParams) {
+}: CustomMutationParams) {
   const editedEvent = await trpcClient.event.actions.edit.request.mutate({
     declaration,
     annotation,
     eventId,
     transactionId,
-    keepAssignmentIfAccepted: true,
-    content
+    keepAssignmentIfAccepted: true
   })
 
   if (wasRejected(editedEvent, ActionType.EDIT)) {
@@ -138,7 +141,7 @@ export async function editAndRegister({
 
   return trpcClient.event.actions.register.request.mutate({
     declaration: {},
-    annotation,
+    annotation: { ...annotation, ...targetActionAnnotation },
     eventId,
     transactionId
   })
@@ -149,15 +152,14 @@ export async function editAndDeclare({
   declaration,
   transactionId,
   annotation,
-  content
-}: EditRequestParams) {
+  targetActionAnnotation
+}: CustomMutationParams) {
   const editedEvent = await trpcClient.event.actions.edit.request.mutate({
     declaration,
     annotation,
     eventId,
     transactionId,
-    keepAssignmentIfAccepted: true,
-    content
+    keepAssignmentIfAccepted: true
   })
 
   if (wasRejected(editedEvent, ActionType.EDIT)) {
@@ -166,7 +168,7 @@ export async function editAndDeclare({
 
   return trpcClient.event.actions.declare.request.mutate({
     declaration,
-    annotation,
+    annotation: { ...annotation, ...targetActionAnnotation },
     eventId,
     transactionId
   })
@@ -177,15 +179,14 @@ export async function editAndNotify({
   declaration,
   transactionId,
   annotation,
-  content
-}: EditRequestParams) {
+  targetActionAnnotation
+}: CustomMutationParams) {
   const editedEvent = await trpcClient.event.actions.edit.request.mutate({
     declaration,
     annotation,
     eventId,
     transactionId,
-    keepAssignmentIfAccepted: true,
-    content
+    keepAssignmentIfAccepted: true
   })
 
   if (wasRejected(editedEvent, ActionType.EDIT)) {
@@ -194,7 +195,7 @@ export async function editAndNotify({
 
   return trpcClient.event.actions.notify.request.mutate({
     declaration,
-    annotation,
+    annotation: { ...annotation, ...targetActionAnnotation },
     eventId,
     transactionId
   })

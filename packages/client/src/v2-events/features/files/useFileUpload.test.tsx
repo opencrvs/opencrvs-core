@@ -8,7 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { renderHook, waitFor } from '@testing-library/react'
+import { renderHook } from '@testing-library/react'
 import { http, HttpResponse } from 'msw'
 import { setupServer } from 'msw/node'
 import React, { PropsWithChildren } from 'react'
@@ -24,16 +24,15 @@ import {
 } from '@client/v2-events/features/events/useEvents/api'
 import { queryClient, TRPCProvider } from '@client/v2-events/trpc'
 import { createTemporaryId } from '@client/v2-events/utils'
-import { UPLOAD_MUTATION_KEY, useFileUpload } from './useFileUpload'
+import { useFileUpload } from './useFileUpload'
 
 const uploadedPaths: string[] = []
-const deletedPaths: string[] = []
 
 const server = setupServer(
-  http.post('/api/upload', () => HttpResponse.text('uploaded')),
-  http.delete('/api/files/*', ({ request }) => {
-    deletedPaths.push(new URL(request.url).pathname.replace('/api/files/', ''))
-    return new HttpResponse(null, { status: 204 })
+  http.post('/api/upload', async ({ request }) => {
+    const formData = await request.formData()
+    uploadedPaths.push(String(formData.get('path')))
+    return HttpResponse.text(String(formData.get('path')))
   })
 )
 
@@ -44,39 +43,11 @@ beforeAll(() => {
    */
   vi.stubGlobal('caches', { keys: () => [] })
   server.listen()
-
-  /*
-   * Records the path each upload is sent with, reading it off the `FormData` the
-   * caller built. Wraps the `fetch` msw installed above, so requests still reach
-   * the handlers.
-   */
-  const interceptedFetch = globalThis.fetch
-  vi.stubGlobal(
-    'fetch',
-    async (input: RequestInfo | URL, init?: RequestInit) => {
-      if (init?.body instanceof FormData) {
-        uploadedPaths.push(String(init.body.get('path')))
-      }
-
-      return interceptedFetch(input, init)
-    }
-  )
-
-  /*
-   * The upload mutation is registered with `retry: true` and a five second delay,
-   * so a failing request would leave the promise pending until the test times out
-   * and hide the error that caused it.
-   */
-  queryClient.setMutationDefaults([UPLOAD_MUTATION_KEY], {
-    retry: 1,
-    retryDelay: 0
-  })
 })
 afterEach(() => {
   server.resetHandlers()
   queryClient.clear()
   uploadedPaths.length = 0
-  deletedPaths.length = 0
 })
 afterAll(() => server.close())
 
@@ -129,27 +100,5 @@ describe('uploading a file for an event that only has a temporary id', () => {
     await new Promise((resolve) => setTimeout(resolve, 1000))
 
     expect(uploadedPaths).toEqual([])
-  })
-
-  test('deletes the file from the canonical event path', async () => {
-    const event = generateEventDocument({
-      configuration: tennisClubMembershipEvent,
-      actions: [{ type: ActionType.CREATE }]
-    })
-    const temporaryId = createTemporaryId()
-
-    addLocalEventConfig(tennisClubMembershipEvent)
-    setEventData(temporaryId, event)
-
-    const { result } = renderHook(
-      () => useFileUpload(`events/${temporaryId}/`, 'my-field'),
-      { wrapper }
-    )
-
-    result.current.deleteFile(`events/${temporaryId}/proof.png`)
-
-    await waitFor(() =>
-      expect(deletedPaths).toEqual([`events/${event.id}/proof.png`])
-    )
   })
 })

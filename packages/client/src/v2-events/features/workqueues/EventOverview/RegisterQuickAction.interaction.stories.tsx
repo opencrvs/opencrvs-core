@@ -9,10 +9,10 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import React from 'react'
-import { Meta, StoryObj } from '@storybook/react'
+import { Meta, StoryObj } from '@storybook/react-vite'
 import { createTRPCMsw, httpLink } from '@vafanassieff/msw-trpc'
 import superjson from 'superjson'
-import { screen, within, userEvent } from '@storybook/test'
+import { screen, within, userEvent } from 'storybook/test'
 import { toast } from 'react-hot-toast'
 import {
   ActionType,

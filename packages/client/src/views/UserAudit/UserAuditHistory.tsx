@@ -26,7 +26,7 @@ import { orderBy } from 'lodash'
 
 import subMonths from 'date-fns/subMonths'
 
-import { ResponsiveModal } from '@opencrvs/components/lib/ResponsiveModal'
+import { Dialog } from '@opencrvs/components/lib/Dialog'
 import format from '@client/utils/date-formatting'
 import { Text } from '@opencrvs/components/lib/Text'
 import { useWindowSize } from '@opencrvs/components/src/hooks'
@@ -62,8 +62,15 @@ const OPERATIONS_TO_HIDE = [
   'event.search',
   'event.actions.assign.request',
   'event.actions.unassign.request',
+  'locations.create',
+  'locations.update',
+  'locations.withdrawVersion',
+  'administrativeAreas.create',
+  'administrativeAreas.update',
+  'administrativeAreas.withdrawVersion',
   // Written each time a record's documents load; kept for investigations only
-  'event.files.presign'
+  'event.files.presign',
+  'event.file.getPresignedUrl'
 ]
 
 const TableDiv = styled.div`
@@ -83,6 +90,10 @@ const RecentActionsHolder = styled.div`
 
 const AuditContent = styled.div`
   color: ${({ theme }) => theme.colors.grey600};
+`
+
+const LinkLeftAligned = styled(Link)`
+  text-align: left;
 `
 
 interface IBaseProp {
@@ -269,9 +280,12 @@ function UserAuditHistoryComponent(props: Props) {
     return orderBy(
       results.map((entry) => ({
         actionDescription: (
-          <Link font="bold14" onClick={() => toggleActionDetails(entry)}>
+          <LinkLeftAligned
+            font="bold14"
+            onClick={() => toggleActionDetails(entry)}
+          >
             {getActionMessage(entry)}
-          </Link>
+          </LinkLeftAligned>
         ),
         actionDescriptionString: getActionMessage(entry),
         trackingId: (() => {
@@ -356,14 +370,13 @@ function UserAuditHistoryComponent(props: Props) {
             }
           />
           {state.actionDetailsData && (
-            <ResponsiveModal
+            <Dialog
               actions={[]}
-              handleClose={() => toggleActionDetails(null)}
-              show={state.showModal}
-              responsive={true}
+              onClose={() => toggleActionDetails(null)}
+              isOpen={state.showModal}
               title={getActionMessage(state.actionDetailsData)}
               width={1024}
-              autoHeight={true}
+              variant="large"
             >
               <AuditContent>
                 {props.userName} -{' '}
@@ -372,7 +385,7 @@ function UserAuditHistoryComponent(props: Props) {
                   'MMMM dd, yyyy hh:mm a'
                 )}
               </AuditContent>
-            </ResponsiveModal>
+            </Dialog>
           )}
         </TableDiv>
       )}

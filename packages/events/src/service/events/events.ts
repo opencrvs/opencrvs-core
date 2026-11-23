@@ -12,7 +12,13 @@
 import { TRPCError } from '@trpc/server'
 import { NoResultError } from 'kysely'
 import * as z from 'zod/v4'
-import { logger, TokenUserType, TokenWithBearer, UUID } from '@opencrvs/commons'
+import {
+  eventAttachmentPath,
+  logger,
+  TokenUserType,
+  TokenWithBearer,
+  UUID
+} from '@opencrvs/commons'
 import {
   ActionInputWithType,
   ActionStatus,
@@ -27,7 +33,6 @@ import {
   FieldType,
   FieldUpdateValue,
   FileFieldValue,
-  getAcceptedActions,
   getActionConfig,
   getAvailableActionsForEvent,
   getCurrentEventState,
@@ -41,8 +46,8 @@ import {
 import { TrpcUserContext } from '@events/context'
 import { getEventConfigurationById } from '@events/service/config/config'
 import {
-  cleanupUnreferencedFiles,
-  deleteFile,
+  sweepUnreferencedFiles,
+  deleteFilesByPrefix,
   fileExists,
   assertFilesBelongToEvent
 } from '@events/service/files'
@@ -72,6 +77,14 @@ export const getEventById = async (eventId: UUID): Promise<EventDocument> => {
   }
 }
 
+/**
+ * Throws tRPC HTTP 404 unless the id names a record. The documents service
+ * cannot make this check, because it knows nothing about events.
+ */
+export const assertEventExists = async (eventId: UUID): Promise<void> => {
+  await getEventById(eventId)
+}
+
 function getValidFileValue(
   fieldKey: string,
   fieldValue: FieldUpdateValue,
@@ -84,31 +97,6 @@ function getValidFileValue(
     return undefined
   }
   return validFieldValue.data
-}
-
-async function deleteEventAttachments(
-  token: TokenWithBearer,
-  event: EventDocument
-) {
-  const configuration = await getEventConfigurationById({
-    eventType: event.type,
-    token
-  })
-
-  const actions = getAcceptedActions(event)
-  // @TODO: Check that this works after making sure data incldues only declaration fields.
-  const fieldConfigs = getDeclarationFields(configuration)
-  for (const ac of actions) {
-    for (const [key, value] of Object.entries(ac.declaration)) {
-      const fileValue = getValidFileValue(key, value, fieldConfigs)
-
-      if (!fileValue) {
-        continue
-      }
-
-      await deleteFile(fileValue.path, token)
-    }
-  }
 }
 
 /** Throws tRPC HTTP 409 if the status and the flags of the event do not allow the action. */
@@ -161,7 +149,10 @@ export async function throwConflictIfActionNotAllowed(
     return
   }
 
-  const context = await getValidatorContext(token)
+  const context = await getValidatorContext({
+    token,
+    event: { document: event, state: eventIndex }
+  })
   const actionIsEnabled = isActionEnabled(actionConfig, eventIndex, context)
   const actionIsAvailable = isActionVisible(actionConfig, eventIndex, context)
 
@@ -191,7 +182,7 @@ export async function deleteEvent(
   }
 
   const { id } = event
-  await deleteEventAttachments(token, event)
+  await deleteFilesByPrefix(eventAttachmentPath(id), token)
   await draftsRepo.deleteDraftsByEventId(id)
   await eventsRepo.deleteEventById(id)
 
@@ -327,6 +318,7 @@ export function buildAction(
     }
     case ActionType.REJECT:
     case ActionType.ARCHIVE:
+    case ActionType.UNARCHIVE:
     case ActionType.PRINT_CERTIFICATE:
     case ActionType.READ:
     case ActionType.CREATE:
@@ -455,28 +447,18 @@ export async function addAction(
 
   if (input.type !== ActionType.READ && input.type !== ActionType.ASSIGN) {
     await draftsRepo.deleteDraftsByEventId(input.eventId)
-    await cleanupUnreferencedFiles(updatedEvent, token)
+    await sweepUnreferencedFiles(updatedEvent, token)
   }
 
   return updatedEvent
 }
 
-/**
- * Created events are never indexed, and only created events can be deleted. Together these
- * guarantee that every event deduplication can flag still exists.
- */
-function isEventIndexable(event: EventDocument) {
-  return getStatusFromActions(event.actions) !== EventStatus.enum.CREATED
-}
-
-export async function ensureEventIndexed(
-  event: EventDocument,
-  configuration: EventConfig,
-  waitFor: boolean
-) {
-  if (isEventIndexable(event)) {
-    await indexEvent(event, configuration, waitFor)
-  }
+/** False for drafts and READ actions. Created events stay unindexed and only they can be deleted, so flagged duplicates exist. */
+function isEventIndexable(event: EventDocument, actionType: ActionType) {
+  return (
+    actionType !== ActionType.READ &&
+    getStatusFromActions(event.actions) !== EventStatus.enum.CREATED
+  )
 }
 
 /**
@@ -545,8 +527,10 @@ export async function processAction(
       `Indexing action without waiting for results. Action type: ${input.type}`
     )
   }
-  // Only send the event to Elasticsearch if it is not a draft
-  await ensureEventIndexed(updatedEvent, configuration, input.waitFor)
+  if (isEventIndexable(updatedEvent, input.type)) {
+    await indexEvent(updatedEvent, configuration, input.waitFor)
+  }
+
   return updatedEvent
 }
 
@@ -556,6 +540,8 @@ type AsyncRejectActionInput = Pick<
 > & {
   keepAssignment: boolean
   waitFor: boolean
+  requestId?: UUID
+  content?: Record<string, unknown> | null
 }
 
 export async function addAsyncRejectAction(
@@ -564,7 +550,9 @@ export async function addAsyncRejectAction(
     originalActionId,
     type,
     keepAssignment,
-    waitFor
+    waitFor,
+    requestId,
+    content
   }: AsyncRejectActionInput,
   {
     user,
@@ -583,6 +571,8 @@ export async function addAsyncRejectAction(
     actionType: type,
     status: ActionStatus.Rejected,
     originalActionId,
+    requestId,
+    content,
     createdBy: user.id,
     createdByRole:
       user.type === TokenUserType.enum.user ? user.role : undefined,
@@ -608,7 +598,9 @@ export async function addAsyncRejectAction(
   }
 
   const updatedEvent = await getEventById(eventId)
-  await ensureEventIndexed(updatedEvent, configuration, waitFor)
+  if (isEventIndexable(updatedEvent, type)) {
+    await indexEvent(updatedEvent, configuration, waitFor)
+  }
   await draftsRepo.deleteDraftsByEventId(eventId)
 
   return updatedEvent

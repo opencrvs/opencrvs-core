@@ -19,8 +19,7 @@ import {
   FileFieldWithOptionValue,
   getAcceptedActions
 } from '@opencrvs/commons/client'
-import { removeCached } from '@client/v2-events/cache'
-import { precacheFiles } from './useFileUpload'
+import { precacheFiles, removeCached } from '@client/v2-events/cache'
 
 export function getFilepathsFromActionDocument(
   actions: ActionDocument[] | Draft['action'][]
@@ -61,7 +60,7 @@ export function getFilepathsFromActionDocument(
   return _.uniq(filepaths)
 }
 
-export async function cacheFiles(event: EventDocument) {
+export async function cacheFilesFromEventDocument(event: EventDocument) {
   const actions = getAcceptedActions(event)
   const fileNames = getFilepathsFromActionDocument(actions)
 

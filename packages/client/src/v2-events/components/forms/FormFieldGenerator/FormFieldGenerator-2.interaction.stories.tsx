@@ -10,8 +10,8 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import type { Meta, StoryObj } from '@storybook/react'
-import { waitFor, expect, userEvent, within } from '@storybook/test'
+import type { Meta, StoryObj } from '@storybook/react-vite'
+import { waitFor, expect, userEvent, within } from 'storybook/test'
 import React from 'react'
 import styled from 'styled-components'
 import {
@@ -24,11 +24,13 @@ import {
   EventState,
   generateTranslationConfig,
   DocumentPath,
-  PlainDate
+  PlainDate,
+  eventAttachmentPath
 } from '@opencrvs/commons/client'
 
 import { FormFieldGenerator } from '@client/v2-events/components/forms/FormFieldGenerator'
 import { TRPCProvider } from '@client/v2-events/trpc'
+import { storybookEventId } from '@client/v2-events/features/events/fixtures'
 import { getTestValidatorContext } from '../../../../../.storybook/decorators'
 
 const meta: Meta<typeof FormFieldGenerator> = {
@@ -364,7 +366,9 @@ const fields = [
   {
     id: 'club.rules',
     type: FieldType.PARAGRAPH,
-    label: generateTranslationConfig('All members must follow club guidelines and regulations.'),
+    label: generateTranslationConfig(
+      'All members must follow club guidelines and regulations.'
+    ),
     configuration: {
       styles: { hint: true }
     }
@@ -471,6 +475,7 @@ export const DisabledFormFields: StoryObj<typeof FormFieldGenerator> = {
         path: '/event/:eventId',
         element: (
           <StyledFormFieldGenerator
+            attachmentPath={eventAttachmentPath(storybookEventId)}
             fields={fields.map((f) => ({
               ...f,
               // Make all fields disabled
@@ -529,6 +534,7 @@ export const EnabledFormFields: StoryObj<typeof FormFieldGenerator> = {
         path: '/event/:eventId',
         element: (
           <StyledFormFieldGenerator
+            attachmentPath={eventAttachmentPath(storybookEventId)}
             fields={fields}
             formValues={{
               ...declaration,
@@ -582,6 +588,7 @@ export const EnabledFormFieldsByEnableCondition: StoryObj<
         path: '/event/:eventId',
         element: (
           <StyledFormFieldGenerator
+            attachmentPath={eventAttachmentPath(storybookEventId)}
             fields={fields
               .map((f) => {
                 if (f.id === 'applicant.age') {

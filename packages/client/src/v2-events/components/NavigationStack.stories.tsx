@@ -10,8 +10,8 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import type { Meta, StoryObj } from '@storybook/react'
-import { expect, userEvent, within } from '@storybook/test'
+import type { Meta, StoryObj } from '@storybook/react-vite'
+import { expect, userEvent, within } from 'storybook/test'
 import React from 'react'
 import { Link, Outlet, useNavigate } from 'react-router-dom'
 import { TRPCProvider } from '@client/v2-events/trpc'

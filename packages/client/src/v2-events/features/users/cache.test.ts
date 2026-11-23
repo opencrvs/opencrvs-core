@@ -38,7 +38,7 @@ import { checkAuth } from '@client/profile/profileActions'
 // as a module-level side effect. Without this import cacheUsersFromEventDocument
 // would have no queryFn to call when it invokes queryClient.fetchQuery.
 import { useUsers } from '@client/v2-events/hooks/useUsers'
-import { cacheUsersFromEventDocument } from '@client/v2-events/features/users/cache'
+import { precacheUsersFromEventDocument } from '@client/v2-events/features/users/cache'
 
 // ── Stable test data (created once for the entire suite) ─────────────────────
 
@@ -139,7 +139,7 @@ describe('user summary caching after event download', () => {
     const wrapper = await makeWrapper()
 
     // Simulate what event.get's queryFn does after receiving the event document.
-    await cacheUsersFromEventDocument(EVENT_DOCUMENT)
+    await precacheUsersFromEventDocument(EVENT_DOCUMENT)
 
     // The server should have been hit exactly once, with all 5 user IDs.
     expect(userListSpy).toHaveBeenCalledTimes(1)
@@ -163,7 +163,7 @@ describe('user summary caching after event download', () => {
     const wrapper = await makeWrapper()
 
     // Warm the cache exactly as downloading a record would.
-    await cacheUsersFromEventDocument(EVENT_DOCUMENT)
+    await precacheUsersFromEventDocument(EVENT_DOCUMENT)
     userListSpy.mockClear()
 
     // Ask for all 5 users through the hook that record-rendering components use.
@@ -195,7 +195,7 @@ describe('user summary caching after event download', () => {
     const wrapper = await makeWrapper()
 
     // Cache all 5 users via the event-download path.
-    await cacheUsersFromEventDocument(EVENT_DOCUMENT)
+    await precacheUsersFromEventDocument(EVENT_DOCUMENT)
     userListSpy.mockClear()
 
     // Request 3 of the 5 users. This produces a query key the cache has never
@@ -221,7 +221,6 @@ describe('user summary caching after event download', () => {
 describe('user summary refresh after an avatar change', () => {
   test('returns the new avatar once changeAvatar invalidates user.list', async () => {
     // No service worker cache in jsdom; precaching just logs and returns
-    const originalCaches = globalThis.caches
     vi.stubGlobal('caches', { keys: vi.fn().mockResolvedValue([]) })
     vi.spyOn(console, 'error').mockImplementation(() => undefined)
 
@@ -258,6 +257,6 @@ describe('user summary refresh after an avatar change', () => {
     )
     expect(userListSpy).toHaveBeenCalled()
 
-    vi.stubGlobal('caches', originalCaches)
+    vi.unstubAllGlobals()
   })
 })

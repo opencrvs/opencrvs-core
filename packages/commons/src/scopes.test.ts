@@ -15,6 +15,7 @@ import {
   encodeScope,
   getScopeOptionValue,
   JurisdictionFilter,
+  Scope,
   ScopesWithDeclaredOptions,
   ScopesWithFullOptions,
   ScopesWithPlaceEventOptions
@@ -135,6 +136,48 @@ describe('getScopeOptionValue()', () => {
 
     expect(result).toEqual('user')
   })
+
+  it('should return "all" for notifiedIn when not set', () => {
+    const result = getScopeOptionValue(
+      { type: 'record.edit', options: {} },
+      'notifiedIn'
+    )
+
+    expect(result).toEqual(JurisdictionFilter.enum.all)
+  })
+
+  it('should return undefined for notifiedBy when not set', () => {
+    const result = getScopeOptionValue(
+      { type: 'record.edit', options: {} },
+      'notifiedBy'
+    )
+
+    expect(result).toBeUndefined()
+  })
+
+  it('should return set value for notifiedIn over default', () => {
+    const result = getScopeOptionValue(
+      {
+        type: 'record.edit',
+        options: { notifiedIn: JurisdictionFilter.enum.location }
+      },
+      'notifiedIn'
+    )
+
+    expect(result).toEqual(JurisdictionFilter.enum.location)
+  })
+
+  it('should return set value for notifiedBy', () => {
+    const result = getScopeOptionValue(
+      {
+        type: 'record.search',
+        options: { notifiedBy: 'user' as const }
+      },
+      'notifiedBy'
+    )
+
+    expect(result).toEqual('user')
+  })
 })
 
 describe('2.0 scopes', () => {
@@ -146,6 +189,8 @@ describe('2.0 scopes', () => {
           event: ['birth', 'death'],
           placeOfEvent: 'location',
           // @ts-expect-error - intentionally include irrelevant options to test that they are stripped out
+          notifiedBy: 'user' as const,
+          notifiedIn: 'administrativeArea' as const,
           declaredBy: 'user' as const,
           declaredIn: 'administrativeArea' as const,
           registeredBy: 'user' as const,
@@ -177,6 +222,8 @@ describe('2.0 scopes', () => {
         options: {
           event: ['birth', 'death'],
           placeOfEvent: 'location' as const,
+          notifiedBy: 'user' as const,
+          notifiedIn: 'administrativeArea' as const,
           declaredBy: 'user' as const,
           declaredIn: 'administrativeArea' as const,
           // @ts-expect-error - intentionally include irrelevant options to test that they are stripped out
@@ -192,6 +239,8 @@ describe('2.0 scopes', () => {
         options: {
           event: ['birth', 'death'],
           placeOfEvent: 'location',
+          notifiedIn: 'administrativeArea',
+          notifiedBy: 'user',
           declaredIn: 'administrativeArea',
           declaredBy: 'user'
         }
@@ -201,6 +250,8 @@ describe('2.0 scopes', () => {
         options: {
           event: ['birth', 'death'],
           placeOfEvent: 'location',
+          notifiedIn: 'administrativeArea',
+          notifiedBy: 'user',
           declaredIn: 'administrativeArea',
           declaredBy: 'user'
         }
@@ -210,15 +261,19 @@ describe('2.0 scopes', () => {
         options: {
           event: ['birth', 'death'],
           placeOfEvent: 'location',
+          notifiedIn: 'administrativeArea',
+          notifiedBy: 'user',
           declaredIn: 'administrativeArea',
           declaredBy: 'user'
         }
       },
       {
-        type: 'record.review-duplicates',
+        type: 'record.unarchive',
         options: {
           event: ['birth', 'death'],
           placeOfEvent: 'location',
+          notifiedIn: 'administrativeArea',
+          notifiedBy: 'user',
           declaredIn: 'administrativeArea',
           declaredBy: 'user'
         }
@@ -228,6 +283,8 @@ describe('2.0 scopes', () => {
         options: {
           event: ['birth', 'death'],
           placeOfEvent: 'location',
+          notifiedIn: 'administrativeArea',
+          notifiedBy: 'user',
           declaredIn: 'administrativeArea',
           declaredBy: 'user'
         }
@@ -242,6 +299,8 @@ describe('2.0 scopes', () => {
         options: {
           event: ['birth', 'death'],
           placeOfEvent: 'location' as const,
+          notifiedBy: 'user' as const,
+          notifiedIn: 'administrativeArea' as const,
           declaredBy: 'user' as const,
           declaredIn: 'administrativeArea' as const,
           registeredBy: 'user' as const,
@@ -256,6 +315,8 @@ describe('2.0 scopes', () => {
         options: {
           event: ['birth', 'death'],
           placeOfEvent: 'location',
+          notifiedIn: 'administrativeArea',
+          notifiedBy: 'user',
           declaredIn: 'administrativeArea',
           declaredBy: 'user',
           registeredIn: 'administrativeArea',
@@ -267,6 +328,8 @@ describe('2.0 scopes', () => {
         options: {
           event: ['birth', 'death'],
           placeOfEvent: 'location',
+          notifiedIn: 'administrativeArea',
+          notifiedBy: 'user',
           declaredIn: 'administrativeArea',
           declaredBy: 'user',
           registeredIn: 'administrativeArea',
@@ -278,6 +341,8 @@ describe('2.0 scopes', () => {
         options: {
           event: ['birth', 'death'],
           placeOfEvent: 'location',
+          notifiedIn: 'administrativeArea',
+          notifiedBy: 'user',
           declaredIn: 'administrativeArea',
           declaredBy: 'user',
           registeredIn: 'administrativeArea',
@@ -289,6 +354,8 @@ describe('2.0 scopes', () => {
         options: {
           event: ['birth', 'death'],
           placeOfEvent: 'location',
+          notifiedIn: 'administrativeArea',
+          notifiedBy: 'user',
           declaredIn: 'administrativeArea',
           declaredBy: 'user',
           registeredIn: 'administrativeArea',
@@ -300,6 +367,21 @@ describe('2.0 scopes', () => {
         options: {
           event: ['birth', 'death'],
           placeOfEvent: 'location',
+          notifiedIn: 'administrativeArea',
+          notifiedBy: 'user',
+          declaredIn: 'administrativeArea',
+          declaredBy: 'user',
+          registeredIn: 'administrativeArea',
+          registeredBy: 'user'
+        }
+      },
+      {
+        type: 'record.review-duplicates',
+        options: {
+          event: ['birth', 'death'],
+          placeOfEvent: 'location',
+          notifiedIn: 'administrativeArea',
+          notifiedBy: 'user',
           declaredIn: 'administrativeArea',
           declaredBy: 'user',
           registeredIn: 'administrativeArea',
@@ -400,6 +482,24 @@ describe('2.0 scopes', () => {
     })
   })
 
+  it('Supports status option for record.edit', () => {
+    const scopeWithStatus = encodeScope({
+      type: 'record.edit',
+      options: {
+        event: ['birth'],
+        status: ['DECLARED']
+      }
+    })
+
+    expect(decodeScope(scopeWithStatus)).toEqual({
+      type: 'record.edit',
+      options: {
+        event: ['birth'],
+        status: ['DECLARED']
+      }
+    })
+  })
+
   it('V1 record.registered.print-certified-copies with templates migrates to V2 with templates preserved', () => {
     const v1Scope =
       'record.registered.print-certified-copies[event=birth|death,templates=cert-1|cert-2]'
@@ -407,6 +507,13 @@ describe('2.0 scopes', () => {
     expect(legacyScopeToV2Scope(v1Scope)).toEqual(
       'type=record.print-certified-copies&event=birth,death&templates=cert-1,cert-2'
     )
+  })
+
+  it('Encodes and decodes the plain location.edit scope', () => {
+    const encoded = encodeScope({ type: 'location.edit' })
+
+    expect(encoded).toBe('type=location.edit')
+    expect(decodeScope(encoded)).toEqual({ type: 'location.edit' })
   })
 
   it('Should decode scope with single event & template', () => {
@@ -483,7 +590,6 @@ it('transform legacy scope to v2', () => {
     localSystemAdmin: [
       'user.read:my-office',
       'user.read:my-jurisdiction',
-      'user.update:my-jurisdiction',
       'organisation.read-locations:my-jurisdiction',
       'performance.read',
       'performance.read-dashboards',
@@ -496,7 +602,6 @@ it('transform legacy scope to v2', () => {
       'config.update-all',
       'organisation.read-locations',
       'user.create:all',
-      'user.update:all',
       'user.read:all',
       'performance.read',
       'performance.read-dashboards',
@@ -529,7 +634,6 @@ it('migrate legacy scopes to v2', () => {
     'performance.read-dashboards',
     'user.read:my-office',
     'user.read:my-jurisdiction',
-    'user.update:my-jurisdiction',
     'organisation.read-locations:my-jurisdiction',
     'user.read:only-my-audit',
     'organisation.read-locations:my-office',
@@ -551,31 +655,30 @@ it('migrate legacy scopes to v2', () => {
     'record.declared.review-duplicates[event=birth|death|tennis-club-membership]'
   ]
 
-  expect(v1Scopes).toHaveLength(24)
+  expect(v1Scopes).toHaveLength(23)
 
   const v2Scopes = migrateLegacyScopesToV2(v1Scopes)
-  expect(v2Scopes).toHaveLength(24)
+  expect(v2Scopes).toHaveLength(23)
 
   expect(v2Scopes).toEqual([
     'type=performance.read',
     'type=performance.read-dashboards',
     'type=user.read&accessLevel=location',
     'type=user.read&accessLevel=administrativeArea',
-    'type=user.edit&accessLevel=administrativeArea',
     'type=organisation.read-locations&accessLevel=administrativeArea',
     'type=user.read-only-my-audit',
     'type=organisation.read-locations&accessLevel=location',
     'type=workqueue&ids=all-events,assigned-to-you,recent,requires-completion,requires-updates,in-review-all,in-external-validation,ready-to-print,ready-to-issue',
-    'type=record.search&event=birth&placeOfEvent=all',
-    'type=record.search&event=death&placeOfEvent=all',
-    'type=record.search&event=tennis-club-membership&placeOfEvent=all',
-    'type=record.search&event=FOOTBALL_CLUB_MEMBERSHIP&placeOfEvent=all',
+    'type=record.search&event[]=birth&placeOfEvent=all',
+    'type=record.search&event[]=death&placeOfEvent=all',
+    'type=record.search&event[]=tennis-club-membership&placeOfEvent=all',
+    'type=record.search&event[]=FOOTBALL_CLUB_MEMBERSHIP&placeOfEvent=all',
     'type=record.create&event=birth,death,tennis-club-membership',
     'type=record.read&event=birth,death,tennis-club-membership',
     'type=record.declare&event=birth,death,tennis-club-membership',
     'type=record.reject&event=birth,death,tennis-club-membership',
     'type=record.archive&event=birth,death,tennis-club-membership',
-    'type=record.custom-action&event=birth,death,tennis-club-membership&customActionTypes=VALIDATE_DECLARATION',
+    'type=record.custom-action&event=birth,death,tennis-club-membership&customActionTypes[]=VALIDATE_DECLARATION',
     'type=record.register&event=birth,death,tennis-club-membership',
     'type=record.print-certified-copies&event=birth,death,tennis-club-membership',
     'type=record.correct&event=birth,death,tennis-club-membership',
@@ -732,6 +835,31 @@ describe('migrateLegacyScopesArrayToV2Scopes() — AND-pair merge', () => {
         accessLevel: 'administrativeArea',
         role: ['FIELD_AGENT']
       }
+    })
+  })
+})
+
+describe('action confirmation scopes', () => {
+  test('parses with or without the usual record-scope options', () => {
+    expect(Scope.safeParse({ type: 'record.action.accept' }).success).toBe(true)
+    expect(
+      Scope.safeParse({
+        type: 'record.action.reject',
+        options: { event: ['birth'] }
+      }).success
+    ).toBe(true)
+  })
+
+  test('survives the encode/decode round trip used in tokens', () => {
+    const encoded = encodeScope({
+      type: 'record.action.accept',
+      options: { event: ['birth'] }
+    })
+
+    expect(encoded).toBe('type=record.action.accept&event[]=birth')
+    expect(decodeScope(encoded)).toEqual({
+      type: 'record.action.accept',
+      options: { event: ['birth'] }
     })
   })
 })

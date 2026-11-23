@@ -132,9 +132,9 @@ describe('useNetworkProbe', () => {
     const abortSpy = vi.fn()
     const controller = { abort: abortSpy, signal: new AbortController().signal }
     const OriginalAbortController = global.AbortController
-    global.AbortController = vi.fn(
-      () => controller
-    ) as unknown as typeof AbortController
+    global.AbortController = vi.fn(function () {
+      return controller
+    }) as unknown as typeof AbortController
 
     // eslint-disable-next-line @typescript-eslint/no-empty-function, @typescript-eslint/promise-function-async
     fetchMock.mockImplementationOnce(() => new Promise<Response>(() => {}))

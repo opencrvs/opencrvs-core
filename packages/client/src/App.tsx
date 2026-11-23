@@ -13,7 +13,6 @@ import { NotificationComponent } from '@client/components/Notification'
 import { Page } from '@client/components/Page'
 import { ProtectedPage } from '@client/components/ProtectedPage'
 import ScrollToTop from '@client/components/ScrollToTop'
-import { SessionExpireConfirmation } from '@client/components/SessionExpireConfirmation'
 import { getTheme } from '@opencrvs/components'
 import * as React from 'react'
 import { Provider } from 'react-redux'
@@ -62,7 +61,6 @@ export const routesConfig = [
     path: '/',
     element: (
       <ScrollToTop>
-        <SessionExpireConfirmation />
         <NotificationComponent>
           <Page>
             <MainSection>

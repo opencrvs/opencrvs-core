@@ -43,8 +43,37 @@ import { AddressFieldValue, AddressType } from '../CompositeFieldValue'
 import { isFieldReference } from '../../conditionals/conditionals'
 
 export function getStatusFromActions(actions: Array<Action>) {
-  return actions
-    .filter(({ status }) => status === ActionStatus.Accepted)
+  const acceptedActions = actions.filter(
+    ({ status }) => status === ActionStatus.Accepted
+  )
+
+  // ARCHIVE/UNARCHIVE don't represent real progress, they just park/unpark the
+  // record. Whether the record is currently archived is determined by which of
+  // the two happened most recently.
+  const isCurrentlyArchived = acceptedActions.reduce<boolean>(
+    (archived, action) => {
+      if (action.type === ActionType.ARCHIVE) {
+        return true
+      }
+      if (action.type === ActionType.UNARCHIVE) {
+        return false
+      }
+      return archived
+    },
+    false
+  )
+
+  if (isCurrentlyArchived) {
+    return EventStatus.enum.ARCHIVED
+  }
+
+  // Not currently archived: derive status as if archiving never happened, so
+  // unarchiving always restores exactly the status the record had before it
+  // was archived, no matter how many archive/unarchive cycles occurred.
+  return acceptedActions
+    .filter(
+      ({ type }) => type !== ActionType.ARCHIVE && type !== ActionType.UNARCHIVE
+    )
     .reduce<EventStatus>((status, action) => {
       switch (action.type) {
         case ActionType.CREATE:
@@ -53,10 +82,11 @@ export function getStatusFromActions(actions: Array<Action>) {
           return EventStatus.enum.DECLARED
         case ActionType.REGISTER:
           return EventStatus.enum.REGISTERED
-        case ActionType.ARCHIVE:
-          return EventStatus.enum.ARCHIVED
         case ActionType.NOTIFY:
           return EventStatus.enum.NOTIFIED
+        // Already filtered out above; listed here only to satisfy exhaustiveness.
+        case ActionType.ARCHIVE:
+        case ActionType.UNARCHIVE:
         case ActionType.CUSTOM:
         case ActionType.PRINT_CERTIFICATE:
         case ActionType.ASSIGN:

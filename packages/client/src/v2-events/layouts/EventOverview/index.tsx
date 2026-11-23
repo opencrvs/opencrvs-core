@@ -11,13 +11,20 @@
 
 import React from 'react'
 import { defineMessages, useIntl } from 'react-intl'
-import { useLocation, useNavigate, matchPath } from 'react-router-dom'
+import {
+  useLocation,
+  useNavigate,
+  useNavigationType,
+  matchPath,
+  NavigationType
+} from 'react-router-dom'
 import {
   useTypedParams,
   useTypedSearchParams
 } from 'react-router-typesafe-routes/dom'
 import styled from 'styled-components'
 import {
+  ActionType,
   applyDraftToEventIndex,
   deepDropNulls,
   EventStatus
@@ -38,12 +45,13 @@ import { useIntlFormatMessageWithFlattenedParams } from '@client/v2-events/messa
 import { ROUTES } from '@client/v2-events/routes'
 import { flattenEventIndex } from '@client/v2-events/utils'
 import { DownloadButton } from '@client/v2-events/components/DownloadButton'
-import { recordAuditMessages } from '@client/i18n/messages/views/recordAudit'
+import { EventIcon } from '@client/v2-events/components/EventIcon'
 import { useUsers } from '@client/v2-events/hooks/useUsers'
 import { EventOverviewProvider } from '@client/v2-events/features/workqueues/EventOverview/EventOverviewContext'
 import { constantsMessages } from '@client/i18n/messages/constants'
 import { useLocations } from '@client/v2-events/hooks/useLocations'
 import { useCanAccessEventWithScopes } from '@client/v2-events/hooks/useCanAccessEventWithScopes'
+import { useEventActionConfigurationResolver } from '@client/v2-events/features/workqueues/Actions/useActionConfigurationResolver'
 
 const Tab = styled.button`
   border: none;
@@ -106,7 +114,9 @@ function EventOverviewTabs() {
       <Tab
         className={isActive(ROUTES.V2.EVENTS.EVENT.path) ? 'active' : ''}
         onClick={() => {
-          navigate(ROUTES.V2.EVENTS.EVENT.buildPath({ eventId }, { backTo }))
+          navigate(ROUTES.V2.EVENTS.EVENT.buildPath({ eventId }, { backTo }), {
+            replace: true
+          })
         }}
       >
         {intl.formatMessage(messages.summary)}
@@ -118,7 +128,8 @@ function EventOverviewTabs() {
           }
           onClick={() => {
             navigate(
-              ROUTES.V2.EVENTS.EVENT.RECORD.buildPath({ eventId }, { backTo })
+              ROUTES.V2.EVENTS.EVENT.RECORD.buildPath({ eventId }, { backTo }),
+              { replace: true }
             )
           }}
         >
@@ -129,7 +140,8 @@ function EventOverviewTabs() {
         className={isActive(ROUTES.V2.EVENTS.EVENT.AUDIT.path) ? 'active' : ''}
         onClick={() => {
           navigate(
-            ROUTES.V2.EVENTS.EVENT.AUDIT.buildPath({ eventId }, { backTo })
+            ROUTES.V2.EVENTS.EVENT.AUDIT.buildPath({ eventId }, { backTo }),
+            { replace: true }
           )
         }}
       >
@@ -137,6 +149,12 @@ function EventOverviewTabs() {
       </Tab>
     </TabContainer>
   )
+}
+
+const noNameMessage = {
+  id: 'recordAudit.noName',
+  defaultMessage: 'No name provided',
+  description: 'Label for name not available'
 }
 
 export function EventOverviewLayout({
@@ -157,14 +175,16 @@ export function EventOverviewLayout({
   const eventResults = searchEventById.useSuspenseQuery(eventId)
 
   const navigate = useNavigate()
+  const navigationType = useNavigationType()
   const intl = useIntl()
   const flattenedIntl = useIntlFormatMessageWithFlattenedParams()
-
   if (eventResults.total === 0) {
     throw new Error(`Event details with id ${eventId} not found`)
   }
 
   const event = eventResults.results[0]
+  const { resolveAction } = useEventActionConfigurationResolver(event)
+  const readActionStatus = resolveAction(ActionType.READ)
 
   const { eventConfiguration } = useEventConfiguration(event.type)
   const eventIndexWithDraftApplied = draft
@@ -174,8 +194,15 @@ export function EventOverviewLayout({
   const isDraft = event.status === EventStatus.enum.CREATED
 
   const exit = () => {
+    // If backTo is set and we navigated via push (from a list), pop history to go back to the list.
+    // Otherwise, replace or go home as appropriate.
+    if (backTo && navigationType === NavigationType.Push) {
+      navigate(-1)
+      return
+    }
+
     if (backTo) {
-      navigate(backTo)
+      navigate(backTo, { replace: true })
       return
     }
 
@@ -188,13 +215,22 @@ export function EventOverviewLayout({
         <AppBar
           appBarRowTwo={<EventOverviewTabs />}
           desktopCenter={<EventOverviewTabs />}
+          desktopLeft={
+            <EventIcon
+              event={eventIndexWithDraftApplied}
+              eventConfig={eventConfiguration}
+              name={null}
+            />
+          }
           desktopRight={
             <Stack>
-              <DownloadButton
-                key={`DownloadButton-${eventId}`}
-                event={eventIndexWithDraftApplied}
-                isDraft={isDraft}
-              />
+              {!readActionStatus.hidden && (
+                <DownloadButton
+                  key={`DownloadButton-${eventId}`}
+                  event={eventIndexWithDraftApplied}
+                  isDraft={isDraft}
+                />
+              )}
               <ActionMenu eventId={eventId} />
               <DividerVertical />
               <Button
@@ -211,16 +247,25 @@ export function EventOverviewLayout({
             flattenedIntl.formatMessage(
               eventConfiguration.title,
               flattenEventIndex(deepDropNulls(eventIndexWithDraftApplied))
-            ) || intl.formatMessage(recordAuditMessages.noName)
+            ) || intl.formatMessage(noNameMessage)
+          }
+          mobileLeft={
+            <EventIcon
+              event={eventIndexWithDraftApplied}
+              eventConfig={eventConfiguration}
+              name={null}
+            />
           }
           mobileRight={
             <>
               <Stack>
-                <DownloadButton
-                  key={`DownloadButton-${eventId}`}
-                  event={eventIndexWithDraftApplied}
-                  isDraft={isDraft}
-                />
+                {!readActionStatus.hidden && (
+                  <DownloadButton
+                    key={`DownloadButton-${eventId}`}
+                    event={eventIndexWithDraftApplied}
+                    isDraft={isDraft}
+                  />
+                )}
                 <ActionMenu eventId={eventId} />
                 <DividerVertical />
                 <Button
@@ -238,7 +283,7 @@ export function EventOverviewLayout({
             flattenedIntl.formatMessage(
               eventConfiguration.title,
               flattenEventIndex(deepDropNulls(eventIndexWithDraftApplied))
-            ) || intl.formatMessage(recordAuditMessages.noName)
+            ) || intl.formatMessage(noNameMessage)
           }
         />
       }

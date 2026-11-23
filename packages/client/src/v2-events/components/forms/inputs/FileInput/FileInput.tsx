@@ -16,7 +16,8 @@ import {
   MimeType,
   File as FileConfig,
   SignatureField as SignatureFieldConfig,
-  DocumentPath
+  DocumentPath,
+  AttachmentPath
 } from '@opencrvs/commons/client'
 import { useFileUpload } from '@client/v2-events/features/files/useFileUpload'
 import { buttonMessages } from '@client/i18n/messages'
@@ -49,7 +50,7 @@ function FileInput({
   name: string
   description?: string
   error?: string
-  filePath: string
+  filePath: AttachmentPath
   label: string
   touched?: boolean
   disabled?: boolean

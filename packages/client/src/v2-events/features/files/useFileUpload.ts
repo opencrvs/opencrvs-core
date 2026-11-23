@@ -12,28 +12,18 @@
 import { useMutation } from '@tanstack/react-query'
 import { v4 as uuid } from 'uuid'
 import {
+  AttachmentPath,
   DocumentPath,
-  FullDocumentPath,
-  joinValues,
-  UUID
+  joinValues
 } from '@opencrvs/commons/client'
-import { getToken } from '@client/utils/authUtils'
-import { fetchFileFromUrl } from '@client/utils/imageUtils'
-import {
-  cacheFile,
-  findFileCache,
-  removeCached
-} from '@client/v2-events/cache'
+import { ensureFreshAccessToken, getToken } from '@client/utils/authUtils'
+import { cacheFile } from '@client/v2-events/cache'
 import { resolveTemporaryIdInPath } from '@client/v2-events/features/events/useEvents/temporary-id'
-import {
-  isExpectedAccessError,
-  queryClient,
-  trpcClient
-} from '@client/v2-events/trpc'
+import { queryClient } from '@client/v2-events/trpc'
 
 interface UploadFileParams {
   file: File
-  path: string
+  path: AttachmentPath
   meta: {
     transactionId: string
     referenceId: string
@@ -45,6 +35,7 @@ async function uploadFile({
   path,
   meta
 }: UploadFileParams): Promise<{ url: string }> {
+  await ensureFreshAccessToken()
   const formData = new FormData()
   formData.append('file', file)
   formData.append('transactionId', meta.transactionId)
@@ -70,195 +61,8 @@ async function uploadFile({
   return { url: await response.text() }
 }
 
-/**
- * NOTE: This function is used to delete a file from the server.
- * There are two worrying cases:
- * 1. User deletes a file but does not save the changes when they leave. We try to access the file later and it is not there.
- * 2. Documents service includes "fail-safe" for users other than the creator of the file. If a user tries to delete a file that they do not own, it will fail (silently). Given the above scenario, the file would still be there.
- *
- */
-async function deleteFile({ filename }: { filename: string }): Promise<void> {
-  /*
-   * The path is derived from the event id, which is still temporary when the file is
-   * attached before the event has synced (e.g. offline). Actions referring to the file
-   * are sent with the canonical id, so the file must be stored under it, too.
-   */
-  const filePath = resolveTemporaryIdInPath(filename)
+const UPLOAD_MUTATION_KEY = 'uploadFile'
 
-  const response = await fetch('/api/files/' + filePath, {
-    method: 'DELETE',
-    headers: {
-      Authorization: `Bearer ${getToken()}`
-    }
-  })
-
-  if (!response.ok) {
-    if (response.status === 403) {
-      // eslint-disable-next-line no-console
-      console.warn(
-        `Unable to hard-delete the file ${filename}. Only the creator can remove it.`
-      )
-    }
-
-    if (response.status === 404) {
-      // eslint-disable-next-line no-console
-      console.warn(
-        `Unable to hard-delete the file ${filename}. File not found.`
-      )
-    }
-
-    throw new Error('File deletion failed', { cause: response.status })
-  }
-
-  return
-}
-
-export const UPLOAD_MUTATION_KEY = 'uploadFile'
-const DELETE_MUTATION_KEY = 'deleteFile'
-
-/**
- * The record or user whose files are signed together. The server signs every
- * file the owner names in one call, keyed by the path it stores.
- */
-export type FileOwner = { eventId: UUID } | { userId: UUID }
-
-async function presignOwnerFiles(
-  owner: FileOwner
-): Promise<Record<string, string>> {
-  if ('eventId' in owner) {
-    return await trpcClient.event.files.presign.query({
-      eventId: owner.eventId
-    })
-  }
-
-  return await trpcClient.user.files.presign.query({ userIds: [owner.userId] })
-}
-
-/**
- *
- * returns already cached file urls in absolute format.
- */
-async function getCachedUrls(cache: Cache) {
-  const requests = await cache.keys()
-  return new Set(requests.map((req) => req.url))
-}
-
-function toAbsoluteUrl(url: string) {
-  return new URL(url, window.location.origin).href
-}
-
-/**
- * Downloads each path from its presigned URL and caches it under the path.
- * Paths the server didn't sign are skipped.
- */
-async function cachePresigned(urls: Record<string, string>, paths: string[]) {
-  await Promise.all(
-    paths.map(async (path) => {
-      const presignedUrl = urls[path] as string | undefined
-
-      if (!presignedUrl) {
-        return
-      }
-
-      const file = await fetchFileFromUrl(presignedUrl, path)
-
-      if (file) {
-        await cacheFile({ url: path, file })
-      }
-    })
-  )
-}
-
-function warnUnlessExpected(error: unknown) {
-  if (!isExpectedAccessError(error)) {
-    // eslint-disable-next-line no-console
-    console.warn('Failed to precache file', error)
-  }
-}
-
-/**
- * Precaches the owner's files that are not cached already, signing them in
- * one call, and only when at least one is missing.
- */
-export async function precacheFiles(
-  paths: (DocumentPath | FullDocumentPath)[],
-  owner: FileOwner
-) {
-  if (paths.length === 0) {
-    return
-  }
-
-  const cache = await findFileCache()
-
-  if (!cache) {
-    return
-  }
-
-  const cachedUrls = await getCachedUrls(cache)
-
-  const missingFiles = paths.filter(
-    (path) => !cachedUrls.has(toAbsoluteUrl(path))
-  )
-
-  if (missingFiles.length === 0) {
-    return
-  }
-
-  try {
-    await cachePresigned(await presignOwnerFiles(owner), missingFiles)
-  } catch (error) {
-    warnUnlessExpected(error)
-  }
-}
-
-/**
- * Precaches the avatars of several users (e.g. a list's) that are not cached
- * already, signing them in one call. Signatures are left out: a list shows
- * none, and they would otherwise land on the device of everyone who may read
- * those users.
- */
-export async function precacheUserAvatars(userIds: UUID[]) {
-  if (userIds.length === 0) {
-    return
-  }
-
-  const cache = await findFileCache()
-
-  if (!cache) {
-    return
-  }
-
-  try {
-    const urls = await trpcClient.user.files.presign.query({
-      userIds,
-      avatarsOnly: true
-    })
-    const cachedUrls = await getCachedUrls(cache)
-    const missingFiles = Object.keys(urls).filter(
-      (path) => !cachedUrls.has(toAbsoluteUrl(path))
-    )
-
-    await cachePresigned(urls, missingFiles)
-  } catch (error) {
-    warnUnlessExpected(error)
-  }
-}
-
-queryClient.setMutationDefaults([DELETE_MUTATION_KEY], {
-  // @ts-ignore
-  retry: (_, error) => {
-    if (error.cause === 403) {
-      return false
-    }
-    if (error.cause === 404) {
-      return false
-    }
-
-    return true
-  },
-  retryDelay: 5000,
-  mutationFn: deleteFile
-})
 queryClient.setMutationDefaults([UPLOAD_MUTATION_KEY], {
   retry: true,
   retryDelay: 5000,
@@ -276,7 +80,7 @@ interface Options {
 }
 
 export function useFileUpload(
-  path: string,
+  path: AttachmentPath,
   uniqueIdentifier: string,
   options: Options = {}
 ) {
@@ -306,18 +110,7 @@ export function useFileUpload(
     }
   })
 
-  const del = useMutation({
-    mutationFn: deleteFile,
-    mutationKey: [DELETE_MUTATION_KEY, uniqueIdentifier],
-    onSuccess: (data, { filename }) => {
-      void removeCached(filename as DocumentPath)
-    }
-  })
-
   return {
-    deleteFile: (filename: string) => {
-      return del.mutate({ filename })
-    },
     /**
      * Uploads a file with an optional identifier.
      *

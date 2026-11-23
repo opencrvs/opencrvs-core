@@ -15,11 +15,13 @@ import { locationMessages } from '@client/i18n/messages'
 import { countries } from '@client/utils/countries'
 import { getDefaultLanguage } from '@client/i18n/utils'
 import {
-  AdministrativeArea,
+  ClientAdministrativeArea,
+  ClientLocation,
   joinValues,
-  Location,
   UUID,
-  getAdministrativeAreaHierarchy
+  getAdministrativeAreaHierarchy,
+  resolveVersion,
+  todayISO
 } from '@opencrvs/commons/client'
 
 export function filterLocations(
@@ -65,15 +67,19 @@ export function generateLocationName(
  * @deprecated
  *
  * Given locations and administrative areas maps, creates searchable options to be used in location search inputs.
+ *
+ * Search options are behavior-preserving: always today's name. Anchoring
+ * options to the form's event date is the selector-anchoring follow-up
+ * (#13143).
  */
 export function createSearchOptions({
   locations,
   administrativeAreas,
   filter
 }: {
-  locations: Map<UUID, Location>
-  administrativeAreas: Map<UUID, AdministrativeArea>
-  filter?: (location: Location | AdministrativeArea) => boolean
+  locations: Map<UUID, ClientLocation>
+  administrativeAreas: Map<UUID, ClientAdministrativeArea>
+  filter?: (location: ClientLocation | ClientAdministrativeArea) => boolean
 }) {
   let locationsArr = Array.from(locations.values())
   let administrativeAreasArr = Array.from(administrativeAreas.values())
@@ -83,6 +89,10 @@ export function createSearchOptions({
     locationsArr = locationsArr.filter(filter)
     administrativeAreasArr = administrativeAreasArr.filter(filter)
   }
+
+  const anchor = todayISO()
+  const nameOf = (versions: ClientLocation['versions']) =>
+    resolveVersion(versions, anchor).name
 
   // 2. Map locations and administrative areas to SearchLocation format.
   const locationOptions: SearchLocation[] = locationsArr.map((location) => {
@@ -94,9 +104,12 @@ export function createSearchOptions({
 
     return {
       id: location.id,
-      searchableText: location.name,
+      searchableText: nameOf(location.versions),
       displayLabel: joinValues(
-        [location.name, ...hierarchy.map((area) => area.name)],
+        [
+          nameOf(location.versions),
+          ...hierarchy.map((area) => nameOf(area.versions))
+        ],
         ', '
       )
     }
@@ -158,8 +171,8 @@ function getLocalizedLocationName(intl: IntlShape, location: ILocation) {
  *
  * @param {string} params.locationId - The UUID of the reference location (the one representing the office's jurisdiction).
  * @param {string} params.otherLocationId - The UUID of the location to check against the jurisdiction.
- * @param {Map<UUID, Location>} params.locations - A map of all locations, keyed by UUID.
- * @param {Map<UUID, AdministrativeArea>} params.administrativeAreas - A map of administrative areas, keyed by UUID.
+ * @param {Map<UUID, ClientLocation>} params.locations - A map of all locations, keyed by UUID.
+ * @param {Map<UUID, ClientAdministrativeArea>} params.administrativeAreas - A map of administrative areas, keyed by UUID.
  * @returns {boolean} True if the other location falls under the parent administrative area of the given location, otherwise false.
  */
 export function isLocationUnderJurisdiction({
@@ -170,8 +183,8 @@ export function isLocationUnderJurisdiction({
 }: {
   locationId: string
   otherLocationId: string
-  locations: Map<UUID, Location>
-  administrativeAreas: Map<UUID, AdministrativeArea>
+  locations: Map<UUID, ClientLocation>
+  administrativeAreas: Map<UUID, ClientAdministrativeArea>
 }) {
   const location = locations.get(UUID.parse(locationId))
   const otherLocation = locations.get(UUID.parse(otherLocationId))

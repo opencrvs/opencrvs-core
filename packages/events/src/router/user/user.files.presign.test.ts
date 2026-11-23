@@ -89,7 +89,6 @@ describe('user.files.presign', () => {
   })
 
   test('returns files for several users in one call', async () => {
-    // `avatar` is the owner's (from setup); `ownAvatar` is the viewer's own
     const { viewer, owner, avatar } = await setupUsersWithFiles()
     const ownAvatar = `users/${viewer.id}/${getUUID()}.jpg`
     await updateUserById(viewer.id as UUID, { profileImagePath: ownAvatar })

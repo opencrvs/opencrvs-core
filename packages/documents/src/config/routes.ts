@@ -21,7 +21,10 @@ import {
   listFiles
 } from '@documents/features/getDocument/handler'
 import { svgUploadHandler } from '@documents/features/uploadSvg/handler'
-import { deleteDocument } from '@documents/features/deleteDocument/handler'
+import {
+  deleteDocument,
+  deletePrefix
+} from '@documents/features/deleteDocument/handler'
 
 export const getRoutes = () => {
   const routes: Hapi.ServerRoute[] = [
@@ -119,6 +122,15 @@ export const getRoutes = () => {
       method: 'DELETE',
       path: '/files/{filePath*}',
       handler: deleteDocument,
+      options: {
+        tags: ['api']
+      }
+    },
+    // delete everything under a record's or a user's prefix
+    {
+      method: 'DELETE',
+      path: '/prefix/{prefix*}',
+      handler: deletePrefix,
       options: {
         tags: ['api']
       }

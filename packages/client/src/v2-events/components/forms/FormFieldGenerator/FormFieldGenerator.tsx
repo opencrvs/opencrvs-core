@@ -23,7 +23,8 @@ import {
   FormState,
   IndexMap,
   mapFormState,
-  ValidatorContext
+  ValidatorContext,
+  AttachmentPath
 } from '@opencrvs/commons/client'
 import { getValidationErrorsForForm } from '@client/v2-events/components/forms/validation'
 import { useFormInitialValues } from '@client/v2-events/hooks/useFormInitialValues'
@@ -53,8 +54,14 @@ export interface FormFieldGeneratorPropsWithoutRef {
   /** form id */
   id: string
   readonlyMode?: boolean
+  searchMode?: boolean
   className?: string
-  attachmentPath?: string
+  /**
+   * Where the files uploaded into this form are stored. `null` says the form
+   * cannot contain a file field; rendering one anyway throws rather than
+   * writing the file outside every prefix.
+   */
+  attachmentPath: AttachmentPath | null
   /** Which fields are generated */
   fields: FieldConfig[]
   eventConfig?: EventConfig
@@ -82,7 +89,8 @@ export const FormFieldGenerator = forwardRef<
       formValues,
       className,
       eventConfig,
-      attachmentPath = '',
+      searchMode,
+      attachmentPath,
       readonlyMode,
       id,
       onValidSubmit,
@@ -211,6 +219,7 @@ export const FormFieldGenerator = forwardRef<
                 ...makeFormikFieldIdsOpenCRVSCompatible(formikProps.values)
               }}
               readonlyMode={readonlyMode}
+              searchMode={searchMode}
               setTouched={formikProps.setTouched}
               setValues={formikProps.setValues}
               touched={formikProps.touched}

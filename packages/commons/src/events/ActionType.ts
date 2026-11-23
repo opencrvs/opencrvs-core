@@ -29,6 +29,7 @@ export const ActionType = {
   MARK_AS_DUPLICATE: 'MARK_AS_DUPLICATE',
   MARK_AS_NOT_DUPLICATE: 'MARK_AS_NOT_DUPLICATE',
   ARCHIVE: 'ARCHIVE',
+  UNARCHIVE: 'UNARCHIVE',
   // Record actions
   PRINT_CERTIFICATE: 'PRINT_CERTIFICATE',
   REQUEST_CORRECTION: 'REQUEST_CORRECTION',
@@ -51,6 +52,7 @@ export const ConfirmableActions = [
   ActionType.REGISTER,
   ActionType.REJECT,
   ActionType.ARCHIVE,
+  ActionType.UNARCHIVE,
   ActionType.PRINT_CERTIFICATE,
   ActionType.REQUEST_CORRECTION,
   ActionType.APPROVE_CORRECTION,
@@ -71,6 +73,7 @@ export const ActionTypes = z.enum([
   'MARK_AS_DUPLICATE',
   'MARK_AS_NOT_DUPLICATE',
   'ARCHIVE',
+  'UNARCHIVE',
   'PRINT_CERTIFICATE',
   'REQUEST_CORRECTION',
   'REJECT_CORRECTION',
@@ -141,6 +144,7 @@ export const WorkqueueActionType = ActionTypes.extract([
   ActionType.REJECT,
   ActionType.MARK_AS_DUPLICATE,
   ActionType.ARCHIVE,
+  ActionType.UNARCHIVE,
   ActionType.PRINT_CERTIFICATE,
   ActionType.REQUEST_CORRECTION
 ])

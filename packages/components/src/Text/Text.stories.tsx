@@ -10,7 +10,7 @@
  */
 
 import React from 'react'
-import { ComponentMeta, ComponentStory } from '@storybook/react'
+import { ComponentMeta, ComponentStory } from '@storybook/react-vite'
 import { Text } from './Text'
 import { Stack } from '../Stack'
 import { User } from '../icons'

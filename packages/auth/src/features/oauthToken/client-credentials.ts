@@ -45,7 +45,10 @@ export async function clientCredentialsHandler(
    * Intermediary step to convert any legacy scopes to the new format.
    * For example, 'record.create' becomes 'type=record.create' to align with the new scope format.
    *
-   * Since mongo is in the middle of deprecation, we won't write new migrations to update existing scopes in the database, but instead convert them on the fly here.
+   * system_clients.scopes lives in postgres now, so a one-time migration is possible,
+   * but the events integrations API still accepts/returns the legacy string format —
+   * writing a migration now would just have this shim re-convert the API's legacy
+   * input again. Do the migration when that API is updated to accept the v2 format.
    */
   const v2Scopes = result.scope.map((s) => {
     // Intentionally verbose for clarity.

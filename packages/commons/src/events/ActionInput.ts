@@ -89,10 +89,7 @@ export const DeclareActionInput = BaseActionInput.extend(
 
 export const EditActionInput = BaseActionInput.extend(
   z.object({
-    type: z.literal(ActionType.EDIT).default(ActionType.EDIT),
-    content: z.object({
-      comment: z.string().describe('Comment for the edit action.').optional()
-    })
+    type: z.literal(ActionType.EDIT).default(ActionType.EDIT)
   }).shape
 )
 
@@ -160,10 +157,21 @@ export type MarkNotDuplicateActionInput = z.infer<
 export const ArchiveActionInput = BaseActionInput.extend(
   z.object({
     type: z.literal(ActionType.ARCHIVE).default(ActionType.ARCHIVE),
-    content: ReasonContent
+    /**
+     * Archiving does not collect a reason on its own. Only the
+     * "mark as duplicate" flow archives with a reason attached.
+     */
+    content: ReasonContent.optional()
   }).shape
 )
 export type ArchiveActionInput = z.infer<typeof ArchiveActionInput>
+
+export const UnarchiveActionInput = BaseActionInput.extend(
+  z.object({
+    type: z.literal(ActionType.UNARCHIVE).default(ActionType.UNARCHIVE)
+  }).shape
+)
+export type UnarchiveActionInput = z.infer<typeof UnarchiveActionInput>
 
 export const AssignActionInput = BaseActionInput.extend(
   z.object({
@@ -271,6 +279,7 @@ export const ActionInput = z
       id: 'MarkNotDuplicateActionInput'
     }),
     ArchiveActionInput.meta({ id: 'ArchiveActionInput' }),
+    UnarchiveActionInput.meta({ id: 'UnarchiveActionInput' }),
     AssignActionInput.meta({ id: 'AssignActionInput' }),
     UnassignActionInput.meta({ id: 'UnassignActionInput' }),
     PrintCertificateActionInput.meta({ id: 'PrintCertificateActionInput' }),

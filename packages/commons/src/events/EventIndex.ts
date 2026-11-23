@@ -11,12 +11,14 @@
 
 import { z, ZodType } from 'zod/v4'
 import { EventMetadata, EventStatus } from './EventMetadata'
-import { Flag } from './Flag'
+import { ContainsFlags } from './Flag'
 import { EventState } from './ActionDocument'
 
 import { TENNIS_CLUB_MEMBERSHIP } from './Constants'
 import { TokenUserType } from '../authentication'
 import { SelectDateRangeValue } from './FieldValue'
+
+export { ContainsFlags } from './Flag'
 
 export const EventIndex = EventMetadata.extend({
   declaration: EventState
@@ -96,15 +98,6 @@ export const Range = z
   })
   .meta({
     id: 'Range'
-  })
-
-export const ContainsFlags = z
-  .object({
-    anyOf: z.array(Flag).optional(),
-    noneOf: z.array(Flag).optional()
-  })
-  .meta({
-    id: 'ContainsFlags'
   })
 
 export const Within = z

@@ -66,5 +66,5 @@ for tag in ${IMAGE_TAGS_TO_CHECK[@]}; do
 done
 
 if [ $imagesAlreadyBuilt == "false" ]; then
-  yarn compose:push:version
+  pnpm compose:push:version
 fi

@@ -20,7 +20,8 @@ import { Icon } from '@opencrvs/components/lib/Icon'
 import {
   DocumentPath,
   FileFieldValue,
-  MimeType
+  MimeType,
+  AttachmentPath
 } from '@opencrvs/commons/client'
 import { messages } from '@client/i18n/messages/views/review'
 import { buttonMessages } from '@client/i18n/messages'
@@ -46,7 +47,7 @@ interface SignatureFieldProps {
   onChange: (value: FileFieldValue | null) => void
   required?: boolean
   maxFileSize: number
-  filePath: string
+  filePath: AttachmentPath
   acceptedFileTypes?: MimeType[]
   modalTitle: string
   disabled?: boolean

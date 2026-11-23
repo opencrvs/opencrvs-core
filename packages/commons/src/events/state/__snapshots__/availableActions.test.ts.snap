@@ -16,6 +16,13 @@ exports[`getAvailableActionsForEvent() should not allow ARCHIVE or EDIT for "ARC
 [
   "READ",
   "CUSTOM",
+  "UNARCHIVE",
+]
+`;
+
+exports[`getAvailableActionsForEvent() should not allow UNARCHIVE for "ARCHIVED" status while an unarchive request is pending 1`] = `
+[
+  "READ",
 ]
 `;
 
@@ -23,6 +30,7 @@ exports[`getAvailableActionsForEvent() should return the correct actions for "AR
 [
   "READ",
   "CUSTOM",
+  "UNARCHIVE",
 ]
 `;
 
@@ -32,7 +40,6 @@ exports[`getAvailableActionsForEvent() should return the correct actions for "CR
   "DECLARE",
   "NOTIFY",
   "DELETE",
-  "CUSTOM",
 ]
 `;
 
