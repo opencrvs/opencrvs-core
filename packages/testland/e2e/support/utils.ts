@@ -11,7 +11,10 @@
 import { Locator, Page, expect } from '@playwright/test'
 import { CLIENT_URL } from './constants'
 import { isMobile } from './mobile-helpers'
-import { waitForActionResponses } from './helpers'
+import {
+  getEventIdFromUrl as getEventIdFromUrlPath,
+  waitForActionResponses
+} from './helpers'
 
 // tRPC route fragments fired when confirming a correction action. The same
 // approve endpoint backs both "approve a request" and "make a direct correction".
@@ -235,6 +238,62 @@ export async function waitForLocalDraftToContain(page: Page, text: string) {
     )
 
   await expect.poll(readLocalDraft).toContain(text)
+}
+
+/**
+ * The client saves the query cache to IndexedDB with a 250 ms throttle. If
+ * the page reloads before that write, the restored cache has no `event.get`
+ * entry for the event, and the action page cannot open the record. Call this
+ * before `page.reload()` on an action page that has an event ID in its URL.
+ * See `throttlePersister` in core.
+ */
+export async function waitForPersistedEvent(page: Page) {
+  const eventId = getEventIdFromUrlPath(page)
+
+  const isEventPersisted = () =>
+    page.evaluate(
+      (id) =>
+        new Promise<boolean>((resolve) => {
+          const db = indexedDB.open('OpenCRVS')
+          db.onsuccess = () => {
+            const entries = db.result
+              .transaction('keyvaluepairs')
+              .objectStore('keyvaluepairs')
+              .getAll()
+            entries.onsuccess = () => {
+              const queries = (entries.result as unknown[]).flatMap(
+                (entry) =>
+                  (
+                    entry as {
+                      clientState?: {
+                        queries?: {
+                          queryKey: unknown[]
+                          state: { status: string }
+                        }[]
+                      }
+                    } | null
+                  )?.clientState?.queries ?? []
+              )
+              resolve(
+                queries.some(({ queryKey, state }) => {
+                  const [path, options] = queryKey as [
+                    string[],
+                    { input?: { eventId?: string } } | undefined
+                  ]
+                  return (
+                    path.join('.') === 'event.get' &&
+                    options?.input?.eventId === id &&
+                    state.status === 'success'
+                  )
+                })
+              )
+            }
+          }
+        }),
+      eventId
+    )
+
+  await expect.poll(isEventPersisted).toBe(true)
 }
 
 export const assertTexts = async ({
