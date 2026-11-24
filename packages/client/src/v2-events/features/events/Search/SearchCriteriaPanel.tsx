@@ -51,6 +51,11 @@ const SearchParamContainer = styled.div`
   color: ${({ theme }) => theme.colors.primaryDark};
 `
 
+/* A search criterion can be long, so its label wraps inside the pill. */
+const SearchParamPill = styled(Pill)`
+  white-space: normal;
+`
+
 function convertPathToLabel(path?: string): string {
   if (!path) {
     return ''
@@ -100,7 +105,14 @@ function SearchParamLabel({
       {':'} {valueOutput}
     </>
   )
-  return <Pill key={field.id} label={output} size="small" type="default"></Pill>
+  return (
+    <SearchParamPill
+      key={field.id}
+      label={output}
+      size="small"
+      type="default"
+    ></SearchParamPill>
+  )
 }
 
 export function SearchCriteriaPanel({
@@ -122,12 +134,12 @@ export function SearchCriteriaPanel({
   return (
     <>
       <SearchParamContainer>
-        <Pill
+        <SearchParamPill
           key={messagesToDefine.event.id}
           label={`${intl.formatMessage(messagesToDefine.event)}: ${convertPathToLabel(eventConfig.id)}`}
           size="small"
           type="default"
-        ></Pill>
+        ></SearchParamPill>
         {Object.entries(formValues).map(([key, value]) => (
           <SearchParamLabel
             key={key}
