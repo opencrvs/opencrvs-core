@@ -270,32 +270,49 @@ describe('defineConfig()', () => {
       )
     })
 
-    it('should reject two versions whose ids give the same search index name, naming the event and both ids', () => {
+    it('should reject a version id with characters other than a-z, 0-9 and underscores, naming the id', () => {
       expect(() =>
         defineConfig({
           id: eventId,
           label,
           advancedSearch,
-          versions: [
-            { ...v1, id: 'birth v1' },
-            { ...v2, id: 'Birth.V1' }
-          ]
+          versions: [v1, { ...v2, id: 'Birth-V2' }]
         })
       ).toThrow(
-        `Event '${eventId}' has versions 'birth v1' and 'Birth.V1', whose ids give the same search index name ('birth_v1').`
+        `Version id 'Birth-V2' must contain only lower-case letters (a-z), digits (0-9) and underscores (_).`
       )
     })
 
-    it('should accept two versions whose ids give different search index names', () => {
+    it('should accept a version id of lower-case letters, digits and underscores', () => {
       expect(() =>
         defineConfig({
           id: eventId,
           label,
           advancedSearch,
-          versions: [
-            { ...v1, id: 'birth-v1' },
-            { ...v2, id: 'birth_v1' }
-          ]
+          versions: [v1, { ...v2, id: 'birth_v2_2027' }]
+        })
+      ).not.toThrow()
+    })
+
+    it('should reject a version id longer than 64 characters, naming the id', () => {
+      const id = 'v'.repeat(65)
+      expect(() =>
+        defineConfig({
+          id: eventId,
+          label,
+          advancedSearch,
+          versions: [v1, { ...v2, id }]
+        })
+      ).toThrow(`Version id '${id}' must have at most 64 characters.`)
+    })
+
+    it('should accept a version id of 64 characters', () => {
+      expect(() =>
+        defineConfig({
+          id: eventId,
+          label,
+          advancedSearch,
+          versions: [v1, { ...v2, id: 'v'.repeat(64) }]
         })
       ).not.toThrow()
     })

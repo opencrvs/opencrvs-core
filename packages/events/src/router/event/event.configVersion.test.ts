@@ -303,7 +303,7 @@ describe('the event configuration version of a record', () => {
     // e.g. a version for digitising legacy records. Only the initial version has the custom action.
     await useVersions(
       withCustomAction(version(INITIAL_EVENT_CONFIG_VERSION_ID, PAST)),
-      version('legacy-1980', '1980-01-01')
+      version('legacy_1980', '1980-01-01')
     )
 
     await expect(

@@ -13,7 +13,6 @@ import {
   DEFAULT_EFFECTIVE_FROM,
   EventConfig,
   EventConfigInput,
-  getVersionIndexSegment,
   VersionedEventConfig
 } from './EventConfig'
 import { ActionType, WorkqueueActionType } from './ActionType'
@@ -463,30 +462,6 @@ function validateVersionIdsAreUnique(
   })
 }
 
-/** Each version has its own search index, named after its id. */
-function validateVersionIndexNamesAreUnique(
-  config: VersionedEventConfig,
-  ctx: VersionListCtx
-) {
-  /** Id of the first version with each search index name */
-  const versionIdByIndexSegment = new Map<string, string>()
-
-  config.versions.forEach((version, index) => {
-    const indexSegment = getVersionIndexSegment(version.id)
-    const sameIndexSegmentId = versionIdByIndexSegment.get(indexSegment)
-
-    if (sameIndexSegmentId === undefined) {
-      versionIdByIndexSegment.set(indexSegment, version.id)
-    } else if (sameIndexSegmentId !== version.id) {
-      ctx.addIssue({
-        code: 'custom',
-        message: `Event '${config.id}' has versions '${sameIndexSegmentId}' and '${version.id}', whose ids give the same search index name ('${indexSegment}'). Version ids must still differ once lower-cased and with every character other than a-z, 0-9, '-' and '_' replaced by '_'.`,
-        path: ['versions', index, 'id']
-      })
-    }
-  })
-}
-
 /** At most one version may omit `effectiveFrom` (effective from the beginning of time). */
 function validateVersionEffectiveFromsAreUnique(
   config: VersionedEventConfig,
@@ -518,14 +493,12 @@ function validateVersionEffectiveFromsAreUnique(
 }
 
 /**
- * Versions are told apart by `id`, by search index name and by `effectiveFrom`: no two
- * versions may share any of them.
+ * Versions are told apart by `id` and by `effectiveFrom`: no two versions may share either of them.
  */
 export function validateVersionList(
   config: VersionedEventConfig,
   ctx: VersionListCtx
 ) {
   validateVersionIdsAreUnique(config, ctx)
-  validateVersionIndexNamesAreUnique(config, ctx)
   validateVersionEffectiveFromsAreUnique(config, ctx)
 }

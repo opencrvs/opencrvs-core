@@ -113,7 +113,7 @@ export type EventConfigVersionInput = Omit<
   EventConfigSchemaInput,
   EventLevelField
 > & {
-  /** Identifier of the version, unique within the event (e.g. "birth-v2"). */
+  /** Identifier of the version, unique within the event (e.g. "birth_v2"). Only lower-case letters (a-z), digits (0-9) and underscores (_), at most 64 characters. */
   id: string
   /** Name of the version, which the UI shows wherever it names the version. For example, `{event.configVersionLabel}` in the event summary. */
   label: TranslationConfig
@@ -273,8 +273,16 @@ const _EventConfigVersion: z.ZodType<
 > = z.object({
   id: z
     .string()
+    .regex(/^[a-z0-9_]+$/, {
+      error: (issue) =>
+        `Version id '${String(issue.input)}' must contain only lower-case letters (a-z), digits (0-9) and underscores (_).`
+    })
+    .max(64, {
+      error: (issue) =>
+        `Version id '${String(issue.input)}' must have at most 64 characters.`
+    })
     .describe(
-      'Identifier of the version, unique within the event (e.g. "birth-v2").'
+      'Identifier of the version, unique within the event (e.g. "birth_v2"). It can contain only lower-case letters (a-z), digits (0-9) and underscores (_), and at most 64 characters.'
     ),
   label: TranslationConfig.describe(
     'Name of the version, which the UI shows wherever it names the version. For example, "{event.configVersionLabel}" in the event summary.'
@@ -363,14 +371,6 @@ export function getEventConfigOfVersion(
   versionId: string
 ): EventConfig {
   return toEventConfig(config, getConfigVersion(config, versionId))
-}
-
-/**
- * @returns `versionId` as it appears in the name of the version's search index:
- * lower-cased, with every character other than a-z, 0-9, '-' and '_' replaced by '_'.
- */
-export function getVersionIndexSegment(versionId: string) {
-  return versionId.toLowerCase().replace(/[^a-z0-9_-]/g, '_')
 }
 
 /** Orders versions by `effectiveFrom`, earliest first. */

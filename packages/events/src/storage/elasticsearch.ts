@@ -9,7 +9,6 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import * as elasticsearch from '@elastic/elasticsearch'
-import { getVersionIndexSegment } from '@opencrvs/commons/events'
 import { env } from '@events/environment'
 import { FIELD_ID_SEPARATOR } from '@events/service/indexing/utils'
 
@@ -40,7 +39,7 @@ export function getEventIndexName(eventType: string) {
 
 /** Name under which the records of one version of an event are indexed. */
 export function getEventVersionIndexName(eventType: string, versionId: string) {
-  return `${getEventIndexName(eventType)}_${getVersionIndexSegment(versionId)}`
+  return `${getEventIndexName(eventType)}_${versionId}`
 }
 
 /** Name of the index a reindex builds for one version of an event, before it goes live. */

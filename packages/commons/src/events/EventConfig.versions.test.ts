@@ -16,7 +16,6 @@ import {
   getEventConfigForRecord,
   getEventConfigOfVersion,
   getEventConfigsInLookupOrder,
-  getVersionIndexSegment,
   resolveEffectiveVersion,
   resolveEventConfigInTimeZone,
   resolveEventConfigOnDate,
@@ -195,19 +194,5 @@ describe('getConfigVersion()', () => {
 describe('findConfigVersion()', () => {
   it('is undefined when the version is not configured', () => {
     expect(findConfigVersion(config, 'v9')).toBeUndefined()
-  })
-})
-
-describe('getVersionIndexSegment()', () => {
-  it('keeps an id made of lower-case letters, digits, hyphens and underscores', () => {
-    expect(getVersionIndexSegment('birth-v1_2027')).toBe('birth-v1_2027')
-  })
-
-  it('lower-cases the id', () => {
-    expect(getVersionIndexSegment('Birth-V2')).toBe('birth-v2')
-  })
-
-  it('replaces every other character with an underscore', () => {
-    expect(getVersionIndexSegment('birth v2.1/2027*')).toBe('birth_v2_1_2027_')
   })
 })

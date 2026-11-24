@@ -12,7 +12,6 @@ import { Client } from 'pg'
 import { inject, vi } from 'vitest'
 import {
   getDeclarationFields,
-  getVersionIndexSegment,
   INITIAL_EVENT_CONFIG_VERSION_ID,
   TENNIS_CLUB_MEMBERSHIP
 } from '@opencrvs/commons/events'
@@ -48,7 +47,7 @@ async function resetESServer() {
   getEventIndexName.mockImplementation((type: string) => type + '_' + id)
   getEventVersionIndexName.mockImplementation(
     (type: string, versionId: string) =>
-      `${getEventIndexName(type)}_${getVersionIndexSegment(versionId)}`
+      `${getEventIndexName(type)}_${versionId}`
   )
   getEventAliasName.mockReturnValue('events_' + id)
   getReindexingStatusIndexName.mockReturnValue('reindexing_status_' + id)
