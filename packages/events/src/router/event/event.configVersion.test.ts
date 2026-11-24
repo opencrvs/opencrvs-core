@@ -409,6 +409,31 @@ describe('the event configuration version of a record', () => {
     expect(results.map(({ id }) => id)).toEqual([event.id])
   })
 
+  test('search finds a record of a version that is added while the service runs', async () => {
+    await useVersions(version('v1'))
+    const { user, generator } = await setupTestCase()
+    const client = createTestClient(user, SEARCH_SCOPES)
+
+    // Countryconfig serves v2 without a restart, so the startup check did not create its index.
+    // v2 takes effect in 2010 and v1 in year 1, so a new record gets v2.
+    const config: VersionedEventConfig = {
+      ...eventLevel,
+      versions: [version('v1'), version('v2', PAST)]
+    }
+    mswServer.use(
+      http.get(`${env.COUNTRY_CONFIG_URL}/config/events`, () =>
+        HttpResponse.json([config])
+      )
+    )
+
+    const declared = await createEvent(client, generator, [ActionType.DECLARE])
+    const { results } = await client.event.search({
+      query: { type: 'and', clauses: [{ id: declared.id }] }
+    })
+
+    expect(results).toMatchObject([{ id: declared.id, configVersionId: 'v2' }])
+  })
+
   test('a workqueue count filters by a field that only an older version has', async () => {
     const { client } = await declareRecordWithNicknameOfOlderVersion()
 

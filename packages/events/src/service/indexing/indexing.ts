@@ -499,6 +499,36 @@ export async function ensureIndexExists(
   }
 }
 
+/** Runs of `ensureIndexExists`, by the index names of the versions that they cover. */
+const versionIndexChecks = new Map<string, Promise<void>>()
+
+/**
+ * Runs `ensureIndexExists` once per process for each set of versions. A version can be
+ * added to the configuration while the service runs. A write to an index that does not
+ * exist creates it without the mapping and the aliases that search uses.
+ */
+export async function ensureVersionIndicesExist(
+  eventConfiguration: VersionedEventConfig
+) {
+  const key = eventConfiguration.versions
+    .map(({ id }) => getEventVersionIndexName(eventConfiguration.id, id))
+    .join(',')
+
+  const existing = versionIndexChecks.get(key)
+  if (existing) {
+    return existing
+  }
+
+  const check = ensureIndexExists(eventConfiguration).catch(
+    (error: unknown) => {
+      versionIndexChecks.delete(key)
+      throw error
+    }
+  )
+  versionIndexChecks.set(key, check)
+  return check
+}
+
 type _Combine<
   T,
   K extends PropertyKey = T extends unknown ? keyof T : never
@@ -591,10 +621,13 @@ export async function indexEventsInBulk(
 
 export async function indexEvent(
   event: EventDocument,
-  config: EventConfig,
+  versionedConfig: VersionedEventConfig,
   waitFor: boolean
 ) {
+  await ensureVersionIndicesExist(versionedConfig)
+
   const esClient = getOrCreateClient()
+  const config = getEventConfigForRecord(versionedConfig, event)
   const indexName = getEventVersionIndexName(event.type, event.configVersionId)
   const eventIndex = eventToEventIndex(event, config)
 
