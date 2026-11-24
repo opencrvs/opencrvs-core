@@ -2,6 +2,10 @@
 
 ## 1.9.24
 
+### Improvements
+
+- The events service now validates and serializes the event configurations once and reuses the result for every request that gets them, until the configurations change. Before, each request validated and serialized the full configurations again. This could take most of the CPU of a busy events service, so that all requests were slow. [#14194](https://github.com/opencrvs/opencrvs-core/issues/14194)
+
 ## 1.9.23
 
 ### Bug fixes
