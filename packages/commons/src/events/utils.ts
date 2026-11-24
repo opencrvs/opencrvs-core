@@ -392,10 +392,11 @@ export function isPageVisible(
  * Removes the values of hidden fields from the declaration and the annotation of the form.
  * Only the values of `fields` are checked. Other values stay as they are.
  *
- * Visibility is checked against the values that are left, so the loop runs until the form
- * does not change. A removed value can hide other fields.
+ * A removed value can change the visibility of other fields.
+ * Thus the function removes the hidden values again until the result does not change.
  *
  * @param fields - The field configurations to check visibility against
+ * @param includeHiddenFieldsWithNullValues - When `true`, a hidden field with the value `null` stays in the form
  * @returns The form without the values of hidden fields
  */
 export function omitHiddenFields(
@@ -404,19 +405,23 @@ export function omitHiddenFields(
   context: ActionFormConditionalContext,
   includeHiddenFieldsWithNullValues: boolean = false
 ): FormValues {
-  function fn(prevForm: FormValues): FormValues {
-    const shouldOmit = (value: unknown, fieldId: string) => {
-      const fieldConfig = fields.filter((f) => f.id === fieldId)
+  // A deep copy, so that the result does not share nested values (e.g. an address) with the input.
+  const formCopy = cloneDeep(form)
 
-      if (!fieldConfig.length) {
+  function removeHiddenValues(formForVisibility: FormValues): FormValues {
+    const isHiddenValue = (value: unknown, fieldId: string) => {
+      const fieldsWithId = fields.filter((field) => field.id === fieldId)
+
+      if (fieldsWithId.length === 0) {
         return false
       }
 
-      const isHidden = fieldConfig.every(
-        (f) => !isFieldVisible(f, prevForm, context)
+      // Fields can have the same id. The value is hidden only when all of these fields are hidden.
+      const allFieldsHidden = fieldsWithId.every(
+        (field) => !isFieldVisible(field, formForVisibility, context)
       )
 
-      if (!isHidden) {
+      if (!allFieldsHidden) {
         return false
       }
 
@@ -427,12 +432,19 @@ export function omitHiddenFields(
       return true
     }
 
-    const cleaned = mapValues(form, (values) => omitBy(values, shouldOmit))
+    // Remove the hidden values from the declaration and from the annotation.
+    const formWithoutHiddenValues = mapValues(formCopy, (values) =>
+      omitBy(values, isHiddenValue)
+    )
 
-    return isEqual(cleaned, prevForm) ? cleaned : fn(cleaned)
+    if (isEqual(formWithoutHiddenValues, formForVisibility)) {
+      return formWithoutHiddenValues
+    }
+
+    return removeHiddenValues(formWithoutHiddenValues)
   }
 
-  return fn(form)
+  return removeHiddenValues(formCopy)
 }
 
 /**
@@ -444,27 +456,31 @@ export function omitHiddenPaginatedFields(
   context: ActionFormConditionalContext,
   includeHiddenFieldsWithNullValues: boolean = false
 ): FormValues {
-  const visibleFields = formConfig.pages
-    .filter((p) => isPageVisible(p, form, context))
-    .flatMap((p) => p.fields)
+  const visiblePages = formConfig.pages.filter((page) =>
+    isPageVisible(page, form, context)
+  )
+  const hiddenPages = formConfig.pages.filter(
+    (page) => !isPageVisible(page, form, context)
+  )
 
-  const hiddenFields = formConfig.pages
-    .filter((p) => !isPageVisible(p, form, context))
-    .flatMap((p) => p.fields)
+  const fieldsOnVisiblePages = visiblePages.flatMap((page) => page.fields)
+  const fieldsOnHiddenPages = hiddenPages.flatMap((page) => page.fields)
 
-  const isOnHiddenPageOnly = (_: unknown, fieldId: string) =>
-    hiddenFields.some((f) => f.id === fieldId) &&
-    !visibleFields.some((f) => f.id === fieldId)
+  // A field id can be on more than one page.
+  // The value is removed only when no visible page has a field with the same id.
+  const isOnHiddenPageOnly = (_value: unknown, fieldId: string) =>
+    fieldsOnHiddenPages.some((field) => field.id === fieldId) &&
+    !fieldsOnVisiblePages.some((field) => field.id === fieldId)
 
-  const formExceptHiddenPage = mapValues(form, (values) =>
+  const formWithoutHiddenPages = mapValues(form, (values) =>
     omitBy(values, isOnHiddenPageOnly)
   )
 
-  // Visibility is checked against the form without the hidden pages.
-  // Otherwise fields on a hidden page would count as visible.
+  // Field visibility is checked against the form without the hidden pages.
+  // Otherwise a value on a hidden page could make a field visible.
   return omitHiddenFields(
-    visibleFields,
-    formExceptHiddenPage,
+    fieldsOnVisiblePages,
+    formWithoutHiddenPages,
     context,
     includeHiddenFieldsWithNullValues
   )
