@@ -55,14 +55,11 @@ import {
   applyTextEdits,
   findProperty,
   findToolkitImportName,
-  indentationOf,
-  insertAt,
+  insertIntoAction,
   isAction,
   isToolkitDefineConfigCall,
-  layoutOf,
   location,
   mayBeAction,
-  restOfLine,
   TextEdit
 } from './utils'
 
@@ -145,49 +142,6 @@ function findNotifyAction(config: ObjectLiteralExpression, actions: Node[]) {
   }
 
   return candidates[0]
-}
-
-/**
- * Returns the edit inserting the properties into the action after its `label`,
- * or after its `type` when it has no `label`, in the action's own layout: on
- * lines of their own at the anchor's indentation, or inline when the action is
- * on one line.
- */
-function insertIntoAction(
-  action: ObjectLiteralExpression,
-  properties: string[]
-): TextEdit[] {
-  // `type` is always there: it is how the action was found
-  const anchor =
-    action.getProperty('label') ?? action.getPropertyOrThrow('type')
-
-  const text = action.getSourceFile().getFullText()
-  const anchorLayout = layoutOf(anchor)
-  const indent = indentationOf(anchor)
-
-  if (anchorLayout.ownsLines) {
-    const position =
-      anchorLayout.end + restOfLine(text, anchorLayout.end).length
-    const lines = properties.map((property) => `\n${indent}${property}`)
-
-    if (anchorLayout.hasComma) {
-      return [insertAt(position, `${lines.join(',')},`)]
-    }
-
-    // The anchor was the last property: it needs a comma now
-    return position === anchor.getEnd()
-      ? [insertAt(position, `,${lines.join(',')}`)]
-      : [insertAt(anchor.getEnd(), ','), insertAt(position, lines.join(','))]
-  }
-
-  const separator = action.getText().includes('\n') ? `,\n${indent}` : ', '
-
-  return [
-    insertAt(
-      anchor.getEnd(),
-      properties.map((property) => `${separator}${property}`).join('')
-    )
-  ]
 }
 
 /**

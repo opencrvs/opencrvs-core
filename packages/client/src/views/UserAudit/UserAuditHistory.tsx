@@ -263,12 +263,14 @@ function UserAuditHistoryComponent(props: Props) {
         actionType: ActionType.CUSTOM,
         customActionType: entry.requestData.customAction
       })
-      if (actionConfig?.type === ActionType.CUSTOM) {
+
+      if (actionConfig) {
         return props.intl.formatMessage(actionConfig.auditHistoryLabel)
       }
-      // This will not be needed once getActionConfig() returns typed config
+
       return entry.requestData.customAction
     }
+
     const actionDescriptor = getUserAuditDescription(entry.operation)
     return actionDescriptor
       ? props.intl.formatMessage(actionDescriptor)

@@ -50,7 +50,7 @@ const generatedNotifyAction = (() => {
     actionType: ActionType.NOTIFY
   })
 
-  if (action?.type !== ActionType.NOTIFY) {
+  if (!action) {
     throw new Error('Expected a NOTIFY action')
   }
 

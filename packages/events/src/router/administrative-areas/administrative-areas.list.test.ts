@@ -18,9 +18,11 @@ import {
 } from '@opencrvs/commons'
 import {
   createInitialisationTestClient,
+  createSystemTestClient,
   createTestClient,
   setupTestCase,
-  systemInitialisationTestSetup
+  systemInitialisationTestSetup,
+  TEST_SYSTEM_ID
 } from '@events/tests/utils'
 import { getClient } from '@events/storage/postgres/events'
 
@@ -197,6 +199,15 @@ test('Filters administrative areas by active status', async () => {
 })
 
 describe('sync', () => {
+  test('Rejects a system user, because only the client syncs', async () => {
+    await setupTestCase()
+    const client = createSystemTestClient(TEST_SYSTEM_ID, [])
+
+    await expect(client.administrativeAreas.sync({})).rejects.toThrow(
+      'FORBIDDEN'
+    )
+  })
+
   test('Returns updatedAt at millisecond precision on every administrative area', async () => {
     const { user } = await setupTestCase()
     const client = createTestClient(user, [])
