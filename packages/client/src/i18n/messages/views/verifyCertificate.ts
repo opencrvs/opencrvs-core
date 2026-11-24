@@ -12,64 +12,14 @@ import { defineMessages, MessageDescriptor } from 'react-intl'
 
 interface IVerifyCertificateMessages
   extends Record<string | number | symbol, MessageDescriptor> {
-  loadingState: MessageDescriptor
-  timeOutState: MessageDescriptor
-  successAlertTitle: MessageDescriptor
-  successAlertMessage: MessageDescriptor
-  errorAlertTitle: MessageDescriptor
-  errorAlertMessage: MessageDescriptor
-  successUrlValidation: MessageDescriptor
   fullName: MessageDescriptor
   dateOfBirth: MessageDescriptor
-  dateOfDeath: MessageDescriptor
-  sex: MessageDescriptor
   placeOfBirth: MessageDescriptor
-  placeOfDeath: MessageDescriptor
-  registrationCenter: MessageDescriptor
-  registar: MessageDescriptor
   brn: MessageDescriptor
-  drn: MessageDescriptor
-  certifiedAt: MessageDescriptor
   toastMessage: MessageDescriptor
 }
 
 const messagesToDefine: IVerifyCertificateMessages = {
-  loadingState: {
-    id: 'verifyCertificate.loading',
-    defaultMessage: 'Verifying certificate',
-    description: 'message when verification is checking'
-  },
-  timeOutState: {
-    id: 'verifyCertificate.timeOut',
-    defaultMessage: 'You been timed out',
-    description: 'message when time out after few minute'
-  },
-  successAlertTitle: {
-    id: 'verifyCertificate.successTitle',
-    defaultMessage: 'Valid QR code',
-    description: 'title for success alert'
-  },
-  successAlertMessage: {
-    id: 'verifyCertificate.successMessage',
-    defaultMessage:
-      'Compare the partial details of the record below against those against those recorded on the certificate',
-    description: 'message for success alert'
-  },
-  errorAlertTitle: {
-    id: 'verifyCertificate.errorTitle',
-    defaultMessage: 'Invalid QR code',
-    description: 'title for error alert'
-  },
-  errorAlertMessage: {
-    id: 'verifyCertificate.errorMessage',
-    defaultMessage: 'The certificate is a potential forgery please...',
-    description: 'message for error alert'
-  },
-  successUrlValidation: {
-    id: 'verifyCertificate.successUrl',
-    defaultMessage: 'URL Verification',
-    description: 'title for success alert for url validation'
-  },
   fullName: {
     id: 'verifyCertificate.fullname',
     defaultMessage: 'Full Name',
@@ -80,61 +30,21 @@ const messagesToDefine: IVerifyCertificateMessages = {
     defaultMessage: 'Date of birth',
     description: 'Label for date of birth'
   },
-  dateOfDeath: {
-    id: 'verifyCertificate.dateOfDeath',
-    defaultMessage: 'Date of death',
-    description: 'Label for date of death'
-  },
-  sex: {
-    id: 'verifyCertificate.sex',
-    defaultMessage: 'Sex',
-    description: 'Label for sex'
-  },
   placeOfBirth: {
     id: 'verifyCertificate.placeOfBirth',
     defaultMessage: 'Place of birth',
     description: 'Label for place of birth'
-  },
-  placeOfDeath: {
-    id: 'verifyCertificate.placeOfDeath',
-    defaultMessage: 'Place of death',
-    description: 'Label for place of death'
-  },
-  registrationCenter: {
-    id: 'verifyCertificate.registrationCenter',
-    defaultMessage: 'Registration Center',
-    description: 'Label for registration center'
-  },
-  registar: {
-    id: 'verifyCertificate.registar',
-    defaultMessage: 'Name of registar',
-    description: 'Label for name of registar center'
-  },
-  certifiedAt: {
-    id: 'verifyCertificate.certifiedAt',
-    defaultMessage: 'Date of certification',
-    description: 'Label for date of certification'
   },
   brn: {
     id: 'verifyCertificate.brn',
     defaultMessage: 'BRN',
     description: 'Label for Birth Registration Number'
   },
-  drn: {
-    id: 'verifyCertificate.drn',
-    defaultMessage: 'DRN',
-    description: 'Label for Death Registration Number'
-  },
   toastMessage: {
     id: 'verifyCertificate.toastMessage',
     defaultMessage:
       'After verifying the certificate, please close the browser window',
     description: 'Message for the toast when time spend 1 minute'
-  },
-  female: {
-    defaultMessage: 'Female',
-    description: 'Option for form field: Sex name',
-    id: 'verifyCertificate.sexFemale'
   },
   male: {
     defaultMessage: 'Male',

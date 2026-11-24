@@ -82,6 +82,7 @@ export function LanguageSelect() {
       {languageOptions.length > 1 && (
         <SelectContainer>
           <Select2
+            id="language-select"
             value={selectedLanguage}
             options={languageOptions}
             onChange={onLanguageChange}

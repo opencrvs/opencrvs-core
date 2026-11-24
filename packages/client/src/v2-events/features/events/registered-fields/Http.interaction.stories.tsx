@@ -9,8 +9,8 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import type { Meta, StoryObj } from '@storybook/react'
-import { userEvent, within, expect, waitFor } from '@storybook/test'
+import type { Meta, StoryObj } from '@storybook/react-vite'
+import { userEvent, within, expect, waitFor } from 'storybook/test'
 import React from 'react'
 import styled from 'styled-components'
 import { http, HttpResponse } from 'msw'
@@ -22,7 +22,8 @@ import {
   ConditionalType,
   never,
   user,
-  FieldConfig
+  FieldConfig,
+  toPlainDate
 } from '@opencrvs/commons/client'
 import { TRPCProvider } from '@client/v2-events/trpc'
 import {
@@ -474,7 +475,7 @@ export const HttpTextResponseInCopy: StoryObj<typeof Review> = {
   },
   render: function Component() {
     const allFields = fetchNidFields.flat()
-    const stringifier = useFormDataStringifier()
+    const stringifier = useFormDataStringifier(toPlainDate('2025-01-01'))
     const flattenedIntl = useIntlFormatMessageWithFlattenedParams()
 
     const FORM_DATA = {

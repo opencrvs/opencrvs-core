@@ -1,9 +1,8 @@
 {{ if and .Values.postgres.enabled (eq (include "postgres.restore_enabled" .) "true") }}
-{{- $run_as_cronjob := or .Values.restore.cronjob .Values.postgres.restore.cronjob }}
 {{ if eq .Values.postgres.restore.type "dump" }}
 ---
 apiVersion: batch/v1
-{{- if $run_as_cronjob }}
+{{- if .Values.restore.cronjob }}
 kind: CronJob
 {{- else }}
 kind: Job
@@ -14,7 +13,7 @@ metadata:
     app: postgres
     job-type: restore
 spec:
-  {{- if $run_as_cronjob }}
+  {{- if .Values.restore.cronjob }}
   schedule: {{ default .Values.restore.schedule .Values.postgres.restore.schedule }}
   {{- if .Values.timezone }}
   timeZone: {{ .Values.timezone }}
@@ -28,10 +27,11 @@ spec:
             app: postgres
             job-type: restore
         spec:
+          {{- include "opencrvs.imagePullSecrets" (dict "root" . "service" .Values.postgres) | nindent 10 }}
           restartPolicy: OnFailure
           containers:
             - name: restore
-              image: {{ .Values.postgres.image }}
+              image: {{ include "opencrvs.imageReference" .Values.postgres }}
               env:
                 - name: POSTGRES_HOST
                   value: postgres-0.postgres.{{ .Release.Namespace }}.svc.cluster.local
@@ -65,10 +65,7 @@ spec:
                       name: {{ .Values.restore.backup_server_secret }}
                       key: user
                 - name: BACKUP_HOST
-                  valueFrom:
-                    secretKeyRef:
-                      name: {{ .Values.restore.backup_server_secret }}
-                      key: host
+                  value: {{ default .Values.restore.host .Values.postgres.restore.host }}
                 - name: BACKUP_REMOTE_DIR
                   value: {{ default .Values.restore.backup_server_dir .Values.postgres.restore.server_dir }}
               {{- include "render-env-vars" (dict "service_name" "restore" "Values" .Values) | nindent 4 }}
@@ -95,15 +92,18 @@ spec:
 {{- if eq .Values.postgres.restore.type "differential" }}
 ---
 apiVersion: batch/v1
-{{- if $run_as_cronjob }}
+{{- if .Values.restore.cronjob }}
 kind: CronJob
 {{- else }}
 kind: Job
 {{- end }}
 metadata:
   name: postgres-restore
+  labels:
+    app: backup-runner
+    job-type: restore
 spec:
-  {{- if $run_as_cronjob }}
+  {{- if .Values.restore.cronjob }}
   schedule: {{ default .Values.restore.schedule .Values.postgres.restore.schedule }}
   {{- if .Values.timezone }}
   timeZone: {{ .Values.timezone }}
@@ -112,11 +112,16 @@ spec:
     spec:
   {{- end }}
       template:
+        metadata:
+          labels:
+            app: backup-runner
+            job-type: restore
         spec:
+          {{- include "opencrvs.imagePullSecrets" (dict "root" . "service" .Values.postgres) | nindent 10 }}
           serviceAccountName: backup-runner
           containers:
             - name: runner
-              image: bitnami/kubectl:latest
+              image: {{ include "opencrvs.imageReference" .Values.utilities }}
               command:
                 - /bin/sh
                 - -c
@@ -140,7 +145,7 @@ spec:
                   kubectl exec postgres-restore-runner -- \
                     rm -rf /var/lib/postgresql/data/*
                   kubectl exec postgres-restore-runner -- \
-                    pgbackrest --stanza="{{ .Values.postgres.backup.stanza }}" restore --delta --force || exit 1
+                    su postgres -c 'pgbackrest --stanza="{{ .Values.postgres.backup.stanza }}" restore --delta --force' || exit 1
                   kubectl scale statefulset postgres --replicas=1
               volumeMounts:
                 - mountPath: /manifests

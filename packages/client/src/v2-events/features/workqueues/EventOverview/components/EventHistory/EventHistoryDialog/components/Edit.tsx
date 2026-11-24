@@ -37,7 +37,8 @@ function EditComponent({
   validatorContext: ValidatorContext
 }) {
   const { eventConfiguration } = useEventConfiguration(fullEvent.type)
-  const comment = action.content.comment
+  // content.comment is a deprecated field that was used on 2.0
+  const comment = action.content?.comment
   const intl = useIntl()
 
   return (

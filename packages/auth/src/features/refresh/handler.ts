@@ -11,32 +11,42 @@
 import * as Hapi from '@hapi/hapi'
 import * as Joi from 'joi'
 import { unauthorized } from '@hapi/boom'
-import { verifyToken, ITokenPayload } from '@auth/features/authenticate/service'
+import { TokenUserType, logger } from '@opencrvs/commons'
+import { verifyRefreshToken } from '@auth/features/authenticate/service'
 import { refreshToken } from '@auth/features/refresh/service'
 
 interface IRefreshPayload {
-  nonce: string
   token: string
 }
 
 export default async function refreshHandler(request: Hapi.Request) {
   const { token } = request.payload as IRefreshPayload
 
-  const decodedOrError = verifyToken(token)
+  const decodedOrError = verifyRefreshToken(token)
   if (decodedOrError._tag === 'Left') {
     return unauthorized()
   }
 
-  const decoded = decodedOrError.right
+  const { sub, userType, familyId, jti } = decodedOrError.right
 
-  const newToken = await refreshToken(decoded as ITokenPayload)
-  return { token: newToken }
+  try {
+    const tokens = await refreshToken(
+      sub,
+      userType as TokenUserType,
+      familyId,
+      jti
+    )
+    return tokens
+  } catch (err) {
+    logger.error(`Failed to refresh token: ${err}`)
+    return unauthorized()
+  }
 }
 
 export const requestSchema = Joi.object({
-  nonce: Joi.string(),
   token: Joi.string()
 })
 export const responseSchma = Joi.object({
-  token: Joi.string()
+  token: Joi.string(),
+  refreshToken: Joi.string()
 })

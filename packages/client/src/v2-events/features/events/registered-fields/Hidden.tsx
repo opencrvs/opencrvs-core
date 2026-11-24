@@ -25,7 +25,5 @@ function HiddenInput({ id, value }: { id: string; value?: string }) {
 
 export const Hidden = {
   Input: HiddenInput,
-  stringify: (value: string | undefined) => {
-    return value?.toString() || ''
-  }
+  Output: null
 }

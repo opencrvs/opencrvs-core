@@ -17,7 +17,14 @@ import {
 import { registerRoute, NavigationRoute } from 'workbox-routing'
 import { NetworkFirst, CacheFirst } from 'workbox-strategies'
 import { clientsClaim } from 'workbox-core'
+import { WorkboxPlugin } from 'workbox-core/types'
 import { MINIO_REGEX } from '@opencrvs/commons/client'
+
+// "App shell" = the SPA's index.html, served for any unmatched route. True
+// if a document's URL got poisoned with that HTML instead of the real file.
+function isAppShellResponse(response: Response) {
+  return (response.headers.get('content-type') ?? '').startsWith('text/html')
+}
 
 self.__WB_DISABLE_DEV_LOGS = true
 
@@ -49,7 +56,7 @@ cleanupOutdatedCaches()
  * As the config file can change after the app is built, we cannot precache it
  * as we do with other assets. Instead, we use the NetworkFirst strategy that
  * tries to load the file, but falls back to the cached version. This version is updated
- * when a new version is succesfully loaded.
+ * when a new version is successfully loaded.
  * https://developers.google.com/web/tools/workbox/modules/workbox-strategies#network_first_network_falling_back_to_cache
  */
 
@@ -70,8 +77,29 @@ registerRoute(/http(.+)config$/, new NetworkFirst())
 // This caches certificates fetched from the countryconfig microservice
 registerRoute(/api\/countryconfig\/certificates/, new NetworkFirst())
 
+// Refuses to cache an app-shell response under a document's URL, and drops one already cached.
+const documentsOnly: WorkboxPlugin = {
+  cacheWillUpdate: async ({ response }) =>
+    isAppShellResponse(response) ? null : response,
+
+  // Repairs entries poisoned by an earlier version: dropping the entry and
+  // returning nothing makes CacheFirst fall through to the network.
+  cachedResponseWillBeUsed: async ({ cachedResponse, cacheName, request }) => {
+    if (!cachedResponse || !isAppShellResponse(cachedResponse)) {
+      return cachedResponse
+    }
+
+    const cache = await caches.open(cacheName)
+    // eslint-disable-next-line no-console
+    console.log('deleting app-shell response from cache')
+    await cache.delete(request)
+
+    return undefined
+  }
+}
+
 // This caches the minio urls
-registerRoute(MINIO_REGEX, new CacheFirst())
+registerRoute(MINIO_REGEX, new CacheFirst({ plugins: [documentsOnly] }))
 
 /*
  *   Alternate for navigateFallback & navigateFallbackBlacklist

@@ -24,12 +24,16 @@ spec:
       app: mosip-mock
   template:
     metadata:
+      annotations:
+        lastdeploy-timestamp: {{ now | quote }}
       labels:
         app: mosip-mock
     spec:
+      {{- include "opencrvs.imagePullSecrets" (dict "root" . "service" .Values.mosip_mock) | nindent 6 }}
       containers:
         - name: mosip-mock
-          image: {{ .Values.mosip_mock.image.repository }}:{{ .Values.mosip_mock.image.tag }}
+          image: {{ include "opencrvs.image" (dict "root" . "service" .Values.mosip_mock) }}
+          imagePullPolicy: {{ .Values.mosip_mock.image.pullPolicy | default .Values.platform.imagePullPolicy }}
           env:
             - name: MOSIP_WEBSUB_CALLBACK_URL
               value: http://mosip-api.{{ .Release.Namespace }}.svc.cluster.local:2024/websub/callback

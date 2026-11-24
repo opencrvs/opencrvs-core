@@ -10,8 +10,19 @@
  */
 
 import { TRPCError } from '@trpc/server'
-import { ActionType, encodeScope, getUUID } from '@opencrvs/commons'
+import { http, HttpResponse } from 'msw'
+import {
+  ActionStatus,
+  ActionType,
+  encodeScope,
+  EventStatus,
+  getCurrentEventState,
+  getUUID
+} from '@opencrvs/commons'
+import { tennisClubMembershipEvent } from '@opencrvs/commons/fixtures'
 import { createTestClient, setupTestCase } from '@events/tests/utils'
+import { mswServer } from '@events/tests/msw'
+import { env } from '@events/environment'
 
 test(`prevents forbidden access if missing required scope`, async () => {
   const { user, generator } = await setupTestCase()
@@ -114,6 +125,83 @@ test(`should only contain ${ActionType.ARCHIVE} action if not marked as duplicat
   expect(actions.at(-3)).not.toStrictEqual(ActionType.MARK_AS_DUPLICATE)
 })
 
+test(`${ActionType.ARCHIVE} stores no reason when none is given`, async () => {
+  const { user, generator } = await setupTestCase()
+  const client = createTestClient(user)
+
+  const originalEvent = await client.event.create(generator.event.create())
+
+  const createAction = originalEvent.actions.filter(
+    (action) => action.type === ActionType.CREATE
+  )
+
+  const assignmentInput = generator.event.actions.assign(originalEvent.id, {
+    assignedTo: createAction[0].createdBy
+  })
+
+  await client.event.actions.assignment.assign(assignmentInput)
+  await client.event.actions.declare.request(
+    generator.event.actions.declare(originalEvent.id)
+  )
+  await client.event.actions.assignment.assign({
+    ...assignmentInput,
+    transactionId: getUUID()
+  })
+
+  const event = await client.event.actions.archive.request(
+    generator.event.actions.archive(originalEvent.id)
+  )
+
+  const archiveActions = event.actions.flatMap((action) =>
+    action.type === ActionType.ARCHIVE &&
+    action.status === ActionStatus.Accepted
+      ? [action]
+      : []
+  )
+
+  expect(archiveActions).toHaveLength(1)
+  expect(archiveActions[0].content).toBeUndefined()
+})
+
+test(`${ActionType.ARCHIVE} keeps the reason when one is given`, async () => {
+  const { user, generator } = await setupTestCase()
+  const client = createTestClient(user)
+
+  const originalEvent = await client.event.create(generator.event.create())
+
+  const createAction = originalEvent.actions.filter(
+    (action) => action.type === ActionType.CREATE
+  )
+
+  const assignmentInput = generator.event.actions.assign(originalEvent.id, {
+    assignedTo: createAction[0].createdBy
+  })
+
+  await client.event.actions.assignment.assign(assignmentInput)
+  await client.event.actions.declare.request(
+    generator.event.actions.declare(originalEvent.id)
+  )
+  await client.event.actions.assignment.assign({
+    ...assignmentInput,
+    transactionId: getUUID()
+  })
+
+  const event = await client.event.actions.archive.request({
+    ...generator.event.actions.archive(originalEvent.id),
+    content: { reason: 'Duplicate of TEST123' }
+  })
+
+  const archiveActions = event.actions.flatMap((action) =>
+    action.type === ActionType.ARCHIVE &&
+    action.status === ActionStatus.Accepted
+      ? [action]
+      : []
+  )
+
+  expect(archiveActions).toHaveLength(1)
+  expect(archiveActions[0].content).toEqual({ reason: 'Duplicate of TEST123' })
+})
+
 test(`${ActionType.ARCHIVE} action is idempotent`, async () => {
   const { user, generator } = await setupTestCase()
   const client = createTestClient(user)
@@ -148,4 +236,169 @@ test(`${ActionType.ARCHIVE} action is idempotent`, async () => {
     await client.event.actions.archive.request(archivePayload)
 
   expect(firstResponse).toEqual(secondResponse)
+})
+
+describe('3rd party integration confirmation behaviour', () => {
+  function mockActionApi(action: ActionType, status: number) {
+    return mswServer.use(
+      http.post<never, { actionId: string }>(
+        `${env.COUNTRY_CONFIG_URL}/trigger/events/tennis-club-membership/actions/${action}`,
+        () => {
+          return HttpResponse.json({}, { status })
+        }
+      )
+    )
+  }
+
+  test('Throws when integration responds with 202 when keepAssignment is given', async () => {
+    mockActionApi(ActionType.ARCHIVE, 202)
+    const { generator, user } = await setupTestCase()
+
+    const client = createTestClient(user)
+
+    const event = await client.event.create(generator.event.create())
+
+    await client.event.actions.declare.request(
+      generator.event.actions.declare(event.id, { keepAssignment: true })
+    )
+
+    await expect(
+      client.event.actions.archive.request(
+        generator.event.actions.archive(event.id, { keepAssignment: true })
+      )
+    ).rejects.toThrow('Confirmation API did not return a synchronous response.')
+  })
+
+  test('Throws when integration responds with 202 when keepAssignmentIfRejected is given', async () => {
+    mockActionApi(ActionType.ARCHIVE, 202)
+    const { generator, user } = await setupTestCase()
+
+    const client = createTestClient(user)
+
+    const event = await client.event.create(generator.event.create())
+
+    await client.event.actions.declare.request(
+      generator.event.actions.declare(event.id, { keepAssignment: true })
+    )
+
+    await expect(
+      client.event.actions.archive.request(
+        generator.event.actions.archive(event.id, {
+          keepAssignmentIfRejected: true
+        })
+      )
+    ).rejects.toThrow('Confirmation API did not return a synchronous response.')
+  })
+
+  test('Throws when integration responds with 202 when keepAssignmentIfAccepted is given', async () => {
+    mockActionApi(ActionType.ARCHIVE, 202)
+    const { generator, user } = await setupTestCase()
+
+    const client = createTestClient(user)
+
+    const event = await client.event.create(generator.event.create())
+
+    await client.event.actions.declare.request(
+      generator.event.actions.declare(event.id, { keepAssignment: true })
+    )
+
+    await expect(
+      client.event.actions.archive.request(
+        generator.event.actions.archive(event.id, {
+          keepAssignmentIfAccepted: true
+        })
+      )
+    ).rejects.toThrow('Confirmation API did not return a synchronous response.')
+  })
+
+  test('Unassigns when integration responds with 202', async () => {
+    mockActionApi(ActionType.ARCHIVE, 202)
+
+    const { generator, user } = await setupTestCase()
+
+    const client = createTestClient(user)
+
+    const event = await client.event.create(generator.event.create())
+
+    await client.event.actions.declare.request(
+      generator.event.actions.declare(event.id, { keepAssignment: true })
+    )
+
+    const response = await client.event.actions.archive.request(
+      generator.event.actions.archive(event.id)
+    )
+
+    const lastAction = response.actions[response.actions.length - 1]
+
+    expect(lastAction.type).toEqual(ActionType.UNASSIGN)
+    expect(lastAction.status).toEqual(ActionStatus.Accepted)
+
+    const currentState = getCurrentEventState(
+      response,
+      tennisClubMembershipEvent
+    )
+
+    expect(currentState.flags).toEqual(['archive:requested'])
+    expect(currentState.status).toEqual(EventStatus.enum.DECLARED)
+    expect(currentState.assignedTo).toEqual(undefined)
+  })
+
+  test('Records a rejected action when integration responds with 400', async () => {
+    mockActionApi(ActionType.ARCHIVE, 400)
+
+    const { generator, user } = await setupTestCase()
+
+    const client = createTestClient(user)
+
+    const event = await client.event.create(generator.event.create())
+
+    await client.event.actions.declare.request(
+      generator.event.actions.declare(event.id, { keepAssignment: true })
+    )
+
+    const response = await client.event.actions.archive.request(
+      generator.event.actions.archive(event.id)
+    )
+
+    expect(
+      response.actions.find(
+        (action) =>
+          action.type === ActionType.ARCHIVE &&
+          action.status === ActionStatus.Rejected
+      )
+    ).toBeDefined()
+  })
+
+  test('Keeps assignment when integration responds with 500', async () => {
+    mockActionApi(ActionType.ARCHIVE, 500)
+
+    const { generator, user } = await setupTestCase()
+
+    const client = createTestClient(user)
+
+    const event = await client.event.create(generator.event.create())
+
+    await client.event.actions.declare.request(
+      generator.event.actions.declare(event.id, { keepAssignment: true })
+    )
+
+    await expect(
+      client.event.actions.archive.request(
+        generator.event.actions.archive(event.id)
+      )
+    ).rejects.toThrow(
+      'Unexpected failure from country config action confirmation API'
+    )
+
+    const eventAfterFailure = await client.event.get({ eventId: event.id })
+
+    const currentState = getCurrentEventState(
+      eventAfterFailure,
+      tennisClubMembershipEvent
+    )
+
+    expect(currentState.flags).toEqual(['archive:requested'])
+    expect(currentState.status).toEqual(EventStatus.enum.DECLARED)
+    expect(currentState.assignedTo).toEqual(user.id)
+  })
 })

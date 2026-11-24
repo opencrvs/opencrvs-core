@@ -10,12 +10,6 @@
  */
 import { vi } from 'vitest'
 
-/*
- * Kept in its own setup file, listed before `setupTests.ts`: modules such as
- * `utils/countries` read `window.config` while they are being evaluated, and
- * `setupTests.ts` imports the application before it reaches any statement of
- * its own, so a stub declared there would come too late.
- */
 const config = {
   APPLICATION_NAME: 'Farajaland CRVS',
   COUNTRY: 'BGD',

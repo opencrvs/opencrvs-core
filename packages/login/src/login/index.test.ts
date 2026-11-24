@@ -79,6 +79,7 @@ describe('reducer', () => {
       submitting: false,
       submissionError: false,
       resentAuthenticationCode: false,
+      refreshToken: undefined,
       authenticationDetails: {
         nonce: '1234'
       }
@@ -187,7 +188,8 @@ describe('reducer', () => {
       ...initialState,
       stepSubmitting: false,
       token:
-        'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJPbmxpbmUgSldUIEJ1aWxkZXIiLCJpYXQiOjE1NTY3ODM5NDMsImV4cCI6MTU4ODMxOTk0MywiYXVkIjoid3d3LmV4YW1wbGUuY29tIiwic3ViIjoianJvY2tldEBleGFtcGxlLmNvbSIsInNjb3BlIjpbIk1hbmFnZXIiLCJQcm9qZWN0IEFkbWluaXN0cmF0b3IiXX0.ggXSgfcD_OJqEd8_pmzw_AoqiqIq5sWXKtReCx6YdbQ'
+        'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJPbmxpbmUgSldUIEJ1aWxkZXIiLCJpYXQiOjE1NTY3ODM5NDMsImV4cCI6MTU4ODMxOTk0MywiYXVkIjoid3d3LmV4YW1wbGUuY29tIiwic3ViIjoianJvY2tldEBleGFtcGxlLmNvbSIsInNjb3BlIjpbIk1hbmFnZXIiLCJQcm9qZWN0IEFkbWluaXN0cmF0b3IiXX0.ggXSgfcD_OJqEd8_pmzw_AoqiqIq5sWXKtReCx6YdbQ',
+      refreshToken: undefined
     }
 
     const action = {
@@ -211,7 +213,7 @@ describe('reducer', () => {
     })
     store.dispatch({
       type: actions.VERIFY_CODE_COMPLETED,
-      payload: { token: 'test-token' }
+      payload: { token: 'test-token', refreshToken: 'test-refresh-token' }
     })
 
     await new Promise((resolve) => setTimeout(resolve, 0))
@@ -222,6 +224,44 @@ describe('reducer', () => {
     expect(assign).not.toHaveBeenCalledWith(
       expect.stringContaining('/register//events/')
     )
+  })
+
+  describe('GOTO_APP', () => {
+    it('redirects to /register/?refreshToken=<token> when state.refreshToken is set', async () => {
+      const assign = vi.fn()
+      vi.stubGlobal('location', { assign })
+
+      // Seed refreshToken into state via AUTHENTICATION_COMPLETED with no token
+      // (no-token branch calls inAppRedirect, not window.location.assign)
+      store.dispatch({
+        type: actions.AUTHENTICATION_COMPLETED,
+        payload: {
+          nonce: 'abc',
+          refreshToken: 'my-refresh-token',
+          inAppRedirect: () => {}
+        }
+      })
+      await new Promise((resolve) => setTimeout(resolve, 0))
+      assign.mockClear()
+
+      store.dispatch({ type: actions.GOTO_APP, payload: '' })
+      await new Promise((resolve) => setTimeout(resolve, 0))
+
+      expect(assign).toHaveBeenCalledWith(
+        '/register/?refreshToken=my-refresh-token'
+      )
+    })
+
+    it('redirects to /login when state.refreshToken is falsy', async () => {
+      const assign = vi.fn()
+      vi.stubGlobal('location', { assign })
+
+      // Fresh store has refreshToken = '' (falsy)
+      store.dispatch({ type: actions.GOTO_APP, payload: '' })
+      await new Promise((resolve) => setTimeout(resolve, 0))
+
+      expect(assign).toHaveBeenCalledWith('/login')
+    })
   })
 })
 

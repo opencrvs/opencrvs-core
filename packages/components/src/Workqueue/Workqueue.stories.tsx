@@ -8,7 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { ComponentMeta, ComponentStory } from '@storybook/react'
+import { ComponentMeta, ComponentStory } from '@storybook/react-vite'
 import { Workqueue } from './Workqueue'
 import { DeclarationIcon, Download, Downloaded } from '../icons'
 import React from 'react'

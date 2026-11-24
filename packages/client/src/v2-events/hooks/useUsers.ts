@@ -34,10 +34,7 @@ import {
   setMutationDefaults,
   setQueryDefaults
 } from '../features/events/useEvents/procedures/utils'
-import {
-  precacheFiles,
-  precacheUserAvatars
-} from '../features/files/useFileUpload'
+import { precacheFiles, precacheUserAvatars } from '../cache'
 
 type UserWithResolvedFiles = Omit<UserOrSystem, 'signature' | 'avatar'> & {
   signature?: string

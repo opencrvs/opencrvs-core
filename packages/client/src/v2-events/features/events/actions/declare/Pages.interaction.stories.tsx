@@ -8,11 +8,10 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import type { Meta, StoryObj } from '@storybook/react'
-import { expect, fn, userEvent, waitFor, within } from '@storybook/test'
+import type { Meta, StoryObj } from '@storybook/react-vite'
+import { expect, fn, userEvent, waitFor, within } from 'storybook/test'
 import { createTRPCMsw, httpLink } from '@vafanassieff/msw-trpc'
 import superjson from 'superjson'
-import * as selectEvent from 'react-select-event'
 import {
   ActionStatus,
   ActionType,
@@ -24,6 +23,7 @@ import {
   tennisClubMembershipEvent,
   UUID
 } from '@opencrvs/commons/client'
+import * as selectEvent from '@client/v2-events/select-event'
 import { AppRouter } from '@client/v2-events/trpc'
 import { ROUTES, routesConfig } from '@client/v2-events/routes'
 import { tennisClubMembershipEventDocument } from '@client/v2-events/features/events/fixtures'
@@ -167,7 +167,7 @@ export const SaveAndExit: Story = {
         const continueButton = await canvas.findByText('Continue')
         await userEvent.click(continueButton)
 
-        const backButton = await canvas.findByText('Back')
+        const backButton = await canvas.findByRole('button', { name: 'Back' })
         await userEvent.click(backButton)
 
         await expect(await canvas.findByTestId('text__firstname')).toHaveValue(
@@ -283,7 +283,7 @@ export const DraftShownInForm: Story = {
         const continueButton = await canvas.findByText('Continue')
         await userEvent.click(continueButton)
 
-        const backButton = await canvas.findByText('Back')
+        const backButton = await canvas.findByRole('button', { name: 'Back' })
         await userEvent.click(backButton)
 
         await expect(await canvas.findByTestId('text__firstname')).toHaveValue(

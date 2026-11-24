@@ -32,7 +32,7 @@ export function customActionProcedures() {
       .input(CustomActionInput)
       .use(middleware.canAccessEventWithScopes(['record.custom-action']))
       .use(middleware.requireAssignment)
-      .use(middleware.validateAction)
+      .use(middleware.validateRequestAction)
       .output(EventDocument)
       .mutation(async ({ ctx, input }) => {
         const { token, user, existingAction } = ctx

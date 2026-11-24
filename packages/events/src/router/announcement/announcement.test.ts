@@ -24,7 +24,7 @@ import {
   processNextAnnouncement
 } from '@events/workers/announcementWorker'
 import { env } from '@events/environment'
-import { ANONYMOUS_TOKEN, mswServer } from '@events/tests/msw'
+import { mswServer } from '@events/tests/msw'
 
 const scope = encodeScope({ type: 'config.update-all' })
 
@@ -88,7 +88,7 @@ async function insertAdminWithEmail(
   return { id: result.id as UUID, email }
 }
 
-const ALL_USER_NOTIFICATION_URL = `${env.COUNTRY_CONFIG_URL}/triggers/user/all-user-notification`
+const ALL_USER_NOTIFICATION_URL = `${env.COUNTRY_CONFIG_URL}/trigger/user/all-user-notification`
 
 describe('announcement.broadcast', () => {
   describe('authorization', () => {
@@ -495,7 +495,7 @@ describe('processNextAnnouncement', () => {
      * of its own. Asserted explicitly: if it stops doing so, country config
      * rejects the dispatch with a 401 and no announcement is ever delivered.
      */
-    expect(capturedAuth).toEqual([`Bearer ${ANONYMOUS_TOKEN}`])
+    expect(capturedAuth).toEqual([`Bearer service-token`])
   })
 
   test('sends recipients in chunks of BCC_CHUNK_SIZE and updates progress after each', async () => {

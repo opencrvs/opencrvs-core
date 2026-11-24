@@ -1,25 +1,27 @@
-// Vitest Snapshot v1
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
 exports[`authUtils tests > getAuthorizedToken > when token is in local storage > when it's valid > returns the token 1`] = `
 {
-  "aud": [
-    "gateway",
-  ],
-  "exp": 1543195227,
-  "iat": 1533195228,
-  "role": "admin",
-  "sub": "1",
+  "aud": "opencrvs:gateway-user",
+  "exp": 4102444800,
+  "iat": 1487076708,
+  "iss": "opencrvs:auth-service",
+  "role": "FIELD_AGENT",
+  "scope": [],
+  "sub": "b77b78af-a259-4bc1-85d5-b1e8c1382273",
+  "userType": "user",
 }
 `;
 
 exports[`authUtils tests > getAuthorizedToken > when token is in url > when it's valid > returns the token 1`] = `
 {
-  "aud": [
-    "gateway",
-  ],
-  "exp": 1543195227,
-  "iat": 1533195228,
-  "role": "admin",
-  "sub": "1",
+  "aud": "opencrvs:gateway-user",
+  "exp": 4102444800,
+  "iat": 1487076708,
+  "iss": "opencrvs:auth-service",
+  "role": "FIELD_AGENT",
+  "scope": [],
+  "sub": "b77b78af-a259-4bc1-85d5-b1e8c1382273",
+  "userType": "user",
 }
 `;

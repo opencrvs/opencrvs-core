@@ -8,7 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { JWT_ISSUER } from '@auth/constants'
+import { JWT_ISSUER, REFRESH_TOKEN_AUDIENCE } from '@auth/constants'
 import { readFileSync } from 'fs'
 import { promisify } from 'util'
 import * as jwt from 'jsonwebtoken'
@@ -27,19 +27,25 @@ import {
   sendVerificationCode,
   storeVerificationCode
 } from '@auth/features/verifyCode/service'
-import { logger, UUID, UserName } from '@opencrvs/commons'
+import {
+  logger,
+  UUID,
+  UserName,
+  fetchJSON,
+  joinUrl,
+  Roles,
+  InactiveOfficeError,
+  isSelectableAtAnchor,
+  Location
+} from '@opencrvs/commons'
 import { UserAuditLog } from '@opencrvs/commons/events'
 import * as F from 'fp-ts'
-import {
-  EncodedScope,
-  encodeScope,
-  TokenUserType,
-  TokenWithBearer
-} from '@opencrvs/commons/authentication'
+import { EncodedScope, TokenUserType } from '@opencrvs/commons/authentication'
 const { chainW, tryCatch } = F.either
 const { pipe } = F.function
 import { env } from '@auth/environment'
 import { AppRouter, InternalRouter } from '@opencrvs/events/src/router'
+import { createFamily } from '@auth/features/refresh/family'
 
 const cert = readFileSync(env.CERT_PRIVATE_KEY_PATH)
 const publicCert = readFileSync(env.CERT_PUBLIC_KEY_PATH)
@@ -116,6 +122,7 @@ export interface IAuthentication {
   status: string
   email?: string
   role: string
+  primaryOfficeId: string
 }
 
 export interface ISystemAuthentication {
@@ -145,7 +152,26 @@ export async function authenticate(
     role: body.role,
     status: body.status,
     mobile: body.mobile,
-    email: body.email
+    email: body.email,
+    primaryOfficeId: body.primaryOfficeId
+  }
+}
+
+/**
+ * Throws {@link InactiveOfficeError} if the given office is inactive.
+ */
+function isOfficeActiveToday(location: Pick<Location, 'versions'>) {
+  const today = new Date().toISOString().slice(0, 10)
+  return isSelectableAtAnchor(location.versions, today)
+}
+
+export async function assertOfficeIsActive(officeId: string) {
+  const location = await internalClient.locations.getById.query(
+    officeId as UUID
+  )
+
+  if (!isOfficeActiveToday(location)) {
+    throw new InactiveOfficeError()
   }
 }
 
@@ -196,49 +222,27 @@ export async function createToken(
   })
 }
 
-type ActionConfirmationInput = {
-  eventId: UUID
-  actionId: UUID
+export async function signRefreshToken(
+  userId: string,
+  userType: TokenUserType,
+  familyId: string,
+  jti: string
+): Promise<string> {
+  return sign({ userType, familyId, jti }, cert, {
+    subject: userId,
+    algorithm: 'RS256',
+    expiresIn: env.CONFIG_REFRESH_TOKEN_EXPIRY_SECONDS,
+    audience: REFRESH_TOKEN_AUDIENCE,
+    issuer: JWT_ISSUER
+  })
 }
 
-type LegacyRecordValidationInput = {
-  recordId: UUID
-}
-
-export async function createTokenForActionConfirmation(
-  input: ActionConfirmationInput | LegacyRecordValidationInput,
-  userId: UUID,
-  extraScopes: string[] = [],
+export async function createRefreshToken(
+  userId: string,
   userType: TokenUserType = TokenUserType.enum.user
-) {
-  return sign(
-    {
-      scope: [
-        encodeScope({ type: 'record.confirm-registration' }),
-        encodeScope({ type: 'record.reject-registration' }),
-        ...extraScopes
-      ],
-      eventId: 'eventId' in input ? input.eventId : undefined,
-      actionId: 'actionId' in input ? input.actionId : undefined,
-      recordId: 'recordId' in input ? input.recordId : undefined,
-      userType
-    },
-    cert,
-    {
-      subject: userId,
-      algorithm: 'RS256',
-      expiresIn: env.CONFIG_ACTION_CONFIRMATION_TOKEN_EXPIRY_SECONDS,
-      audience: [
-        'opencrvs:gateway-user',
-        'opencrvs:events-user',
-        'opencrvs:user-mgnt-user',
-        'opencrvs:auth-user',
-        'opencrvs:countryconfig-user',
-        'opencrvs:documents-user'
-      ],
-      issuer: JWT_ISSUER
-    }
-  )
+): Promise<string> {
+  const { familyId, jti } = await createFamily(userId)
+  return signRefreshToken(userId, userType, familyId, jti)
 }
 
 export async function storeUserInformation(
@@ -336,28 +340,65 @@ export function verifyToken(token: string) {
   return pipe(token, safeVerifyJwt, chainW(tokenPayload.decode))
 }
 
+const refreshTokenPayload = t.type({
+  sub: t.string,
+  iat: t.number,
+  exp: t.number,
+  aud: t.array(t.string),
+  userType: t.string,
+  familyId: t.string,
+  jti: t.string
+})
+
+function safeVerifyRefreshJwt(token: string) {
+  return tryCatch(
+    () =>
+      jwt.verify(token, publicCert, {
+        issuer: JWT_ISSUER,
+        audience: 'opencrvs:auth-refresh'
+      }),
+    (e) => (e instanceof Error ? e : new Error('Unknown error'))
+  )
+}
+
+export function verifyRefreshToken(token: string) {
+  return pipe(token, safeVerifyRefreshJwt, chainW(refreshTokenPayload.decode))
+}
+
+export async function getUserRoleScopeMapping() {
+  const roles = await fetchJSON<Roles>(
+    joinUrl(env.COUNTRY_CONFIG_URL_INTERNAL, '/config/roles')
+  )
+
+  return roles.reduce<Record<string, EncodedScope[]>>((acc, { id, scopes }) => {
+    acc[id] = scopes
+    return acc
+  }, {})
+}
+
 export function getPublicKey() {
   return publicCert
 }
 
 export async function recordUserAuditEvent(
-  tokenWithBearer: TokenWithBearer,
-  input: UserAuditLog
+  userId: string,
+  entry: UserAuditLog
 ): Promise<void> {
   try {
-    await eventsClient.user.audit.record.mutate(input, {
-      context: { headers: { Authorization: tokenWithBearer } }
-    })
+    await internalClient.user.audit.record.mutate({ clientId: userId, entry })
   } catch (err) {
     logger.error('Failed to record user audit event', err)
   }
 }
 
 export async function recordAnonymousUserAuditEvent(
-  input: UserAuditLog
+  entry: UserAuditLog
 ): Promise<void> {
   try {
-    await internalClient.user.audit.record.mutate(input)
+    await internalClient.user.audit.record.mutate({
+      clientId: entry.requestData.subjectId,
+      entry
+    })
   } catch (err) {
     logger.error('Failed to record anonymous user audit event', err)
   }

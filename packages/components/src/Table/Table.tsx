@@ -41,14 +41,6 @@ const TableHeader = styled.div<{
   align-items: top;
   border-bottom: 1px solid ${({ theme }) => theme.colors.grey300};
   border-radius: 2px 2px 0 0;
-
-  & span:first-child {
-    padding-left: 8px;
-  }
-
-  & span:last-child {
-    padding-right: 8px;
-  }
 `
 
 const TableHeaderText = styled.div`
@@ -69,13 +61,6 @@ const TableBody = styled.div<{
   & div:last-of-type {
     ${({ footerColumns }) => (footerColumns ? 'border-bottom: none;' : '')};
   }
-  & span:first-child {
-    padding-left: 8px;
-  }
-
-  & span:last-child {
-    padding-right: 8px;
-  }
 `
 const RowWrapper = styled.div<{
   totalWidth: number
@@ -84,6 +69,8 @@ const RowWrapper = styled.div<{
   horizontalPadding?: IBreakpoint
   hideTableBottomBorder?: boolean
   columns: IColumn[]
+  backgroundColor?: string
+  clickable?: boolean
 }>`
   display: flex;
   width: 100%;
@@ -91,6 +78,9 @@ const RowWrapper = styled.div<{
   padding-top: 10px;
   padding-bottom: 10px;
   border-bottom: 1px solid ${({ theme }) => theme.colors.grey200};
+  ${({ backgroundColor }) =>
+    backgroundColor && `background-color: ${backgroundColor};`}
+  ${({ clickable }) => clickable && `cursor: pointer;`}
 
   &:last-child {
     ${({ hideTableBottomBorder }) =>
@@ -118,12 +108,6 @@ const TableFooter = styled(RowWrapper)<{
     color: ${({ theme }) => theme.colors.copy};
     ${({ theme }) => theme.fonts.bold14};
   }
-  & span:first-child {
-    padding-left: 8px;
-  }
-  & span:last-child {
-    padding-right: 8px;
-  }
 `
 
 const ContentWrapper = styled.span<{
@@ -139,6 +123,12 @@ const ContentWrapper = styled.span<{
   cursor: ${({ sortable }) => (sortable ? 'pointer' : 'default')};
   color: ${({ theme }) => theme.colors.grey400};
   padding: 0 4px;
+  &:first-child {
+    padding-left: 8px;
+  }
+  &:last-child {
+    padding-right: 8px;
+  }
 `
 const ValueWrapper = styled.span<{
   width: number
@@ -161,6 +151,12 @@ const ValueWrapper = styled.span<{
   text-overflow: ellipsis;
   overflow: hidden;
   ${({ color }) => color && `color: ${color};`}
+  &:first-child {
+    padding-left: 8px;
+  }
+  &:last-child {
+    padding-right: 8px;
+  }
 `
 const Error = styled.span`
   color: ${({ theme }) => theme.colors.negative};
@@ -184,7 +180,7 @@ const TableScrollerHorizontal = styled.div<{
 }>`
   ${({ disableScrollOnOverflow }) =>
     !disableScrollOnOverflow && `overflow: auto`};
-  padding-bottom: 8px;
+
   &::-webkit-scrollbar {
     border-radius: 8px;
     width: 8px;
@@ -209,8 +205,8 @@ const TableScroller = styled.div<{
     isFullPage
       ? `calc(100vh - ${offsetTop}px - 180px)`
       : height
-        ? `${height}px`
-        : 'auto'};
+      ? `${height}px`
+      : 'auto'};
 
   ${({ fixedWidth, totalWidth }) =>
     fixedWidth
@@ -245,9 +241,16 @@ const defaultConfiguration = {
   currentPage: 1
 }
 
+export interface ITableRow extends IDynamicValues {
+  /** Background colour applied to the whole row. */
+  rowBackgroundColor?: string
+  /** Click handler for the whole row; its presence makes the row clickable. */
+  onRowClick?: (event: React.MouseEvent) => void
+}
+
 export interface ITableProps {
   id?: string
-  content: IDynamicValues[]
+  content: ITableRow[]
   columns: IColumn[]
   footerColumns?: IFooterFColumn[]
   noResultText?: string
@@ -310,7 +313,7 @@ export const Table = ({
   const getDisplayItems = (
     currentPage: number,
     pageSize: number,
-    allItems: IDynamicValues[]
+    allItems: ITableRow[]
   ) => {
     if (allItems.length <= pageSize) {
       // expect that allItem is already sliced correctly externally
@@ -411,6 +414,9 @@ export const Table = ({
                         horizontalPadding={rowStyle?.horizontalPadding}
                         hideTableBottomBorder={hideTableBottomBorder}
                         columns={columns}
+                        backgroundColor={item.rowBackgroundColor}
+                        clickable={Boolean(item.onRowClick)}
+                        onClick={item.onRowClick}
                       >
                         {columns.map((preference, indx) => {
                           return (

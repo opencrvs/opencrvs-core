@@ -52,6 +52,7 @@ function NumberWithUnitInput({
     <NumberWithUnitWrapper>
       <Number.Input
         {...props}
+        max={configuration?.max}
         min={configuration?.min}
         placeholder={configuration?.numberFieldPlaceholder?.defaultMessage}
         value={value?.numericValue}

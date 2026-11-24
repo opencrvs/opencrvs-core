@@ -1,25 +1,5 @@
 // Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
-exports[`Allows creating draft for event with actions 1`] = `
-{
-  "action": {
-    "annotation": null,
-    "createdAt": "[sanitized]",
-    "createdBy": "[sanitized]",
-    "createdByRole": "REGISTRATION_AGENT",
-    "createdByUserType": "[sanitized]",
-    "declaration": {},
-    "status": "Accepted",
-    "transactionId": "[sanitized]",
-    "type": "REGISTER",
-  },
-  "createdAt": "[sanitized]",
-  "eventId": "[sanitized]",
-  "id": "[sanitized]",
-  "transactionId": "[sanitized]",
-}
-`;
-
 exports[`Allows creating draft for event without actions 1`] = `
 {
   "action": {

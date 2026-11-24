@@ -26,8 +26,8 @@ import {
   QueryParamReaderFieldUpdateValue,
   QueryParamReaderFieldValue
 } from './CompositeFieldValue'
-import { PlainDate, plainDateToLocalDate } from './PlainDate'
-export { PlainDate, plainDateToLocalDate }
+import { PlainDate, plainDateToLocalDate, toPlainDate } from './PlainDate'
+export { PlainDate, plainDateToLocalDate, toPlainDate }
 /**
  * FieldValues defined in this file are primitive field values.
  * FieldValues defined in CompositeFieldValue.ts are composed of multiple primitive field values (Address, File etc).
@@ -49,8 +49,10 @@ export const DateValue = z.iso.date().describe('Date in the format YYYY-MM-DD')
 
 export type DateValue = z.infer<typeof DateValue>
 
+export const AGE_MAX_VALUE = 999
+
 export const AgeValue = z.object({
-  age: z.number(),
+  age: z.number().int().min(0).max(AGE_MAX_VALUE),
   asOfDateRef: z.string()
 })
 export type AgeValue = z.infer<typeof AgeValue>

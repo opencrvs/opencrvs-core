@@ -16,16 +16,9 @@ export const dimensionsMap = {
 
 export type IButtonSize = 'small' | 'medium' | 'large'
 
-export * from './Action'
 export * from './Button'
-export * from './PrimaryButton'
-export * from './SecondaryButton'
 export * from './ExpansionButton'
 export * from './LinkButton'
-export * from './TertiaryButton'
 export * from './FloatingActionButton'
 export * from './CircleButton'
-export * from './IconButton'
 export * from './ArrowExpansionButton'
-export * from './SuccessButton'
-export * from './DangerButton'

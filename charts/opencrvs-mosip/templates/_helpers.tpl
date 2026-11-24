@@ -1,4 +1,3 @@
-
 {{- define "http-scheme" -}}
 {{- if .Values.ingress.ssl_enabled }}
 {{- printf "https" }}

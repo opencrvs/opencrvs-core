@@ -9,30 +9,26 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import * as React from 'react'
-import { ListViewItemSimplified } from '@opencrvs/components/lib/ListViewSimplified'
 import { constantsMessages, buttonMessages } from '@client/i18n/messages'
 import { useIntl } from 'react-intl'
 import {
-  LabelContainer,
-  ValueContainer,
-  DynamicHeightLinkButton
+  DynamicHeightLinkButton,
+  SettingsRow
 } from '@client/views/Settings/items/components'
 
-export function PIN() {
+export function usePIN(): SettingsRow {
   const intl = useIntl()
-  return (
-    <ListViewItemSimplified
-      label={
-        <LabelContainer>
-          {intl.formatMessage(constantsMessages.labelPin)}
-        </LabelContainer>
-      }
-      value={<ValueContainer>****</ValueContainer>}
-      actions={
+
+  return {
+    id: 'pin',
+    item: {
+      label: intl.formatMessage(constantsMessages.labelPin),
+      value: '****',
+      actions: (
         <DynamicHeightLinkButton disabled>
           {intl.formatMessage(buttonMessages.change)}
         </DynamicHeightLinkButton>
-      }
-    />
-  )
+      )
+    }
+  }
 }

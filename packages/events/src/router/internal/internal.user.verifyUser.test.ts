@@ -264,3 +264,41 @@ test('looks up user by email (case-insensitive)', async () => {
   expect(result.id).toBe(userId)
   expect(result.username).toBe('lookup.user')
 })
+
+test('returns UNAUTHORIZED for a non-active account so no recovery notification is sent', async () => {
+  const { eventsDb, locations } = await setupTestCase()
+
+  const userId = getUUID()
+  await eventsDb
+    .insertInto('users')
+    .values({
+      id: userId,
+      email: 'deactivated@example.com',
+      role: 'REGISTRATION_AGENT',
+      status: 'deactivated',
+      officeId: locations[0].id,
+      firstname: '',
+      surname: ''
+    })
+    .execute()
+
+  // The account has security questions, so recovery would otherwise proceed —
+  // it must be refused the same way as a missing account (no notification, and
+  // no signal that the account exists but is inactive).
+  await eventsDb
+    .insertInto('userCredentials')
+    .values({
+      userId,
+      username: 'deactivated.user',
+      passwordHash: 'hash',
+      salt: 'salt',
+      securityQuestions: sql`cast (${JSON.stringify([
+        { questionKey: 'BIRTH_TOWN', answerHash: 'h1' }
+      ])} as jsonb)` as unknown as Record<string, unknown>
+    })
+    .execute()
+
+  await expect(
+    caller.user.verifyUser({ email: 'deactivated@example.com' })
+  ).rejects.toMatchObject(new TRPCError({ code: 'UNAUTHORIZED' }))
+})

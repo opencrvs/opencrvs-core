@@ -9,9 +9,51 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { DocumentPath, UUID } from '@opencrvs/commons'
-import { presignFiles } from '@events/service/files'
+import { getUploadPath, presignFiles } from '@events/service/files'
 
 const eventId = '105b69b3-415f-4e53-b912-ef71484cb6c0' as UUID
+
+describe('getUploadPath', () => {
+  test('derives the key from the event id', () => {
+    expect(
+      getUploadPath({
+        file: new File([''], 'proof.png'),
+        transactionId: 'transaction-1',
+        eventId
+      })
+    ).toBe(`events/${eventId}/`)
+  })
+
+  test('prefers the event id over a path the caller chose', () => {
+    expect(
+      getUploadPath({
+        file: new File([''], 'proof.png'),
+        transactionId: 'transaction-1',
+        eventId,
+        path: 'somewhere/else/'
+      })
+    ).toBe(`events/${eventId}/`)
+  })
+
+  test('still accepts a deprecated caller-chosen path', () => {
+    expect(
+      getUploadPath({
+        file: new File([''], 'avatar.png'),
+        transactionId: 'transaction-1',
+        path: 'users/abc/'
+      })
+    ).toBe('users/abc/')
+  })
+
+  test('refuses an upload that names neither an event nor a path', () => {
+    expect(() =>
+      getUploadPath({
+        file: new File([''], 'loose.png'),
+        transactionId: 'transaction-1'
+      })
+    ).toThrow(/eventId or path/)
+  })
+})
 
 describe('presignFiles', () => {
   const token = 'Bearer test-token'
@@ -26,7 +68,6 @@ describe('presignFiles', () => {
     const urls = await presignFiles(paths, token)
 
     expect(Object.keys(urls)).toEqual(paths)
-    // The documents mock (tests/msw.ts) signs each path under the `ocrvs` bucket
     for (const path of paths) {
       expect(urls[path]).toContain(`/ocrvs/${path}?`)
     }

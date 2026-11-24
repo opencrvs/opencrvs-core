@@ -21,6 +21,12 @@ export default interface AdministrativeAreasTable {
   validUntil: ColumnType<string | null, string | null, string | null>
 
   externalId: ColumnType<string | null, string | null, string | null>
+
+  versions: ColumnType<
+    Record<string, any>,
+    Record<string, any>,
+    Record<string, any>
+  >
 }
 
 export type AdministrativeAreas = Selectable<AdministrativeAreasTable>

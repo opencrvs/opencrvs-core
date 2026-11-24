@@ -132,3 +132,5 @@ export const PINKeypad = ({
     </Container>
   )
 }
+
+export type { IProps as IPINKeypadProps }

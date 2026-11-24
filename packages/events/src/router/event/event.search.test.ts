@@ -1481,6 +1481,12 @@ test('Returns events assigned to a specific user', async () => {
       }
     }),
     encodeScope({
+      type: 'record.read',
+      options: {
+        event: ['birth', 'death', 'tennis-club-membership']
+      }
+    }),
+    encodeScope({
       type: 'record.create',
       options: {
         event: ['birth', 'death', 'tennis-club-membership']
@@ -1594,8 +1600,7 @@ test('Returns relevant events in right order', async () => {
     })
   ])
 
-  // Until we have a way to reindex from mongodb, we create events through API.
-  // Since it is expensive and time consuming, we will run multiple checks against the same set of events.
+  // Creating events through the API is expensive and time consuming, so we run multiple checks against the same set of events.
   const actionCombinations = [
     [ActionType.DECLARE],
     [ActionType.DECLARE, ActionType.REJECT],
@@ -1842,6 +1847,7 @@ const LOCATION_FILTER_WITHOUT_OFFICE_ERROR = new TRPCError({
 test.each([
   'placeOfEvent',
   'createdIn',
+  'notifiedIn',
   'declaredIn',
   'registeredIn'
 ] as const)(

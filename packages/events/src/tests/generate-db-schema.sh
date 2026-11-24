@@ -24,11 +24,13 @@ else
   HOST=172.17.0.1
 fi
 
+# the `grep` command removes psql meta-commands (\restrict, \unrestrict) —
+# added by pg_dump 17 as security bookmarks; valid only in psql, not in the
+# pg Node.js driver.
 docker run --rm postgres:17.6 pg_dump \
   "postgres://events_migrator:migrator_password@${HOST}:5432/events" \
   -s \
   --exclude-schema=analytics \
   --exclude-schema=reference_data \
-  --exclude-table=app.pgmigrations_legacy_data \
-  | bash "$(dirname "$0")/strip-pg-dump.sh" \
+  | grep -v '^\\' \
   > "$(dirname "$0")/postgres-migrations.sql"

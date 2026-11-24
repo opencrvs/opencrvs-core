@@ -15,6 +15,10 @@ import {
   EventConfig,
   EventState,
   FieldConfig,
+  getDeclaration,
+  getDeclarationFields,
+  isFieldVisible,
+  omitHiddenFields,
   omitHiddenPaginatedFields,
   ValidatorContext
 } from '@opencrvs/commons/client'
@@ -115,19 +119,35 @@ export function getChangedDeclarationDiff(
   eventConfiguration: EventConfig,
   validatorContext: ValidatorContext
 ): EventState {
+  const visibleForm = omitHiddenFields(
+    getDeclarationFields(eventConfiguration),
+    form,
+    validatorContext
+  )
+
+  function shouldClearNowHiddenField(field: FieldConfig) {
+    const wasVisibleAndFilled =
+      isFieldVisible(field, previousFormValues, validatorContext) &&
+      !isDeeplyEmpty(previousFormValues[field.id])
+    const isHiddenNow = !(field.id in visibleForm)
+    return wasVisibleAndFilled && isHiddenNow
+  }
+
   return Object.fromEntries(
     fields
-      .filter((field) =>
-        hasDeclarationFieldChanged(
-          field,
-          form,
-          previousFormValues,
-          eventConfiguration,
-          validatorContext
-        )
+      .filter(
+        (field) =>
+          hasDeclarationFieldChanged(
+            field,
+            form,
+            previousFormValues,
+            eventConfiguration,
+            validatorContext
+          ) || shouldClearNowHiddenField(field)
       )
       .map((field) => {
-        const value = form[field.id]
+        // A now-hidden field is absent from `visibleForm`, so it maps to `null`.
+        const value = visibleForm[field.id]
         return [field.id, isDeeplyEmpty(value) ? null : value]
       })
   )
@@ -155,7 +175,7 @@ export function getCleanedDeclarationDiff({
   // If there's no original declaration, just clean the update and return it
   if (isEmpty(originalDeclaration)) {
     return omitHiddenPaginatedFields(
-      eventConfiguration.declaration,
+      getDeclaration(eventConfiguration),
       declarationDiff,
       validatorContext,
       true
@@ -172,7 +192,7 @@ export function getCleanedDeclarationDiff({
   // (Ensures we only consider fields relevant to the event configuration)
   const cleanedDeclarationWithHiddenFieldsWithNullValues =
     omitHiddenPaginatedFields(
-      eventConfiguration.declaration,
+      getDeclaration(eventConfiguration),
       merged,
       validatorContext,
       true
