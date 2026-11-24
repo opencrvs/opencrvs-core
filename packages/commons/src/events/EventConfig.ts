@@ -209,14 +209,17 @@ const versionFields = {
 const _EventConfigBase: z.ZodType<EventConfig, EventConfigSchemaInput> =
   z.object({ ...eventLevelFields, ...versionFields })
 
-/** Validations of one version of an event, read together with the fields shared by every version. */
+/**
+ * Validations of one version of an event, read together with the fields shared by every version.
+ * @returns whether the event has exactly one DECLARE action, which the validations of its fields need.
+ */
 export function validateEventConfig(
   event: EventConfig,
   ctx: z.RefinementCtx<EventConfig>
 ) {
   // This validation is made to early return, since following validations depend on the declare action being present and correctly configured.
   if (!validateExactlyOneDeclareAction(event, ctx)) {
-    return
+    return false
   }
   validateNotificationForm(event, ctx)
   validateAdvancedSearchConfig(event, ctx)
@@ -224,12 +227,15 @@ export function validateEventConfig(
   validatePlaceOfEvent(event, ctx)
   validateActionFlags(event, ctx)
   validateActionOrder(event, ctx)
+  return true
 }
 
 export const EventConfig: z.ZodType<EventConfig, EventConfigSchemaInput> =
   _EventConfigBase
     .superRefine((event, ctx) => {
-      validateEventConfig(event, ctx)
+      if (!validateEventConfig(event, ctx)) {
+        return
+      }
       validateAdvancedSearchFieldIds(event, [event], ctx)
       validateAdvancedSearchDefaultValues(event, [event], ctx)
     })
@@ -515,15 +521,16 @@ export function resolveEventConfig(config: VersionedEventConfig): EventConfig {
  * `versions[i]`). Issues on a field of the version are reported under that version.
  * Issues on a field shared by every version (e.g. `advancedSearch`) are reported once,
  * where they are defined.
+ * @returns whether `validate` returned `true` for every version. Every version is validated either way.
  */
 export function validateEachVersion<E>(
   ctx: Pick<z.RefinementCtx<unknown>, 'addIssue'>,
   events: E[],
-  validate: (event: E, versionCtx: z.RefinementCtx<E>) => void
+  validate: (event: E, versionCtx: z.RefinementCtx<E>) => boolean
 ) {
   const reported = new Set<string>()
 
-  events.forEach((event, index) => {
+  const results = events.map((event, index) => {
     const addIssue: z.RefinementCtx<E>['addIssue'] = (issue) => {
       if (typeof issue === 'string') {
         ctx.addIssue({
@@ -548,8 +555,10 @@ export function validateEachVersion<E>(
       ctx.addIssue({ ...issue, path })
     }
 
-    validate(event, { value: event, addIssue } as z.RefinementCtx<E>)
+    return validate(event, { value: event, addIssue } as z.RefinementCtx<E>)
   })
+
+  return results.every(Boolean)
 }
 
 export const VersionedEventConfig: z.ZodType<
@@ -570,7 +579,9 @@ export const VersionedEventConfig: z.ZodType<
       toEventConfig(config, version)
     )
     validateVersionList(config, ctx)
-    validateEachVersion(ctx, versionConfigs, validateEventConfig)
+    if (!validateEachVersion(ctx, versionConfigs, validateEventConfig)) {
+      return
+    }
     validateAdvancedSearchFieldIds(config, versionConfigs, ctx)
     validateAdvancedSearchDefaultValues(
       config,
