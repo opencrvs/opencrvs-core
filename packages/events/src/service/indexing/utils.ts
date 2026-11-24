@@ -507,14 +507,37 @@ function getLocationIdsFromScopeOptions(
   }
 
   if (filter === JurisdictionFilter.enum.location) {
+    // `canSearchEvents` rejects this case with FORBIDDEN. If the filter got
+    // `undefined` here, the search would drop it and return records from all
+    // offices.
+    if (!user.primaryOfficeId) {
+      throw new Error(
+        'The "location" jurisdiction filter needs a primary office, but the user has none.'
+      )
+    }
+
     return user.primaryOfficeId
   }
 
+  // A user with no administrative area (for example, in an office at the root
+  // of the hierarchy) has jurisdiction over all areas. This is intended, and
+  // `userCanAccessEventWithScopes` works the same way.
   if (filter === JurisdictionFilter.enum.administrativeArea) {
     return user.administrativeAreaId
   }
 
   throw new Error(`Unknown jurisdiction filter: ${filter}`)
+}
+
+/**
+ * Returns true if an option of the scope is the "location" jurisdiction
+ * filter. Only the jurisdiction options can have the value "location", because
+ * the other options are arrays, objects or user filters.
+ */
+export function hasLocationJurisdictionFilter(scope: RecordScopeV2): boolean {
+  return Object.values(scope.options ?? {}).some(
+    (value) => value === JurisdictionFilter.enum.location
+  )
 }
 
 /**
