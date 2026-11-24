@@ -132,23 +132,22 @@ jobs:
           trigger infrastructure "$INFRASTRUCTURE_TOKEN"
           trigger opencrvs-testland "$TESTLAND_TOKEN"
 
-      # Cut from e2e's branch for the same line, or from develop if it has none.
-      - name: Create the release branch in the e2e repo
+      # Core PRs into release/<major>.<minor>.x run against the e2e branch of
+      # the same name. The first release of a line cuts that branch from e2e's
+      # develop. Later releases find it and skip this step.
+      - name: Create the line branch in the e2e repo
         env:
           GH_TOKEN: ${{ secrets.E2E_WORKFLOW_TOKEN }}
-          RELEASE_BRANCH: release/${{ inputs.version }}
           LINE_BRANCH: ${{ steps.line.outputs.branch }}
         run: |
-          if gh api "repos/opencrvs/e2e/git/ref/heads/$RELEASE_BRANCH" > /dev/null 2>&1; then
-            echo "$RELEASE_BRANCH already exists in e2e, skipping."
+          if gh api "repos/opencrvs/e2e/git/ref/heads/$LINE_BRANCH" > /dev/null 2>&1; then
+            echo "$LINE_BRANCH already exists in e2e, skipping."
             exit 0
           fi
 
-          if ! sha=$(gh api "repos/opencrvs/e2e/git/ref/heads/$LINE_BRANCH" --jq .object.sha 2>/dev/null); then
-            sha=$(gh api "repos/opencrvs/e2e/git/ref/heads/develop" --jq .object.sha)
-          fi
-          gh api repos/opencrvs/e2e/git/refs -f ref="refs/heads/$RELEASE_BRANCH" -f sha="$sha" > /dev/null
-          echo "Created $RELEASE_BRANCH in e2e"
+          sha=$(gh api "repos/opencrvs/e2e/git/ref/heads/develop" --jq .object.sha)
+          gh api repos/opencrvs/e2e/git/refs -f ref="refs/heads/$LINE_BRANCH" -f sha="$sha" > /dev/null
+          echo "Created $LINE_BRANCH in e2e"
 
       # The draft gives the release notes somewhere to be written while the
       # release is in flight. Its tag is deleted again so nothing points at
