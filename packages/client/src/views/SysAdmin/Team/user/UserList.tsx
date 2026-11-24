@@ -175,14 +175,6 @@ const LinkButtonModified = styled(LinkButton)`
   height: 24px;
 `
 
-/*
- * Fills the actions column, so that the pills line up at its left edge and the
- * menus line up at its right edge, also on rows that have no menu.
- */
-const StatusAndMenu = styled(Stack)`
-  flex: 1;
-`
-
 interface SearchParams {
   locationId?: UUID
 }
@@ -480,11 +472,11 @@ function UserListComponent({ userDetails }: UserListProps) {
       status?: string
     }) {
       return (
-        <StatusAndMenu
+        <Stack
           alignItems="center"
           direction="row"
           gap={8}
-          justifyContent="space-between"
+          justifyContent="flex-start"
         >
           <Status status={status || 'pending'} />
           {canEditUser(user) && (
@@ -496,7 +488,7 @@ function UserListComponent({ userDetails }: UserListProps) {
               menuItems={getMenuItems(user)}
             />
           )}
-        </StatusAndMenu>
+        </Stack>
       )
     },
     [canEditUser, getMenuItems]

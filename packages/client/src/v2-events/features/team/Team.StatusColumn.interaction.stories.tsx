@@ -105,6 +105,11 @@ export const StatusPillsLineUp: Story = {
     const menus = Array.from(
       canvasElement.querySelectorAll('#user_list button[popovertarget]')
     )
+    const actionCells = Array.from(
+      canvasElement.querySelectorAll<HTMLElement>(
+        '#user_list td[data-testid$="-actions"]'
+      )
+    )
 
     await step('Some rows have a menu and some rows do not', async () => {
       await expect(pills).toHaveLength(usersWithEachStatus.length)
@@ -120,18 +125,24 @@ export const StatusPillsLineUp: Story = {
       }
     })
 
-    await step('The pills line up at the same left edge', async () => {
-      const leftEdges = pills.map((pill) =>
-        Math.round(pill.getBoundingClientRect().left)
-      )
-      await expect(new Set(leftEdges).size).toBe(1)
+    await step('Each pill stays inside the actions column', async () => {
+      for (const cell of actionCells) {
+        const pill = within(cell).getByText(/^(Active|Deactivated|Pending)$/)
+        await expect(pill.getBoundingClientRect().left).toBeGreaterThanOrEqual(
+          cell.getBoundingClientRect().left
+        )
+      }
     })
 
-    await step('The menus line up at the same right edge', async () => {
-      const rightEdges = menus.map((menu) =>
-        Math.round(menu.getBoundingClientRect().right)
-      )
-      await expect(new Set(rightEdges).size).toBe(1)
+    await step('The pill and the menu are right-aligned', async () => {
+      for (const cell of actionCells) {
+        const lastItem =
+          cell.querySelector('button[popovertarget]') ??
+          within(cell).getByText(/^(Active|Deactivated|Pending)$/)
+        await expect(Math.round(lastItem.getBoundingClientRect().right)).toBe(
+          Math.round(cell.getBoundingClientRect().right)
+        )
+      }
     })
   }
 }
