@@ -325,8 +325,9 @@ async function logExcerpt(detailsUrl) {
 }
 
 /**
- * The CI result on the PR. When the event starts the prescreen, CI has
- * normally not finished yet. A manual run later sees the result.
+ * The CI result on the PR. A CI run starts the prescreen when
+ * "Lint and run unit tests" completes, but other workflows on the PR can
+ * still be pending. A manual run can start at any time.
  * The checks of this workflow are not CI: they are pending while it runs.
  */
 async function collectChecks(statusCheckRollup) {
