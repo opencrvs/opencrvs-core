@@ -1,5 +1,11 @@
 # Changelog
 
+## 2.0.8
+
+### Improvements
+
+- The events service now validates and serializes the event configurations once and reuses the result for every request that gets them, until the configurations change. Before, each request validated and serialized the full configurations again. This could take most of the CPU of a busy events service, so that all requests were slow. [#14194](https://github.com/opencrvs/opencrvs-core/issues/14194)
+
 ## 2.0.7
 
 ### Security
@@ -12,10 +18,6 @@
 - Upload record attachments with `path: events/{eventId}/`.
 - Actions and drafts may only name files stored under their record's `events/{eventId}/`, or files the record already names. Imported records may also name pre-2.0 keys and their author's own signature. Any other file is rejected with `400`.
 - `user.create`, `user.update` and `user.changeAvatar` only accept a signature or avatar stored under the user's own `users/` path.
-
-### Improvements
-
-- The events service now validates and serializes the event configurations once and reuses the result for every request that gets them, until the configurations change. Before, each request validated and serialized the full configurations again. This could take most of the CPU of a busy events service, so that all requests were slow. [#14194](https://github.com/opencrvs/opencrvs-core/issues/14194)
 
 ### Bug fixes
 
