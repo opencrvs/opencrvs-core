@@ -11,7 +11,7 @@
 import * as z from 'zod/v4'
 import { EventConfig, VersionedEventConfig } from './EventConfig'
 import { ClauseOutput } from './DeduplicationConfig'
-import { everyVersionHasOneDeclareAction, findAllFields } from './utils'
+import { findAllFields } from './utils'
 import { findFieldOfPath, findFieldPartOfPath } from './fieldPath'
 
 /** The fields that a deduplication query reads or matches against. */
@@ -59,10 +59,6 @@ export function validateDeduplicationFieldPaths(
   versions: EventConfig[],
   ctx: Pick<z.RefinementCtx<unknown>, 'addIssue'>
 ) {
-  if (!everyVersionHasOneDeclareAction(versions)) {
-    return
-  }
-
   const fields = versions.flatMap(findAllFields)
   const paths = [...new Set(getDeduplicationPaths(versions))]
 
@@ -103,10 +99,6 @@ export function validateSearchedFieldTypes(
   versionConfigs: EventConfig[],
   ctx: Pick<z.RefinementCtx<unknown>, 'addIssue'>
 ) {
-  if (!everyVersionHasOneDeclareAction(versionConfigs)) {
-    return
-  }
-
   const fieldsOfVersions = versionConfigs.map(findAllFields)
   const allFields = fieldsOfVersions.flat()
   // A part of a field, such as `child.name.firstname`, uses the field `child.name`.
