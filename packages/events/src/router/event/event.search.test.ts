@@ -25,6 +25,7 @@ import {
   getCurrentEventState,
   getMixedPath,
   getUUID,
+  JurisdictionFilter,
   Location,
   TENNIS_CLUB_MEMBERSHIP,
   TEST_SYSTEM_IANA_TIMEZONE
@@ -1813,6 +1814,112 @@ test('User with "location" scope only sees events created by system user to thei
   expect(
     sanitizeForSnapshot(events[0], UNSTABLE_EVENT_FIELDS)
   ).toMatchSnapshot()
+})
+
+const SEARCH_ALL_TENNIS_CLUB_EVENTS = {
+  query: {
+    type: 'and' as const,
+    clauses: [{ eventType: TENNIS_CLUB_MEMBERSHIP }]
+  }
+}
+
+const UNRESTRICTED_TENNIS_CLUB_SEARCH_SCOPE = encodeScope({
+  type: 'record.search',
+  options: { event: [TENNIS_CLUB_MEMBERSHIP] }
+})
+
+const LOCATION_FILTER_WITHOUT_OFFICE_ERROR = new TRPCError({
+  code: 'FORBIDDEN',
+  message:
+    'The caller has no primary office, so a search scope cannot use the "location" jurisdiction filter.'
+})
+
+/**
+ * A system client has no primary office, so a "location" filter cannot limit
+ * its search. If the search drops the filter, it returns records from all
+ * offices.
+ */
+test.each([
+  'placeOfEvent',
+  'createdIn',
+  'declaredIn',
+  'registeredIn'
+] as const)(
+  'System client with "%s=location" search scope is forbidden to search',
+  async (locationOption) => {
+    const { user, generator } = await setupTestCase(5541)
+    await createEvent(createTestClient(user), generator, [ActionType.DECLARE])
+
+    // Without the location filter, the system client finds the record.
+    const unrestrictedSystemClient = createSystemTestClient(TEST_SYSTEM_ID, [
+      UNRESTRICTED_TENNIS_CLUB_SEARCH_SCOPE
+    ])
+
+    const unrestricted = await unrestrictedSystemClient.event.search(
+      SEARCH_ALL_TENNIS_CLUB_EVENTS
+    )
+
+    expect(unrestricted.total).toBe(1)
+
+    const locationLimitedSystemClient = createSystemTestClient(TEST_SYSTEM_ID, [
+      encodeScope({
+        type: 'record.search',
+        options: {
+          event: [TENNIS_CLUB_MEMBERSHIP],
+          [locationOption]: JurisdictionFilter.enum.location
+        }
+      })
+    ])
+
+    await expect(
+      locationLimitedSystemClient.event.search(SEARCH_ALL_TENNIS_CLUB_EVENTS)
+    ).rejects.toMatchObject(LOCATION_FILTER_WITHOUT_OFFICE_ERROR)
+  }
+)
+
+test('System client with an unrestricted search scope and a "location" search scope is forbidden to search', async () => {
+  const { user, generator } = await setupTestCase(5541)
+  await createEvent(createTestClient(user), generator, [ActionType.DECLARE])
+
+  const systemClient = createSystemTestClient(TEST_SYSTEM_ID, [
+    UNRESTRICTED_TENNIS_CLUB_SEARCH_SCOPE,
+    encodeScope({
+      type: 'record.search',
+      options: {
+        event: [TENNIS_CLUB_MEMBERSHIP],
+        placeOfEvent: JurisdictionFilter.enum.location
+      }
+    })
+  ])
+
+  await expect(
+    systemClient.event.search(SEARCH_ALL_TENNIS_CLUB_EVENTS)
+  ).rejects.toMatchObject(LOCATION_FILTER_WITHOUT_OFFICE_ERROR)
+})
+
+/**
+ * A caller with no administrative area has jurisdiction over all areas. This
+ * is intended, and `userCanAccessEventWithScopes` works the same way.
+ */
+test('System client with "placeOfEvent=administrativeArea" search scope sees events from all areas', async () => {
+  const { user, generator } = await setupTestCase(5541)
+  await createEvent(createTestClient(user), generator, [ActionType.DECLARE])
+
+  const systemClient = createSystemTestClient(TEST_SYSTEM_ID, [
+    encodeScope({
+      type: 'record.search',
+      options: {
+        event: [TENNIS_CLUB_MEMBERSHIP],
+        placeOfEvent: JurisdictionFilter.enum.administrativeArea
+      }
+    })
+  ])
+
+  const { total } = await systemClient.event.search(
+    SEARCH_ALL_TENNIS_CLUB_EVENTS
+  )
+
+  expect(total).toBe(1)
 })
 
 test('User without an event in the scope should not be able to view events of that type', async () => {
