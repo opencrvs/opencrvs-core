@@ -568,7 +568,7 @@ export async function runSetupEnvironment() {
       : environment_type === 'production'
   })
 
-  if (!two_fa_enabled && ['production', 'staging'].includes(environment_type)) {
+  if (!two_fa_enabled && environment_type === 'production') {
     warn(
       '2FA is disabled on a production-like environment. Logins will accept the fixed test code 000000, exposing real citizen data. Only do this if you know what you are doing.'
     )
