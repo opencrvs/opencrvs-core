@@ -16,6 +16,7 @@ import {
   FieldValue,
   eventQueryDataGenerator,
   Clause,
+  ActionType,
   ClauseInput,
   EventConfig,
   FieldType,
@@ -293,29 +294,40 @@ describe('deduplication query input conversion', () => {
   describe('falsy field values', () => {
     const eventConfigWithNumberField = {
       ...ChildOnboardingEvent,
-      declaration: {
-        ...ChildOnboardingEvent.declaration,
-        pages: [
-          ...ChildOnboardingEvent.declaration.pages,
-          {
-            id: 'extra',
-            type: PageTypes.enum.FORM,
-            requireCompletionToContinue: false,
-            title: { id: 'extra', defaultMessage: 'Extra', description: '' },
-            fields: [
-              {
-                id: 'child.previousBirths',
-                type: FieldType.NUMBER,
-                label: {
-                  id: 'previousBirths',
-                  defaultMessage: 'Previous births',
-                  description: ''
-                }
+      actions: ChildOnboardingEvent.actions.map((action) =>
+        action.type === ActionType.DECLARE
+          ? {
+              ...action,
+              declaration: {
+                ...action.declaration,
+                pages: [
+                  ...action.declaration.pages,
+                  {
+                    id: 'extra',
+                    type: PageTypes.enum.FORM,
+                    requireCompletionToContinue: false,
+                    title: {
+                      id: 'extra',
+                      defaultMessage: 'Extra',
+                      description: ''
+                    },
+                    fields: [
+                      {
+                        id: 'child.previousBirths',
+                        type: FieldType.NUMBER,
+                        label: {
+                          id: 'previousBirths',
+                          defaultMessage: 'Previous births',
+                          description: ''
+                        }
+                      }
+                    ]
+                  }
+                ]
               }
-            ]
-          }
-        ]
-      }
+            }
+          : action
+      )
     } satisfies EventConfig
 
     function queryFor(

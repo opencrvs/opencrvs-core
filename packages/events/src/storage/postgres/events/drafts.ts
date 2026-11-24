@@ -143,8 +143,9 @@ export async function getDraftsByEventIdAndUserId(
     .selectFrom('eventActionDrafts')
     .where('eventId', '=', eventId)
     .where('createdBy', '=', createdBy)
+    .where('actionType', 'in', DraftInput.shape.type.options)
     .selectAll()
     .execute()
 
-  return z.array(Draft).parse(drafts.map(toDraftDocument) satisfies Draft[])
+  return drafts.map(toDraftDocument)
 }
