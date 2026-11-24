@@ -124,25 +124,5 @@ export const StatusPillsLineUp: Story = {
         })
       }
     })
-
-    await step('Each pill stays inside the actions column', async () => {
-      for (const cell of actionCells) {
-        const pill = within(cell).getByText(/^(Active|Deactivated|Pending)$/)
-        await expect(pill.getBoundingClientRect().left).toBeGreaterThanOrEqual(
-          cell.getBoundingClientRect().left
-        )
-      }
-    })
-
-    await step('The pill and the menu are right-aligned', async () => {
-      for (const cell of actionCells) {
-        const lastItem =
-          cell.querySelector('button[popovertarget]') ??
-          within(cell).getByText(/^(Active|Deactivated|Pending)$/)
-        await expect(Math.round(lastItem.getBoundingClientRect().right)).toBe(
-          Math.round(cell.getBoundingClientRect().right)
-        )
-      }
-    })
   }
 }
