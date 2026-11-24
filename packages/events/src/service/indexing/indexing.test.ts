@@ -795,6 +795,17 @@ describe('withJurisdictionFilters', () => {
     term: { someField: 'someValue' }
   }
 
+  test('matches no records if no scopes are given', () => {
+    const result = withJurisdictionFilters({
+      query: baseQuery,
+      scopesV2: []
+    })
+
+    expect(result).toEqual({
+      bool: { must_not: { match_all: {} } }
+    })
+  })
+
   test('returns original query if no scope filters are applied', () => {
     const result = withJurisdictionFilters({
       query: baseQuery,
