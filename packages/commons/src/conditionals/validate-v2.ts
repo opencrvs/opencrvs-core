@@ -36,9 +36,6 @@ export type AnnotationFormValues = {
  */
 export type FormValues = DeclarationFormValues | AnnotationFormValues
 
-/**
- * The user who performs the action.
- */
 export type UserConditionalContext = {
   /** In system-wide context internal service tokens do not have UUID. */
   sub: string
@@ -99,7 +96,7 @@ type CommonConditionalParameters = {
 /**
  * @private - Build Conditional parameters based on your need.
  * @see buildActionFormConditionalParameters when user is performing actions
- * @see buildActionConditionalContext when deciding if action is available
+ * @see buildActionConditionalParameters when deciding if action is available
  * @see buildSecuredConditionalParameters when evaluating if field is secured
  * @see buildCertificateTemplateConditionalParameters when evaluating which templates are available.
  */
@@ -120,7 +117,6 @@ function buildCommonConditionalParameters(
 
 /*
  * ActionForm: field visibility, field validation and page visibility in the form of one action.
- * `eventDocument` contains the actions before the current action.
  */
 export type ActionFormConditionalContext = EventDocumentConditionalContext & {
   user: UserConditionalContext
@@ -146,8 +142,7 @@ export function buildActionFormConditionalParameters(
 }
 
 /**
- * ActionConditional: whether an action is shown (SHOW) or enabled (ENABLE).
- * `eventDocument` contains the actions before the current action.
+ * ActionConditional: whether an action is visible or enabled. field('..') targets current state declaration.
  */
 export type ActionConditionalContext = EventDocumentConditionalContext & {
   user: UserConditionalContext
@@ -170,8 +165,7 @@ export function buildActionConditionalParameters(
 }
 
 /**
- * CertificateTemplate: which certificate templates are available.
- * Templates are chosen in the PRINT_CERTIFICATE action. `eventDocument` contains the actions before that action.
+ * CertificateTemplate: which certificate templates are available for printing.
  */
 export type CertificateTemplateConditionalContext =
   EventDocumentConditionalContext
