@@ -63,23 +63,7 @@ export function introductionPage(version: BirthVersion) {
             fontVariant: 'reg16'
           }
         }
-      },
-      ...(version === BirthVersion.INITIAL
-        ? [
-            {
-              id: 'form.section.information.birth.deprecatedVersion',
-              type: FieldType.PARAGRAPH,
-              label: {
-                defaultMessage:
-                  'This is a deprecated form version. It was in use before 1 September 2026.',
-                description:
-                  'Note on the introduction page of the birth form version that was in use before 1 September 2026',
-                id: 'form.section.information.birth.deprecatedVersion'
-              },
-              configuration: {}
-            }
-          ]
-        : [])
+      }
     ]
   })
 }

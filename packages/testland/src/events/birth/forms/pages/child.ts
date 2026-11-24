@@ -337,7 +337,7 @@ export function childPage(version: BirthVersion) {
             : {
                 defaultMessage: 'Facility of occurrence',
                 description:
-                  'Label of the place of birth field in the birth form version that was in use before 1 September 2026',
+                  'Label of the place of birth field in the birth form version that was in use before 26 November 2026',
                 id: 'event.birth.action.declare.form.section.child.field.placeOfBirth.initial.label'
               },
         options: placeOfBirthOptions

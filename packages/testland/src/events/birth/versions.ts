@@ -14,9 +14,9 @@ import { INITIAL_EVENT_CONFIG_VERSION_ID } from '@opencrvs/toolkit/events'
  * The versions of the birth event. Testland has two of them, so that QA can test
  * form versioning (#7463) against records of a version that is no longer current.
  *
- * - `initial` is the form that was in use before 1 September 2026. It keeps the
+ * - `initial` is the form that was in use before 26 November 2026. It keeps the
  *   id of the version that every record created before versioning is stamped with.
- * - `v2` is the current form, in effect from 1 September 2026.
+ * - `v2` is the current form, in effect from 26 November 2026.
  */
 export const BirthVersion = {
   INITIAL: INITIAL_EVENT_CONFIG_VERSION_ID,
@@ -26,4 +26,4 @@ export const BirthVersion = {
 export type BirthVersion = (typeof BirthVersion)[keyof typeof BirthVersion]
 
 /** The date from which version `v2` is in effect. */
-export const BIRTH_V2_EFFECTIVE_FROM = '2026-09-01'
+export const BIRTH_V2_EFFECTIVE_FROM = '2026-11-26'

@@ -1551,7 +1551,7 @@ export const birthEvent = defineConfig({
       label: {
         defaultMessage: 'Initial',
         description:
-          'Name of the birth form version that was in use before 1 September 2026',
+          'Name of the birth form version that was in use before 26 November 2026',
         id: 'event.birth.version.initial.label'
       },
       versionActions: [INITIAL_ONLY_ACTION]
@@ -1561,7 +1561,7 @@ export const birthEvent = defineConfig({
       label: {
         defaultMessage: 'V2',
         description:
-          'Name of the birth form version that is in use from 1 September 2026',
+          'Name of the birth form version that is in use from 26 November 2026',
         id: 'event.birth.version.v2.label'
       },
       effectiveFrom: BIRTH_V2_EFFECTIVE_FROM,
