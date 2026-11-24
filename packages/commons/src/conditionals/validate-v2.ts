@@ -116,7 +116,7 @@ function buildCommonConditionalParameters(
 }
 
 /*
- * ActionForm: field visibility, field validation and page visibility in the form of one action.
+ * ActionForm: field visibility, field validation and page visibility in the form of one action. Used by declaration and annotation actions.
  */
 export type ActionFormConditionalContext = EventDocumentConditionalContext & {
   user: UserConditionalContext
