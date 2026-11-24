@@ -37,6 +37,7 @@ const result = JSON.parse(readFileSync(resultPath, 'utf8'))
 function clean(text) {
   return String(text ?? '')
     .replace(/\r?\n+/g, ' ')
+    .replace(/`+/g, '`')
     .split(/(`[^`]*`)/)
     .map((part, index) =>
       // Odd parts are code spans. GitHub shows code as text: it does not read
