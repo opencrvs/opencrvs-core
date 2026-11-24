@@ -105,8 +105,9 @@ export function getInvalidUpdateKeys<T>({
     }))
 }
 
-/** @returns The user of the token. */
-function getUserConditionalContext(token: string): UserConditionalContext {
+export function getUserConditionalContext(
+  token: string
+): UserConditionalContext {
   const tokenPayload = getOrThrow(getTokenPayload(token), 'Token is missing.')
 
   return {

@@ -149,10 +149,13 @@ export function buildActionFormConditionalParameters(
  * ActionConditional: whether an action is shown (SHOW) or enabled (ENABLE).
  * `eventDocument` contains the actions before the current action.
  */
-export type ActionConditionalContext = EventDocumentConditionalContext
+export type ActionConditionalContext = EventDocumentConditionalContext & {
+  user: UserConditionalContext
+}
 
 export type ActionConditionalParameters = CommonConditionalParameters & {
   $event: EventDocument
+  $user: UserConditionalContext
 }
 
 export function buildActionConditionalParameters(
@@ -161,7 +164,8 @@ export function buildActionConditionalParameters(
 ): ActionConditionalParameters {
   return {
     ...buildCommonConditionalParameters(form, context),
-    $event: context.eventDocument
+    $event: context.eventDocument,
+    $user: context.user
   }
 }
 

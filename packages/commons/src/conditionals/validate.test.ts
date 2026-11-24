@@ -526,7 +526,10 @@ describe('isActionVisible with status()', () => {
       isActionVisible(
         reinstateConfig,
         { declaration: {}, annotation: {} },
-        { eventDocument, eventConfig: tennisClubMembershipEvent }
+        {
+          ...generateEmptyTestValidatorContext(tennisClubMembershipEvent),
+          eventDocument
+        }
       )
     ).toBe(true)
   })
@@ -544,7 +547,10 @@ describe('isActionVisible with status()', () => {
       isActionVisible(
         reinstateConfig,
         { declaration: {}, annotation: {} },
-        { eventDocument, eventConfig: tennisClubMembershipEvent }
+        {
+          ...generateEmptyTestValidatorContext(tennisClubMembershipEvent),
+          eventDocument
+        }
       )
     ).toBe(false)
   })
