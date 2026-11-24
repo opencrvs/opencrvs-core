@@ -100,7 +100,7 @@ const ProfileMenuComponent = ({
         toggleButton={
           <Avatar
             name={getUserName(userDetails)}
-            size="sm"
+            size="md"
             src={userDetails?.avatar}
           />
         }

@@ -86,7 +86,7 @@ Below, "your revoked flag" means the flag your custom revoke adds. The examples 
 
 **Do not delete the custom revoke action or your revoked flag.** Flags are recalculated from the current config, so removing them un-revokes every record revoked with them. Keep both, and stop new custom revocations instead:
 
-1. **Event config.** Add the core actions next to the custom ones. Copy the custom actions' `label`, `icon`, `supportingCopy`, `form` and `flags`, leaving out every operation on your revoked flag: the `REVOKED` status replaces it. Hide the core revoke on records revoked the old way:
+1. **Event config.** Add the core actions next to the custom ones. Copy the custom actions' `label`, `icon`, `dialogCopy` (`supportingCopy` before 2.2), `form` and `flags`, leaving out every operation on your revoked flag: the `REVOKED` status replaces it. Hide the core revoke on records revoked the old way:
 
    ```ts
    {
@@ -209,6 +209,8 @@ Core 2.2 reads event configurations only in the versioned shape, so a country co
 
 `opencrvs upgrade` does it for you: the `resolve-versioned-event-config` codemod rewrites every read of a version's field on a `VersionedEventConfig` under `src/`, and every `VersionedEventConfig` passed where an `EventConfig` is expected, to go through `resolveEventConfig`, and imports it. It then lists every use it could not rewrite (an optional chain, a destructured field, an assignment, a value that may be `undefined`) for you to change by hand.
 
+**Analytics must use the version of each record.** The codemod makes `src/analytics/analytics.ts` read each event configuration through `resolveEventConfig`, which gives the version in effect today. This is correct while an event has one version. When you add a second version, read the configuration of each record through `getEventConfigForRecord(config, event)` instead. Otherwise, analytics drops the fields that only an older version has, and the Metabase cards that use those fields break. See `packages/testland/src/analytics/analytics.ts` in opencrvs-core for an example.
+
 **`GET /api/events/config` returns the versioned shape.** Each event in the response is now `{ id, label, advancedSearch, versions }`, and the fields of a version (`actions`, `title`, `summary`, `flags`...) are under `versions[]`, each with its `id` and `effectiveFrom`. An event configured without versions comes back as a single version with id `initial` and `effectiveFrom` `0001-01-01`. Integrations that read `actions` or another version field off an event must read it from a version instead.
 
 **Records carry `configVersionId`.** Event documents and search results have the id of the version the record was created under. `event.create` takes an optional `configVersionId`: without it, the record is created under the version in effect. A given `configVersionId` must be a configured version already in effect, or the call fails with HTTP 400.
@@ -305,6 +307,57 @@ Check conditionals that rely on the old counting:
 
 [#10876](https://github.com/opencrvs/opencrvs-core/issues/10876)
 
+#### `supportingCopy` is renamed to `dialogCopy`, and each action gives the copy of its own dialog
+
+`dialogCopy` is now the one key for the text at the top of a confirmation dialog:
+
+- `NOTIFY`, `DECLARE`, `REGISTER`, `REJECT`, `ARCHIVE`, `UNARCHIVE`, `REVOKE_REGISTRATION`, `REINSTATE_REGISTRATION` and custom actions give one message in `dialogCopy`. The dialog of the action shows it, wherever the dialog opens.
+- `EDIT` gives `dialogCopy.notify`, `dialogCopy.declare` and `dialogCopy.register` for the dialogs of the edit page, as before.
+- The other actions do not accept `dialogCopy`, because no dialog of these actions shows copy from the configuration.
+
+The `DECLARE` action no longer gives copy for the notify and register dialogs of the declaration review page. These dialogs show the `dialogCopy` of the `NOTIFY` and `REGISTER` actions.
+
+```diff
+ {
+   type: ActionType.DECLARE,
+-  dialogCopy: {
+-    notify: { id: 'event.birth.action.declare.notify.copy', ... },
+-    declare: { id: 'event.birth.action.declare.declare.copy', ... },
+-    register: { id: 'event.birth.action.declare.register.copy', ... }
+-  },
++  dialogCopy: { id: 'event.birth.action.declare.declare.copy', ... },
+   ...
+ },
+ {
+   type: ActionType.NOTIFY,
++  dialogCopy: { id: 'event.birth.action.declare.notify.copy', ... },
+   ...
+ },
+ {
+   type: ActionType.REGISTER,
++  dialogCopy: { id: 'event.birth.action.declare.register.copy', ... },
+   ...
+ },
+ {
+   type: ActionType.REJECT,
+-  supportingCopy: { id: 'event.birth.action.reject.supportingCopy', ... },
++  dialogCopy: { id: 'event.birth.action.reject.supportingCopy', ... },
+   ...
+ }
+```
+
+**Change in behaviour:** before 2.2, the register dialog of the declaration review page showed `dialogCopy.register` of the `DECLARE` action, and the register dialog of the action menu showed `supportingCopy` of the `REGISTER` action. Now both dialogs show the `dialogCopy` of the `REGISTER` action. If your config gives both, make sure that the copy of the `REGISTER` action fits both dialogs.
+
+**Country configs must change the old keys.** A `DECLARE` action whose `dialogCopy` has `notify`, `declare` and `register` fails validation. `opencrvs upgrade` changes them for you. Its `move-supporting-copy-to-dialog-copy` codemod:
+
+- renames `supportingCopy` to `dialogCopy`, and removes the `supportingCopy` that no dialog showed
+- gives the `declare` copy of the `DECLARE` action as its `dialogCopy`, and moves the `notify` and `register` copy to the `NOTIFY` and `REGISTER` actions. When one of these actions already gives copy, the codemod keeps that copy. When the event has no `NOTIFY` action, the codemod removes the `notify` copy, because an event without a `NOTIFY` action cannot be notified.
+- lists every place that it could not change, for you to change by hand
+
+The translation keys do not change.
+
+[#13697](https://github.com/opencrvs/opencrvs-core/issues/13697)
+
 ### New features
 
 #### Create records under a past configuration version (experimental)
@@ -317,7 +370,7 @@ The feature is experimental. Its UI is not a supported feature in 2.2. It can ch
 
 #### `REVOKED` status with revoke and reinstate registration actions
 
-Added `EventStatus.REVOKED` and two core actions, `ActionType.REVOKE_REGISTRATION` and `ActionType.REINSTATE_REGISTRATION`, that move a record between `REGISTERED` and `REVOKED`, guarded by new `record.revoke-registration` and `record.reinstate-registration` scopes. Existing environments need a reindex for the new `legalStatuses.REVOKED` field. [#4569](https://github.com/opencrvs/opencrvs-core/issues/4569)
+Added `EventStatus.REVOKED` and two core actions, `ActionType.REVOKE_REGISTRATION` and `ActionType.REINSTATE_REGISTRATION`, that move a record between `REGISTERED` and `REVOKED`, guarded by new `record.revoke-registration` and `record.reinstate-registration` scopes. Existing environments need a reindex for the new `legalStatuses.REVOKED` field. The confirmation dialogs of these actions show only the `dialogCopy` of the action, and core gives no default copy. [#4569](https://github.com/opencrvs/opencrvs-core/issues/4569)
 
 #### Exclude statuses in workqueue and search queries
 
@@ -342,6 +395,10 @@ The toolkit and the country configuration template work with any container regis
 1. Update `.github/TEMPLATES/secret-migration.yaml`, `github-to-k8s-sync-env.yml` and `deploy-opencrvs.yml` from [opencrvs/infrastructure](https://github.com/opencrvs/infrastructure). The secrets are copied to the new names on the next deployment.
 2. Add `publish-to-registry.yml` from the template to your country configuration repository. **Do not delete `publish-to-dockerhub.yml`**: replace its content with the template's deprecated version, because release branches such as `release/2.1.1` still use it.
 
+#### Measure late registration from the declaration date
+
+Date rules could only compare with today, so a record declared on time became late when a registrar reviewed or corrected it after the deadline. Date rules can now compare with the date of an action on the record, for example `field('child.dob').isAfter().days(365).beforeAction(event.firstAction(ActionType.NOTIFY, ActionType.DECLARE))`. Use `event.firstAction(...)` or `event.lastAction(...)` with one or more action types, and `.beforeAction(...)` or `.afterAction(...)` after `isAfter().days(n)` or `isBefore().days(n)`. Only accepted actions count. Until one exists, the rule compares with today. To get the same behaviour, replace `.inPast()` with `.beforeAction(...)` in your late registration rules. [#14329](https://github.com/opencrvs/opencrvs-core/issues/14329)
+
 ### Improvements
 
 - Review auth_mode secret management for OpenCRVS helm chart [#14234](https://github.com/opencrvs/opencrvs-core/issues/14234)
@@ -353,6 +410,8 @@ The toolkit and the country configuration template work with any container regis
 - `environment:init` now asks whether to enable monitoring, so environments that do not need their own monitoring stack (for example `qa-hotfix` on a cluster that already hosts `qa`) can switch it off without editing the generated YAML. The answer is stored as the GitHub environment variable `MONITORING_ENABLED` and drives `monitoring.enabled`, `otel.enabled` and Traefik tracing in the generated Helm values, so OpenTelemetry is on exactly when monitoring is. The Kibana credential questions are skipped when monitoring is disabled. Re-run `environment:init` for existing environments to create the variable; it defaults to enabled, which matches the previous behaviour. [#13377](https://github.com/opencrvs/opencrvs-core/issues/13377)
 - `environment:init` now asks about workflow approvals for every environment, not only production, and always stores the GitHub environment variable `APPROVAL_REQUIRED` (default `true` for production, `false` for other environments). `GH_APPROVERS` is asked whenever approvals are enabled. The infrastructure workflows require manual approval unless `APPROVAL_REQUIRED` is `false`, so re-run `environment:init` for existing non-production environments (or set the variable by hand) before updating the infrastructure repository.
 - Upgrade Node.js to 22.23.4, a Node.js security release. This applies to every core image and to CI.
+- Sync locations and administrative areas incrementally. When the client has the lists cached, it asks the server only for the rows written since its last sync, instead of downloading the full lists again. The lists refresh every minute instead of once a day. The `Location` and `AdministrativeArea` responses of `GET /locations` and `GET /administrative-areas` now include `updatedAt`. [#14098](https://github.com/opencrvs/opencrvs-core/issues/14098)
+- Add e2e tests setup: `environment:init` asks whether to enable e2e tests for the environment, and `opencrvs upgrade` adds the sample Playwright tests of the country config template to country configs that have no `e2e/` directory [#13345](https://github.com/opencrvs/opencrvs-core/issues/13345)
 
 ### Bug fixes
 

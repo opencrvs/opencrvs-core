@@ -40,6 +40,7 @@ import { serializeSearchParams } from '@client/v2-events/features/events/Search/
 import { testDataGenerator } from '@client/tests/test-data-generators'
 import { TRPCProvider, AppRouter } from '@client/v2-events/trpc'
 import { ROUTES, routesConfig } from '@client/v2-events/routes'
+import { locationListHandlers } from '../../../../../.storybook/default-request-handlers'
 import { AdvancedSearch } from './index'
 
 const meta: Meta<typeof AdvancedSearch> = {
@@ -71,6 +72,7 @@ const IBOMBO_ADMIN_AREA_ID = '62a0ccb4-880d-4f30-8882-f256007dfff9' as UUID
  */
 const RENAMED_FACILITY: Location = {
   id: 'a1a1a1a1-1111-4111-8111-111111111111' as UUID,
+  updatedAt: '2024-01-01T00:00:00.000Z',
   name: 'New Riverside Health Post',
   locationType: 'HEALTH_FACILITY',
   administrativeAreaId: IBOMBO_ADMIN_AREA_ID,
@@ -97,6 +99,7 @@ const RENAMED_FACILITY: Location = {
 /** A health facility in Ibombo that has since been inactivated (closed). */
 const INACTIVE_FACILITY: Location = {
   id: 'b2b2b2b2-2222-4222-8222-222222222222' as UUID,
+  updatedAt: '2024-01-01T00:00:00.000Z',
   name: 'Closed Hilltop Health Post',
   locationType: 'HEALTH_FACILITY',
   administrativeAreaId: IBOMBO_ADMIN_AREA_ID,
@@ -122,6 +125,7 @@ const mockLocations: Location[] = [
 /** A currently-valid top-level administrative area. */
 const ACTIVE_PROVINCE: AdministrativeArea = {
   id: 'c3c3c3c3-3333-4333-8333-333333333333' as UUID,
+  updatedAt: '2024-01-01T00:00:00.000Z',
   name: 'ZZ Active Province',
   externalId: null,
   parentId: null,
@@ -140,6 +144,7 @@ const ACTIVE_PROVINCE: AdministrativeArea = {
 /** A top-level administrative area that has since been inactivated. */
 const INACTIVE_PROVINCE: AdministrativeArea = {
   id: 'd4d4d4d4-4444-4444-8444-444444444444' as UUID,
+  updatedAt: '2024-01-01T00:00:00.000Z',
   name: 'ZZ Closed Province',
   externalId: null,
   parentId: null,
@@ -216,8 +221,10 @@ const mswConfig = {
       })
     ],
     eventLocations: [
-      tRPCMsw.locations.list.query(() => mockLocations),
-      tRPCMsw.administrativeAreas.list.query(() => mockAdministrativeAreas)
+      ...locationListHandlers({
+        locations: mockLocations,
+        administrativeAreas: mockAdministrativeAreas
+      })
     ],
     user: [
       tRPCMsw.user.list.query(() => {

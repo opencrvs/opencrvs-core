@@ -25,6 +25,7 @@ const rng = createPrng(4242)
 
 const versionedProvince: AdministrativeArea = {
   id: generateUuid(rng),
+  updatedAt: '2024-01-01T00:00:00.000Z',
   name: 'Greater Pangasinan',
   externalId: null,
   parentId: null,
@@ -37,6 +38,7 @@ const versionedProvince: AdministrativeArea = {
 
 const versionedDistrict: AdministrativeArea = {
   id: generateUuid(rng),
+  updatedAt: '2024-01-01T00:00:00.000Z',
   name: 'Alaminos City',
   externalId: null,
   parentId: versionedProvince.id,
@@ -54,6 +56,7 @@ const versionedDistrict: AdministrativeArea = {
 
 const versionedOffice: Location = {
   id: generateUuid(rng),
+  updatedAt: '2024-01-01T00:00:00.000Z',
   name: 'Alaminos City Registry Office',
   externalId: null,
   administrativeAreaId: versionedDistrict.id,
@@ -70,6 +73,7 @@ const versionedOffice: Location = {
 
 const standaloneOffice: Location = {
   id: generateUuid(rng),
+  updatedAt: '2024-01-01T00:00:00.000Z',
   name: 'Standalone Office',
   externalId: null,
   administrativeAreaId: null,
@@ -275,7 +279,8 @@ describe('toClientLocation / toClientAdministrativeArea', () => {
       id: versionedOffice.id,
       administrativeAreaId: versionedOffice.administrativeAreaId,
       locationType: versionedOffice.locationType,
-      versions: versionedOffice.versions
+      versions: versionedOffice.versions,
+      updatedAt: versionedOffice.updatedAt
     })
   })
 
@@ -284,7 +289,8 @@ describe('toClientLocation / toClientAdministrativeArea', () => {
     expect(stripped).toEqual({
       id: versionedDistrict.id,
       parentId: versionedDistrict.parentId,
-      versions: versionedDistrict.versions
+      versions: versionedDistrict.versions,
+      updatedAt: versionedDistrict.updatedAt
     })
   })
 })

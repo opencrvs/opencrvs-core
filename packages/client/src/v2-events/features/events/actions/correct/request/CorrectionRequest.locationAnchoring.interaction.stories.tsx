@@ -32,6 +32,7 @@ import {
 import { testDataGenerator } from '@client/tests/test-data-generators'
 import { ROUTES } from '@client/v2-events/routes'
 import { AppRouter } from '@client/v2-events/trpc'
+import { locationListHandlers } from '../../../../../../../.storybook/default-request-handlers'
 import { router } from './router'
 import * as Request from './index'
 
@@ -59,6 +60,7 @@ const IBOMBO_ADMIN_AREA_ID = '62a0ccb4-880d-4f30-8882-f256007dfff9' as UUID
  */
 const RENAMED_FACILITY: Location = {
   id: 'a1a1a1a1-1111-4111-8111-111111111111' as UUID,
+  updatedAt: '2024-01-01T00:00:00.000Z',
   name: 'New Riverside Health Post',
   locationType: 'HEALTH_FACILITY',
   administrativeAreaId: IBOMBO_ADMIN_AREA_ID,
@@ -182,8 +184,10 @@ const mswConfig = {
     ],
     event: [tRPCMsw.event.get.query(() => birthEventDocument)],
     eventLocations: [
-      tRPCMsw.locations.list.query(() => [RENAMED_FACILITY]),
-      tRPCMsw.administrativeAreas.list.query(() => [])
+      ...locationListHandlers({
+        locations: [RENAMED_FACILITY],
+        administrativeAreas: []
+      })
     ],
     user: [
       tRPCMsw.user.list.query(() => [mockUser]),
@@ -281,8 +285,10 @@ const mswConfigPostRename = {
     ],
     event: [tRPCMsw.event.get.query(() => birthEventDocumentPostRename)],
     eventLocations: [
-      tRPCMsw.locations.list.query(() => [RENAMED_FACILITY]),
-      tRPCMsw.administrativeAreas.list.query(() => [])
+      ...locationListHandlers({
+        locations: [RENAMED_FACILITY],
+        administrativeAreas: []
+      })
     ],
     user: [
       tRPCMsw.user.list.query(() => [mockUser]),

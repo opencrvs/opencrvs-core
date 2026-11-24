@@ -39,8 +39,8 @@ importers:
         specifier: ^7.0.0
         version: 7.1.2
       '@opencrvs/toolkit':
-        specifier: 2.2.0-rc.5bf5dfc
-        version: 2.2.0-rc.5bf5dfc(@types/node@18.19.130)(typescript@7.0.2)
+        specifier: 2.2.0-rc.977cf84
+        version: 2.2.0-rc.977cf84(@types/node@18.19.130)(typescript@7.0.2)
       '@opentelemetry/auto-instrumentations-node':
         specifier: ^0.78.0
         version: 0.78.0(@opentelemetry/api@1.9.1)(@opentelemetry/core@2.12.1(@opentelemetry/api@1.9.1))
@@ -201,6 +201,9 @@ importers:
       '@octokit/core':
         specifier: 4.2.1
         version: 4.2.1
+      '@playwright/test':
+        specifier: 1.61.1
+        version: 1.61.1
       '@types/handlebars':
         specifier: ^4.1.0
         version: 4.1.0
@@ -1021,8 +1024,8 @@ packages:
   '@octokit/types@9.3.2':
     resolution: {integrity: sha512-D4iHGTdAnEEVsB8fl95m1hiz7D5YiRdQ9b/OEb3BYRVwbLsGHcRVPz+u+BgRLNk0Q0/4iZCBqDN96j2XNxfXrA==}
 
-  '@opencrvs/toolkit@2.2.0-rc.5bf5dfc':
-    resolution: {integrity: sha512-hnDzbjdNIEiu13wUOx+A5o1aLY3qZmufW+q2bKFcYJhjMBiy4blQyou4j1p2Dlx/xezhdvuufQ1yshs53nT2Hw==}
+  '@opencrvs/toolkit@2.2.0-rc.977cf84':
+    resolution: {integrity: sha512-LmEGrgnyHa/lChuE3Zh/lwRlvmG1eAk+AWXWBNhMAhwNqLYex1OA//7bcyseY4IXmAEKc8TU4JhBJbVXYmzJFQ==}
     hasBin: true
 
   '@opentelemetry/api-logs@0.220.0':
@@ -1523,6 +1526,11 @@ packages:
   '@pkgjs/parseargs@0.11.0':
     resolution: {integrity: sha512-+1VkjdD0QBLPodGrJUeqarH8VAIvQODIbwh9XpP5Syisf7YoQgsJKPNFoqqLQlu+VQ/tVSshMR6loPMn8U+dPg==}
     engines: {node: '>=14'}
+
+  '@playwright/test@1.61.1':
+    resolution: {integrity: sha512-8nKv6+0RJSL9FE4jYOEGXnPeM/Hg12qZpmqzZjRh3qM0Y7c3z1mrOTfFLids72RDQYVh9WpLEfR5WdpNX4fkig==}
+    engines: {node: '>=18'}
+    hasBin: true
 
   '@protobufjs/aspromise@1.1.2':
     resolution: {integrity: sha512-j+gKExEuLmKwvz3OgROXtrJ2UG2x8Ch2YZUxahh+s1F2HZ+wAceUNLkvy6zKCPVRkU++ZWQrdxsUeQXmcg4uoQ==}
@@ -2880,6 +2888,11 @@ packages:
     resolution: {integrity: sha512-GMBAbW9antB8iZRHLoGw0b3HANt57diZYFO/HL1JGIC1MjKrdmhxvrJbupnVvpys0zsz7yBApXdQyfepKly2kA==}
     engines: {node: '>=0.10.0'}
 
+  fsevents@2.3.2:
+    resolution: {integrity: sha512-xiqMQR4xAeHTuB9uWm+fFRcIOgKBMiOBP+eXiyT7jsgVCq1bkVygt00oASowB7EdtpOHaaPgKt812P9ab+DDKA==}
+    engines: {node: ^8.16.0 || ^10.6.0 || >=11.0.0}
+    os: [darwin]
+
   fsevents@2.3.3:
     resolution: {integrity: sha512-5xoDfX+fL7faATnagmWPpbFtwh/R77WmMMqqHGS65C3vvB0YHrgF+B1YmZ3441tMj5n63k0212XNoJwzlhffQw==}
     engines: {node: ^8.16.0 || ^10.6.0 || >=11.0.0}
@@ -4006,6 +4019,16 @@ packages:
   pkg-up@3.1.0:
     resolution: {integrity: sha512-nDywThFk1i4BQK4twPQ6TA4RT8bDY96yeuCVBWL3ePARCiEKDRSrNGbFIgUJpLp+XeIR65v8ra7WuJOFUBtkMA==}
     engines: {node: '>=8'}
+
+  playwright-core@1.61.1:
+    resolution: {integrity: sha512-h7Qlt6m4REp25qvIdvbDtVmD4LqVXfpRxhORv9L0jzETM05p4fuPJ3dKyuSXQxDSbXnmS79HAgi9589lGSpLkg==}
+    engines: {node: '>=18'}
+    hasBin: true
+
+  playwright@1.61.1:
+    resolution: {integrity: sha512-DWnY5o3YbLWK4GovuAVwpqL+1VwGNdUGrRr++8j8PtQQzvAVZUIMjKQ90fY689sEJZJBbZVw1rXaOKSTitkzPQ==}
+    engines: {node: '>=18'}
+    hasBin: true
 
   please-upgrade-node@3.2.0:
     resolution: {integrity: sha512-gQR3WpIgNIKwBMVLkpMUeR3e1/E1y42bqDQZfql+kDeXd8COYfM8PQA4X6y7a8u9Ua9FHmsrrmirW2vHs45hWg==}
@@ -5581,7 +5604,7 @@ snapshots:
     dependencies:
       '@octokit/openapi-types': 18.1.1
 
-  '@opencrvs/toolkit@2.2.0-rc.5bf5dfc(@types/node@18.19.130)(typescript@7.0.2)':
+  '@opencrvs/toolkit@2.2.0-rc.977cf84(@types/node@18.19.130)(typescript@7.0.2)':
     dependencies:
       '@inquirer/prompts': 8.5.2(@types/node@18.19.130)
       '@octokit/core': 4.2.1
@@ -6327,6 +6350,10 @@ snapshots:
 
   '@pkgjs/parseargs@0.11.0':
     optional: true
+
+  '@playwright/test@1.61.1':
+    dependencies:
+      playwright: 1.61.1
 
   '@protobufjs/aspromise@1.1.2': {}
 
@@ -7786,6 +7813,9 @@ snapshots:
     dependencies:
       map-cache: 0.2.2
 
+  fsevents@2.3.2:
+    optional: true
+
   fsevents@2.3.3:
     optional: true
 
@@ -8961,6 +8991,14 @@ snapshots:
   pkg-up@3.1.0:
     dependencies:
       find-up: 3.0.0
+
+  playwright-core@1.61.1: {}
+
+  playwright@1.61.1:
+    dependencies:
+      playwright-core: 1.61.1
+    optionalDependencies:
+      fsevents: 2.3.2
 
   please-upgrade-node@3.2.0:
     dependencies:

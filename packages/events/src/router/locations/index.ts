@@ -21,7 +21,8 @@ import {
 import {
   internalProcedure,
   router,
-  userAndSystemProcedure
+  userAndSystemProcedure,
+  userOnlyProcedure
 } from '@events/router/trpc'
 import {
   createLocation,
@@ -30,6 +31,7 @@ import {
   getLocationHierarchy,
   getLocations,
   setLocations,
+  syncLocations,
   updateLocation,
   withdrawLocationVersion
 } from '@events/service/locations/locations'
@@ -95,6 +97,27 @@ export const locationRouter = router({
       }
     })
   ),
+  /**
+   * Incremental sync of the client cache. Returns the locations written since
+   * the previous sync, and `syncedAt` for the next one. When `since` is not
+   * given, it returns all locations, so that the first fetch also gets
+   * `syncedAt` from the server.
+   */
+  sync: userOnlyProcedure
+    .input(
+      z.object({
+        since: z.iso
+          .datetime()
+          .optional()
+          .describe(
+            'Return the rows written after this time. Rows written up to one minute before it are also returned, to include writes that committed late. Pass the `syncedAt` of the previous response to receive only the new changes. Omit it to receive all rows, for example on the first fetch.'
+          )
+      })
+    )
+    // `z.custom` does not validate the output at runtime, the same as `list`,
+    // because validation of all locations is slow.
+    .output(z.custom<{ syncedAt: string; locations: Location[] }>())
+    .query(async ({ input }) => syncLocations(input.since)),
   create: userAndSystemProcedure
     .meta({
       openapi: {

@@ -652,6 +652,8 @@ jobs:
     if: github.event_name == 'pull_request'
     runs-on: ubuntu-26.04
     permissions:
+      # actions/checkout needs `contents: read` in a private repository.
+      contents: read
       pull-requests: write
 
     steps:

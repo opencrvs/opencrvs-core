@@ -29,6 +29,7 @@ import * as selectEvent from '@client/v2-events/select-event'
 import { localDraftStore } from '@client/v2-events/features/drafts/useDrafts'
 import { ROUTES, routesConfig } from '@client/v2-events/routes'
 import { AppRouter } from '@client/v2-events/trpc'
+import { locationListHandlers } from '../../../../../../.storybook/default-request-handlers'
 import { useActionAnnotation } from '../../useActionAnnotation'
 import { useEventFormData } from '../../useEventFormData'
 import { Pages } from './index'
@@ -58,6 +59,7 @@ const IBOMBO_ADMIN_AREA_ID = '62a0ccb4-880d-4f30-8882-f256007dfff9' as UUID
  */
 const RENAMED_FACILITY: Location = {
   id: 'a1a1a1a1-1111-4111-8111-111111111111' as UUID,
+  updatedAt: '2024-01-01T00:00:00.000Z',
   name: 'New Riverside Health Post',
   locationType: 'HEALTH_FACILITY',
   administrativeAreaId: IBOMBO_ADMIN_AREA_ID,
@@ -88,6 +90,7 @@ const RENAMED_FACILITY: Location = {
  */
 const RENAMED_BUT_ALWAYS_ACTIVE_FACILITY: Location = {
   id: 'b2b2b2b2-2222-4222-8222-222222222222' as UUID,
+  updatedAt: '2024-01-01T00:00:00.000Z',
   name: 'Greater Pangasinan Clinic',
   locationType: 'HEALTH_FACILITY',
   administrativeAreaId: IBOMBO_ADMIN_AREA_ID,
@@ -160,11 +163,10 @@ const mswConfig = {
       tRPCMsw.event.search.query(() => ({ results: [], total: 0 }))
     ],
     eventLocations: [
-      tRPCMsw.locations.list.query(() => [
-        RENAMED_FACILITY,
-        RENAMED_BUT_ALWAYS_ACTIVE_FACILITY
-      ]),
-      tRPCMsw.administrativeAreas.list.query(() => [])
+      ...locationListHandlers({
+        locations: [RENAMED_FACILITY, RENAMED_BUT_ALWAYS_ACTIVE_FACILITY],
+        administrativeAreas: []
+      })
     ]
   }
 }

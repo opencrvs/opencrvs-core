@@ -15,59 +15,52 @@ import {
   toClientAdministrativeArea,
   UUID
 } from '@opencrvs/commons/client'
-import { trpcOptionsProxy, useTRPC } from '@client/v2-events/trpc'
+import { trpcClient, trpcOptionsProxy } from '@client/v2-events/trpc'
 import { setQueryDefaults } from '../features/events/useEvents/procedures/utils'
+import {
+  LOCATION_LIST_STALE_TIME_MS,
+  rowsOf,
+  syncCache
+} from './incremental-sync'
 
 setQueryDefaults(trpcOptionsProxy.administrativeAreas.list, {
   meta: {
     useLargeQueryStorage: true
   },
-  queryFn: async (...params) => {
-    const queryOptions =
-      trpcOptionsProxy.administrativeAreas.list.queryOptions()
-    if (typeof queryOptions.queryFn !== 'function') {
-      throw new Error('queryFn is not a function')
-    }
-
-    const administrativeAreas = await queryOptions.queryFn(...params)
-    // Strip the server-flattened `name`/`status`/`externalId` as the cache is
-    // built — see useLocations.ts for the full rationale.
-    return new Map<UUID, ClientAdministrativeArea>(
-      administrativeAreas.map((administrativeArea) => [
-        administrativeArea.id,
-        toClientAdministrativeArea(administrativeArea)
-      ])
-    )
-  },
-  staleTime: 1000 * 60 * 60 * 24 // keep it in cache 1 day
+  // The cached value is a `SyncedCache`, not the `list` response. The query
+  // calls `sync`: without `since` for all rows when the client has no cache,
+  // and with `since` for the changed rows when it has one. The rows are
+  // stripped of the server-flattened `name`/`status`/`externalId`, the same as
+  // for locations in useLocations.ts.
+  queryFn: async ({ client, queryKey, signal }) =>
+    syncCache(client.getQueryData<unknown>(queryKey), async (since) => {
+      const { syncedAt, administrativeAreas } =
+        await trpcClient.administrativeAreas.sync.query({ since }, { signal })
+      return {
+        syncedAt,
+        rows: administrativeAreas.map(toClientAdministrativeArea)
+      }
+    }),
+  staleTime: LOCATION_LIST_STALE_TIME_MS
 })
 
 export function useAdministrativeAreas() {
-  const trpc = useTRPC()
   return {
     getAdministrativeAreas: {
-      useSuspenseQuery: ({
-        isActive,
-        ids
-      }: {
-        isActive?: boolean
-        ids?: UUID[]
-      } = {}) => {
+      useSuspenseQuery: () => {
         // We intentionally remove `queryFn` here because we already set a global default
         // via `setQueryDefaults`. Passing it again would override caching/persistence.
-        // The `...rest` spread carries over things like staleTime, gcTime, enabled, etc.
-        // Then we re-attach the queryKey explicitly so React Query can identify this cache.
-
+        // The `...rest` spread carries the query key and things like staleTime, gcTime, enabled, etc.
+        // Do not pass an input to `queryOptions()`. An input changes the key,
+        // so the hook stops sharing the cache entry that `PrefetchQueries`
+        // fills and the list is fetched and stored twice. Filter the result instead.
         const { queryFn, ...rest } =
           trpcOptionsProxy.administrativeAreas.list.queryOptions()
 
         return useSuspenseQuery({
           ...rest,
-          queryKey: trpc.administrativeAreas.list.queryKey({
-            isActive,
-            ids
-          })
-        }).data as unknown as Map<UUID, ClientAdministrativeArea>
+          select: (data) => rowsOf<ClientAdministrativeArea>(data)
+        }).data
       }
     }
   }
