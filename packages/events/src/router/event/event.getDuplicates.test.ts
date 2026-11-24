@@ -457,7 +457,9 @@ test('Skips duplicates that no longer exist instead of failing', async () => {
 
   mswServer.use(
     http.get(`${env.COUNTRY_CONFIG_URL}/config/events`, () => {
-      return HttpResponse.json([tennisClubMembershipWithDedupCheckConfig])
+      return HttpResponse.json(
+        [tennisClubMembershipWithDedupCheckConfig].map(toVersionedEventConfig)
+      )
     })
   )
 
@@ -466,7 +468,15 @@ test('Skips duplicates that no longer exist instead of failing', async () => {
     tennisClubMembershipWithDedupCheckConfig
   )
 
-  const client = createTestClient(user, TEST_USER_DEFAULT_SCOPES)
+  const client = createTestClient(user, [
+    ...TEST_USER_DEFAULT_SCOPES,
+    encodeScope({
+      type: 'record.review-duplicates',
+      options: {
+        event: ['birth', 'death', 'tennis-club-membership']
+      }
+    })
+  ])
 
   const declaration = generateActionDuplicateDeclarationInput(
     tennisClubMembershipWithDedupCheckConfig,
@@ -516,7 +526,9 @@ test('Returns no duplicates when every flagged duplicate no longer exists', asyn
 
   mswServer.use(
     http.get(`${env.COUNTRY_CONFIG_URL}/config/events`, () => {
-      return HttpResponse.json([tennisClubMembershipWithDedupCheckConfig])
+      return HttpResponse.json(
+        [tennisClubMembershipWithDedupCheckConfig].map(toVersionedEventConfig)
+      )
     })
   )
 
@@ -525,7 +537,15 @@ test('Returns no duplicates when every flagged duplicate no longer exists', asyn
     tennisClubMembershipWithDedupCheckConfig
   )
 
-  const client = createTestClient(user, TEST_USER_DEFAULT_SCOPES)
+  const client = createTestClient(user, [
+    ...TEST_USER_DEFAULT_SCOPES,
+    encodeScope({
+      type: 'record.review-duplicates',
+      options: {
+        event: ['birth', 'death', 'tennis-club-membership']
+      }
+    })
+  ])
 
   const declaration = generateActionDuplicateDeclarationInput(
     tennisClubMembershipWithDedupCheckConfig,
