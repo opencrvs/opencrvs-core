@@ -105,11 +105,6 @@ export const StatusPillsLineUp: Story = {
     const menus = Array.from(
       canvasElement.querySelectorAll('#user_list button[popovertarget]')
     )
-    const actionCells = Array.from(
-      canvasElement.querySelectorAll<HTMLElement>(
-        '#user_list td[data-testid$="-actions"]'
-      )
-    )
 
     await step('Some rows have a menu and some rows do not', async () => {
       await expect(pills).toHaveLength(usersWithEachStatus.length)
