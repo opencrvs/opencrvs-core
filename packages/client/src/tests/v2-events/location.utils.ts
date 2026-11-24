@@ -26,6 +26,7 @@ export function buildInactiveLocation({
 }): Location {
   return {
     id,
+    updatedAt: '2024-01-01T00:00:00.000Z',
     name,
     locationType,
     administrativeAreaId,
@@ -71,6 +72,7 @@ export function buildFutureLocation({
 }): Location {
   return {
     id,
+    updatedAt: '2024-01-01T00:00:00.000Z',
     name,
     locationType,
     administrativeAreaId,
@@ -102,6 +104,7 @@ export function buildFutureAdministrativeArea({
 }): AdministrativeArea {
   return {
     id,
+    updatedAt: '2024-01-01T00:00:00.000Z',
     name,
     parentId,
     externalId: null,

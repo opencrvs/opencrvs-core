@@ -30,6 +30,7 @@ import * as selectEvent from '@client/v2-events/select-event'
 import { localDraftStore } from '@client/v2-events/features/drafts/useDrafts'
 import { ROUTES, routesConfig } from '@client/v2-events/routes'
 import { AppRouter } from '@client/v2-events/trpc'
+import { locationListHandlers } from '../../../../../../.storybook/default-request-handlers'
 import { useActionAnnotation } from '../../useActionAnnotation'
 import { useEventFormData } from '../../useEventFormData'
 import { Pages } from './index'
@@ -57,6 +58,7 @@ const tRPCMsw = createTRPCMsw<AppRouter>({
  */
 const RENAMED_AREA: AdministrativeArea = {
   id: 'c3c3c3c3-1111-4111-8111-111111111111' as UUID,
+  updatedAt: '2024-01-01T00:00:00.000Z',
   name: 'New Riverside District',
   externalId: null,
   parentId: null,
@@ -86,6 +88,7 @@ const RENAMED_AREA: AdministrativeArea = {
  */
 const RENAMED_BUT_ALWAYS_ACTIVE_AREA: AdministrativeArea = {
   id: 'd4d4d4d4-2222-4222-8222-222222222222' as UUID,
+  updatedAt: '2024-01-01T00:00:00.000Z',
   name: 'Greater Pangasinan',
   externalId: null,
   parentId: null,
@@ -165,11 +168,10 @@ const mswConfig = {
       tRPCMsw.event.search.query(() => ({ results: [], total: 0 }))
     ],
     eventLocations: [
-      tRPCMsw.locations.list.query(() => []),
-      tRPCMsw.administrativeAreas.list.query(() => [
-        RENAMED_AREA,
-        RENAMED_BUT_ALWAYS_ACTIVE_AREA
-      ])
+      ...locationListHandlers({
+        locations: [],
+        administrativeAreas: [RENAMED_AREA, RENAMED_BUT_ALWAYS_ACTIVE_AREA]
+      })
     ]
   }
 }
