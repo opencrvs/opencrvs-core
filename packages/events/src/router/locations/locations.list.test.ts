@@ -23,9 +23,11 @@ import {
 import {
   createInitialisationTestClient,
   createServiceTokenTestClient,
+  createSystemTestClient,
   createTestClient,
   setupTestCase,
-  systemInitialisationTestSetup
+  systemInitialisationTestSetup,
+  TEST_SYSTEM_ID
 } from '@events/tests/utils'
 import { getClient } from '@events/storage/postgres/events'
 import { appRouter } from '@events/router/router'
@@ -289,6 +291,13 @@ test('Documents the response as an array of locations, without validating it', (
 })
 
 describe('sync', () => {
+  test('Rejects a system user, because only the client syncs', async () => {
+    await setupTestCase()
+    const client = createSystemTestClient(TEST_SYSTEM_ID, [])
+
+    await expect(client.locations.sync({})).rejects.toThrow('FORBIDDEN')
+  })
+
   test('Returns updatedAt at millisecond precision on every location', async () => {
     const { user } = await setupTestCase()
     const client = createTestClient(user, [])

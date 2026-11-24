@@ -21,7 +21,8 @@ import {
 import {
   internalProcedure,
   router,
-  userAndSystemProcedure
+  userAndSystemProcedure,
+  userOnlyProcedure
 } from '@events/router/trpc'
 import { writeAuditLog } from '@events/storage/postgres/events/auditLog'
 import { diffLocationVersions } from '@events/service/locations/locations'
@@ -78,7 +79,7 @@ export const administrativeAreaRouter = router({
    * `syncedAt` for the next one. When `since` is not given, it returns all
    * administrative areas.
    */
-  sync: userAndSystemProcedure
+  sync: userOnlyProcedure
     .input(
       z.object({
         since: z.iso

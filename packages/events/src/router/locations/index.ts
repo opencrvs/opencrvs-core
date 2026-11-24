@@ -21,7 +21,8 @@ import {
 import {
   internalProcedure,
   router,
-  userAndSystemProcedure
+  userAndSystemProcedure,
+  userOnlyProcedure
 } from '@events/router/trpc'
 import {
   createLocation,
@@ -102,7 +103,7 @@ export const locationRouter = router({
    * given, it returns all locations, so that the first fetch also gets
    * `syncedAt` from the server.
    */
-  sync: userAndSystemProcedure
+  sync: userOnlyProcedure
     .input(
       z.object({
         since: z.iso
