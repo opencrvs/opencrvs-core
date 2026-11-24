@@ -302,7 +302,7 @@ elasticsearch:
 monitoring:
   enabled: false
   logs:
-    retention_days: 30
+    retention_days: 7
   metrics:
     retention_days: 30
 
@@ -445,8 +445,6 @@ rustfs:
   # admin_username:
   # admin_password:
 
-
-
   # Origins that may read the S3 API from a browser, as RUSTFS_CORS_ALLOWED_ORIGINS: `*` or a comma-separated list.
   # Browsers fetch presigned document URLs from the client origin. With `*` a browser does not send credentials,
   # which presigned URLs do not need.
@@ -458,7 +456,6 @@ rustfs:
     enabled: true
     # Keep `network_policy.rules` the same, it opens this port.
     port: 3536
-
 
   # storage_type: host_path
   # PVC Configuration
