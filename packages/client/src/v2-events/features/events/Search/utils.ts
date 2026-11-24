@@ -843,8 +843,8 @@ export function withSearchLocationBehaviour(
 }
 
 /**
- * @param fields the fields that the search can use. Defaults to those of `eventConfig`. A
- * search screen passes those of every version (`useSearchableFields`).
+ * @param fields - The fields that the search can use. Defaults to those of `eventConfig`.
+ * Search screens pass the fields of all versions, from `useSearchableFields`.
  */
 export function resolveAdvancedSearchConfig(
   eventConfig: EventConfig,
