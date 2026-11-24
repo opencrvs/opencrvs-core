@@ -8,7 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { UUID } from '@opencrvs/commons'
+import { SystemContext, TokenUserType, UUID } from '@opencrvs/commons'
 import {
   AddressType,
   EventIndex,
@@ -98,6 +98,22 @@ describe('resolveRecordActionScopeToIds()', () => {
         user
       ).options?.createdIn
     ).toBeUndefined()
+  })
+
+  test('throws for placeOfEvent: location when the user has no primary office', () => {
+    const systemClient = SystemContext.parse({
+      id: 'd6b3e7f0-4a5c-4d8b-8f6e-901234567890',
+      type: TokenUserType.enum.system
+    })
+
+    expect(() =>
+      resolveRecordActionScopeToIds(
+        { type: 'record.search', options: { placeOfEvent: 'location' } },
+        systemClient
+      )
+    ).toThrow(
+      'The "location" jurisdiction filter needs a primary office, but the user has none.'
+    )
   })
 })
 
