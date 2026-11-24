@@ -10,7 +10,7 @@
  */
 import { css, FlattenSimpleInterpolation } from 'styled-components'
 
-export const START_COLUMN_WIDTH = '44px'
+const START_COLUMN_WIDTH = '44px'
 
 /**
  * The trailing gutter is reserved for the whole table, so the value columns sit
@@ -18,7 +18,7 @@ export const START_COLUMN_WIDTH = '44px'
  * width. It becomes wider when the actions of a row need more space, for
  * example a status pill next to a menu.
  */
-export const ACTIONS_COLUMN_WIDTH = '96px'
+const ACTIONS_COLUMN_WIDTH = '96px'
 
 const stackedBelow = (styles: FlattenSimpleInterpolation) => css`
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
