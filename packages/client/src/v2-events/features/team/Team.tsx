@@ -24,7 +24,7 @@ function TeamPageComponent() {
   const intl = useIntl()
   return (
     <WorkqueueLayout title={intl.formatMessage(teamTitle)}>
-      <UserList hideNavigation={true} />
+      <UserList />
     </WorkqueueLayout>
   )
 }

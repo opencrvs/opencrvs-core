@@ -54,6 +54,7 @@ export interface FormFieldGeneratorPropsWithoutRef {
   id: string
   readonlyMode?: boolean
   className?: string
+  attachmentPath?: string
   /** Which fields are generated */
   fields: FieldConfig[]
   eventConfig?: EventConfig
@@ -81,6 +82,7 @@ export const FormFieldGenerator = forwardRef<
       formValues,
       className,
       eventConfig,
+      attachmentPath = '',
       readonlyMode,
       id,
       onValidSubmit,
@@ -186,17 +188,20 @@ export const FormFieldGenerator = forwardRef<
                 },
                 validatorContext
               ),
+              // this is caught in CI but editor flags as unnecessary condition
               // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
               (errs) => errs[0]?.message && intl.formatMessage(errs[0].message)
             )
           )
         }
+        validateOnChange={false}
         validateOnMount={true}
         onSubmit={noop}
       >
         {(formikProps) => {
           return (
             <FormSectionComponent
+              attachmentPath={attachmentPath}
               className={className}
               eventConfig={eventConfig}
               fields={pageFields}

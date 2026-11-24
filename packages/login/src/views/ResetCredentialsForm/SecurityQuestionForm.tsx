@@ -81,9 +81,9 @@ const messages = {
 type Props = WrappedComponentProps
 
 const SecurityQuestionComponent = ({ intl }: Props) => {
-  const [answer, setAnswer] = useState<string>('')
-  const [touched, setTouched] = useState<boolean>(false)
-  const [error, setError] = useState<boolean>(false)
+  const [answer, setAnswer] = useState('')
+  const [touched, setTouched] = useState(false)
+  const [error, setError] = useState(false)
 
   const location = useLocation()
   const navigate = useNavigate()
@@ -105,7 +105,9 @@ const SecurityQuestionComponent = ({ intl }: Props) => {
       return setError(true)
     }
 
-    if (error) return
+    if (error) {
+      return
+    }
 
     let result: IVerifySecurityAnswerResponse
 
@@ -113,6 +115,10 @@ const SecurityQuestionComponent = ({ intl }: Props) => {
       result = await authApi.verifySecurityAnswer(location.state.nonce, answer)
 
       if (!result.matched) {
+        // Clear the input
+        setAnswer('')
+        setTouched(false)
+        setError(false)
         return setQuestionKey(result.securityQuestionKey)
       }
       if (location.state.forgottenItem === FORGOTTEN_ITEMS.USERNAME) {
@@ -166,15 +172,11 @@ const SecurityQuestionComponent = ({ intl }: Props) => {
             }
             mobileTitle={intl.formatMessage(
               sharedMessages.credentialsResetFormTitle,
-              {
-                forgottenItem
-              }
+              { forgottenItem }
             )}
             desktopTitle={intl.formatMessage(
               sharedMessages.credentialsResetFormTitle,
-              {
-                forgottenItem
-              }
+              { forgottenItem }
             )}
           />
         }

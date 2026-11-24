@@ -70,6 +70,46 @@ describe('useIntlFormatMessageWithFlattenedParams', () => {
       expect(formattedMessage).toBe('Fallback message for test.')
     })
 
+    describe('date-element variables', () => {
+      it('returns empty string when a date-format variable is missing from params', () => {
+        const { result } = renderUseIntlHook()
+        const formattedMessage = result.current.formatMessage(
+          {
+            id: 'non.existent',
+            defaultMessage: 'Updated: {event.updatedAt, date, medium}'
+          },
+          {}
+        )
+        expect(formattedMessage).toBe('')
+      })
+
+      it('returns empty string when a date-format variable is explicitly null', () => {
+        const { result } = renderUseIntlHook()
+        const formattedMessage = result.current.formatMessage(
+          {
+            id: 'non.existent',
+            defaultMessage: 'Created: {event.createdAt, date, medium}'
+          },
+          { 'event.createdAt': null }
+        )
+        expect(formattedMessage).toBe('')
+      })
+
+      it('formats correctly when a date-format variable is a valid timestamp', () => {
+        const { result } = renderUseIntlHook()
+        const timestamp = new Date('2024-01-15').getTime()
+        const formattedMessage = result.current.formatMessage(
+          {
+            id: 'non.existent',
+            defaultMessage: 'Updated: {event.updatedAt, date, medium}'
+          },
+          { 'event.updatedAt': timestamp }
+        )
+        expect(formattedMessage).not.toBe('')
+        expect(formattedMessage).toContain('2024')
+      })
+    })
+
     it('defaults to empty strings if message strings refers to non-existing variables', () => {
       const { result } = renderUseIntlHook()
       expect(result.current.formatMessage({ id: 'test.message' }, {})).toBe(

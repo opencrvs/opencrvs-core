@@ -1,0 +1,70 @@
+{{- if .Values.monitoring.enabled }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: logstash
+spec:
+  type: ClusterIP
+  selector:
+    app: logstash
+  ports:
+    - name: gelf-tcp
+      protocol: TCP
+      port: 12201
+      targetPort: 12201
+    - name: gelf-udp
+      protocol: UDP
+      port: 12201
+      targetPort: 12201
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: logstash
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: logstash
+  template:
+    metadata:
+      labels:
+        app: logstash
+    spec:
+      containers:
+      - name: logstash
+        image: {{ .Values.logstash.image }}
+        command: ["logstash", "-f", "/etc/logstash/logstash.conf", "--verbose"]
+        ports:
+        - containerPort: 12201
+          protocol: TCP
+        - containerPort: 12201
+          protocol: UDP
+        env:
+            - name: ELASTICSEARCH_SUPERUSER_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.elasticsearch.admin_user_secret_name }}
+                  key: ELASTIC_PASSWORD
+            - name: ELASTICSEARCH_HOSTS
+              {{- $elastic_host := default (printf "elasticsearch-0.elasticsearch.%s.svc.cluster.local" $.Release.Namespace) $.Values.elasticsearch.host }}
+              value: {{ $elastic_host }}:9200
+            - name: ELASTICSEARCH_USERNAME
+              value: "elastic"
+            - name: ELASTICSEARCH_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.elasticsearch.admin_user_secret_name }}
+                  key: ELASTIC_PASSWORD
+        volumeMounts:
+        - name: logstash-configmap
+          mountPath: /etc/logstash/logstash.conf
+          subPath: logstash.conf
+        - name: logstash-configmap
+          mountPath: /usr/share/logstash/config/logstash.yml
+          subPath: logstash.yml
+      volumes:
+      - name: logstash-configmap
+        configMap:
+          name: logstash-configmap
+{{- end }}

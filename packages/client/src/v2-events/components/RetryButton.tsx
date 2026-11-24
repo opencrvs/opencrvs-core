@@ -15,7 +15,7 @@ import { defineMessages, useIntl } from 'react-intl'
 import styled from 'styled-components'
 import { EventIndex } from '@opencrvs/commons/client'
 import { useOutbox } from '../features/events/useEvents/outbox'
-import { Mutation, useQueryClient } from '@tanstack/react-query'
+import { useQueryClient } from '@tanstack/react-query'
 
 const RetryAction = styled(Button)`
   height: 40px;

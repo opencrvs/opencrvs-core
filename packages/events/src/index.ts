@@ -9,15 +9,16 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import fetch from 'node-fetch'
 import { logger } from '@opencrvs/commons'
 import '@opencrvs/commons/monitoring'
 import { env } from './environment'
 import { server } from './server'
-import { getAnonymousToken, getIntegrationCreatorToken } from './service/auth'
+import { getAnonymousToken } from './service/auth'
 import { getInMemoryEventConfigurations } from './service/config/config'
+import { triggerSystemReady } from './service/config/systemReady'
 import { ensureIndexExists } from './service/indexing/indexing'
 import { ensureConnection } from './storage/postgres/events'
+import { startAnnouncementWorker } from './workers/announcementWorker'
 
 // eslint-disable-next-line @typescript-eslint/no-require-imports
 const path = require('path')
@@ -25,28 +26,6 @@ const path = require('path')
 const appModulePath = require('app-module-path')
 
 appModulePath.addPath(path.join(__dirname, '../'))
-
-async function triggerSystemReady() {
-  try {
-    const bootstrapToken = await getIntegrationCreatorToken()
-    const res = await fetch(
-      new URL('/triggers/system/ready', env.COUNTRY_CONFIG_URL).toString(),
-      {
-        method: 'GET',
-        headers: { Authorization: `Bearer ${bootstrapToken}` }
-      }
-    )
-    if (!res.ok) {
-      logger.warn(
-        `system/ready trigger returned ${res.status}: ${await res.text()}`
-      )
-    }
-  } catch (error) {
-    logger.warn(
-      `system/ready trigger failed: ${error instanceof Error ? error.message : error}`
-    )
-  }
-}
 
 export async function main() {
   try {
@@ -70,6 +49,7 @@ export async function main() {
 
     return
   }
+  startAnnouncementWorker()
   server().listen(5555)
   void triggerSystemReady()
 }

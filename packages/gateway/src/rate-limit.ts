@@ -9,27 +9,17 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { redis } from '@gateway/utils/redis'
-import { GraphQLResolveInfo, GraphQLError } from 'graphql'
-import { Context } from '@gateway/graphql/context'
-import { getUserId, hasScope } from '@gateway/features/user/utils'
-import { DISABLE_RATE_LIMIT } from './constants'
 import { Lifecycle, ReqRefDefaults } from '@hapi/hapi'
 import { get } from 'lodash'
-import { SCOPES } from '@opencrvs/commons/authentication'
+import { DISABLE_RATE_LIMIT } from './constants'
+import { hasScope } from '@opencrvs/commons'
 
 /**
- * Custom RateLimitError. This is being caught in Apollo & Hapi (`onPreResponse` in createServer)
+ * Custom RateLimitError. This is being caught in Hapi (`onPreResponse` in createServer)
  */
-export class RateLimitError extends GraphQLError {
+export class RateLimitError extends Error {
   constructor(message = 'You are being rate limited') {
-    super(message, {
-      extensions: {
-        code: 'RATE_LIMIT_EXCEEDED',
-        http: {
-          status: 429
-        }
-      }
-    })
+    super(message)
   }
 }
 
@@ -75,6 +65,7 @@ interface RateLimitedRouteOptions {
   /** e.g. "username" or "user.name" */
   pathForKey: string
   pathOptionsForKey?: never
+  staticKey?: never
 }
 
 interface RateLimitedRouteMultipleOptions {
@@ -82,6 +73,18 @@ interface RateLimitedRouteMultipleOptions {
   pathForKey?: never
   /** Works the same as `pathForKey` but uses the first value that gets resolved of the keys */
   pathOptionsForKey: string[]
+  staticKey?: never
+}
+
+interface RateLimitedRouteStaticKeyOptions {
+  requestsPerMinute: number
+  pathForKey?: never
+  pathOptionsForKey?: never
+  /**
+   * A constant key to rate limit on, used when the payload has no
+   * per-user field to key on (e.g. super user auth only sends a password).
+   */
+  staticKey: string
 }
 
 export const rateLimitedRoute =
@@ -94,23 +97,36 @@ export const rateLimitedRoute =
     {
       requestsPerMinute,
       pathForKey,
-      pathOptionsForKey
-    }: RateLimitedRouteOptions | RateLimitedRouteMultipleOptions,
+      pathOptionsForKey,
+      staticKey
+    }:
+      | RateLimitedRouteOptions
+      | RateLimitedRouteMultipleOptions
+      | RateLimitedRouteStaticKeyOptions,
     fn: (...args: A) => R
   ) =>
   (...args: A) => {
     if (
-      hasScope(
-        { Authorization: args[0].headers.authorization },
-        SCOPES.BYPASSRATELIMIT
-      )
+      args[0].headers.authorization &&
+      hasScope(args[0].headers.authorization as string, 'bypassratelimit')
     ) {
       return fn(...args)
     }
 
+    const route = args[1].request.path
+
+    if (staticKey) {
+      return withRateLimit(
+        {
+          key: `${staticKey}:${route}`,
+          requestsPerMinute
+        },
+        fn
+      )(...args)
+    }
+
     if (pathForKey) pathOptionsForKey = [pathForKey]
 
-    const route = args[1].request.path
     const payload = JSON.parse(args[0].payload.toString())
 
     const key = pathOptionsForKey!.find(
@@ -127,28 +143,6 @@ export const rateLimitedRoute =
     return withRateLimit(
       {
         key: `${value}:${route}`,
-        requestsPerMinute
-      },
-      fn
-    )(...args)
-  }
-
-export const rateLimitedResolver =
-  <A extends [any, any, Context, GraphQLResolveInfo], R>(
-    { requestsPerMinute }: { requestsPerMinute: number },
-    fn: (...args: A) => R
-  ) =>
-  (...args: A) => {
-    if (hasScope(args[2].headers, SCOPES.BYPASSRATELIMIT)) {
-      return fn(...args)
-    }
-
-    const route = args[3].fieldName // e.g. "getUser"
-    const userId = getUserId(args[2].headers)
-
-    return withRateLimit(
-      {
-        key: `${userId}:${route}`,
         requestsPerMinute
       },
       fn

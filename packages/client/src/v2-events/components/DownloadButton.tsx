@@ -21,17 +21,20 @@ import { useIntl } from 'react-intl'
 import ReactTooltip from 'react-tooltip'
 import { useModal } from '@client/hooks/useModal'
 import styled from 'styled-components'
-import { ActionType, EventIndex, getOrThrow } from '@opencrvs/commons/client'
 import {
+  ActionType,
   AssignmentStatus,
+  EventIndex,
   getAssignmentStatus,
-  getUsersFullName
-} from '../utils'
+  getOrThrow,
+  TokenUserType
+} from '@opencrvs/commons/client'
+import { getUsersFullName } from '../utils'
 import { useAuthentication } from '@client/utils/userUtils'
 import { useEvents } from '../features/events/useEvents/useEvents'
 import { useUsers } from '../hooks/useUsers'
-import { useAllowedActionConfigurations } from '../features/workqueues/EventOverview/components/useAllowedActionConfigurations'
 import { AssignModal } from './AssignModal'
+import { useResolveAssignmentActionConditionals } from '../features/workqueues/Actions/useActionConfigurationResolver'
 
 interface DownloadButtonProps {
   id?: string
@@ -87,35 +90,28 @@ export function DownloadButton({
     'Authentication is not available but is required'
   )
 
+  const { resolveConditionals } = useResolveAssignmentActionConditionals(event)
+  const unassign = resolveConditionals(ActionType.UNASSIGN)
+  const assign = resolveConditionals(ActionType.ASSIGN)
+
   const { getEvent, actions } = useEvents()
   const users = useUsers()
-  const user = users.getUser.useQuery(event.assignedTo || '', {
+  const user = users.getUsers.useQueryById(event.assignedTo || '', {
     enabled: !!event.assignedTo
   }).data
 
-  const [_, actionMenuItems] = useAllowedActionConfigurations(
-    event,
-    authentication
-  )
+  if (user && user.type === TokenUserType.enum.system) {
+    throw new Error(
+      `Event ${event.id} is assigned to a system user. This should never happen`
+    )
+  }
+
   const assignmentStatus = getAssignmentStatus(event, authentication.sub)
 
-  const eventDocument = getEvent.findFromCache(event.id)
+  const eventDocument = getEvent.useFindEventFromCache(event.id)
   const isAssignMutationFetching = actions.assignment.assign.isAssigning(
     event.id
   )
-
-  if (eventDocument.isFetching || isAssignMutationFetching) {
-    return (
-      <StatusIndicator
-        className={className}
-        id={`${id}-download-loading`}
-        isLoading={true}
-      >
-        <Spinner id={`action-loading-${id}`} size={24} />
-      </StatusIndicator>
-    )
-  }
-  const isFailed = eventDocument.isError
 
   if (!isOnline) {
     return (
@@ -124,6 +120,7 @@ export function DownloadButton({
           data-tip
           data-class="no-connection"
           data-for={`${id}_noConnection`}
+          data-testid="no-connection-icon"
         >
           <ConnectionError key={id} id={`${id}_noConnection`} />
         </div>
@@ -134,12 +131,26 @@ export function DownloadButton({
     )
   }
 
+  if (eventDocument.isFetching || isAssignMutationFetching) {
+    return (
+      <StatusIndicator
+        className={className}
+        data-testid="download-loading-icon"
+        id={`${id}-download-loading`}
+        isLoading={true}
+      >
+        <Spinner id={`action-loading-${id}`} size={24} />
+      </StatusIndicator>
+    )
+  }
+  const isFailed = eventDocument.isError
+
   const isDownloadedToMe =
     assignmentStatus === AssignmentStatus.ASSIGNED_TO_SELF &&
     eventDocument.isFetched
 
   if (isDraft && isDownloadedToMe) {
-    return <Downloaded />
+    return <Downloaded data-testid="downloaded-icon" />
   }
 
   const isAssignedToSomeoneElse =
@@ -162,24 +173,30 @@ export function DownloadButton({
     }
 
     if (assignmentStatus === AssignmentStatus.UNASSIGNED) {
-      const assign = await openModal<boolean>((close) => (
+      const assignModal = await openModal<boolean>((close) => (
         <AssignModal close={close} />
       ))
-      if (assign) {
+      if (assignModal) {
         void download()
       }
     }
   }
 
+  const canAssign = !isAssignedToSomeoneElse && !isDownloadedToMe
+
   return (
     <>
       <DownloadAction
-        aria-label={intl.formatMessage(constantsMessages.assignRecord)}
+        aria-label={intl.formatMessage(
+          canAssign
+            ? constantsMessages.assignRecord
+            : { id: 'user.avatar', defaultMessage: 'User avatar' }
+        )}
         className={className}
         disabled={
           !(
-            actionMenuItems.find(({ type }) => type === ActionType.UNASSIGN) ||
-            actionMenuItems.find(({ type }) => type === ActionType.ASSIGN) ||
+            assign.enabled ||
+            unassign.enabled ||
             assignmentStatus === AssignmentStatus.ASSIGNED_TO_SELF
           )
         }
@@ -187,21 +204,14 @@ export function DownloadButton({
         type="icon"
         onClick={handleDownload}
       >
-        {isAssignedToSomeoneElse || isDownloadedToMe ? (
+        {canAssign ? (
+          <Download isFailed={isFailed} />
+        ) : (
           <AvatarSmall
             key={user?.avatar || 'default'}
-            avatar={
-              user?.avatar
-                ? {
-                    data: user.avatar,
-                    type: 'image/jpeg' // This is never used internally
-                  }
-                : undefined
-            }
-            name={user && getUsersFullName(user.name, intl.locale)}
+            avatar={user?.avatar || undefined}
+            name={user && getUsersFullName(user.name)}
           />
-        ) : (
-          <Download isFailed={isFailed} />
         )}
       </DownloadAction>
       {modal}

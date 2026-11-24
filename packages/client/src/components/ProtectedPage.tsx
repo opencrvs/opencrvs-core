@@ -36,13 +36,7 @@ import { IStoreState } from '@client/store'
 import { shouldBypassLock } from '@client/utils/lockBypass'
 export const SCREEN_LOCK = 'screenLock'
 
-type OwnProps = PropsWithChildren<{
-  // Kept for the legacy (V1) declaration flow, which tolerates the app
-  // backgrounding at any point on these routes, not just right after an
-  // upload click. shouldBypassLock() covers the narrower, click-triggered
-  // case (e.g. v2-events routes, which don't match these route names).
-  unprotectedRouteElements?: string[]
-}>
+type OwnProps = PropsWithChildren<{}>
 
 type DispatchProps = {
   onNumPadVisible: () => void
@@ -121,11 +115,7 @@ class ProtectedPageComponent extends React.Component<Props, IProtectPageState> {
   async handleVisibilityChange(isVisible: boolean) {
     const alreadyLocked = isVisible || (await storage.getItem(SCREEN_LOCK))
 
-    const onUnprotectedPage = this.props.unprotectedRouteElements?.some(
-      (route) => this.props.router.location.pathname.includes(route)
-    )
-
-    const lockShouldBeBypassed = onUnprotectedPage || shouldBypassLock()
+    const lockShouldBeBypassed = shouldBypassLock()
 
     const newState = { ...this.state }
 

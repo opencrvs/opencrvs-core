@@ -29,6 +29,7 @@ interface IProps {
   toggleButton: JSX.Element
   menuItems: IToggleMenuItem[]
   hide?: boolean
+  ariaLabel?: string
 }
 
 export const ToggleMenu = ({
@@ -36,11 +37,12 @@ export const ToggleMenu = ({
   menuHeader,
   toggleButton,
   menuItems,
-  hide
+  hide,
+  ariaLabel
 }: IProps) => {
   return hide ? null : (
     <DropdownMenu id={id}>
-      <DropdownMenu.Trigger>
+      <DropdownMenu.Trigger ariaLabel={ariaLabel}>
         <TriggerWrapper>{toggleButton}</TriggerWrapper>
       </DropdownMenu.Trigger>
       <DropdownMenu.Content>

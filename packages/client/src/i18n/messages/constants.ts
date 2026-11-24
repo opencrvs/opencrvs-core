@@ -164,7 +164,6 @@ interface IConstantsMessages
   duplicateOf: MessageDescriptor
   matchedTo: MessageDescriptor
   humanName: MessageDescriptor
-  retryInSeconds: MessageDescriptor
 }
 const messagesToDefine: IConstantsMessages = {
   action: {
@@ -985,12 +984,6 @@ const messagesToDefine: IConstantsMessages = {
     defaultMessage: `{firstName} {middleName} {lastName}`,
     description: 'A localized order of the full name',
     id: 'constants.humanName'
-  },
-  retryInSeconds: {
-    defaultMessage: 'Retry in {seconds}s',
-    description:
-      'Button label showing remaining seconds before retry is allowed',
-    id: 'constants.retryInSeconds'
   }
 }
 export const constantsMessages: Record<
@@ -1170,7 +1163,7 @@ const dynamicMessagesToDefine: Record<
   }
 }
 
-export const dynamicConstantsMessages: Record<
+const dynamicConstantsMessages: Record<
   string | number | symbol,
   MessageDescriptor
 > = defineMessages(dynamicMessagesToDefine)
@@ -1416,12 +1409,12 @@ const countryMessagesToDefine: Record<
   },
   HKG: {
     id: 'countries.HKG',
-    defaultMessage: '"China, Hong Kong Special Administrative Region"',
+    defaultMessage: 'China, Hong Kong Special Administrative Region',
     description: 'ISO Country: HKG'
   },
   MAC: {
     id: 'countries.MAC',
-    defaultMessage: '"China, Macao Special Administrative Region"',
+    defaultMessage: 'China, Macao Special Administrative Region',
     description: 'ISO Country: MAC'
   },
   CXR: {
@@ -1800,8 +1793,8 @@ const countryMessagesToDefine: Record<
     description: 'ISO Country: KGZ'
   },
   LAO: {
-    id: 'countries.KGZ',
-    defaultMessage: "Lao People's Democratic Republic Republic",
+    id: 'countries.LAO',
+    defaultMessage: "Lao People's Democratic Republic",
     description: 'ISO Country: LAO'
   },
   LVA: {
@@ -2282,7 +2275,7 @@ const countryMessagesToDefine: Record<
   },
   MKD: {
     id: 'countries.MKD',
-    defaultMessage: 'The former Yugoslav Republic of Macedonia',
+    defaultMessage: 'North Macedonia',
     description: 'ISO Country: MKD'
   },
   TLS: {
@@ -2317,7 +2310,7 @@ const countryMessagesToDefine: Record<
   },
   TUR: {
     id: 'countries.TUR',
-    defaultMessage: 'Turkey',
+    defaultMessage: 'Türkiye',
     description: 'ISO Country: TUR'
   },
   TKM: {

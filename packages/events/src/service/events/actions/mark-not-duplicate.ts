@@ -26,7 +26,7 @@ export async function markNotDuplicate(
   configuration: EventConfig
 ) {
   return processAction(input, {
-    event,
+    eventId: event.id,
     user,
     token,
     status: ActionStatus.Accepted,

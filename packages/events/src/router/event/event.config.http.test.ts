@@ -26,24 +26,6 @@ vi.mock('@events/environment', async (importOriginal) => {
   return { env: { ...actual.env, isProduction: true } }
 })
 
-// On this release line, the test setup loads the config service before the
-// environment mock above applies. The service then fetches new configurations
-// on every call, as in development. Keep them in memory here, as the service
-// does in production.
-vi.mock('@events/service/config/config', async (importOriginal) => {
-  const actual =
-    await importOriginal<typeof import('@events/service/config/config')>()
-  let configurations:
-    | Awaited<ReturnType<typeof actual.getInMemoryEventConfigurations>>
-    | undefined
-  return {
-    ...actual,
-    getInMemoryEventConfigurations: async (
-      token: Parameters<typeof actual.getInMemoryEventConfigurations>[0]
-    ) => (configurations ??= await actual.getInMemoryEventConfigurations(token))
-  }
-})
-
 let serverInstance: ReturnType<typeof server>
 let url: string
 

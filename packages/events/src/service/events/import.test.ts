@@ -10,13 +10,25 @@
  */
 
 import { TRPCError } from '@trpc/server'
-import { ActionType, generateEventDocument, SCOPES } from '@opencrvs/commons'
+import {
+  ActionType,
+  createPrng,
+  DocumentPath,
+  encodeScope,
+  EventDocument,
+  generateEventDocument,
+  getUUID
+} from '@opencrvs/commons'
 import { tennisClubMembershipEvent } from '@opencrvs/commons/fixtures'
-import { createSystemTestClient, setupTestCase } from '@events/tests/utils'
+import {
+  createSystemTestClient,
+  setupTestCase,
+  TEST_SYSTEM_ID
+} from '@events/tests/utils'
 
 describe('bulkImport', () => {
   test('prevents forbidden access if missing required scope', async () => {
-    const client = createSystemTestClient('test-system', [])
+    const client = createSystemTestClient(TEST_SYSTEM_ID, [])
 
     await expect(
       client.event.bulkImport([
@@ -30,7 +42,9 @@ describe('bulkImport', () => {
 
   test('allows access with import scope', async () => {
     const { user } = await setupTestCase()
-    const client = createSystemTestClient('test-system', [SCOPES.RECORD_IMPORT])
+    const client = createSystemTestClient(TEST_SYSTEM_ID, [
+      encodeScope({ type: 'record.import' })
+    ])
 
     await expect(
       client.event.bulkImport([
@@ -47,17 +61,23 @@ describe('bulkImport', () => {
 
   test('importing events indexes them into Elasticsearch at the next refresh', async () => {
     const { user } = await setupTestCase()
-    const client = createSystemTestClient('test-system', [
-      SCOPES.RECORD_IMPORT,
-      SCOPES.RECORD_READ,
-      `search[event=${tennisClubMembershipEvent.id},access=all]`
+    const client = createSystemTestClient(TEST_SYSTEM_ID, [
+      encodeScope({ type: 'record.import' }),
+      encodeScope({ type: 'record.read' }),
+      encodeScope({
+        type: 'record.search',
+        options: {
+          event: [tennisClubMembershipEvent.id]
+        }
+      })
     ])
     const event1 = generateEventDocument({
       configuration: tennisClubMembershipEvent,
       actions: [
         { type: ActionType.CREATE, user },
         { type: ActionType.DECLARE, user }
-      ]
+      ],
+      rng: createPrng(871)
     })
 
     const event2 = generateEventDocument({
@@ -65,7 +85,8 @@ describe('bulkImport', () => {
       actions: [
         { type: ActionType.CREATE, user },
         { type: ActionType.DECLARE, user }
-      ]
+      ],
+      rng: createPrng(872)
     })
     await client.event.bulkImport([event1, event2])
 
@@ -87,5 +108,134 @@ describe('bulkImport', () => {
     expect([events[0].id, events[1].id].sort()).toEqual(
       [event1.id, event2.id].sort()
     )
+  })
+
+  describe('file binding', () => {
+    async function importEvents(events: EventDocument[]) {
+      return createSystemTestClient(TEST_SYSTEM_ID, [
+        encodeScope({ type: 'record.import' })
+      ]).event.bulkImport(events)
+    }
+
+    function eventWithFiles(
+      userId: string,
+      files: {
+        image: (eventId: string) => string
+        signature: (eventId: string) => string
+      },
+      rng = createPrng(901)
+    ) {
+      const eventId = getUUID()
+      const event = generateEventDocument({
+        configuration: tennisClubMembershipEvent,
+        rng,
+        actions: [
+          { type: ActionType.CREATE, user: { id: userId } },
+          {
+            type: ActionType.DECLARE,
+            user: { id: userId },
+            declarationOverrides: {
+              'applicant.image': {
+                type: 'image/png',
+                originalFilename: 'image.png',
+                path: files.image(eventId) as DocumentPath
+              }
+            }
+          }
+        ],
+        defaults: { id: eventId }
+      })
+
+      return {
+        ...event,
+        actions: event.actions.map((action) => ({
+          ...action,
+          createdBySignature: files.signature(eventId) as DocumentPath
+        }))
+      }
+    }
+
+    test("accepts the record's own files, legacy keys and the author's signature", async () => {
+      const { user } = await setupTestCase()
+
+      await expect(
+        importEvents([
+          eventWithFiles(user.id, {
+            image: (eventId) => `events/${eventId}/${getUUID()}.png`,
+            signature: () => `users/${user.id}/${getUUID()}.png`
+          }),
+          eventWithFiles(
+            user.id,
+            {
+              image: () => `${getUUID()}.png`,
+              signature: () => `${getUUID()}.png`
+            },
+            createPrng(902)
+          )
+        ])
+      ).resolves.not.toThrow()
+    })
+
+    test.each([
+      [
+        "an image under another record's prefix",
+        { image: () => `events/${getUUID()}/${getUUID()}.png` }
+      ],
+      [
+        "an image under a user's prefix",
+        { image: () => `users/${getUUID()}/${getUUID()}.png` }
+      ],
+      [
+        "a signature under another user's prefix",
+        { signature: () => `users/${getUUID()}/${getUUID()}.png` }
+      ],
+      [
+        "a signature under another record's prefix",
+        { signature: () => `events/${getUUID()}/${getUUID()}.png` }
+      ],
+      [
+        'a path that escapes its prefix',
+        { image: (eventId: string) => `events/${eventId}/../${getUUID()}.png` }
+      ]
+    ])('rejects %s', async (_, overrides) => {
+      const { user } = await setupTestCase()
+      const event = eventWithFiles(user.id, {
+        image: (eventId) => `events/${eventId}/${getUUID()}.png`,
+        signature: () => `users/${user.id}/${getUUID()}.png`,
+        ...overrides
+      })
+
+      await expect(importEvents([event])).rejects.toMatchObject({
+        code: 'BAD_REQUEST'
+      })
+    })
+
+    test('stores none of the records when one of them is rejected', async () => {
+      const { user, eventsDb } = await setupTestCase()
+      const valid = eventWithFiles(user.id, {
+        image: (eventId) => `events/${eventId}/${getUUID()}.png`,
+        signature: () => `users/${user.id}/${getUUID()}.png`
+      })
+      const invalid = eventWithFiles(
+        user.id,
+        {
+          image: () => `events/${getUUID()}/${getUUID()}.png`,
+          signature: () => `users/${user.id}/${getUUID()}.png`
+        },
+        createPrng(902)
+      )
+
+      await expect(importEvents([valid, invalid])).rejects.toMatchObject({
+        code: 'BAD_REQUEST'
+      })
+
+      const stored = await eventsDb
+        .selectFrom('events')
+        .select('id')
+        .where('id', 'in', [valid.id, invalid.id])
+        .execute()
+
+      expect(stored).toEqual([])
+    })
   })
 })

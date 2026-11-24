@@ -21,7 +21,6 @@ import * as actions from '@client/offline/actions'
 import * as profileActions from '@client/profile/profileActions'
 import { storage } from '@client/storage'
 import {
-  IApplicationConfig,
   IApplicationConfigAnonymous,
   ILocationDataResponse,
   referenceApi,
@@ -32,29 +31,17 @@ import {
 } from '@client/utils/referenceApi'
 import { ILanguage } from '@client/i18n/reducer'
 import { filterLocations } from '@client/utils/locationUtils'
-import { System } from '@client/utils/gateway'
 import { UserDetails } from '@client/utils/userUtils'
 import { isOfflineDataLoaded } from './selectors'
 import { merge } from 'lodash'
 import { isNavigatorOnline } from '@client/utils'
-import { ISerializedForm } from '@client/forms'
-import { initConditionals } from '@client/forms/conditionals'
 import { initHandlebarHelpers } from '@client/forms/handlebarHelpers'
-import { initValidators } from '@client/forms/validators'
 import {
   Action as NotificationAction,
   configurationErrorNotification
 } from '@client/notification/actions'
 import { getToken } from '@client/utils/authUtils'
-
-export const OFFLINE_LOCATIONS_KEY = 'locations'
-export const OFFLINE_FACILITIES_KEY = 'facilities'
-
-export type LocationType =
-  | 'HEALTH_FACILITY'
-  | 'CRVS_OFFICE'
-  | 'ADMIN_STRUCTURE'
-  | 'PRIVATE_HOME'
+import { ApplicationConfig } from '@opencrvs/commons/client'
 
 export interface ILocation {
   id: string
@@ -76,31 +63,23 @@ type JurisdictionType =
   | 'LOCATION_LEVEL_5'
 
 export interface AdminStructure extends ILocation {
-  type: 'ADMIN_STRUCTURE'
+  type: string
   jurisdictionType: JurisdictionType
-  physicalType: 'Jurisdiction'
+  physicalType: string
 }
 
 export interface Facility extends ILocation {
-  type: 'HEALTH_FACILITY'
-  physicalType: 'Building'
+  type: string
+  physicalType: string
 }
 
 export interface CRVSOffice extends ILocation {
-  type: 'CRVS_OFFICE'
-  physicalType: 'Building'
-}
-
-export interface IForms {
-  version: string
-  birth: ISerializedForm
-  death: ISerializedForm
-  marriage: ISerializedForm
+  type: string
+  physicalType: string
 }
 
 export interface IOfflineData {
   locations: ILocationDataResponse
-  forms: IForms
   facilities: IFacilitiesDataResponse
   activeFacilities: IFacilitiesDataResponse
   offices: IOfficesDataResponse
@@ -116,8 +95,7 @@ export interface IOfflineData {
   assets: {
     logo: string
   }
-  systems: System[]
-  config: IApplicationConfig
+  config: ApplicationConfig
   anonymousConfig: IApplicationConfigAnonymous
 }
 
@@ -229,11 +207,6 @@ const LOCATIONS_CMD = Cmd.run(() => referenceApi.loadLocations(), {
   failActionCreator: actions.locationsFailed
 })
 
-const FORMS_CMD = Cmd.run(() => referenceApi.loadForms(), {
-  successActionCreator: actions.formsLoaded,
-  failActionCreator: actions.formsFailed
-})
-
 const CONFIG_CMD = Cmd.run(() => referenceApi.loadConfig(), {
   successActionCreator: actions.configLoaded,
   failActionCreator: actions.configFailed
@@ -242,16 +215,6 @@ const CONFIG_CMD = Cmd.run(() => referenceApi.loadConfig(), {
 const CONTENT_CMD = Cmd.run(() => referenceApi.loadContent(), {
   successActionCreator: actions.contentLoaded,
   failActionCreator: actions.contentFailed
-})
-
-const CONDITIONALS_CMD = Cmd.run(() => initConditionals(), {
-  successActionCreator: actions.conditionalsLoaded,
-  failActionCreator: actions.conditionalsFailed
-})
-
-const VALIDATORS_CMD = Cmd.run(() => initValidators(), {
-  successActionCreator: actions.validatorsLoaded,
-  failActionCreator: actions.validatorsFailed
 })
 
 const HANDLEBARS_CMD = Cmd.run(() => initHandlebarHelpers(), {
@@ -269,16 +232,7 @@ function delay(cmd: RunCmd<any>, time: number) {
 }
 
 function getDataLoadingCommands() {
-  return Cmd.list<actions.Action>([
-    FACILITIES_CMD,
-    LOCATIONS_CMD,
-    CONFIG_CMD,
-    CONDITIONALS_CMD,
-    VALIDATORS_CMD,
-    HANDLEBARS_CMD,
-    FORMS_CMD,
-    CONTENT_CMD
-  ])
+  return Cmd.list<actions.Action>([CONFIG_CMD, HANDLEBARS_CMD, CONTENT_CMD])
 }
 
 function updateGlobalConfig() {
@@ -377,32 +331,16 @@ function reducer(
         Cmd.run(saveOfflineData, { args: [newOfflineData] })
       )
     }
-    case actions.UPDATE_OFFLINE_SYSTEMS: {
-      const newOfflineData = {
-        ...state.offlineData,
-        systems: action.payload.systems
-      }
-
-      return loop(
-        {
-          ...state,
-          offlineData: newOfflineData
-        },
-        Cmd.run(saveOfflineData, { args: [newOfflineData] })
-      )
-    }
-
     /*
      * Configurations
      */
     case actions.APPLICATION_CONFIG_LOADED: {
-      const { certificates, config, systems } = action.payload
+      const { certificates, config } = action.payload
       merge(window.config, config)
 
       const newOfflineData = {
         ...state.offlineData,
         config,
-        systems,
         templates: {
           ...state.offlineData.templates,
           certificates: (certificates as ICertificateData[]).map((x) => {
@@ -521,40 +459,6 @@ function reducer(
         delay(LOCATIONS_CMD, RETRY_TIMEOUT)
       )
     }
-
-    /*
-     * Forms
-     */
-
-    case actions.FORMS_LOADED: {
-      return {
-        ...state,
-        offlineData: {
-          ...state.offlineData,
-          forms: action.payload.forms
-        }
-      }
-    }
-    case actions.FORMS_FAILED: {
-      const payload = action.payload
-      if (payload.cause === 'VALIDATION_ERROR') {
-        return loop(
-          {
-            ...state,
-            loadingError: errorIfDataNotLoaded(state)
-          },
-          Cmd.action(configurationErrorNotification(payload.message))
-        )
-      }
-      return loop(
-        {
-          ...state,
-          loadingError: errorIfDataNotLoaded(state)
-        },
-        delay(FORMS_CMD, RETRY_TIMEOUT)
-      )
-    }
-
     /*
      * Facilities && Offices
      */
@@ -567,23 +471,7 @@ function reducer(
         )
       )
 
-      const offices = filterLocations(
-        action.payload,
-        'CRVS_OFFICE'
-        /*
-
-        // This is used to filter office locations available offline
-        // It was important in an older design and may become important again
-
-        {
-          locationLevel: 'id',
-          locationId: isNationalSystemAdmin(state.userDetails)
-            ? undefined
-            : state.userDetails &&
-              state.userDetails.primaryOffice &&
-              state.userDetails.primaryOffice.id
-        }*/
-      )
+      const offices = filterLocations(action.payload, 'CRVS_OFFICE')
       const activeOffices = Object.fromEntries(
         Object.entries(offices).filter(
           ([, office]) => office.status === 'active'

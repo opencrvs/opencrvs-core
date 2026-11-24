@@ -8,9 +8,12 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { Client, Pool } from 'pg'
+import { Client } from 'pg'
 import { inject, vi } from 'vitest'
-import { getDeclarationFields } from '@opencrvs/commons/events'
+import {
+  getDeclarationFields,
+  TENNIS_CLUB_MEMBERSHIP
+} from '@opencrvs/commons/events'
 import { tennisClubMembershipEvent } from '@opencrvs/commons/fixtures'
 import {
   getPool,
@@ -18,7 +21,11 @@ import {
 } from '@events/storage/postgres/events'
 
 import { createIndex } from '@events/service/indexing/indexing'
-import { getReindexingStatusIndexName } from '@events/storage/__mocks__/elasticsearch'
+import {
+  getReindexingStatusIndexName,
+  getTemporaryIndexName
+} from '@events/storage/__mocks__/elasticsearch'
+import { getOrCreateClient } from '@events/storage/elasticsearch'
 import { mswServer } from './msw'
 import {
   createDatabase,
@@ -30,28 +37,60 @@ import {
 vi.mock('@events/storage/mongodb/user-mgnt')
 vi.mock('@events/storage/elasticsearch')
 
+// Tracks the unique id used by this worker's previous test run so we can
+// clean up only our own indices without affecting other concurrent workers.
+let previousId: string | null = null
+
 async function resetESServer() {
   const { getEventIndexName, getEventAliasName } = await import(
     // @ts-expect-error - "Cannot find module '@events/storage/elasticsearch' or its corresponding type declarations."
     '@events/storage/elasticsearch'
   )
-  const index = 'events_tennis_club_membership' + Date.now() + Math.random()
-  getEventIndexName.mockReturnValue(index)
-  getEventAliasName.mockReturnValue('events_' + +Date.now() + Math.random())
-  getReindexingStatusIndexName.mockReturnValue(
-    'reindexing_status_' + Date.now() + Math.random()
+  const id = Date.now() + Math.random()
+
+  getEventIndexName.mockImplementation((type: string) => type + '_' + id)
+  getEventAliasName.mockReturnValue('events_' + id)
+  getReindexingStatusIndexName.mockReturnValue('reindexing_status_' + id)
+  getTemporaryIndexName.mockImplementation(
+    (eventType: string, timestamp: number) => {
+      return `${getEventIndexName(eventType)}_${timestamp}`
+    }
   )
-  await createIndex(index, getDeclarationFields(tennisClubMembershipEvent))
+
+  const client = getOrCreateClient()
+
+  // Delete indices created by this worker's previous test run to prevent
+  // shard accumulation. The id is unique per beforeEach call and is embedded
+  // in every index name, so `*<id>*` matches all indices from that run
+  // without touching indices owned by other concurrent workers.
+  if (previousId !== null) {
+    try {
+      await client.indices.delete({ index: `*${previousId}*` })
+    } catch {
+      // Indices may already be gone
+    }
+  }
+  previousId = String(id)
+
+  await client.cluster.putSettings({
+    body: {
+      persistent: {
+        'action.auto_create_index': 'false'
+      }
+    }
+  })
+
+  // Create concrete indices
+  await createIndex(
+    getEventIndexName(TENNIS_CLUB_MEMBERSHIP),
+    getDeclarationFields(tennisClubMembershipEvent)
+  )
 }
 
 // Database created for the test currently running. Tracked so it can be
 // dropped afterwards — every test creates its own database, and without the
 // drop a full run leaves behind ~8MB per test, filling up the CI runner.
 let currentDb: string | null = null
-
-// The pool handed to the code under test, kept so this file can close it.
-// resetServer only drops the module's reference to it.
-let currentPool: Pool | null = null
 
 function getClusterClient() {
   return new Client({
@@ -64,14 +103,8 @@ async function dropPostgresDatabase() {
     return
   }
 
-  // End the pool before its database goes away: DROP DATABASE refuses while a
-  // session is connected, and FORCE terminating one server-side surfaces as an
-  // unhandled 'error' on a pool that has no error listener.
-  if (currentPool !== null) {
-    await currentPool.end()
-    currentPool = null
-  }
-  resetEventsPostgresServer()
+  // End the pool before its database goes away.
+  await resetEventsPostgresServer()
 
   const clusterClient = getClusterClient()
   await clusterClient.connect()
@@ -101,8 +134,8 @@ async function resetPostgresServer() {
   await initializeSchemaAccess(databaseInitializer)
   await databaseInitializer.end()
 
-  resetEventsPostgresServer()
-  currentPool = getPool(EVENTS_APP_POSTGRES_URI)
+  await resetEventsPostgresServer()
+  getPool(EVENTS_APP_POSTGRES_URI)
 }
 
 beforeEach(async () => Promise.all([resetPostgresServer(), resetESServer()]))

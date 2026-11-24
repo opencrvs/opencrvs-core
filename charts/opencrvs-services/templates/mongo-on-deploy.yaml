@@ -1,0 +1,67 @@
+{{- if eq .Values.mongodb.auth_mode "auto" }}
+apiVersion: batch/v1
+kind: Job
+metadata:
+  annotations:
+    "helm.sh/hook": pre-install,pre-upgrade
+    "helm.sh/hook-weight": "1"
+  labels:
+    app: mongo-on-deploy
+  name: mongo-on-deploy
+spec:
+  template:
+    metadata:
+      labels:
+        app: mongo-on-deploy
+    spec:
+      containers:
+        - name: mongo-on-deploy
+          command: ["/bin/bash", "/on-deploy.sh"]
+          image: "mongo:4.4"
+          env:
+            - name: MONGODB_HOSTNAME
+              value: {{ .Values.mongodb.host }}
+            - name: MONGODB_ADMIN_USER
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.mongodb.admin_user_secret_name }}
+                  key: MONGODB_ADMIN_USER
+            - name: MONGODB_ADMIN_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.mongodb.admin_user_secret_name }}
+                  key: MONGODB_ADMIN_PASSWORD
+          {{- range .Values.mongodb.databases }}
+            - name: {{ .prefix }}_MONGODB_DB
+              valueFrom:
+                secretKeyRef:
+                  name: {{ $.Values.mongodb.users_secret }}
+                  key: {{ .prefix }}_MONGODB_DB
+            - name: {{ .prefix }}_MONGODB_USER
+              valueFrom:
+                secretKeyRef:
+                  name: {{ $.Values.mongodb.users_secret }}
+                  key: {{ .prefix }}_MONGODB_USER
+            - name: {{ .prefix }}_MONGODB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ $.Values.mongodb.users_secret }}
+                  key: {{ .prefix }}_MONGODB_PASSWORD
+          {{- if .roles }}
+            - name: {{ .prefix }}_MONGODB_ROLES
+              valueFrom:
+                secretKeyRef:
+                  name: {{ $.Values.mongodb.users_secret }}
+                  key: {{ .prefix }}_MONGODB_ROLES
+          {{- end }}
+          {{- end }}
+          volumeMounts:
+            - mountPath: /on-deploy.sh
+              name: mongo-on-deploy-script
+              subPath: on-deploy.sh
+      volumes:
+        - name: mongo-on-deploy-script
+          configMap:
+            name: mongo-on-deploy-script
+      restartPolicy: "OnFailure"
+  {{- end }}

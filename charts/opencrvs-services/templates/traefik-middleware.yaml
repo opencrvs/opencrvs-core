@@ -1,0 +1,52 @@
+apiVersion: traefik.io/v1alpha1
+kind: Middleware
+metadata:
+  name: sts-and-basic-response-headers
+spec:
+  headers:
+    customResponseHeaders:
+      Pragma: "no-cache"
+      Cache-control: "no-store"
+      X-Robots-Tag: "none"
+    stsSeconds: 31536000
+    stsIncludeSubdomains: true
+    stsPreload: true
+---
+# Enable compression
+apiVersion: traefik.io/v1alpha1
+kind: Middleware
+metadata:
+  name: enable-compression
+spec:
+  compress:
+    excludedContentTypes:
+      - "image/png"
+      - "image/jpeg"
+      - "image/gif"
+      - "video/mp4"
+      - "audio/mpeg"
+      - "application/zip"
+      - "application/pdf"
+      - "application/x-tar" 
+---
+# Enable compression
+apiVersion: traefik.io/v1alpha1
+kind: Middleware
+metadata:
+  name: block-internal-routes
+spec:
+  ipAllowList:
+    sourceRange:
+      - 255.255.255.255
+# TODO: re-implement
+# ---
+# apiVersion: traefik.io/v1alpha1
+# kind: TLSStore
+# metadata:
+#   name: default
+#   namespace: traefik
+# spec:
+#   certificates:
+#     - secretName: localhost-cert
+#   defaultCertificate:
+#     secretName: localhost-cert

@@ -10,7 +10,7 @@
  */
 
 import { TRPCError } from '@trpc/server'
-import { ActionType, PageTypes } from '@opencrvs/commons'
+import { ActionType, encodeScope, PageTypes } from '@opencrvs/commons'
 import {
   createEvent,
   createTestClient,
@@ -31,7 +31,12 @@ test('prevents forbidden access if missing required scope', async () => {
 test(`allows access if required scope is present`, async () => {
   const { user, generator } = await setupTestCase()
   const client = createTestClient(user, [
-    'record.registered.print-certified-copies[event=birth|death|tennis-club-membership]'
+    encodeScope({
+      type: 'record.print-certified-copies',
+      options: {
+        event: ['birth', 'death', 'tennis-club-membership']
+      }
+    })
   ])
 
   await expect(
@@ -47,7 +52,6 @@ test(`Has validation errors when required ${PageTypes.enum.VERIFICATION} page fi
 
   const event = await createEvent(client, generator, [
     ActionType.DECLARE,
-    ActionType.VALIDATE,
     ActionType.REGISTER
   ])
 
@@ -68,7 +72,6 @@ test(`Has no validation errors when required ${PageTypes.enum.VERIFICATION} page
 
   const event = await createEvent(client, generator, [
     ActionType.DECLARE,
-    ActionType.VALIDATE,
     ActionType.REGISTER
   ])
 
@@ -102,7 +105,6 @@ test(`PRINT_CERTIFICATE action can be added to registered event`, async () => {
 
   const event = await createEvent(client, generator, [
     ActionType.DECLARE,
-    ActionType.VALIDATE,
     ActionType.REGISTER
   ])
 
@@ -122,7 +124,6 @@ test('when mandatory field is invalid, conditional hidden fields are still skipp
 
   const event = await createEvent(client, generator, [
     ActionType.DECLARE,
-    ActionType.VALIDATE,
     ActionType.REGISTER
   ])
 
@@ -141,7 +142,6 @@ test(`PRINT_CERTIFICATE is idempotent`, async () => {
 
   const event = await createEvent(client, generator, [
     ActionType.DECLARE,
-    ActionType.VALIDATE,
     ActionType.REGISTER
   ])
 
@@ -157,22 +157,4 @@ test(`PRINT_CERTIFICATE is idempotent`, async () => {
   )
 
   expect(firstResponse).toEqual(secondResponse)
-})
-
-test(`PRINT_CERTIFICATE is not allowed if the event is waiting for correction`, async () => {
-  const { user, generator } = await setupTestCase()
-  const client = createTestClient(user)
-
-  const event = await createEvent(client, generator, [
-    ActionType.DECLARE,
-    ActionType.VALIDATE,
-    ActionType.REGISTER,
-    ActionType.REQUEST_CORRECTION
-  ])
-
-  await expect(
-    client.event.actions.printCertificate.request(
-      generator.event.actions.printCertificate(event.id)
-    )
-  ).rejects.toThrowErrorMatchingSnapshot()
 })

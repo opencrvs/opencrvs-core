@@ -13,6 +13,7 @@ const { FlatCompat } = require('@eslint/eslintrc')
 const { defineConfig } = require('eslint/config')
 const path = require('path')
 const eventsConfig = require('../../eslint.events.config.js')
+const typescriptConfig = require('../../eslint.typescript.config.js')
 
 const compat = new FlatCompat({
   baseDirectory: path.dirname(__filename)
@@ -27,10 +28,7 @@ module.exports = defineConfig([
       'vitest.config.ts'
     ]
   },
-  ...compat.extends(
-    'plugin:@typescript-eslint/recommended',
-    'plugin:prettier/recommended'
-  ),
+  ...compat.extends('plugin:@typescript-eslint/recommended'),
   {
     files: ['./src/**/*.ts', 'src/**/*.ts'],
     languageOptions: {
@@ -51,6 +49,7 @@ module.exports = defineConfig([
     },
     rules: {
       ...eventsConfig.rules,
+      ...(process.env.CI === 'true' ? typescriptConfig.rules : {}),
       'no-console': 'warn',
       '@typescript-eslint/no-unused-vars': 'warn',
       '@typescript-eslint/consistent-type-definitions': 'off',

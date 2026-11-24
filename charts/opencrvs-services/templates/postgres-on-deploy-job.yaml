@@ -1,0 +1,22 @@
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  annotations:
+    "helm.sh/hook": pre-install,pre-upgrade
+    "helm.sh/hook-weight": "1"
+  labels:
+    app: postgres-on-deploy
+  name: postgres-on-deploy
+spec:
+  template:
+    metadata:
+      labels:
+        app: postgres-on-deploy
+    spec:
+      containers:
+        {{- include "postgres-on-deploy.containerSpec" . | nindent 8 }}
+{{- include "render-env-vars" (dict "service_name" "postgres_on_deploy" "Values" .Values) }}
+      restartPolicy: "OnFailure"
+      volumes:
+        {{- include "postgres-on-deploy.volumes" . | nindent 8 }}

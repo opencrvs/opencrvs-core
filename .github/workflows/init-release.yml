@@ -111,15 +111,13 @@ jobs:
       # The companion repos cut their own release branches. target_branch tells
       # them which of core's branches the release is made on.
       #
-      # TODO: countryconfig, testland and helm-charts only cut release branches on
-      # the 1.9.x line; 2.0 ships its charts from this repo. Drop them from this
-      # list once this branch reaches develop.
+      # TODO: countryconfig and testland only cut release branches on the 1.9.x
+      # line. Drop them from this list once this branch reaches develop.
       - name: Trigger the companion workflows
         env:
           COUNTRYCONFIG_TOKEN: ${{ secrets.COUNTRYCONFIG_WORKFLOW_TOKEN }}
           INFRASTRUCTURE_TOKEN: ${{ secrets.INFRASTRUCTURE_WORKFLOW_TOKEN }}
           TESTLAND_TOKEN: ${{ secrets.TESTLAND_WORKFLOW_TOKEN }}
-          HELM_CHARTS_TOKEN: ${{ secrets.HELM_CHARTS_WORKFLOW_TOKEN }}
         run: |
           trigger() { # repo, token
             GH_TOKEN="$2" gh workflow run init-release.yml \
@@ -133,7 +131,6 @@ jobs:
           trigger opencrvs-countryconfig "$COUNTRYCONFIG_TOKEN"
           trigger infrastructure "$INFRASTRUCTURE_TOKEN"
           trigger opencrvs-testland "$TESTLAND_TOKEN"
-          trigger helm-charts "$HELM_CHARTS_TOKEN"
 
       # Cut from e2e's branch for the same line, or from develop if it has none.
       - name: Create the release branch in the e2e repo

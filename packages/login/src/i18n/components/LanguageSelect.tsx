@@ -37,7 +37,7 @@ const messages = defineMessages({
 })
 
 function useLanguage(selectedLanguage: string, paramLanguage: string | null) {
-  const applicationLanguages = window.config.LANGUAGES.split(',')
+  const applicationLanguages = window.config.LANGUAGES
   const navigate = useNavigate()
   const location = useLocation()
   const dispatch = useDispatch()

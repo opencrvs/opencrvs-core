@@ -9,6 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
+export * from './AuditLog'
 export * from './Constants'
 export * from './ActionConfig'
 export * from './offline'
@@ -32,6 +33,7 @@ export * from './FieldValue'
 export * from './FormConfig'
 export * from './CompositeFieldValue'
 export * from './state'
+export * from './state/flags'
 export * from './utils'
 export * from './defineConfig'
 export * from './DeduplicationConfig'
@@ -47,12 +49,15 @@ export * from './scopes'
 export * from './serializer'
 export * from './state/availableActions'
 export * from './FileUtils'
+export * from './mocks.test.utils'
 // In order to infer types, we need to export the following types along with events
 export * from '../conditionals/conditionals'
 export * from '../conditionals/validate'
 // This is a workaround for the fact that field is not exported from events
 export * from './field'
+export * from './Flag'
 export * from './event'
 export * from './locations'
 
 export { UUID } from '../uuid'
+export { DocumentPath } from '../documents'

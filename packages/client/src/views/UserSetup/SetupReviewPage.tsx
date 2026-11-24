@@ -8,7 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { Mutation } from '@apollo/client/react/components'
+
 import {
   IProtectedAccountSetupData,
   ISecurityQuestionAnswer,
@@ -23,12 +23,11 @@ import {
 import { messages } from '@client/i18n/messages/views/userSetup'
 import { getUserDetails } from '@client/profile/profileSelectors'
 import { IStoreState } from '@client/store'
-import {
-  SubmitActivateUserMutation,
-  SubmitActivateUserMutationVariables
-} from '@client/utils/gateway'
 import { getUserName, UserDetails } from '@client/utils/userUtils'
-import { activateUserMutation } from '@client/views/UserSetup/queries'
+import { useLocations } from '@client/v2-events/hooks/useLocations'
+import { formatUserRole } from '@client/v2-events/hooks/useRoles'
+import { useUsers } from '@client/v2-events/hooks/useUsers'
+import { getOrThrow } from '@opencrvs/commons/client'
 import { ErrorText } from '@opencrvs/components/lib/'
 import { ActionPageLight } from '@opencrvs/components/lib/ActionPageLight'
 import { Button } from '@opencrvs/components/lib/Button'
@@ -59,16 +58,33 @@ export function UserSetupReview({ setupData, goToStep }: IProps) {
   const userDetails = useSelector<IStoreState, UserDetails | null>(
     getUserDetails
   )
+
+  const primaryOfficeId = getOrThrow(
+    userDetails?.primaryOfficeId,
+    'User primary office ID is required'
+  )
+
+  const onCompleted = () => {
+    goToStep(ProtectedAccoutStep.CONFIRMATION, setupData)
+  }
+  const onError = () => {
+    setSubmitError(true)
+  }
+
+  const { getLocation } = useLocations()
+  const location = getLocation.useQuery(primaryOfficeId)
+  const { activateUser } = useUsers()
+
+  const activateUserUserMutation = activateUser({
+    onSuccess: onCompleted,
+    onError: onError
+  })
   const englishName = getUserName(userDetails)
   const mobile = (userDetails && (userDetails.mobile as string)) || ''
   const email = (userDetails && (userDetails.email as string)) || ''
-  const role = userDetails && intl.formatMessage(userDetails.role.label)
+  const role = formatUserRole(userDetails?.role, intl)
 
-  const primaryOffice =
-    (userDetails &&
-      userDetails.primaryOffice &&
-      userDetails.primaryOffice.name) ||
-    ''
+  const primaryOffice = location.data?.name ?? ''
 
   const answeredQuestions: IDataProps[] = []
   setupData.securityQuestionAnswers &&
@@ -126,74 +142,59 @@ export function UserSetupReview({ setupData, goToStep }: IProps) {
     ...answeredQuestions
   ]
 
-  const onCompleted = () => {
-    goToStep(ProtectedAccoutStep.CONFIRMATION, setupData)
-  }
-  const onError = () => {
-    setSubmitError(true)
-  }
   return (
-    <Mutation<SubmitActivateUserMutation, SubmitActivateUserMutationVariables>
-      mutation={activateUserMutation}
-      variables={{
-        userId: String(setupData.userId),
-        password: String(setupData.password),
-        securityQuestionAnswers:
-          setupData.securityQuestionAnswers as ISecurityQuestionAnswer[]
+    <ActionPageLight
+      title={intl.formatMessage(messages.userSetupRevieTitle)}
+      hideBackground
+      goBack={() => {
+        goToStep(ProtectedAccoutStep.SECURITY_QUESTION, setupData)
       }}
-      onCompleted={() => onCompleted()}
-      onError={() => onError()}
     >
-      {(submitActivateUser, { loading }) => {
-        return (
-          <ActionPageLight
-            title={intl.formatMessage(messages.userSetupRevieTitle)}
-            hideBackground
-            goBack={() => {
-              goToStep(ProtectedAccoutStep.SECURITY_QUESTION, setupData)
-            }}
-          >
-            {loading ? (
-              <Content>
-                <Loader
-                  id="setup_submit_waiting"
-                  loadingText={intl.formatMessage(messages.waiting)}
-                />
-              </Content>
-            ) : (
-              <Content
-                title={intl.formatMessage(messages.userSetupReviewHeader)}
-                bottomActionButtons={[
-                  <Button
-                    key="confirm"
-                    id="Confirm"
-                    type="primary"
-                    size="large"
-                    fullWidth
-                    onClick={() => submitActivateUser()}
-                  >
-                    <Icon name="Check" />
-                    {intl.formatMessage(buttonMessages.confirm)}
-                  </Button>
-                ]}
-              >
-                <GlobalError id="GlobalError">
-                  {submitError && (
-                    <ErrorText>
-                      {intl.formatMessage(errorMessages.pleaseTryAgainError)}
-                    </ErrorText>
-                  )}
-                </GlobalError>
-                <div id="UserSetupData">
-                  {items.map((item: IDataProps, index: number) => (
-                    <DataRow key={index} {...item} />
-                  ))}
-                </div>
-              </Content>
+      {activateUserUserMutation.isPending ? (
+        <Content>
+          <Loader
+            id="setup_submit_waiting"
+            loadingText={intl.formatMessage(messages.waiting)}
+          />
+        </Content>
+      ) : (
+        <Content
+          title={intl.formatMessage(messages.userSetupReviewHeader)}
+          bottomActionButtons={[
+            <Button
+              key="confirm"
+              id="Confirm"
+              type="primary"
+              size="large"
+              fullWidth
+              onClick={() =>
+                activateUserUserMutation.mutate({
+                  userId: String(setupData.userId),
+                  password: String(setupData.password),
+                  securityQNAs:
+                    setupData.securityQuestionAnswers as ISecurityQuestionAnswer[]
+                })
+              }
+            >
+              <Icon name="Check" />
+              {intl.formatMessage(buttonMessages.confirm)}
+            </Button>
+          ]}
+        >
+          <GlobalError id="GlobalError">
+            {submitError && (
+              <ErrorText>
+                {intl.formatMessage(errorMessages.pleaseTryAgainError)}
+              </ErrorText>
             )}
-          </ActionPageLight>
-        )
-      }}
-    </Mutation>
+          </GlobalError>
+          <div id="UserSetupData">
+            {items.map((item: IDataProps, index: number) => (
+              <DataRow key={index} {...item} />
+            ))}
+          </div>
+        </Content>
+      )}
+    </ActionPageLight>
   )
 }

@@ -13,7 +13,7 @@ import type { Meta, StoryObj } from '@storybook/react'
 import React from 'react'
 import styled from 'styled-components'
 import { within, expect } from '@storybook/test'
-import { userEvent } from '@storybook/testing-library'
+import { userEvent, waitFor } from '@storybook/testing-library'
 import { ConditionalType, FieldType, never } from '@opencrvs/commons/client'
 import {
   FormFieldGenerator,
@@ -50,7 +50,14 @@ export const WithHiddenOption: Story = {
   name: 'With hidden country option',
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement)
-    await userEvent.click(await canvas.findByRole('textbox'))
+    const control = await waitFor(() => {
+      const el = canvasElement.querySelector('.react-select__control')
+      if (!el) {
+        throw new Error('Dropdown not found')
+      }
+      return el
+    })
+    await userEvent.click(control)
     await expect(canvas.queryByText('Bangladesh')).toBeInTheDocument()
     await expect(canvas.queryByText('Canada')).not.toBeInTheDocument()
     await expect(
@@ -93,7 +100,14 @@ export const WithAddressCountryOverride: Story = {
   name: 'Address field with hidden country option override',
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement)
-    await userEvent.click(await canvas.findByRole('textbox'))
+    const control = await waitFor(() => {
+      const el = canvasElement.querySelector('.react-select__control')
+      if (!el) {
+        throw new Error('Dropdown not found')
+      }
+      return el
+    })
+    await userEvent.click(control)
     await expect(canvas.queryByText('Bangladesh')).toBeInTheDocument()
     await expect(canvas.queryByText('Canada')).not.toBeInTheDocument()
   },
@@ -141,7 +155,14 @@ export const WithDisabledOption: Story = {
   name: 'With disabled country option',
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement)
-    await userEvent.click(await canvas.findByRole('textbox'))
+    const control = await waitFor(() => {
+      const el = canvasElement.querySelector('.react-select__control')
+      if (!el) {
+        throw new Error('Dropdown not found')
+      }
+      return el
+    })
+    await userEvent.click(control)
     const canadaOption = canvas.queryByText('Canada')
     await expect(canadaOption).toBeInTheDocument()
     await expect(canadaOption).toHaveClass('react-select__option--is-disabled')

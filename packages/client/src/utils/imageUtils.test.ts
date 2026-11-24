@@ -10,6 +10,7 @@
  */
 import {
   getBase64String,
+  getCropWindowSize,
   getFileAsTextString,
   validateCertificateTemplate,
   validateImage
@@ -104,5 +105,32 @@ describe('Test validateImage function if file is larger than 5Mb', () => {
 
   it('Should return error if file greater than 5Mb', () => {
     expect(async () => await validateImage(file)).rejects.toThrow()
+  })
+})
+
+describe('Test getCropWindowSize function', () => {
+  it('Should return a square window when no target size is configured', () => {
+    expect(getCropWindowSize(360)).toEqual({ width: 360, height: 360 })
+  })
+
+  it('Should return a square window for a square target size', () => {
+    expect(getCropWindowSize(360, { width: 200, height: 200 })).toEqual({
+      width: 360,
+      height: 360
+    })
+  })
+
+  it('Should match the aspect ratio of a portrait target size', () => {
+    expect(getCropWindowSize(360, { width: 350, height: 450 })).toEqual({
+      width: 280,
+      height: 360
+    })
+  })
+
+  it('Should match the aspect ratio of a landscape target size', () => {
+    expect(getCropWindowSize(240, { width: 800, height: 400 })).toEqual({
+      width: 240,
+      height: 120
+    })
   })
 })

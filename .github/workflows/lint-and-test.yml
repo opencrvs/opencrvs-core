@@ -49,10 +49,34 @@ jobs:
           echo "Found packages: $PACKAGES"
           echo "matrix=${PACKAGES}" >> $GITHUB_OUTPUT
 
+      - name: Prepare coverage explanation
+        run: |
+          echo "COVERAGE_EXPLANATION<<EOF" >> $GITHUB_ENV
+          echo "_ℹ️ Coverage metrics explained:_" >> $GITHUB_ENV
+          echo "• *Statements* — Executed code statements (basic logic lines)" >> $GITHUB_ENV
+          echo "• *Branches* — Tested decision paths (if/else, switch, ternaries)" >> $GITHUB_ENV
+          echo "• *Functions* — Functions invoked during tests" >> $GITHUB_ENV
+          echo "• *Lines* — Source lines executed" >> $GITHUB_ENV
+          echo "EOF" >> $GITHUB_ENV
+
+      - name: Post coverage explanation to PR
+        if: github.event_name == 'pull_request'
+        uses: mshick/add-pr-comment@v3
+        with:
+          message-id: test-coverage-explanation
+          message: ${{ env.COVERAGE_EXPLANATION }}
+
   test:
     name: Test
     needs: setup
     runs-on: ubuntu-24.04
+    permissions:
+      # Declaring any permission drops every other one to `none`, so
+      # `contents: read` has to be spelled out for actions/checkout. On a
+      # public repository the checkout succeeds without it; on a private
+      # one it fails with "Repository not found".
+      contents: read
+      pull-requests: write
     strategy:
       fail-fast: false
       matrix:
@@ -61,7 +85,9 @@ jobs:
     steps:
       - name: Checking out git repo
         uses: actions/checkout@v7
-
+      - name: Cleanup patches directory for non-client packages
+        if: ${{ matrix.package != 'packages/client' }}
+        run: rm -rf patches
       - name: Check package.json and scripts
         id: check-scripts
         run: |
@@ -125,15 +151,13 @@ jobs:
             fi
           done
 
-      - name: Cache Node.js dependencies
-        uses: actions/cache@v6
+      - name: Restore Yarn cache
+        uses: actions/cache/restore@v6
+        id: yarn-cache
         with:
           path: |
-            **/node_modules
             ~/.cache/yarn/v6
           key: node-${{ hashFiles('**/yarn.lock', format('{0}/{1}',matrix.package,'package.json')) }}
-          restore-keys: |
-            ${{ runner.os }}-node-
 
       - name: Verify every file has a license header
         if: steps.check-scripts.outputs.skip != 'true'
@@ -142,6 +166,15 @@ jobs:
       - name: Runs dependency installation
         if: steps.check-scripts.outputs.skip != 'true'
         run: CI="" yarn install --frozen-lockfile
+
+      - name: Save Yarn cache
+        if: |
+          github.ref == format('refs/heads/{0}', github.event.repository.default_branch) &&
+          steps.yarn-cache.outputs.cache-hit != 'true'
+        uses: actions/cache/save@v6
+        with:
+          path: ~/.cache/yarn/v6
+          key: ${{ steps.yarn-cache.outputs.cache-primary-key }}
 
       - name: Build common package
         if: matrix.package != 'packages/client' && steps.check-scripts.outputs.skip != 'true' && contains(env.DEPENDENCIES, 'packages/commons')
@@ -152,6 +185,10 @@ jobs:
         run: |
           cd packages/components && yarn build
 
+      - name: Build events router types
+        if: matrix.package != 'packages/client' && steps.check-scripts.outputs.skip != 'true' && contains(env.DEPENDENCIES, 'packages/events')
+        run: cd packages/events && node_modules/.bin/tsc -p tsconfig.router.json
+
       # TODO: should run parallel to unit tests as can take as much as unit tests
       - name: Run linting
         if: matrix.package != 'packages/client' && steps.check-scripts.outputs.skip != 'true' && steps.check-scripts.outputs.skip-lint != 'true'
@@ -161,6 +198,41 @@ jobs:
         if: matrix.package != 'packages/client' && steps.check-scripts.outputs.skip != 'true' && steps.check-scripts.outputs.skip-test != 'true'
         run: cd ${{ matrix.package }} && yarn test
 
+      - name: Generate test coverage summary
+        if: github.event_name == 'pull_request'
+          && (matrix.package == 'packages/commons' || matrix.package == 'packages/events')
+        run: |
+          export PACKAGE_NAME=$(basename "${{ matrix.package }}")
+          export COVERAGE_FILE="./${{ matrix.package }}/coverage/coverage-summary.json"
+
+          GENERATED_REPORT=$(node -e '
+            const s = require(process.env.COVERAGE_FILE).total;
+            const title = `## 📊 ${process.env.PACKAGE_NAME} test coverage`;
+
+            console.log(
+              title + "\n\n" +
+              "```text\n" +
+              `Statements: ${s.statements.pct}%\n` +
+              `Branches:   ${s.branches.pct}%\n` +
+              `Functions:  ${s.functions.pct}%\n` +
+              `Lines:      ${s.lines.pct}%\n` +
+              `Updated at: ${new Date().toUTCString()}\n` +
+              "```"
+            );
+          ')
+
+          echo "PR_COMMENT_BODY<<EOF" >> $GITHUB_ENV
+          echo "$GENERATED_REPORT" >> $GITHUB_ENV
+          echo "EOF" >> $GITHUB_ENV
+
+      - name: Post test coverage to PR
+        if: github.event_name == 'pull_request'
+          && (matrix.package == 'packages/commons' || matrix.package == 'packages/events')
+        uses: mshick/add-pr-comment@v3
+        with:
+          message-id: ${{ matrix.package }}-test-coverage
+          message: ${{ env.PR_COMMENT_BODY }}
+
   prepare-client-tests:
     name: Prepare client tests
     runs-on: ubuntu-24.04
@@ -169,8 +241,6 @@ jobs:
     steps:
       - name: Checking out git repo
         uses: actions/checkout@v7
-        with:
-          fetch-depth: 0 # Fetch history to compare PR changes against the base branch
 
       - name: Use Node.js from .nvmrc
         uses: actions/setup-node@v7
@@ -208,18 +278,25 @@ jobs:
             fi
           done
 
-      - name: Cache Node.js dependencies
-        uses: actions/cache@v6
+      - name: Restore Yarn cache
+        uses: actions/cache/restore@v6
+        id: yarn-cache
         with:
           path: |
-            **/node_modules
             ~/.cache/yarn/v6
           key: node-${{ hashFiles('**/yarn.lock', format('{0}/{1}','packages/client','package.json')) }}
-          restore-keys: |
-            ${{ runner.os }}-node-
 
       - name: Install dependencies
         run: CI="" yarn install --frozen-lockfile
+
+      - name: Save Yarn cache
+        if: |
+          github.ref == format('refs/heads/{0}', github.event.repository.default_branch) &&
+          steps.yarn-cache.outputs.cache-hit != 'true'
+        uses: actions/cache/save@v6
+        with:
+          path: ~/.cache/yarn/v6
+          key: ${{ steps.yarn-cache.outputs.cache-primary-key }}
 
       - name: Build common package
         run: cd packages/commons && yarn build
@@ -228,8 +305,22 @@ jobs:
         run: |
           cd packages/components && yarn build
 
+      # Build Storybook once here (with --webpack-stats-json so that
+      # `preview-stats.json` is emitted). The artifact is reused by
+      # `chromatic` (--storybook-build-dir) and `test-storybook`,
+      # avoiding duplicate Storybook builds. `preview-stats.json` is the
+      # input to the change-detection script that decides whether
+      # Chromatic must run.
+      - name: Build Storybook (with TurboSnap stats)
+        working-directory: packages/client
+        env:
+          # Why are we using NODE_ENV=production? It's recommended in Chromatic docs, to ensure webpack tree-shaking is working properly
+          # See: https://www.chromatic.com/docs/turbosnap/troubleshooting/#why-are-changes-not-being-detected-correctly
+          NODE_ENV: production
+        run: yarn run build-storybook --webpack-stats-json
+
       - name: Upload filesystem as artifact
-        uses: actions/upload-artifact@v4.5.0
+        uses: actions/upload-artifact@v7
         with:
           name: client
           include-hidden-files: true
@@ -237,6 +328,7 @@ jobs:
             .
             !**/.git
             !**/node_modules
+
   lint-client:
     name: Lint client
     needs: prepare-client-tests
@@ -244,7 +336,7 @@ jobs:
 
     steps:
       - name: Download filesystem artifact
-        uses: actions/download-artifact@v4.1.8
+        uses: actions/download-artifact@v7
         with:
           name: client
           path: .
@@ -254,18 +346,28 @@ jobs:
         with:
           node-version-file: .nvmrc
 
-      - name: Cache Node.js dependencies
-        uses: actions/cache@v6
+      - name: Restore Yarn cache
+        uses: actions/cache/restore@v6
+        id: yarn-cache
         with:
           path: |
-            **/node_modules
             ~/.cache/yarn/v6
           key: node-${{ hashFiles('**/yarn.lock', format('{0}/{1}','packages/client','package.json')) }}
-          restore-keys: |
-            ${{ runner.os }}-node-
 
       - name: Install dependencies
         run: CI="" yarn install --frozen-lockfile
+
+      - name: Save Yarn cache
+        if: |
+          github.ref == format('refs/heads/{0}', github.event.repository.default_branch) &&
+          steps.yarn-cache.outputs.cache-hit != 'true'
+        uses: actions/cache/save@v6
+        with:
+          path: ~/.cache/yarn/v6
+          key: ${{ steps.yarn-cache.outputs.cache-primary-key }}
+
+      - name: Build events router types
+        run: cd packages/events && node_modules/.bin/tsc -p tsconfig.router.json
 
       - name: Compile
         run: cd packages/client && yarn test:compilation
@@ -280,26 +382,20 @@ jobs:
     # Chromatic visual tests are disabled for now until we find a way to reduce the monthly costs
     # On average, every day we create roughly 7500 - 10000 snapshots per working day
     # Snapshots included in our plan are 35 000 per month and all exceeding snapshots are charged at $0.008 per snapshot
-    #
-    # develop and the 2.0.x release branches already carry this same guard.
     if: false
-
     steps:
-      # Chromatic's TurboSnap needs the full history. This used to be done by
-      # bare-cloning opencrvs-core over `.git` after the fact, which only ever
-      # worked in that one repository — anywhere else (a fork, or a private
-      # copy) it fetches the wrong history and then fails on
-      # `git checkout <branch>`, because the branch does not exist there.
-      # Check out this repository instead; the artifact extracted on top adds
-      # the prebuilt outputs, and source files match the current commit so the
-      # overwrites are no-ops.
+      # Fresh checkout brings .git (needed by Chromatic's TurboSnap and
+      # by the change-detection `git diff` below). The artifact
+      # extracted on top adds the prebuilt commons/components outputs
+      # and `packages/client/storybook-static/`; source files match the
+      # current commit so overwrites are no-ops.
       - name: Checkout PR branch (for git history)
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           fetch-depth: 0
 
       - name: Download filesystem artifact
-        uses: actions/download-artifact@v4.1.8
+        uses: actions/download-artifact@v7
         with:
           name: client
           path: .
@@ -313,18 +409,29 @@ jobs:
         uses: actions/cache@v6
         with:
           path: |
-            **/node_modules
             ~/.cache/yarn/v6
           key: node-${{ hashFiles('**/yarn.lock', format('{0}/{1}','packages/client','package.json')) }}
-          restore-keys: |
-            ${{ runner.os }}-node-
 
       - name: Install dependencies
+        if: steps.detect.outputs.affects == 'true'
         run: CI="" yarn install --frozen-lockfile
 
+      - name: Save Yarn cache
+        if: |
+          steps.detect.outputs.affects == 'true' &&
+          github.ref == format('refs/heads/{0}', github.event.repository.default_branch) &&
+          steps.yarn-cache.outputs.cache-hit != 'true'
+        uses: actions/cache/save@v6
+        with:
+          path: ~/.cache/yarn/v6
+          key: ${{ steps.yarn-cache.outputs.cache-primary-key }}
+
       - name: Run Chromatic
-        run: yarn run chromatic
+        if: steps.detect.outputs.affects == 'true'
         working-directory: packages/client
+        run: |
+          yarn run chromatic --storybook-build-dir storybook-static --diagnostics-file
+          cat chromatic-diagnostics.json
         env:
           CHROMATIC_PROJECT_TOKEN: ${{ secrets.CHROMATIC_PROJECT_TOKEN }}
 
@@ -335,7 +442,7 @@ jobs:
 
     steps:
       - name: Download filesystem artifact
-        uses: actions/download-artifact@v4.1.8
+        uses: actions/download-artifact@v7
         with:
           name: client
           path: .
@@ -345,27 +452,33 @@ jobs:
         with:
           node-version-file: .nvmrc
 
-      - name: Cache Node.js dependencies
-        uses: actions/cache@v6
+      - name: Restore Yarn cache
+        uses: actions/cache/restore@v6
+        id: yarn-cache
         with:
           path: |
-            **/node_modules
             ~/.cache/yarn/v6
           key: node-${{ hashFiles('**/yarn.lock', format('{0}/{1}','packages/client','package.json')) }}
-          restore-keys: |
-            ${{ runner.os }}-node-
 
       - name: Install dependencies
         run: CI="" yarn install --frozen-lockfile
+
+      - name: Save Yarn cache
+        if: |
+          github.ref == format('refs/heads/{0}', github.event.repository.default_branch) &&
+          steps.yarn-cache.outputs.cache-hit != 'true'
+        uses: actions/cache/save@v6
+        with:
+          path: ~/.cache/yarn/v6
+          key: ${{ steps.yarn-cache.outputs.cache-primary-key }}
 
       - name: Install Playwright
         # Playwright is required since @storybook/test-runner depends on it
         run: npx playwright install --with-deps
 
-      - name: Build Storybook
-        working-directory: packages/client
-        run: yarn run build-storybook
-
+      # `storybook-static/` is restored from the artifact built in
+      # `prepare-client-tests`, so we don't need to build Storybook
+      # again here.
       - name: Serve Storybook and run tests
         working-directory: packages/client
         # based on https://storybook.js.org/docs/writing-tests/test-runner#run-against-non-deployed-storybooks
@@ -385,7 +498,7 @@ jobs:
 
     steps:
       - name: Download filesystem artifact
-        uses: actions/download-artifact@v4.1.8
+        uses: actions/download-artifact@v7
         with:
           name: client
           path: .
@@ -395,21 +508,28 @@ jobs:
         with:
           node-version-file: .nvmrc
 
-      - name: Cache Node.js dependencies
-        uses: actions/cache@v6
+      - name: Restore Yarn cache
+        uses: actions/cache/restore@v6
+        id: yarn-cache
         with:
           path: |
-            **/node_modules
             ~/.cache/yarn/v6
           key: node-${{ hashFiles('**/yarn.lock', format('{0}/{1}','packages/client','package.json')) }}
-          restore-keys: |
-            ${{ runner.os }}-node-
 
       - name: Install dependencies
         run: CI="" yarn install --frozen-lockfile
 
+      - name: Save Yarn cache
+        if: |
+          github.ref == format('refs/heads/{0}', github.event.repository.default_branch) &&
+          steps.yarn-cache.outputs.cache-hit != 'true'
+        uses: actions/cache/save@v6
+        with:
+          path: ~/.cache/yarn/v6
+          key: ${{ steps.yarn-cache.outputs.cache-primary-key }}
+
       - name: Run Unit Test
-        run: cd packages/client && yarn test -- --shard $(( ${{ strategy.job-index }} + 1 ))/${{ strategy.job-total }}
+        run: cd packages/client && yarn test --shard $(( ${{ strategy.job-index }} + 1 ))/${{ strategy.job-total }}
 
   lint-knip:
     name: Lint unused exports with Knip

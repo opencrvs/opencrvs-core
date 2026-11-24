@@ -45,7 +45,7 @@ const LoadingTextContainer = styled.div`
 export const Loader = ({
   id,
   loadingText,
-  marginPercent,
+  marginPercent = 0,
   innerMargin = 24,
   spinnerDiameter,
   flexDirection

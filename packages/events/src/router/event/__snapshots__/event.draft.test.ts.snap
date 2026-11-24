@@ -11,7 +11,7 @@ exports[`Allows creating draft for event with actions 1`] = `
     "declaration": {},
     "status": "Accepted",
     "transactionId": "[sanitized]",
-    "type": "VALIDATE",
+    "type": "REGISTER",
   },
   "createdAt": "[sanitized]",
   "eventId": "[sanitized]",

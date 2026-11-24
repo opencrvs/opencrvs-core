@@ -10,7 +10,13 @@
  */
 
 import { IntlShape } from 'react-intl'
-import { FieldConfigInput, Location, User } from '@opencrvs/commons/client'
+import {
+  AdministrativeArea,
+  FieldConfigInput,
+  Location,
+  User,
+  UUID
+} from '@opencrvs/commons/client'
 import { AdminStructureItem } from '@client/utils/referenceApi'
 
 export interface RegisteredFieldModule<T extends FieldConfigInput> {
@@ -30,7 +36,8 @@ export interface RegisteredFieldModule<T extends FieldConfigInput> {
 
 export interface StringifierContext<F extends FieldConfigInput> {
   intl: IntlShape
-  locations: Location[]
+  locations: Map<UUID, Location>
+  administrativeAreas: Map<UUID, AdministrativeArea>
   users?: User[]
   config?: F
   adminLevels?: AdminStructureItem[]

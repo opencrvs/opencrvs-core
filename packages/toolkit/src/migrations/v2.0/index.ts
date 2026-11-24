@@ -1,0 +1,91 @@
+/*
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at https://mozilla.org/MPL/2.0/.
+ *
+ * OpenCRVS is also distributed under the terms of the Civil Registration
+ * & Healthcare Disclaimer located at http://opencrvs.org/license.
+ *
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
+ */
+import { main as removeReviewFromRegisterAction } from './remove-review-from-register-action'
+import { main as makeBuiltInValidateActionsCustom } from './make-built-in-validate-actions-custom'
+import { main as removeDeleteActions } from './remove-delete-actions'
+import { main as convertParagraphToHeading } from './convert-paragraph-to-heading'
+import { main as migrateValidatedWorkqueueStatusToFlag } from './migrate-validated-workqueue-status-to-flag'
+import { main as addBirthCertificateIssuanceFlag } from './add-birth-certificate-issuance-flag'
+import { main as removePendingCertificationFlag } from './remove-pending-certification-flag'
+import { main as renameLocationParentId } from './rename-location-parent-id'
+import { main as renameApiPaths } from './rename-api-paths'
+import { main as convertConfigFilesToTs } from './convert-config-files-to-ts'
+import { main as migrateScopes } from './migrate-scopes'
+import { main as removeDeprecatedImports } from './remove-deprecated-imports'
+import { main as removeUnusedEnvironmentVariables } from './remove-unused-environment-variables'
+import { main as removeFhirUrlHelpers } from './remove-fhir-url-helpers'
+import { main as migrateApplicationConfigUrl } from './migrate-application-config-url'
+import { main as removeOldStatisticsService } from './remove-old-statistics-service'
+import { main as updatePackageJson } from './update-package-json'
+import { main as migrateWorkqueueConfigs } from './migrate-workqueue-configs'
+import { main as removeDemoScope } from './remove-demo-scope'
+import { main as removeHearthMigrations } from './remove-hearth-migrations'
+import { main as createEventsIndex } from './create-events-index'
+import { main as checkoutUpstreamFiles } from './checkout-upstream-files'
+import { main as addResendInviteNotification } from './add-resend-invite-notification'
+import { main as simplifyAnalyticsPrecalculations } from './simplify-analytics-precalculations'
+import { main as mergeInfrastructureDirectory } from './merge-infrastructure-directory'
+import { main as deleteInfrastructureDirectory } from './delete-infrastructure-directory'
+import { main as fixAcceptRequestedRegistrationFunctionType } from './fix-accept-requested-registration-function-type'
+
+/**
+ * Top-level subdirectories of `infrastructure/` that non-Swarm deployments
+ * still need (e.g. Postgres init scripts, Metabase config). Everything else
+ * under `infrastructure/` is deleted, and these subdirectories are then
+ * merged with upstream so the country config picks up the v2.0 changes.
+ */
+const NON_SWARM_INFRA_SUBDIRS = ['postgres', 'metabase']
+
+/**
+ * Run the upgrade process for the country config in the current working
+ * directory.
+ *
+ * @param dockerSwarm - When true, the local `infrastructure/` directory is
+ *   merged with upstream changes in its entirety (Docker Swarm deployments
+ *   still need it all). When false (the default), everything under
+ *   `infrastructure/` is deleted EXCEPT the subdirectories listed in
+ *   `NON_SWARM_INFRA_SUBDIRS`, and those preserved subdirectories are then
+ *   merged with upstream.
+ */
+export async function runUpgrade(dockerSwarm: boolean) {
+  await migrateWorkqueueConfigs()
+  await removeReviewFromRegisterAction()
+  await makeBuiltInValidateActionsCustom()
+  await removeDeleteActions()
+  await convertParagraphToHeading()
+  await migrateValidatedWorkqueueStatusToFlag()
+  await addBirthCertificateIssuanceFlag()
+  await removePendingCertificationFlag()
+  await renameLocationParentId()
+  await renameApiPaths()
+  await convertConfigFilesToTs()
+  await migrateScopes()
+  await removeDeprecatedImports()
+  await removeUnusedEnvironmentVariables()
+  await removeFhirUrlHelpers()
+  await migrateApplicationConfigUrl()
+  await removeOldStatisticsService()
+  await removeDemoScope()
+  await removeHearthMigrations()
+  await createEventsIndex()
+  await checkoutUpstreamFiles()
+  await addResendInviteNotification()
+  await simplifyAnalyticsPrecalculations()
+  await fixAcceptRequestedRegistrationFunctionType()
+  await updatePackageJson()
+
+  if (dockerSwarm) {
+    await mergeInfrastructureDirectory()
+  } else {
+    await deleteInfrastructureDirectory({ keep: NON_SWARM_INFRA_SUBDIRS })
+    await mergeInfrastructureDirectory({ subdirs: NON_SWARM_INFRA_SUBDIRS })
+  }
+}
