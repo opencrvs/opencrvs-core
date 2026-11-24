@@ -351,17 +351,16 @@ describe('runFieldValidations with customClientValidator', () => {
 })
 
 describe('areConditionsMet', () => {
+  // `health-worker-notified` is a flag that the event configuration defines. The NOTIFY action adds it.
   const flagConditional = {
     type: ConditionalType.SHOW,
-    conditional: flag('rejected')
+    conditional: flag('health-worker-notified')
   }
 
   it('is met when the event carries the flag', () => {
     const eventDocument = generateEventDocument({
       configuration: tennisClubMembershipEvent,
-      actions: [ActionType.CREATE, ActionType.DECLARE, ActionType.REJECT].map(
-        (type) => ({ type })
-      )
+      actions: [ActionType.CREATE, ActionType.NOTIFY].map((type) => ({ type }))
     })
 
     expect(
@@ -398,11 +397,14 @@ describe('areConditionsMet', () => {
 describe('isFieldVisible', () => {
   // `flag(...)` resolves through the event state of `context.eventDocument`.
   const flaggedField = {
-    id: 'rejectedOnly',
+    id: 'notifiedOnly',
     type: FieldType.TEXT,
     label: { id: '', defaultMessage: '', description: '' },
     conditionals: [
-      { type: ConditionalType.SHOW, conditional: flag('rejected') }
+      {
+        type: ConditionalType.SHOW,
+        conditional: flag('health-worker-notified')
+      }
     ]
   } satisfies FieldConfig
 
@@ -411,11 +413,9 @@ describe('isFieldVisible', () => {
     actions: [ActionType.CREATE, ActionType.DECLARE].map((type) => ({ type }))
   })
 
-  const rejectedDocument = generateEventDocument({
+  const notifiedDocument = generateEventDocument({
     configuration: tennisClubMembershipEvent,
-    actions: [ActionType.CREATE, ActionType.DECLARE, ActionType.REJECT].map(
-      (type) => ({ type })
-    )
+    actions: [ActionType.CREATE, ActionType.NOTIFY].map((type) => ({ type }))
   })
 
   it('resolves flag() against the event document carried on the context', () => {
@@ -425,7 +425,7 @@ describe('isFieldVisible', () => {
         { declaration: {}, annotation: {} },
         {
           ...generateEmptyTestValidatorContext(tennisClubMembershipEvent),
-          eventDocument: rejectedDocument
+          eventDocument: notifiedDocument
         }
       )
     ).toBe(true)
@@ -438,6 +438,16 @@ describe('isFieldVisible', () => {
           ...generateEmptyTestValidatorContext(tennisClubMembershipEvent),
           eventDocument: document
         }
+      )
+    ).toBe(false)
+  })
+
+  it('treats flags as empty when the event is only created', () => {
+    expect(
+      isFieldVisible(
+        flaggedField,
+        { declaration: {}, annotation: {} },
+        generateEmptyTestValidatorContext(tennisClubMembershipEvent)
       )
     ).toBe(false)
   })

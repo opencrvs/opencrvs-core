@@ -23,10 +23,6 @@ import {
   DuplicateDetectedAction,
   ActionUpdate
 } from './ActionDocument'
-import {
-  getEventValidatorContext,
-  ValidatorContext
-} from '../conditionals/validate'
 import { ActionFormConditionalContext } from '../conditionals/validate-v2'
 import {
   ApproveCorrectionActionInput,
@@ -92,24 +88,14 @@ import {
   HttpFieldValue
 } from './CompositeFieldValue'
 import { FieldValue, PlainDate } from './FieldValue'
-import {
-  EncodedScope,
-  encodeScope,
-  ITokenPayload,
-  TokenUserType
-} from '../users/authentication'
+import { TokenUserType } from '../users/authentication'
 import * as z from 'zod/v4'
 import { DocumentPath } from '../documents'
 import { defineConfig } from './defineConfig'
 import { toNotificationForm } from './toNotificationForm'
-import { V2_DEFAULT_MOCK_ADMINISTRATIVE_AREAS_MAP } from './mocks.test.utils'
 
 /**
- * @TODO: Placeholder context to generate test data without a stored event or a user.
- * Before the strict context, these callers passed an empty context (`{}`).
- * The user has no role and no scopes, so user conditionals are false, as before.
- * The event document has only the CREATE action, because the event state cannot be calculated without it.
- * We handle this case separately.
+ * Placeholder context to generate test data without a stored event or a user.
  */
 export function generateEmptyTestValidatorContext(
   configuration: EventConfig
@@ -1633,55 +1619,6 @@ export function getLeafAdministrativeAreaIds(
   }
 
   return result
-}
-
-/**
- *
- * @returns TokenPayload. Useful for building test setup for ValidatorContext
- */
-function generateUserTokenPayload({
-  role,
-  scope
-}: {
-  role?: TestUserRole
-  scope?: EncodedScope[]
-}): ITokenPayload {
-  return {
-    // @TODO: Validate which fields are necessary https://github.com/opencrvs/opencrvs-core/issues/13530
-    sub: generateUuid(),
-    algorithm: 'RS256',
-    exp: '1787221786',
-    role: role ?? TestUserRole.enum.FIELD_AGENT,
-    scope: scope ?? [
-      encodeScope({
-        type: 'record.read'
-      })
-    ],
-    userType: TokenUserType.enum.user
-  }
-}
-
-export function generateTestValidatorContext(
-  userRole?: TestUserRole,
-  eventWithConfig?: { event: EventDocument; eventConfig: EventConfig }
-): ValidatorContext {
-  const user = generateUserTokenPayload({ role: userRole })
-
-  const leafAdminStructureLocationIds = getLeafAdministrativeAreaIds(
-    V2_DEFAULT_MOCK_ADMINISTRATIVE_AREAS_MAP
-  )
-
-  if (!eventWithConfig) {
-    return { user, leafAdminStructureLocationIds }
-  }
-
-  const { event, eventConfig } = eventWithConfig
-
-  return {
-    user,
-    leafAdminStructureLocationIds,
-    event: getEventValidatorContext(event, eventConfig)
-  }
 }
 
 /**
