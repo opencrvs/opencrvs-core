@@ -16,15 +16,14 @@ Same command with UI:
 pnpm e2e --ui
 ```
 
-
 Against a deployed environment:
 
 ```bash
 SCHEME=https DOMAIN=<your-environment-domain> pnpm e2e
 ```
 
-| Variable                       | Default            | Description                                                         |
-| ------------------------------ | ------------------ | ------------------------------------------------------------------- |
-| `DOMAIN`                       | `opencrvs.localhost`        | Domain after the `login.`, `gateway.` and other subdomains          |
-| `SCHEME`                       | `http`            | URL scheme                                                          |
-| `E2E_USERNAME`, `E2E_PASSWORD` | `c.lungu` / `test` | User from `src/data-seeding/employees/source/default-employees.csv` |
+| Variable                       | Default              | Description                                                                                     |
+| ------------------------------ | -------------------- | ----------------------------------------------------------------------------------------------- |
+| `DOMAIN`                       | `opencrvs.localhost` | Domain after the `login.` and `register.` and other subdomains. |
+| `SCHEME`                       | `http`               | URL scheme                                                                                      |
+| `E2E_USERNAME`, `E2E_PASSWORD` | `c.lungu` / `test`   | User from `src/data-seeding/employees/source/default-employees.csv`                             |
