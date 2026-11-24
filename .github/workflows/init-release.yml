@@ -22,8 +22,9 @@ on:
 env:
   VERSION: ${{ inputs.version }}
 
-# Pushes the line branch and the draft release's tag. The companion repos and
-# e2e are reached with their own tokens.
+# Pushes the line branch and the draft release's tag. The companion repos are
+# reached with their own tokens. e2e needs no branch for each release: core
+# PRs into release/<major>.<minor>.x use the e2e branch of the same name.
 permissions:
   contents: write
 
@@ -134,24 +135,6 @@ jobs:
           trigger infrastructure "$INFRASTRUCTURE_TOKEN"
           trigger opencrvs-testland "$TESTLAND_TOKEN"
           trigger helm-charts "$HELM_CHARTS_TOKEN"
-
-      # Cut from e2e's branch for the same line, or from develop if it has none.
-      - name: Create the release branch in the e2e repo
-        env:
-          GH_TOKEN: ${{ secrets.E2E_WORKFLOW_TOKEN }}
-          RELEASE_BRANCH: release/${{ inputs.version }}
-          LINE_BRANCH: ${{ steps.line.outputs.branch }}
-        run: |
-          if gh api "repos/opencrvs/e2e/git/ref/heads/$RELEASE_BRANCH" > /dev/null 2>&1; then
-            echo "$RELEASE_BRANCH already exists in e2e, skipping."
-            exit 0
-          fi
-
-          if ! sha=$(gh api "repos/opencrvs/e2e/git/ref/heads/$LINE_BRANCH" --jq .object.sha 2>/dev/null); then
-            sha=$(gh api "repos/opencrvs/e2e/git/ref/heads/develop" --jq .object.sha)
-          fi
-          gh api repos/opencrvs/e2e/git/refs -f ref="refs/heads/$RELEASE_BRANCH" -f sha="$sha" > /dev/null
-          echo "Created $RELEASE_BRANCH in e2e"
 
       # The draft gives the release notes somewhere to be written while the
       # release is in flight. Its tag is deleted again so nothing points at
