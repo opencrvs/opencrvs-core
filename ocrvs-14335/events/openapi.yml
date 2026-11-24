@@ -873,6 +873,10 @@ paths:
                           - name
                           - status
                         additionalProperties: false
+                    updatedAt:
+                      type: string
+                      format: date-time
+                      pattern: ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d:[0-5]\d(?:\.\d+)?(?:Z))$
                   required:
                     - id
                     - name
@@ -880,6 +884,7 @@ paths:
                     - locationType
                     - status
                     - versions
+                    - updatedAt
                   additionalProperties: false
         "400": *a1
         "401": *a2
@@ -1003,6 +1008,10 @@ paths:
                         - name
                         - status
                       additionalProperties: false
+                  updatedAt:
+                    type: string
+                    format: date-time
+                    pattern: ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d:[0-5]\d(?:\.\d+)?(?:Z))$
                 required:
                   - id
                   - name
@@ -1010,6 +1019,7 @@ paths:
                   - locationType
                   - status
                   - versions
+                  - updatedAt
                 additionalProperties: false
         "400": *a1
         "401": *a2
@@ -1133,6 +1143,10 @@ paths:
                         - name
                         - status
                       additionalProperties: false
+                  updatedAt:
+                    type: string
+                    format: date-time
+                    pattern: ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d:[0-5]\d(?:\.\d+)?(?:Z))$
                 required:
                   - id
                   - name
@@ -1140,6 +1154,7 @@ paths:
                   - locationType
                   - status
                   - versions
+                  - updatedAt
                 additionalProperties: false
         "400": *a1
         "401": *a2
@@ -1234,6 +1249,10 @@ paths:
                         - name
                         - status
                       additionalProperties: false
+                  updatedAt:
+                    type: string
+                    format: date-time
+                    pattern: ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d:[0-5]\d(?:\.\d+)?(?:Z))$
                 required:
                   - id
                   - name
@@ -1241,6 +1260,7 @@ paths:
                   - locationType
                   - status
                   - versions
+                  - updatedAt
                 additionalProperties: false
         "400": *a1
         "401": *a2
@@ -1330,12 +1350,17 @@ paths:
                           - name
                           - status
                         additionalProperties: false
+                    updatedAt:
+                      type: string
+                      format: date-time
+                      pattern: ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d:[0-5]\d(?:\.\d+)?(?:Z))$
                   required:
                     - id
                     - name
                     - parentId
                     - status
                     - versions
+                    - updatedAt
                   additionalProperties: false
         "400": *a1
         "401": *a2
@@ -1450,12 +1475,17 @@ paths:
                         - name
                         - status
                       additionalProperties: false
+                  updatedAt:
+                    type: string
+                    format: date-time
+                    pattern: ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d:[0-5]\d(?:\.\d+)?(?:Z))$
                 required:
                   - id
                   - name
                   - parentId
                   - status
                   - versions
+                  - updatedAt
                 additionalProperties: false
         "400": *a1
         "401": *a2
@@ -1575,12 +1605,17 @@ paths:
                         - name
                         - status
                       additionalProperties: false
+                  updatedAt:
+                    type: string
+                    format: date-time
+                    pattern: ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d:[0-5]\d(?:\.\d+)?(?:Z))$
                 required:
                   - id
                   - name
                   - parentId
                   - status
                   - versions
+                  - updatedAt
                 additionalProperties: false
         "400": *a1
         "401": *a2
@@ -1672,12 +1707,17 @@ paths:
                         - name
                         - status
                       additionalProperties: false
+                  updatedAt:
+                    type: string
+                    format: date-time
+                    pattern: ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d:[0-5]\d(?:\.\d+)?(?:Z))$
                 required:
                   - id
                   - name
                   - parentId
                   - status
                   - versions
+                  - updatedAt
                 additionalProperties: false
         "400": *a1
         "401": *a2
@@ -3804,9 +3844,6 @@ components:
           description: READ is a meta action excluded from flag resolution, so flags
             configured here would never apply.
           not: {}
-        supportingCopy:
-          description: Text displayed on the confirmation dialog
-          $ref: "#/components/schemas/TranslationConfigOutput"
         icon:
           type: string
           description: Icon representing the action
@@ -14496,9 +14533,6 @@ components:
           description: ASSIGN is a meta action excluded from flag resolution, so flags
             configured here would never apply.
           not: {}
-        supportingCopy:
-          description: Text displayed on the confirmation dialog
-          $ref: "#/components/schemas/TranslationConfigOutput"
         icon:
           type: string
           description: Icon representing the action
@@ -14525,9 +14559,6 @@ components:
           description: UNASSIGN is a meta action excluded from flag resolution, so flags
             configured here would never apply.
           not: {}
-        supportingCopy:
-          description: Text displayed on the confirmation dialog
-          $ref: "#/components/schemas/TranslationConfigOutput"
         icon:
           type: string
           description: Icon representing the action
@@ -14556,9 +14587,6 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/ActionFlagConfig"
-        supportingCopy:
-          description: Text displayed on the confirmation dialog
-          $ref: "#/components/schemas/TranslationConfigOutput"
         icon:
           type: string
           description: Icon representing the action
@@ -14619,9 +14647,6 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/ActionFlagConfig"
-        supportingCopy:
-          description: Text displayed on the confirmation dialog
-          $ref: "#/components/schemas/TranslationConfigOutput"
         icon:
           type: string
           description: Icon representing the action
@@ -14661,6 +14686,9 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/FieldConfig"
+        dialogCopy:
+          description: Text shown at the top of the confirmation dialog of the action.
+          $ref: "#/components/schemas/TranslationConfigOutput"
       required:
         - label
         - flags
@@ -14734,9 +14762,6 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/ActionFlagConfig"
-        supportingCopy:
-          description: Text displayed on the confirmation dialog
-          $ref: "#/components/schemas/TranslationConfigOutput"
         icon:
           type: string
           description: Icon representing the action
@@ -14776,22 +14801,8 @@ components:
           items:
             $ref: "#/components/schemas/FieldConfig"
         dialogCopy:
-          type: object
-          properties:
-            notify:
-              description: Confirmation text for the notify action
-              $ref: "#/components/schemas/TranslationConfigOutput"
-            declare:
-              description: Confirmation text for the declare action
-              $ref: "#/components/schemas/TranslationConfigOutput"
-            register:
-              description: Confirmation text for the register action
-              $ref: "#/components/schemas/TranslationConfigOutput"
-          required:
-            - notify
-            - declare
-            - register
-          additionalProperties: false
+          description: Text shown at the top of the confirmation dialog of the action.
+          $ref: "#/components/schemas/TranslationConfigOutput"
       required:
         - label
         - flags
@@ -14958,8 +14969,6 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/ActionFlagConfig"
-        supportingCopy:
-          not: {}
         icon:
           description: DUPLICATE_DETECTED is system-generated and never shown as a button,
             so it has no icon.
@@ -14990,9 +14999,6 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/ActionFlagConfig"
-        supportingCopy:
-          description: Text displayed on the confirmation dialog
-          $ref: "#/components/schemas/TranslationConfigOutput"
         icon:
           type: string
           description: Icon representing the action
@@ -15022,9 +15028,6 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/ActionFlagConfig"
-        supportingCopy:
-          description: Text displayed on the confirmation dialog
-          $ref: "#/components/schemas/TranslationConfigOutput"
         icon:
           type: string
           description: Icon representing the action
@@ -15055,9 +15058,6 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/ActionFlagConfig"
-        supportingCopy:
-          description: Text displayed on the confirmation dialog
-          $ref: "#/components/schemas/TranslationConfigOutput"
         icon:
           type: string
           description: Icon representing the action
@@ -15075,6 +15075,9 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/FieldConfig"
+        dialogCopy:
+          description: Text shown at the top of the confirmation dialog of the action.
+          $ref: "#/components/schemas/TranslationConfigOutput"
       required:
         - label
         - flags
@@ -15093,9 +15096,6 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/ActionFlagConfig"
-        supportingCopy:
-          description: Text displayed on the confirmation dialog
-          $ref: "#/components/schemas/TranslationConfigOutput"
         icon:
           type: string
           description: Icon representing the action
@@ -15115,6 +15115,9 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/FieldConfig"
+        dialogCopy:
+          description: Text shown at the top of the confirmation dialog of the action.
+          $ref: "#/components/schemas/TranslationConfigOutput"
       required:
         - label
         - flags
@@ -15133,9 +15136,6 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/ActionFlagConfig"
-        supportingCopy:
-          description: Text displayed on the confirmation dialog
-          $ref: "#/components/schemas/TranslationConfigOutput"
         icon:
           type: string
           description: Icon representing the action
@@ -15300,9 +15300,6 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/ActionFlagConfig"
-        supportingCopy:
-          description: Text displayed on the confirmation dialog
-          $ref: "#/components/schemas/TranslationConfigOutput"
         icon:
           type: string
           description: Icon representing the action
@@ -15349,9 +15346,6 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/ActionFlagConfig"
-        supportingCopy:
-          description: Text displayed on the confirmation dialog
-          $ref: "#/components/schemas/TranslationConfigOutput"
         icon:
           type: string
           description: Icon representing the action
@@ -15381,9 +15375,6 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/ActionFlagConfig"
-        supportingCopy:
-          description: Text displayed on the confirmation dialog
-          $ref: "#/components/schemas/TranslationConfigOutput"
         icon:
           type: string
           description: Icon representing the action
@@ -15413,9 +15404,6 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/ActionFlagConfig"
-        supportingCopy:
-          description: Text displayed on the confirmation dialog
-          $ref: "#/components/schemas/TranslationConfigOutput"
         icon:
           type: string
           description: Icon representing the action
@@ -15431,13 +15419,13 @@ components:
           type: object
           properties:
             notify:
-              description: Confirmation text for the notify with edits action
+              description: Confirmation text for the 'Notify with edits' action
               $ref: "#/components/schemas/TranslationConfigOutput"
             declare:
-              description: Confirmation text for the declare with edits action
+              description: Confirmation text for the 'Declare with edits' action
               $ref: "#/components/schemas/TranslationConfigOutput"
             register:
-              description: Confirmation text for the register with edits action
+              description: Confirmation text for the 'Register with edits' action
               $ref: "#/components/schemas/TranslationConfigOutput"
           required:
             - notify
@@ -15463,9 +15451,6 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/ActionFlagConfig"
-        supportingCopy:
-          description: Text displayed on the confirmation dialog
-          $ref: "#/components/schemas/TranslationConfigOutput"
         icon:
           type: string
           description: Icon representing the action
@@ -15483,6 +15468,9 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/FieldConfig"
+        dialogCopy:
+          description: Text shown at the top of the confirmation dialog of the action.
+          $ref: "#/components/schemas/TranslationConfigOutput"
       required:
         - label
         - flags
@@ -15501,9 +15489,6 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/ActionFlagConfig"
-        supportingCopy:
-          description: Text displayed on the confirmation dialog
-          $ref: "#/components/schemas/TranslationConfigOutput"
         icon:
           type: string
           description: Icon representing the action
@@ -15515,6 +15500,9 @@ components:
         type:
           type: string
           const: UNARCHIVE
+        dialogCopy:
+          description: Text shown at the top of the confirmation dialog of the action.
+          $ref: "#/components/schemas/TranslationConfigOutput"
       required:
         - label
         - flags
@@ -15533,9 +15521,6 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/ActionFlagConfig"
-        supportingCopy:
-          description: Text displayed on the confirmation dialog
-          $ref: "#/components/schemas/TranslationConfigOutput"
         icon:
           type: string
           description: Icon representing the action
@@ -15553,6 +15538,9 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/FieldConfig"
+        dialogCopy:
+          description: Text shown at the top of the confirmation dialog of the action.
+          $ref: "#/components/schemas/TranslationConfigOutput"
       required:
         - label
         - flags
@@ -15571,9 +15559,6 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/ActionFlagConfig"
-        supportingCopy:
-          description: Text displayed on the confirmation dialog
-          $ref: "#/components/schemas/TranslationConfigOutput"
         icon:
           type: string
           description: Icon representing the action
@@ -15591,6 +15576,9 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/FieldConfig"
+        dialogCopy:
+          description: Text shown at the top of the confirmation dialog of the action.
+          $ref: "#/components/schemas/TranslationConfigOutput"
       required:
         - label
         - flags
@@ -15609,9 +15597,6 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/ActionFlagConfig"
-        supportingCopy:
-          description: Text displayed on the confirmation dialog
-          $ref: "#/components/schemas/TranslationConfigOutput"
         icon:
           type: string
           description: Icon representing the action
@@ -15635,6 +15620,9 @@ components:
         auditHistoryLabel:
           description: The label to show in audit history for this action. For example
             "Approved".
+          $ref: "#/components/schemas/TranslationConfigOutput"
+        dialogCopy:
+          description: Text shown at the top of the confirmation dialog of the action.
           $ref: "#/components/schemas/TranslationConfigOutput"
       required:
         - label

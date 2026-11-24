@@ -3725,9 +3725,6 @@ components:
           description: READ is a meta action excluded from flag resolution, so flags
             configured here would never apply.
           not: {}
-        supportingCopy:
-          description: Text displayed on the confirmation dialog
-          $ref: "#/components/schemas/TranslationConfig"
         icon:
           type: string
           description: Icon representing the action
@@ -14791,9 +14788,6 @@ components:
           description: ASSIGN is a meta action excluded from flag resolution, so flags
             configured here would never apply.
           not: {}
-        supportingCopy:
-          description: Text displayed on the confirmation dialog
-          $ref: "#/components/schemas/TranslationConfig"
         icon:
           type: string
           description: Icon representing the action
@@ -14820,9 +14814,6 @@ components:
           description: UNASSIGN is a meta action excluded from flag resolution, so flags
             configured here would never apply.
           not: {}
-        supportingCopy:
-          description: Text displayed on the confirmation dialog
-          $ref: "#/components/schemas/TranslationConfig"
         icon:
           type: string
           description: Icon representing the action
@@ -14851,9 +14842,6 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/ActionFlagConfig"
-        supportingCopy:
-          description: Text displayed on the confirmation dialog
-          $ref: "#/components/schemas/TranslationConfig"
         icon:
           type: string
           description: Icon representing the action
@@ -14914,9 +14902,6 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/ActionFlagConfig"
-        supportingCopy:
-          description: Text displayed on the confirmation dialog
-          $ref: "#/components/schemas/TranslationConfig"
         icon:
           type: string
           description: Icon representing the action
@@ -14956,6 +14941,9 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/FieldConfig"
+        dialogCopy:
+          description: Text shown at the top of the confirmation dialog of the action.
+          $ref: "#/components/schemas/TranslationConfig"
       required:
         - label
         - flags
@@ -15029,9 +15017,6 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/ActionFlagConfig"
-        supportingCopy:
-          description: Text displayed on the confirmation dialog
-          $ref: "#/components/schemas/TranslationConfig"
         icon:
           type: string
           description: Icon representing the action
@@ -15071,22 +15056,8 @@ components:
           items:
             $ref: "#/components/schemas/FieldConfig"
         dialogCopy:
-          type: object
-          properties:
-            notify:
-              description: Confirmation text for the notify action
-              $ref: "#/components/schemas/TranslationConfig"
-            declare:
-              description: Confirmation text for the declare action
-              $ref: "#/components/schemas/TranslationConfig"
-            register:
-              description: Confirmation text for the register action
-              $ref: "#/components/schemas/TranslationConfig"
-          required:
-            - notify
-            - declare
-            - register
-          additionalProperties: false
+          description: Text shown at the top of the confirmation dialog of the action.
+          $ref: "#/components/schemas/TranslationConfig"
       required:
         - label
         - flags
@@ -15253,8 +15224,6 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/ActionFlagConfig"
-        supportingCopy:
-          not: {}
         icon:
           description: DUPLICATE_DETECTED is system-generated and never shown as a button,
             so it has no icon.
@@ -15285,9 +15254,6 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/ActionFlagConfig"
-        supportingCopy:
-          description: Text displayed on the confirmation dialog
-          $ref: "#/components/schemas/TranslationConfig"
         icon:
           type: string
           description: Icon representing the action
@@ -15317,9 +15283,6 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/ActionFlagConfig"
-        supportingCopy:
-          description: Text displayed on the confirmation dialog
-          $ref: "#/components/schemas/TranslationConfig"
         icon:
           type: string
           description: Icon representing the action
@@ -15350,9 +15313,6 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/ActionFlagConfig"
-        supportingCopy:
-          description: Text displayed on the confirmation dialog
-          $ref: "#/components/schemas/TranslationConfig"
         icon:
           type: string
           description: Icon representing the action
@@ -15370,6 +15330,9 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/FieldConfig"
+        dialogCopy:
+          description: Text shown at the top of the confirmation dialog of the action.
+          $ref: "#/components/schemas/TranslationConfig"
       required:
         - label
         - flags
@@ -15388,9 +15351,6 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/ActionFlagConfig"
-        supportingCopy:
-          description: Text displayed on the confirmation dialog
-          $ref: "#/components/schemas/TranslationConfig"
         icon:
           type: string
           description: Icon representing the action
@@ -15410,6 +15370,9 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/FieldConfig"
+        dialogCopy:
+          description: Text shown at the top of the confirmation dialog of the action.
+          $ref: "#/components/schemas/TranslationConfig"
       required:
         - label
         - flags
@@ -15428,9 +15391,6 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/ActionFlagConfig"
-        supportingCopy:
-          description: Text displayed on the confirmation dialog
-          $ref: "#/components/schemas/TranslationConfig"
         icon:
           type: string
           description: Icon representing the action
@@ -15595,9 +15555,6 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/ActionFlagConfig"
-        supportingCopy:
-          description: Text displayed on the confirmation dialog
-          $ref: "#/components/schemas/TranslationConfig"
         icon:
           type: string
           description: Icon representing the action
@@ -15644,9 +15601,6 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/ActionFlagConfig"
-        supportingCopy:
-          description: Text displayed on the confirmation dialog
-          $ref: "#/components/schemas/TranslationConfig"
         icon:
           type: string
           description: Icon representing the action
@@ -15676,9 +15630,6 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/ActionFlagConfig"
-        supportingCopy:
-          description: Text displayed on the confirmation dialog
-          $ref: "#/components/schemas/TranslationConfig"
         icon:
           type: string
           description: Icon representing the action
@@ -15708,9 +15659,6 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/ActionFlagConfig"
-        supportingCopy:
-          description: Text displayed on the confirmation dialog
-          $ref: "#/components/schemas/TranslationConfig"
         icon:
           type: string
           description: Icon representing the action
@@ -15726,13 +15674,13 @@ components:
           type: object
           properties:
             notify:
-              description: Confirmation text for the notify with edits action
+              description: Confirmation text for the 'Notify with edits' action
               $ref: "#/components/schemas/TranslationConfig"
             declare:
-              description: Confirmation text for the declare with edits action
+              description: Confirmation text for the 'Declare with edits' action
               $ref: "#/components/schemas/TranslationConfig"
             register:
-              description: Confirmation text for the register with edits action
+              description: Confirmation text for the 'Register with edits' action
               $ref: "#/components/schemas/TranslationConfig"
           required:
             - notify
@@ -15758,9 +15706,6 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/ActionFlagConfig"
-        supportingCopy:
-          description: Text displayed on the confirmation dialog
-          $ref: "#/components/schemas/TranslationConfig"
         icon:
           type: string
           description: Icon representing the action
@@ -15778,6 +15723,9 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/FieldConfig"
+        dialogCopy:
+          description: Text shown at the top of the confirmation dialog of the action.
+          $ref: "#/components/schemas/TranslationConfig"
       required:
         - label
         - flags
@@ -15796,9 +15744,6 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/ActionFlagConfig"
-        supportingCopy:
-          description: Text displayed on the confirmation dialog
-          $ref: "#/components/schemas/TranslationConfig"
         icon:
           type: string
           description: Icon representing the action
@@ -15810,6 +15755,9 @@ components:
         type:
           type: string
           const: UNARCHIVE
+        dialogCopy:
+          description: Text shown at the top of the confirmation dialog of the action.
+          $ref: "#/components/schemas/TranslationConfig"
       required:
         - label
         - flags
@@ -15828,9 +15776,6 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/ActionFlagConfig"
-        supportingCopy:
-          description: Text displayed on the confirmation dialog
-          $ref: "#/components/schemas/TranslationConfig"
         icon:
           type: string
           description: Icon representing the action
@@ -15848,6 +15793,9 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/FieldConfig"
+        dialogCopy:
+          description: Text shown at the top of the confirmation dialog of the action.
+          $ref: "#/components/schemas/TranslationConfig"
       required:
         - label
         - flags
@@ -15866,9 +15814,6 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/ActionFlagConfig"
-        supportingCopy:
-          description: Text displayed on the confirmation dialog
-          $ref: "#/components/schemas/TranslationConfig"
         icon:
           type: string
           description: Icon representing the action
@@ -15886,6 +15831,9 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/FieldConfig"
+        dialogCopy:
+          description: Text shown at the top of the confirmation dialog of the action.
+          $ref: "#/components/schemas/TranslationConfig"
       required:
         - label
         - flags
@@ -15904,9 +15852,6 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/ActionFlagConfig"
-        supportingCopy:
-          description: Text displayed on the confirmation dialog
-          $ref: "#/components/schemas/TranslationConfig"
         icon:
           type: string
           description: Icon representing the action
@@ -15930,6 +15875,9 @@ components:
         auditHistoryLabel:
           description: The label to show in audit history for this action. For example
             "Approved".
+          $ref: "#/components/schemas/TranslationConfig"
+        dialogCopy:
+          description: Text shown at the top of the confirmation dialog of the action.
           $ref: "#/components/schemas/TranslationConfig"
       required:
         - label
