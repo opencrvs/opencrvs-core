@@ -407,6 +407,7 @@ Date rules could only compare with today, so a record declared on time became la
 - `environment:init` now asks about workflow approvals for every environment, not only production, and always stores the GitHub environment variable `APPROVAL_REQUIRED` (default `true` for production, `false` for other environments). `GH_APPROVERS` is asked whenever approvals are enabled. The infrastructure workflows require manual approval unless `APPROVAL_REQUIRED` is `false`, so re-run `environment:init` for existing non-production environments (or set the variable by hand) before updating the infrastructure repository.
 - Upgrade Node.js to 22.23.4, a Node.js security release. This applies to every core image and to CI.
 - Sync locations and administrative areas incrementally. When the client has the lists cached, it asks the server only for the rows written since its last sync, instead of downloading the full lists again. The lists refresh every minute instead of once a day. The `Location` and `AdministrativeArea` responses of `GET /locations` and `GET /administrative-areas` now include `updatedAt`. [#14098](https://github.com/opencrvs/opencrvs-core/issues/14098)
+- Add e2e tests setup: `environment:init` asks whether to enable e2e tests for the environment, and `opencrvs upgrade` adds the sample Playwright tests of the country config template to country configs that have no `e2e/` directory [#13345](https://github.com/opencrvs/opencrvs-core/issues/13345)
 
 ### Bug fixes
 
