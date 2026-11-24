@@ -73,16 +73,16 @@ import {
   validateActionPayloadStructure
 } from './utils'
 
-export function getFieldErrors(
+/**
+ * Returns the errors of `fields`. Conditionals read the whole `form`. Only `data` is checked against `fields`.
+ * Use @see getDeclarationFieldErrors or @see getAnnotationFieldErrors, so that the checked values are explicit.
+ */
+function getFieldErrors(
   fields: FieldConfig[],
+  data: ActionUpdate,
   form: FormValues,
   context: ActionFormConditionalContext
 ) {
-  // The conditionals of annotation fields read the declaration too, so the form holds both.
-  // Only the annotation values are checked against the annotation fields.
-  const data =
-    form.annotation === undefined ? form.declaration : form.annotation
-
   const visibleFields = fields.filter((field) =>
     isFieldVisible(field, form, context)
   )
@@ -133,6 +133,44 @@ export function getFieldErrors(
   return [...hiddenFieldErrors, ...visibleFieldErrors]
 }
 
+/** Checks the declaration values against declaration fields. Annotation values can not affect declaration conditionals. */
+export function getDeclarationFieldErrors(
+  fields: FieldConfig[],
+  form: DeclarationFormValues,
+  context: ActionFormConditionalContext
+) {
+  return getFieldErrors(fields, form.declaration, form, context)
+}
+
+/**
+ * Checks the annotation values against annotation and delcaration fields.
+ */
+export function getAnnotationFieldErrors(
+  fields: FieldConfig[],
+  form: AnnotationFormValues,
+  context: ActionFormConditionalContext
+) {
+  return getFieldErrors(fields, form.annotation, form, context)
+}
+
+/**
+ * Checks the annotation values against annotation fields.
+ * Values of hidden fields are dropped, not reported as errors.
+ */
+function getVisibleAnnotationFieldErrors(
+  fields: FieldConfig[],
+  form: AnnotationFormValues,
+  context: ActionFormConditionalContext
+) {
+  const visibleForm = omitHiddenFields(fields, form, context)
+  return getFieldErrors(
+    fields,
+    visibleForm.annotation ?? {},
+    visibleForm,
+    context
+  )
+}
+
 function getDeclarationFormErrors<T extends EventState | ActionUpdate>({
   form,
   completeDeclaration,
@@ -175,7 +213,11 @@ function getDeclarationFormErrors<T extends EventState | ActionUpdate>({
     .filter((page) => isPageVisible(page, cleanedForm, context))
     .flatMap((page) => page.fields)
 
-  const fieldErrors = getFieldErrors(allVisiblePageFields, cleanedForm, context)
+  const fieldErrors = getDeclarationFieldErrors(
+    allVisiblePageFields,
+    cleanedForm,
+    context
+  )
 
   return { cleanedDeclaration, invalidKeys, fieldErrors }
 }
@@ -257,18 +299,12 @@ function validateDeclarationUpdateAction({
       ]
     : []
 
-  const visibleAnnotationForm = omitHiddenFields(
+  const annotationErrors = getVisibleAnnotationFieldErrors(
     reviewFields,
     {
       declaration: cleanedDeclaration,
       annotation: deepDropNulls(annotation ?? {})
     },
-    context
-  )
-
-  const annotationErrors = getFieldErrors(
-    reviewFields,
-    visibleAnnotationForm,
     context
   )
 
@@ -308,7 +344,7 @@ function validateActionAnnotation({
   ]
 
   const errors = [
-    ...getFieldErrors(formFields, form, context),
+    ...getAnnotationFieldErrors(formFields, form, context),
     ...getVerificationPageErrors(visibleVerificationPageIds, annotation)
   ]
 
@@ -337,7 +373,7 @@ function validateCustomAction({
     ).declaration,
     annotation
   } satisfies AnnotationFormValues
-  return getFieldErrors(customActionFields, form, context)
+  return getAnnotationFieldErrors(customActionFields, form, context)
 }
 
 export function validateNotifyAction({
@@ -476,16 +512,12 @@ export function validateNotifyAction({
 
   // Required, type and custom validation errors of the NOTIFY review and dialog fields.
   // Unlike DECLARE, dialog fields are not relaxed: the NOTIFY dialog is always shown before submitting.
-  const reviewErrors = getFieldErrors(
+  const reviewErrors = getVisibleAnnotationFieldErrors(
     notifyAnnotationFields,
-    omitHiddenFields(
-      notifyAnnotationFields,
-      {
-        declaration: cleanedDeclaration,
-        annotation: deepDropNulls(annotation)
-      },
-      context
-    ),
+    {
+      declaration: cleanedDeclaration,
+      annotation: deepDropNulls(annotation)
+    },
     context
   )
 

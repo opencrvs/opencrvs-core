@@ -24,7 +24,11 @@ import {
   user
 } from '@opencrvs/commons'
 import { tennisClubMembershipEvent } from '@opencrvs/commons/fixtures'
-import { getFieldErrors, validateNotifyAction } from './index'
+import {
+  getAnnotationFieldErrors,
+  getDeclarationFieldErrors,
+  validateNotifyAction
+} from './index'
 
 export const testContext = {
   user: {
@@ -43,16 +47,16 @@ export const testContext = {
 
 describe('getFieldErrors()', () => {
   it('should return an empty array there are no fields to validate', () => {
-    const errors = getFieldErrors(
+    const errors = getDeclarationFieldErrors(
       [],
-      { declaration: {}, annotation: {} },
+      { declaration: {} },
       testContext
     )
     expect(errors).toEqual([])
   })
 
   it('should return an error if a required field is not provided', () => {
-    const errors = getFieldErrors(
+    const errors = getDeclarationFieldErrors(
       [
         {
           id: 'test.checkbox',
@@ -66,14 +70,14 @@ describe('getFieldErrors()', () => {
           }
         }
       ],
-      { declaration: {}, annotation: {} },
+      { declaration: {} },
       testContext
     )
     expect(errors).toMatchSnapshot()
   })
 
   it('should not return an error if a required field is provided', () => {
-    const errors = getFieldErrors(
+    const errors = getDeclarationFieldErrors(
       [
         {
           id: 'test.checkbox',
@@ -87,7 +91,7 @@ describe('getFieldErrors()', () => {
           }
         }
       ],
-      { declaration: { 'test.checkbox': true }, annotation: {} },
+      { declaration: { 'test.checkbox': true } },
       testContext
     )
 
@@ -95,7 +99,7 @@ describe('getFieldErrors()', () => {
   })
 
   it('should return an error if a value for a conditionally hidden required field is provided', () => {
-    const errors = getFieldErrors(
+    const errors = getDeclarationFieldErrors(
       [
         {
           id: 'test.checkbox',
@@ -115,7 +119,7 @@ describe('getFieldErrors()', () => {
           ]
         }
       ],
-      { declaration: { 'test.checkbox': true }, annotation: {} },
+      { declaration: { 'test.checkbox': true } },
       testContext
     )
 
@@ -123,7 +127,7 @@ describe('getFieldErrors()', () => {
   })
 
   it('should not return an error if a value for a conditionally hidden required field is not provided', () => {
-    const errors = getFieldErrors(
+    const errors = getDeclarationFieldErrors(
       [
         {
           id: 'test.checkbox',
@@ -143,7 +147,7 @@ describe('getFieldErrors()', () => {
           ]
         }
       ],
-      { declaration: {}, annotation: {} },
+      { declaration: {} },
       testContext
     )
 
@@ -151,7 +155,7 @@ describe('getFieldErrors()', () => {
   })
 
   it('should not return an error if a value for a user-based conditionally hidden required field is not provided', () => {
-    const errors = getFieldErrors(
+    const errors = getDeclarationFieldErrors(
       [
         {
           id: 'test.checkbox',
@@ -171,7 +175,7 @@ describe('getFieldErrors()', () => {
           ]
         }
       ],
-      { declaration: {}, annotation: {} },
+      { declaration: {} },
       testContext
     )
 
@@ -179,7 +183,7 @@ describe('getFieldErrors()', () => {
   })
 
   it('should return an error if a value for a user-based conditionally required field is not provided', () => {
-    const errors = getFieldErrors(
+    const errors = getDeclarationFieldErrors(
       [
         {
           id: 'test.text',
@@ -198,7 +202,7 @@ describe('getFieldErrors()', () => {
           ]
         }
       ],
-      { declaration: {}, annotation: {} },
+      { declaration: {} },
       testContext
     )
 
@@ -206,7 +210,7 @@ describe('getFieldErrors()', () => {
   })
 
   it('should not return an error if a value for a user-based conditionally required field is provided', () => {
-    const errors = getFieldErrors(
+    const errors = getDeclarationFieldErrors(
       [
         {
           id: 'test.text',
@@ -228,8 +232,7 @@ describe('getFieldErrors()', () => {
       {
         declaration: {
           'test.text': 'some value'
-        },
-        annotation: {}
+        }
       },
       testContext
     )
@@ -238,7 +241,7 @@ describe('getFieldErrors()', () => {
   })
 
   it('should not return an error if a value for a conditionally visible required field is provided', () => {
-    const errors = getFieldErrors(
+    const errors = getAnnotationFieldErrors(
       [
         {
           id: 'test.checkbox',
@@ -269,7 +272,7 @@ describe('getFieldErrors()', () => {
   })
 
   it('should not return error if multiple fields with same id are configured, and value is provided', () => {
-    const errors = getFieldErrors(
+    const errors = getDeclarationFieldErrors(
       [
         {
           id: 'test.input',
@@ -305,8 +308,7 @@ describe('getFieldErrors()', () => {
         }
       ],
       {
-        declaration: { 'test.input': 'not empty', 'test.text': 'helloooo' },
-        annotation: {}
+        declaration: { 'test.input': 'not empty', 'test.text': 'helloooo' }
       },
       testContext
     )
@@ -349,9 +351,9 @@ describe('getFieldErrors()', () => {
     })
 
     it('accepts a value when the event carries the flag that makes the field visible', () => {
-      const errors = getFieldErrors(
+      const errors = getDeclarationFieldErrors(
         [flaggedField],
-        { declaration: { 'test.input': 'not empty' }, annotation: {} },
+        { declaration: { 'test.input': 'not empty' } },
         { ...testContext, eventDocument: rejectedDocument }
       )
 
@@ -359,9 +361,9 @@ describe('getFieldErrors()', () => {
     })
 
     it('rejects a value when the event does not carry the flag', () => {
-      const errors = getFieldErrors(
+      const errors = getDeclarationFieldErrors(
         [flaggedField],
-        { declaration: { 'test.input': 'not empty' }, annotation: {} },
+        { declaration: { 'test.input': 'not empty' } },
         { ...testContext, eventDocument: document }
       )
 
@@ -376,7 +378,7 @@ describe('getFieldErrors()', () => {
   })
 
   it('should return errors for field with custom validation if value does not pass validation', () => {
-    const errors = getFieldErrors(
+    const errors = getDeclarationFieldErrors(
       [
         {
           id: 'test.input',
@@ -399,7 +401,7 @@ describe('getFieldErrors()', () => {
           ]
         }
       ],
-      { declaration: { 'test.input': 'not hello!' }, annotation: {} },
+      { declaration: { 'test.input': 'not hello!' } },
       testContext
     )
 
@@ -407,7 +409,7 @@ describe('getFieldErrors()', () => {
   })
 
   it('should not return errors for field with custom validations if value passes validation', () => {
-    const errors = getFieldErrors(
+    const errors = getDeclarationFieldErrors(
       [
         {
           id: 'test.input',
@@ -430,7 +432,7 @@ describe('getFieldErrors()', () => {
           ]
         }
       ],
-      { declaration: { 'test.input': 'helloooo' }, annotation: {} },
+      { declaration: { 'test.input': 'helloooo' } },
       testContext
     )
 
