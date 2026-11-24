@@ -22,6 +22,14 @@ export const env = cleanEnv(process.env, {
   COUNTRY_CONFIG_URL_INTERNAL: url({ devDefault: 'http://localhost:3040/' }),
   CERT_PRIVATE_KEY_PATH: str({ devDefault: '../../.secrets/private-key.pem' }),
   CERT_PUBLIC_KEY_PATH: str({ devDefault: '../../.secrets/public-key.pem' }),
+  CORE_REQUEST_SIGNING_KEY_PATH: str({
+    devDefault: '../../.secrets/core-request-signing-key.pem',
+    desc: 'Ed25519 private key that core signs its requests to country config with'
+  }),
+  CORE_REQUEST_SIGNING_PREVIOUS_KEY_PATH: str({
+    default: undefined,
+    desc: 'While the request-signing key changes: the old key, still published so that requests it signed are accepted'
+  }),
   TWO_FA_ENABLED: bool({
     devDefault: false,
     default: true,

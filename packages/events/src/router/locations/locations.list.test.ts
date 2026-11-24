@@ -13,6 +13,7 @@ import { generateOpenApiDocument } from 'trpc-to-openapi'
 import * as z from 'zod/v4'
 import {
   createPrng,
+  encodeScope,
   generateUuid,
   Location,
   LocationVersion,
@@ -22,12 +23,38 @@ import {
 import {
   createInitialisationTestClient,
   createServiceTokenTestClient,
+  createSystemTestClient,
   createTestClient,
   setupTestCase,
-  systemInitialisationTestSetup
+  systemInitialisationTestSetup,
+  TEST_SYSTEM_ID
 } from '@events/tests/utils'
 import { getClient } from '@events/storage/postgres/events'
 import { appRouter } from '@events/router/router'
+
+const locationEditScope = encodeScope({ type: 'location.edit' })
+
+/** Moves every location's last write far into the past. */
+async function ageAllLocations() {
+  await getClient()
+    .updateTable('locations')
+    .set({ updatedAt: '2020-01-01T00:00:00.000Z' })
+    .execute()
+}
+
+/**
+ * A `since` that a client holds when it synced a while after
+ * {@link ageAllLocations}: the aged rows are outside the sync window.
+ */
+const CURSOR_AFTER_AGED_ROWS = '2020-01-01T00:02:00.000Z'
+
+async function setUpdatedAt(locationId: UUID, updatedAt: string) {
+  await getClient()
+    .updateTable('locations')
+    .set({ updatedAt: sql`${updatedAt}::timestamptz` })
+    .where('id', '=', locationId)
+    .execute()
+}
 
 async function appendVersion(locationId: UUID, version: LocationVersion) {
   await getClient()
@@ -261,4 +288,248 @@ test('Documents the response as an array of locations, without validating it', (
   delete expected.$schema
 
   expect(schema).toEqual(expected)
+})
+
+describe('sync', () => {
+  test('Rejects a system user, because only the client syncs', async () => {
+    await setupTestCase()
+    const client = createSystemTestClient(TEST_SYSTEM_ID, [])
+
+    await expect(client.locations.sync({})).rejects.toThrow('FORBIDDEN')
+  })
+
+  test('Returns updatedAt at millisecond precision on every location', async () => {
+    const { user } = await setupTestCase()
+    const client = createTestClient(user, [])
+
+    const locations = await client.locations.list()
+
+    expect(locations.length).toBeGreaterThan(0)
+    for (const location of locations) {
+      expect(location.updatedAt).toMatch(
+        /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/
+      )
+    }
+  })
+
+  test('Returns only locations written less than one minute before `since`, or later', async () => {
+    const { user } = await setupTestCase()
+    const client = createTestClient(user, [])
+    const [older, atWindowStart, insideWindow] = (
+      await client.locations.list()
+    ).map((l) => l.id)
+
+    await ageAllLocations()
+    await setUpdatedAt(older, '2020-06-01T11:58:59.999Z')
+    await setUpdatedAt(atWindowStart, '2020-06-01T11:59:00.000Z')
+    await setUpdatedAt(insideWindow, '2020-06-01T11:59:00.001Z')
+
+    const { locations } = await client.locations.sync({
+      since: '2020-06-01T12:00:00.000Z'
+    })
+
+    expect(locations.map((l) => l.id)).toEqual([insideWindow])
+  })
+
+  test('Returns all locations when `since` is not given, and none again on the next sync', async () => {
+    const { user } = await setupTestCase()
+    const client = createTestClient(user, [])
+    // A seed writes every row in one transaction, so all rows get the same
+    // `updatedAt`. Age them, so that they are outside the window of the next sync.
+    await ageAllLocations()
+    const all = await client.locations.list()
+
+    // The first fetch of a client has no cache, so it sends no `since`.
+    const first = await client.locations.sync({})
+    expect(first.locations.map((l) => l.id).sort()).toEqual(
+      all.map((l) => l.id).sort()
+    )
+
+    const second = await client.locations.sync({ since: first.syncedAt })
+    expect(second.locations).toEqual([])
+  })
+
+  test('Returns syncedAt from the database clock', async () => {
+    const { user } = await setupTestCase()
+    const client = createTestClient(user, [locationEditScope])
+    const created = await client.locations.create({
+      name: 'Clock Office',
+      externalId: 'sync-clock-pcode',
+      administrativeAreaId: null,
+      locationType: 'CRVS_OFFICE',
+      effectiveFrom: '2024-01-01',
+      status: 'active'
+    })
+
+    const { syncedAt } = await client.locations.sync({
+      since: CURSOR_AFTER_AGED_ROWS
+    })
+
+    expect(syncedAt).toMatch(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/)
+    expect(syncedAt >= created.updatedAt).toBe(true)
+  })
+
+  test('Returns a newly created location', async () => {
+    const { user } = await setupTestCase()
+    const client = createTestClient(user, [locationEditScope])
+    await ageAllLocations()
+
+    const created = await client.locations.create({
+      name: 'New Office',
+      externalId: 'sync-created-pcode',
+      administrativeAreaId: null,
+      locationType: 'CRVS_OFFICE',
+      effectiveFrom: '2024-01-01',
+      status: 'active'
+    })
+
+    const locations = (
+      await client.locations.sync({ since: CURSOR_AFTER_AGED_ROWS })
+    ).locations
+
+    expect(locations).toEqual([created])
+  })
+
+  test('Returns a location with a backdated version and its whole history', async () => {
+    const { user } = await setupTestCase()
+    const client = createTestClient(user, [locationEditScope])
+    const created = await client.locations.create({
+      name: 'Old Name',
+      externalId: 'sync-backdated-pcode',
+      administrativeAreaId: null,
+      locationType: 'CRVS_OFFICE',
+      effectiveFrom: '2024-01-01',
+      status: 'active'
+    })
+    await ageAllLocations()
+
+    await client.locations.update({
+      id: created.id,
+      name: 'New Name',
+      externalId: 'sync-backdated-pcode',
+      status: 'active',
+      effectiveFrom: '2025-01-01',
+      lastVersionId: created.versions[0].versionId
+    })
+
+    const locations = (
+      await client.locations.sync({ since: CURSOR_AFTER_AGED_ROWS })
+    ).locations
+
+    expect(locations).toHaveLength(1)
+    expect(locations[0].versions.map((v) => v.name)).toEqual([
+      'Old Name',
+      'New Name'
+    ])
+  })
+
+  test('Returns a location after a version is withdrawn, without that version', async () => {
+    const { user } = await setupTestCase()
+    const client = createTestClient(user, [locationEditScope])
+    const created = await client.locations.create({
+      name: 'Current Name',
+      externalId: 'sync-withdrawn-pcode',
+      administrativeAreaId: null,
+      locationType: 'CRVS_OFFICE',
+      effectiveFrom: '2024-01-01',
+      status: 'active'
+    })
+    const updated = await client.locations.update({
+      id: created.id,
+      name: 'Future Name',
+      externalId: 'sync-withdrawn-pcode',
+      status: 'active',
+      effectiveFrom: '2099-01-01',
+      lastVersionId: created.versions[0].versionId
+    })
+    await ageAllLocations()
+
+    await client.locations.withdrawVersion({
+      id: created.id,
+      versionId: updated.versions[1].versionId
+    })
+
+    const locations = (
+      await client.locations.sync({ since: CURSOR_AFTER_AGED_ROWS })
+    ).locations
+
+    expect(locations).toHaveLength(1)
+    expect(locations[0].versions.map((v) => v.name)).toEqual(['Current Name'])
+  })
+
+  test('Returns a reseeded location with its replaced history', async () => {
+    const { user } = await setupTestCase()
+    const client = createTestClient(user, [])
+    await systemInitialisationTestSetup()
+    const seeder = createInitialisationTestClient()
+
+    const locationId = generateUuid()
+    await seeder.locations.set([
+      {
+        id: locationId,
+        administrativeAreaId: null,
+        name: 'First seed',
+        locationType: 'CRVS_OFFICE',
+        externalId: 'sync-reseed-pcode'
+      }
+    ])
+    await ageAllLocations()
+
+    await seeder.locations.set([
+      {
+        id: locationId,
+        administrativeAreaId: null,
+        name: 'Second seed',
+        locationType: 'CRVS_OFFICE',
+        externalId: 'sync-reseed-pcode'
+      }
+    ])
+
+    const locations = (
+      await client.locations.sync({ since: CURSOR_AFTER_AGED_ROWS })
+    ).locations
+
+    expect(locations).toHaveLength(1)
+    expect(locations[0]).toMatchObject({ id: locationId, name: 'Second seed' })
+    expect(locations[0].versions.map((v) => v.name)).toEqual(['Second seed'])
+  })
+
+  test('Returns a location that became inactive', async () => {
+    const { user } = await setupTestCase()
+    const client = createTestClient(user, [locationEditScope])
+    const created = await client.locations.create({
+      name: 'Closing Office',
+      externalId: 'sync-inactive-pcode',
+      administrativeAreaId: null,
+      locationType: 'CRVS_OFFICE',
+      effectiveFrom: '2024-01-01',
+      status: 'active'
+    })
+    await ageAllLocations()
+
+    await client.locations.update({
+      id: created.id,
+      name: 'Closing Office',
+      externalId: 'sync-inactive-pcode',
+      status: 'inactive',
+      effectiveFrom: '2025-01-01',
+      lastVersionId: created.versions[0].versionId
+    })
+
+    const locations = (
+      await client.locations.sync({ since: CURSOR_AFTER_AGED_ROWS })
+    ).locations
+
+    expect(locations).toHaveLength(1)
+    expect(locations[0]).toMatchObject({ id: created.id, status: 'inactive' })
+  })
+
+  test('Rejects since when it is not an ISO datetime', async () => {
+    const { user } = await setupTestCase()
+    const client = createTestClient(user, [])
+
+    await expect(
+      client.locations.sync({ since: 'yesterday' })
+    ).rejects.toThrow()
+  })
 })

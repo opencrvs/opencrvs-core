@@ -23,6 +23,7 @@ import { routesConfig } from '@client/v2-events/routes'
 import * as V1_LEGACY_ROUTES from '@client/navigation/routes'
 import { testDataGenerator } from '@client/tests/test-data-generators'
 import { buildInactiveLocation } from '@client/tests/v2-events/location.utils'
+import { locationListHandlers } from '../../../../.storybook/default-request-handlers'
 import { TeamPage } from './Team'
 
 const tRPCMsw = createTRPCMsw<AppRouter>({
@@ -59,13 +60,10 @@ const meta: Meta<typeof TeamPage> = {
           tRPCMsw.user.roles.list.query(() => mockRoles)
         ],
         eventLocations: [
-          tRPCMsw.locations.list.query(() => [
-            ...V2_DEFAULT_MOCK_LOCATIONS,
-            INACTIVE_OFFICE
-          ]),
-          tRPCMsw.administrativeAreas.list.query(
-            () => V2_DEFAULT_MOCK_ADMINISTRATIVE_AREAS
-          )
+          ...locationListHandlers({
+            locations: [...V2_DEFAULT_MOCK_LOCATIONS, INACTIVE_OFFICE],
+            administrativeAreas: V2_DEFAULT_MOCK_ADMINISTRATIVE_AREAS
+          })
         ]
       }
     },

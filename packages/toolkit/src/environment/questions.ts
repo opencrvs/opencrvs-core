@@ -54,6 +54,18 @@ function validateRegistryHost(input: string): true | string {
     : 'Please enter a registry host without protocol or path (e.g. docker.io, ghcr.io)'
 }
 
+const GITHUB_REPOSITORY_PATTERN =
+  /^(?:(?:https:\/\/|git@)github\.com[/:])?([\w.-]+)\/([\w.-]+?)(?:\.git)?\/?$/
+
+/**
+ * Accepts a GitHub URL (https or ssh) or a plain `owner/repo` and returns `owner/repo`,
+ * which is the format expected by `actions/checkout`.
+ */
+function toGithubRepositorySlug(input: string) {
+  const match = input.trim().match(GITHUB_REPOSITORY_PATTERN)
+  return match ? `${match[1]}/${match[2]}` : undefined
+}
+
 // The DOCKER_* and DOCKERHUB_* secrets are the previous names of the REGISTRY_* secrets
 export const registryQuestions = [
   {
@@ -177,6 +189,24 @@ export const githubTokenQuestion = [
     valueType: 'SECRET' as const,
     scope: 'REPOSITORY' as const,
     valueLabel: 'GH_TOKEN'
+  }
+]
+
+export const e2eQuestions = [
+  {
+    name: 'countryconfigRepository',
+    type: 'text' as const,
+    message:
+      'What is your country configuration repository? (e.g. https://github.com/opencrvs/opencrvs-farajaland)',
+    valueType: 'VARIABLE' as const,
+    valueLabel: 'COUNTRYCONFIG_REPOSITORY',
+    validate: (value: string) =>
+      toGithubRepositorySlug(value)
+        ? true
+        : 'Please enter a GitHub repository URL or owner/repository',
+    format: (value: string) => toGithubRepositorySlug(value) ?? value,
+    initial: process.env.COUNTRYCONFIG_REPOSITORY,
+    scope: 'REPOSITORY' as const
   }
 ]
 

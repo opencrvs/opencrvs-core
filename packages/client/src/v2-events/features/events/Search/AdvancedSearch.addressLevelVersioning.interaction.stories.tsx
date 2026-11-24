@@ -45,6 +45,7 @@ import { serializeSearchParams } from '@client/v2-events/features/events/Search/
 import { testDataGenerator } from '@client/tests/test-data-generators'
 import { TRPCProvider, AppRouter } from '@client/v2-events/trpc'
 import { ROUTES, routesConfig } from '@client/v2-events/routes'
+import { locationListHandlers } from '../../../../../.storybook/default-request-handlers'
 import { AdvancedSearch } from './index'
 
 const meta: Meta<typeof AdvancedSearch> = {
@@ -86,6 +87,7 @@ function renamedArea(
 
   return {
     id,
+    updatedAt: '2024-01-01T00:00:00.000Z',
     name: names[names.length - 1],
     externalId: null,
     parentId,
@@ -230,8 +232,10 @@ const mswConfig = {
       ])
     ],
     eventLocations: [
-      tRPCMsw.locations.list.query(() => V2_DEFAULT_MOCK_LOCATIONS),
-      tRPCMsw.administrativeAreas.list.query(() => mockAdministrativeAreas)
+      ...locationListHandlers({
+        locations: V2_DEFAULT_MOCK_LOCATIONS,
+        administrativeAreas: mockAdministrativeAreas
+      })
     ],
     user: [
       tRPCMsw.user.list.query(() => [mockUser]),

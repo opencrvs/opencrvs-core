@@ -647,7 +647,7 @@ Configuration example for filebeat:
 ```yaml
 monitoring:
   logs:
-    retention_days: 30
+    retention_days: 7
   metrics:
     retention_days: 30
 filebeat:
