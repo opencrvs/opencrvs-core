@@ -35,7 +35,8 @@ import {
   ensureAssignedToUser,
   selectAction,
   type,
-  waitForLocalDraftToContain
+  waitForLocalDraftToContain,
+  waitForPersistedEvent
 } from '@e2e/support/utils'
 import {
   navigateToCertificatePrintAction,
@@ -217,6 +218,7 @@ test.describe('Form state', () => {
       await page.getByTestId('change-button-mother.name').click()
       await type(page, '#firstname', updatedMotherName)
       await waitForLocalDraftToContain(page, updatedMotherName)
+      await waitForPersistedEvent(page)
       await page.reload()
       await expect(page.locator('#firstname')).toHaveValue(updatedMotherName, {
         timeout: 30_000
@@ -272,6 +274,7 @@ test.describe('Form state', () => {
 
     await test.step('refresh the page and verify fields are populated', async () => {
       await waitForLocalDraftToContain(page, 'bar')
+      await waitForPersistedEvent(page)
       await page.reload()
       await expect(page.locator('#firstname')).toHaveValue('foo', {
         timeout: 30_000

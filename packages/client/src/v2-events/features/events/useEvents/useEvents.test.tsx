@@ -121,7 +121,10 @@ const server = setupServer(
     return [versionedTennisClubMembershipEvent]
   }),
 
-  tRPCMsw.administrativeAreas.list.query(() => [])
+  tRPCMsw.administrativeAreas.sync.query(() => ({
+    syncedAt: new Date().toISOString(),
+    administrativeAreas: []
+  }))
 )
 
 beforeAll(() => server.listen())

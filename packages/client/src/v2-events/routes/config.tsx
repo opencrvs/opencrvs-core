@@ -85,9 +85,9 @@ function PrefetchQueries() {
   const { prefetch } = useWorkqueues()
 
   useEffect(() => {
-    // No `queryFn`: the defaults from `setQueryDefaults` build the cached Map
-    // that the list hooks read from the same key. A fresh cache is not
-    // fetched again.
+    // No `queryFn`: the defaults from `setQueryDefaults` build the cache
+    // that the list hooks read from the same key, and sync only the changed
+    // rows when a cache exists. A fresh cache is not fetched again.
     void queryClient.prefetchQuery({
       queryKey: trpcOptionsProxy.locations.list.queryKey()
     })

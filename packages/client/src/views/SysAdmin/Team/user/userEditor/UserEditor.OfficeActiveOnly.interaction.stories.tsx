@@ -11,6 +11,7 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import { expect, userEvent, waitFor, within } from 'storybook/test'
 import { createTRPCMsw, httpLink } from '@vafanassieff/msw-trpc'
+import { locationListHandlers } from '../../../../../../.storybook/default-request-handlers'
 import superjson from 'superjson'
 import {
   TestUserRole,
@@ -55,13 +56,10 @@ const meta: Meta = {
       handlers: {
         userRoles: [tRPCMsw.user.roles.list.query(() => mockRoles)],
         eventLocations: [
-          tRPCMsw.locations.list.query(() => [
-            ...V2_DEFAULT_MOCK_LOCATIONS,
-            INACTIVE_OFFICE
-          ]),
-          tRPCMsw.administrativeAreas.list.query(
-            () => V2_DEFAULT_MOCK_ADMINISTRATIVE_AREAS
-          )
+          ...locationListHandlers({
+            locations: [...V2_DEFAULT_MOCK_LOCATIONS, INACTIVE_OFFICE],
+            administrativeAreas: V2_DEFAULT_MOCK_ADMINISTRATIVE_AREAS
+          })
         ]
       }
     }

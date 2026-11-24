@@ -95,9 +95,17 @@ function getQueryClient() {
   })
 }
 
-function createIDBPersister(storageIdentifier: string) {
+export function createIDBPersister(storageIdentifier: string) {
   const fullStorageIdentifier = `react-query-${storageIdentifier}`
   const largeQueryStorageIdentifier = `react-query-large-query-storage-${storageIdentifier}`
+
+  /**
+   * The `data` of each large query as it was last written to, or restored
+   * from, storage. Dehydration keeps the reference to `query.state.data`, so
+   * a query whose `queryFn` returned the cached object again has not changed.
+   * `dataUpdatedAt` cannot tell this, because every successful fetch sets it.
+   */
+  const persistedLargeQueryData = new Map<string, unknown>()
 
   return {
     /** By default, client is persisted whenever a query/mutation occurs */
@@ -122,25 +130,32 @@ function createIDBPersister(storageIdentifier: string) {
       // 2. Persist the main client without large queries
       await storage.setItem(fullStorageIdentifier, clientWithoutLargeQueries)
 
-      // 3. Persist large queries only if they have changed since the last persist to avoid unnecessary serialization.
-      const changed = largeQueries.some((query) => {
-        if (query.state.status !== 'success') {
-          return false
-        }
+      // 3. Persist large queries only if their data has changed since the last persist to avoid unnecessary serialization.
+      // When a large query is removed, the count changes. The persister then
+      // writes again, so that the removed query leaves storage.
+      const removed = largeQueries.length !== persistedLargeQueryData.size
+      const changed =
+        removed ||
+        largeQueries.some((query) => {
+          if (query.state.status !== 'success') {
+            return false
+          }
 
-        if (query.state.fetchStatus === 'fetching') {
-          return false
-        }
+          if (query.state.fetchStatus === 'fetching') {
+            return false
+          }
 
-        const updatedAt = query.state.dataUpdatedAt
-        const dehydratedAt = query.dehydratedAt
-
-        // During the first load updatedAt === dehydratedAt.
-        return dehydratedAt === undefined || updatedAt >= dehydratedAt
-      })
+          return (
+            persistedLargeQueryData.get(query.queryHash) !== query.state.data
+          )
+        })
 
       if (changed) {
         await storage.setItem(largeQueryStorageIdentifier, largeQueries)
+        persistedLargeQueryData.clear()
+        for (const query of largeQueries) {
+          persistedLargeQueryData.set(query.queryHash, query.state.data)
+        }
       }
     },
     /** Restore client from storage on page change / refresh. Expected to happen more rarely. */
@@ -159,6 +174,12 @@ function createIDBPersister(storageIdentifier: string) {
 
       // 4. Re-attach large queries to the client to provide consistent state.
       if (largeQueries) {
+        // Hydration keeps these references. When the restored data does not
+        // change, the next persist does not write it back.
+        for (const query of largeQueries) {
+          persistedLargeQueryData.set(query.queryHash, query.state.data)
+        }
+
         return {
           ...client,
           clientState: {

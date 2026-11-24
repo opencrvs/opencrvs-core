@@ -32,6 +32,7 @@ import {
 import { ROUTES, routesConfig } from '@client/v2-events/routes'
 import { testDataGenerator } from '@client/tests/test-data-generators'
 import { buildInactiveLocation } from '@client/tests/v2-events/location.utils'
+import { locationListHandlers } from '../../../../../../../.storybook/default-request-handlers'
 import { EventOverviewIndex } from '../../EventOverview'
 
 const tRPCMsw = createTRPCMsw<AppRouter>({
@@ -174,15 +175,15 @@ export const InactiveOfficeIsNotLinked: Story = {
     msw: {
       handlers: {
         eventLocations: [
-          tRPCMsw.locations.list.query(() => [
-            ...V2_DEFAULT_MOCK_LOCATIONS.filter(
-              (location) => location.id !== office.id
-            ),
-            inactiveOffice
-          ]),
-          tRPCMsw.administrativeAreas.list.query(
-            () => V2_DEFAULT_MOCK_ADMINISTRATIVE_AREAS
-          )
+          ...locationListHandlers({
+            locations: [
+              ...V2_DEFAULT_MOCK_LOCATIONS.filter(
+                (location) => location.id !== office.id
+              ),
+              inactiveOffice
+            ],
+            administrativeAreas: V2_DEFAULT_MOCK_ADMINISTRATIVE_AREAS
+          })
         ]
       }
     }
