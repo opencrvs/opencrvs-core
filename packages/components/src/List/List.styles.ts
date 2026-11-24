@@ -14,7 +14,9 @@ export const START_COLUMN_WIDTH = '44px'
 
 /**
  * The trailing gutter is reserved for the whole table, so the value columns sit
- * at the same x whether or not a given row has actions.
+ * at the same x whether or not a given row has actions. This is its minimum
+ * width. It becomes wider when the actions of a row need more space, for
+ * example a status pill next to a menu.
  */
 export const ACTIONS_COLUMN_WIDTH = '96px'
 
@@ -31,7 +33,12 @@ const stackedBelow = (styles: FlattenSimpleInterpolation) => css`
 export const table = css`
   width: 100%;
   border-collapse: collapse;
-  table-layout: fixed;
+  /*
+   * The auto layout lets the start and actions columns become wider than their
+   * minimum width when their content needs it. The label and value columns
+   * get equal percent widths from <List>, so they stay equal.
+   */
+  table-layout: auto;
 
   ${stackedBelow(css`
     display: block;
@@ -96,8 +103,12 @@ const cell = css`
 export const startCell = css`
   ${cell}
   padding-right: 12px;
+  /* The minimum width includes the padding, as a column width does. */
+  box-sizing: border-box;
+  min-width: ${START_COLUMN_WIDTH};
 
   ${stackedBelow(css`
+    min-width: auto;
     display: block;
     grid-column: 1;
     grid-row: 1;
@@ -174,8 +185,11 @@ export const redactionBar = css`
 export const actionsCell = css`
   ${cell}
   text-align: right;
+  box-sizing: border-box;
+  min-width: ${ACTIONS_COLUMN_WIDTH};
 
   ${stackedBelow(css`
+    min-width: auto;
     display: block;
     grid-column: 3;
     grid-row: 1;
