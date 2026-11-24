@@ -22,6 +22,7 @@ import {
 } from '@events/context'
 import { env } from '@events/environment'
 import { canInitialiseSystem } from './middleware'
+import { transformer } from './serialization'
 
 function errorFormatter({
   shape,
@@ -48,7 +49,7 @@ export const t = initTRPC
   .context<Partial<TrpcContext>>()
   .meta<OpenApiMeta>()
   .create({
-    transformer: superjson,
+    transformer,
     errorFormatter
   })
 
