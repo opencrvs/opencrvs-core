@@ -33,11 +33,6 @@ const stackedBelow = (styles: FlattenSimpleInterpolation) => css`
 export const table = css`
   width: 100%;
   border-collapse: collapse;
-  /*
-   * The auto layout lets the start and actions columns become wider than their
-   * minimum width when their content needs it. The label and value columns
-   * get equal percent widths from <List>, so they stay equal.
-   */
   table-layout: auto;
 
   ${stackedBelow(css`
@@ -103,7 +98,6 @@ const cell = css`
 export const startCell = css`
   ${cell}
   padding-right: 12px;
-  /* The minimum width includes the padding, as a column width does. */
   box-sizing: border-box;
   min-width: ${START_COLUMN_WIDTH};
 
