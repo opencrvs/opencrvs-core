@@ -151,7 +151,7 @@ for job in opensrvs_postdeploy_jobs:
 if os.path.exists('../playwright.config.ts'):
   local_resource(
       'e2e-tests',
-      cmd='cd ../ && npx playwright install chromium && npx playwright test',
+      cmd='cd ../ && pnpm exec playwright install chromium && pnpm e2e',
       trigger_mode=TRIGGER_MODE_MANUAL,
       auto_init=False,
       allow_parallel=True,

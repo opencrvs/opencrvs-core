@@ -176,7 +176,7 @@ async function main() {
 
   if (added) {
     console.log(
-      `\n  Install dependencies to add ${PLAYWRIGHT_PACKAGE} to your lockfile, then run the tests with: npx playwright test\n`
+      `\n  Run "pnpm install" to add ${PLAYWRIGHT_PACKAGE} to your lockfile, then run the tests with: pnpm e2e\n`
     )
   }
 }
