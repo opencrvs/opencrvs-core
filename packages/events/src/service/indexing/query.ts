@@ -335,6 +335,12 @@ export function withJurisdictionFilters({
   query: estypes.QueryDslQueryContainer
   scopesV2: ResolvedRecordScopeV2[]
 }): estypes.QueryDslQueryContainer {
+  // With no scopes, the caller has access to no records. Without this check,
+  // the code below returns the query with no jurisdiction filter.
+  if (!scopesV2.length) {
+    return { bool: { must_not: { match_all: {} }, should: undefined } }
+  }
+
   const scopeQueries = scopesV2
     .map((scope) => {
       const must: estypes.QueryDslQueryContainer[] = []

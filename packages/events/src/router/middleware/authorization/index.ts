@@ -53,7 +53,10 @@ import { getLocationHierarchy } from '@events/service/locations/locations'
 import { assertCanReadOtherUser } from '@events/service/users/access'
 import { findUserOrSystem, getUser } from '../../../service/users/api'
 import { getInMemoryEventConfigurations } from '../../../service/config/config'
-import { getEventIndexWithAdministrativeHierarchy } from '../../../service/indexing/utils'
+import {
+  getEventIndexWithAdministrativeHierarchy,
+  hasLocationJurisdictionFilter
+} from '../../../service/indexing/utils'
 
 /**
  * Depending on how the API is called, there might or might not be Bearer keyword in the header.
@@ -378,6 +381,19 @@ export const canSearchEvents: MiddlewareFunction<
 
   if (acceptedScopes.length === 0) {
     throw new TRPCError({ code: 'FORBIDDEN' })
+  }
+
+  // A system client has no primary office, so a "location" filter cannot limit
+  // its search. One scope that cannot be applied denies the whole request.
+  if (
+    !opts.ctx.user.primaryOfficeId &&
+    acceptedScopes.some(hasLocationJurisdictionFilter)
+  ) {
+    throw new TRPCError({
+      code: 'FORBIDDEN',
+      message:
+        'The caller has no primary office, so a search scope cannot use the "location" jurisdiction filter.'
+    })
   }
 
   return opts.next({
