@@ -2362,8 +2362,11 @@ components:
             properties:
               id:
                 type: string
+                maxLength: 64
+                pattern: ^[a-z0-9_]+$
                 description: Identifier of the version, unique within the event (e.g.
-                  "birth-v2").
+                  "birth_v2"). It can contain only lower-case letters (a-z),
+                  digits (0-9) and underscores (_), and at most 64 characters.
               label:
                 description: Name of the version, which the UI shows wherever it names the
                   version. For example, "{event.configVersionLabel}" in the
