@@ -75,7 +75,13 @@ export const AdministrativeArea = z.object({
   externalId: z.string().nullish(),
   parentId: UUID.nullable(),
   status: LocationStatus,
-  versions: z.array(LocationVersion)
+  versions: z.array(LocationVersion),
+  /**
+   * Server time of the last write to the row (create, append, withdraw or
+   * seed), at millisecond precision. A client that syncs its cache
+   * incrementally compares it to see if a returned row changed.
+   */
+  updatedAt: z.iso.datetime()
 })
 
 export type AdministrativeArea = z.infer<typeof AdministrativeArea>
@@ -87,7 +93,13 @@ export const Location = z.object({
   administrativeAreaId: UUID.nullable(),
   locationType: z.string().nullable(),
   status: LocationStatus,
-  versions: z.array(LocationVersion)
+  versions: z.array(LocationVersion),
+  /**
+   * Server time of the last write to the row, the same as `updatedAt` of
+   * {@link AdministrativeArea}. A client that syncs its cache incrementally
+   * compares it to see if a returned row changed.
+   */
+  updatedAt: z.iso.datetime()
 })
 
 export type Location = z.infer<typeof Location>
@@ -134,7 +146,8 @@ export function toClientLocation(location: Location): ClientLocation {
     id: location.id,
     administrativeAreaId: location.administrativeAreaId,
     locationType: location.locationType,
-    versions: location.versions
+    versions: location.versions,
+    updatedAt: location.updatedAt
   }
 }
 
@@ -145,7 +158,8 @@ export function toClientAdministrativeArea(
   return {
     id: area.id,
     parentId: area.parentId,
-    versions: area.versions
+    versions: area.versions,
+    updatedAt: area.updatedAt
   }
 }
 
