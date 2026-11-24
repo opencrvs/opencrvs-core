@@ -58,8 +58,7 @@ flowchart TD
     subgraph POST["Post-release"]
         POST1["⚡ init-release starts X.Y.Z+1 when the GitHub release is published\n(version bump and CHANGELOG section on release/X.Y.x, companion repos, draft release)"]
         POST2["Merge the forward-merge PRs in order, until the changes reach develop"]
-        POST3["Infrastructure: merge the PR from release/X.Y.x into develop\n(only the newest line opens it)"]
-        POST1 --> POST2 --> POST3
+        POST1 --> POST2
     end
 
     PRE --> CORE
