@@ -44,7 +44,17 @@ spec:
                 secretKeyRef:
                   key: S3_ADMIN_SECRET_KEY
                   name: {{ .Values.s3.users_secret }}
+            - name: CORE_REQUEST_SIGNING_KEY_PATH
+              value: /secrets/core-request-signing-key.pem
           {{- include "render-env-vars" (dict "service_name" "data_seed" "Values" .Values) }}
+          volumeMounts:
+            - mountPath: /secrets/core-request-signing-key.pem
+              name: core-request-signing-key
+              subPath: core-request-signing-key.pem
+      volumes:
+        - name: core-request-signing-key
+          secret:
+            secretName: opencrvs-core-request-signing-key
       restartPolicy: "Never"
   backoffLimit: 0
 
