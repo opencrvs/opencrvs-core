@@ -14,6 +14,9 @@ import { inject, vi } from 'vitest'
 /** @knipignore */
 export const getEventIndexName = vi.fn<(type: string) => string>()
 /** @knipignore */
+export const getEventVersionIndexName =
+  vi.fn<(type: string, versionId: string) => string>()
+/** @knipignore */
 export const getEventAliasName = vi.fn()
 
 /** @knipignore */
@@ -26,4 +29,4 @@ export function getOrCreateClient() {
 export const getReindexingStatusIndexName = vi.fn()
 
 /** @knipignore */
-export const getTemporaryIndexName = vi.fn()
+export const getTemporaryVersionIndexName = vi.fn()

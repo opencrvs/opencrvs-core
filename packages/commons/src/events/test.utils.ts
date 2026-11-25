@@ -1579,6 +1579,32 @@ export function withDeclaration(
   }
 }
 
+/** @returns a copy of the configuration with `field` added to the first page of its declaration. */
+export function withDeclarationField<T extends Pick<EventConfig, 'actions'>>(
+  configuration: T,
+  field: FieldConfig
+): T {
+  return {
+    ...configuration,
+    actions: configuration.actions.map((action) => {
+      if (action.type !== ActionType.DECLARE) {
+        return action
+      }
+      const [firstPage, ...otherPages] = action.declaration.pages
+      return {
+        ...action,
+        declaration: {
+          ...action.declaration,
+          pages: [
+            { ...firstPage, fields: [...firstPage.fields, field] },
+            ...otherPages
+          ]
+        }
+      }
+    })
+  }
+}
+
 /**
  * Get the leaf administrative area IDs from a list of administrative areas.
  *

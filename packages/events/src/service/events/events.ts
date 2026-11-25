@@ -46,7 +46,10 @@ import {
 } from '@opencrvs/commons/events'
 
 import { TrpcUserContext } from '@events/context'
-import { getEventConfigurationForRecord } from '@events/service/config/config'
+import {
+  getEventConfigurationForRecord,
+  getVersionedEventConfigurationById
+} from '@events/service/config/config'
 import { resolveVersionForNewRecord } from '@events/service/events/configVersion'
 import {
   sweepUnreferencedFiles,
@@ -503,7 +506,14 @@ export async function processAction(
     )
   }
   if (isEventIndexable(updatedEvent, input.type)) {
-    await indexEvent(updatedEvent, configuration, input.waitFor)
+    await indexEvent(
+      updatedEvent,
+      await getVersionedEventConfigurationById({
+        eventType: updatedEvent.type,
+        token
+      }),
+      input.waitFor
+    )
   }
 
   return updatedEvent
@@ -536,7 +546,7 @@ export async function addAsyncRejectAction(
   }: {
     user: TrpcUserContext
     event: EventDocument
-    configuration: EventConfig
+    configuration: VersionedEventConfig
   }
 ) {
   const eventId = event.id

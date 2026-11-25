@@ -30,12 +30,7 @@ import {
   DisplayableAction,
   writeActions
 } from './ActionType'
-import {
-  byEffectiveFrom,
-  EventConfig,
-  toEventConfig,
-  VersionedEventConfig
-} from './EventConfig'
+import { EventConfig } from './EventConfig'
 import { FieldConfig, FieldReference } from './FieldConfig'
 import {
   Action,
@@ -103,30 +98,6 @@ export function getDeclarationFields(
   configuration: EventConfig
 ): FieldConfig[] {
   return getDeclarationPages(configuration).flatMap(({ fields }) => fields)
-}
-
-/**
- * @returns the declaration fields of every version of the event, one per id: what any
- * record of the event can hold, whichever version it was created under. Where versions
- * define an id differently, the newest version's field is kept.
- *
- * Used to build the search index mapping: records of every version share one index per
- * event, so its mapping must hold the fields of all of them. Goes away once each version
- * gets its own index (#14335).
- * Known limitation: a field id must keep its type in every version until #14335.
- */
-export function getDeclarationFieldsOfAllVersions(
-  config: VersionedEventConfig
-): FieldConfig[] {
-  const oldestFirst = [...config.versions].sort(byEffectiveFrom)
-  const fieldsById = new Map(
-    oldestFirst.flatMap((version) =>
-      getDeclarationFields(toEventConfig(config, version)).map(
-        (field) => [field.id, field] as const
-      )
-    )
-  )
-  return [...fieldsById.values()]
 }
 
 /**

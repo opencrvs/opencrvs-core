@@ -9,7 +9,12 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import * as z from 'zod/v4'
-import { EventConfig, EventConfigInput } from './EventConfig'
+import {
+  DEFAULT_EFFECTIVE_FROM,
+  EventConfig,
+  EventConfigInput,
+  VersionedEventConfig
+} from './EventConfig'
 import { ActionType, WorkqueueActionType } from './ActionType'
 import { InherentFlags } from './Flag'
 import {
@@ -39,26 +44,19 @@ const SEARCH_DEFAULT_VALUE_FIELD_TYPES = [
   FieldType.DATE
 ]
 
-export function validateAdvancedSearchConfig(
-  event: EventConfig,
-  ctx: z.RefinementCtx<EventConfig>
+/**
+ * Rejects advanced search fields that match a field of none of the `versions`, nor a
+ * metadata field. A field that only some versions have can still be searched.
+ * Each version must have exactly one DECLARE action, as `validateEventConfig` checks.
+ */
+export function validateAdvancedSearchFieldIds(
+  event: Pick<EventConfig, 'id' | 'advancedSearch'>,
+  versions: EventConfig[],
+  ctx: Pick<z.RefinementCtx<unknown>, 'addIssue'>
 ) {
-  const allFields = findAllFields(event)
-  const fieldIds = allFields.map((field) => field.id)
-
-  const advancedSearchFields = event.advancedSearch.flatMap((section) =>
-    section.fields.flatMap((field) => field.fieldId)
+  const fieldIds = versions.flatMap((version) =>
+    findAllFields(version).map((field) => field.id)
   )
-
-  const advancedSearchFieldsSet = new Set(advancedSearchFields)
-
-  if (advancedSearchFieldsSet.size !== advancedSearchFields.length) {
-    ctx.addIssue({
-      code: 'custom',
-      message: 'Advanced search field ids must be unique',
-      path: ['advancedSearch']
-    })
-  }
 
   const invalidFields = event.advancedSearch.flatMap((section) =>
     // Check if the fieldId is not in the fieldIds array
@@ -85,8 +83,41 @@ export function validateAdvancedSearchConfig(
       path: ['advancedSearch']
     })
   }
+}
 
-  // Rejects search field default values that can't be filled into the field
+export function validateAdvancedSearchConfig(
+  event: EventConfig,
+  ctx: z.RefinementCtx<EventConfig>
+) {
+  const advancedSearchFields = event.advancedSearch.flatMap((section) =>
+    section.fields.flatMap((field) => field.fieldId)
+  )
+
+  const advancedSearchFieldsSet = new Set(advancedSearchFields)
+
+  if (advancedSearchFieldsSet.size !== advancedSearchFields.length) {
+    ctx.addIssue({
+      code: 'custom',
+      message: 'Advanced search field ids must be unique',
+      path: ['advancedSearch']
+    })
+  }
+}
+
+/**
+ * Rejects search field default values that can't be filled into the field. Each field is
+ * read from the newest of the `versions` that has it.
+ * Each version must have exactly one DECLARE action, as `validateEventConfig` checks.
+ *
+ * @param versions newest first
+ */
+export function validateAdvancedSearchDefaultValues(
+  event: Pick<EventConfig, 'advancedSearch'>,
+  versions: EventConfig[],
+  ctx: Pick<z.RefinementCtx<unknown>, 'addIssue'>
+) {
+  const fieldsOfEachVersion = versions.map(findAllFields)
+
   event.advancedSearch.forEach((section, sectionIndex) => {
     section.fields.forEach((searchField, fieldIndex) => {
       if (
@@ -120,9 +151,11 @@ export function validateAdvancedSearchConfig(
         return
       }
 
-      const formField = allFields.find(({ id }) => id === searchField.fieldId)
+      const formField = fieldsOfEachVersion
+        .map((fields) => fields.find(({ id }) => id === searchField.fieldId))
+        .find((found) => found !== undefined)
 
-      // An unknown field id is already reported above
+      // An unknown field id is reported by validateAdvancedSearchFieldIds
       if (!formField) {
         return
       }
@@ -389,4 +422,65 @@ export function validateNotificationForm(
       })
     })
   })
+}
+
+type VersionListCtx = z.RefinementCtx<VersionedEventConfig>
+
+function validateVersionIdsAreUnique(
+  config: VersionedEventConfig,
+  ctx: VersionListCtx
+) {
+  const ids = new Set<string>()
+
+  config.versions.forEach((version, index) => {
+    if (ids.has(version.id)) {
+      ctx.addIssue({
+        code: 'custom',
+        message: `Event '${config.id}' has more than one version with id '${version.id}'. Each version must have a different id.`,
+        path: ['versions', index, 'id']
+      })
+    }
+    ids.add(version.id)
+  })
+}
+
+/** At most one version may omit `effectiveFrom` (effective from the beginning of time). */
+function validateVersionEffectiveFromsAreUnique(
+  config: VersionedEventConfig,
+  ctx: VersionListCtx
+) {
+  /** Id of the first version with each `effectiveFrom` */
+  const versionIdByEffectiveFrom = new Map<string, string>()
+
+  config.versions.forEach((version, index) => {
+    const sameEffectiveFromId = versionIdByEffectiveFrom.get(
+      version.effectiveFrom
+    )
+
+    if (sameEffectiveFromId === undefined) {
+      versionIdByEffectiveFrom.set(version.effectiveFrom, version.id)
+      return
+    }
+
+    const versionIds = `'${sameEffectiveFromId}', '${version.id}'`
+    ctx.addIssue({
+      code: 'custom',
+      message:
+        version.effectiveFrom !== DEFAULT_EFFECTIVE_FROM
+          ? `Event '${config.id}' has more than one version with \`effectiveFrom\` '${version.effectiveFrom}' (${versionIds}). Each version must have a different \`effectiveFrom\`.`
+          : `Event '${config.id}' has more than one version without \`effectiveFrom\` (${versionIds}). At most one version may omit it.`,
+      path: ['versions', index, 'effectiveFrom']
+    })
+  })
+}
+
+/**
+ * Versions are told apart by `id` and by `effectiveFrom`: no two versions may share either of them.
+ */
+export function validateVersionList(
+  config: VersionedEventConfig,
+  ctx: VersionListCtx
+) {
+  validateVersionIdsAreUnique(config, ctx)
+  validateVersionEffectiveFromsAreUnique(config, ctx)
 }

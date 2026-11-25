@@ -44,8 +44,7 @@ import {
 } from '@events/tests/utils'
 import { mswServer } from '@events/tests/msw'
 import { env } from '@events/environment'
-import { getEventIndexName } from '@events/storage/elasticsearch'
-import { createIndex } from '@events/service/indexing/indexing'
+import { createEventIndex } from '@events/tests/createEventIndex'
 
 describe('Overwriting parent field', () => {
   const informantOtherThanMother = and(
@@ -226,8 +225,8 @@ describe('Overwriting parent field', () => {
     let event = await client.event.create(
       generator.event.create({ type: CHILD_ONBOARDING_EVENT })
     )
-    await createIndex(
-      getEventIndexName(CHILD_ONBOARDING_EVENT),
+    await createEventIndex(
+      CHILD_ONBOARDING_EVENT,
       getDeclarationFields(modifiedChildOnboardingEvent)
     )
 
@@ -376,8 +375,8 @@ describe('Search index should reflect corrected null informant fields', () => {
       generator.event.create({ type: CHILD_ONBOARDING_EVENT })
     )
 
-    await createIndex(
-      getEventIndexName(CHILD_ONBOARDING_EVENT),
+    await createEventIndex(
+      CHILD_ONBOARDING_EVENT,
       getDeclarationFields(modifiedChildOnboardingEvent)
     )
 

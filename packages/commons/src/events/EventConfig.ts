@@ -29,8 +29,11 @@ import {
   validatePlaceOfEvent,
   validateDateOfEvent,
   validateAdvancedSearchConfig,
+  validateAdvancedSearchDefaultValues,
+  validateAdvancedSearchFieldIds,
   validateExactlyOneDeclareAction,
-  validateNotificationForm
+  validateNotificationForm,
+  validateVersionList
 } from './eventConfigValidation'
 
 export const EventFieldReference = z
@@ -110,7 +113,7 @@ export type EventConfigVersionInput = Omit<
   EventConfigSchemaInput,
   EventLevelField
 > & {
-  /** Identifier of the version, unique within the event (e.g. "birth-v2"). */
+  /** Identifier of the version, unique within the event (e.g. "birth_v2"). Only lower-case letters (a-z), digits (0-9) and underscores (_), at most 64 characters. */
   id: string
   /** Name of the version, which the UI shows wherever it names the version. For example, `{event.configVersionLabel}` in the event summary. */
   label: TranslationConfig
@@ -206,14 +209,17 @@ const versionFields = {
 const _EventConfigBase: z.ZodType<EventConfig, EventConfigSchemaInput> =
   z.object({ ...eventLevelFields, ...versionFields })
 
-/** Validations of one version of an event, read together with the fields shared by every version. */
+/**
+ * Validations of one version of an event, read together with the fields shared by every version.
+ * @returns whether the event has exactly one DECLARE action, which the validations of its fields need.
+ */
 export function validateEventConfig(
   event: EventConfig,
   ctx: z.RefinementCtx<EventConfig>
 ) {
   // This validation is made to early return, since following validations depend on the declare action being present and correctly configured.
   if (!validateExactlyOneDeclareAction(event, ctx)) {
-    return
+    return false
   }
   validateNotificationForm(event, ctx)
   validateAdvancedSearchConfig(event, ctx)
@@ -221,14 +227,23 @@ export function validateEventConfig(
   validatePlaceOfEvent(event, ctx)
   validateActionFlags(event, ctx)
   validateActionOrder(event, ctx)
+  return true
 }
 
 export const EventConfig: z.ZodType<EventConfig, EventConfigSchemaInput> =
-  _EventConfigBase.superRefine(validateEventConfig).meta({
-    id: 'EventConfig',
-    description:
-      'Configuration defining an event type registered in OpenCRVS (for example birth or death).'
-  })
+  _EventConfigBase
+    .superRefine((event, ctx) => {
+      if (!validateEventConfig(event, ctx)) {
+        return
+      }
+      validateAdvancedSearchFieldIds(event, [event], ctx)
+      validateAdvancedSearchDefaultValues(event, [event], ctx)
+    })
+    .meta({
+      id: 'EventConfig',
+      description:
+        'Configuration defining an event type registered in OpenCRVS (for example birth or death).'
+    })
 
 type EventLevelField = keyof typeof eventLevelFields
 
@@ -264,8 +279,16 @@ const _EventConfigVersion: z.ZodType<
 > = z.object({
   id: z
     .string()
+    .regex(/^[a-z0-9_]+$/, {
+      error: (issue) =>
+        `Version id '${String(issue.input)}' must contain only lower-case letters (a-z), digits (0-9) and underscores (_).`
+    })
+    .max(64, {
+      error: (issue) =>
+        `Version id '${String(issue.input)}' must have at most 64 characters.`
+    })
     .describe(
-      'Identifier of the version, unique within the event (e.g. "birth-v2").'
+      'Identifier of the version, unique within the event (e.g. "birth_v2"). It can contain only lower-case letters (a-z), digits (0-9) and underscores (_), and at most 64 characters.'
     ),
   label: TranslationConfig.describe(
     'Name of the version, which the UI shows wherever it names the version. For example, "{event.configVersionLabel}" in the event summary.'
@@ -412,6 +435,25 @@ export function resolveEffectiveVersion(
 }
 
 /**
+ * @returns the configuration of each version, in the order to look up a field in: the
+ * version in effect on `date`, a date in the country's time zone, first. Then older
+ * versions, newest first. Versions that take effect later come last, earliest first.
+ */
+export function getEventConfigsInLookupOrder(
+  config: VersionedEventConfig,
+  date: PlainDate
+): EventConfig[] {
+  const inEffect = getVersionsInEffectOn(config, date)
+  const later = config.versions
+    .filter((version) => !inEffect.includes(version))
+    .sort(byEffectiveFrom)
+
+  return [...inEffect.reverse(), ...later].map((version) =>
+    toEventConfig(config, version)
+  )
+}
+
+/**
  * @returns the configuration of the version a record is stamped with, like
  * `getEventConfigForRecord`, or undefined when that version is not configured.
  */
@@ -475,60 +517,20 @@ export function resolveEventConfig(config: VersionedEventConfig): EventConfig {
 }
 
 /**
- * Versions are told apart by `id` and by `effectiveFrom`: no two versions may share
- * either, and at most one may omit `effectiveFrom` (effective from the beginning of time).
- */
-function validateVersionList(
-  config: VersionedEventConfig,
-  ctx: z.RefinementCtx<VersionedEventConfig>
-) {
-  const ids = new Set<string>()
-  /** Id of the first version with each `effectiveFrom` */
-  const versionIdByEffectiveFrom = new Map<string, string>()
-
-  config.versions.forEach((version, index) => {
-    if (ids.has(version.id)) {
-      ctx.addIssue({
-        code: 'custom',
-        message: `Event '${config.id}' has more than one version with id '${version.id}'. Each version must have a different id.`,
-        path: ['versions', index, 'id']
-      })
-    }
-    ids.add(version.id)
-
-    const sameEffectiveFromId = versionIdByEffectiveFrom.get(
-      version.effectiveFrom
-    )
-    if (sameEffectiveFromId !== undefined) {
-      const versionIds = `'${sameEffectiveFromId}', '${version.id}'`
-      ctx.addIssue({
-        code: 'custom',
-        message:
-          version.effectiveFrom !== DEFAULT_EFFECTIVE_FROM
-            ? `Event '${config.id}' has more than one version with \`effectiveFrom\` '${version.effectiveFrom}' (${versionIds}). Each version must have a different \`effectiveFrom\`.`
-            : `Event '${config.id}' has more than one version without \`effectiveFrom\` (${versionIds}). At most one version may omit it.`,
-        path: ['versions', index, 'effectiveFrom']
-      })
-    } else {
-      versionIdByEffectiveFrom.set(version.effectiveFrom, version.id)
-    }
-  })
-}
-
-/**
  * Runs `validate` on the configuration of each version (`events[i]` is that of
  * `versions[i]`). Issues on a field of the version are reported under that version.
  * Issues on a field shared by every version (e.g. `advancedSearch`) are reported once,
  * where they are defined.
+ * @returns whether `validate` returned `true` for every version. Every version is validated either way.
  */
 export function validateEachVersion<E>(
   ctx: Pick<z.RefinementCtx<unknown>, 'addIssue'>,
   events: E[],
-  validate: (event: E, versionCtx: z.RefinementCtx<E>) => void
+  validate: (event: E, versionCtx: z.RefinementCtx<E>) => boolean
 ) {
   const reported = new Set<string>()
 
-  events.forEach((event, index) => {
+  const results = events.map((event, index) => {
     const addIssue: z.RefinementCtx<E>['addIssue'] = (issue) => {
       if (typeof issue === 'string') {
         ctx.addIssue({
@@ -553,8 +555,10 @@ export function validateEachVersion<E>(
       ctx.addIssue({ ...issue, path })
     }
 
-    validate(event, { value: event, addIssue } as z.RefinementCtx<E>)
+    return validate(event, { value: event, addIssue } as z.RefinementCtx<E>)
   })
+
+  return results.every(Boolean)
 }
 
 export const VersionedEventConfig: z.ZodType<
@@ -571,11 +575,21 @@ export const VersionedEventConfig: z.ZodType<
       )
   })
   .superRefine((config, ctx) => {
+    const versionConfigs = config.versions.map((version) =>
+      toEventConfig(config, version)
+    )
     validateVersionList(config, ctx)
-    validateEachVersion(
-      ctx,
-      config.versions.map((version) => toEventConfig(config, version)),
-      validateEventConfig
+    if (!validateEachVersion(ctx, versionConfigs, validateEventConfig)) {
+      return
+    }
+    validateAdvancedSearchFieldIds(config, versionConfigs, ctx)
+    validateAdvancedSearchDefaultValues(
+      config,
+      [...config.versions]
+        .sort(byEffectiveFrom)
+        .reverse()
+        .map((version) => toEventConfig(config, version)),
+      ctx
     )
   })
   .meta({
