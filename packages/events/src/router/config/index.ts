@@ -8,7 +8,6 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { pick } from 'lodash'
 import { z } from 'zod'
 import { getAcceptedScopesFromToken } from '@opencrvs/commons/authentication'
 import {
@@ -17,19 +16,10 @@ import {
   userAndSystemProcedure
 } from '@events/router/trpc'
 import {
-  getApplicationConfig,
   getClientApplicationConfig,
+  getPublicApplicationConfig,
   getInMemoryCertificateConfigurations
 } from '@events/service/config/config'
-
-/** The application configuration fields the login page shows before sign-in. */
-const PUBLIC_APPLICATION_CONFIG_FIELDS = [
-  'APPLICATION_NAME',
-  'COUNTRY_LOGO',
-  'PHONE_NUMBER_PATTERN',
-  'USER_NOTIFICATION_DELIVERY_METHOD',
-  'INFORMANT_NOTIFICATION_DELIVERY_METHOD'
-] as const
 
 export const configRouter = router({
   application: userAndSystemProcedure
@@ -38,9 +28,7 @@ export const configRouter = router({
 
   publicApplication: publicProcedure
     .input(z.void())
-    .query(async () =>
-      pick(await getApplicationConfig(), PUBLIC_APPLICATION_CONFIG_FIELDS)
-    ),
+    .query(async () => getPublicApplicationConfig()),
 
   /** The certificate templates the caller may print. */
   certificates: userAndSystemProcedure
