@@ -289,6 +289,8 @@ const FAILED_CONCLUSIONS = [
 const MAX_FAILED_CHECKS = 6
 const MAX_LOG_EXCERPT = 3000
 const LOG_LINES_BEFORE_ERROR = 40
+// The color codes in a log, for example "\u001b[31m".
+const ANSI_ESCAPE = /\u001b\[[0-9;]*[A-Za-z]/g
 
 /**
  * The lines of a failed job log that most likely show the cause. GitHub
@@ -304,12 +306,20 @@ async function logExcerpt(detailsUrl) {
     const lines = (
       await gh([
         'api',
+        // CI logs hold color codes. Without this flag, a new gh refuses to
+        // print the log. The color codes are removed below.
+        '--allow-escape-sequences',
         `repos/${process.env.GITHUB_REPOSITORY}/actions/jobs/${jobId}/logs`
       ])
     )
       .split('\n')
-      // Remove the timestamp at the start of each line.
-      .map((line) => line.replace(/^\S+Z /, '').trimEnd())
+      // Remove the timestamp at the start of each line and the color codes.
+      .map((line) =>
+        line
+          .replace(/^\S+Z /, '')
+          .replace(ANSI_ESCAPE, '')
+          .trimEnd()
+      )
       .filter(Boolean)
     const marker = lines.findIndex((line) => line.startsWith('##[error]'))
     const end = marker === -1 ? lines.length : marker + 3
