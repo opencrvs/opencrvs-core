@@ -2,6 +2,10 @@
 
 ## 2.1.4
 
+### Improvements
+
+- The events service now validates and serializes the event configurations once and reuses the result for every request that gets them, until the configurations change. Before, each request validated and serialized the full configurations again. This could take most of the CPU of a busy events service, so that all requests were slow. [#14194](https://github.com/opencrvs/opencrvs-core/issues/14194)
+
 ### Bug fixes
 
 - `npx @opencrvs/toolkit upgrade` now sets `version` and `@opencrvs/toolkit` in your `package.json` to the toolkit version it runs from, points scripts at `assets/` instead of `infrastructure/`, and removes scripts whose file no longer exists, such as `snapshot`, `port-forward` and `environment:init` [#14382](https://github.com/opencrvs/opencrvs-core/issues/14382)
