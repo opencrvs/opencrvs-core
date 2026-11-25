@@ -18,6 +18,7 @@ import { createStore } from './store'
 import 'focus-visible/dist/focus-visible.js'
 import WebFont from 'webfontloader'
 import { authApi } from './utils/authApi'
+import { getBasename } from './utils/basename'
 import { delay } from 'lodash'
 import { applicationConfigLoadedAction } from './login/actions'
 import { createBrowserRouter } from 'react-router-dom'
@@ -35,8 +36,8 @@ const { store } = createStore()
 const container = document.getElementById('root')
 const root = createRoot(container!)
 const router = createBrowserRouter(routesConfig, {
-  // "/" or the path that nginx put in <base href>, for example "/login/"
-  basename: new URL(document.baseURI).pathname,
+  // "/" or the path that nginx put in <base href>, for example "/login"
+  basename: getBasename(document.baseURI),
   future: {
     v7_relativeSplatPath: true,
     v7_fetcherPersist: true,
