@@ -4,7 +4,7 @@
 flowchart TD
     subgraph PRE["Prerequisites — both repos"]
         P1[Verify no open PRs pending for release]
-        P2["release/X.Y.Z branch exists in Core + CountryConfig\nPR'd to master and develop"]
+        P2["release/X.Y.x has the version bump and the CHANGELOG section of X.Y.Z\n(init-release made them when the previous release was published)"]
         P3[CI passing on all PRs]
         P4["CHANGELOG.md + package.json reflect release version\n(committed at branch creation)"]
         P5[CountryConfig already using latest pre-release toolkit version]
@@ -56,11 +56,9 @@ flowchart TD
     end
 
     subgraph POST["Post-release"]
-        POST1[Merge both release branches into master + develop simultaneously]
-        POST2["Create release/X.Y.Z+1 from release/X.Y.Z in both repos"]
-        POST3["Commit version bump on new release branches"]
-        POST4["PR new branches into master + develop in both repos\n⚠️ init-release.yml may help with POST2–POST4 (unverified)"]
-        POST1 --> POST2 --> POST3 --> POST4
+        POST1["⚡ init-release starts X.Y.Z+1 when the GitHub release is published\n(version bump and CHANGELOG section on release/X.Y.x, companion repos, draft release)"]
+        POST2["Merge the forward-merge PRs in order, until the changes reach develop"]
+        POST1 --> POST2
     end
 
     PRE --> CORE
@@ -73,4 +71,4 @@ flowchart TD
 ## Links
 
 - Copy items notebook: https://gist.github.com/rikukissa/9415b88016c0acfc0e0d4e00add45993
-- init-release workflow: https://github.com/opencrvs/opencrvs-core/actions/workflows/init-release.yml
+- init-release workflow: https://github.com/opencrvs/opencrvs-core/actions/workflows/init-release.yml. It runs when a release is published. Run it by hand only for the first release of a line, X.Y.0.
