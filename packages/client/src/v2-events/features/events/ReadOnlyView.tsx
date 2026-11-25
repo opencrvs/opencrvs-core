@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import React, { useEffect, useMemo } from 'react'
+import React, { useEffect, useMemo, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
 import {
   useTypedParams,
@@ -113,16 +113,19 @@ function ReadonlyViewContent({ eventId }: { eventId: UUID }) {
     return Object.keys(cleaned).length > 0 ? cleaned : undefined
   }, [event, draft])
 
+  // A new event object or assignment status must not remove the files. Only leaving the record does.
+  const latestRef = useRef({ event, assignmentStatus })
+  latestRef.current = { event, assignmentStatus }
+
   useEffect(() => {
     return () => {
-      if (assignmentStatus === AssignmentStatus.ASSIGNED_TO_SELF) {
+      const latest = latestRef.current
+      if (latest.assignmentStatus === AssignmentStatus.ASSIGNED_TO_SELF) {
         return
       }
-      void (async () => {
-        await removeCachedFiles(event)
-      })()
+      void removeCachedFiles(latest.event)
     }
-  }, [event, assignmentStatus])
+  }, [event.id])
 
   const actionConfiguration = configuration.actions.find(
     (a) => a.type === ActionType.READ

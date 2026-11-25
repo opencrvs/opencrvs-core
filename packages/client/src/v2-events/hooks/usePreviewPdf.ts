@@ -42,7 +42,7 @@ export function usePreviewPdf(path: DocumentPath) {
   const pdfUrl = toFileUrl(path)
   const containerRef = React.useRef<HTMLDivElement>(null)
   const [loading, setLoading] = React.useState(true)
-  const [error, setError] = React.useState<string | null>(null)
+  const [failed, setFailed] = React.useState(false)
   const renderedRef = React.useRef(false)
   // Shared across the initial load and any retry, since both call loadPdf().
   const cancelledRef = React.useRef(false)
@@ -50,11 +50,11 @@ export function usePreviewPdf(path: DocumentPath) {
 
   const loadPdf = React.useCallback(async () => {
     setLoading(true)
-    setError(null)
+    setFailed(false)
 
     const res = await fetch(pdfUrl)
     if (!res.ok) {
-      setError(i18n.formatMessage(pdfLoadErrorMessage))
+      setFailed(true)
       setLoading(false)
       throw new Error(`Failed to fetch PDF: ${res.status} ${res.statusText}`)
     }
@@ -63,7 +63,7 @@ export function usePreviewPdf(path: DocumentPath) {
     const pdfjsLib = await loadPdfJs()
     if (!pdfjsLib) {
       {
-        setError(i18n.formatMessage(pdfLoadErrorMessage))
+        setFailed(true)
         setLoading(false)
         throw new Error(`Failed to load pdfjsLib`)
       }
@@ -107,23 +107,29 @@ export function usePreviewPdf(path: DocumentPath) {
       container.appendChild(canvas)
       canvasesRef.current.push(canvas)
 
-      page.render({ canvasContext: context, viewport, canvas })
+      const rendering = page.render({
+        canvasContext: context,
+        viewport,
+        canvas
+      })
+      // Show the first page without waiting for the other pages.
+      if (pageNum === 1) {
+        await rendering.promise
+        setLoading(false)
+      }
     }
 
     setLoading(false)
-  }, [pdfUrl, i18n])
+  }, [pdfUrl])
 
-  const handleLoadError = React.useCallback(
-    (err: unknown) => {
-      if (!cancelledRef.current) {
-        // eslint-disable-next-line no-console
-        console.error(err)
-        setError(i18n.formatMessage(pdfLoadErrorMessage))
-        setLoading(false)
-      }
-    },
-    [i18n]
-  )
+  const handleLoadError = React.useCallback((err: unknown) => {
+    if (!cancelledRef.current) {
+      // eslint-disable-next-line no-console
+      console.error(err)
+      setFailed(true)
+      setLoading(false)
+    }
+  }, [])
 
   const runLoadPdf = React.useCallback(() => {
     cancelledRef.current = false
@@ -140,7 +146,7 @@ export function usePreviewPdf(path: DocumentPath) {
   const retry = React.useCallback(() => {
     cancelledRef.current = false
     setLoading(true)
-    setError(null)
+    setFailed(false)
     precacheFile(path).then(loadPdf).catch(handleLoadError)
   }, [path, loadPdf, handleLoadError])
 
@@ -156,6 +162,9 @@ export function usePreviewPdf(path: DocumentPath) {
       cancelledRef.current = true
     }
   }, [runLoadPdf])
+
+  // The message is formatted here because a new intl object in loadPdf would cancel the load.
+  const error = failed ? i18n.formatMessage(pdfLoadErrorMessage) : null
 
   return { containerRef, loading, error, retry }
 }
