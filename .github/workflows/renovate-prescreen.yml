@@ -188,3 +188,15 @@ jobs:
           else
             gh pr comment "$PR_NUMBER" --body-file .renovate-prescreen/comment.md
           fi
+
+      # Keep the input and the output of Claude
+      - uses: actions/upload-artifact@v7
+        if: always() && steps.pr.outputs.skip != 'true'
+        with:
+          name: renovate-prescreen-${{ matrix.pr }}
+          path: .renovate-prescreen/
+          include-hidden-files: true
+          retention-days: 14
+          if-no-files-found: ignore
+          # A re-run of the job uploads the files again.
+          overwrite: true
