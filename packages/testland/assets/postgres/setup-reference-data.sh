@@ -86,6 +86,13 @@ CREATE TABLE IF NOT EXISTS reference_data.icd10 (
 );
 
 ALTER TABLE reference_data.icd10 ADD COLUMN IF NOT EXISTS uc_label text NOT NULL DEFAULT '';
+ALTER TABLE reference_data.icd10 ADD COLUMN IF NOT EXISTS chapter_no text NOT NULL DEFAULT '';
+ALTER TABLE reference_data.icd10 ADD COLUMN IF NOT EXISTS chapter_range text NOT NULL DEFAULT '';
+ALTER TABLE reference_data.icd10 ADD COLUMN IF NOT EXISTS chapter_name text NOT NULL DEFAULT '';
+ALTER TABLE reference_data.icd10 ADD COLUMN IF NOT EXISTS subchapter_code text NOT NULL DEFAULT '';
+ALTER TABLE reference_data.icd10 ADD COLUMN IF NOT EXISTS subchapter_name text NOT NULL DEFAULT '';
+ALTER TABLE reference_data.icd10 ADD COLUMN IF NOT EXISTS ncd_cd_injuries text NOT NULL DEFAULT '';
+ALTER TABLE reference_data.icd10 ADD COLUMN IF NOT EXISTS ill_defined text NOT NULL DEFAULT '';
 
 GRANT USAGE ON SCHEMA reference_data TO ${REFERENCE_DATA_EDITOR_USER};
 
