@@ -188,6 +188,8 @@ function createPdfWithPages(pageCount: number) {
   return pdf
 }
 
+const longPdfPageCount = 1000
+
 export const FirstPdfPageShowsBeforeAllPagesLoad: Story = {
   name: 'First page of a long PDF shows before all pages load',
   loaders: [
@@ -196,9 +198,11 @@ export const FirstPdfPageShowsBeforeAllPagesLoad: Story = {
       await cacheFile(
         {
           url: pdfOption.value.url,
-          file: new File([createPdfWithPages(1000)], 'test-document.pdf', {
-            type: 'application/pdf'
-          })
+          file: new File(
+            [createPdfWithPages(longPdfPageCount)],
+            'test-document.pdf',
+            { type: 'application/pdf' }
+          )
         },
         await caches.open(CACHE_NAME)
       )
@@ -212,16 +216,14 @@ export const FirstPdfPageShowsBeforeAllPagesLoad: Story = {
     await waitFor(
       async () => {
         await expect(canvasElement.querySelector('canvas')).not.toBeNull()
-      },
-      { timeout: 5000 }
-    )
-    await waitFor(
-      async () => {
         await expect(
           within(canvasElement).queryByText('Loading...')
         ).not.toBeInTheDocument()
       },
-      { timeout: 1000 }
+      { timeout: 5000 }
+    )
+    await expect(canvasElement.querySelectorAll('canvas').length).toBeLessThan(
+      longPdfPageCount
     )
   },
   render: () => <DocumentViewer id="document_section" options={[pdfOption]} />
