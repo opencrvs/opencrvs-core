@@ -13,7 +13,8 @@ import { getAcceptedScopesFromToken } from '@opencrvs/commons/authentication'
 import {
   publicProcedure,
   router,
-  userAndSystemProcedure
+  userAndSystemProcedure,
+  userOnlyProcedure
 } from '@events/router/trpc'
 import {
   getClientApplicationConfig,
@@ -30,25 +31,23 @@ export const configRouter = router({
     .input(z.void())
     .query(async () => getPublicApplicationConfig()),
 
-  /** The certificate templates the caller may print. */
-  certificates: userAndSystemProcedure
-    .input(z.void())
-    .query(async ({ ctx }) => {
-      const printScopes = getAcceptedScopesFromToken(ctx.token, [
-        'record.print-certified-copies'
-      ])
-      if (printScopes.length === 0) {
-        return []
-      }
+  /** The certificate templates the user may print. */
+  certificates: userOnlyProcedure.input(z.void()).query(async ({ ctx }) => {
+    const printScopes = getAcceptedScopesFromToken(ctx.token, [
+      'record.print-certified-copies'
+    ])
+    if (printScopes.length === 0) {
+      return []
+    }
 
-      const certificates = await getInMemoryCertificateConfigurations()
-      if (printScopes.some((scope) => !scope.options?.templates?.length)) {
-        return certificates
-      }
+    const certificates = await getInMemoryCertificateConfigurations()
+    if (printScopes.some((scope) => !scope.options?.templates?.length)) {
+      return certificates
+    }
 
-      const allowed = new Set(
-        printScopes.flatMap((scope) => scope.options?.templates ?? [])
-      )
-      return certificates.filter(({ id }) => allowed.has(id))
-    })
+    const allowed = new Set(
+      printScopes.flatMap((scope) => scope.options?.templates ?? [])
+    )
+    return certificates.filter(({ id }) => allowed.has(id))
+  })
 })
