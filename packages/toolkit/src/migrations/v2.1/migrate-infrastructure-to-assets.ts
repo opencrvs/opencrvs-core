@@ -42,7 +42,9 @@
  * Then `Dockerfile.assets` is replaced with the template's, the migrated files
  * are removed from `infrastructure/` (kept with `--docker-swarm`), and the
  * result is staged. Files with conflicts are left unstaged. Anything else in
- * `infrastructure/`, such as Docker Swarm configuration, is left in place.
+ * `infrastructure/`, such as Docker Swarm configuration, is listed and, once
+ * confirmed (or with `--remove-infrastructure`), deleted with `git rm`. Files
+ * git does not track are never deleted.
  *
  * Caveats:
  *   - Existing files under `assets/` are never overwritten, so running it
@@ -362,7 +364,100 @@ const DESCRIPTIONS: Record<Outcome, string> = {
     'changed locally but not moved: the chart runs its own on-deploy script, port your changes there'
 }
 
-async function main(dockerSwarm = false) {
+/** Files under `infrastructure/` git tracks, and the ones it does not. */
+function listLeftovers(cwd: string) {
+  const all = listFiles(cwd, INFRASTRUCTURE_DIR)
+  let tracked: string[] = []
+  try {
+    tracked = execFileSync(
+      'git',
+      ['ls-files', '-z', '--', INFRASTRUCTURE_DIR],
+      {
+        cwd,
+        encoding: 'utf8'
+      }
+    )
+      .split('\0')
+      .filter(Boolean)
+  } catch {
+    // Not a git repository: nothing counts as tracked, so nothing is deleted
+  }
+  return {
+    tracked: all.filter((file) => tracked.includes(file)),
+    untracked: all.filter((file) => !tracked.includes(file))
+  }
+}
+
+async function confirmRemoval(files: string[]) {
+  const { confirm } = await import('@inquirer/prompts')
+  return confirm({
+    message: `Delete these ${files.length} file(s) from infrastructure/? They are tracked by git, so the deletion can be reverted.`,
+    default: true
+  })
+}
+
+/**
+ * The Kubernetes deployment does not use what is left in `infrastructure/`
+ * (Docker Swarm compose files, server setup and so on). Deletes the files git
+ * tracks, after asking, or straight away with `--remove-infrastructure`.
+ * Untracked and ignored files, such as a local `.kube/` config, are never
+ * deleted: they cannot be restored from git.
+ */
+export async function removeLeftovers(
+  cwd: string,
+  removeInfrastructure: boolean,
+  confirm: (files: string[]) => Promise<boolean> = confirmRemoval
+) {
+  if (!existsSync(path.join(cwd, INFRASTRUCTURE_DIR))) {
+    console.log('\n  ✓ infrastructure/ removed, nothing is left in it.')
+    return
+  }
+
+  const { tracked, untracked } = listLeftovers(cwd)
+
+  if (tracked.length > 0) {
+    console.log(
+      '\n  infrastructure/ still has files the Kubernetes deployment does not use:'
+    )
+    for (const file of tracked) {
+      console.log(`    ${file}`)
+    }
+
+    let remove = removeInfrastructure
+    if (!remove && process.stdin.isTTY) {
+      remove = await confirm(tracked)
+    } else if (!remove) {
+      console.warn(
+        "\n  ⚠️  Not deleted: no terminal to ask in. Re-run with '--remove-infrastructure' to delete them, or delete them by hand."
+      )
+    }
+
+    if (remove) {
+      try {
+        execFileSync('git', ['rm', '-r', '-q', '--', ...tracked], {
+          cwd,
+          stdio: 'pipe'
+        })
+        console.log(
+          `  ✓ Deleted ${tracked.length} file(s) from infrastructure/`
+        )
+      } catch (error) {
+        const stderr = (error as { stderr?: Buffer }).stderr?.toString().trim()
+        console.warn(
+          `  ⚠️  Could not delete them${stderr ? ` (${stderr})` : ''}. Commit or discard local changes under infrastructure/ and re-run, or delete them by hand.`
+        )
+      }
+    }
+  }
+
+  if (untracked.length > 0) {
+    console.warn(
+      `\n  ⚠️  Left in place because git does not track them, so they could not be restored: ${untracked.join(', ')}. Delete them by hand if they are no longer needed.`
+    )
+  }
+}
+
+async function main(dockerSwarm = false, removeInfrastructure = false) {
   const cwd = process.cwd()
   console.log('Moving infrastructure/ into assets/...\n')
 
@@ -425,10 +520,8 @@ async function main(dockerSwarm = false) {
         `\n  ⚠️  ${conflicts.length} file(s) need their conflicts resolved: ${conflicts.map((file) => `assets/${file}`).join(', ')}`
       )
     }
-    if (existsSync(path.join(cwd, INFRASTRUCTURE_DIR)) && !dockerSwarm) {
-      console.warn(
-        '  ⚠️  infrastructure/ still has files the Kubernetes deployment does not use. Review and delete them if they are no longer needed.'
-      )
+    if (!dockerSwarm) {
+      await removeLeftovers(cwd, removeInfrastructure)
     }
   } else {
     console.log('  infrastructure/ not found, nothing to move.')
