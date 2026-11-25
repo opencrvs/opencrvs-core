@@ -1,6 +1,6 @@
 {
   "name": "@opencrvs/countryconfig-template",
-  "version": "2.1.2",
+  "version": "2.1.3",
   "description": "OpenCRVS country configuration template for forking new country configurations",
   "os": [
     "darwin",
