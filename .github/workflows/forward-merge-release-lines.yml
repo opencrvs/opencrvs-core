@@ -1,0 +1,195 @@
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at https://mozilla.org/MPL/2.0/.
+#
+# OpenCRVS is also distributed under the terms of the Civil Registration
+# & Healthcare Disclaimer located at http://opencrvs.org/license.
+#
+# Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
+
+# Carries each release line's changes into the next line, one PR at a time, so
+# a fix made on an older line also reaches the newer ones and develop:
+#
+#   push to release/1.9.x -> PR release/1.9.x into release/2.0.x
+#   merging it            -> PR release/2.0.x into release/2.1.x
+#   merging it            -> PR release/2.1.x into develop
+#
+# Each hop carries the previous hops' resolved conflicts, so it only has to
+# merge one line's worth of differences. Conflicts are resolved by Claude Code
+# only after a reviewer approves the Resolve conflicts job, so no tokens are
+# spent on a line that shouldn't get the changes. The logic lives in
+# .github/scripts/forward-merge/, which runs locally too.
+#
+# Pushes and PRs use ocrvs-bot's fine-grained token (secret
+# CORE_FORWARD_MERGE_TOKEN: opencrvs-core only, read and write on contents,
+# pull requests and workflows): GITHUB_TOKEN may not push changes to
+# .github/workflows/, and its pushes don't start CI. The token expires, so
+# renew it in time; without it the workflow falls back to GITHUB_TOKEN, and
+# merges that change workflow files are left to a person. A person merging a forward-merge PR starts the next
+# hop; a merge made with GITHUB_TOKEN would not.
+name: Release - Forward-merge release lines
+run-name: Forward-merge ${{ inputs.from || github.ref_name }}${{ inputs.dry_run && ' (dry run)' || '' }}
+
+on:
+  push:
+    branches:
+      - 'release/*.x'
+  workflow_dispatch:
+    inputs:
+      from:
+        type: string
+        required: true
+        description: 'Release line to start from, e.g. 1.9.x'
+      dry_run:
+        type: boolean
+        default: false
+        description: 'Only report what would be pushed and opened'
+
+# Each job asks for what it needs.
+permissions: {}
+
+jobs:
+  plan:
+    name: Plan
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: read
+      pull-requests: read
+    outputs:
+      source: ${{ steps.plan.outputs.source }}
+      target: ${{ steps.plan.outputs.target }}
+      reviewers: ${{ steps.plan.outputs.reviewers }}
+      hop: ${{ steps.plan.outputs.hop }}
+      conflicted: ${{ steps.plan.outputs.conflicted }}
+    steps:
+      # A full clone: a partial one fails to fetch some files on demand.
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Try the merge into the next line
+        id: plan
+        env:
+          GH_TOKEN: ${{ github.token }}
+          # the line typed into a manual run, or the line that was pushed to
+          REQUESTED_LINE: ${{ inputs.from || github.ref_name }}
+          BEFORE: ${{ github.event.before }}
+        run: bash .github/scripts/forward-merge/plan.sh
+
+  # Pushes the merges git can do alone, and opens the PR into the next line
+  # (or comments on the open one).
+  forward-merge:
+    name: Open PR
+    needs: plan
+    if: needs.plan.outputs.hop != ''
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: write
+      pull-requests: write
+    # one run per PR at a time, so two pushes in a row update it in order
+    concurrency:
+      group: forward-merge-${{ needs.plan.outputs.source }}-${{ needs.plan.outputs.target }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      # The scripts run from a copy: the job checks out branches that may not
+      # have them yet.
+      - name: Copy the scripts
+        run: cp -r .github/scripts/forward-merge "$RUNNER_TEMP/forward-merge"
+
+      - name: Push and open or update the PR into ${{ needs.plan.outputs.target }}
+        env:
+          SOURCE_BRANCH: ${{ needs.plan.outputs.source }}
+          HOP: ${{ needs.plan.outputs.hop }}
+          REVIEWERS: ${{ needs.plan.outputs.reviewers }}
+          DRY_RUN: ${{ inputs.dry_run == true }}
+          GH_TOKEN: ${{ secrets.CORE_FORWARD_MERGE_TOKEN || github.token }}
+          CAN_PUSH_WORKFLOWS: ${{ secrets.CORE_FORWARD_MERGE_TOKEN != '' }}
+        run: bash "$RUNNER_TEMP/forward-merge/open-pr.sh"
+
+  # Waits for a reviewer to approve, in the forward-merge-claude environment,
+  # before Claude spends tokens on a merge.
+  resolve-conflicts:
+    name: Resolve conflicts
+    needs: [plan, forward-merge]
+    if: needs.plan.outputs.conflicted == 'true' && inputs.dry_run != true
+    runs-on: ubuntu-24.04
+    environment: forward-merge-claude
+    permissions:
+      contents: write
+      pull-requests: write
+    # a newer run's job replaces one still waiting for approval
+    concurrency:
+      group: forward-merge-claude-${{ needs.plan.outputs.source }}-${{ needs.plan.outputs.target }}
+    env:
+      SOURCE_BRANCH: ${{ needs.plan.outputs.source }}
+      TARGET_BRANCH: ${{ needs.plan.outputs.target }}
+      PR_BRANCH: ${{ fromJSON(needs.plan.outputs.hop).pr_branch }}
+      MERGING: ${{ fromJSON(needs.plan.outputs.hop).conflict_merging }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      # The scripts run from a copy: the job checks out branches that may not
+      # have them yet.
+      - name: Copy the scripts
+        run: cp -r .github/scripts/forward-merge "$RUNNER_TEMP/forward-merge"
+
+      - name: Start the merge of ${{ env.MERGING }}
+        id: merge
+        env:
+          GH_TOKEN: ${{ secrets.CORE_FORWARD_MERGE_TOKEN || github.token }}
+          CAN_PUSH_WORKFLOWS: ${{ secrets.CORE_FORWARD_MERGE_TOKEN != '' }}
+        run: bash "$RUNNER_TEMP/forward-merge/resolve.sh" start
+
+      - name: Resolve the conflicts with Claude
+        if: steps.merge.outputs.needed == 'true' && steps.merge.outputs.conflicts != '[]'
+        # if Claude fails, the next step asks for a merge by hand
+        continue-on-error: true
+        # The CLI, not anthropics/claude-code-action: the action refuses push
+        # events, which start most runs. Claude gets no GitHub token; its tools
+        # are limited to editing files and local, read-only or staging git
+        # commands. resolve.sh start saved the target's settings, and
+        # --setting-sources user skips the working tree's copy, which can hold
+        # conflict markers.
+        env:
+          CLAUDE_CODE_OAUTH_TOKEN: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+          PROMPT: |
+            A git merge is in progress in this repository, OpenCRVS core: `${{ env.MERGING }}` is being merged into `${{ env.PR_BRANCH }}`. That branch carries the release line `${{ env.SOURCE_BRANCH }}` into the newer line `${{ env.TARGET_BRANCH }}`, and will be merged into `${{ env.TARGET_BRANCH }}` after review.
+
+            These files have conflicts: ${{ join(fromJSON(steps.merge.outputs.conflicts), ', ') }}
+
+            Resolve every conflict. The result must keep `${{ env.TARGET_BRANCH }}`'s code and behaviour and add the changes `${{ env.SOURCE_BRANCH }}` made since the two lines split:
+            - Use `git log` and `git show` on both sides to understand what each change is for before choosing.
+            - When a change from `${{ env.SOURCE_BRANCH }}` touches code that is different on `${{ env.TARGET_BRANCH }}`, apply the same fix to `${{ env.TARGET_BRANCH }}`'s code. If it doesn't apply there at all, leave it out.
+            - package.json files: keep `${{ env.TARGET_BRANCH }}`'s "version" values; merge the other fields.
+            - CHANGELOG.md: keep `${{ env.TARGET_BRANCH }}`'s sections and headings. Add the entries `${{ env.SOURCE_BRANCH }}` added under `${{ env.TARGET_BRANCH }}`'s topmost section, leaving out entries for changes that were left out.
+            - A file that one side deleted: keep it deleted unless the other side's change is still needed.
+
+            Remove every conflict marker and `git add` (or `git rm`) each resolved file. Do not commit, push, or abort the merge.
+
+            Finally, write a short Markdown summary to `${{ runner.temp }}/resolution.md`: one bullet per file saying what you kept and why, and a separate list of anything a reviewer should check closely.
+        run: |
+          npm install -g @anthropic-ai/claude-code@2.1.318
+          printf '%s' "$PROMPT" | claude -p \
+            --settings "$RUNNER_TEMP/claude-settings.json" \
+            --setting-sources user \
+            --max-turns 200 \
+            --allowedTools "Read,Edit,Write,Glob,Grep,Bash(git status:*),Bash(git diff:*),Bash(git log:*),Bash(git show:*),Bash(git ls-files:*),Bash(git add:*),Bash(git rm:*),Bash(git checkout --ours:*),Bash(git checkout --theirs:*)"
+
+      - name: Push the resolution
+        if: steps.merge.outputs.needed == 'true'
+        env:
+          CONFLICTS: ${{ steps.merge.outputs.conflicts }}
+          RESOLUTION_FILE: ${{ runner.temp }}/resolution.md
+          GH_TOKEN: ${{ secrets.CORE_FORWARD_MERGE_TOKEN || github.token }}
+        run: bash "$RUNNER_TEMP/forward-merge/resolve.sh" finish

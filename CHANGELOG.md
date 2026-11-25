@@ -2,6 +2,17 @@
 
 ## 2.1.3
 
+### Security
+
+- Fixes two security vulnerabilities. Details will be published in security advisories.
+
+### Breaking changes
+
+- `event.file.getPresignedUrl` is deprecated in favour of `event.files.presign({ eventId })` and `user.files.presign({ userIds })` (users only), which return presigned URLs keyed by the stored path. `getPresignedUrl` takes an `eventId` for files stored outside `events/{eventId}/`.
+- Upload record attachments with `path: events/{eventId}/`.
+- Actions and drafts may only name files stored under their record's `events/{eventId}/`, or files the record already names. Imported records may also name pre-2.0 keys and their author's own signature. Any other file is rejected with `400`.
+- `user.create`, `user.update` and `user.changeAvatar` only accept a signature or avatar stored under the user's own `users/` path.
+
 ### Bug fixes
 
 - `npx @opencrvs/toolkit upgrade` removes `COPY typings ./typings` from a v2.0 country config's `Dockerfile`. The Tiltfile it installs no longer sends `typings/` to the image build, so `tilt up` stopped at `[runner 6/6] COPY typings ./typings`. If you already upgraded with 2.1.0, delete that line from your `Dockerfile` [#14050](https://github.com/opencrvs/opencrvs-core/issues/14050)
@@ -14,6 +25,17 @@
 - Clearing a form page with the "Clear" button (`showClearButton`) no longer leaves data behind that keeps the page's section expanded on review pages and the record view. A field with a configured default value is now reset to that default; previously it was overwritten with an empty name, which was stored on the record and could stop the record being indexed for search. [#13459](https://github.com/opencrvs/opencrvs-core/issues/13459)
 
   **Note:** records saved before this fix keep that value, so they may still be missing from search; this release does not repair them.
+
+- The image crop window now matches the `targetSize` configured on a file field. It was always a circle, so a non-square target stretched the saved image and gave the user no way to frame it accurately. [#12034](https://github.com/opencrvs/opencrvs-core/issues/12034)
+
+  ```ts
+  configuration: {
+    maxImageSize: { targetSize: { width: 350, height: 450 } }
+  }
+  ```
+
+- A print button placed in a custom action's form no longer breaks the page. Opening the action showed an "Oops!" error instead of the form, so configurations that let a user print something — a notification receipt, for example — part-way through a record's life could not be used at all. The button now works wherever it is configured, and custom action forms can read the record they act on, so fields in them can be shown or hidden based on it. [#13056](https://github.com/opencrvs/opencrvs-core/issues/13056)
+- Corrected the default country list, which had not been reviewed since 2017. Implementations maintaining their own `client.csv` should re-run `yarn extract:translations` and add any keys it reports as missing. [#11954](https://github.com/opencrvs/opencrvs-core/issues/11954)
 
 ## 2.1.2
 

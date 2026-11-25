@@ -164,7 +164,7 @@ test('Returns single duplicate when found', async () => {
   const event2 = await client.event.create(generator.event.create())
   await client.event.actions.declare.request(
     generator.event.actions.declare(event2.id, {
-      declaration: event1Payload.declaration
+      declaration
     })
   )
 
@@ -255,14 +255,14 @@ test('Returns multiple duplicates when found', async () => {
   const event2 = await client.event.create(generator.event.create())
   await client.event.actions.declare.request(
     generator.event.actions.declare(event2.id, {
-      declaration: event1Payload.declaration
+      declaration
     })
   )
 
   const event3 = await client.event.create(generator.event.create())
   await client.event.actions.declare.request(
     generator.event.actions.declare(event3.id, {
-      declaration: event1Payload.declaration
+      declaration
     })
   )
 
@@ -377,7 +377,7 @@ async function setupInaccessibleMatch() {
   const duplicateEvent = await client.event.create(generator.event.create())
   await client.event.actions.declare.request(
     generator.event.actions.declare(duplicateEvent.id, {
-      declaration: matchedEventPayload.declaration
+      declaration
     })
   )
 

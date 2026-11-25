@@ -278,16 +278,16 @@ jobs:
 
               inputs: {
                 'core-image-tag': '${{ env.HEAD_COMMIT_HASH }}',
-                // e2e checks out Helm charts from the public opencrvs-core repo, where
-                // a private repository's branches don't exist. There, use the branch
-                // the PR targets instead.
-                'core-branch': '${{ github.event.repository.private && github.base_ref || env.BRANCH_NAME }}',
+                // e2e checks out Helm charts and tests from core-repo (this repository),
+                // so the PR branch itself exists there.
+                'core-branch': '${{ env.BRANCH_NAME }}',
                 stack: '${{ steps.generate_stack.outputs.stack }}',
                 'keep-e2e': '${{ needs.generate_stack_name_and_branch.outputs.keep_e2e }}',
                 branch: e2eBranch,
                 'actor': '${{ github.actor }}',
                 reset: 'true',
                 registry: '${{ vars.TARGET_REPO || 'ghcr.io/opencrvs' }}',
+                'core-repo': '${{ github.repository }}',
               },
             });
 

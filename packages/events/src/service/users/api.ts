@@ -26,6 +26,7 @@ import {
   eventAttachmentPath,
   isUUID,
   logger,
+  parseDocumentPath,
   triggerUserEventNotification
 } from '@opencrvs/commons'
 import { EventStatus, getStatusFromActions } from '@opencrvs/commons/events'
@@ -246,6 +247,76 @@ async function deleteDraftsAndOrphanedEventsInTrx(
   return orphaned
 }
 
+/**
+ * The user form uploads a new user's signature under `users/tmp-{uuid}/`,
+ * because the user has no id yet, and the path is never moved afterwards.
+ *
+ * TODO: remove once new users' files are stored under their real id and the
+ * existing `users/tmp-` paths are migrated, along with `allowTemporary` in
+ * `assertOwnSignaturePath` and `isOwnUserFile`, and its use in
+ * `isSignableKey`.
+ */
+export function isTemporaryUserFile(path: string) {
+  const prefix = 'users/tmp-'
+
+  return (
+    path.startsWith(prefix) &&
+    parseDocumentPath(path.replace(prefix, 'users/'))?.kind === 'user'
+  )
+}
+
+/**
+ * Whether a stored avatar or signature is one of the user's own files: under
+ * `users/{userId}/`, a pre-2.0 key, or with `allowTemporary`, a signature
+ * uploaded while the user was being created. Values stored before paths were
+ * checked on write may name any file, so they are checked again on read.
+ */
+export function isOwnUserFile(
+  path: string,
+  userId: UUID,
+  { allowTemporary = false }: { allowTemporary?: boolean } = {}
+) {
+  const file = parseDocumentPath(path)
+
+  return (
+    (file?.kind === 'user' && file.userId === userId) ||
+    file?.kind === 'legacy' ||
+    (allowTemporary && isTemporaryUserFile(path))
+  )
+}
+
+/**
+ * A user's signature is signed for everyone who reads that user's actions, so
+ * it must be one of the user's own files: under `users/{userId}/` or, when
+ * creating the user, a temporary upload from the user form (see
+ * `isTemporaryUserFile`). A path the user already has is kept as is (e.g. a
+ * pre-2.0 key, or the temporary upload from when the user was created).
+ */
+function assertOwnSignaturePath(
+  path: string | undefined,
+  {
+    userId,
+    current,
+    allowTemporary = false
+  }: { userId?: UUID; current?: string | null; allowTemporary?: boolean } = {}
+) {
+  if (path === undefined || path === current) {
+    return
+  }
+
+  const file = parseDocumentPath(path)
+  const isOwn =
+    (file?.kind === 'user' && file.userId === userId) ||
+    (allowTemporary && isTemporaryUserFile(path))
+
+  if (!isOwn) {
+    throw new TRPCError({
+      code: 'BAD_REQUEST',
+      message: "Signature must be a file under the user's own users/ path"
+    })
+  }
+}
+
 export async function updateUser(
   input: UpdateUserInput,
   token: string
@@ -271,6 +342,11 @@ export async function updateUser(
         message: `User not found: ${userId}`
       })
     }
+
+    assertOwnSignaturePath(signature?.path, {
+      userId,
+      current: existingUser.signaturePath
+    })
 
     await updateUserByIdInTrx(trx, userId, {
       ...otherFields,
@@ -384,6 +460,8 @@ export async function createUser(
   const usernameCandidate = input.username ?? generateUsername(input.name)
   const username = await findAvailableUsername(usernameCandidate)
   const resolvedUser = resolveCreateUserInput({ ...input, username })
+  // The user has no id yet, so only a temporary-id upload can be theirs
+  assertOwnSignaturePath(resolvedUser.signature?.path, { allowTemporary: true })
 
   const userPayload = {
     firstname: resolvedUser.name.firstname,

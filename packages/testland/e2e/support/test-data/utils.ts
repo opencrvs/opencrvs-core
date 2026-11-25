@@ -23,11 +23,16 @@ export function getSignatureFile() {
   })
 }
 
-export async function uploadFile(file: File, token: string) {
+/**
+ * Uploads under the record's prefix: a record may only reference files
+ * stored there.
+ */
+export async function uploadFile(file: File, token: string, eventId: string) {
   const formData = new FormData()
   const transactionId = uuidv4()
   formData.append('file', file)
   formData.append('transactionId', transactionId)
+  formData.append('path', `events/${eventId}/`)
 
   const url = new URL('/upload', GATEWAY_HOST)
   const res = await fetch(url, {

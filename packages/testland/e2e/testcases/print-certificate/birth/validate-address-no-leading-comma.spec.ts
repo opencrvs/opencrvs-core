@@ -77,7 +77,7 @@ test.describe
       assignedTo: userId
     })
 
-    const signature = await uploadFile(getSignatureFile(), provincialToken)
+    const signature = await uploadFile(getSignatureFile(), provincialToken, eventId)
 
     const registerRes = await client.event.actions.register.request.mutate({
       eventId,

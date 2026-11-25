@@ -9,8 +9,9 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
+import { DocumentPath } from '../documents'
 import { EventDocument } from './EventDocument'
-import { getFilePathsFromEvent } from './FileUtils'
+import { getFilePathsFromEvent, getFilePathsFromValues } from './FileUtils'
 
 test('file references finder returns all file references from action document', () => {
   const data = {
@@ -224,5 +225,106 @@ test('file references finder counts files named by a synchronously rejected acti
   expect(getFilePathsFromEvent(data)).toEqual([
     'events/105b69b3-415f-4e53-b912-ef71484cb6c0/e1fb6470-a836-4346-b46b-982304eb25df.jpeg',
     'events/105b69b3-415f-4e53-b912-ef71484cb6c0/ff45a750-d09e-4d06-b2c7-eda3f4b32417.png'
+  ])
+})
+
+test('file references finder reads single and multi-file values from declaration and annotation', () => {
+  expect(
+    getFilePathsFromValues({
+      declaration: {
+        'applicant.image': {
+          path: 'events/105b69b3-415f-4e53-b912-ef71484cb6c0/a.jpeg' as DocumentPath,
+          type: 'image/jpeg',
+          originalFilename: 'a.jpeg'
+        },
+        'applicant.name': 'not a file',
+        'documents.proof': [
+          {
+            path: 'b.png' as DocumentPath,
+            type: 'image/png',
+            originalFilename: 'b.png',
+            option: 'PASSPORT'
+          }
+        ]
+      },
+      annotation: {
+        'review.signature': {
+          path: 'users/0f1e2d3c-4b5a-4968-8776-655443322110/c.png' as DocumentPath,
+          type: 'image/png',
+          originalFilename: 'c.png'
+        }
+      }
+    })
+  ).toEqual([
+    'events/105b69b3-415f-4e53-b912-ef71484cb6c0/a.jpeg',
+    'b.png',
+    'users/0f1e2d3c-4b5a-4968-8776-655443322110/c.png'
+  ])
+})
+
+test('file references finder accepts actions without annotation', () => {
+  expect(getFilePathsFromValues({ declaration: {} })).toEqual([])
+})
+
+test('file references finder includes the signatures of the users who performed actions', () => {
+  const data = {
+    id: '105b69b3-415f-4e53-b912-ef71484cb6c0',
+    type: 'tennis-club-membership',
+    createdAt: '2025-09-18T07:54:00.073Z',
+    updatedAt: '2025-09-18T07:54:00.073Z',
+    actions: [
+      {
+        id: '64718c96-f85f-4940-89bb-de713d060f2c',
+        transactionId: 'ed5518a7-a2bb-45f9-a393-fcd358e06c94',
+        createdByUserType: 'user',
+        createdAt: '2025-09-18T07:54:00.073Z',
+        createdBy: '68c122bc28f080e722d4927c',
+        createdByRole: 'LOCAL_REGISTRAR',
+        createdBySignature:
+          'users/0f1e2d3c-4b5a-4968-8776-655443322110/sig.png',
+        createdAtLocation: 'f3da7778-161e-44a1-9e64-ab93dc1fe77f',
+        declaration: {},
+        status: 'Accepted',
+        type: 'CREATE'
+      }
+    ],
+    trackingId: 'ICJY4Z'
+  } as unknown as EventDocument
+
+  expect(getFilePathsFromEvent(data)).toEqual([
+    'users/0f1e2d3c-4b5a-4968-8776-655443322110/sig.png'
+  ])
+})
+
+test('file references finder reads annotation files even when an action has no declaration', () => {
+  const data = {
+    id: '105b69b3-415f-4e53-b912-ef71484cb6c0',
+    type: 'tennis-club-membership',
+    createdAt: '2025-09-18T07:54:00.073Z',
+    updatedAt: '2025-09-18T07:54:00.073Z',
+    actions: [
+      {
+        id: '64718c96-f85f-4940-89bb-de713d060f2c',
+        transactionId: 'ed5518a7-a2bb-45f9-a393-fcd358e06c94',
+        createdByUserType: 'user',
+        createdAt: '2025-09-18T07:54:00.073Z',
+        createdBy: '68c122bc28f080e722d4927c',
+        createdAtLocation: 'f3da7778-161e-44a1-9e64-ab93dc1fe77f',
+        annotation: {
+          'review.signature': {
+            path: 'events/105b69b3-415f-4e53-b912-ef71484cb6c0/sig.png',
+            type: 'image/png',
+            originalFilename: 'sig.png'
+          }
+        },
+        status: 'Accepted',
+        type: 'REJECT'
+      }
+    ],
+    trackingId: 'ICJY4Z'
+  } as unknown as EventDocument
+
+  expect(getFilePathsFromEvent(data)).toEqual([
+    'events/105b69b3-415f-4e53-b912-ef71484cb6c0/sig.png'
   ])
 })

@@ -11,6 +11,7 @@
 import { omit } from 'lodash'
 import { EventDocument, getUUID, TokenWithBearer } from '@opencrvs/commons'
 import { upsertEventWithActions } from '@events/storage/postgres/events/import'
+import { assertImportedFilesBelongToEvent } from '@events/service/files'
 import { getInMemoryEventConfigurations } from '../config/config'
 import { indexEventsInBulk, type BulkResponse } from '../indexing/indexing'
 
@@ -42,6 +43,8 @@ export async function bulkImportEvents(
   token: TokenWithBearer
 ): Promise<BulkResponse> {
   const toIndex = []
+
+  events.forEach(assertImportedFilesBelongToEvent)
 
   const eventConfigs = await getInMemoryEventConfigurations(token)
 
