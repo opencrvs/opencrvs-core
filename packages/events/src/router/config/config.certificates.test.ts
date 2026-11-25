@@ -20,10 +20,21 @@ import {
   setupTestCase
 } from '@events/tests/utils'
 
+function certificate(id: string, event: string) {
+  return {
+    id,
+    event,
+    label: { id: `certificates.${id}`, defaultMessage: id, description: '' },
+    isDefault: false,
+    fee: { onTime: 0, late: 0, delayed: 0 },
+    svgUrl: `/api/countryconfig/certificates/${id}.svg`
+  }
+}
+
 const certificates = [
-  { id: 'birth-certificate', event: 'birth' },
-  { id: 'birth-certified-copy', event: 'birth' },
-  { id: 'death-certificate', event: 'death' }
+  certificate('birth-certificate', 'birth'),
+  certificate('birth-certified-copy', 'birth'),
+  certificate('death-certificate', 'death')
 ]
 
 function serveCertificates() {
@@ -81,6 +92,22 @@ describe('config.certificates', () => {
     await expect(client.config.certificates()).rejects.toMatchObject(
       new TRPCError({ code: 'FORBIDDEN' })
     )
+  })
+
+  test('rejects certificates that do not match the certificate config', async () => {
+    const { user } = await setupTestCase()
+    mswServer.use(
+      http.get(`${env.COUNTRY_CONFIG_URL}/certificates`, () =>
+        HttpResponse.json([{ id: 'birth-certificate', event: 'birth' }])
+      )
+    )
+    const client = createTestClient(user, [
+      encodeScope({ type: 'record.print-certified-copies' })
+    ])
+
+    await expect(client.config.certificates()).rejects.toMatchObject({
+      code: 'INTERNAL_SERVER_ERROR'
+    })
   })
 
   test('reads the certificates signed as core, without the user token', async () => {
