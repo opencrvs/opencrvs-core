@@ -33,6 +33,7 @@ import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents
 import { FormLayout } from '@client/v2-events/layouts'
 import { ROUTES } from '@client/v2-events/routes'
 import { useValidatorContext } from '@client/v2-events/hooks/useValidatorContext'
+import { usePreloadCertificateFonts } from '@client/v2-events/hooks/useCertificateFonts'
 
 export function Pages() {
   const { eventId, pageId } = useTypedParams(
@@ -80,6 +81,8 @@ export function Pages() {
       )
     }
   }, [pageId, currentPageId, navigate, eventId, searchParams])
+
+  usePreloadCertificateFonts(String(annotation[CERT_TEMPLATE_ID]))
 
   const pagesValidatorContext = {
     ...validatorContext,
