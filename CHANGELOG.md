@@ -399,6 +399,10 @@ The toolkit and the country configuration template work with any container regis
 
 Date rules could only compare with today, so a record declared on time became late when a registrar reviewed or corrected it after the deadline. Date rules can now compare with the date of an action on the record, for example `field('child.dob').isAfter().days(365).beforeAction(event.firstAction(ActionType.NOTIFY, ActionType.DECLARE))`. Use `event.firstAction(...)` or `event.lastAction(...)` with one or more action types, and `.beforeAction(...)` or `.afterAction(...)` after `isAfter().days(n)` or `isBefore().days(n)`. Only accepted actions count. Until one exists, the rule compares with today. To get the same behaviour, replace `.inPast()` with `.beforeAction(...)` in your late registration rules. [#14329](https://github.com/opencrvs/opencrvs-core/issues/14329)
 
+#### Search and deduplicate by a part of a field
+
+`searchFields` in advanced search, and `fieldId` and `matchAgainst` in deduplication, accept a part of a field, for example `child.name.firstname`. Use this when a new version replaces fields, for example 3 TEXT fields with one NAME field. Search and deduplication then find the records of both versions. `matchAgainst` also accepts a list of fields, matched with OR. An event configuration fails validation when a path names no field and no part of a field, when a path is both a field id and a part of another field, or when search or deduplication uses a field whose type differs between versions. [#14335](https://github.com/opencrvs/opencrvs-core/issues/14335)
+
 ### Improvements
 
 - Review auth_mode secret management for OpenCRVS helm chart [#14234](https://github.com/opencrvs/opencrvs-core/issues/14234)
