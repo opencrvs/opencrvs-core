@@ -8,6 +8,7 @@ Read this page when a change adds or changes a test. [Coding standards](README.m
 - Test at the layer where the bug is. Prefer integration tests at the level of the endpoint to unit tests that make the behaviour hard to follow or change.
 - Cover the negative cases and each acceptance criterion of the issue.
 - A new tRPC procedure has access tests (allowed and forbidden, for each caller type) and functional tests. If an endpoint can return more than one item, test it with 0, 1 and more items.
+- In the events service, each endpoint has its own test file next to its router. Name the file after the path of the procedure: `internal.user.verifyPassword` is tested in `router/internal/internal.user.verifyPassword.test.ts`.
 - Test date code with more than one timezone offset.
 
 ## Choose the cheapest test that covers the change
