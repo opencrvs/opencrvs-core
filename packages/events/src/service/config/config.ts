@@ -9,6 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
+import { pick } from 'lodash'
 import fetch from 'node-fetch'
 import { array, object, string } from 'zod'
 import {
@@ -125,27 +126,38 @@ async function fetchApplicationConfig(): Promise<unknown> {
   return res.json()
 }
 
-export async function getApplicationConfig() {
-  return ApplicationConfig.parse(await fetchApplicationConfig())
-}
-
-/**
- * The application configuration as the client gets it: validated, but with
- * the fields core does not know kept, because a country config may add some
- * for its own client code.
- */
-export async function getClientApplicationConfig() {
-  return ApplicationConfig.loose().parse(await fetchApplicationConfig())
-}
-
 /**
  * @returns application configuration, cached in production for up to
- * `EVENT_CONFIG_CACHE_TTL_MS` (always fresh in development).
+ * `EVENT_CONFIG_CACHE_TTL_MS` (always fresh in development). It keeps the
+ * fields that core does not know, because a country config may add some for
+ * its own client code.
  */
 const getInMemoryApplicationConfig = createTtlConfigCache(
   'application configuration',
-  async () => getApplicationConfig()
+  async () => ApplicationConfig.loose().parse(await fetchApplicationConfig())
 )
+
+/** @returns the application configuration for signed-in users and systems. */
+export async function getClientApplicationConfig() {
+  return getInMemoryApplicationConfig()
+}
+
+/** The application configuration fields the login page shows before sign-in. */
+const PUBLIC_APPLICATION_CONFIG_FIELDS = [
+  'APPLICATION_NAME',
+  'COUNTRY_LOGO',
+  'PHONE_NUMBER_PATTERN',
+  'USER_NOTIFICATION_DELIVERY_METHOD',
+  'INFORMANT_NOTIFICATION_DELIVERY_METHOD'
+] as const
+
+/** @returns only the application configuration fields that anyone may read. */
+export async function getPublicApplicationConfig() {
+  return pick(
+    await getInMemoryApplicationConfig(),
+    PUBLIC_APPLICATION_CONFIG_FIELDS
+  )
+}
 
 /** @returns the country's time zone (IANA), in which configuration versions take effect. */
 export async function getCountryTimeZone() {

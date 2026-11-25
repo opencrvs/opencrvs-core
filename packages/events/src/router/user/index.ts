@@ -43,7 +43,7 @@ import {
   userOnlyProcedure
 } from '@events/router/trpc'
 import {
-  getApplicationConfig,
+  getPublicApplicationConfig,
   getInMemoryRoles
 } from '@events/service/config/config'
 import { generateHash } from '@events/service/auth/hash'
@@ -133,7 +133,7 @@ function getAuditLogIdentifiers(token: TokenWithBearer) {
 }
 
 async function validateMobile(mobile: string) {
-  const config = await getApplicationConfig()
+  const config = await getPublicApplicationConfig()
   let pattern: RegExp
   try {
     pattern = new RegExp(config.PHONE_NUMBER_PATTERN)
