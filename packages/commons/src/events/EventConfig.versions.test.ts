@@ -15,6 +15,7 @@ import {
   getConfigVersion,
   getEventConfigForRecord,
   getEventConfigOfVersion,
+  getEventConfigsInLookupOrder,
   resolveEffectiveVersion,
   resolveEventConfigInTimeZone,
   resolveEventConfigOnDate,
@@ -22,10 +23,6 @@ import {
 } from './EventConfig'
 import { PlainDate } from './PlainDate'
 import { toVersionedEventConfig } from './test.utils'
-import { ActionType } from './ActionType'
-import { FieldConfig } from './FieldConfig'
-import { FieldType } from './FieldType'
-import { getDeclarationFieldsOfAllVersions } from './utils'
 
 const { versions, ...eventLevel } = toVersionedEventConfig(
   tennisClubMembershipEvent
@@ -91,6 +88,26 @@ describe('resolveEffectiveVersion()', () => {
         'UTC'
       )
     ).toBeUndefined()
+  })
+})
+
+describe('getEventConfigsInLookupOrder()', () => {
+  // Uses `config` at the top of this file: v1 from the beginning of time, v2 from 2020-01-01, v3 from 2030-01-01.
+  const idsInLookupOrder = (date: string) =>
+    getEventConfigsInLookupOrder(config, date as PlainDate).map(
+      (eventConfig) =>
+        config.versions.find(
+          (version) =>
+            getEventConfigOfVersion(config, version.id) === eventConfig
+        )?.id
+    )
+
+  it('puts the version in effect first, then older versions newest first, then later versions', () => {
+    expect(idsInLookupOrder('2025-06-01')).toEqual(['v2', 'v1', 'v3'])
+  })
+
+  it('puts a version first once it takes effect', () => {
+    expect(idsInLookupOrder('2030-01-01')).toEqual(['v3', 'v2', 'v1'])
   })
 })
 
@@ -177,97 +194,5 @@ describe('getConfigVersion()', () => {
 describe('findConfigVersion()', () => {
   it('is undefined when the version is not configured', () => {
     expect(findConfigVersion(config, 'v9')).toBeUndefined()
-  })
-})
-
-describe('getDeclarationFieldsOfAllVersions()', () => {
-  function withField(
-    version: (typeof versions)[number],
-    field: FieldConfig
-  ): (typeof versions)[number] {
-    return {
-      ...version,
-      actions: version.actions.map((action) => {
-        if (action.type !== ActionType.DECLARE) {
-          return action
-        }
-        const [firstPage, ...otherPages] = action.declaration.pages
-        return {
-          ...action,
-          declaration: {
-            ...action.declaration,
-            pages: [
-              { ...firstPage, fields: [...firstPage.fields, field] },
-              ...otherPages
-            ]
-          }
-        }
-      })
-    }
-  }
-
-  const label = {
-    id: 'event.versions.test.field.label',
-    defaultMessage: 'Field',
-    description: 'Field of the versions tests'
-  }
-
-  it('returns the fields of every version, one per id', () => {
-    const fields = getDeclarationFieldsOfAllVersions({
-      ...eventLevel,
-      versions: [
-        withField(
-          { ...base, id: 'v1' },
-          {
-            id: 'applicant.removed',
-            type: FieldType.TEXT,
-            label
-          }
-        ),
-        withField(
-          { ...base, id: 'v2', effectiveFrom: '2020-01-01' },
-          {
-            id: 'applicant.added',
-            type: FieldType.TEXT,
-            label
-          }
-        )
-      ]
-    })
-    const ids = fields.map(({ id }) => id)
-
-    expect(ids).toEqual(
-      expect.arrayContaining(['applicant.removed', 'applicant.added'])
-    )
-    expect(new Set(ids).size).toBe(ids.length)
-  })
-
-  it("keeps the newest version's field when versions define an id differently", () => {
-    const fields = getDeclarationFieldsOfAllVersions({
-      ...eventLevel,
-      // Listed newest first: the newest wins by effectiveFrom, not by position.
-      versions: [
-        withField(
-          { ...base, id: 'v2', effectiveFrom: '2020-01-01' },
-          {
-            id: 'applicant.changed',
-            type: FieldType.NUMBER,
-            label
-          }
-        ),
-        withField(
-          { ...base, id: 'v1' },
-          {
-            id: 'applicant.changed',
-            type: FieldType.TEXT,
-            label
-          }
-        )
-      ]
-    })
-
-    expect(fields.find(({ id }) => id === 'applicant.changed')?.type).toBe(
-      FieldType.NUMBER
-    )
   })
 })

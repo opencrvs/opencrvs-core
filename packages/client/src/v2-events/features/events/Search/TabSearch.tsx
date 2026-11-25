@@ -34,6 +34,7 @@ import { ROUTES } from '@client/v2-events/routes'
 import { useValidatorContext } from '@client/v2-events/hooks/useValidatorContext'
 import { useDefaultValue } from '@client/v2-events/hooks/useDefaultValue'
 import { useAdminStructure } from '@client/v2-events/hooks/useAdminStructure'
+import { useSearchableFields } from '@client/v2-events/features/events/useEventConfiguration'
 import {
   getAdvancedSearchFieldErrors,
   resolveAdvancedSearchConfig,
@@ -151,9 +152,11 @@ export function TabSearch({
   const validatorContext = useValidatorContext()
   const getDefaultValues = useDefaultValue()
   const adminStructure = useAdminStructure()
+  const getSearchableFields = useSearchableFields()
   const advancedSearchSections = resolveAdvancedSearchConfig(
     currentEvent,
-    adminStructure
+    adminStructure,
+    getSearchableFields(currentEvent.id)
   )
 
   const sections = advancedSearchSections.map((section) => ({

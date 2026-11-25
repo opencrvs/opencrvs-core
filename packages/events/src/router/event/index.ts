@@ -45,7 +45,7 @@ import {
   getCountryTimeZone,
   getEventConfigurationForRecord,
   getVersionedEventConfigurationById,
-  getInMemoryEventConfigurations,
+  getInMemoryEventConfigurationsInLookupOrder,
   getInMemoryVersionedEventConfigurations
 } from '@events/service/config/config'
 import { assignRecord } from '@events/service/events/actions/assign'
@@ -515,7 +515,7 @@ export const eventRouter = router({
     )
     .query(async ({ input, ctx }) => {
       const [eventConfigs, versionedEventConfigs] = await Promise.all([
-        getInMemoryEventConfigurations(ctx.token),
+        getInMemoryEventConfigurationsInLookupOrder(ctx.token),
         getInMemoryVersionedEventConfigurations(ctx.token)
       ])
 

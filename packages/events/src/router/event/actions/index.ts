@@ -58,7 +58,10 @@ import {
   withoutOwnRequestedAction,
   processAction
 } from '@events/service/events/events'
-import { getEventConfigurationForRecord } from '@events/service/config/config'
+import {
+  getEventConfigurationForRecord,
+  getVersionedEventConfigurationById
+} from '@events/service/config/config'
 import { TrpcUserContext } from '@events/context'
 import { getServiceToken } from '@events/service/auth'
 import { writeAuditLog } from '@events/storage/postgres/events/auditLog'
@@ -595,8 +598,8 @@ export function getDefaultActionProcedures(
           return getEventById(input.eventId)
         }
 
-        const configuration = await getEventConfigurationForRecord({
-          event: event,
+        const configuration = await getVersionedEventConfigurationById({
+          eventType: event.type,
           token: ctx.token
         })
 

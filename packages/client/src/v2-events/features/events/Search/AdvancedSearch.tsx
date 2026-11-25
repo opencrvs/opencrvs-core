@@ -23,10 +23,14 @@ import {
   FieldValue,
   SearchQueryParams
 } from '@opencrvs/commons/client'
-import { useEventConfigurations } from '@client/v2-events/features/events/useEventConfiguration'
+import {
+  useEventConfigurations,
+  useSearchableFields
+} from '@client/v2-events/features/events/useEventConfiguration'
 import { useAdminStructure } from '@client/v2-events/hooks/useAdminStructure'
 import { getScope } from '@client/profile/profileSelectors'
 import { TabSearch } from './TabSearch'
+import { useUnfitSearchCriteriaNotice } from './useUnfitSearchCriteriaNotice'
 import {
   checkScopeForEventSearch,
   parseFieldSearchParams,
@@ -75,27 +79,37 @@ export function AdvancedSearch() {
   )
 
   const adminStructure = useAdminStructure()
+  const getSearchableFields = useSearchableFields()
+  const [{ formValuesByTabId: initialFormValuesByTabId, unfitFieldIds }] =
+    useState(() => {
+      const initialState: Record<string, EventState> = {}
+      let unfit: string[] = []
+      const currentEvent = advancedSearchEvents.find(
+        (e) => e.id === searchParams.eventType
+      )
+      for (const event of advancedSearchEvents) {
+        if (currentEvent && currentEvent.id === event.id) {
+          const parsedParams = parseFieldSearchParams({
+            eventConfig: event,
+            searchParams,
+            adminStructure,
+            fields: getSearchableFields(event.id)
+          })
+          initialState[event.id] = parsedParams.values
+          unfit = parsedParams.unfitFieldIds
+        } else {
+          initialState[event.id] = {}
+        }
+      }
+      return { formValuesByTabId: initialState, unfitFieldIds: unfit }
+    })
+
+  // Warns when values of the link were left out because they no longer fit their field.
+  useUnfitSearchCriteriaNotice(unfitFieldIds)
+
   const [formValuesByTabId, setFormValuesByTabId] = useState<
     Record<string, EventState>
-  >(() => {
-    const initialState: Record<string, EventState> = {}
-    const currentEvent = advancedSearchEvents.find(
-      (e) => e.id === searchParams.eventType
-    )
-    for (const event of advancedSearchEvents) {
-      if (currentEvent && currentEvent.id === event.id) {
-        const parsedParams = parseFieldSearchParams(
-          event,
-          searchParams,
-          adminStructure
-        )
-        initialState[event.id] = parsedParams
-      } else {
-        initialState[event.id] = {}
-      }
-    }
-    return initialState
-  })
+  >(initialFormValuesByTabId)
 
   const formTabSections = advancedSearchEvents.map((a) => ({
     id: a.id,

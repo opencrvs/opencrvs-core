@@ -35,13 +35,12 @@ import {
   payloadGenerator,
   setupHierarchyWithUsers
 } from '@events/tests/generators'
-import { createIndex } from '@events/service/indexing/indexing'
-import { getEventIndexName } from '@events/storage/elasticsearch'
+import { createEventIndex } from '@events/tests/createEventIndex'
 import { EventNotFoundError } from '../../service/events/events'
 
 test('Check scopes against event.get', async () => {
-  await createIndex(
-    getEventIndexName('tennis-club-membership_premium'),
+  await createEventIndex(
+    'tennis-club-membership_premium',
     getDeclarationFields(tennisClubMembershipEvent)
   )
   // 1. Setup test fixture with a known set of users, administrative areas, and events.

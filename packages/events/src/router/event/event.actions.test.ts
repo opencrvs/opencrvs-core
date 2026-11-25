@@ -44,8 +44,7 @@ import {
   TEST_USER_DEFAULT_SCOPES,
   UNSTABLE_EVENT_FIELDS
 } from '@events/tests/utils'
-import { createIndex } from '@events/service/indexing/indexing'
-import { getEventIndexName } from '@events/storage/elasticsearch'
+import { createEventIndex } from '@events/tests/createEventIndex'
 import { mswServer } from '../../tests/msw'
 import { env } from '../../environment'
 
@@ -269,8 +268,8 @@ const multiFileConfig = withDeclaration(
 ) satisfies EventConfig
 
 beforeEach(async () => {
-  return createIndex(
-    getEventIndexName(multiFileConfig.id),
+  return createEventIndex(
+    multiFileConfig.id,
     getDeclarationFields(tennisClubMembershipEvent)
   )
 })
