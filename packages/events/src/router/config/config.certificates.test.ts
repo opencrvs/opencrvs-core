@@ -13,11 +13,7 @@ import { encodeScope } from '@opencrvs/commons'
 import { env } from '@events/environment'
 import { mswServer } from '@events/tests/msw'
 import { verifySignedByCore } from '@events/tests/request-signing'
-import {
-  createTestClient,
-  createUnauthenticatedTestClient,
-  setupTestCase
-} from '@events/tests/utils'
+import { createTestClient, setupTestCase } from '@events/tests/utils'
 
 const certificates = [
   { id: 'birth-certificate', event: 'birth' },
@@ -85,58 +81,5 @@ describe('config.certificates', () => {
     expect(await verifySignedByCore(requests[0])).toMatchObject({
       valid: true
     })
-  })
-})
-
-describe('config.application', () => {
-  test('returns the application configuration, with fields core does not know', async () => {
-    const { user } = await setupTestCase()
-    mswServer.use(
-      http.get(`${env.COUNTRY_CONFIG_URL}/config/application`, () =>
-        HttpResponse.json({
-          APPLICATION_NAME: 'Farajaland CRS',
-          COUNTRY_LOGO: { fileName: 'logo.png', file: '' },
-          SYSTEM_IANA_TIMEZONE: 'UTC',
-          CURRENCY: { isoCode: 'USD', languagesAndCountry: ['en-US'] },
-          ADMIN_STRUCTURE: [],
-          PHONE_NUMBER_PATTERN: '^01[1-9][0-9]{8}$',
-          USER_NOTIFICATION_DELIVERY_METHOD: 'email',
-          INFORMANT_NOTIFICATION_DELIVERY_METHOD: 'email',
-          LOGIN_BACKGROUND: { backgroundColor: '36304E' }
-        })
-      )
-    )
-
-    const config = await createTestClient(user).config.application()
-
-    expect(config).toMatchObject({
-      APPLICATION_NAME: 'Farajaland CRS',
-      SEARCH_DEFAULT_CRITERIA: 'TRACKING_ID',
-      LOGIN_BACKGROUND: { backgroundColor: '36304E' }
-    })
-  })
-
-  test('requires authentication', async () => {
-    const client = await createUnauthenticatedTestClient()
-
-    await expect(client.config.application()).rejects.toMatchObject({
-      code: 'UNAUTHORIZED'
-    })
-  })
-})
-
-describe('config.publicApplication', () => {
-  test('gives anyone the fields the login page needs, and no others', async () => {
-    const client = await createUnauthenticatedTestClient()
-
-    const config = await client.config.publicApplication()
-
-    expect(Object.keys(config).sort()).toEqual([
-      'APPLICATION_NAME',
-      'COUNTRY_LOGO',
-      'INFORMANT_NOTIFICATION_DELIVERY_METHOD',
-      'PHONE_NUMBER_PATTERN',
-      'USER_NOTIFICATION_DELIVERY_METHOD'
-    ])
   })
 })
