@@ -50,8 +50,17 @@ cleanupOutdatedCaches()
 registerRoute(/http(.+)config\.js$/, new NetworkFirst())
 // This caches the certificate config file fetched from country config
 registerRoute(/http(.+)certificate-configuration$/, new NetworkFirst())
-// This caches font files fetched from country config
-registerRoute(/http(.+)fonts\/.*\.ttf$/, new NetworkFirst())
+// This caches font files fetched from country config. On a slow connection, the
+// cached font is used after 3 seconds, so that certificates do not wait for the network.
+// The font responses vary by origin, and the preview and the PDF request the fonts
+// with different headers. The cache ignores Vary, so that both match the cached font.
+registerRoute(
+  /http(.+)fonts\/.*\.ttf$/,
+  new NetworkFirst({
+    networkTimeoutSeconds: 3,
+    matchOptions: { ignoreVary: true }
+  })
+)
 // This caches validations fetched from country config
 registerRoute(/http(.+)validators\.js$/, new NetworkFirst())
 // This caches handlebars fetched from country config
