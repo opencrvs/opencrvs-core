@@ -10,17 +10,20 @@
 # Starts a release on its line's branch, release/<major>.<minor>.x, where the
 # version bump and an empty CHANGELOG section are committed.
 # forward-merge-release-lines.yml carries it into the newer lines.
+#
+# When a release vX.Y.Z is published, this workflow starts the next patch,
+# X.Y.(Z+1), so that the fixes after the release have a CHANGELOG section.
+# Run it by hand for the first release of a line, X.Y.0.
 name: Release - Start a new release
 on:
+  release:
+    types: [published]
   workflow_dispatch:
     inputs:
       version:
         type: string
         required: true
         description: 'Version to release'
-
-env:
-  VERSION: ${{ inputs.version }}
 
 # Pushes the line branch and the draft release's tag. The companion repos and
 # e2e are reached with their own tokens.
@@ -29,8 +32,33 @@ permissions:
 
 jobs:
   release_workflow:
+    # A pre-release, or a tag such as v2.1.0-beta, does not start a patch.
+    if: >-
+      github.event_name == 'workflow_dispatch' ||
+      (!github.event.release.prerelease &&
+       startsWith(github.event.release.tag_name, 'v') &&
+       !contains(github.event.release.tag_name, '-'))
     runs-on: ubuntu-latest
     steps:
+      - name: Work out the version
+        env:
+          INPUT_VERSION: ${{ inputs.version }}
+          TAG: ${{ github.event.release.tag_name }}
+        run: |
+          if [ "$GITHUB_EVENT_NAME" = "workflow_dispatch" ]; then
+            echo "VERSION=$INPUT_VERSION" >> "$GITHUB_ENV"
+            exit 0
+          fi
+
+          if [[ ! $TAG =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            echo "::error::$TAG is not a vX.Y.Z tag, so the next patch is not known."
+            exit 1
+          fi
+
+          IFS='.' read -r x y z <<< "${TAG#v}"
+          echo "VERSION=$x.$y.$((z + 1))" >> "$GITHUB_ENV"
+          echo "$TAG is published. The next patch is $x.$y.$((z + 1))."
+
       # Runs before the checkout, so it cannot read the repository.
       - name: Work out the release line
         id: line
@@ -111,6 +139,9 @@ jobs:
       # The companion repos cut their own release branches. target_branch tells
       # them which of core's branches the release is made on.
       #
+      # countryconfig and testland run the workflow from their line branch.
+      # infrastructure runs it from develop. That workflow serves all the lines.
+      #
       # TODO: countryconfig and testland only cut release branches on the 1.9.x
       # line. Drop them from this list once this branch reaches develop.
       - name: Trigger the companion workflows
@@ -118,19 +149,20 @@ jobs:
           COUNTRYCONFIG_TOKEN: ${{ secrets.COUNTRYCONFIG_WORKFLOW_TOKEN }}
           INFRASTRUCTURE_TOKEN: ${{ secrets.INFRASTRUCTURE_WORKFLOW_TOKEN }}
           TESTLAND_TOKEN: ${{ secrets.TESTLAND_WORKFLOW_TOKEN }}
+          LINE_BRANCH: ${{ steps.line.outputs.branch }}
         run: |
-          trigger() { # repo, token
+          trigger() { # repo, token, ref
             GH_TOKEN="$2" gh workflow run init-release.yml \
               --repo "opencrvs/$1" \
-              --ref "${{ github.ref_name }}" \
+              --ref "$3" \
               -f version="$VERSION" \
               -f target_branch="${{ steps.line.outputs.branch }}"
             echo "Triggered init-release in $1"
           }
 
-          trigger opencrvs-countryconfig "$COUNTRYCONFIG_TOKEN"
-          trigger infrastructure "$INFRASTRUCTURE_TOKEN"
-          trigger opencrvs-testland "$TESTLAND_TOKEN"
+          trigger opencrvs-countryconfig "$COUNTRYCONFIG_TOKEN" "$LINE_BRANCH"
+          trigger infrastructure "$INFRASTRUCTURE_TOKEN" develop
+          trigger opencrvs-testland "$TESTLAND_TOKEN" "$LINE_BRANCH"
 
       # Core PRs into release/<major>.<minor>.x run against the e2e branch of
       # the same name. The first release of a line cuts that branch from e2e's
