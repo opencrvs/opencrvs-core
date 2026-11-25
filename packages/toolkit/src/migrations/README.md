@@ -1,15 +1,15 @@
 # Country config migrations (codemods)
 
 Codemods run by `opencrvs upgrade` against a country config repo to upgrade it
-to the next major OpenCRVS version. Each version has its own folder, e.g. `v2.0/`.
+to the next major OpenCRVS version. Each version has its own folder, e.g. `v2.1/`.
 
 Run from inside a country config checkout:
 
 ```bash
-opencrvs upgrade [--docker-swarm]
+opencrvs upgrade [--docker-swarm | --remove-infrastructure]
 ```
 
-Related documentation: https://documentation.opencrvs.org/v2.0/technical/guides/version-upgrades#step-2-update-code-and-test-locally
+Related documentation: https://documentation.opencrvs.org/technical/guides/version-upgrades
 
 ## Translations are already handled
 
@@ -26,10 +26,10 @@ itself, which an upgrade has no business rewriting.
 
 ## Adding a step
 
-1. **Create** `v2.0/<your-step-name>.ts` — export `async function main()` that
+1. **Create** `v2.1/<your-step-name>.ts` — export `async function main()` that
    mutates files under `process.cwd()`.
 
-2. **Wire up** in `v2.0/index.ts`:
+2. **Wire up** in `v2.1/index.ts`:
 
    ```ts
    import { main as yourStepName } from './your-step-name'
@@ -43,13 +43,11 @@ itself, which an upgrade has no business rewriting.
 
 ```bash
 cd opencrvs-core/packages/toolkit
-yarn build:all
-yarn link "@opencrvs/toolkit"
+pnpm build:all
 
 cd opencrvs-countryconfig
-yarn link "@opencrvs/toolkit"
-yarn
-./node_modules/@opencrvs/toolkit/dist/cli.js upgrade && rm -rf src/api/notification/testData.ts && git reset src/analytics && yarn test:compilation
+pnpm link <path-to>/opencrvs-core/packages/toolkit
+./node_modules/@opencrvs/toolkit/dist/cli.js upgrade && rm -rf src/api/notification/testData.ts && git reset src/analytics && pnpm test:compilation
 ```
 
 We also have a CI check which runs the codemod script in [`.github/workflows/test-upgrade-script.yml`](../../../../.github/workflows/test-upgrade-script.yml)
