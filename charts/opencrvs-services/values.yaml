@@ -130,6 +130,19 @@ hostname: opencrvs.localhost
 #            - register-opencrvs.localhost
 subdomain_separator: '.'
 
+# routing: how the services share `hostname`.
+routing:
+  # mode: subdomain | path
+  # - subdomain: every service has its own name, <service><subdomain_separator><hostname>.
+  # - path: all services share `hostname`, so one DNS record and one certificate are enough.
+  #     - the client is at https://<hostname>/
+  #     - the login app is at https://<hostname>/login. The client and login apps use this path in their code.
+  #     - countryconfig is at https://<hostname>/api/countryconfig, through the client
+  #     - S3 objects are at https://<hostname>/<bucket>/, see the dependencies chart
+  #   Metabase stays on metabase<subdomain_separator><hostname>, because it cannot run under a path.
+  #   Use the same mode in the dependencies chart. It needs login and client images that have base path support.
+  mode: subdomain
+
 # This section allows manually define credentials
 credentials:
   {}

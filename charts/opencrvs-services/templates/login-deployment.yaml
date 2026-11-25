@@ -12,13 +12,16 @@ spec:
     - web
   {{- end }}
   routes:
-  - match: 'Host(`{{ include "render-external-subdomain" (dict "service_name" "login" "Values" .Values) }}`) || Host(`{{ .Values.hostname }}`)'
+  - match: '{{ include "render-login-rule" . }}'
     kind: Rule
     services:
     - name: login
       namespace: {{ .Release.Namespace }}
       port: {{ .Values.login.port }}
     middlewares:
+      {{- if include "is-path-routing" . }}
+      - name: login-strip-prefix
+      {{- end }}
       - name: sts-and-basic-response-headers
       - name: enable-compression
       {{- if .Values.ingress.application_allowlist }}
@@ -66,6 +69,11 @@ spec:
           }}
             - name: CONTENT_SECURITY_POLICY_WILDCARD
               value: "*.{{ .Values.hostname }}"
+          {{- end }}
+          {{- if include "is-path-routing" . }}
+            # The app uses it as <base href>, so that its files and routes work under the login path
+            - name: LOGIN_BASE_HREF
+              value: {{ include "login-path" . }}/
           {{- end }}
             - name: COUNTRY_CONFIG_URL_INTERNAL
               value: http://countryconfig.{{ .Release.Namespace }}.svc.cluster.local:3040

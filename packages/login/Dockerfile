@@ -19,6 +19,7 @@ USER root
 RUN sed -i '1iload_module modules/ngx_otel_module.so;' /etc/nginx/nginx.conf
 USER nginx
 
+ENV LOGIN_BASE_HREF=/
 ENV OTEL_NGINX_TRACE=off
 ENV OTEL_NGINX_EXPORTER_ENDPOINT=127.0.0.1:4317
 ENV OTEL_NGINX_SERVICE_NAME=opencrvs_login

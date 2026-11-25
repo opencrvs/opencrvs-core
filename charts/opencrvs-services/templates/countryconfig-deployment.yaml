@@ -12,6 +12,18 @@ spec:
     - web
   {{- end }}
   routes:
+  {{- if include "is-path-routing" . }}
+  {{- /* The client proxies /api/countryconfig/ to countryconfig, so it needs no route of its own. This route blocks the same paths as the routes of the countryconfig subdomain below. */}}
+  - match: 'Host(`{{ .Values.hostname }}`) && (Path(`/api/countryconfig/email`) || Path(`/api/countryconfig/notification`) || Path(`/api/countryconfig/dashboards/queries.json`))'
+    kind: Rule
+    priority: 500
+    # Placeholder only, see internal-routes-ingressroute.yaml
+    services:
+    - name: noop@internal
+      kind: TraefikService
+    middlewares:
+      - name: block-internal-routes
+  {{- else }}
   - match: 'Host(`{{ include "render-external-subdomain" (dict "service_name" "countryconfig" "Values" .Values) }}`) && !Path(`/email`) && !Path(`/notification`) && !Path(`/dashboards/queries.json`)'
     kind: Rule
     services:
@@ -48,6 +60,7 @@ spec:
       port: {{ .Values.countryconfig.port }}
     middlewares:
       - name: block-internal-routes
+  {{- end }}
   {{- if .Values.ingress.tls_resolver }}
   tls:
     certResolver: {{ .Values.ingress.tls_resolver }}

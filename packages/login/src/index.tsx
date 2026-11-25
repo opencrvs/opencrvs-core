@@ -35,6 +35,8 @@ const { store } = createStore()
 const container = document.getElementById('root')
 const root = createRoot(container!)
 const router = createBrowserRouter(routesConfig, {
+  // "/" or the path that nginx put in <base href>, for example "/login/"
+  basename: new URL(document.baseURI).pathname,
   future: {
     v7_relativeSplatPath: true,
     v7_fetcherPersist: true,

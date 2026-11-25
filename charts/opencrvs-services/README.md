@@ -220,6 +220,11 @@ helm upgrade --install opencrvs oci://ghcr.io/opencrvs/opencrvs-services \
             <td>Separator between <code>hostname</code> and subdomains. See values.yaml for more information.</td>
         </tr>
         <tr>
+            <td>routing.mode</td>
+            <td><code>subdomain</code></td>
+            <td><code>subdomain</code> gives each service its own name. <code>path</code> serves the client, the login app, countryconfig and the S3 objects from <code>hostname</code>, so one DNS record and one certificate are enough. See <a href="#single-domain-deployment">Single domain deployment</a>.</td>
+        </tr>
+        <tr>
             <td>ingress.ssl_enabled</td>
             <td>true</td>
             <td>Enable or disable https endpoint, by default all http traffic is routed to https</td>
@@ -711,6 +716,26 @@ ingress:
 The public dashboards on the Metabase host are left untouched, since the Performance page embeds them for every user: `/public/`, `/app/` (static assets), `/api/public/`, `/api/geojson/` (custom region maps) and `/api/session/properties` follow `application_allowlist` instead, and everything else on the host is the admin console.
 
 Set the same key in the dependencies chart's `values.yaml` to also restrict the RustFS console and Kibana (the S3 API route is left untouched, since it typically needs to stay public for presigned object URLs).
+
+# Single domain deployment
+
+Set `routing.mode: path` to serve OpenCRVS from `hostname` alone. Use the same mode in the dependencies chart.
+
+| Service       | Subdomain mode (default)        | Path mode                                                                                     |
+| ------------- | ------------------------------- | --------------------------------------------------------------------------------------------- |
+| Client        | `<hostname>`                    | `https://<hostname>/`                                                                         |
+| Login         | `login<separator><hostname>`    | `https://<hostname>/login`                                                                    |
+| Countryconfig | `countryconfig<separator>...`   | `https://<hostname>/api/countryconfig`, through the client proxy                              |
+| S3 objects    | `rustfs<separator><hostname>`   | `https://<hostname>/<bucket>/`, see the dependencies chart                                    |
+| Metabase      | `metabase<separator><hostname>` | No change. Metabase cannot run under a path. Disable `dashboards` for a strict single domain. |
+
+In path mode:
+
+- The client route has the lowest priority, so every path that no other route takes goes to the client.
+- The login route takes `/login` and `/register`. After sign-in, the login app goes to `/register/?refreshToken=...`. The nginx of login redirects that request to the client, as it does on the login subdomain. Traefik removes `/login` from the path before it reaches login, so login serves its files from `/`.
+- The chart sets `LOGIN_BASE_HREF=/login/` on the login container. The nginx of login writes it into `<base href>` of the page, and the router of login uses it as its base path.
+
+Path mode needs login and client images that have base path support. An older login image ignores `LOGIN_BASE_HREF` and does not load under `/login`.
 
 # Authentication configuration
 
