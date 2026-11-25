@@ -1687,8 +1687,8 @@ importers:
         specifier: ^6.0.10
         version: 6.2.8
       nodemailer:
-        specifier: ^8.0.0
-        version: 8.0.11
+        specifier: ^10.0.0
+        version: 10.6.1
       tsx:
         specifier: ^4.19.2
         version: 4.23.1
@@ -1840,8 +1840,8 @@ importers:
         specifier: ^2.6.1
         version: 2.7.0(encoding@0.1.13)
       nodemailer:
-        specifier: ^7.0.11
-        version: 7.0.13
+        specifier: ^10.0.0
+        version: 10.6.1
       opener:
         specifier: ^1.5.1
         version: 1.5.2
@@ -5751,7 +5751,9 @@ packages:
   '@smithy/core@3.36.0':
     resolution: {integrity: sha512-3hJiwG1F5t1SoXqp/yOCmYXziyx7ZVqF63S5W6YU201e/qwVaHPex+E/3vvyY9a3ORq/b+BydeNZpP2saQ9X2g==}
     engines: {node: '>=18.0.0'}
-    deprecated: Deprecated due to a bug in custom logger data redaction. See https://github.com/aws/aws-sdk-js-v3/issues/8393.
+    deprecated: |-
+      Deprecated due to a bug in custom logger data redaction. Upgrade to the latest version. If you used a custom logger with this
+        version, review your logs and rotate any credentials or other secrets. See https://github.com/aws/aws-sdk-js-v3/issues/8393.
 
   '@smithy/credential-provider-imds@4.5.2':
     resolution: {integrity: sha512-A9uSdn72ozbRUSit0eib0TW7nXuNPlaeM0zcGkJ+nE6tFcSDbnmtwoxbTCFBukVQcszDAyvsd7+rTduPTXpygg==}
@@ -12165,13 +12167,9 @@ packages:
     resolution: {integrity: sha512-rfl4GWMygQfzlExPkQ2LWyya5n2jOBm5vhEnup+4mdw7tQhNpJWbP5ldr09Jfj93k5SfY5lxcn8od5qrQ/6mBg==}
     engines: {node: '>= 10'}
 
-  nodemailer@7.0.13:
-    resolution: {integrity: sha512-PNDFSJdP+KFgdsG3ZzMXCgquO7I6McjY2vlqILjtJd0hy8wEvtugS9xKRF2NWlPNGxvLCXlTNIae4serI7dinw==}
-    engines: {node: '>=6.0.0'}
-
-  nodemailer@8.0.11:
-    resolution: {integrity: sha512-nrO/pDAUKl+wXX+lx16tDLbnm0fW6sK/x8mgohaCpg+CdCEl482bD4tCuAZk2DyliruiNTIZxRCoWkDqJEnAiA==}
-    engines: {node: '>=6.0.0'}
+  nodemailer@10.6.1:
+    resolution: {integrity: sha512-d7kfFfS/tR4Aca+SBvRaQ+MXKNv7d2JiRe5TxaRcFT/kYMh4GGPnW9aKksTIEvyEbA7d/7HYWE4YPDEHxzJj/g==}
+    engines: {node: '>=20.0.0'}
 
   nodemon@2.0.22:
     resolution: {integrity: sha512-B8YqaKMmyuCO7BowF1Z1/mkPqLk6cs/l63Ojtd6otKjMx47Dq1utxfRxcavH1I7VSaL8n5BUaoutadnsX3AAVQ==}
@@ -28451,9 +28449,7 @@ snapshots:
       shell-escape: 0.2.0
       ssh2: 1.17.0
 
-  nodemailer@7.0.13: {}
-
-  nodemailer@8.0.11: {}
+  nodemailer@10.6.1: {}
 
   nodemon@2.0.22:
     dependencies:
