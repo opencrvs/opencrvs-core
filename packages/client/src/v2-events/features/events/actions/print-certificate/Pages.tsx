@@ -33,6 +33,8 @@ import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents
 import { FormLayout } from '@client/v2-events/layouts'
 import { ROUTES } from '@client/v2-events/routes'
 import { useValidatorContext } from '@client/v2-events/hooks/useValidatorContext'
+import { useAppConfig } from '@client/v2-events/hooks/useAppConfig'
+import { loadCertificateFonts } from '@client/v2-events/hooks/useCertificateFonts'
 
 export function Pages() {
   const { eventId, pageId } = useTypedParams(
@@ -80,6 +82,17 @@ export function Pages() {
       )
     }
   }, [pageId, currentPageId, navigate, eventId, searchParams])
+
+  const { certificateTemplates } = useAppConfig()
+  const templateFonts = certificateTemplates.find(
+    (template) => template.id === annotation[CERT_TEMPLATE_ID]
+  )?.fonts
+
+  // Preload the fonts used on certificates while the user fills the form,
+  // so that the review page does not need to wait for them.
+  useEffect(() => {
+    void loadCertificateFonts(templateFonts)
+  }, [templateFonts])
 
   const pagesValidatorContext = {
     ...validatorContext,

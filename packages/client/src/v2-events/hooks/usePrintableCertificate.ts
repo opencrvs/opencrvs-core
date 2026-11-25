@@ -128,7 +128,7 @@ export const usePrintableCertificate = ({
 
   const certificateFonts = certificateConfig.fonts ?? {}
 
-  const svgWithoutFonts = compileSvg({
+  const svgCode = compileSvg({
     templateString: certificateConfig.svg,
     $metadata: modifiedMetadata,
     $declaration: declaration,
@@ -141,8 +141,6 @@ export const usePrintableCertificate = ({
     config,
     adminLevels
   })
-
-  const svgCode = addFontsToSvg(svgWithoutFonts, certificateFonts)
 
   /**
    * NOTE: We have separated the preparing and printing of the PDF certificate. Without the separation, user is already unassigned from the event and cache is cleared. We end up losing the images in the PDF unless we run actions in correct order.
