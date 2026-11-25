@@ -12,10 +12,13 @@ import { defineConfig, devices } from '@playwright/test'
 
 const TEST_TIMEOUT = 180_000
 
-const subdomains = ['register'] // TODO: Add more subdomains if needed
-const insecureOrigins = subdomains.map(
-  (subdomain) =>
-    `--unsafely-treat-insecure-origin-as-secure=https://${subdomain}.${process.env.DOMAIN}`
+// ROUTING_MODE=path: everything is on DOMAIN, there is no register subdomain
+const hosts =
+  process.env.ROUTING_MODE === 'path'
+    ? [process.env.DOMAIN]
+    : [`register.${process.env.DOMAIN}`] // TODO: Add more subdomains if needed
+const insecureOrigins = hosts.map(
+  (host) => `--unsafely-treat-insecure-origin-as-secure=https://${host}`
 )
 
 const ignoreHTTPSErrors = process.env.CI ? true : false

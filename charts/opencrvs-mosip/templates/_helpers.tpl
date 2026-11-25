@@ -9,7 +9,12 @@
 {{- define "render-external-url" -}}
 {{- $service_name := .service_name }}
 {{- $http_scheme := include "http-scheme" . }}
+{{- if and (eq .Values.routing.mode "path") (eq $service_name "register") }}
+{{- /* The OpenCRVS client has no name of its own in path mode */}}
+{{- printf "%s://%s" $http_scheme .Values.hostname }}
+{{- else }}
 {{- printf "%s://%s.%s" $http_scheme $service_name .Values.hostname }}
+{{- end }}
 {{- end }}
 
 {{/*

@@ -1,0 +1,3 @@
+{{- if not (has .Values.routing.mode (list "subdomain" "path")) }}
+{{- fail (printf "routing.mode: %v is not supported. Use subdomain or path" .Values.routing.mode) }}
+{{- end }}

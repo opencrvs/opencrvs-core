@@ -223,6 +223,11 @@ jobs:
         run: |
           export NODE_EXTRA_CA_CERTS=/tmp/letsencrypt-stg-root-x1.pem
           curl -s -o $NODE_EXTRA_CA_CERTS https://letsencrypt.org/certs/staging/letsencrypt-stg-root-x1.pem
+          # The deployed environment decides the routing mode, so ask it. On a single domain (routing.mode: path)
+          # /login is the login app and answers 200. With subdomains, the client redirects /login to login.<domain>.
+          status=$(curl -s --cacert "$NODE_EXTRA_CA_CERTS" -o /dev/null -w '%{http_code}' --max-time 30 "https://${DOMAIN}/login" || true)
+          if [ "$status" = "200" ]; then export ROUTING_MODE=path; else export ROUTING_MODE=subdomain; fi
+          echo "GET https://${DOMAIN}/login answered ${status}, so ROUTING_MODE=${ROUTING_MODE}"
           npx playwright test ${{ join(matrix.files, ' ') }}
         env:
           DOMAIN: ${{ inputs.domain }}
