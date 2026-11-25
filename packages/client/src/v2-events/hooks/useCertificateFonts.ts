@@ -11,6 +11,7 @@
 
 import { useEffect, useState } from 'react'
 import { CertificateTemplateConfig } from '@opencrvs/commons/client'
+import { useAppConfig } from '@client/v2-events/hooks/useAppConfig'
 
 type CertificateFonts = NonNullable<CertificateTemplateConfig['fonts']>
 
@@ -24,7 +25,7 @@ const FONT_VARIANTS = {
 /** Each font face loads one time, so that the next preview does not wait for the network. */
 const fontFaces = new Map<string, Promise<FontFace>>()
 
-function loadFontFace(
+async function loadFontFace(
   family: string,
   variant: keyof typeof FONT_VARIANTS,
   url: string
@@ -45,15 +46,29 @@ function loadFontFace(
   return fontFace
 }
 
-/** Loads the fonts of a certificate. Call it early, so that the preview does not wait for the fonts. */
-export function loadCertificateFonts(fonts: CertificateFonts | undefined) {
+async function loadCertificateFonts(fonts: CertificateFonts | undefined) {
   const promises = Object.entries(fonts ?? {}).flatMap(([family, variants]) =>
-    Object.entries(variants).map(([variant, url]) =>
+    Object.entries(variants).map(async ([variant, url]) =>
       loadFontFace(family, variant as keyof typeof FONT_VARIANTS, url)
     )
   )
 
   return Promise.allSettled(promises)
+}
+
+/**
+ * Loads the fonts of a certificate template while the user fills the print form, so that the
+ * review page does not need to wait for them. The fonts are not added to the document.
+ */
+export function usePreloadCertificateFonts(templateId: string) {
+  const { certificateTemplates } = useAppConfig()
+  const fonts = certificateTemplates.find(
+    (template) => template.id === templateId
+  )?.fonts
+
+  useEffect(() => {
+    void loadCertificateFonts(fonts)
+  }, [fonts])
 }
 
 /**
