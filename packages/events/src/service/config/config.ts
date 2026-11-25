@@ -11,9 +11,10 @@
 
 import { pick } from 'lodash'
 import fetch from 'node-fetch'
-import { array, object, string } from 'zod'
+import { array } from 'zod'
 import {
   ApplicationConfig,
+  CertificateConfig,
   EventDocument,
   getEventConfigById,
   getEventConfigForRecord,
@@ -260,9 +261,6 @@ async function getRoles() {
 
 export const getInMemoryRoles = createTtlConfigCache('roles', getRoles)
 
-/** Certificate templates are opaque to core, apart from their id. */
-const CertificateConfig = object({ id: string() }).passthrough()
-
 async function getCertificateConfigurations() {
   const res = await fetchConfig('/certificates')
 
@@ -270,7 +268,7 @@ async function getCertificateConfigurations() {
     throw new Error(`Failed to fetch certificates config: ${res.status}`)
   }
 
-  return array(CertificateConfig).parse(await res.json())
+  return array(CertificateConfig.loose()).parse(await res.json())
 }
 
 /**
