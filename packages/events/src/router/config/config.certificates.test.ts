@@ -9,11 +9,16 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { http, HttpResponse } from 'msw'
-import { encodeScope } from '@opencrvs/commons'
+import { TRPCError } from '@trpc/server'
+import { encodeScope, getUUID } from '@opencrvs/commons'
 import { env } from '@events/environment'
 import { mswServer } from '@events/tests/msw'
 import { verifySignedByCore } from '@events/tests/request-signing'
-import { createTestClient, setupTestCase } from '@events/tests/utils'
+import {
+  createSystemTestClient,
+  createTestClient,
+  setupTestCase
+} from '@events/tests/utils'
 
 const certificates = [
   { id: 'birth-certificate', event: 'birth' },
@@ -65,6 +70,17 @@ describe('config.certificates', () => {
     const client = createTestClient(user, [])
 
     expect(await client.config.certificates()).toEqual([])
+  })
+
+  test('rejects a system client, even one with the print scope', async () => {
+    serveCertificates()
+    const client = createSystemTestClient(getUUID(), [
+      encodeScope({ type: 'record.print-certified-copies' })
+    ])
+
+    await expect(client.config.certificates()).rejects.toMatchObject(
+      new TRPCError({ code: 'FORBIDDEN' })
+    )
   })
 
   test('reads the certificates signed as core, without the user token', async () => {
