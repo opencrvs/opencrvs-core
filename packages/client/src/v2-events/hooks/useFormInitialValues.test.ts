@@ -18,18 +18,14 @@ import {
   InteractiveFieldType
 } from '@opencrvs/commons/client'
 import { generateTranslationConfig } from '@opencrvs/commons/client'
-import { EventlessFormConditionalContext } from '@client/v2-events/components/forms/formConditionalContext'
+import { generateTestEventlessConditionalContext } from '@client/tests/conditional-context'
 import { computeInitialValues } from './useFormInitialValues'
 
 // ---------------------------------------------------------------------------
 // computeInitialValues
 // ---------------------------------------------------------------------------
 
-// @todo: use generator/real uuid
-const emptyContext: EventlessFormConditionalContext = {
-  user: { sub: 'test-user', scope: [], userType: 'user' },
-  leafAdminStructureLocationIds: []
-}
+const emptyContext = generateTestEventlessConditionalContext()
 const t = generateTranslationConfig
 
 /** Stub that returns the raw string defaultValue, or undefined. */

@@ -167,9 +167,8 @@ export const FormFieldGenerator = forwardRef<
             siblingValues
           )
         )
-          .map(([, errs]) => errs[0]?.message)
-          .filter((message) => message !== undefined)
-          .map((message) => intl.formatMessage(message))
+          .filter(([, errs]) => errs.length > 0)
+          .map(([, errs]) => intl.formatMessage(errs[0].message))
         if (currentErrors.length === 0) {
           onValidSubmit?.(updatedFormValues)
         }
@@ -218,7 +217,10 @@ export const FormFieldGenerator = forwardRef<
                 conditionalContext,
                 siblingValues
               ),
-              (errs) => errs[0]?.message && intl.formatMessage(errs[0].message)
+              (errs) =>
+                errs.length > 0
+                  ? intl.formatMessage(errs[0].message)
+                  : undefined
             )
           )
         }

@@ -15,8 +15,8 @@ import {
   FieldType,
   FormConfig
 } from '@opencrvs/commons/client'
+import { generateTestEventlessConditionalContext } from '@client/tests/conditional-context'
 import { validationErrorsInActionFormExist } from './validation'
-import { EventlessFormConditionalContext } from './formConditionalContext'
 
 const formConfig: FormConfig = {
   label: { id: 'form.label', defaultMessage: 'Form', description: 'Form' },
@@ -51,11 +51,7 @@ const signature = {
   originalFilename: 'abcd.png',
   type: 'image/png'
 }
-// @todo: real uuid/generator user.
-const conditionalContext: EventlessFormConditionalContext = {
-  user: { sub: 'test-user', scope: [], userType: 'user' },
-  leafAdminStructureLocationIds: []
-}
+const conditionalContext = generateTestEventlessConditionalContext()
 
 describe('validationErrorsInActionFormExist', () => {
   it('accepts a signed review field whose visibility depends on the declaration', () => {

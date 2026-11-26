@@ -33,6 +33,7 @@ import {
 import { getFieldsOfAllVersions } from '@client/v2-events/features/events/useEventConfiguration'
 import { toVersionedLocation } from '@client/v2-events/VersionedLocation'
 import { AdminStructureItem } from '@client/utils/referenceApi'
+import { generateTestEventlessConditionalContext } from '@client/tests/conditional-context'
 import {
   getMetadataFieldConfigs,
   buildSearchQuery,
@@ -65,11 +66,11 @@ describe('getAdvancedSearchFieldErrors', () => {
       tennisClubMembershipEvent,
       ADMIN_STRUCTURE
     )
-    // @TODO: use generated user /properid
-    const errors = getAdvancedSearchFieldErrors(sections, mockFormValues, {
-      user: { sub: 'test-user', scope: [], userType: 'user' },
-      leafAdminStructureLocationIds: []
-    })
+    const errors = getAdvancedSearchFieldErrors(
+      sections,
+      mockFormValues,
+      generateTestEventlessConditionalContext()
+    )
     expect(errors).toEqual({
       'applicant.name': [],
       'recommender.name': [],

@@ -19,15 +19,11 @@ import {
   tennisClubMembershipEvent,
   withDeclaration
 } from '@opencrvs/commons/client'
-import { EventlessFormConditionalContext } from '@client/v2-events/components/forms/formConditionalContext'
+import { generateTestEventlessConditionalContext } from '@client/tests/conditional-context'
 import { getCleanedDeclarationDiff, getSubmissionForm } from './declarationDiff'
 
 const eventConfiguration = tennisClubMembershipEvent
-// @todo: real uuid/generator user.
-const conditionalContext: EventlessFormConditionalContext = {
-  user: { sub: 'test-user', scope: [], userType: 'user' },
-  leafAdminStructureLocationIds: []
-}
+const conditionalContext = generateTestEventlessConditionalContext()
 
 type Submission = Parameters<typeof getSubmissionForm>[1]
 

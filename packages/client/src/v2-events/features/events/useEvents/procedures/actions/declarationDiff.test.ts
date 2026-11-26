@@ -24,7 +24,7 @@ import {
   getDeclarationPages
 } from '@opencrvs/commons/client'
 import type { ActionFormConditionalContext } from '@opencrvs/commons/client'
-import { EventlessFormConditionalContext } from '@client/v2-events/components/forms/formConditionalContext'
+import { generateTestEventlessConditionalContext } from '@client/tests/conditional-context'
 import {
   getChangedDeclarationDiff,
   getCleanedDeclarationDiff,
@@ -34,11 +34,7 @@ import {
 
 const eventConfiguration = tennisClubMembershipEvent
 const fields = getDeclarationFields(tennisClubMembershipEvent)
-// @todo: real uuid/generator user.
-const conditionalContext: EventlessFormConditionalContext = {
-  user: { sub: 'test-user', scope: [], userType: 'user' },
-  leafAdminStructureLocationIds: []
-}
+const conditionalContext = generateTestEventlessConditionalContext()
 
 const filledName = { firstname: 'Jane', surname: 'Doe' }
 const emptyName = { firstname: '', surname: '' }
