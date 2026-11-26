@@ -11,7 +11,9 @@
 
 import fetch from 'node-fetch'
 import { logger } from '@opencrvs/commons'
+import { withCoreSignature } from '@opencrvs/commons/request-signing'
 import { env } from '@events/environment'
+import { getCoreSigningKey } from '@events/request-signing'
 import { getIntegrationCreatorToken } from '@events/service/auth'
 
 const MAX_ATTEMPTS = 10
@@ -33,14 +35,16 @@ async function attemptSystemReady() {
   // The bootstrap token lives 60 seconds, which is shorter than the retry
   // window, so it is minted per attempt rather than once up front
   const bootstrapToken = await getIntegrationCreatorToken(REQUEST_TIMEOUT_MS)
-  const res = await fetch(
-    new URL('/trigger/system/ready', env.COUNTRY_CONFIG_URL).toString(),
-    {
-      method: 'GET',
-      headers: { Authorization: `Bearer ${bootstrapToken}` },
-      timeout: REQUEST_TIMEOUT_MS
-    }
-  )
+  const url = new URL('/trigger/system/ready', env.COUNTRY_CONFIG_URL)
+  const res = await fetch(url, {
+    // The signature proves the request comes from core. The bootstrap token
+    // is not a credential for this request: country config uses it to
+    // register its integrations with events. #14241 replaces it.
+    ...withCoreSignature(getCoreSigningKey(), url, {
+      headers: { Authorization: `Bearer ${bootstrapToken}` }
+    }),
+    timeout: REQUEST_TIMEOUT_MS
+  })
 
   // 404 and 501 mean the country config does not implement the trigger. That
   // is a valid configuration, not a failure worth retrying.
