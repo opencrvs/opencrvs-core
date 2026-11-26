@@ -8,7 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { vi, describe, it, expect, beforeEach } from 'vitest'
+import { vi, describe, it, expect, beforeEach, afterEach } from 'vitest'
 
 vi.mock('./notification/constant', async (importOriginal) => {
   const actual =
@@ -72,7 +72,7 @@ import {
   userNotificationTestData
 } from './notification/testData'
 import { createServer } from '../index'
-import { coreKey, publishCoreKey } from '../tests/core-request'
+import { coreKey } from '../tests/core-request'
 
 const [{ eventType, actionType, eventDocument }] = informantNotificationTestData
 const confirmationUrl = `/trigger/events/${eventType}/actions/${actionType}`
@@ -87,10 +87,17 @@ describe('Requests that only core may send', () => {
   let server: any
 
   beforeEach(async () => {
-    publishCoreKey()
+    // Serve the test key as auth's key list before the server starts.
+    vi.spyOn(global, 'fetch').mockResolvedValue(
+      new Response(JSON.stringify(coreKey.jwks))
+    )
     server = await createServer()
     // Clear the calls made while the server was starting up.
     ;(fetch as any).mockClear()
+  })
+
+  afterEach(() => {
+    vi.mocked(global.fetch).mockRestore()
   })
 
   it('accepts an action confirmation that core signed', async () => {

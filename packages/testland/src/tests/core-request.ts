@@ -8,14 +8,6 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { vi } from 'vitest'
 import { createTestCoreKey } from '@opencrvs/toolkit/request-signing'
 
 export const coreKey = createTestCoreKey()
-
-/** Serves the test key as auth's key list. Call before `createServer`. */
-export function publishCoreKey() {
-  vi.spyOn(global, 'fetch').mockResolvedValue(
-    new Response(JSON.stringify(coreKey.jwks))
-  )
-}
