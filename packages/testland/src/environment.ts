@@ -26,6 +26,9 @@ const uuidOrEmpty = makeValidator<string>((value) =>
   value === '' ? value : z.uuid().parse(value)
 )
 
+/** A UUID. Checked as strictly as `uuidOrEmpty`. */
+const uuid = makeValidator<string>((value) => z.uuid().parse(value))
+
 export const env = cleanEnv(process.env, {
   DOMAIN: str({ devDefault: '*' }),
   GATEWAY_URL: url({ devDefault: 'http://localhost:7070' }),
@@ -59,6 +62,14 @@ export const env = cleanEnv(process.env, {
     default: '',
     devDefault: '23953953-51aa-42ca-b443-2426a7d21c61',
     desc: "OpenCRVS system client ID to seed for the MOSIP integration on startup. Must be a UUID and match the mosip-api's OPENCRVS_CLIENT_ID. Leave empty to have events generate credentials instead (NSA reveals them via the Integrations page)."
+  }),
+  COUNTRY_CONFIG_CLIENT_ID: uuid({
+    devDefault: '3c726498-2b2f-47ae-8e53-f6e406a0de13',
+    desc: "OpenCRVS system client ID that country config calls core with, e.g. to read locations after an action confirmation. Core's requests to country config carry no token."
+  }),
+  COUNTRY_CONFIG_CLIENT_SECRET: str({
+    devDefault: '0fe62f63-657a-40fb-a406-cec6657dc0cc',
+    desc: 'OpenCRVS system client secret for COUNTRY_CONFIG_CLIENT_ID.'
   }),
   MOSIP_INTEGRATION_CLIENT_SECRET: str({
     default: '',

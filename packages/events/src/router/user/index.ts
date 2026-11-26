@@ -44,7 +44,7 @@ import {
   userOnlyProcedure
 } from '@events/router/trpc'
 import {
-  getApplicationConfig,
+  getPublicApplicationConfig,
   getInMemoryRoles
 } from '@events/service/config/config'
 import { generateHash } from '@events/service/auth/hash'
@@ -136,7 +136,7 @@ function getAuditLogIdentifiers(token: TokenWithBearer) {
 }
 
 async function validateMobile(mobile: string) {
-  const config = await getApplicationConfig()
+  const config = await getPublicApplicationConfig()
   let pattern: RegExp
   try {
     pattern = new RegExp(config.PHONE_NUMBER_PATTERN)
@@ -213,7 +213,7 @@ export async function handleCreateUser(
     })
   }
 
-  const user = await createUser(input, ctx.token)
+  const user = await createUser(input)
 
   const auditLogIdentifiers = getAuditLogIdentifiers(ctx.token)
   await writeAuditLog({
@@ -406,9 +406,7 @@ export const userRouter = router({
     .query(async ({ input }) => getUsersById(input)),
   search: searchUsersRoute(userAndSystemProcedure.use(canSearchUsers)),
   roles: router({
-    list: userOnlyProcedure.query(async ({ ctx }) =>
-      getInMemoryRoles(ctx.token)
-    )
+    list: userOnlyProcedure.query(async () => getInMemoryRoles())
   }),
   changePassword: userOnlyProcedure
     .input(
@@ -456,12 +454,10 @@ export const userRouter = router({
       }
 
       const nonce = generateNonce()
-      const rawToken = ctx.token.replace('Bearer ', '')
       const user = await getUser(ctx.user.id)
 
       await generateAndSendVerificationCode({
         nonce,
-        token: rawToken,
         notificationEvent: 'change-email-address',
         recipientName: user.name,
         phoneNumber: user.mobile,
@@ -486,12 +482,10 @@ export const userRouter = router({
       }
 
       const nonce = generateNonce()
-      const rawToken = ctx.token.replace('Bearer ', '')
       const user = await getUser(ctx.user.id)
 
       await generateAndSendVerificationCode({
         nonce,
-        token: rawToken,
         notificationEvent: 'change-phone-number',
         recipientName: user.name,
         phoneNumber: user.mobile,
@@ -691,7 +685,7 @@ export const userRouter = router({
     .mutation(async ({ input, ctx }) => {
       const userId = UUID.parse(input)
 
-      await resendInvite(userId, ctx.token)
+      await resendInvite(userId)
       const auditLogIdentifiers = getAuditLogIdentifiers(ctx.token)
       await writeAuditLog({
         operation: 'user.resend_invite',
@@ -729,7 +723,7 @@ export const userRouter = router({
     .use(canAccessUserWithScopes(['user.edit']))
     .mutation(async ({ input, ctx }) => {
       const userId = UUID.parse(input)
-      await sendUsernameReminder(userId, ctx.token)
+      await sendUsernameReminder(userId)
       const auditLogIdentifiers = getAuditLogIdentifiers(ctx.token)
       await writeAuditLog({
         operation: 'user.username_reminder_by_admin',
@@ -745,15 +739,11 @@ export const userRouter = router({
       const userId = UUID.parse(input)
       const auditLogIdentifiers = getAuditLogIdentifiers(ctx.token)
       const adminUser = await getUser(auditLogIdentifiers.sub)
-      await sendResetPasswordInvite(
-        userId,
-        {
-          id: adminUser.id,
-          name: adminUser.name,
-          role: adminUser.role
-        },
-        ctx.token
-      )
+      await sendResetPasswordInvite(userId, {
+        id: adminUser.id,
+        name: adminUser.name,
+        role: adminUser.role
+      })
       await writeAuditLog({
         operation: 'user.password_reset_by_admin',
         requestData: { subjectId: userId },

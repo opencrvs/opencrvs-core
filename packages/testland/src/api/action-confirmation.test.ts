@@ -8,7 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { vi, describe, it, expect, beforeEach } from 'vitest'
+import { vi, describe, it, expect, beforeEach, afterEach } from 'vitest'
 
 vi.mock('./notification/constant', async (importOriginal) => {
   const actual =
@@ -67,82 +67,91 @@ vi.mock('nanoid', () => {
 })
 
 import fetch from 'node-fetch'
-import { SERVICE_USER_ID } from '@opencrvs/toolkit/authentication'
 import {
   informantNotificationTestData,
   userNotificationTestData
 } from './notification/testData'
 import { createServer } from '../index'
+import { coreKey } from '../tests/core-request'
 
 const [{ eventType, actionType, eventDocument }] = informantNotificationTestData
 const confirmationUrl = `/trigger/events/${eventType}/actions/${actionType}`
 
 /*
- * A token a logged-in registrar could hold. It authenticates fine, it just did
- * not come from core, which is what the guard is there to tell apart.
+ * What a logged-in registrar could send. Its token may be valid, it just did
+ * not come from core, which is what `auth: 'core'` is there to tell apart.
  */
-const registrarCredentials = {
-  sub: '3fb1d1ed-63c5-4d3f-bb9f-7ca44d09e70a',
-  scope: ['record.register']
-}
+const registrarAuthorization = 'Bearer registrar.access.token'
 
-describe('Action confirmation requests are only accepted from core', () => {
+describe('Requests that only core may send', () => {
   let server: any
 
   beforeEach(async () => {
+    // Serve the test key as auth's key list before the server starts.
+    vi.spyOn(global, 'fetch').mockResolvedValue(
+      new Response(JSON.stringify(coreKey.jwks))
+    )
     server = await createServer()
     // Clear the calls made while the server was starting up.
     ;(fetch as any).mockClear()
   })
 
-  it('rejects a confirmation request carrying a token other than the service token', async () => {
-    const response = await server.server.inject({
-      method: 'POST',
-      url: confirmationUrl,
-      payload: eventDocument,
-      auth: {
-        strategy: 'jwt',
-        credentials: registrarCredentials,
-        artifacts: { token: 'mock-token' }
-      }
-    })
-
-    expect(response.statusCode).toBe(403)
-    expect(response.result).toEqual({ error: 'forbidden' })
-    // The handler never ran, so no informant was notified.
-    expect(fetch as any).not.toHaveBeenCalled()
+  afterEach(() => {
+    vi.mocked(global.fetch).mockRestore()
   })
 
-  it('lets the same request through when it carries the service token', async () => {
-    const response = await server.server.inject({
-      method: 'POST',
-      url: confirmationUrl,
-      payload: eventDocument,
-      auth: {
-        strategy: 'jwt',
-        credentials: { sub: SERVICE_USER_ID },
-        artifacts: { token: 'mock-token' }
-      }
-    })
+  it('accepts an action confirmation that core signed', async () => {
+    const response = await server.server.inject(
+      coreKey.request('POST', confirmationUrl, eventDocument)
+    )
 
     expect(response.statusCode).not.toBe(403)
     expect(fetch as any).toHaveBeenCalled()
   })
 
-  it('leaves routes other than action confirmation to their own authorization', async () => {
-    const [{ event, payload }] = userNotificationTestData
-
+  it('rejects an action confirmation whose body was changed after signing', async () => {
     const response = await server.server.inject({
-      method: 'POST',
-      url: `/trigger/user/${event}`,
-      payload,
-      auth: {
-        strategy: 'jwt',
-        credentials: registrarCredentials,
-        artifacts: { token: 'mock-token' }
-      }
+      ...coreKey.request('POST', confirmationUrl, eventDocument),
+      payload: JSON.stringify({ ...eventDocument, id: 'another-event' })
     })
 
-    expect(response.statusCode).not.toBe(403)
+    expect(response.statusCode).toBe(403)
+    expect(fetch as any).not.toHaveBeenCalled()
+  })
+
+  const [userNotification] = userNotificationTestData
+  it.each([
+    ['POST', confirmationUrl, eventDocument],
+    [
+      'POST',
+      `/trigger/user/${userNotification.event}`,
+      userNotification.payload
+    ],
+    ['GET', '/config/events', undefined],
+    ['GET', '/config/roles', undefined],
+    ['GET', '/config/users', undefined],
+    ['GET', '/certificates', undefined]
+  ])('rejects %s %s from a registrar', async (method, url, payload) => {
+    const response = await server.server.inject({
+      method,
+      url,
+      payload,
+      headers: { Authorization: registrarAuthorization }
+    })
+
+    expect(response.statusCode).toBe(403)
+    // The handler never ran, so it did not call out.
+    expect(fetch as any).not.toHaveBeenCalled()
+  })
+
+  it.each([
+    '/config/events',
+    '/config/roles',
+    '/config/users',
+    '/certificates'
+  ])('serves %s to core', async (url) => {
+    const response = await server.server.inject(coreKey.request('GET', url))
+
+    expect(response.statusCode).toBe(200)
   })
 })

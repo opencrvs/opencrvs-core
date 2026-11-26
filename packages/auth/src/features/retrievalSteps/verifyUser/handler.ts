@@ -20,14 +20,12 @@ import {
   RETRIEVAL_FLOW_PASSWORD
 } from '@auth/features/retrievalSteps/verifyUser/service'
 import { generateNonce } from '@auth/features/verifyCode/service'
-import { createToken } from '@auth/features/authenticate/service'
-import { JWT_ISSUER } from '@auth/constants'
 import { env } from '@auth/environment'
+import { coreSigningKey } from '@auth/request-signing'
 import {
   logger,
   triggerUserEventNotification,
-  TriggerEvent,
-  TokenUserType
+  TriggerEvent
 } from '@opencrvs/commons'
 
 interface IVerifyUserPayload {
@@ -56,17 +54,6 @@ export default async function verifyUserHandler(
     })
     const token = generateNonce()
 
-    const authHeader = {
-      Authorization: `Bearer ${await createToken(
-        'auth',
-        [],
-        ['opencrvs:countryconfig-user'],
-        JWT_ISSUER,
-        undefined,
-        TokenUserType.enum.system
-      )}`
-    }
-
     await storeRetrievalStepInformation(
       token,
       RetrievalSteps.WAITING_FOR_VERIFICATION,
@@ -90,7 +77,7 @@ export default async function verifyUserHandler(
         }
       },
       countryConfigUrl: env.COUNTRY_CONFIG_URL_INTERNAL,
-      authHeader
+      signingKey: coreSigningKey
     }).catch((err) => logger.error(err))
   } catch (err) {
     // Swallowed on purpose: no such user, no security questions, and events
