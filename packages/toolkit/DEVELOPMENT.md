@@ -25,14 +25,16 @@ src/
 
 For the upgrade codemods, see [src/migrations/README.md](./src/migrations/README.md).
 
-## Development using yarn link
+## Development using pnpm link
+
+Use [`pnpm link`](https://pnpm.io/cli/link) to test a local build of the toolkit in a country config.
 
 ```
 # tsconfig.json references commons. When `tsc --build` runs, it builds both.
 > pnpm build:all
-# If you do not do this step, you can have problems with the types.
-> cd dist
-> yarn link
+# Link the dist directory. If you link the package root, you can have problems with the types.
+> cd <your-countryconfig>
+> pnpm link <path-to-opencrvs-core>/packages/toolkit/dist
 ```
 
 ## Internal dependencies
