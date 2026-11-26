@@ -11,6 +11,7 @@
 import * as Hapi from '@hapi/hapi'
 import { describe, expect, it, vi, beforeEach } from 'vitest'
 import fetch from 'node-fetch'
+import { encodeScope } from '@opencrvs/toolkit/scopes'
 import { logger } from '../../logger'
 import { systemReadyHandler } from './handler'
 
@@ -18,11 +19,10 @@ vi.mock('node-fetch', () => ({ default: vi.fn() }))
 vi.mock('../../logger', () => ({
   logger: { info: vi.fn(), warn: vi.fn(), error: vi.fn(), debug: vi.fn() }
 }))
-// The MOSIP entry in INTEGRATIONS is built from these at module load
+// The entries in INTEGRATIONS are built from these at module load
 vi.mock('../../constants', () => ({
-  // No country config client, so MOSIP is the only integration.
-  COUNTRY_CONFIG_CLIENT_ID: '',
-  COUNTRY_CONFIG_CLIENT_SECRET: '',
+  COUNTRY_CONFIG_CLIENT_ID: '3c726498-2b2f-47ae-8e53-f6e406a0de13',
+  COUNTRY_CONFIG_CLIENT_SECRET: '0fe62f63-657a-40fb-a406-cec6657dc0cc',
   MOSIP_INTEGRATION_CLIENT_ID: '5f10f0e9-dafa-48d6-b5e6-551809efa0ab',
   MOSIP_INTEGRATION_CLIENT_SECRET: '7514fe5f-6401-429b-8ac3-1f1c3dc40359',
   EVENTS_URL: 'http://events:5555/'
@@ -30,6 +30,12 @@ vi.mock('../../constants', () => ({
 
 const CONFIGURED_ID = '5f10f0e9-dafa-48d6-b5e6-551809efa0ab'
 const CONFIGURED_SECRET = '7514fe5f-6401-429b-8ac3-1f1c3dc40359'
+
+/** The country config client, registered with its configured id. */
+const COUNTRY_CONFIG_INTEGRATION = {
+  id: '3c726498-2b2f-47ae-8e53-f6e406a0de13',
+  name: 'Country config'
+}
 
 const mockFetch = vi.mocked(fetch)
 const mockLogger = vi.mocked(logger)
@@ -80,17 +86,32 @@ describe('systemReadyHandler', () => {
   it('seeds the configured credentials when the integration is new', async () => {
     mockFetch.mockResolvedValueOnce(jsonResponse([]))
     mockFetch.mockResolvedValueOnce(jsonResponse({ clientId: CONFIGURED_ID }))
+    mockFetch.mockResolvedValueOnce(
+      jsonResponse({ clientId: COUNTRY_CONFIG_INTEGRATION.id })
+    )
 
     const status = await runHandler()
 
-    const [, options] = registrationCalls()[0]
-    expect(JSON.parse(String(options?.body))).toMatchObject({
-      name: 'MOSIP',
-      credentials: {
-        clientId: CONFIGURED_ID,
-        clientSecret: CONFIGURED_SECRET
-      }
-    })
+    const bodies = registrationCalls().map(([, options]) =>
+      JSON.parse(String(options?.body))
+    )
+    expect(bodies).toEqual([
+      expect.objectContaining({
+        name: 'MOSIP',
+        credentials: {
+          clientId: CONFIGURED_ID,
+          clientSecret: CONFIGURED_SECRET
+        }
+      }),
+      expect.objectContaining({
+        name: 'Country config',
+        scopes: [encodeScope({ type: 'organisation.read-locations' })],
+        credentials: {
+          clientId: '3c726498-2b2f-47ae-8e53-f6e406a0de13',
+          clientSecret: '0fe62f63-657a-40fb-a406-cec6657dc0cc'
+        }
+      })
+    ])
     expect(warnings()).toEqual([])
     expect(status).toBe(200)
   })
@@ -98,7 +119,10 @@ describe('systemReadyHandler', () => {
   // A restart must never clobber a secret a National System Admin rotated
   it('skips silently when the registered client id matches the configured one', async () => {
     mockFetch.mockResolvedValueOnce(
-      jsonResponse([{ id: CONFIGURED_ID, name: 'MOSIP' }])
+      jsonResponse([
+        { id: CONFIGURED_ID, name: 'MOSIP' },
+        COUNTRY_CONFIG_INTEGRATION
+      ])
     )
 
     const status = await runHandler()
@@ -113,7 +137,8 @@ describe('systemReadyHandler', () => {
   it('warns when the registered client id differs from the configured one', async () => {
     mockFetch.mockResolvedValueOnce(
       jsonResponse([
-        { id: 'ac3daa16-bd38-41dd-9dbc-98a10b71bddd', name: 'MOSIP' }
+        { id: 'ac3daa16-bd38-41dd-9dbc-98a10b71bddd', name: 'MOSIP' },
+        COUNTRY_CONFIG_INTEGRATION
       ])
     )
 
@@ -143,7 +168,7 @@ describe('systemReadyHandler', () => {
   })
 
   it('reports incomplete when registering an integration is refused', async () => {
-    mockFetch.mockResolvedValueOnce(jsonResponse([]))
+    mockFetch.mockResolvedValueOnce(jsonResponse([COUNTRY_CONFIG_INTEGRATION]))
     mockFetch.mockResolvedValueOnce(jsonResponse({ error: 'nope' }, 500))
 
     const status = await runHandler()
@@ -153,7 +178,7 @@ describe('systemReadyHandler', () => {
   })
 
   it('reports incomplete when registering an integration throws', async () => {
-    mockFetch.mockResolvedValueOnce(jsonResponse([]))
+    mockFetch.mockResolvedValueOnce(jsonResponse([COUNTRY_CONFIG_INTEGRATION]))
     mockFetch.mockRejectedValueOnce(new Error('ECONNREFUSED'))
 
     const status = await runHandler()

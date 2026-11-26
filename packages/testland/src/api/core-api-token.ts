@@ -24,13 +24,9 @@ let cached: { token: string; fetchedAt: number } | undefined
 /**
  * A token of country config's own system client, for calls to core. Core's
  * requests to country config are signed and carry no token to reuse.
- * Undefined when no client is configured or auth does not answer; the caller
- * then skips its call to core.
+ * Undefined when auth does not answer; the caller then skips its call to core.
  */
 export async function getCoreApiToken(): Promise<string | undefined> {
-  if (!COUNTRY_CONFIG_CLIENT_ID || !COUNTRY_CONFIG_CLIENT_SECRET) {
-    return undefined
-  }
   if (cached && Date.now() - cached.fetchedAt < REUSE_FOR_MS) {
     return cached.token
   }

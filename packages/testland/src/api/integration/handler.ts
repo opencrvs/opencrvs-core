@@ -60,16 +60,12 @@ const INTEGRATIONS: IntegrationConfig[] = [
   },
   // Country config's own client, for its calls to core: core's requests to
   // country config are signed and carry no token it could reuse.
-  ...(COUNTRY_CONFIG_CLIENT_ID && COUNTRY_CONFIG_CLIENT_SECRET
-    ? [
-        {
-          name: 'Country config',
-          scopes: [{ type: 'organisation.read-locations' } as const],
-          clientId: COUNTRY_CONFIG_CLIENT_ID,
-          clientSecret: COUNTRY_CONFIG_CLIENT_SECRET
-        }
-      ]
-    : [])
+  {
+    name: 'Country config',
+    scopes: [{ type: 'organisation.read-locations' }],
+    clientId: COUNTRY_CONFIG_CLIENT_ID,
+    clientSecret: COUNTRY_CONFIG_CLIENT_SECRET
+  }
 ]
 
 const INTEGRATIONS_URL = new URL('/integrations', EVENTS_URL).toString()
