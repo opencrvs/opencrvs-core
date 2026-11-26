@@ -22,15 +22,13 @@ import {
   ActionType,
   EventIndex,
   getActionConfig,
-  getUUID
-} from '@opencrvs/commons/client'
-import { useModal } from '@client/v2-events/hooks/useModal'
-import { useValidatorContext } from '@client/v2-events/hooks/useValidatorContext'
-import { ROUTES } from '@client/v2-events/routes/routes'
-import {
+  getUUID,
   isActionEnabled,
   isActionVisible
-} from '@client/v2-events/conditionals'
+} from '@opencrvs/commons/client'
+import { useModal } from '@client/v2-events/hooks/useModal'
+import { useActionConditionalContext } from '@client/v2-events/hooks/useConditionalContext'
+import { ROUTES } from '@client/v2-events/routes/routes'
 import { useEventConfigurationForRecord } from '../../useEventConfiguration'
 import { useEventTitle } from '../../useEvents/useEventTitle'
 import { useEvents } from '../../useEvents/useEvents'
@@ -62,7 +60,12 @@ export const DuplicateForm = ({ eventIndex }: { eventIndex: EventIndex }) => {
 
   const { eventConfiguration: configuration } =
     useEventConfigurationForRecord(eventIndex)
-  const validatorContext = useValidatorContext()
+  const actionContext = useActionConditionalContext(
+    eventIndex,
+    undefined,
+    configuration
+  )
+  const form = { declaration: eventIndex.declaration }
 
   const [modal, openModal] = useModal()
 
@@ -78,18 +81,10 @@ export const DuplicateForm = ({ eventIndex }: { eventIndex: EventIndex }) => {
   })
 
   const notADuplicateVisible = markAsNotDuplicateActionConfig
-    ? isActionVisible(
-        markAsNotDuplicateActionConfig,
-        eventIndex,
-        validatorContext
-      )
+    ? isActionVisible(markAsNotDuplicateActionConfig, form, actionContext)
     : true
   const notADuplicateEnabled = markAsNotDuplicateActionConfig
-    ? isActionEnabled(
-        markAsNotDuplicateActionConfig,
-        eventIndex,
-        validatorContext
-      )
+    ? isActionEnabled(markAsNotDuplicateActionConfig, form, actionContext)
     : true
 
   // `archiveOnDuplicate` is a client-side combinator that fires the core
@@ -102,10 +97,10 @@ export const DuplicateForm = ({ eventIndex }: { eventIndex: EventIndex }) => {
     actionType: ActionType.MARK_AS_DUPLICATE
   })
   const markAsDuplicateVisible = markAsDuplicateActionConfig
-    ? isActionVisible(markAsDuplicateActionConfig, eventIndex, validatorContext)
+    ? isActionVisible(markAsDuplicateActionConfig, form, actionContext)
     : true
   const markAsDuplicateEnabled = markAsDuplicateActionConfig
-    ? isActionEnabled(markAsDuplicateActionConfig, eventIndex, validatorContext)
+    ? isActionEnabled(markAsDuplicateActionConfig, form, actionContext)
     : true
 
   const notADuplicateButton = notADuplicateVisible && (

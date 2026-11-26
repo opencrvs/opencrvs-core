@@ -12,9 +12,9 @@ import { describe, it, expect, vi } from 'vitest'
 import {
   field,
   generateTranslationConfig,
-  PageConfig,
-  ValidatorContext
+  PageConfig
 } from '@opencrvs/commons/client'
+import { EventlessFormConditionalContext } from '@client/v2-events/components/forms/formConditionalContext'
 import { getFormBackAction } from './FormBackAction'
 
 const label = generateTranslationConfig('label')
@@ -32,15 +32,19 @@ function formPage(
     ...(conditional ? { conditional } : {})
   } as unknown as PageConfig
 }
-
-const validatorContext = {} as ValidatorContext
+// @todo: real uuid/generator user.
+const conditionalContext: EventlessFormConditionalContext = {
+  user: { sub: 'test-user', scope: [], userType: 'user' },
+  leafAdminStructureLocationIds: []
+}
 
 describe('getFormBackAction', () => {
   it('returns undefined on the first page', () => {
     const back = getFormBackAction({
       formPages: [formPage('a'), formPage('b')],
       formData: {},
-      validatorContext,
+      annotates: null,
+      conditionalContext,
       pageId: 'a',
       onNavigateToPage: vi.fn()
     })
@@ -52,7 +56,8 @@ describe('getFormBackAction', () => {
     const back = getFormBackAction({
       formPages: [formPage('a'), formPage('b')],
       formData: {},
-      validatorContext,
+      annotates: null,
+      conditionalContext,
       pageId: 'missing',
       onNavigateToPage: vi.fn()
     })
@@ -65,7 +70,8 @@ describe('getFormBackAction', () => {
     const back = getFormBackAction({
       formPages: [formPage('a'), formPage('b'), formPage('c')],
       formData: {},
-      validatorContext,
+      annotates: null,
+      conditionalContext,
       pageId: 'c',
       onNavigateToPage
     })
@@ -86,7 +92,8 @@ describe('getFormBackAction', () => {
         formPage('c')
       ],
       formData: {},
-      validatorContext,
+      annotates: null,
+      conditionalContext,
       pageId: 'c',
       onNavigateToPage
     })

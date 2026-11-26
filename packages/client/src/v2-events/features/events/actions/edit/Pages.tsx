@@ -23,7 +23,7 @@ import { useEventFormNavigation } from '@client/v2-events/features/events/useEve
 import { FormLayout } from '@client/v2-events/layouts'
 import { ROUTES } from '@client/v2-events/routes'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
-import { useValidatorContext } from '@client/v2-events/hooks/useValidatorContext'
+import { useActionFormConditionalContext } from '@client/v2-events/hooks/useConditionalContext'
 import { EditPageBanner } from './EditPageBanner'
 import { useEditForm } from './useEditForm'
 
@@ -37,8 +37,11 @@ export function Pages() {
   const formValues = getFormValues()
   const event = events.getEvent.useGetEventFromCache(eventId)
 
-  const validatorContext = useValidatorContext(event)
   const { eventConfiguration: configuration, formConfig } = useEditForm(event)
+  const conditionalContext = useActionFormConditionalContext(
+    event,
+    configuration
+  )
   const declarationPages = formConfig.pages
 
   const currentPageId =
@@ -74,7 +77,8 @@ export function Pages() {
   const backAction = getFormBackAction({
     formPages: declarationPages,
     formData: formValues,
-    validatorContext,
+    annotates: null,
+    conditionalContext,
     pageId: currentPageId,
     onNavigateToPage: onPageChange
   })
@@ -85,13 +89,14 @@ export function Pages() {
       <FormLayout backAction={backAction} route={ROUTES.V2.EVENTS.EDIT}>
         {modal}
         <PagesComponent
+          annotates={null}
           attachmentPath={eventAttachmentPath(eventId)}
+          conditionalContext={conditionalContext}
           eventConfig={configuration}
           formData={formValues}
           formPages={declarationPages}
           pageId={currentPageId}
           setFormData={(data) => setFormValues(data)}
-          validatorContext={validatorContext}
           onPageChange={onPageChange}
           onSubmit={() =>
             navigate(

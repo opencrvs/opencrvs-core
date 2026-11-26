@@ -60,7 +60,11 @@ describe('getAdvancedSearchFieldErrors', () => {
       tennisClubMembershipEvent,
       ADMIN_STRUCTURE
     )
-    const errors = getAdvancedSearchFieldErrors(sections, mockFormValues, {})
+    // @TODO: use generated user /properid
+    const errors = getAdvancedSearchFieldErrors(sections, mockFormValues, {
+      user: { sub: 'test-user', scope: [], userType: 'user' },
+      leafAdminStructureLocationIds: []
+    })
     expect(errors).toEqual({
       'applicant.name': [],
       'recommender.name': [],

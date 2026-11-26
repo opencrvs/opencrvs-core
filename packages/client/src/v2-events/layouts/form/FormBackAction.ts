@@ -10,10 +10,15 @@
  */
 import {
   EventState,
+  isPageVisible,
   PageConfig,
-  ValidatorContext
+  ActionUpdate
 } from '@opencrvs/commons/client'
-import { isPageVisible } from '@client/v2-events/conditionals'
+import {
+  FormConditionalContext,
+  toActionFormConditionalContext
+} from '@client/v2-events/components/forms/formConditionalContext'
+import { formForConditionals } from '@client/v2-events/components/forms/formValues'
 
 /**
  * Derives the form header's Back action from the current pagination state.
@@ -29,18 +34,25 @@ import { isPageVisible } from '@client/v2-events/conditionals'
 export function getFormBackAction({
   formPages,
   formData,
-  validatorContext,
+  annotates,
+  conditionalContext,
   pageId,
   onNavigateToPage
 }: {
   formPages: PageConfig[]
   formData: EventState
-  validatorContext: ValidatorContext
+  /** See `formForConditionals`. */
+  annotates: ActionUpdate | null
+  conditionalContext: FormConditionalContext
   pageId: string
   onNavigateToPage: (nextPageId: string) => void
 }): (() => void) | undefined {
   const visiblePages = formPages.filter((page) =>
-    isPageVisible(page, formData, validatorContext)
+    isPageVisible(
+      page,
+      formForConditionals(formData, annotates),
+      toActionFormConditionalContext(conditionalContext)
+    )
   )
   const pageIdx = visiblePages.findIndex((p) => p.id === pageId)
 

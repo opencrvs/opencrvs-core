@@ -17,13 +17,17 @@ import {
   getDeclarationPages,
   getNotificationForm,
   tennisClubMembershipEvent,
-  ValidatorContext,
   withDeclaration
 } from '@opencrvs/commons/client'
+import { EventlessFormConditionalContext } from '@client/v2-events/components/forms/formConditionalContext'
 import { getCleanedDeclarationDiff, getSubmissionForm } from './declarationDiff'
 
 const eventConfiguration = tennisClubMembershipEvent
-const validatorContext: ValidatorContext = {}
+// @todo: real uuid/generator user.
+const conditionalContext: EventlessFormConditionalContext = {
+  user: { sub: 'test-user', scope: [], userType: 'user' },
+  leafAdminStructureLocationIds: []
+}
 
 type Submission = Parameters<typeof getSubmissionForm>[1]
 
@@ -83,7 +87,7 @@ describe('getSubmissionForm', () => {
         form: getSubmissionForm(config, submission),
         originalDeclaration: {},
         declarationDiff: { [fieldId]: 'jane@example.com' },
-        validatorContext
+        conditionalContext
       })
 
     expect(clean('editAndNotify')).toEqual({ [fieldId]: 'jane@example.com' })
@@ -123,7 +127,7 @@ describe('getCleanedDeclarationDiff with fields not in the submitted form', () =
         'applicant.name': filledName,
         'applicant.email': 'jane@example.com'
       },
-      validatorContext
+      conditionalContext
     })
 
     expect(result).toEqual({ 'applicant.name': filledName })
@@ -141,7 +145,7 @@ describe('getCleanedDeclarationDiff with fields not in the submitted form', () =
         'applicant.name': { firstname: 'John', surname: 'Doe' },
         'applicant.email': null
       },
-      validatorContext
+      conditionalContext
     })
 
     expect(result).toEqual({
@@ -167,7 +171,7 @@ describe('getCleanedDeclarationDiff with fields not in the submitted form', () =
             'applicant.dobUnknown': dobUnknown,
             'applicant.age': 30
           },
-          validatorContext
+          conditionalContext
         })
 
       expect(clean(true)).toEqual({
@@ -186,7 +190,7 @@ describe('getCleanedDeclarationDiff with fields not in the submitted form', () =
         'applicant.email': 'jane@example.com',
         'unknown.field': 'value'
       },
-      validatorContext
+      conditionalContext
     })
 
     expect(result).toEqual({ 'applicant.email': 'jane@example.com' })

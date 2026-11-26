@@ -16,6 +16,7 @@ import {
   FormConfig
 } from '@opencrvs/commons/client'
 import { validationErrorsInActionFormExist } from './validation'
+import { EventlessFormConditionalContext } from './formConditionalContext'
 
 const formConfig: FormConfig = {
   label: { id: 'form.label', defaultMessage: 'Form', description: 'Form' },
@@ -50,6 +51,11 @@ const signature = {
   originalFilename: 'abcd.png',
   type: 'image/png'
 }
+// @todo: real uuid/generator user.
+const conditionalContext: EventlessFormConditionalContext = {
+  user: { sub: 'test-user', scope: [], userType: 'user' },
+  leafAdminStructureLocationIds: []
+}
 
 describe('validationErrorsInActionFormExist', () => {
   it('accepts a signed review field whose visibility depends on the declaration', () => {
@@ -59,7 +65,7 @@ describe('validationErrorsInActionFormExist', () => {
         form: { 'parents.count': 2 },
         annotation: { 'review.secondParentSignature': signature },
         reviewFields: [secondParentSignature],
-        context: {}
+        conditionalContext
       })
     ).toBe(false)
   })
@@ -71,7 +77,7 @@ describe('validationErrorsInActionFormExist', () => {
         form: { 'parents.count': 2 },
         annotation: {},
         reviewFields: [secondParentSignature],
-        context: {}
+        conditionalContext
       })
     ).toBe(true)
   })
@@ -83,7 +89,7 @@ describe('validationErrorsInActionFormExist', () => {
         form: { 'parents.count': 1 },
         annotation: {},
         reviewFields: [secondParentSignature],
-        context: {}
+        conditionalContext
       })
     ).toBe(false)
   })

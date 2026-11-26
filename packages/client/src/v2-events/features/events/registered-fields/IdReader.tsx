@@ -15,9 +15,10 @@ import {
   IdReaderField,
   IdReaderFieldValue,
   QrReaderFieldValue,
-  isQrReaderFieldType
+  isQrReaderFieldType,
+  ActionUpdate
 } from '@opencrvs/commons/client'
-import { useValidatorContext } from '@client/v2-events/hooks/useValidatorContext'
+import { FormConditionalContext } from '@client/v2-events/components/forms/formConditionalContext'
 import { FormFieldGenerator } from '@client/v2-events/components/forms/FormFieldGenerator'
 
 const SubComponentStack = styled.div`
@@ -44,21 +45,30 @@ function getQrFieldValue(fields: IdReaderField['methods'], values: EventState) {
 function IdReaderInput({
   id,
   methods,
+  annotates,
+  siblingValues,
+  conditionalContext,
   onChange
 }: {
   id: string
   methods: IdReaderField['methods']
+  /** See `formForConditionals`. */
+  annotates: ActionUpdate | null
+  /** See `formForConditionals`. */
+  siblingValues?: ActionUpdate
+  /** The context of the form that the field is in. */
+  conditionalContext: FormConditionalContext
   onChange: (data: IdReaderFieldValue) => void
 }) {
-  const validatorContext = useValidatorContext()
-
   return (
     <SubComponentStack>
       <FormFieldGenerator
+        annotates={annotates}
         attachmentPath={null}
+        conditionalContext={conditionalContext}
         fields={methods}
         id={id}
-        validatorContext={validatorContext}
+        siblingValues={siblingValues}
         onFormChange={(values) => {
           /**
            * Extracts the actual value from nested field definitions (passed as `methods`)

@@ -160,6 +160,7 @@ export const ReviewWithValidationErrors: Story = {
         <Review.ActionModal.Reject
           attachmentPath={eventAttachmentPath(storybookEventId)}
           close={close}
+          event={tennisClubMembershipEventDocument}
           eventConfiguration={tennisClubMembershipEvent}
         />
       ))
@@ -502,12 +503,12 @@ export const ReviewDuringCreateNoAnnotationFields: Story = {
             anchor={toPlainDate('2025-01-01')}
             annotation={{}}
             attachmentPath={eventAttachmentPath(storybookEventId)}
+            conditionalContext={getTestValidatorContext()}
             form={mockDeclaration}
             formConfig={TENNIS_CLUB_DECLARATION_FORM}
             readonlyMode={false}
             reviewFields={[reviewCommentField, reviewSignatureField]}
             title="Member declaration for John Doe"
-            validatorContext={getTestValidatorContext()}
             onAnnotationChange={noop}
             onEdit={noop}
           />
@@ -639,6 +640,7 @@ export const AcceptModalWithFormFields: Story = {
           onConfirm: generateTranslationConfig('Confirm')
         }}
         declaration={{}}
+        event={tennisClubMembershipEventDocument}
         eventConfiguration={tennisClubMembershipEvent}
         eventType="Tennis club membership"
         fields={[modalCommentsField, modalCategoryField]}
@@ -718,6 +720,7 @@ export const AcceptModalWithRequiredField: Story = {
           onConfirm: generateTranslationConfig('Confirm')
         }}
         declaration={{}}
+        event={tennisClubMembershipEventDocument}
         eventConfiguration={tennisClubMembershipEvent}
         eventType="Tennis club membership"
         fields={[acceptModalRequiredField]}
@@ -767,6 +770,7 @@ export const RejectModalWithFormFields: Story = {
       <Review.ActionModal.Reject
         attachmentPath={eventAttachmentPath(storybookEventId)}
         close={rejectModalWithFormFieldsClose}
+        event={tennisClubMembershipEventDocument}
         eventConfiguration={tennisClubMembershipEvent}
         fields={[modalCommentsField, modalCategoryField]}
       />

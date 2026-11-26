@@ -24,10 +24,11 @@ import {
   NameFieldValue,
   not,
   TextField,
-  ValidatorContext
+  ActionUpdate
 } from '@opencrvs/commons/client'
 import { mergeWithoutNullsOrUndefined } from '@client/v2-events/utils'
 import { FormFieldGenerator } from '@client/v2-events/components/forms/FormFieldGenerator'
+import { FormConditionalContext } from '@client/v2-events/components/forms/formConditionalContext'
 
 interface Props {
   configuration?: NameField['configuration']
@@ -37,9 +38,13 @@ interface Props {
   name: string
   onBlur: (formikFieldId: string, newTouched: FormState<boolean>) => void
   onChange: (newValue: NameFieldValue) => void
+  /** See `formForConditionals`. */
+  annotates: ActionUpdate | null
+  /** See `formForConditionals`. */
+  siblingValues?: ActionUpdate
   touched: IndexMap<FormState<boolean>> | undefined
   validation: FieldConfig['validation']
-  validatorContext: ValidatorContext
+  conditionalContext: FormConditionalContext
   value?: NameFieldValue
 }
 
@@ -142,7 +147,9 @@ function NameInput({
   value,
   eventConfig,
   configuration,
-  validatorContext,
+  annotates,
+  siblingValues,
+  conditionalContext,
   ...props
 }: Props) {
   value ??= defaultNameFieldValue(configuration?.name)
@@ -236,13 +243,15 @@ function NameInput({
   return (
     <>
       <FormFieldGenerator
+        annotates={annotates}
         attachmentPath={null}
+        conditionalContext={conditionalContext}
         eventConfig={eventConfig}
         fields={fields}
         formTouched={touched}
         formValues={value}
         id={id}
-        validatorContext={validatorContext}
+        siblingValues={siblingValues}
         onFormChange={(values) =>
           onChange(
             mergeWithoutNullsOrUndefined(

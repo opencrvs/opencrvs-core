@@ -22,7 +22,7 @@ import {
   getCurrentEventState,
   getDeclaration,
   getDeclarationFields,
-  ValidatorContext
+  isFieldDisplayedOnReview
 } from '@opencrvs/commons/client'
 import { Table } from '@opencrvs/components'
 import { useEventConfigurationForRecord } from '@client/v2-events/features/events/useEventConfiguration'
@@ -38,7 +38,7 @@ import {
   getChangedDeclarationDiff,
   hasFieldChanged
 } from '@client/v2-events/features/events/useEvents/procedures/actions/declarationDiff'
-import { isFieldDisplayedOnReview } from '@client/v2-events/conditionals'
+import { useActionFormConditionalContext } from '@client/v2-events/hooks/useConditionalContext'
 
 const TableHeader = styled.th`
   text-transform: uppercase;
@@ -48,7 +48,6 @@ const TableHeader = styled.th`
 interface BaseDeclarationComparisonTableProps {
   fullEvent: EventDocument
   eventConfig: EventConfig
-  validatorContext: ValidatorContext
   id: string
 }
 
@@ -104,8 +103,7 @@ function DeclarationComparisonTableComponent({
   form,
   fullEvent,
   eventConfig,
-  id,
-  validatorContext
+  id
 }: DeclarationComparisonTableProps) {
   const acceptedActions = getAcceptedActions(fullEvent)
   const index = acceptedActions.findIndex((a) => a.id === action?.id)
@@ -114,7 +112,12 @@ function DeclarationComparisonTableComponent({
   const reviewFormFields = getReviewFormFields(eventConfig)
 
   const intl = useIntl()
+  // @TODO: check if we should pass this as prop.
   const { eventConfiguration } = useEventConfigurationForRecord(fullEvent)
+  const conditionalContext = useActionFormConditionalContext(
+    fullEvent,
+    eventConfiguration
+  )
 
   const eventBeforeUpdate = action
     ? sliceEventAt(fullEvent, action.id, false)
@@ -145,7 +148,7 @@ function DeclarationComparisonTableComponent({
           form,
           previousDeclaration,
           eventConfiguration,
-          validatorContext
+          conditionalContext
         )
       }
     : applyDeclarationToEventIndex(
@@ -161,7 +164,7 @@ function DeclarationComparisonTableComponent({
         f,
         acceptedActions,
         index,
-        validatorContext
+        conditionalContext
       )
 
       const { currentAnnotations, previousAnnotations, valueHasChanged } =
@@ -207,14 +210,18 @@ function DeclarationComparisonTableComponent({
               )
           )
           .filter((field) =>
-            isFieldDisplayedOnReview(field, latestDeclaration, validatorContext)
+            isFieldDisplayedOnReview(
+              field,
+              { declaration: latestDeclaration },
+              conditionalContext
+            )
           )
           .filter((f) =>
             hasFieldChanged(
               f,
               latestDeclaration,
               previousDeclaration,
-              validatorContext
+              conditionalContext
             )
           )
           .map((f) => {

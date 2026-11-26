@@ -33,7 +33,10 @@ import {
   type FormFieldGeneratorHandle
 } from '@client/v2-events/components/forms/FormFieldGenerator'
 import { AppRouter, TRPCProvider } from '@client/v2-events/trpc'
-import { storybookEventId, TestImage } from '@client/v2-events/features/events/fixtures'
+import {
+  storybookEventId,
+  TestImage
+} from '@client/v2-events/features/events/fixtures'
 import { shouldBypassLock } from '@client/utils/lockBypass'
 import { getTestValidatorContext } from '../../../../../../.storybook/decorators'
 import { SignatureField } from './SignatureField'
@@ -128,7 +131,9 @@ export const SignatureFileUpload: StoryObj<typeof StyledFormFieldGenerator> = {
         path: '/event/:eventId',
         element: (
           <StyledFormFieldGenerator
+            annotates={null}
             attachmentPath={eventAttachmentPath(storybookEventId)}
+            conditionalContext={getTestValidatorContext()}
             fields={[
               {
                 id: 'storybook.signature',
@@ -142,7 +147,6 @@ export const SignatureFileUpload: StoryObj<typeof StyledFormFieldGenerator> = {
               }
             ]}
             id="my-form"
-            validatorContext={getTestValidatorContext()}
           />
         )
       },
@@ -254,7 +258,9 @@ export const UploadButtonsArmLockBypass: StoryObj<
         path: '/event/:eventId',
         element: (
           <StyledFormFieldGenerator
+            annotates={null}
             attachmentPath={eventAttachmentPath(storybookEventId)}
+            conditionalContext={getTestValidatorContext()}
             fields={[
               {
                 id: 'storybook.signature',
@@ -296,7 +302,6 @@ export const UploadButtonsArmLockBypass: StoryObj<
               }
             ]}
             id="my-form"
-            validatorContext={getTestValidatorContext()}
           />
         )
       },
@@ -398,7 +403,9 @@ export const SignatureCanvasUpload: StoryObj<typeof StyledFormFieldGenerator> =
           path: '/event/:eventId',
           element: (
             <StyledFormFieldGenerator
+              annotates={null}
               attachmentPath={eventAttachmentPath(storybookEventId)}
+              conditionalContext={getTestValidatorContext()}
               fields={[
                 {
                   id: 'storybook.signature',
@@ -412,7 +419,6 @@ export const SignatureCanvasUpload: StoryObj<typeof StyledFormFieldGenerator> =
                 }
               ]}
               id="my-form"
-              validatorContext={getTestValidatorContext()}
             />
           )
         },
@@ -536,7 +542,9 @@ export const NoDuplicateErrorAfterDelete: StoryObj<
         element: (
           <StyledFormFieldGenerator
             ref={noDuplicateErrorFormRef}
+            annotates={null}
             attachmentPath={eventAttachmentPath(storybookEventId)}
+            conditionalContext={getTestValidatorContext()}
             fields={[
               {
                 id: 'storybook.signature',
@@ -559,7 +567,6 @@ export const NoDuplicateErrorAfterDelete: StoryObj<
               }
             }}
             id="my-form"
-            validatorContext={getTestValidatorContext()}
           />
         )
       },

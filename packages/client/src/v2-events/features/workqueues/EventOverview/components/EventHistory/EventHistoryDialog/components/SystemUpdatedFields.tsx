@@ -16,13 +16,13 @@ import {
   EventDocument,
   getCurrentEventState,
   getDeclarationFields,
-  ValidatorContext
+  isFieldDisplayedOnReview
 } from '@opencrvs/commons/client'
 import { ColumnContentAlignment, Table, Text } from '@opencrvs/components'
 import { useEventConfigurationForRecord } from '@client/v2-events/features/events/useEventConfiguration'
 import { Output } from '@client/v2-events/features/events/components/Output'
 import { recordAnchorDate } from '@client/v2-events/utils'
-import { isFieldDisplayedOnReview } from '@client/v2-events/conditionals'
+import { useActionFormConditionalContext } from '@client/v2-events/hooks/useConditionalContext'
 
 const messages = defineMessages({
   title: {
@@ -53,15 +53,17 @@ const Label = styled.label`
  */
 export function SystemUpdatedFields({
   declaration,
-  fullEvent,
-  validatorContext
+  fullEvent
 }: {
   declaration: ActionUpdate
   fullEvent: EventDocument
-  validatorContext: ValidatorContext
 }) {
   const intl = useIntl()
   const { eventConfiguration } = useEventConfigurationForRecord(fullEvent)
+  const conditionalContext = useActionFormConditionalContext(
+    fullEvent,
+    eventConfiguration
+  )
   const fields = getDeclarationFields(eventConfiguration)
   const currentState = getCurrentEventState(fullEvent, eventConfiguration)
   const anchor = recordAnchorDate(currentState)
@@ -75,8 +77,8 @@ export function SystemUpdatedFields({
     if (
       isFieldDisplayedOnReview(
         field,
-        currentState.declaration,
-        validatorContext
+        { declaration: currentState.declaration },
+        conditionalContext
       )
     ) {
       return []

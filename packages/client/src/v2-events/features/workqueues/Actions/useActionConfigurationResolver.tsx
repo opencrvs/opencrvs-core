@@ -17,7 +17,7 @@ import {
   isValidIcon
 } from '@opencrvs/commons/client'
 import { useEventConfigurationForRecord } from '@client/v2-events/features/events/useEventConfiguration'
-import { useValidatorContext } from '@client/v2-events/hooks/useValidatorContext'
+import { useActionConditionalContext } from '@client/v2-events/hooks/useConditionalContext'
 import { useOnlineStatus } from '@client/utils'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
 import { useDrafts } from '@client/v2-events/features/drafts/useDrafts'
@@ -61,7 +61,11 @@ export function useEventActionConfigurationResolver(event: EventIndex) {
   const { useFindEventFromCache } = events.getEvent
   const cachedEvent = useFindEventFromCache(event.id)
   const isDownloaded = Boolean(cachedEvent.data)
-  const validatorContext = useValidatorContext(cachedEvent.data)
+  const actionContext = useActionConditionalContext(
+    event,
+    cachedEvent.data,
+    eventConfiguration
+  )
   const isAssigning = events.actions.assignment.assign.useIsAssigning(event.id)
   // Don't offer a review that may turn out to have nothing to show.
   const areDuplicatesAvailable =
@@ -84,7 +88,7 @@ export function useEventActionConfigurationResolver(event: EventIndex) {
           ? resolveBaseActionConditionals({
               event,
               actionType: draftActionType,
-              validatorContext,
+              actionContext,
               isActionAllowedForUser,
               eventConfiguration
             })
@@ -104,7 +108,7 @@ export function useEventActionConfigurationResolver(event: EventIndex) {
       const { enabled, visible } = resolveActionConditionals({
         event,
         actionType,
-        validatorContext,
+        actionContext,
         isActionAllowedForUser,
         eventConfiguration,
         isOnline,
@@ -131,7 +135,7 @@ export function useEventActionConfigurationResolver(event: EventIndex) {
     [
       draftActionType,
       event,
-      validatorContext,
+      actionContext,
       isActionAllowedForUser,
       eventConfiguration,
       isOnline,
@@ -165,7 +169,11 @@ export function useResolveAssignmentActionConditionals(event: EventIndex) {
   const { useFindEventFromCache } = events.getEvent
   const cachedEvent = useFindEventFromCache(event.id)
   const isDownloaded = Boolean(cachedEvent.data)
-  const validatorContext = useValidatorContext(cachedEvent.data)
+  const actionContext = useActionConditionalContext(
+    event,
+    cachedEvent.data,
+    eventConfiguration
+  )
   const isAssigning = events.actions.assignment.assign.useIsAssigning(event.id)
 
   const resolveConditionals = useCallback(
@@ -178,7 +186,7 @@ export function useResolveAssignmentActionConditionals(event: EventIndex) {
       const { enabled, visible } = resolveActionConditionals({
         event,
         actionType,
-        validatorContext,
+        actionContext,
         isActionAllowedForUser,
         eventConfiguration,
         isOnline,
@@ -190,7 +198,7 @@ export function useResolveAssignmentActionConditionals(event: EventIndex) {
     },
     [
       event,
-      validatorContext,
+      actionContext,
       isActionAllowedForUser,
       eventConfiguration,
       isOnline,

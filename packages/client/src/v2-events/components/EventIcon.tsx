@@ -16,10 +16,10 @@ import {
   EventConfig,
   EventIndex,
   JSONSchema,
-  validate,
-  ValidatorContext
+  validate
 } from '@opencrvs/commons/client'
-import { useValidatorContext } from '@client/v2-events/hooks/useValidatorContext'
+import { useEventlessFormConditionalContext } from '@client/v2-events/hooks/useConditionalContext'
+import { EventlessFormConditionalContext } from '@client/v2-events/components/forms/formConditionalContext'
 import { IconWithName } from './IconWithName'
 import { IconWithNameEvent } from './IconWithNameEvent'
 
@@ -32,7 +32,7 @@ import { IconWithNameEvent } from './IconWithNameEvent'
 function resolveEventIcon(
   iconConfig: EventConfig['icon'],
   event: EventIndex,
-  context: ValidatorContext
+  context: EventlessFormConditionalContext
 ): AvailableIcons | undefined {
   if (!iconConfig) {
     return undefined
@@ -40,8 +40,8 @@ function resolveEventIcon(
 
   const clientFunctionContext = {
     ...buildClientFunctionContext({
-      form: { ...context.baseFormState, ...event.declaration },
-      validatorContext: context
+      form: event.declaration,
+      conditionalContext: context
     }),
     $flags: event.flags,
     $status: event.status
@@ -74,8 +74,10 @@ export function EventIcon({
   isArchived?: boolean
   isValidatedOnReview?: boolean
 }) {
-  const validatorContext = useValidatorContext()
-  const iconName = resolveEventIcon(eventConfig.icon, event, validatorContext)
+  // @TODO: seems weird to use eventless conditionals for event icon.
+  // The icon reads the flags and the status of the event index. It needs no event document.
+  const conditionalContext = useEventlessFormConditionalContext()
+  const iconName = resolveEventIcon(eventConfig.icon, event, conditionalContext)
 
   if (displayEventType) {
     return (

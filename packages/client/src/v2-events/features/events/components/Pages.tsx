@@ -15,13 +15,14 @@ import { omit } from 'lodash'
 import {
   EventState,
   EventConfig,
+  isPageVisible,
   isNonInteractiveFieldType,
   PageTypes,
   PageConfig,
   AttachmentPath,
-  ValidatorContext,
   isNameFieldType,
-  FieldConfig
+  FieldConfig,
+  ActionUpdate
 } from '@opencrvs/commons/client'
 import { MAIN_CONTENT_ANCHOR_ID, Button } from '@opencrvs/components'
 import {
@@ -30,7 +31,11 @@ import {
 } from '@client/v2-events/components/forms/FormFieldGenerator'
 import { useClearFormModal } from '@client/v2-events/components/ClearFormModal'
 import { useDefaultValue } from '@client/v2-events/hooks/useDefaultValue'
-import { isPageVisible } from '@client/v2-events/conditionals'
+import {
+  FormConditionalContext,
+  toActionFormConditionalContext
+} from '@client/v2-events/components/forms/formConditionalContext'
+import { formForConditionals } from '@client/v2-events/components/forms/formValues'
 import { useEventFormData } from '../useEventFormData'
 import { VerificationWizard } from './VerificationWizard'
 import { FormWizard } from './FormWizard'
@@ -45,13 +50,15 @@ const messages = defineMessages({
 
 interface PagesProps {
   formData: EventState
+  /** The declaration that the pages annotate, or `null` when the pages edit a declaration. */
+  annotates: ActionUpdate | null
   setFormData: (form: EventState) => void
   pageId: string
   hideBackToReview?: boolean
   formPages: PageConfig[]
   onPageChange: (nextPageId: string) => void
   onSubmit: () => void
-  validatorContext: ValidatorContext
+  conditionalContext: FormConditionalContext
   continueButtonText?: string
   eventConfig?: EventConfig
   attachmentPath: AttachmentPath
@@ -75,11 +82,17 @@ export function Pages({
   eventConfig,
   // When isCorrection is true, we should disabled fields with 'uncorrectable' set to true, or skip pages where all fields have 'uncorrectable' set to true
   isCorrection = false,
-  validatorContext
+  annotates,
+  conditionalContext
 }: PagesProps) {
   const intl = useIntl()
+  const actionFormContext = toActionFormConditionalContext(conditionalContext)
   const visiblePages = formPages.filter((page) =>
-    isPageVisible(page, formData, validatorContext)
+    isPageVisible(
+      page,
+      formForConditionals(formData, annotates),
+      actionFormContext
+    )
   )
 
   const pageIdx = visiblePages.findIndex((p) => p.id === pageId)
@@ -100,7 +113,11 @@ export function Pages({
 
   function switchToNextPage(formValues: EventState = formData) {
     const currentVisiblePages = formPages.filter((p) =>
-      isPageVisible(p, formValues, validatorContext)
+      isPageVisible(
+        p,
+        formForConditionals(formValues, annotates),
+        actionFormContext
+      )
     )
     const currentPageIdx = currentVisiblePages.findIndex((p) => p.id === pageId)
     const nextPageIdx = currentPageIdx + 1
@@ -208,14 +225,15 @@ export function Pages({
   const fields = (
     <FormFieldGenerator
       ref={formRef}
+      annotates={annotates}
       attachmentPath={attachmentPath}
+      conditionalContext={conditionalContext}
       eventConfig={eventConfig}
       fields={page.fields}
       formTouched={formTouched}
       formValues={formData}
       id="pagesSection"
       isCorrection={isCorrection}
-      validatorContext={validatorContext}
       onFormChange={setFormData}
       onTouchedChange={setFormTouched}
     />

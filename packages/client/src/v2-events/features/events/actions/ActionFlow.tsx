@@ -37,7 +37,7 @@ import { isTemporaryId, recordAnchorDate } from '@client/v2-events/utils'
 import { useSaveAndExitModal } from '@client/v2-events/components/SaveAndExitModal'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
 import { useEventConfigurationForRecord } from '@client/v2-events/features/events/useEventConfiguration'
-import { useValidatorContext } from '@client/v2-events/hooks/useValidatorContext'
+import { useActionFormConditionalContext } from '@client/v2-events/hooks/useConditionalContext'
 import { makeFormFieldIdFormikCompatible } from '@client/v2-events/components/forms/utils'
 import { useIntlFormatMessageWithFlattenedParams } from '@client/v2-events/messages/utils'
 import { DeclareActionMenu } from './declare/DeclareActionMenu'
@@ -71,10 +71,13 @@ export function ActionFlowPages({
   const { getFormValues, setFormValues } = useEventFormData()
   const formValues = getFormValues()
   const event = events.getEvent.useGetEventFromCache(eventId)
-  const validatorContext = useValidatorContext(event)
 
   const { eventConfiguration: configuration } =
     useEventConfigurationForRecord(event)
+  const conditionalContext = useActionFormConditionalContext(
+    event,
+    configuration
+  )
   const pages = getActionForm(configuration, actionType).pages
 
   const currentPageId = pages.find((p) => p.id === pageId)?.id || pages[0]?.id
@@ -127,7 +130,8 @@ export function ActionFlowPages({
   const backAction = getFormBackAction({
     formPages: pages,
     formData: formValues,
-    validatorContext,
+    annotates: null,
+    conditionalContext,
     pageId: currentPageId,
     onNavigateToPage: onPageChange
   })
@@ -148,13 +152,14 @@ export function ActionFlowPages({
     >
       {modal}
       <PagesComponent
+        annotates={null}
         attachmentPath={eventAttachmentPath(event.id)}
+        conditionalContext={conditionalContext}
         eventConfig={configuration}
         formData={formValues}
         formPages={pages}
         pageId={currentPageId}
         setFormData={(data) => setFormValues(data)}
-        validatorContext={validatorContext}
         onPageChange={onPageChange}
         onSubmit={() =>
           navigate(
@@ -180,8 +185,8 @@ export function ActionFlowReview({
   const navigate = useNavigate()
   const { formatMessage } = useIntlFormatMessageWithFlattenedParams()
   const event = events.getEvent.useGetEventFromCache(eventId)
-  const validatorContext = useValidatorContext(event)
   const { eventConfiguration: config } = useEventConfigurationForRecord(event)
+  const conditionalContext = useActionFormConditionalContext(event, config)
   const formConfig = getActionForm(config, actionType)
   const reviewConfig = getActionReview(config, actionType)
 
@@ -228,11 +233,11 @@ export function ActionFlowReview({
         anchor={anchor}
         annotation={annotation}
         attachmentPath={eventAttachmentPath(eventId)}
+        conditionalContext={conditionalContext}
         form={form}
         formConfig={formConfig}
         reviewFields={reviewConfig.fields}
         title={formatMessage(reviewConfig.title, form)}
-        validatorContext={validatorContext}
         onAnnotationChange={(values) => setAnnotation(values)}
         onEdit={handleEdit}
       />

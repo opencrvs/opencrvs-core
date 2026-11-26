@@ -41,7 +41,7 @@ import { Review as ReviewComponent } from '@client/v2-events/features/events/com
 import { useIntlFormatMessageWithFlattenedParams } from '@client/v2-events/messages/utils'
 import { withSuspense } from '@client/v2-events/components/withSuspense'
 import { useDrafts } from '@client/v2-events/features/drafts/useDrafts'
-import { useValidatorContext } from '@client/v2-events/hooks/useValidatorContext'
+import { useActionFormConditionalContext } from '@client/v2-events/hooks/useConditionalContext'
 import { recordAnchorDate } from '@client/v2-events/utils'
 import { useAuthentication } from '@client/utils/userUtils'
 import { useOnlineStatus } from '@client/utils'
@@ -72,7 +72,6 @@ const OfflineMessageWrapper = styled.div`
 function ReadonlyViewContent({ eventId }: { eventId: UUID }) {
   const events = useEvents()
   const event = events.getEvent.useGetOrDownloadEvent(eventId)
-  const validatorContext = useValidatorContext(event)
 
   const maybeAuth = useAuthentication()
   const authentication = getOrThrow(
@@ -84,6 +83,10 @@ function ReadonlyViewContent({ eventId }: { eventId: UUID }) {
   const draft = useRemoteDraftByEventId(event.id)
   const { eventConfiguration: configuration } =
     useEventConfigurationForRecord(event)
+  const conditionalContext = useActionFormConditionalContext(
+    event,
+    configuration
+  )
 
   const eventStateWithDraft = useMemo(() => {
     const eventState = getCurrentEventState(event, configuration)
@@ -139,11 +142,11 @@ function ReadonlyViewContent({ eventId }: { eventId: UUID }) {
       anchor={recordAnchorDate(eventStateWithDraft)}
       annotation={annotation}
       attachmentPath={eventAttachmentPath(eventId)}
+      conditionalContext={conditionalContext}
       form={eventStateWithDraft.declaration}
       formConfig={formConfig}
       reviewFields={fields}
       title={formatMessage(title, eventStateWithDraft.declaration)}
-      validatorContext={validatorContext}
       onEdit={noop}
     />
   )

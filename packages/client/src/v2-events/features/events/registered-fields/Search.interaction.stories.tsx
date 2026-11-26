@@ -29,6 +29,7 @@ import {
   FormFieldGenerator,
   FormFieldGeneratorPropsWithoutRef
 } from '@client/v2-events/components/forms/FormFieldGenerator'
+import { getTestValidatorContext } from '../../../../../.storybook/decorators'
 
 const meta: Meta<FormFieldGeneratorPropsWithoutRef> = {
   title: 'Inputs/Search',
@@ -275,9 +276,9 @@ export const InvalidValue_NoRecordsFound: Story = {
     return (
       <StyledFormFieldGenerator
         {...args}
+        conditionalContext={getTestValidatorContext()}
         fields={searchFields}
         id="my-form"
-        validatorContext={{}}
       />
     )
   }
@@ -363,9 +364,9 @@ export const SearchWithRegistrationNumber: Story = {
     return (
       <StyledFormFieldGenerator
         {...args}
+        conditionalContext={getTestValidatorContext()}
         fields={searchFields}
         id="my-form"
-        validatorContext={{}}
       />
     )
   }
@@ -426,10 +427,10 @@ export const ExternalValueReset: Story = {
       <>
         <StyledFormFieldGenerator
           {...args}
+          conditionalContext={getTestValidatorContext()}
           fields={searchFields}
           formValues={formValues}
           id="my-form"
-          validatorContext={{}}
           onFormChange={setFormValues}
         />
         <button
@@ -480,9 +481,9 @@ export const TimeOut: Story = {
     return (
       <StyledFormFieldGenerator
         {...args}
+        conditionalContext={getTestValidatorContext()}
         fields={searchFields}
         id="my-form"
-        validatorContext={{}}
       />
     )
   }
@@ -523,9 +524,9 @@ export const HttpError: Story = {
     return (
       <StyledFormFieldGenerator
         {...args}
+        conditionalContext={getTestValidatorContext()}
         fields={searchFields}
         id="my-form"
-        validatorContext={{}}
       />
     )
   }
@@ -566,9 +567,9 @@ export const DisabledByConditional: Story = {
     return (
       <StyledFormFieldGenerator
         {...args}
+        conditionalContext={getTestValidatorContext()}
         fields={disabledSearchFields}
         id="my-form"
-        validatorContext={{}}
       />
     )
   }

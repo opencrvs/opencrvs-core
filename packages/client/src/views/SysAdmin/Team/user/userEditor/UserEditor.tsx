@@ -47,7 +47,7 @@ import {
 import { Check, Cross } from '@opencrvs/components/icons'
 import { CircleButton } from '@opencrvs/components/legacy'
 import { TRPCClientError } from '@trpc/client'
-import React, { useCallback, useEffect } from 'react'
+import React, { useCallback, useEffect, useMemo } from 'react'
 import { useIntl } from 'react-intl'
 import { useNavigate } from 'react-router-dom'
 import { useTypedSearchParams } from 'react-router-typesafe-routes/dom'
@@ -61,9 +61,21 @@ import toast from 'react-hot-toast'
 import { showToast } from '@client/v2-events/features/events/useToastAndRedirect'
 import { messages as notificationMessages } from '@client/i18n/messages/views/notifications'
 import { getFormBackAction } from '@client/v2-events/layouts/form/FormBackAction'
+import { EventlessFormConditionalContext } from '@client/v2-events/components/forms/formConditionalContext'
+import { useUser } from '@client/v2-events/hooks/useConditionalContext'
 import { useUserEditConfig } from '@client/hooks/useUserEditConfig'
 import { useUserFormState } from './useUserFormState'
 import { useUserEditorRoutes } from './useUserEditorRoutes'
+
+/**
+ * Returns the context for the user form.
+ * The user form does not read the leaf locations, so the hook does not load them.
+ */
+function useUserEditorConditionalContext(): EventlessFormConditionalContext {
+  const user = useUser()
+
+  return useMemo(() => ({ user, leafAdminStructureLocationIds: [] }), [user])
+}
 
 const Container = styled.div`
   display: flex;
@@ -199,6 +211,7 @@ const EditUserComponent = () => {
     additionalFields
   )
   const eventConfig = getConfig()
+  const conditionalContext = useUserEditorConditionalContext()
   const formConfig = getDeclaration(eventConfig)
 
   const { canEditUser, canAddOfficeUsers } = usePermissions()
@@ -264,7 +277,8 @@ const EditUserComponent = () => {
   const backAction = getFormBackAction({
     formPages: formConfig.pages,
     formData: formState as Record<string, FieldValue>,
-    validatorContext: {},
+    annotates: null,
+    conditionalContext,
     pageId: currentPageId,
     onNavigateToPage: onPageChange
   })
@@ -278,14 +292,15 @@ const EditUserComponent = () => {
       title={title}
     >
       <PagesComponent
+        annotates={null}
         attachmentPath={userAttachmentPath(userId)}
         hideBackToReview={true}
         eventConfig={eventConfig}
         formData={formState as Record<string, FieldValue>}
         formPages={formConfig.pages}
         pageId={currentPageId}
+        conditionalContext={conditionalContext}
         setFormData={setUserForm}
-        validatorContext={{}}
         onPageChange={onPageChange}
         onSubmit={() => {
           navigate(reviewPath())
@@ -353,6 +368,7 @@ const ReviewUserComponent = () => {
     additionalFields
   )
   const eventConfig = getConfig()
+  const conditionalContext = useUserEditorConditionalContext()
   const formConfig = getDeclaration(eventConfig)
 
   const alreadyInitialized =
@@ -508,7 +524,7 @@ const ReviewUserComponent = () => {
         formConfig={formConfig}
         reviewFields={[]}
         title={intl.formatMessage(messages.userFormReviewTitle)}
-        validatorContext={{}}
+        conditionalContext={conditionalContext}
         onEdit={(values) => navigate(editPath(values.pageId))}
       >
         {isNewUser ? (

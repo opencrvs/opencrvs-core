@@ -31,13 +31,13 @@ export type AnnotationFormValues = {
 }
 
 /**
- * Conditional parameter $form is a combination of declaration and annotation.
- * If you are editing existing event declaration, include a version where current changes are merged in.
+ * `$form` merges the declaration and the annotation.
+ * When you edit a declaration, merge the changes into it first.
  */
 export type FormValues = DeclarationFormValues | AnnotationFormValues
 
 export type UserConditionalContext = {
-  /** In system-wide context internal service tokens do not have UUID. */
+  /** Internal service tokens have no UUID, so `sub` is a string. */
   sub: string
   scope: EncodedScope[]
   role?: string
@@ -61,9 +61,8 @@ export type EventIndexConditionalContext = {
 }
 
 /**
- *  NOTE: Always prefer @see EventDocumentConditionalContext over @see EventIndexConditionalContext.
- *  Some functionality like Event summary and action menu depend on declaration coming from event.search endpoint.
- *  event.search might not have all the properties available when field has secured: true.
+ * Use @see EventDocumentConditionalContext when you can.
+ * The event summary and the action menu use the event index from `event.search`. That index has no secured fields.
  */
 export type EventConditionalContext =
   | EventDocumentConditionalContext
@@ -72,6 +71,10 @@ export type EventConditionalContext =
 /**
  * The flags, the status and the stored declaration of the event.
  * All cases read them through this function, so they always come from the same source.
+ *
+ * TODO: Add a cache for `getCurrentEventState`, with the event document as the key. https://github.com/opencrvs/opencrvs-core/issues/14485
+ * With an event document, each conditional call calculates the event state again.
+ * The client form evaluates conditionals for each field on each render, so the time adds up.
  */
 export function resolveEventState(
   context: EventConditionalContext
@@ -85,7 +88,7 @@ export function resolveEventState(
 
 /** Parameters that every context has. */
 type CommonConditionalParameters = {
-  /** Combination of previous declaration (if available), current declaration and annotation (if available) */
+  /** The declaration and the annotation, merged. The annotation values win. */
   $form: ActionUpdate
   $flags: EventIndex['flags']
   $status: EventIndex['status']
@@ -94,11 +97,11 @@ type CommonConditionalParameters = {
 }
 
 /**
- * @private - Build Conditional parameters based on your need.
- * @see buildActionFormConditionalParameters when user is performing actions
- * @see buildActionConditionalParameters when deciding if action is available
- * @see buildSecuredConditionalParameters when evaluating if field is secured
- * @see buildCertificateTemplateConditionalParameters when evaluating which templates are available.
+ * @private Use one of these functions:
+ * @see buildActionFormConditionalParameters for the form of an action.
+ * @see buildActionConditionalParameters to decide whether an action is available.
+ * @see buildSecuredConditionalParameters to decide whether a field is secured.
+ * @see buildCertificateTemplateConditionalParameters to decide which certificate templates are available.
  */
 function buildCommonConditionalParameters(
   form: FormValues,
@@ -115,8 +118,9 @@ function buildCommonConditionalParameters(
   }
 }
 
-/*
- * ActionForm: field visibility, field validation and page visibility in the form of one action. Used by declaration and annotation actions.
+/**
+ * The context for field visibility, field validation and page visibility in the form of an action.
+ * Declaration actions and annotation actions use it.
  */
 export type ActionFormConditionalContext = EventDocumentConditionalContext & {
   user: UserConditionalContext
@@ -142,14 +146,18 @@ export function buildActionFormConditionalParameters(
 }
 
 /**
- * ActionConditional: whether an action is visible or enabled. field('..') targets current state declaration.
+ * The context to decide whether an action is visible or enabled. `field()` reads the declaration of the current event state.
+ *
+ * The event can be an event index, e.g. in a workqueue where the event is not downloaded.
+ * Then `$event` is not available. Pass a real event index, and put any changed values in the form, not in the index.
  */
-export type ActionConditionalContext = EventDocumentConditionalContext & {
+export type ActionConditionalContext = EventConditionalContext & {
   user: UserConditionalContext
 }
 
 export type ActionConditionalParameters = CommonConditionalParameters & {
-  $event: EventDocument
+  // @todo: should be stricter.
+  $event?: EventDocument
   $user: UserConditionalContext
 }
 
@@ -159,13 +167,13 @@ export function buildActionConditionalParameters(
 ): ActionConditionalParameters {
   return {
     ...buildCommonConditionalParameters(form, context),
-    $event: context.eventDocument,
+    $event: 'eventDocument' in context ? context.eventDocument : undefined,
     $user: context.user
   }
 }
 
 /**
- * CertificateTemplate: which certificate templates are available for printing.
+ * The context to decide which certificate templates are available for printing.
  */
 export type CertificateTemplateConditionalContext =
   EventDocumentConditionalContext
@@ -186,8 +194,8 @@ export function buildCertificateTemplateConditionalParameters(
 }
 
 /**
- * Secured: whether a field is secured and removed from event.search payload.
- * Accepts EventIndex over EventDocument since it is never available to it.
+ * The context to decide whether a field is secured. The `event.search` payload does not include a secured field.
+ * It takes an event index, because the search index never has the event document.
  */
 export type SecuredConditionalContext = EventIndexConditionalContext
 
@@ -198,4 +206,20 @@ export function buildSecuredConditionalParameters(
   context: SecuredConditionalContext
 ): SecuredConditionalParameters {
   return buildCommonConditionalParameters(form, context)
+}
+
+/**
+ * The context of a serialised client function, e.g. a validator, a default value or a synced value.
+ * A client function can run without an event, e.g. in a user form. Then the context has only the user and the locations.
+ */
+export type ClientFunctionConditionalContext = {
+  user: UserConditionalContext
+  leafAdminStructureLocationIds: Array<{ id: UUID }>
+} & (EventConditionalContext | {})
+
+/** Returns `true` if the context of a client function has an event. */
+export function hasClientFunctionEvent(
+  context: ClientFunctionConditionalContext
+): context is ClientFunctionConditionalContext & EventConditionalContext {
+  return 'eventDocument' in context || 'eventIndex' in context
 }

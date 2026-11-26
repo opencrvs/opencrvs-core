@@ -18,19 +18,22 @@ import {
   getCustomActionFields,
   FieldConfig,
   EventConfig,
+  isFieldVisible,
   PlainDate,
-  ValidatorContext
+  ActionFormConditionalContext,
+  EventState
 } from '@opencrvs/commons/client'
 import { useEventConfigurationForRecord } from '@client/v2-events/features/events/useEventConfiguration'
 import { Output } from '@client/v2-events/features/events/components/Output'
 import { recordAnchorDate } from '@client/v2-events/utils'
-import { isFieldVisible } from '@client/v2-events/conditionals'
+import { useActionFormConditionalContext } from '@client/v2-events/hooks/useConditionalContext'
 
 function prepareContent(
   action: CustomAction,
   customActionFields: FieldConfig[],
   eventConfiguration: EventConfig,
-  validatorContext: ValidatorContext,
+  conditionalContext: ActionFormConditionalContext,
+  declaration: EventState,
   anchor: PlainDate,
   intl: IntlShape
 ) {
@@ -38,7 +41,11 @@ function prepareContent(
   return customActionFields
     .filter(
       (f) =>
-        isFieldVisible(f, annotation ?? {}, validatorContext) &&
+        isFieldVisible(
+          f,
+          { declaration, annotation: annotation ?? {} },
+          conditionalContext
+        ) &&
         annotation?.[f.id] != null &&
         annotation[f.id] !== ''
     )
@@ -61,15 +68,17 @@ function prepareContent(
 
 export function CustomActionContent({
   event,
-  action,
-  validatorContext
+  action
 }: {
   event: EventDocument
   action: CustomAction
-  validatorContext: ValidatorContext
 }) {
   const intl = useIntl()
   const { eventConfiguration } = useEventConfigurationForRecord(event)
+  const conditionalContext = useActionFormConditionalContext(
+    event,
+    eventConfiguration
+  )
 
   const customActionFields = getCustomActionFields(
     eventConfiguration,
@@ -78,15 +87,15 @@ export function CustomActionContent({
 
   // These are form values, so their locations resolve at the record's form
   // anchor (date of event, falling back to creation) — not the action date.
-  const anchor = recordAnchorDate(
-    getCurrentEventState(event, eventConfiguration)
-  )
+  const eventState = getCurrentEventState(event, eventConfiguration)
+  const anchor = recordAnchorDate(eventState)
 
   const content = prepareContent(
     action,
     customActionFields,
     eventConfiguration,
-    validatorContext,
+    conditionalContext,
+    eventState.declaration,
     anchor,
     intl
   )

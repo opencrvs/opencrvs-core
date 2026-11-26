@@ -60,7 +60,12 @@ export const Default: StoryObj<typeof FormFieldGenerator> = {
         }),
         element: (
           <StyledFormFieldGenerator
+            annotates={null}
             attachmentPath={null}
+            conditionalContext={getTestValidatorContext(undefined, {
+              event: tennisClubMembershipEventDocument,
+              eventConfig: tennisClubMembershipEvent
+            })}
             fields={[
               {
                 id: 'storybook.name',
@@ -76,10 +81,6 @@ export const Default: StoryObj<typeof FormFieldGenerator> = {
               }
             ]}
             id="my-form"
-            validatorContext={getTestValidatorContext(undefined, {
-              event: tennisClubMembershipEventDocument,
-              eventConfig: tennisClubMembershipEvent
-            })}
           />
         )
       },

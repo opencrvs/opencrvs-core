@@ -41,7 +41,6 @@ import {
   EventStatus,
   AdvancedSearchConfigWithFieldsResolved,
   METADATA_FIELD_PREFIX,
-  ValidatorContext,
   getAcceptedScopesByType,
   scopeUsesFullOptions,
   user,
@@ -57,6 +56,7 @@ import {
   getStructuralValidationErrorsForForm
 } from '@client/v2-events/components/forms/validation'
 import { toLocationId } from '@client/v2-events/utils'
+import { FormConditionalContext } from '@client/v2-events/components/forms/formConditionalContext'
 import { statusOptions, timePeriodOptions } from './EventMetadataSearchOptions'
 
 function isNameFieldValue(value: unknown): value is NameFieldValue {
@@ -70,12 +70,16 @@ function isFieldGroupValue(value: unknown): value is FieldGroupValue {
 export function getAdvancedSearchFieldErrors(
   sections: AdvancedSearchConfigWithFieldsResolved[],
   values: EventState,
-  context: ValidatorContext
+  conditionalContext: FormConditionalContext
 ) {
   return sections.reduce(
     (acc, section) => ({
       ...acc,
-      ...getStructuralValidationErrorsForForm(section.fields, values, context)
+      ...getStructuralValidationErrorsForForm(
+        section.fields,
+        values,
+        conditionalContext
+      )
     }),
     {} as IntlErrors
   )

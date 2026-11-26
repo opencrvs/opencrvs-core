@@ -15,15 +15,15 @@ import {
   getUUID,
   ActionType,
   getCurrentEventState,
+  omitHiddenAnnotationFields,
   EventDocument,
   EventConfig,
   ArchiveActionInput,
   MarkAsDuplicateActionInput,
   ActionStatus,
-  ValidatorContext
+  ActionFormConditionalContext
 } from '@opencrvs/commons/client'
 import { trpcClient } from '@client/v2-events/trpc'
-import { omitHiddenAnnotationFields } from '@client/v2-events/conditionals'
 
 // Defines custom API functions that are not part of the generated API from TRPC.
 
@@ -44,7 +44,7 @@ export interface CustomMutationParams {
 
 export interface CorrectionRequestParams extends CustomMutationParams {
   event: EventDocument
-  context: ValidatorContext
+  context: ActionFormConditionalContext
 }
 
 export interface ArchiveOnDuplicateParams extends CustomMutationParams {
@@ -261,8 +261,10 @@ export async function makeCorrectionOnRequest({
     actionConfiguration && declarationMixedUpAnnotation
       ? omitHiddenAnnotationFields(
           actionConfiguration,
-          originalDeclaration,
-          declarationMixedUpAnnotation,
+          {
+            declaration: originalDeclaration,
+            annotation: declarationMixedUpAnnotation
+          },
           context
         )
       : {}

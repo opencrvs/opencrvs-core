@@ -29,7 +29,7 @@ import { useIntlFormatMessageWithFlattenedParams } from '@client/v2-events/messa
 import { FormLayout } from '@client/v2-events/layouts'
 import { recordAnchorDate } from '@client/v2-events/utils'
 import { ROUTES } from '@client/v2-events/routes'
-import { useValidatorContext } from '@client/v2-events/hooks/useValidatorContext'
+import { useActionFormConditionalContext } from '@client/v2-events/hooks/useConditionalContext'
 import { ReviewCorrection } from './ReviewCorrection'
 
 export function Review() {
@@ -37,10 +37,13 @@ export function Review() {
   const events = useEvents()
 
   const event = events.getEvent.useGetEventFromCache(eventId)
-  const validatorContext = useValidatorContext(event)
 
   const { eventConfiguration: configuration } =
     useEventConfigurationForRecord(event)
+  const conditionalContext = useActionFormConditionalContext(
+    event,
+    configuration
+  )
   const eventIndex = getCurrentEventState(event, configuration)
 
   const formConfig = getDeclaration(configuration)
@@ -82,9 +85,9 @@ export function Review() {
           <ReviewCorrection
             correctionRequestAction={correctionRequestAction}
             form={formValuesAfterCorrection}
-            validatorContext={validatorContext}
           />
         }
+        conditionalContext={conditionalContext}
         form={formValuesAfterCorrection}
         formConfig={formConfig}
         isCorrection={true}
@@ -94,7 +97,6 @@ export function Review() {
           actionConfig.label,
           formValuesBeforeCorrection
         )}
-        validatorContext={validatorContext}
         /*
          * @todo isReviewCorrection, onEdit & readyonlyMode needs to be reviewed
          * as they there seems to be some reduntant ones among them

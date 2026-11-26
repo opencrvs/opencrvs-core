@@ -18,8 +18,8 @@ import { ActionType } from '../events/ActionType'
 import { tennisClubMembershipEvent } from '../fixtures'
 import {
   eventQueryDataGenerator,
-  generateEmptyTestValidatorContext,
-  generateEventDocument
+  generateEventDocument,
+  generateEmptyTestConditionalContext
 } from '../events/test.utils'
 import {
   errorMessages,
@@ -193,7 +193,7 @@ describe('runFieldValidations with customClientValidator', () => {
         field: fieldConfig,
         value: '123456',
         form: { declaration: { nid: '123456' }, annotation: {} },
-        context: generateEmptyTestValidatorContext(tennisClubMembershipEvent)
+        context: generateEmptyTestConditionalContext(tennisClubMembershipEvent)
       })
     ).toEqual([])
   })
@@ -219,7 +219,7 @@ describe('runFieldValidations with customClientValidator', () => {
         field: fieldConfig,
         value: '12345',
         form: { declaration: { nid: '12345' }, annotation: {} },
-        context: generateEmptyTestValidatorContext(tennisClubMembershipEvent)
+        context: generateEmptyTestConditionalContext(tennisClubMembershipEvent)
       })
     ).toEqual([{ message: errorMessage }])
   })
@@ -252,7 +252,7 @@ describe('runFieldValidations with customClientValidator', () => {
           declaration: { itemA: 3, itemB: 7, itemSum: 10 },
           annotation: {}
         },
-        context: generateEmptyTestValidatorContext(tennisClubMembershipEvent)
+        context: generateEmptyTestConditionalContext(tennisClubMembershipEvent)
       })
     ).toEqual([])
 
@@ -264,7 +264,7 @@ describe('runFieldValidations with customClientValidator', () => {
           declaration: { itemA: 3, itemB: 7, itemSum: 8 },
           annotation: {}
         },
-        context: generateEmptyTestValidatorContext(tennisClubMembershipEvent)
+        context: generateEmptyTestConditionalContext(tennisClubMembershipEvent)
       })
     ).toEqual([{ message: errorMessage }])
   })
@@ -308,7 +308,7 @@ describe('runFieldValidations with customClientValidator', () => {
         field: fieldConfig,
         value: 4,
         form: { declaration: { amount: 4 }, annotation: {} },
-        context: generateEmptyTestValidatorContext(tennisClubMembershipEvent)
+        context: generateEmptyTestConditionalContext(tennisClubMembershipEvent)
       })
     ).toEqual([])
 
@@ -318,7 +318,7 @@ describe('runFieldValidations with customClientValidator', () => {
         field: fieldConfig,
         value: -2,
         form: { declaration: { amount: -2 }, annotation: {} },
-        context: generateEmptyTestValidatorContext(tennisClubMembershipEvent)
+        context: generateEmptyTestConditionalContext(tennisClubMembershipEvent)
       })
     ).toEqual([
       {
@@ -336,7 +336,7 @@ describe('runFieldValidations with customClientValidator', () => {
         field: fieldConfig,
         value: 3,
         form: { declaration: { amount: 3 }, annotation: {} },
-        context: generateEmptyTestValidatorContext(tennisClubMembershipEvent)
+        context: generateEmptyTestConditionalContext(tennisClubMembershipEvent)
       })
     ).toEqual([
       {
@@ -368,7 +368,7 @@ describe('areConditionsMet', () => {
         [flagConditional],
         { declaration: {}, annotation: {} },
         {
-          ...generateEmptyTestValidatorContext(tennisClubMembershipEvent),
+          ...generateEmptyTestConditionalContext(tennisClubMembershipEvent),
           eventDocument
         }
       )
@@ -386,7 +386,7 @@ describe('areConditionsMet', () => {
         [flagConditional],
         { declaration: {}, annotation: {} },
         {
-          ...generateEmptyTestValidatorContext(tennisClubMembershipEvent),
+          ...generateEmptyTestConditionalContext(tennisClubMembershipEvent),
           eventDocument
         }
       )
@@ -424,7 +424,7 @@ describe('isFieldVisible', () => {
         flaggedField,
         { declaration: {}, annotation: {} },
         {
-          ...generateEmptyTestValidatorContext(tennisClubMembershipEvent),
+          ...generateEmptyTestConditionalContext(tennisClubMembershipEvent),
           eventDocument: notifiedDocument
         }
       )
@@ -435,7 +435,7 @@ describe('isFieldVisible', () => {
         flaggedField,
         { declaration: {}, annotation: {} },
         {
-          ...generateEmptyTestValidatorContext(tennisClubMembershipEvent),
+          ...generateEmptyTestConditionalContext(tennisClubMembershipEvent),
           eventDocument: document
         }
       )
@@ -447,7 +447,7 @@ describe('isFieldVisible', () => {
       isFieldVisible(
         flaggedField,
         { declaration: {}, annotation: {} },
-        generateEmptyTestValidatorContext(tennisClubMembershipEvent)
+        generateEmptyTestConditionalContext(tennisClubMembershipEvent)
       )
     ).toBe(false)
   })
@@ -537,7 +537,7 @@ describe('isActionVisible with status()', () => {
         reinstateConfig,
         { declaration: {}, annotation: {} },
         {
-          ...generateEmptyTestValidatorContext(tennisClubMembershipEvent),
+          ...generateEmptyTestConditionalContext(tennisClubMembershipEvent),
           eventDocument
         }
       )
@@ -558,7 +558,7 @@ describe('isActionVisible with status()', () => {
         reinstateConfig,
         { declaration: {}, annotation: {} },
         {
-          ...generateEmptyTestValidatorContext(tennisClubMembershipEvent),
+          ...generateEmptyTestConditionalContext(tennisClubMembershipEvent),
           eventDocument
         }
       )

@@ -16,12 +16,12 @@ import {
   EventDocument,
   getActionFormFields,
   getCurrentEventState,
-  ValidatorContext
+  isFieldVisible
 } from '@opencrvs/commons/client'
 import { useEventConfigurationForRecord } from '@client/v2-events/features/events/useEventConfiguration'
 import { Output } from '@client/v2-events/features/events/components/Output'
 import { recordAnchorDate } from '@client/v2-events/utils'
-import { isFieldVisible } from '@client/v2-events/conditionals'
+import { useActionFormConditionalContext } from '@client/v2-events/hooks/useConditionalContext'
 
 /**
  * Renders the values submitted through a core action's configured
@@ -29,15 +29,17 @@ import { isFieldVisible } from '@client/v2-events/conditionals'
  */
 export function ActionFormContent({
   event,
-  action,
-  validatorContext
+  action
 }: {
   event: EventDocument
   action: ActionDocument
-  validatorContext: ValidatorContext
 }) {
   const intl = useIntl()
   const { eventConfiguration } = useEventConfigurationForRecord(event)
+  const conditionalContext = useActionFormConditionalContext(
+    event,
+    eventConfiguration
+  )
 
   const originalAction =
     event.actions.find(
@@ -49,14 +51,17 @@ export function ActionFormContent({
 
   // These are form values, so their locations resolve at the record's form
   // anchor (date of event, falling back to creation) — not the action date.
-  const anchor = recordAnchorDate(
-    getCurrentEventState(event, eventConfiguration)
-  )
+  const eventState = getCurrentEventState(event, eventConfiguration)
+  const anchor = recordAnchorDate(eventState)
 
   const content = formFields
     .filter(
       (f) =>
-        isFieldVisible(f, annotation ?? {}, validatorContext) &&
+        isFieldVisible(
+          f,
+          { declaration: eventState.declaration, annotation: annotation ?? {} },
+          conditionalContext
+        ) &&
         annotation?.[f.id] != null &&
         annotation[f.id] !== ''
     )

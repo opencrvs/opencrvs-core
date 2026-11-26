@@ -475,7 +475,9 @@ export const DisabledFormFields: StoryObj<typeof FormFieldGenerator> = {
         path: '/event/:eventId',
         element: (
           <StyledFormFieldGenerator
+            annotates={null}
             attachmentPath={eventAttachmentPath(storybookEventId)}
+            conditionalContext={getTestValidatorContext()}
             fields={fields.map((f) => ({
               ...f,
               // Make all fields disabled
@@ -488,7 +490,6 @@ export const DisabledFormFields: StoryObj<typeof FormFieldGenerator> = {
             }))}
             formValues={declaration}
             id="my-form"
-            validatorContext={getTestValidatorContext()}
           />
         )
       },
@@ -534,17 +535,18 @@ export const EnabledFormFields: StoryObj<typeof FormFieldGenerator> = {
         path: '/event/:eventId',
         element: (
           <StyledFormFieldGenerator
+            annotates={null}
             attachmentPath={eventAttachmentPath(storybookEventId)}
+            conditionalContext={getTestValidatorContext()}
             fields={fields}
+            // Setting 'membership.duration' to a single date value allows us to demonstrate the enabled field
+            // scenario. The original defaultValue is a range (ex: `{ start: '2025-01-01', end: '2025-12-31' }`), which
+            // disables the date field component, making it difficult to check if all fields are enabled via looping.
             formValues={{
               ...declaration,
               'membership.duration': PlainDate.parse('2025-12-31')
             }}
             id="my-form"
-            // Setting 'membership.duration' to a single date value allows us to demonstrate the enabled field
-            // scenario. The original defaultValue is a range (ex: `{ start: '2025-01-01', end: '2025-12-31' }`), which
-            // disables the date field component, making it difficult to check if all fields are enabled via looping.
-            validatorContext={getTestValidatorContext()}
           />
         )
       },
@@ -588,7 +590,9 @@ export const EnabledFormFieldsByEnableCondition: StoryObj<
         path: '/event/:eventId',
         element: (
           <StyledFormFieldGenerator
+            annotates={null}
             attachmentPath={eventAttachmentPath(storybookEventId)}
+            conditionalContext={getTestValidatorContext()}
             fields={fields
               .map((f) => {
                 if (f.id === 'applicant.age') {
@@ -611,7 +615,6 @@ export const EnabledFormFieldsByEnableCondition: StoryObj<
               'applicant.age': 30
             }}
             id="my-form"
-            validatorContext={getTestValidatorContext()}
           />
         )
       },

@@ -32,7 +32,7 @@ import { useEventFormNavigation } from '@client/v2-events/features/events/useEve
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
 import { FormLayout } from '@client/v2-events/layouts'
 import { ROUTES } from '@client/v2-events/routes'
-import { useValidatorContext } from '@client/v2-events/hooks/useValidatorContext'
+import { useActionFormConditionalContext } from '@client/v2-events/hooks/useConditionalContext'
 
 export function Pages() {
   const { eventId, pageId } = useTypedParams(
@@ -49,7 +49,10 @@ export function Pages() {
   const event = events.getEvent.useGetEventFromCache(eventId)
   const { eventConfiguration: configuration } =
     useEventConfigurationForRecord(event)
-  const validatorContext = useValidatorContext(event)
+  const conditionalContext = useActionFormConditionalContext(
+    event,
+    configuration
+  )
   const eventIndex = getCurrentEventState(event, configuration)
   const certTemplateFieldConfig = useCertificateTemplateSelectorFieldConfig(
     event.type,
@@ -81,11 +84,6 @@ export function Pages() {
     }
   }, [pageId, currentPageId, navigate, eventId, searchParams])
 
-  const pagesValidatorContext = {
-    ...validatorContext,
-    baseFormState: eventIndex.declaration
-  }
-
   const onPageChange = (nextPageId: string) =>
     navigate(
       ROUTES.V2.EVENTS.PRINT_CERTIFICATE.PAGES.buildPath(
@@ -97,7 +95,8 @@ export function Pages() {
   const backAction = getFormBackAction({
     formPages,
     formData: annotation,
-    validatorContext: pagesValidatorContext,
+    annotates: eventIndex.declaration,
+    conditionalContext,
     pageId: currentPageId,
     onNavigateToPage: onPageChange
   })
@@ -112,7 +111,9 @@ export function Pages() {
         // Fresh form per page: late async field callbacks can't write into another page
         key={currentPageId}
         hideBackToReview
+        annotates={eventIndex.declaration}
         attachmentPath={eventAttachmentPath(eventId)}
+        conditionalContext={conditionalContext}
         eventConfig={configuration}
         formData={annotation}
         formPages={formPages.map((page) => {
@@ -130,7 +131,6 @@ export function Pages() {
         })}
         pageId={currentPageId}
         setFormData={(data) => setAnnotation(data)}
-        validatorContext={pagesValidatorContext}
         onPageChange={onPageChange}
         onSubmit={() => {
           navigate(

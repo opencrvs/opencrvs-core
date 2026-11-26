@@ -27,7 +27,6 @@ import {
   user,
   not,
   FieldConditional,
-  ValidatorContext,
   generateEventDocument,
   versionedTennisClubMembershipEvent
 } from '@opencrvs/commons/client'
@@ -36,6 +35,7 @@ import { FormFieldGenerator } from '@client/v2-events/components/forms/FormField
 import { AppRouter, TRPCProvider } from '@client/v2-events/trpc'
 import { createTemporaryId } from '@client/v2-events/utils'
 
+import { FormConditionalContext } from '@client/v2-events/components/forms/formConditionalContext'
 import { tennisClubMembershipEventDocument } from '../fixtures'
 import { getTestValidatorContext } from '../../../../../.storybook/decorators'
 
@@ -77,7 +77,7 @@ const StyledFormFieldGenerator = styled(FormFieldGenerator)`
 `
 function createAlphaPrintButtonStoryParameters(
   conditional: FieldConditional,
-  validatorContext: ValidatorContext
+  conditionalContext: FormConditionalContext
 ) {
   return {
     reactRouter: {
@@ -87,7 +87,9 @@ function createAlphaPrintButtonStoryParameters(
         }),
         element: (
           <StyledFormFieldGenerator
+            annotates={null}
             attachmentPath={null}
+            conditionalContext={conditionalContext}
             fields={[
               {
                 id: 'storybook.name',
@@ -104,7 +106,6 @@ function createAlphaPrintButtonStoryParameters(
               }
             ]}
             id="my-form"
-            validatorContext={validatorContext}
           />
         )
       },
@@ -183,7 +184,15 @@ export const WithTemporaryEventId: StoryObj<{}> = {
         }),
         element: (
           <StyledFormFieldGenerator
+            annotates={null}
             attachmentPath={null}
+            conditionalContext={getTestValidatorContext(
+              TestUserRole.enum.LOCAL_REGISTRAR,
+              {
+                event: temporaryEventDocument,
+                eventConfig: tennisClubMembershipEvent
+              }
+            )}
             fields={[
               {
                 id: 'storybook.name',
@@ -199,13 +208,6 @@ export const WithTemporaryEventId: StoryObj<{}> = {
               }
             ]}
             id="my-form"
-            validatorContext={getTestValidatorContext(
-              TestUserRole.enum.LOCAL_REGISTRAR,
-              {
-                event: temporaryEventDocument,
-                eventConfig: tennisClubMembershipEvent
-              }
-            )}
           />
         )
       },
@@ -246,7 +248,15 @@ export const RendersOnARouteWithoutAnEventId: StoryObj<{}> = {
         path: '/',
         element: (
           <StyledFormFieldGenerator
+            annotates={null}
             attachmentPath={null}
+            conditionalContext={getTestValidatorContext(
+              TestUserRole.enum.LOCAL_REGISTRAR,
+              {
+                event: declaredEventDocument,
+                eventConfig: tennisClubMembershipEvent
+              }
+            )}
             fields={[
               {
                 id: 'storybook.name',
@@ -262,13 +272,6 @@ export const RendersOnARouteWithoutAnEventId: StoryObj<{}> = {
               }
             ]}
             id="my-form"
-            validatorContext={getTestValidatorContext(
-              TestUserRole.enum.LOCAL_REGISTRAR,
-              {
-                event: declaredEventDocument,
-                eventConfig: tennisClubMembershipEvent
-              }
-            )}
           />
         )
       },

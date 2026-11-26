@@ -194,14 +194,15 @@ function AuthenticationStateStory({
   return (
     <Stack direction="column" gap={4}>
       <StyledFormFieldGenerator
+        annotates={null}
         attachmentPath={null}
+        conditionalContext={getTestValidatorContext(
+          TestUserRole.enum.LOCAL_REGISTRAR
+        )}
         fields={fields}
         formTouched={initialTouched}
         formValues={initialValues}
         id="id-reader-authentication-states"
-        validatorContext={getTestValidatorContext(
-          TestUserRole.enum.LOCAL_REGISTRAR
-        )}
       />
     </Stack>
   )

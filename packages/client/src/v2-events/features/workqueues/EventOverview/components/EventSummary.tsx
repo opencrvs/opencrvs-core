@@ -14,22 +14,21 @@ import { List } from '@opencrvs/components'
 import {
   EventConfig,
   getDeclarationFields,
+  areConditionsMet,
   getMixedPath,
   EventIndex,
   EventDocument,
-  FieldValue
+  isFieldSecured,
+  FieldValue,
+  FieldConfig
 } from '@opencrvs/commons/client'
 import { useIntlFormatMessageWithFlattenedParams } from '@client/v2-events/messages/utils'
 import { Output } from '@client/v2-events/features/events/components/Output'
-import { useValidatorContext } from '@client/v2-events/hooks/useValidatorContext'
+import { useActionConditionalContext } from '@client/v2-events/hooks/useConditionalContext'
 import { recordAnchorDate } from '@client/v2-events/utils'
 import { convertDateFieldsToUnixTimestamps } from '@client/v2-events/utils'
 import { useFlagLabelsString } from '@client/v2-events/messages/flags'
 import { useConfigVersionLabel } from '@client/v2-events/features/events/useEventConfiguration'
-import {
-  areConditionsMet,
-  isFieldSecured
-} from '@client/v2-events/conditionals'
 import { InfoBox } from './InfoBox'
 
 const messages = {
@@ -140,29 +139,38 @@ export function EventSummary({
   eventDocument?: EventDocument
 }) {
   const intl = useIntlFormatMessageWithFlattenedParams()
-  const validatorContext = useValidatorContext(eventDocument)
+  const actionContext = useActionConditionalContext(
+    eventIndex,
+    eventDocument,
+    eventConfiguration
+  )
+  const summaryForm = { declaration: event }
   const flagLabels = useFlagLabelsString(eventConfiguration, eventIndex.flags)
   const configVersionLabel = intl.formatMessage(
     useConfigVersionLabel(eventIndex)
   )
   const { summary, label: eventLabelMessage } = eventConfiguration
   const declarationFields = getDeclarationFields(eventConfiguration)
-  const securedFields = declarationFields
-    .filter((declarationField) =>
-      isFieldSecured(declarationField, eventIndex, validatorContext)
+  const isSecured = (field: FieldConfig) =>
+    isFieldSecured(
+      field,
+      { declaration: eventIndex.declaration },
+      { eventIndex }
     )
+  const securedFields = declarationFields
+    .filter((declarationField) => isSecured(declarationField))
     .map(({ id }) => id)
 
   const visibleBanners = (summary.banners ?? []).filter(
     (banner) =>
       !banner.conditionals ||
       banner.conditionals.length === 0 ||
-      areConditionsMet(banner.conditionals, event, validatorContext, eventIndex)
+      areConditionsMet(banner.conditionals, summaryForm, actionContext)
   )
   const configuredFields = summary.fields.map((field) => {
     if (
       field.conditionals &&
-      !areConditionsMet(field.conditionals, event, validatorContext, eventIndex)
+      !areConditionsMet(field.conditionals, summaryForm, actionContext)
     ) {
       return null
     }
@@ -180,7 +188,7 @@ export function EventSummary({
         // If a custom label is configured, use it. Otherwise, by default, use the label from the original form field.
         label: field.label ?? config.label,
         emptyValueMessage: field.emptyValueMessage,
-        secured: isFieldSecured(config, eventIndex, validatorContext),
+        secured: isSecured(config),
         value: (
           <Output
             anchor={recordAnchorDate(eventIndex)}

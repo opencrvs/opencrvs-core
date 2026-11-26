@@ -19,8 +19,7 @@ import {
   ActionUpdate,
   EventDocument,
   getAcceptedActions,
-  UUID,
-  ValidatorContext
+  UUID
 } from '@opencrvs/commons/client'
 import { ActionTypeSpecificContent } from './components'
 import { SystemUpdatedFields } from './components/SystemUpdatedFields'
@@ -141,7 +140,6 @@ export function EventHistoryDialog({
   userName,
   close,
   fullEvent,
-  validatorContext,
   title,
   isAwaitingConfirmation,
   systemUpdates
@@ -150,7 +148,6 @@ export function EventHistoryDialog({
   userName: string
   close: () => void
   fullEvent: EventDocument
-  validatorContext: ValidatorContext
   title: string
   isAwaitingConfirmation: boolean
   systemUpdates?: ActionUpdate
@@ -219,16 +216,11 @@ export function EventHistoryDialog({
           noResultText=" "
         />
       )}
-      <ActionTypeSpecificContent
-        action={action}
-        fullEvent={fullEvent}
-        validatorContext={validatorContext}
-      />
+      <ActionTypeSpecificContent action={action} fullEvent={fullEvent} />
       {systemUpdates && (
         <SystemUpdatedFields
           declaration={systemUpdates}
           fullEvent={fullEvent}
-          validatorContext={validatorContext}
         />
       )}
     </Dialog>

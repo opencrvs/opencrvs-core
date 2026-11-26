@@ -11,11 +11,7 @@
 import React from 'react'
 import { useIntl } from 'react-intl'
 import styled from 'styled-components'
-import {
-  EditAction,
-  EventDocument,
-  ValidatorContext
-} from '@opencrvs/commons/client'
+import { EditAction, EventDocument } from '@opencrvs/commons/client'
 import { Text } from '@opencrvs/components'
 import { useEventConfigurationForRecord } from '@client/v2-events/features/events/useEventConfiguration'
 import { withSuspense } from '@client/v2-events/components/withSuspense'
@@ -29,12 +25,10 @@ const ReasonParagraph = styled(Text)`
 /** Displays reason for edit and made edits */
 function EditComponent({
   action,
-  fullEvent,
-  validatorContext
+  fullEvent
 }: {
   action: EditAction
   fullEvent: EventDocument
-  validatorContext: ValidatorContext
 }) {
   const { eventConfiguration } = useEventConfigurationForRecord(fullEvent)
   // content.comment is a deprecated field that was used on 2.0
@@ -57,7 +51,6 @@ function EditComponent({
         eventConfig={eventConfiguration}
         fullEvent={fullEvent}
         id={'declaration-edit'}
-        validatorContext={validatorContext}
       />
     </>
   )

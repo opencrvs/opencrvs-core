@@ -23,11 +23,12 @@ import {
   FormState,
   IndexMap,
   mapFormState,
-  ValidatorContext,
-  AttachmentPath
+  AttachmentPath,
+  ActionUpdate
 } from '@opencrvs/commons/client'
 import { getValidationErrorsForForm } from '@client/v2-events/components/forms/validation'
 import { useFormInitialValues } from '@client/v2-events/hooks/useFormInitialValues'
+import { FormConditionalContext } from '@client/v2-events/components/forms/formConditionalContext'
 import {
   makeFormFieldIdsFormikCompatible,
   makeFormikFieldIdsOpenCRVSCompatible
@@ -65,8 +66,12 @@ export interface FormFieldGeneratorPropsWithoutRef {
   /** Which fields are generated */
   fields: FieldConfig[]
   eventConfig?: EventConfig
-  /** Full form values, the page values are plucked out of it */
+  /** The edited values. The values of the page are taken from it, and the form writes them back with `onFormChange`. */
   formValues?: EventState
+  /** The declaration that the form annotates, or `null` when the form edits a declaration. */
+  annotates: ActionUpdate | null
+  /** The other values of the part that the form edits. Only the inner form of a field sets it. */
+  siblingValues?: ActionUpdate
   /** Full form touched values, the page touched values are plucked out of it */
   formTouched?: IndexMap<FormState<boolean>>
   onFormChange?: (values: EventState) => void
@@ -74,7 +79,7 @@ export interface FormFieldGeneratorPropsWithoutRef {
   /** Called when the form is submitted and all fields are valid */
   onValidSubmit?: (formValues: EventState) => void
   isCorrection?: boolean
-  validatorContext: ValidatorContext
+  conditionalContext: FormConditionalContext
 }
 
 export const FormFieldGenerator = forwardRef<
@@ -96,11 +101,14 @@ export const FormFieldGenerator = forwardRef<
       onValidSubmit,
       isCorrection = false,
       formTouched,
-      validatorContext
+      annotates,
+      siblingValues,
+      conditionalContext
     },
     ref
   ) => {
     const formikRef = useRef<FormikProps<EventState>>(null)
+    const intl = useIntl()
 
     useImperativeHandle(ref, () => ({
       /*
@@ -148,21 +156,33 @@ export const FormFieldGenerator = forwardRef<
           ...extraValues
         }
         onFormChange?.(updatedFormValues)
-        const currentErrors = flattenFormState(formikRef.current?.errors)
-          .map(([, errs]) => errs)
-          .filter((err) => err !== undefined)
+        // Validate the submitted values now. The Formik errors come from the last render
+        // and can be old, e.g. right after a blur.
+        const currentErrors = flattenFormState(
+          getValidationErrorsForForm(
+            pageFields,
+            updatedFormValues,
+            annotates,
+            conditionalContext,
+            siblingValues
+          )
+        )
+          .map(([, errs]) => errs[0]?.message)
+          .filter((message) => message !== undefined)
+          .map((message) => intl.formatMessage(message))
         if (currentErrors.length === 0) {
           onValidSubmit?.(updatedFormValues)
         }
         return currentErrors
       }
     }))
-    const intl = useIntl()
     const { getInitialValues } = useFormInitialValues()
     const initialPageValues = getInitialValues(
       pageFields,
       formValues ?? {},
-      validatorContext
+      annotates,
+      siblingValues,
+      conditionalContext
     )
     const formikCompatibleInitialValues =
       makeFormFieldIdsFormikCompatible(initialPageValues)
@@ -194,10 +214,10 @@ export const FormFieldGenerator = forwardRef<
                   ...formValues,
                   ...makeFormikFieldIdsOpenCRVSCompatible(values)
                 },
-                validatorContext
+                annotates,
+                conditionalContext,
+                siblingValues
               ),
-              // this is caught in CI but editor flags as unnecessary condition
-              // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
               (errs) => errs[0]?.message && intl.formatMessage(errs[0].message)
             )
           )
@@ -209,8 +229,10 @@ export const FormFieldGenerator = forwardRef<
         {(formikProps) => {
           return (
             <FormSectionComponent
+              annotates={annotates}
               attachmentPath={attachmentPath}
               className={className}
+              conditionalContext={conditionalContext}
               eventConfig={eventConfig}
               fields={pageFields}
               isCorrection={isCorrection}
@@ -222,8 +244,8 @@ export const FormFieldGenerator = forwardRef<
               searchMode={searchMode}
               setTouched={formikProps.setTouched}
               setValues={formikProps.setValues}
+              siblingValues={siblingValues}
               touched={formikProps.touched}
-              validatorContext={validatorContext}
               values={formikProps.values}
               onFormChange={(cb) => onFormChange?.(cb(formValues ?? {}))}
               onTouchedChange={(cb) => onTouchedChange?.(cb(formTouched ?? {}))}

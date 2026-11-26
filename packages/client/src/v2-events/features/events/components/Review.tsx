@@ -32,9 +32,14 @@ import {
   FieldType,
   FieldUpdateValue,
   FormConfig,
+  getCurrentEventState,
   getDeclaration,
+  isFieldDisplayedOnReview,
+  isPageVisible,
+  omitHiddenFields,
+  omitHiddenPaginatedFields,
+  runFieldValidations,
   FieldTypesToHideInReview,
-  ValidatorContext,
   flattenFormState,
   IndexMap,
   FormState,
@@ -46,15 +51,14 @@ import { FormFieldGenerator } from '@client/v2-events/components/forms/FormField
 import { getCountryLogoFile } from '@client/offline/selectors'
 import { withSuspense } from '@client/v2-events/components/withSuspense'
 import { buttonMessages } from '@client/i18n/messages'
-import { useValidatorContext } from '@client/v2-events/hooks/useValidatorContext'
-import { useDialogFormState } from '@client/v2-events/hooks/useDialogFormState'
+import { useActionFormConditionalContext } from '@client/v2-events/hooks/useConditionalContext'
+import { omitHiddenPaginatedFieldsFromDeclaration } from '@client/v2-events/components/forms/validation'
 import {
-  isFieldDisplayedOnReview,
-  isPageVisible,
-  omitHiddenFields,
-  omitHiddenPaginatedFields,
-  runFieldValidations
-} from '@client/v2-events/conditionals'
+  FormConditionalContext,
+  toActionFormConditionalContext
+} from '@client/v2-events/components/forms/formConditionalContext'
+import { formForConditionals } from '@client/v2-events/components/forms/formValues'
+import { useDialogFormState } from '@client/v2-events/hooks/useDialogFormState'
 import { Output } from './Output'
 import { DocumentViewer } from './DocumentViewer'
 import { TranslationTextWithFormatModifier } from './TranslationTextWithFormatModifier'
@@ -225,7 +229,7 @@ function FormReview({
   isCorrection = false,
   isReviewCorrection = false,
   treatMissingValuesAsCleared = false,
-  validatorContext,
+  conditionalContext,
   anchor
 }: {
   formConfig: FormConfig
@@ -233,7 +237,7 @@ function FormReview({
   previousForm: EventState
   onEdit: ({ pageId, fieldId }: { pageId: string; fieldId?: string }) => void
   showPreviouslyMissingValuesAsChanged: boolean
-  validatorContext: ValidatorContext
+  conditionalContext: FormConditionalContext
   readonlyMode?: boolean
   isCorrection?: boolean
   isReviewCorrection?: boolean
@@ -242,9 +246,10 @@ function FormReview({
   anchor: PlainDate
 }) {
   const intl = useIntl()
+  const actionFormContext = toActionFormConditionalContext(conditionalContext)
 
   const visiblePages = formConfig.pages.filter((page) =>
-    isPageVisible(page, form, validatorContext)
+    isPageVisible(page, { declaration: form }, actionFormContext)
   )
 
   return (
@@ -253,7 +258,11 @@ function FormReview({
         {visiblePages.map((page) => {
           const fields = page.fields
             .filter((field) =>
-              isFieldDisplayedOnReview(field, form, validatorContext)
+              isFieldDisplayedOnReview(
+                field,
+                { declaration: form },
+                actionFormContext
+              )
             )
             .map((field) => {
               const value = form[field.id]
@@ -285,8 +294,8 @@ function FormReview({
                 runFieldValidations({
                   field,
                   value: form[field.id],
-                  form,
-                  context: validatorContext
+                  form: { declaration: form },
+                  context: actionFormContext
                 })
               ).flatMap(([, errs]) => errs)
 
@@ -428,7 +437,7 @@ function ReviewComponent({
   formConfig,
   previousFormValues,
   form,
-  validatorContext,
+  conditionalContext,
   annotation,
   onEdit,
   children,
@@ -448,7 +457,7 @@ function ReviewComponent({
   attachmentPath: AttachmentPath
   formConfig: FormConfig
   form: EventState
-  validatorContext: ValidatorContext
+  conditionalContext: FormConditionalContext
   annotation?: EventState
   reviewFields?: FieldConfig[]
   previousFormValues?: EventState
@@ -481,17 +490,14 @@ function ReviewComponent({
   const hasAnnotationFieldsToShow =
     annotation !== undefined && reviewFields && reviewFields.length > 0
 
-  // Values of hidden fields must not drive what the review page shows, as validation strips them
-  const visibleForm = omitHiddenPaginatedFields(
+  const actionFormContext = toActionFormConditionalContext(conditionalContext)
+
+  // Validation removes the values of hidden fields, so the review page does not show them
+  const visibleForm = omitHiddenPaginatedFieldsFromDeclaration(
     formConfig,
     form,
-    validatorContext
+    conditionalContext
   )
-
-  const annotationValidatorContext = {
-    ...validatorContext,
-    baseFormState: visibleForm
-  }
 
   const displayedAnnotationFields = hasAnnotationFieldsToShow
     ? reviewFields.filter(
@@ -499,8 +505,8 @@ function ReviewComponent({
           !FieldTypesToHideInReview.some((t) => t === field.type) &&
           isFieldDisplayedOnReview(
             field,
-            annotation,
-            annotationValidatorContext
+            formForConditionals(annotation, visibleForm),
+            actionFormContext
           )
       )
     : []
@@ -513,6 +519,7 @@ function ReviewComponent({
           <ReviewHeader title={title} />
           <FormReview
             anchor={anchor}
+            conditionalContext={conditionalContext}
             form={visibleForm}
             formConfig={formConfig}
             isCorrection={isCorrection}
@@ -523,7 +530,6 @@ function ReviewComponent({
               showPreviouslyMissingValuesAsChanged
             }
             treatMissingValuesAsCleared={treatMissingValuesAsCleared}
-            validatorContext={validatorContext}
             onEdit={onEdit}
           />
 
@@ -540,13 +546,14 @@ function ReviewComponent({
                     name="annotation"
                   >
                     <FormFieldGenerator
+                      annotates={visibleForm}
                       attachmentPath={attachmentPath}
+                      conditionalContext={conditionalContext}
                       fields={reviewFields}
                       formTouched={touched}
                       formValues={annotation}
                       id={'review'}
                       readonlyMode={readonlyMode}
-                      validatorContext={annotationValidatorContext}
                       onFormChange={onAnnotationChange}
                       onTouchedChange={setTouched}
                     />
@@ -624,7 +631,7 @@ function AcceptActionModal({
 }: {
   attachmentPath: AttachmentPath
   /** Record the action is taken on, for fields that act on it, e.g. a print button. */
-  event?: EventDocument
+  event: EventDocument
   copy: {
     onConfirm: MessageDescriptor
     title: MessageDescriptor
@@ -638,26 +645,27 @@ function AcceptActionModal({
   declaration: EventState
 }) {
   const intl = useIntl()
-  const validatorContext = useValidatorContext(event)
+  const conditionalContext = useActionFormConditionalContext(
+    event,
+    eventConfiguration
+  )
   const dialogForm = useDialogFormState()
   const modalValues = dialogForm.formValues
 
-  const dialogValidatorContext = {
-    ...validatorContext,
-    baseFormState: omitHiddenPaginatedFields(
-      getDeclaration(eventConfiguration),
-      declaration,
-      validatorContext
-    )
-  }
+  const visibleDeclaration = omitHiddenPaginatedFields(
+    getDeclaration(eventConfiguration),
+    { declaration },
+    conditionalContext
+  ).declaration
+  const dialogFormValues = formForConditionals(modalValues, visibleDeclaration)
 
   const errorsOnField = fields.flatMap((field) =>
     flattenFormState(
       runFieldValidations({
         field,
-        form: modalValues,
+        form: dialogFormValues,
         value: modalValues[field.id],
-        context: dialogValidatorContext
+        context: conditionalContext
       })
     ).flatMap(([, errs]) => errs)
   )
@@ -683,11 +691,9 @@ function AcceptActionModal({
           type="primary"
           onClick={() => {
             close({
-              values: omitHiddenFields(
-                fields,
-                modalValues,
-                dialogValidatorContext
-              )
+              values:
+                omitHiddenFields(fields, dialogFormValues, conditionalContext)
+                  .annotation ?? {}
             })
           }}
         >
@@ -711,11 +717,12 @@ function AcceptActionModal({
         {fields.length > 0 && (
           <FormFieldGenerator
             {...dialogForm}
+            annotates={visibleDeclaration}
             attachmentPath={attachmentPath}
+            conditionalContext={conditionalContext}
             eventConfig={eventConfiguration}
             fields={fields}
             id={`accept-action-modal-form-${action}`}
-            validatorContext={dialogValidatorContext}
           />
         )}
       </Stack>
@@ -738,7 +745,7 @@ function RejectActionModal({
 }: {
   attachmentPath: AttachmentPath
   /** Record the action is taken on, for fields that act on it, e.g. a print button. */
-  event?: EventDocument
+  event: EventDocument
   close: (result: RejectActionModalResult | null) => void
   dialogCopy?: MessageDescriptor
   fields?: FieldConfig[]
@@ -748,15 +755,26 @@ function RejectActionModal({
   const dialogForm = useDialogFormState()
   const modalValues = dialogForm.formValues
   const intl = useIntl()
-  const validatorContext = useValidatorContext(event)
+  const conditionalContext = useActionFormConditionalContext(
+    event,
+    eventConfiguration
+  )
+
+  const visibleDeclaration = omitHiddenPaginatedFieldsFromDeclaration(
+    getDeclaration(eventConfiguration),
+    getCurrentEventState(event, eventConfiguration).declaration,
+    conditionalContext
+  )
+  // The dialog annotates the declaration.
+  const annotationForm = formForConditionals(modalValues, visibleDeclaration)
 
   const errorsOnField = fields.flatMap((field) =>
     flattenFormState(
       runFieldValidations({
         field,
-        form: modalValues,
+        form: annotationForm,
         value: modalValues[field.id],
-        context: validatorContext
+        context: conditionalContext
       })
     ).flatMap(([, errs]) => errs)
   )
@@ -780,7 +798,9 @@ function RejectActionModal({
       onClick={() => {
         close({
           reason: message,
-          values: omitHiddenFields(fields, modalValues, validatorContext)
+          values:
+            omitHiddenFields(fields, annotationForm, conditionalContext)
+              .annotation ?? {}
         })
       }}
     >
@@ -811,11 +831,12 @@ function RejectActionModal({
         {fields.length > 0 && (
           <FormFieldGenerator
             {...dialogForm}
+            annotates={visibleDeclaration}
             attachmentPath={attachmentPath}
+            conditionalContext={conditionalContext}
             eventConfig={eventConfiguration}
             fields={fields}
             id="reject-action-modal-form"
-            validatorContext={validatorContext}
           />
         )}
       </Stack>

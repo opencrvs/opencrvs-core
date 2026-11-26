@@ -8,23 +8,27 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
+// @TODO: REREAD
 import { MessageDescriptor } from 'react-intl'
 import {
   FieldConfig,
   EventState,
-  FormConfig,
-  ValidatorContext,
-  FormState,
-  flattenFormState,
-  IndexMap
-} from '@opencrvs/commons/client'
-import {
   isPageVisible,
+  FormConfig,
+  runStructuralValidations,
+  runFieldValidations,
   omitHiddenFields,
   omitHiddenPaginatedFields,
-  runFieldValidations,
-  runStructuralValidations
-} from '@client/v2-events/conditionals'
+  FormState,
+  flattenFormState,
+  IndexMap,
+  ActionUpdate
+} from '@opencrvs/commons/client'
+import { formForConditionals } from './formValues'
+import {
+  FormConditionalContext,
+  toActionFormConditionalContext
+} from './formConditionalContext'
 
 interface ErrorMessage {
   message: MessageDescriptor
@@ -32,11 +36,51 @@ interface ErrorMessage {
 
 export type IntlErrors = IndexMap<FormState<ErrorMessage[]>>
 
+/** Returns the declaration without the values of hidden fields. */
+export function omitHiddenFieldsFromDeclaration(
+  fields: FieldConfig[],
+  declaration: EventState,
+  conditionalContext: FormConditionalContext
+): EventState {
+  const form = omitHiddenFields(
+    fields,
+    { declaration },
+    toActionFormConditionalContext(conditionalContext)
+  )
+  // omitHiddenFields only removes values, so the values keep their type
+  return form.declaration as EventState
+}
+
+/** Returns the declaration without the values of hidden pages and hidden fields. */
+export function omitHiddenPaginatedFieldsFromDeclaration(
+  formConfig: FormConfig,
+  declaration: EventState,
+  conditionalContext: FormConditionalContext
+): EventState {
+  const form = omitHiddenPaginatedFields(
+    formConfig,
+    { declaration },
+    toActionFormConditionalContext(conditionalContext)
+  )
+  // omitHiddenPaginatedFields only removes values, so the values keep their type
+  return form.declaration as EventState
+}
+
+/**
+ * @param values the values that the form edits.
+ * @param annotates see `formForConditionals`.
+ * @param siblingValues see `formForConditionals`.
+ */
 export function getValidationErrorsForForm(
   fields: FieldConfig[],
   values: EventState,
-  context: ValidatorContext
+  annotates: ActionUpdate | null,
+  conditionalContext: FormConditionalContext,
+  siblingValues?: ActionUpdate
 ) {
+  const form = formForConditionals(values, annotates, siblingValues)
+  const actionFormContext = toActionFormConditionalContext(conditionalContext)
+
   return fields.reduce((errorsForAllFields: IntlErrors, field) => {
     if (flattenFormState(errorsForAllFields[field.id] ?? []).length > 0) {
       return errorsForAllFields
@@ -47,8 +91,8 @@ export function getValidationErrorsForForm(
       [field.id]: runFieldValidations({
         field,
         value: values[field.id],
-        form: values,
-        context
+        form,
+        context: actionFormContext
       })
     }
   }, {})
@@ -57,8 +101,10 @@ export function getValidationErrorsForForm(
 export function getStructuralValidationErrorsForForm(
   fields: FieldConfig[],
   values: EventState,
-  context: ValidatorContext
+  conditionalContext: FormConditionalContext
 ) {
+  const actionFormContext = toActionFormConditionalContext(conditionalContext)
+
   return fields.reduce((errorsForAllFields: IntlErrors, field) => {
     if (flattenFormState(errorsForAllFields[field.id] ?? []).length > 0) {
       return errorsForAllFields
@@ -68,8 +114,8 @@ export function getStructuralValidationErrorsForForm(
       ...errorsForAllFields,
       [field.id]: runStructuralValidations({
         field,
-        values,
-        context
+        form: { declaration: values },
+        context: actionFormContext
       })
     }
   }, {})
@@ -78,36 +124,48 @@ export function getStructuralValidationErrorsForForm(
 export function validationErrorsInActionFormExist({
   formConfig,
   form,
-  context,
+  annotates = null,
+  conditionalContext,
   annotation,
   reviewFields = []
 }: {
   formConfig: FormConfig
   form: EventState
-  context: ValidatorContext
+  /** The declaration that `form` annotates. Leave it out when `form` is a declaration. */
+  annotates?: EventState | null
+  conditionalContext: FormConditionalContext
   annotation?: EventState
   reviewFields?: FieldConfig[]
 }): boolean {
-  // We don't want to validate hidden fields
-  const formWithoutHiddenFields = omitHiddenPaginatedFields(
-    formConfig,
-    form,
-    context
-  )
+  const actionFormContext = toActionFormConditionalContext(conditionalContext)
+  const formValues = formForConditionals(form, annotates)
 
-  const visibleAnnotationFields = omitHiddenFields(
-    reviewFields,
-    annotation ?? {},
-    { ...context, baseFormState: formWithoutHiddenFields }
+  // Do not validate hidden fields
+  const visibleFormValues = omitHiddenPaginatedFields(
+    formConfig,
+    formValues,
+    actionFormContext
   )
+  // The function only removes values, so the values keep the type of `form`.
+  const formWithoutHiddenFields = ((annotates
+    ? visibleFormValues.annotation
+    : visibleFormValues.declaration) ?? {}) as EventState
+
+  // The function only removes values, so the values keep the type of `annotation`.
+  const visibleAnnotationFields = (omitHiddenFields(
+    reviewFields,
+    { declaration: formWithoutHiddenFields, annotation: annotation ?? {} },
+    actionFormContext
+  ).annotation ?? {}) as EventState
 
   const hasValidationErrors = formConfig.pages
-    .filter((page) => isPageVisible(page, form, context))
+    .filter((page) => isPageVisible(page, formValues, actionFormContext))
     .some((page) => {
       const formErrors = getValidationErrorsForForm(
         page.fields,
         formWithoutHiddenFields,
-        context
+        annotates,
+        conditionalContext
       )
 
       return Object.values(formErrors).some(
@@ -119,7 +177,8 @@ export function validationErrorsInActionFormExist({
     getValidationErrorsForForm(
       reviewFields,
       { ...formWithoutHiddenFields, ...visibleAnnotationFields },
-      context
+      null,
+      conditionalContext
     )
   ).some((fieldErrors) => flattenFormState(fieldErrors ?? []).length > 0)
 

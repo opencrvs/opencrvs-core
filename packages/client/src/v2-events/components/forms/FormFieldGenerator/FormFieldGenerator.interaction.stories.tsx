@@ -862,12 +862,13 @@ export const NullsHiddenFieldUsingServerState: Story = {
         path: '/event/:eventId',
         element: (
           <StyledFormFieldGenerator
+            annotates={null}
             attachmentPath={eventAttachmentPath(storybookEventId)}
+            conditionalContext={getTestValidatorContext()}
             eventConfig={nixEventConfig}
             fields={nixConditionalFields}
             formValues={{}}
             id="nid-oauth-form"
-            validatorContext={getTestValidatorContext()}
             onFormChange={onFormChangeSpy}
           />
         )

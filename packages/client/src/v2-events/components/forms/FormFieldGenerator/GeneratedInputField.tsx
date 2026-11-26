@@ -58,7 +58,6 @@ import {
   isLinkButtonFieldType,
   isVerificationStatusType,
   isQueryParamReaderFieldType,
-  ValidatorContext,
   isIdReaderFieldType,
   isQrReaderFieldType,
   isLoaderFieldType,
@@ -67,11 +66,13 @@ import {
   isFieldGroupFieldType,
   FieldType,
   EventConfig,
+  isFieldVisible,
   IndexMap,
   FormState,
   flattenFieldReference,
   flattenFormState,
   ConditionalType,
+  isConditionMet,
   SelectOption,
   isCustomFieldType,
   isHiddenFieldType,
@@ -80,7 +81,10 @@ import {
   isUserRoleFieldType,
   todayISO,
   AttachmentPath,
-  EventDocument
+  EventDocument,
+  ActionFormConditionalContext,
+  ActionUpdate,
+  FormValues
 } from '@opencrvs/commons/client'
 import { InputField } from '@client/components/form/InputField'
 import { countries } from '@client/utils/countries'
@@ -127,7 +131,15 @@ import { Hidden } from '@client/v2-events/features/events/registered-fields/Hidd
 import { TextArea } from '@client/v2-events/features/events/registered-fields/TextArea'
 import { Autocomplete } from '@client/v2-events/features/events/registered-fields/Autocomplete'
 import { liveAnchorDate } from '@client/v2-events/utils'
-import { isConditionMet, isFieldVisible } from '@client/v2-events/conditionals'
+import {
+  FormConditionalContext,
+  findEventDocument,
+  toActionFormConditionalContext
+} from '@client/v2-events/components/forms/formConditionalContext'
+import {
+  formForConditionals,
+  mergeFormValues
+} from '@client/v2-events/components/forms/formValues'
 import {
   makeFormFieldIdFormikCompatible,
   makeFormikFieldIdOpenCRVSCompatible
@@ -170,6 +182,10 @@ interface GeneratedInputFieldProps<T extends FieldConfig> {
     values: Array<{ name: string; value: FieldValue | undefined }>
   ) => void
   ocrvsFullForm: EventState
+  /** See `formForConditionals`. */
+  annotates: ActionUpdate | null
+  /** See `formForConditionals`. */
+  siblingValues?: ActionUpdate
   /**
    * onBlur is used to set the touched state of the field
    */
@@ -178,7 +194,7 @@ interface GeneratedInputFieldProps<T extends FieldConfig> {
   readonlyMode?: boolean
   searchMode?: boolean
   allKnownFields: FieldConfig[]
-  validatorContext: ValidatorContext
+  conditionalContext: FormConditionalContext
   attachmentPath: AttachmentPath | null
 }
 
@@ -220,8 +236,8 @@ function requireEvent(
 
 function resolveOptions(
   options: SelectOption[],
-  form: EventState,
-  validatorContext: ValidatorContext
+  form: FormValues,
+  actionFormContext: ActionFormConditionalContext
 ) {
   return options
     .filter((option) => {
@@ -232,7 +248,7 @@ function resolveOptions(
         return true
       }
       return showConditionals.some((c) =>
-        isConditionMet(c.conditional, form, validatorContext)
+        isConditionMet(c.conditional, form, actionFormContext)
       )
     })
     .map(({ conditionals, ...option }) => {
@@ -243,7 +259,7 @@ function resolveOptions(
         return option
       }
       const isEnabled = enableConditionals.some((c) =>
-        isConditionMet(c.conditional, form, validatorContext)
+        isConditionMet(c.conditional, form, actionFormContext)
       )
       return { ...option, disabled: !isEnabled }
     })
@@ -256,17 +272,23 @@ export const GeneratedInputField = <T extends FieldConfig>(
     fieldDefinition,
     eventConfig,
     name,
-    validatorContext,
+    conditionalContext,
     onFieldValueChange,
     onBatchFieldValueChange,
     onBlur,
     allKnownFields,
     ocrvsFullForm,
+    annotates,
+    siblingValues,
     disabled,
     attachmentPath,
     readonlyMode,
     searchMode
   } = props
+  const form = formForConditionals(ocrvsFullForm, annotates, siblingValues)
+  // The inner form of a field, e.g. a name or an address, reads the values around the field.
+  const innerFormSiblingValues = { ...siblingValues, ...ocrvsFullForm }
+  const actionFormContext = toActionFormConditionalContext(conditionalContext)
   const intl = useIntl()
   const [input, meta] = useField<FieldValue>(name)
   const { touched: allTouched } = useFormikContext<EventState>()
@@ -312,8 +334,8 @@ export const GeneratedInputField = <T extends FieldConfig>(
 
     return liveAnchorDate({
       dateOfEvent: eventConfig?.dateOfEvent,
-      form: { ...validatorContext.baseFormState, ...ocrvsFullForm },
-      createdAt: validatorContext.event?.document.createdAt ?? todayISO()
+      form: mergeFormValues(form),
+      createdAt: findEventDocument(conditionalContext)?.createdAt ?? todayISO()
     })
   }
 
@@ -376,7 +398,13 @@ export const GeneratedInputField = <T extends FieldConfig>(
     return (
       <InputField {...parentInputFieldProps}>
         {field.config.fields.map((subfield) => {
-          if (!isFieldVisible(subfield, groupScope, validatorContext)) {
+          if (
+            !isFieldVisible(
+              subfield,
+              formForConditionals(groupScope, annotates, siblingValues),
+              actionFormContext
+            )
+          ) {
             return null
           }
           const subfieldName = makeFormFieldIdFormikCompatible(subfield.id)
@@ -424,14 +452,16 @@ export const GeneratedInputField = <T extends FieldConfig>(
       // We are showing errors to underlying text input, so we need to ignore them here
       <InputField {...nameInputFieldProps}>
         <Name.Input
+          annotates={annotates}
+          conditionalContext={conditionalContext}
           configuration={field.config.configuration}
           disabled={disabled}
           eventConfig={eventConfig}
           id={fieldDefinition.id}
           name={name}
+          siblingValues={innerFormSiblingValues}
           touched={groupTouched}
           validation={validation}
-          validatorContext={validatorContext}
           value={field.value}
           onBlur={onBlur}
           onChange={(val) => onFieldValueChange(name, val)}
@@ -629,8 +659,8 @@ export const GeneratedInputField = <T extends FieldConfig>(
   if (isNumberWithUnitFieldType(field)) {
     const resolvedOptions = resolveOptions(
       field.config.options,
-      ocrvsFullForm,
-      validatorContext
+      form,
+      actionFormContext
     )
     return (
       <InputField {...inputFieldProps}>
@@ -703,20 +733,15 @@ export const GeneratedInputField = <T extends FieldConfig>(
       // We are showing errors to underlying inputs, so we need to ignore them here
       <InputField {...omit(field.inputFieldProps, 'error')}>
         <Address.Input
+          annotates={annotates}
+          conditionalContext={conditionalContext}
           config={field.config}
           disabled={disabled}
           eventConfig={eventConfig}
           id={field.config.id}
           name={name}
+          siblingValues={innerFormSiblingValues}
           touched={groupTouched}
-          // The main form is context (non-editable) for the inner address form
-          validatorContext={{
-            ...validatorContext,
-            baseFormState: {
-              ...validatorContext.baseFormState,
-              ...ocrvsFullForm
-            }
-          }}
           value={field.value}
           onBlur={onBlur}
           onChange={(val) => onFieldValueChange(name, val)}
@@ -727,8 +752,8 @@ export const GeneratedInputField = <T extends FieldConfig>(
   if (isSelectFieldType(field)) {
     const resolvedOptions = resolveOptions(
       field.config.options,
-      ocrvsFullForm,
-      validatorContext
+      form,
+      actionFormContext
     )
 
     return (
@@ -752,8 +777,8 @@ export const GeneratedInputField = <T extends FieldConfig>(
               ? { ...country, conditionals: override.conditionals }
               : country
           }),
-          ocrvsFullForm,
-          validatorContext
+          form,
+          actionFormContext
         )
       : undefined
 
@@ -780,8 +805,8 @@ export const GeneratedInputField = <T extends FieldConfig>(
   if (isRadioGroupFieldType(field)) {
     const resolvedOptions = resolveOptions(
       field.config.options,
-      ocrvsFullForm,
-      validatorContext
+      form,
+      actionFormContext
     )
     return (
       <InputField {...inputFieldProps}>
@@ -894,8 +919,8 @@ export const GeneratedInputField = <T extends FieldConfig>(
   if (isFileFieldWithOptionType(field)) {
     const resolvedOptions = resolveOptions(
       field.config.options,
-      ocrvsFullForm,
-      validatorContext
+      form,
+      actionFormContext
     )
     return (
       <InputField {...inputFieldProps}>
@@ -919,7 +944,8 @@ export const GeneratedInputField = <T extends FieldConfig>(
       <Data.Input
         {...field.config}
         allKnownFields={allKnownFields}
-        formData={{ ...validatorContext.baseFormState, ...ocrvsFullForm }}
+        conditionalContext={conditionalContext}
+        formData={mergeFormValues(form)}
         onChange={(val) => onFieldValueChange(name, val)}
       />
     )
@@ -930,7 +956,7 @@ export const GeneratedInputField = <T extends FieldConfig>(
       <AlphaPrintButton.Input
         buttonLabel={field.config.configuration.buttonLabel}
         disabled={disabled}
-        event={requireEvent(validatorContext.event?.document, name)}
+        event={requireEvent(findEventDocument(conditionalContext), name)}
         id={name}
         template={field.config.configuration.template}
         onChange={(val) => onFieldValueChange(name, val)}
@@ -1069,8 +1095,11 @@ export const GeneratedInputField = <T extends FieldConfig>(
     return (
       <InputField variant="highlighted" {...inputFieldProps}>
         <IdReader.Input
+          annotates={annotates}
+          conditionalContext={conditionalContext}
           id={field.config.id}
           methods={field.config.methods}
+          siblingValues={innerFormSiblingValues}
           onChange={(val) => onFieldValueChange(name, val)}
         />
       </InputField>

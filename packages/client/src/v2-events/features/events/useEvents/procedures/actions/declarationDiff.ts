@@ -22,13 +22,15 @@ import {
   getDeclaration,
   getDeclarationFields,
   getNotificationForm,
-  ValidatorContext
-} from '@opencrvs/commons/client'
-import {
   isFieldVisible,
   omitHiddenFields,
   omitHiddenPaginatedFields
-} from '@client/v2-events/conditionals'
+} from '@opencrvs/commons/client'
+import {
+  FormConditionalContext,
+  toActionFormConditionalContext
+} from '@client/v2-events/components/forms/formConditionalContext'
+import { omitHiddenFieldsFromDeclaration } from '@client/v2-events/components/forms/validation'
 import type { CustomMutationKeys } from './customAction'
 
 /**
@@ -48,9 +50,13 @@ export function hasFieldChanged(
   f: FieldConfig,
   form: EventState,
   previousFormValues: EventState,
-  context: ValidatorContext
+  conditionalContext: FormConditionalContext
 ) {
-  const isVisible = isFieldVisible(f, form, context)
+  const isVisible = isFieldVisible(
+    f,
+    { declaration: form },
+    toActionFormConditionalContext(conditionalContext)
+  )
 
   const prevValue = previousFormValues[f.id]
   const currValue = form[f.id]
@@ -70,20 +76,21 @@ export function hasDeclarationFieldChanged(
   form: EventState,
   previousFormValues: EventState,
   eventConfiguration: EventConfig,
-  validatorContext: ValidatorContext,
+  conditionalContext: FormConditionalContext,
   /** Fields of the form being edited, which decide what is hidden. Defaults to the declaration form. */
   formFields: FieldConfig[] = getDeclarationFields(eventConfiguration)
 ) {
-  const formWithoutHiddenFields = omitHiddenFields(
+  const formWithoutHiddenFields = omitHiddenFieldsFromDeclaration(
     formFields,
     form,
-    validatorContext
+    conditionalContext
   )
+
   return hasFieldChanged(
     f,
     formWithoutHiddenFields,
     previousFormValues,
-    validatorContext
+    conditionalContext
   )
 }
 
@@ -202,15 +209,23 @@ export function getChangedDeclarationDiff(
   form: EventState,
   previousFormValues: EventState,
   eventConfiguration: EventConfig,
-  validatorContext: ValidatorContext
+  conditionalContext: FormConditionalContext
 ): EventState {
+  const actionFormContext = toActionFormConditionalContext(conditionalContext)
   // Visibility is decided by the form being edited, e.g. the notification form for a notifier
-  const visibleForm = omitHiddenFields(fields, form, validatorContext)
+  const visibleForm = omitHiddenFieldsFromDeclaration(
+    fields,
+    form,
+    conditionalContext
+  )
 
   function shouldClearNowHiddenField(field: FieldConfig) {
     const wasVisibleAndFilled =
-      isFieldVisible(field, previousFormValues, validatorContext) &&
-      !isDeeplyEmpty(previousFormValues[field.id])
+      isFieldVisible(
+        field,
+        { declaration: previousFormValues },
+        actionFormContext
+      ) && !isDeeplyEmpty(previousFormValues[field.id])
     const isHiddenNow = !(field.id in visibleForm)
     return wasVisibleAndFilled && isHiddenNow
   }
@@ -224,7 +239,7 @@ export function getChangedDeclarationDiff(
             form,
             previousFormValues,
             eventConfiguration,
-            validatorContext,
+            conditionalContext,
             fields
           ) || shouldClearNowHiddenField(field)
       )
@@ -245,15 +260,17 @@ export function getCleanedDeclarationDiff({
   form = getDeclaration(eventConfiguration),
   originalDeclaration,
   declarationDiff: submittedDiff,
-  validatorContext
+  conditionalContext
 }: {
   eventConfiguration: EventConfig
   /** Form whose fields, and their visibility, decide which fields are kept. Defaults to the declaration form. */
   form?: DeclarationFormConfig
   originalDeclaration?: EventState
   declarationDiff?: EventState
-  validatorContext: ValidatorContext
+  conditionalContext: FormConditionalContext
 }): ActionUpdate | undefined {
+  const actionFormContext = toActionFormConditionalContext(conditionalContext)
+
   if (isEmpty(submittedDiff)) {
     return submittedDiff
   }
@@ -274,10 +291,10 @@ export function getCleanedDeclarationDiff({
   if (isEmpty(originalDeclaration)) {
     return omitHiddenPaginatedFields(
       form,
-      declarationDiff,
-      validatorContext,
+      { declaration: declarationDiff },
+      actionFormContext,
       true
-    )
+    ).declaration
   }
 
   // Merge original + updates so we get the final event state
@@ -289,7 +306,12 @@ export function getCleanedDeclarationDiff({
   // Because hidden fields with values in current event state causes confusion and bug in search endpoint
   // (Ensures we only consider fields relevant to the event configuration)
   const cleanedDeclarationWithHiddenFieldsWithNullValues =
-    omitHiddenPaginatedFields(form, merged, validatorContext, true)
+    omitHiddenPaginatedFields(
+      form,
+      { declaration: merged },
+      actionFormContext,
+      true
+    ).declaration
 
   // From the update, keep only fields that are valid in the cleaned declaration
   // (Prevents applying updates to hidden/invalid fields)
