@@ -62,6 +62,11 @@ export const actionLabels = {
     description: 'Label for archive record button in dropdown menu',
     id: 'event.birth.action.archive.label'
   },
+  [ActionType.UNARCHIVE]: {
+    defaultMessage: 'Unarchive',
+    description: 'Label for unarchive record button in dropdown menu',
+    id: 'event.birth.action.unarchive.label'
+  },
   [ActionType.REGISTER]: {
     defaultMessage: 'Register',
     description: 'Label for review record button in dropdown menu',
@@ -102,6 +107,7 @@ export const actionIcons: Record<
   [ActionType.ASSIGN]: 'PushPin',
   [ActionType.UNASSIGN]: 'ArrowCircleDown',
   [ActionType.ARCHIVE]: 'Archive',
+  [ActionType.UNARCHIVE]: 'ArchiveTray',
   [ActionType.MARK_AS_DUPLICATE]: 'Files',
   [ActionType.DELETE]: 'Trash',
   [ActionType.DECLARE]: 'PaperPlaneTilt',

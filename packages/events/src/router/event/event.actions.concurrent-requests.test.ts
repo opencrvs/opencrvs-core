@@ -43,7 +43,6 @@ function mockConfirmations(
           status === 200 && action === ActionType.REGISTER
             ? { registrationNumber: `ABC${Date.now()}` }
             : {}
-        // @ts-expect-error - msw types complain about numeric status
         return HttpResponse.json(body, { status })
       }
     )
@@ -76,6 +75,7 @@ async function setup(actions: Parameters<typeof createEvent>[2] = []) {
     )
 
   return {
+    user,
     client,
     generator,
     event,
@@ -142,10 +142,19 @@ describe('An event has at most one requested action', () => {
   })
 
   test('a DECLARE waiting for its asynchronous confirmation refuses another DECLARE', async () => {
-    const { declare } = await setup()
+    const { user, client, generator, event, declare } = await setup()
     const calls = mockConfirmations(() => 202)
 
-    await declare()
+    // An asynchronous confirmation cannot keep the assignment, and it releases the record
+    await client.event.actions.declare.request(
+      generator.event.actions.declare(event.id)
+    )
+    await client.event.actions.assignment.assign(
+      generator.event.actions.assign(event.id, {
+        assignedTo: user.id
+      })
+    )
+
     await expect(declare()).rejects.toMatchObject({
       code: 'CONFLICT',
       message: expect.stringContaining('declare:requested')

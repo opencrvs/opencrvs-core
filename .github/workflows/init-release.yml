@@ -139,17 +139,13 @@ jobs:
       # The companion repos cut their own release branches. target_branch tells
       # them which of core's branches the release is made on.
       #
-      # countryconfig and testland run the workflow from their line branch.
-      # infrastructure runs it from develop. That workflow serves all the lines.
-      #
-      # TODO: countryconfig and testland only cut release branches on the 1.9.x
-      # line. Drop them from this list once this branch reaches develop.
+      # countryconfig and testland are not triggered: they now live in this
+      # repository as packages/countryconfig-template and packages/testland, so
+      # the version bump above covers them. infrastructure runs the workflow
+      # from develop. That workflow serves all the lines.
       - name: Trigger the companion workflows
         env:
-          COUNTRYCONFIG_TOKEN: ${{ secrets.COUNTRYCONFIG_WORKFLOW_TOKEN }}
           INFRASTRUCTURE_TOKEN: ${{ secrets.INFRASTRUCTURE_WORKFLOW_TOKEN }}
-          TESTLAND_TOKEN: ${{ secrets.TESTLAND_WORKFLOW_TOKEN }}
-          LINE_BRANCH: ${{ steps.line.outputs.branch }}
         run: |
           trigger() { # repo, token, ref
             GH_TOKEN="$2" gh workflow run init-release.yml \
@@ -160,9 +156,7 @@ jobs:
             echo "Triggered init-release in $1"
           }
 
-          trigger opencrvs-countryconfig "$COUNTRYCONFIG_TOKEN" "$LINE_BRANCH"
           trigger infrastructure "$INFRASTRUCTURE_TOKEN" develop
-          trigger opencrvs-testland "$TESTLAND_TOKEN" "$LINE_BRANCH"
 
       # Core PRs into release/<major>.<minor>.x run against the e2e branch of
       # the same name. The first release of a line cuts that branch from e2e's

@@ -8,8 +8,8 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { Meta, StoryObj } from '@storybook/react'
-import { userEvent, waitFor, within, expect } from '@storybook/test'
+import { Meta, StoryObj } from '@storybook/react-vite'
+import { userEvent, waitFor, within, expect } from 'storybook/test'
 import superjson from 'superjson'
 import { createTRPCMsw, httpLink } from '@vafanassieff/msw-trpc'
 import {
@@ -25,7 +25,8 @@ import { ROUTES, routesConfig } from '@client/v2-events/routes'
 import { AppRouter } from '@client/v2-events/trpc'
 import {
   addLocalEventConfig,
-  setEventData
+  setEventData,
+  updateLocalEventIndex
 } from '@client/v2-events/features/events/useEvents/api'
 import { testDataGenerator } from '@client/tests/test-data-generators'
 import { ActionMenu } from '../ActionMenu'
@@ -100,6 +101,7 @@ export const deletedScenariosForRegistrationAgent: StoryObj<typeof ActionMenu> =
        */
       addLocalEventConfig(tennisClubMembershipEvent)
       setEventData(createdEventDocument.id, createdEventDocument)
+      updateLocalEventIndex(createdEventDocument.id, createdEventDocument)
     },
     play: async ({ canvasElement, step }) => {
       const canvas = within(canvasElement)

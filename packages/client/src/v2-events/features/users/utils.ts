@@ -12,10 +12,14 @@
 import _ from 'lodash'
 import { EventDocument } from '@opencrvs/commons/client'
 
-export function findUserIdsFromDocument(eventDocument: EventDocument) {
+export function getUserIdsFromEventDocument(eventDocument: EventDocument) {
+  return _.uniq(eventDocument.actions.map((action) => action.createdBy))
+}
+
+export function getUserIdsFromEventDocuments(eventDocuments: EventDocument[]) {
   return _.uniq(
-    eventDocument.actions
-      .map((action) => ('createdBy' in action ? action.createdBy : undefined))
-      .filter((maybeUserId): maybeUserId is string => Boolean(maybeUserId))
+    eventDocuments.flatMap((eventDocument) =>
+      eventDocument.actions.map((action) => action.createdBy)
+    )
   )
 }

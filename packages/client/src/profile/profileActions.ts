@@ -13,6 +13,7 @@ import { UserDetails } from '@client/utils/userUtils'
 import { User } from '@opencrvs/commons/client'
 
 export const CHECK_AUTH = 'PROFILE/CHECK_AUTH' as const
+export const CHECK_AUTH_COMPLETE = 'PROFILE/CHECK_AUTH_COMPLETE' as const
 export const REDIRECT_TO_AUTHENTICATION =
   'PROFILE/REDIRECT_TO_AUTHENTICATION' as const
 export const SET_USER_DETAILS = 'PROFILE/SET_USER_DETAILS' as const
@@ -33,6 +34,11 @@ type RedirectToAuthenticationAction = {
 
 type CheckAuthAction = {
   type: typeof CHECK_AUTH
+}
+
+type CheckAuthCompleteAction = {
+  type: typeof CHECK_AUTH_COMPLETE
+  payload: { token: string }
 }
 
 type SetUserDetailsAction = {
@@ -60,6 +66,11 @@ type ISetInitialUserDetails = {
 
 export const checkAuth = (): CheckAuthAction => ({
   type: CHECK_AUTH
+})
+
+export const checkAuthComplete = (token: string): CheckAuthCompleteAction => ({
+  type: CHECK_AUTH_COMPLETE,
+  payload: { token }
 })
 
 export const setUserDetails = (payload: User): SetUserDetailsAction => ({
@@ -110,6 +121,7 @@ export const redirectToAuthentication = (
 
 export type Action =
   | CheckAuthAction
+  | CheckAuthCompleteAction
   | SetUserDetailsAction
   | RedirectToAuthenticationAction
   | ISetInitialUserDetails

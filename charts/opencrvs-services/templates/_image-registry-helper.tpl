@@ -117,3 +117,12 @@ imagePullSecrets:
 {{- toYaml . | nindent 2 }}
 {{- end }}
 {{- end -}}
+
+{{/*
+Build image reference from .repository and .tag
+*/}}
+{{- define "opencrvs.imageReference" -}}
+{{- $repository := required "image.repository is required" .image.repository -}}
+{{- $tag := required "image.tag is required" .image.tag | toString -}}
+{{- printf "%s:%s" $repository $tag -}}
+{{- end -}}

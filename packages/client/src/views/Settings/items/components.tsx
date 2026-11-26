@@ -8,17 +8,11 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
+import * as React from 'react'
 import styled from 'styled-components'
 import { LinkButton } from '@opencrvs/components/lib/buttons'
-import { ListViewItemSimplified } from '@opencrvs/components/lib/ListViewSimplified'
+import { ListItemProps } from '@opencrvs/components/lib/List'
 
-export const LabelContainer = styled.span`
-  ${({ theme }) => theme.fonts.bold16}
-`
-
-export const ValueContainer = styled.span`
-  ${({ theme }) => theme.fonts.reg16}
-`
 export const DynamicHeightLinkButton = styled(LinkButton)`
   height: auto;
 `
@@ -29,7 +23,15 @@ export const Message = styled.div`
 export const Label = styled.label`
   margin-bottom: 8px;
 `
-export const TopAlignedListViewItemSimplified = styled(ListViewItemSimplified)`
-  align-items: start;
-  padding: 16px 0;
-`
+
+/**
+ * One setting, as returned by its hook. The row goes in the list's table and the
+ * overlay does not, so they travel separately and the state that joins them
+ * stays in the hook.
+ */
+export interface SettingsRow {
+  /** Identifies the setting, for the row's key and test id. */
+  id: string
+  item: ListItemProps
+  overlay?: React.ReactNode
+}

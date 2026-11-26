@@ -1,9 +1,8 @@
 {
   "compilerOptions": {
-    "baseUrl": "./src",
     "paths": {
-      "@auth/*": ["./*"],
-      "@events/*": ["../../events/src/*"]
+      "@auth/*": ["./src/*"],
+      "@events/*": ["../events/src/*"]
     },
     "target": "es6",
     "module": "node16",
@@ -20,9 +19,9 @@
     "noImplicitAny": true,
     "strictNullChecks": true,
     "noUnusedLocals": true,
-    "types": ["fhir", "jest"]
+    "types": ["jest"]
   },
-  "include": ["resources/**/*.ts", "src/**/*.ts", "typings"],
+  "include": ["resources/**/*.ts", "src/**/*.ts", "typings", "test/setupJest.ts"],
   "exclude": [
     "node_modules",
     "build",

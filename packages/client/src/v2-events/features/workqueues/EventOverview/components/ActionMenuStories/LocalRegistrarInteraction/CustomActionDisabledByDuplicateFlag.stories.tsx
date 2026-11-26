@@ -8,14 +8,15 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import type { Meta, StoryObj } from '@storybook/react'
-import { expect, userEvent, waitFor, screen, within } from '@storybook/test'
+import type { Meta, StoryObj } from '@storybook/react-vite'
+import { expect, userEvent, waitFor, screen, within } from 'storybook/test'
 import superjson from 'superjson'
 import { createTRPCMsw, httpLink } from '@vafanassieff/msw-trpc'
 import {
   ActionType,
   createPrng,
   EventDocument,
+  EventDocumentOnlyLastAction,
   generateActionDocument,
   generateTrackingId,
   getCurrentEventState,
@@ -182,11 +183,16 @@ export const ApproveActionStateTransitions: StoryObj = {
             ]
           })),
           tRPCMsw.event.get.query(() => currentDoc),
-          tRPCMsw.event.getDuplicates.query(() => []),
+          tRPCMsw.event.getDuplicates.query(() => [mockDuplicateEvent]),
           tRPCMsw.event.actions.assignment.assign.mutation(() => {
             currentDoc = eventAssignedWithFlag
-            return eventAssignedWithFlag
+
+            return EventDocumentOnlyLastAction.parse({
+              ...currentDoc,
+              actions: [assignAction]
+            })
           }),
+
           tRPCMsw.event.actions.duplicate.markNotDuplicate.mutation(() => {
             currentDoc = eventAssignedNoFlag
             return eventAssignedNoFlag

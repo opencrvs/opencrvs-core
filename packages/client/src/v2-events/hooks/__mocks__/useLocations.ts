@@ -9,12 +9,12 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { V2_DEFAULT_MOCK_LOCATIONS_MAP } from '@opencrvs/commons/client'
+import { V2_DEFAULT_MOCK_CLIENT_LOCATIONS_MAP } from '@opencrvs/commons/client'
 
 export function useLocations() {
   return {
     getLocations: {
-      useSuspenseQuery: () => V2_DEFAULT_MOCK_LOCATIONS_MAP
+      useSuspenseQuery: () => V2_DEFAULT_MOCK_CLIENT_LOCATIONS_MAP
     }
   }
 }

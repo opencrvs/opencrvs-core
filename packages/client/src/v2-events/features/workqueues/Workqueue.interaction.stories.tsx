@@ -10,16 +10,17 @@
  */
 
 /* eslint-disable max-lines */
-import type { Meta, StoryObj } from '@storybook/react'
+import type { Meta, StoryObj } from '@storybook/react-vite'
 import React from 'react'
 import superjson from 'superjson'
 import { createTRPCMsw, httpLink } from '@vafanassieff/msw-trpc'
-import { userEvent, within, expect, waitFor } from '@storybook/test'
+import { userEvent, within, expect, waitFor } from 'storybook/test'
 import { onlineManager } from '@tanstack/react-query'
 import {
   ActionType,
   createPrng,
   encodeScope,
+  EventDocumentOnlyLastAction,
   EventIndex,
   eventQueryDataGenerator,
   EventStatus,
@@ -120,16 +121,15 @@ export const PaginationAfterDownload: Story = {
         ],
         event: [
           tRPCMsw.event.actions.assignment.assign.mutation(() => {
-            return {
+            return EventDocumentOnlyLastAction.parse({
               ...downloadEvent,
               actions: [
-                ...downloadEvent.actions,
                 generateActionDocument({
                   configuration: tennisClubMembershipEvent,
                   action: ActionType.ASSIGN
                 })
               ]
-            }
+            })
           }),
           tRPCMsw.event.getDuplicates.query(() => {
             return []
@@ -757,7 +757,6 @@ export const MobileCreateEventHiddenForUnauthorizedUser: Story = {
   parameters: {
     userRole: TestUserRole.enum.FIELD_AGENT,
     token: tokenWithWorkqueueButNoCreate,
-    viewport: { defaultViewport: 'mobile' },
     reactRouter: {
       router: routesConfig,
       initialPath: ROUTES.V2.WORKQUEUES.WORKQUEUE.buildPath({ slug: 'recent' })
@@ -807,13 +806,13 @@ export const MobileCreateEventHiddenForUnauthorizedUser: Story = {
         await expect(fab).toBeNull()
       }
     )
-  }
+  },
+  globals: { viewport: { value: 'mobile' } }
 }
 
 export const MobileCreateEventShownForAuthorizedUser: Story = {
   parameters: {
     userRole: TestUserRole.enum.LOCAL_REGISTRAR,
-    viewport: { defaultViewport: 'mobile' },
     reactRouter: {
       router: routesConfig,
       initialPath: ROUTES.V2.WORKQUEUES.WORKQUEUE.buildPath({ slug: 'recent' })
@@ -855,7 +854,6 @@ export const MobileCreateEventShownForAuthorizedUser: Story = {
         await expect(rows.length).toBeGreaterThan(0)
       })
     })
-
     await step(
       'Floating action button for new event creation is rendered',
       async () => {
@@ -865,7 +863,8 @@ export const MobileCreateEventShownForAuthorizedUser: Story = {
         })
       }
     )
-  }
+  },
+  globals: { viewport: { value: 'mobile' } }
 }
 
 export const WorkqueueAutoRefreshOnCountChange: Story = {

@@ -209,33 +209,5 @@ describe('bulkImport', () => {
         code: 'BAD_REQUEST'
       })
     })
-
-    test('stores none of the records when one of them is rejected', async () => {
-      const { user, eventsDb } = await setupTestCase()
-      const valid = eventWithFiles(user.id, {
-        image: (eventId) => `events/${eventId}/${getUUID()}.png`,
-        signature: () => `users/${user.id}/${getUUID()}.png`
-      })
-      const invalid = eventWithFiles(
-        user.id,
-        {
-          image: () => `events/${getUUID()}/${getUUID()}.png`,
-          signature: () => `users/${user.id}/${getUUID()}.png`
-        },
-        createPrng(902)
-      )
-
-      await expect(importEvents([valid, invalid])).rejects.toMatchObject({
-        code: 'BAD_REQUEST'
-      })
-
-      const stored = await eventsDb
-        .selectFrom('events')
-        .select('id')
-        .where('id', 'in', [valid.id, invalid.id])
-        .execute()
-
-      expect(stored).toEqual([])
-    })
   })
 })

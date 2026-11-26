@@ -111,7 +111,7 @@ export function getAnnotationForActionType({
       actionType: ActionType.NOTIFY,
       draft
     })
-    return { ...annotation, ...notifyAnnotation }
+    return { ...notifyAnnotation, ...annotation }
   }
 
   if (Object.keys(annotation).length === 0) {

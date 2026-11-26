@@ -100,20 +100,34 @@ test('filters by status', async () => {
   expect(deactivated).toHaveLength(users.length - active.length)
 })
 
-test('filters by email (case-insensitive partial match)', async () => {
+test('filters by email (exact match, case-insensitive)', async () => {
   const { user } = await setupTestCase()
   const client = createTestClient(user, withSearchAll)
 
+  // The seeder gives every user the email `user-${id}@test.example`
   const results = await client.user.search({
     ...defaultSearch,
-    email: user.id.toUpperCase()
+    email: `USER-${user.id}@TEST.EXAMPLE`
   })
 
   expect(results).toHaveLength(1)
   expect(results[0].id).toBe(user.id)
 })
 
-test('filters by username (case-insensitive partial match)', async () => {
+test('does not match an email that merely contains the search term', async () => {
+  const { user } = await setupTestCase()
+  const client = createTestClient(user, withSearchAll)
+
+  // A substring of the seeded `user-${id}@test.example`
+  const results = await client.user.search({
+    ...defaultSearch,
+    email: `${user.id}@test.example`
+  })
+
+  expect(results).toEqual([])
+})
+
+test('filters by username (exact match, case-insensitive)', async () => {
   const { user } = await setupTestCase()
   const client = createTestClient(user, withSearchAll)
 
@@ -121,14 +135,43 @@ test('filters by username (case-insensitive partial match)', async () => {
 
   const results = await client.user.search({
     ...defaultSearch,
-    username: 'U.NIQUEUSE'
+    username: 'U.NIQUEUSER'
   })
 
   expect(results).toHaveLength(1)
   expect(results[0].id).toBe(user.id)
 })
 
-test('filters by mobile (partial match)', async () => {
+test('does not match a username the search term is only a prefix of', async () => {
+  const { user } = await setupTestCase()
+  const client = createTestClient(user, withSearchAll)
+
+  await updateUsernameById(user.id, `j.campbell2`)
+
+  const results = await client.user.search({
+    ...defaultSearch,
+    username: 'j.campbell'
+  })
+
+  expect(results).toEqual([])
+})
+
+test('filters by mobile (exact match)', async () => {
+  const { user } = await setupTestCase()
+  const client = createTestClient(user, withSearchAll)
+
+  await updateUserById(user.id, { mobile: '+447911123456' })
+
+  const results = await client.user.search({
+    ...defaultSearch,
+    mobile: '+447911123456'
+  })
+
+  expect(results).toHaveLength(1)
+  expect(results[0].id).toBe(user.id)
+})
+
+test('does not match a mobile that merely contains the search term', async () => {
   const { user } = await setupTestCase()
   const client = createTestClient(user, withSearchAll)
 
@@ -139,8 +182,7 @@ test('filters by mobile (partial match)', async () => {
     mobile: '7911123'
   })
 
-  expect(results).toHaveLength(1)
-  expect(results[0].id).toBe(user.id)
+  expect(results).toEqual([])
 })
 
 test('respects count and skip for pagination', async () => {
@@ -156,6 +198,51 @@ test('respects count and skip for pagination', async () => {
 
   expect(page).toHaveLength(1)
   expect(page[0].id).toBe(all[1].id)
+})
+
+test('returns all matching users (no limit) when count is omitted', async () => {
+  const { user, seed, generator } = await setupTestCase()
+  const client = createTestClient(user, withSearchAll)
+
+  const office = user.primaryOfficeId
+
+  // Seed more users
+  for (let i = 0; i < 12; i++) {
+    await seed.user(generator.user.create({ primaryOfficeId: office }))
+  }
+
+  const limited = await client.user.search({
+    ...defaultSearch,
+    primaryOfficeId: office
+  })
+
+  const unlimited = await client.user.search({
+    sortOrder: 'asc',
+    primaryOfficeId: office
+  })
+
+  // `defaultSearch` caps at count: 10, the omitted-count search returns everyone.
+  expect(limited).toHaveLength(10)
+  expect(unlimited.length).toBeGreaterThan(limited.length)
+})
+
+test('skip defaults to 0 when omitted', async () => {
+  const { user, seed, generator } = await setupTestCase()
+  const client = createTestClient(user, withSearchAll)
+
+  await seed.user(
+    generator.user.create({ primaryOfficeId: user.primaryOfficeId })
+  )
+
+  const withExplicitSkip = await client.user.search({
+    ...defaultSearch,
+    skip: 0
+  })
+  const withoutSkip = await client.user.search({ count: 10, sortOrder: 'asc' })
+
+  expect(withoutSkip.map((u) => u.id)).toEqual(
+    withExplicitSkip.map((u) => u.id)
+  )
 })
 
 test('sortOrder asc and desc by createdAt are reversed', async () => {
@@ -260,7 +347,6 @@ test('administrativeArea scope: includes users in nested sub-areas', async () =>
       name: 'Nested area',
       parentId: user.administrativeAreaId,
       id: childAreaId,
-      validUntil: null,
       externalId: 'search-nested-area-001'
     }
   ])
@@ -271,7 +357,6 @@ test('administrativeArea scope: includes users in nested sub-areas', async () =>
       administrativeAreaId: childAreaId,
       locationType: 'CRVS_OFFICE',
       id: nestedOfficeId,
-      validUntil: null,
       externalId: 'search-nested-office-001'
     }
   ])
@@ -297,7 +382,6 @@ test('location + administrativeArea: administrativeArea wins', async () => {
       administrativeAreaId: user.administrativeAreaId,
       locationType: 'CRVS_OFFICE',
       id: sameAreaOfficeId,
-      validUntil: null,
       externalId: 'same-area-office-001'
     }
   ])

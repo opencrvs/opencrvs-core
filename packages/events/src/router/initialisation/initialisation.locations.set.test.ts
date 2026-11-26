@@ -12,7 +12,7 @@ import { TRPCError } from '@trpc/server'
 import {
   createPrng,
   generateUuid,
-  Location,
+  SetLocationPayload,
   TokenUserType
 } from '@opencrvs/commons'
 import {
@@ -22,18 +22,18 @@ import {
   setupTestCase,
   systemInitialisationTestSetup,
   TEST_SYSTEM_ID,
-  TEST_USER_DEFAULT_SCOPES
+  TEST_USER_DEFAULT_SCOPES,
+  UUID_REGEX
 } from '@events/tests/utils'
 import { getClient } from '@events/storage/postgres/events'
 import { payloadGenerator } from '@events/tests/generators'
 
-const locationPayload: Location[] = [
+const locationPayload: SetLocationPayload[] = [
   {
     id: generateUuid(),
     administrativeAreaId: null,
     name: 'New Administrative Area',
     locationType: 'test-location-type',
-    validUntil: null,
     externalId: 'abc123xyz456'
   }
 ]
@@ -166,7 +166,6 @@ test('updates externalId on existing location when re-seeded with a value', asyn
       administrativeAreaId: null,
       name: 'Location without external id',
       locationType: 'CRVS_OFFICE',
-      validUntil: null,
       externalId: null
     }
   ])
@@ -184,7 +183,6 @@ test('updates externalId on existing location when re-seeded with a value', asyn
       administrativeAreaId: null,
       name: 'Location without external id',
       locationType: 'CRVS_OFFICE',
-      validUntil: null,
       externalId: 'adminpcode123'
     }
   ])
@@ -240,9 +238,103 @@ test('seeding locations is additive, not destructive', async () => {
       (a) => a.id === remainingLocation.id
     )
     expect(found).toBeDefined()
+    // `versions` is excluded: a re-seed replaces the history, and a payload
+    // carrying none rebuilds a single element with a fresh versionId. This
+    // test is about rows surviving an omission, not about history.
     expect(remainingLocation).toMatchObject({
       ...found,
-      updatedAt: expect.any(String)
+      updatedAt: expect.any(String),
+      versions: expect.any(Array)
     })
   }
+})
+
+test('stores a single active initial version when creating a location', async () => {
+  await systemInitialisationTestSetup()
+  const client = createInitialisationTestClient()
+
+  const locationId = generateUuid()
+
+  await client.locations.set([
+    {
+      id: locationId,
+      administrativeAreaId: null,
+      name: 'Versioned location',
+      locationType: 'CRVS_OFFICE',
+      externalId: 'versioned-location-pcode'
+    }
+  ])
+
+  const eventsDb = getClient()
+  const { versions } = await eventsDb
+    .selectFrom('locations')
+    .select('versions')
+    .where('id', '=', locationId)
+    .executeTakeFirstOrThrow()
+
+  // toEqual matches keys exactly, so this also asserts the version element
+  // contains no parent reference (administrativeAreaId).
+  expect(versions).toEqual([
+    {
+      versionId: expect.stringMatching(UUID_REGEX),
+      effectiveFrom: '0001-01-01',
+      name: 'Versioned location',
+      externalId: 'versioned-location-pcode',
+      status: 'active'
+    }
+  ])
+})
+
+test('replaces versions when re-seeding an existing location with a new name', async () => {
+  await systemInitialisationTestSetup()
+  const client = createInitialisationTestClient()
+
+  const locationId = generateUuid()
+
+  await client.locations.set([
+    {
+      id: locationId,
+      administrativeAreaId: null,
+      name: 'Original name',
+      locationType: 'CRVS_OFFICE',
+      externalId: 'renamed-location-pcode'
+    }
+  ])
+
+  const eventsDb = getClient()
+  const { versions: versionsAfterInsert } = await eventsDb
+    .selectFrom('locations')
+    .select('versions')
+    .where('id', '=', locationId)
+    .executeTakeFirstOrThrow()
+
+  await client.locations.set([
+    {
+      id: locationId,
+      administrativeAreaId: null,
+      name: 'Renamed location',
+      locationType: 'CRVS_OFFICE',
+      externalId: 'renamed-location-pcode'
+    }
+  ])
+
+  const updated = await eventsDb
+    .selectFrom('locations')
+    .select(['name', 'versions'])
+    .where('id', '=', locationId)
+    .executeTakeFirstOrThrow()
+
+  // Re-seeding replaces the stored history with the incoming one. A payload
+  // carrying no `versions` therefore resets the row to a single element built
+  // from its flat fields — including a freshly generated versionId.
+  expect(updated.name).toBe('Renamed location')
+  expect(updated.versions).not.toEqual(versionsAfterInsert)
+  expect(updated.versions).toEqual([
+    expect.objectContaining({
+      versionId: expect.stringMatching(UUID_REGEX),
+      effectiveFrom: '0001-01-01',
+      name: 'Renamed location',
+      status: 'active'
+    })
+  ])
 })

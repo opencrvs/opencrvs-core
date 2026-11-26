@@ -27,7 +27,8 @@ import {
 
 import {
   refetchAllSearchQueries,
-  setEventData
+  setEventData,
+  updateLocalEventIndex
 } from '@client/v2-events/features/events/useEvents/api'
 import { queryClient, useTRPC, trpcOptionsProxy } from '@client/v2-events/trpc'
 
@@ -111,11 +112,19 @@ setMutationDefaults(trpcOptionsProxy.event.create, {
     }
 
     setEventData(newEvent.transactionId, optimisticEvent)
+    // Explicitly update local event index to make it accessible when created in offline mode.
+
+    updateLocalEventIndex(newEvent.transactionId, optimisticEvent)
+
     return optimisticEvent
   },
   onSuccess: async (response, _variables, context) => {
     setEventData(response.id, response)
     setEventData(context.transactionId, response)
+    // Explicitly update local event index to make it accessible when created in offline mode.
+    updateLocalEventIndex(response.id, response)
+    updateLocalEventIndex(context.transactionId, response)
+
     await refetchAllSearchQueries()
   },
   meta: { actionType: ActionType.CREATE }

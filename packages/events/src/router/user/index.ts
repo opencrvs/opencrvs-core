@@ -12,11 +12,7 @@
 import { TRPCError } from '@trpc/server'
 import * as z from 'zod/v4'
 import { decode } from 'jsonwebtoken'
-import {
-  AuditLogEntrySchema,
-  UserAuditRecordInput,
-  UUID
-} from '@opencrvs/commons/events'
+import { AuditLogEntrySchema, UUID } from '@opencrvs/commons/events'
 import {
   CreateUserInput,
   getAcceptedScopesFromToken,
@@ -35,7 +31,6 @@ import {
   parseDocumentPath
 } from '@opencrvs/commons'
 import {
-  allowedWithAnyOfScopes,
   canAccessUserWithScopes,
   canCreateUserWithScopes,
   canSearchUsers,
@@ -57,7 +52,7 @@ import {
   updateUserById
 } from '@events/storage/postgres/events/users'
 import {
-  queryUserAuditLog,
+  queryClientAuditLog,
   writeAuditLog
 } from '@events/storage/postgres/events/auditLog'
 import {
@@ -96,8 +91,20 @@ const UserSearch = z.object({
   email: z.string().optional(),
   status: z.string().optional(),
   primaryOfficeId: z.string().optional(),
-  count: z.number().min(0),
-  skip: z.number().min(0),
+  count: z
+    .number()
+    .min(0)
+    .optional()
+    .describe(
+      'Optional count of users to return. When omitted, the endpoint returns every matching user (no limit).'
+    ),
+  skip: z
+    .number()
+    .min(0)
+    .default(0)
+    .describe(
+      'Optional skip of users to return. When omitted, the endpoint returns the first page of users.'
+    ),
   sortBy: z
     .enum([
       'createdAt',
@@ -246,7 +253,10 @@ export function searchUsersRoute(
           primaryOfficeId: primaryOfficeId,
           administrativeAreaId: ctx.user.administrativeAreaId
         })
-        return allUsers.slice(input.skip, input.skip + input.count)
+        return allUsers.slice(
+          input.skip,
+          input.count === undefined ? undefined : input.skip + input.count
+        )
       }
 
       if (accessLevel === JurisdictionFilter.enum.location) {
@@ -270,15 +280,6 @@ const UserAuditListQuery = z.object({
 })
 
 const auditRouter = router({
-  record: userAndSystemProcedure
-    .input(UserAuditRecordInput)
-    .mutation(async ({ input, ctx }) => {
-      await writeAuditLog({
-        ...input,
-        clientId: ctx.user.id,
-        clientType: ctx.user.type
-      })
-    }),
   list: userOnlyProcedure
     .input(UserAuditListQuery)
     .output(
@@ -286,8 +287,8 @@ const auditRouter = router({
     )
     .use(userCanReadUserAudit)
     .query(async ({ input }) => {
-      const { results, total } = await queryUserAuditLog({
-        subjectId: input.userId,
+      const { results, total } = await queryClientAuditLog({
+        clientId: input.userId,
         skip: input.skip,
         count: input.count,
         timeStart: input.timeStart,
@@ -373,7 +374,8 @@ export const userRouter = router({
       return user
     }),
   list: userOnlyProcedure
-    .input(z.array(z.string()))
+    // Limit to prevent user enumeration with arbitrarily large IN (...) queries
+    .input(z.array(z.string()).max(100))
     .output(z.array(UserOrSystemSummary))
     .query(async ({ input }) => getUsersById(input)),
   search: searchUsersRoute(userAndSystemProcedure.use(canSearchUsers)),
@@ -709,8 +711,8 @@ export const userRouter = router({
       })
     }),
   sendResetPasswordInvite: userAndSystemProcedure
-    .use(allowedWithAnyOfScopes(['user.edit']))
     .input(UUID)
+    .use(canAccessUserWithScopes(['user.edit']))
     .mutation(async ({ input, ctx }) => {
       const userId = UUID.parse(input)
       const auditLogIdentifiers = getAuditLogIdentifiers(ctx.token)
@@ -752,7 +754,7 @@ export const userRouter = router({
     presign: userOnlyProcedure
       .input(
         z.object({
-          // Limit to prevent user enumeration with arbitrarily large IN (...) queries
+          // Same limit as user.list
           userIds: z.array(UUID).min(1).max(100),
           avatarsOnly: z.boolean().optional()
         })

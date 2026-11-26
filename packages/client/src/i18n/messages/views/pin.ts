@@ -22,7 +22,6 @@ interface IPinMessages
   incorrect: MessageDescriptor
   lastTry: MessageDescriptor
   locked: MessageDescriptor
-  confirmPinTitle: MessageDescriptor
 }
 
 const messagesToDefine: IPinMessages = {
@@ -72,11 +71,6 @@ const messagesToDefine: IPinMessages = {
   reEnterTitle: {
     id: 'misc.reEnterTitle',
     defaultMessage: 'Re-enter your new PIN',
-    description: 'The title displayed while creating a PIN'
-  },
-  confirmPinTitle: {
-    id: 'misc.confirmPinTitle',
-    defaultMessage: 'Confirm PIN',
     description: 'The title displayed while creating a PIN'
   },
   reEnterDescription: {

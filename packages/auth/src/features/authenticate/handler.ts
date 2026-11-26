@@ -12,25 +12,21 @@ import { JWT_ISSUER, WEB_USER_JWT_AUDIENCES } from '@auth/constants'
 import {
   IAuthentication,
   authenticate,
+  assertOfficeIsActive,
   createToken,
+  createRefreshToken,
   generateAndSendVerificationCode,
+  getUserRoleScopeMapping,
   storeUserInformation
 } from '@auth/features/authenticate/service'
 import {
   NotificationEvent,
   generateNonce
 } from '@auth/features/verifyCode/service'
-import { forbidden, unauthorized } from '@hapi/boom'
+import { forbidden, locked, unauthorized } from '@hapi/boom'
 import * as Hapi from '@hapi/hapi'
 import * as Joi from 'joi'
-import { env } from '@auth/environment'
-import {
-  EncodedScope,
-  fetchJSON,
-  joinUrl,
-  logger,
-  Roles
-} from '@opencrvs/commons'
+import { InactiveOfficeError, maskEmail, maskSms } from '@opencrvs/commons'
 
 interface IAuthPayload {
   username: string
@@ -43,21 +39,7 @@ interface IAuthResponse {
   email?: string
   status: string
   token?: string
-}
-
-async function getUserRoleScopeMapping() {
-  const roles = await fetchJSON<Roles>(
-    joinUrl(env.COUNTRY_CONFIG_URL_INTERNAL, '/config/roles')
-  )
-
-  logger.info(
-    'Country config implements the new /roles response format. Custom scopes apply'
-  )
-
-  return roles.reduce<Record<string, EncodedScope[]>>((acc, { id, scopes }) => {
-    acc[id] = scopes
-    return acc
-  }, {})
+  refreshToken?: string
 }
 
 export default async function authenticateHandler(
@@ -73,14 +55,26 @@ export default async function authenticateHandler(
   } catch (err) {
     throw unauthorized()
   }
+
+  try {
+    await assertOfficeIsActive(result.primaryOfficeId)
+  } catch (err) {
+    if (err instanceof InactiveOfficeError) {
+      throw locked(
+        'Your assigned office has been made inactive. Please contact your administrator to be reassigned'
+      )
+    }
+    throw err
+  }
+
   if (result.status === 'deactivated') {
     throw forbidden()
   }
 
   const nonce = generateNonce()
   const response: IAuthResponse = {
-    mobile: result.mobile,
-    email: result.email,
+    mobile: result.mobile && maskSms(result.mobile),
+    email: result.email && maskEmail(result.email),
     status: result.status,
     nonce
   }
@@ -100,6 +94,7 @@ export default async function authenticateHandler(
       JWT_ISSUER,
       role
     )
+    response.refreshToken = await createRefreshToken(result.userId)
   } else {
     await storeUserInformation(
       nonce,
@@ -137,7 +132,8 @@ export const responseSchema = Joi.object({
   email: Joi.string().optional(),
   status: Joi.string(),
   role: Joi.string(),
-  token: Joi.string().optional()
+  token: Joi.string().optional(),
+  refreshToken: Joi.string().optional()
 })
 
 export type AuthenticateResponse = {
@@ -146,4 +142,5 @@ export type AuthenticateResponse = {
   email?: string
   status: string
   token?: string
+  refreshToken?: string
 }

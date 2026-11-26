@@ -8,7 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import type { Meta, StoryObj } from '@storybook/react'
+import type { Meta, StoryObj } from '@storybook/react-vite'
 import { createTRPCMsw, httpLink } from '@vafanassieff/msw-trpc'
 import { http, HttpResponse } from 'msw'
 import superjson from 'superjson'
@@ -22,7 +22,6 @@ import { AppRouter } from '@client/v2-events/trpc'
 import { ROUTES, routesConfig } from '@client/v2-events/routes'
 import { testDataGenerator } from '@client/tests/test-data-generators'
 import { TestImage } from '@client/v2-events/features/events/fixtures'
-import { getFilepathsFromActionDocument } from '@client/v2-events/features/files/cache'
 
 import { ReviewIndex } from './Review'
 
@@ -366,13 +365,11 @@ export const ReviewShowsFilesFromDraft: Story = {
           })
         ],
         files: [
-          tRPCMsw.event.files.presign.query(() =>
-            Object.fromEntries(
-              getFilepathsFromActionDocument([declareDraft.action]).map(
-                (path) => [path, `http://localhost:3535/ocrvs/${path}`]
-              )
-            )
-          ),
+          http.get('/api/presigned-url/:filePath*', (req) => {
+            return HttpResponse.json({
+              presignedURL: `http://localhost:3535/ocrvs/${req.params.filePath}`
+            })
+          }),
           http.get('/:id', () => {
             return new HttpResponse(TestImage.Fish, {
               headers: {

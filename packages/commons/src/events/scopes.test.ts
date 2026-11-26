@@ -10,8 +10,10 @@
  */
 
 import {
+  DOCUMENT_DELETE_SCOPES,
   getAvailableRolesForUserUpdatePayload,
-  isActionInScope
+  isActionInScope,
+  RECORD_WRITE_SCOPES
 } from './scopes'
 import { encodeScope, UserScopeV2 } from '../scopes'
 import { ActionType } from './ActionType'
@@ -27,6 +29,7 @@ import {
   V2_DEFAULT_MOCK_LOCATIONS_MAP
 } from './mocks.test.utils'
 import { getUUID, UUID } from '../uuid'
+import { difference } from 'lodash'
 
 const rng = createPrng(1)
 const officeUuid = generateUuid(rng)
@@ -313,5 +316,22 @@ describe('getAvailableRolesForUserUpdatePayload()', () => {
 
     // Should not include HOSPITAL_CLERK since that role is only allowed at location level and the user does not have access to the user's location, but should include COMMUNITY_LEADER and LOCAL_REGISTRAR since those roles are allowed at any location level
     expect(availableRoles).toEqual(['COMMUNITY_LEADER', 'LOCAL_REGISTRAR'])
+  })
+})
+
+/*
+ * Documents cannot check who owns a prefix, so whatever is on this list can
+ * delete any record's attachments. Adding an action to ACTION_SCOPE_MAP must
+ * not widen that on its own.
+ */
+describe('document deletion scopes', () => {
+  test('every scope that can write to a record can delete its attachments', () => {
+    expect(difference(RECORD_WRITE_SCOPES, DOCUMENT_DELETE_SCOPES)).toEqual([])
+  })
+
+  test('nothing beyond writing a record and editing a user can delete', () => {
+    expect(difference(DOCUMENT_DELETE_SCOPES, RECORD_WRITE_SCOPES)).toEqual([
+      'user.edit'
+    ])
   })
 })

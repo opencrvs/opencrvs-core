@@ -10,7 +10,7 @@
  */
 
 import React from 'react'
-import { Meta, StoryFn } from '@storybook/react'
+import { Meta, StoryFn } from '@storybook/react-vite'
 import { TRPCClientError } from '@trpc/client'
 import { TRPCProvider } from '@client/v2-events/trpc'
 import {

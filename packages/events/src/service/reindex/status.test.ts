@@ -50,7 +50,7 @@ const failingPostHandler = http.post(
 )
 
 const singleEventConfigHandler = http.get(
-  `${env.COUNTRY_CONFIG_URL}/events`,
+  `${env.COUNTRY_CONFIG_URL}/config/events`,
   () => HttpResponse.json([tennisClubMembershipEvent])
 )
 

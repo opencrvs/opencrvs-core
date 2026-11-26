@@ -10,7 +10,6 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-const path = require('path')
 const { defineConfig } = require('eslint/config')
 const baseConfig = require('../../eslint.config.js')
 
@@ -18,20 +17,10 @@ module.exports = defineConfig([
   { ignores: ['build/**/*', 'eslint*'] },
   ...baseConfig,
   {
+    files: ['./src/**/*.js'],
     languageOptions: {
-      sourceType: 'commonjs',
-      parserOptions: {
-        project: [path.resolve(__dirname, './tsconfig.json')]
-      }
-    },
-    settings: {
-      'import/resolver': {
-        typescript: {
-          project: path.resolve(__dirname, './tsconfig.json')
-        }
-      }
-    },
-    files: ['./src/**/*.ts']
+      sourceType: 'module'
+    }
   },
   {
     rules: {

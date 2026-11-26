@@ -38,12 +38,11 @@ import {
   Content,
   Frame,
   Icon,
-  ResponsiveModal,
+  Dialog,
   Spinner,
   Stack,
   Toast
 } from '@opencrvs/components'
-import { Print } from '@opencrvs/components/lib/icons'
 import { ROUTES } from '@client/v2-events/routes'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
 import { useModal } from '@client/v2-events/hooks/useModal'
@@ -269,7 +268,8 @@ export function Review() {
 
   const handlePrint = async () => {
     const confirmed = await openModal<boolean>((close) => (
-      <ResponsiveModal
+      <Dialog
+        isOpen
         actions={[
           <Button
             key="close-modal"
@@ -291,14 +291,12 @@ export function Review() {
             {intl.formatMessage(messages.print)}
           </Button>
         ]}
-        contentHeight={100}
-        handleClose={() => close(false)}
         id="confirm-print-modal"
-        show={true}
         title={intl.formatMessage(messages.printAndIssueModalTitle)}
+        onClose={() => close(false)}
       >
         {intl.formatMessage(messages.printAndIssueModalBody)}
-      </ResponsiveModal>
+      </Dialog>
     ))
 
     /**
@@ -369,10 +367,7 @@ export function Review() {
   )
 
   return (
-    <FormLayout
-      appbarIcon={<Print />}
-      route={ROUTES.V2.EVENTS.PRINT_CERTIFICATE}
-    >
+    <FormLayout route={ROUTES.V2.EVENTS.PRINT_CERTIFICATE}>
       <Frame.LayoutCentered>
         <Stack direction="column">
           <Box>

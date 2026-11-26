@@ -11,19 +11,18 @@
 
 set -e
 
+. "$(dirname "${BASH_SOURCE[0]}")/ensure-deb-utils.sh"
 
 common_config(){
-# PGDG moves superseded releases to apt-archive.postgresql.org, add it so the
-# pinned pgbackrest version stays installable. The archive is HTTPS only and
-# the image has no CA certificates, so install them first.
+
 apt update -q
+apt upgrade -y -q
 apt install -y -q ca-certificates
 pgdg_codename=$(. /etc/os-release && echo "$VERSION_CODENAME")
 pgdg_signed_by=$(grep -rh 'apt\.postgresql\.org' /etc/apt/sources.list.d/ | grep -oE 'signed-by=[^] ]+' | head -n 1)
 echo "deb [${pgdg_signed_by}] https://apt-archive.postgresql.org/pub/repos/apt ${pgdg_codename}-pgdg-archive main" > /etc/apt/sources.list.d/pgdg-archive.list
-apt update -q
-apt upgrade -y -q
-apt install -y -q pgbackrest={{ .Values.postgres.pgbackrest_version }}* openssh-client
+
+ensure_deb_utils "pgbackrest={{ .Values.postgres.pgbackrest_version }}* openssh-client" pgbackrest ssh || exit 1
 # Common configuration for backup and restore
 # Temporal directory required for pushing WAL files
 echo "Create pgbackrest temp directory with correct permissions"
@@ -113,4 +112,3 @@ case "${DB_TYPE:-standalone}" in
     exit 1
     ;;
 esac
-

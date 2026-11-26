@@ -59,6 +59,7 @@ export const AvailableIcons = z.enum([
   'EyeSlash',
   'Envelope',
   'File',
+  'FileLock',
   'FileSearch',
   'FileMinus',
   'FilePlus',

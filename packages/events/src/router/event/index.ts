@@ -10,7 +10,7 @@
  */
 
 import * as z from 'zod/v4'
-import { getUUID } from '@opencrvs/commons'
+import { EventDocumentOnlyLastAction, getUUID } from '@opencrvs/commons'
 import { logger } from '@opencrvs/commons'
 import {
   ActionStatus,
@@ -32,10 +32,7 @@ import {
 } from '@opencrvs/commons/events'
 import { UserContext } from '@opencrvs/commons'
 import * as middleware from '@events/router/middleware'
-import {
-  EventIdParam,
-  EventIdParamWithWaitFor
-} from '@events/router/middleware'
+import { EventIdParam } from '@events/router/middleware'
 import {
   userOnlyProcedure,
   router,
@@ -67,15 +64,18 @@ import { markAsDuplicate } from '@events/service/events/actions/mark-as-duplicat
 import { markNotDuplicate } from '@events/service/events/actions/mark-not-duplicate'
 import {
   assertFilesBelongToEvent,
-  cleanupUnreferencedFiles
+  sweepUnreferencedFiles
 } from '@events/service/files'
 import { writeAuditLog } from '@events/storage/postgres/events/auditLog'
-import { getDuplicateEvents } from '../../service/deduplication/deduplication'
+import {
+  assertCanReviewDuplicatesOf,
+  getDuplicateEvents
+} from '../../service/deduplication/deduplication'
 import { declareActionProcedures } from './actions/declare'
 import { getDefaultActionProcedures } from './actions'
 import { customActionProcedures } from './actions/custom'
 import { createAndNotifyProcedure } from './actions/createAndNotify'
-import { filesRouter } from './files'
+import { fileRouter, filesRouter } from './files'
 
 export const eventRouter = router({
   /*
@@ -206,10 +206,10 @@ export const eventRouter = router({
         protect: true
       }
     })
-    .input(EventIdParamWithWaitFor)
+    .input(EventIdParam)
     .output(EventDocument)
     .use(middleware.canAccessEventWithScopes(['record.read']))
-    .query(async ({ ctx, input }) => {
+    .query(async ({ ctx }) => {
       const { eventId, eventType } = ctx
       const configuration = await getEventConfigurationById({
         token: ctx.token,
@@ -218,7 +218,7 @@ export const eventRouter = router({
 
       const updatedEvent = await processAction(
         {
-          waitFor: input.waitFor,
+          waitFor: true, // unused for READ, but required by the shared type
           type: ActionType.READ,
           eventId,
           transactionId: getUUID(),
@@ -252,6 +252,8 @@ export const eventRouter = router({
     .use(middleware.requireAssignment)
     .query(async ({ input, ctx }) => {
       const event = await getEventById(input.eventId)
+
+      await assertCanReviewDuplicatesOf(event, ctx)
 
       return getDuplicateEvents(event, ctx)
     }),
@@ -288,6 +290,7 @@ export const eventRouter = router({
 
         // Consecutive middlewares lose some of the typing.
         const user = UserContext.parse(ctx.user)
+
         await throwConflictIfActionNotAllowed(
           eventId,
           type,
@@ -325,11 +328,12 @@ export const eventRouter = router({
           event.actions.push(actionFromDraft.data)
         }
 
-        await cleanupUnreferencedFiles(event, ctx.token)
+        await sweepUnreferencedFiles(event, ctx.token)
 
         return currentDraft
       })
   }),
+  file: fileRouter,
   files: filesRouter,
   actions: router({
     notify: router(getDefaultActionProcedures(ActionType.NOTIFY)),
@@ -338,6 +342,7 @@ export const eventRouter = router({
     edit: router(getDefaultActionProcedures(ActionType.EDIT)),
     reject: router(getDefaultActionProcedures(ActionType.REJECT)),
     archive: router(getDefaultActionProcedures(ActionType.ARCHIVE)),
+    unarchive: router(getDefaultActionProcedures(ActionType.UNARCHIVE)),
     register: router(getDefaultActionProcedures(ActionType.REGISTER)),
     printCertificate: router(
       getDefaultActionProcedures(ActionType.PRINT_CERTIFICATE)
@@ -346,10 +351,13 @@ export const eventRouter = router({
     assignment: router({
       assign: userOnlyProcedure
         .input(AssignActionInput)
-        .use(middleware.validateAction)
+        .output(EventDocumentOnlyLastAction)
+        .use(middleware.canAccessEventWithScopes(['record.read']))
+        .use(middleware.validateRequestAction)
         .mutation(async ({ ctx, input }) => {
           const { user, token } = ctx
           const result = await assignRecord({ input, user, token })
+
           await writeAuditLog({
             clientId: user.id,
             clientType: user.type,
@@ -366,7 +374,8 @@ export const eventRouter = router({
         }),
       unassign: userOnlyProcedure
         .input(UnassignActionInput)
-        .use(middleware.validateAction)
+        .output(EventDocumentOnlyLastAction)
+        .use(middleware.validateRequestAction)
         .mutation(async ({ input, ctx }) => {
           const { user, token } = ctx
           const result = await unassignRecord({ input, user, token })
@@ -399,10 +408,13 @@ export const eventRouter = router({
         .input(MarkAsDuplicateActionInput)
         .use(middleware.canAccessEventWithScopes(['record.review-duplicates']))
         .use(middleware.requireAssignment)
-        .use(middleware.validateAction)
+        .use(middleware.validateRequestAction)
         .mutation(async (options) => {
           const { user, token } = options.ctx
           const event = await getEventById(options.input.eventId)
+
+          await assertCanReviewDuplicatesOf(event, options.ctx)
+
           const configuration = await getEventConfigurationById({
             token,
             eventType: event.type
@@ -432,10 +444,13 @@ export const eventRouter = router({
         .input(MarkNotDuplicateActionInput)
         .use(middleware.canAccessEventWithScopes(['record.review-duplicates']))
         .use(middleware.requireAssignment)
-        .use(middleware.validateAction)
+        .use(middleware.validateRequestAction)
         .mutation(async (options) => {
           const { user, token } = options.ctx
           const event = await getEventById(options.input.eventId)
+
+          await assertCanReviewDuplicatesOf(event, options.ctx)
+
           const configuration = await getEventConfigurationById({
             token,
             eventType: event.type
@@ -487,7 +502,8 @@ export const eventRouter = router({
         search: input,
         eventConfigs,
         user: ctx.user,
-        acceptedScopes: ctx.acceptedScopes
+        acceptedScopes: ctx.acceptedScopes,
+        token: ctx.token
       })
 
       if (ctx.user.type === 'system') {
