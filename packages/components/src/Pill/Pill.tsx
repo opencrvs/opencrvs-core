@@ -73,8 +73,11 @@ const StyledPill = styled.span<{
   padding: 0.2em 0.8em;
   align-items: center;
   border-radius: 10px;
+  /*
+   * A label stays on one line, so a list column can fit the whole pill. To let
+   * a long label wrap, give the pill white-space: normal.
+   */
   white-space: nowrap;
-  text-wrap: wrap;
 `
 
 export function Pill({

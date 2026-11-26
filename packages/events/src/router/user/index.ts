@@ -27,7 +27,8 @@ import {
   UserOrSystem,
   UpdateUserInput,
   CreateUserInputInternal,
-  UserOrSystemSummaryWithStatus
+  UserOrSystemSummaryWithStatus,
+  parseDocumentPath
 } from '@opencrvs/commons'
 import {
   canAccessUserWithScopes,
@@ -47,6 +48,8 @@ import {
   getInMemoryRoles
 } from '@events/service/config/config'
 import { generateHash } from '@events/service/auth/hash'
+import { presignFiles } from '@events/service/files'
+import { getReadableUserFiles } from '@events/service/users/files'
 import {
   updatePasswordHash,
   updateUserById
@@ -670,6 +673,14 @@ export const userRouter = router({
         )
         throw new TRPCError({ code: 'UNAUTHORIZED' })
       }
+      // Avatars are readable by every user, so only the caller's own files may become one
+      const avatar = parseDocumentPath(input.avatar)
+      if (avatar?.kind !== 'user' || avatar.userId !== ctx.user.id) {
+        throw new TRPCError({
+          code: 'BAD_REQUEST',
+          message: "Avatar must be a file under the user's own users/ path"
+        })
+      }
       await updateUserById(UUID.parse(ctx.user.id), {
         profileImagePath: input.avatar
       })
@@ -763,5 +774,28 @@ export const userRouter = router({
     .mutation(async ({ input, ctx }) => {
       return verifyPasswordById(ctx.user.id, input.password)
     }),
+  files: router({
+    /**
+     * Presigned URLs for the users' avatars, and (unless `avatarsOnly`) for
+     * the signatures the caller may read, keyed by the path stored on the user.
+     */
+    presign: userOnlyProcedure
+      .input(
+        z.object({
+          // Same limit as user.list
+          userIds: z.array(UUID).min(1).max(100),
+          avatarsOnly: z.boolean().optional()
+        })
+      )
+      .output(z.record(z.string(), z.string()))
+      .query(async ({ input, ctx }) =>
+        presignFiles(
+          await getReadableUserFiles(ctx, input.userIds, {
+            avatarsOnly: input.avatarsOnly
+          }),
+          ctx.token
+        )
+      )
+  }),
   audit: auditRouter
 })

@@ -175,6 +175,13 @@ const LinkButtonModified = styled(LinkButton)`
   height: 24px;
 `
 
+/* Takes the space of the menu on rows without one, so the pills line up. */
+const MenuSpace = styled.span`
+  visibility: hidden;
+`
+
+const menuIcon = <Icon name="DotsThreeVertical" color="primary" size="large" />
+
 interface SearchParams {
   locationId?: UUID
 }
@@ -479,14 +486,14 @@ function UserListComponent({ userDetails }: UserListProps) {
           justifyContent="flex-start"
         >
           <Status status={status || 'pending'} />
-          {canEditUser(user) && (
+          {canEditUser(user) ? (
             <ToggleMenu
               id={`user-item-${index}-menu`}
-              toggleButton={
-                <Icon name="DotsThreeVertical" color="primary" size="large" />
-              }
+              toggleButton={menuIcon}
               menuItems={getMenuItems(user)}
             />
+          ) : (
+            <MenuSpace aria-hidden>{menuIcon}</MenuSpace>
           )}
         </Stack>
       )

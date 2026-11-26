@@ -51,6 +51,7 @@ import { ServiceTrpcContext, TrpcContext } from '@events/context'
 import { getUserById } from '@events/storage/postgres/events/users'
 import { getSystemInitialisation } from '@events/service/auth'
 import { getLocationHierarchy } from '@events/service/locations/locations'
+import { assertCanReadOtherUser } from '@events/service/users/access'
 import { findUserOrSystem, getUser } from '../../../service/users/api'
 import {
   getEventConfigurationForRecord,
@@ -657,48 +658,7 @@ export const userCanReadOtherUser: MiddlewareFunction<
   TrpcContext & UUID,
   UUID
 > = async ({ next, ctx, input }) => {
-  const { token, user: userReading } = ctx
-
-  const acceptedScopes = getAcceptedScopesFromToken(token, ['user.read'])
-
-  const isRequestingOwnUser = userReading.id === input
-
-  if (acceptedScopes.length === 0 && !isRequestingOwnUser) {
-    throw new TRPCError({ code: 'FORBIDDEN' })
-  }
-
-  const otherUser = await getUser(input)
-
-  if (isRequestingOwnUser) {
-    return next()
-  }
-
-  if (acceptedScopes.length === 0) {
-    throw new TRPCError({ code: 'NOT_FOUND' })
-  }
-
-  if (!otherUser.primaryOfficeId) {
-    throw new TRPCError({ code: 'NOT_FOUND' })
-  }
-
-  const userLocationHierarchy = await getLocationHierarchy(
-    otherUser.primaryOfficeId
-  )
-
-  const hasAccess = canAccessOtherUserWithScopes({
-    scopes: acceptedScopes,
-    userToAccess: {
-      role: otherUser.role,
-      administrativeHierarchy: userLocationHierarchy,
-      primaryOfficeId: otherUser.primaryOfficeId
-    },
-    user: userReading
-  })
-
-  if (!hasAccess) {
-    throw new TRPCError({ code: 'NOT_FOUND' })
-  }
-
+  await assertCanReadOtherUser(ctx, input)
   return next()
 }
 

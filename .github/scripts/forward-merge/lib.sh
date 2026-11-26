@@ -93,15 +93,19 @@ plan_hop() { # target
   pr_branch=$(pr_branch_name "$SOURCE_BRANCH" "$target")
   open_pr=$(open_pr_number "$pr_branch" "$target")
 
+  # Without an open PR, a target that has the whole source needs nothing, even
+  # if a forward-merge branch is left over from an earlier PR.
+  if [ -z "$open_pr" ] && contains "origin/$target" "origin/$SOURCE_BRANCH"; then
+    echo "$target: nothing to merge from $SOURCE_BRANCH." >&2
+    return
+  fi
+
   if git rev-parse -q --verify "origin/$pr_branch" > /dev/null \
     && { [ -n "$open_pr" ] || contains "origin/$pr_branch" "origin/$SOURCE_BRANCH"; }; then
     # An open PR, or a branch someone already prepared: build on it.
     start="origin/$pr_branch"
     if ! contains "$start" "origin/$SOURCE_BRANCH"; then pending+=("$SOURCE_BRANCH"); fi
     if ! contains "$start" "origin/$target"; then pending+=("$target"); fi
-  elif contains "origin/$target" "origin/$SOURCE_BRANCH"; then
-    echo "$target: nothing to merge from $SOURCE_BRANCH." >&2
-    return
   elif git rev-parse -q --verify "origin/$pr_branch" > /dev/null \
     && ! contains "origin/$target" "origin/$pr_branch" \
     && ! contains "origin/$SOURCE_BRANCH" "origin/$pr_branch"; then

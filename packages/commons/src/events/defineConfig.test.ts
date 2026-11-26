@@ -16,7 +16,10 @@ import {
   VersionedEventConfig
 } from './EventConfig'
 import { ActionType } from './ActionType'
+import { FieldType } from './FieldType'
+import { field } from './field'
 import { getActionConfig, getDeclaration } from './utils'
+import { withDeclarationField } from './test.utils'
 import { tennisClubMembershipEvent } from '../fixtures'
 
 const declaration = getDeclaration(tennisClubMembershipEvent)
@@ -267,6 +270,53 @@ describe('defineConfig()', () => {
       )
     })
 
+    it('should reject a version id with characters other than a-z, 0-9 and underscores, naming the id', () => {
+      expect(() =>
+        defineConfig({
+          id: eventId,
+          label,
+          advancedSearch,
+          versions: [v1, { ...v2, id: 'Birth-V2' }]
+        })
+      ).toThrow(
+        `Version id 'Birth-V2' must contain only lower-case letters (a-z), digits (0-9) and underscores (_).`
+      )
+    })
+
+    it('should accept a version id of lower-case letters, digits and underscores', () => {
+      expect(() =>
+        defineConfig({
+          id: eventId,
+          label,
+          advancedSearch,
+          versions: [v1, { ...v2, id: 'birth_v2_2027' }]
+        })
+      ).not.toThrow()
+    })
+
+    it('should reject a version id longer than 64 characters, naming the id', () => {
+      const id = 'v'.repeat(65)
+      expect(() =>
+        defineConfig({
+          id: eventId,
+          label,
+          advancedSearch,
+          versions: [v1, { ...v2, id }]
+        })
+      ).toThrow(`Version id '${id}' must have at most 64 characters.`)
+    })
+
+    it('should accept a version id of 64 characters', () => {
+      expect(() =>
+        defineConfig({
+          id: eventId,
+          label,
+          advancedSearch,
+          versions: [v1, { ...v2, id: 'v'.repeat(64) }]
+        })
+      ).not.toThrow()
+    })
+
     it('should reject two versions with the same `effectiveFrom`, naming the event and the date', () => {
       expect(() =>
         defineConfig({
@@ -400,6 +450,95 @@ describe('defineConfig()', () => {
 
       expect(resolveEventConfig(config).label).toEqual(label)
       expect(resolveEventConfig(refetched).label).toEqual(refetched.label)
+    })
+
+    describe('advanced search', () => {
+      const NICKNAME_FIELD_ID = 'applicant.nickname'
+
+      function nicknameField(
+        type: typeof FieldType.TEXT | typeof FieldType.NUMBER
+      ) {
+        return {
+          id: NICKNAME_FIELD_ID,
+          type,
+          label: {
+            id: 'nickname.label',
+            defaultMessage: 'Nickname',
+            description: 'Field that the fixture does not have'
+          }
+        }
+      }
+
+      const v2WithExtraField = withDeclarationField(
+        v2,
+        nicknameField(FieldType.TEXT)
+      )
+
+      function searchingNickname(defaultValue?: string) {
+        return [
+          ...advancedSearch,
+          {
+            title: advancedSearch[1].title,
+            fields: [{ ...field(NICKNAME_FIELD_ID).exact(), defaultValue }]
+          }
+        ]
+      }
+
+      const advancedSearchWithExtraField = searchingNickname()
+
+      it('should accept a search field that only one version has', () => {
+        expect(() =>
+          defineConfig({
+            id: eventId,
+            label,
+            advancedSearch: advancedSearchWithExtraField,
+            versions: [v1, v2WithExtraField]
+          })
+        ).not.toThrow()
+      })
+
+      it('should reject a search field that no version has, naming the field', () => {
+        expect(() =>
+          defineConfig({
+            id: eventId,
+            label,
+            advancedSearch: advancedSearchWithExtraField,
+            versions: [v1, v2]
+          })
+        ).toThrow(
+          `Invalid AdvancedSearch field IDs for event ${eventId}: ${NICKNAME_FIELD_ID}`
+        )
+      })
+
+      it('should check a defaultValue against the newest version that has the field', () => {
+        const textInV1 = withDeclarationField(v1, nicknameField(FieldType.TEXT))
+        const numberInV1 = withDeclarationField(
+          v1,
+          nicknameField(FieldType.NUMBER)
+        )
+        const numberInV2 = withDeclarationField(
+          v2,
+          nicknameField(FieldType.NUMBER)
+        )
+
+        expect(() =>
+          defineConfig({
+            id: eventId,
+            label,
+            advancedSearch: searchingNickname('Ace'),
+            versions: [numberInV1, v2WithExtraField]
+          })
+        ).not.toThrow()
+
+        expect(() =>
+          defineConfig({
+            id: eventId,
+            label,
+            advancedSearch: searchingNickname('Ace'),
+            versions: [textInV1, numberInV2]
+          })
+        ).toThrow('which is not a valid NUMBER value.')
+      })
     })
 
     it('should reject a version field (e.g. actions) at the top level of an event with versions', () => {

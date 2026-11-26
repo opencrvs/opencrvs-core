@@ -18,14 +18,19 @@ import {
   ClauseOutput,
   FieldValue,
   EventConfig,
-  getDeclarationFieldById,
   FieldType,
   extractPotentialDuplicatesFromActions,
-  EventDocument
+  EventDocument,
+  getAllUniqueFields,
+  getEventConfigForRecord,
+  getEventConfigsInLookupOrder,
+  PlainDate,
+  VersionedEventConfig
 } from '@opencrvs/commons/events'
 import {
   getAcceptedScopesFromToken,
   getCurrentEventState,
+  getOrThrow,
   isPlainDate,
   logger,
   userCanAccessEventWithScopes
@@ -46,25 +51,33 @@ import {
 } from '@events/service/indexing/utils'
 import { TrpcContext } from '../../context'
 import { getEventsAuditTrailed } from '../../storage/postgres/events/events'
-import { getEventById } from '../events/events'
+import { EventNotFoundError, getEventById } from '../events/events'
 import { getEventConfigurationForRecord } from '../config/config'
+
+/** `0` and `false` are values; an empty string means nothing was entered. */
+function isMissingQueryValue(value: unknown) {
+  return value === undefined || value === null || value === ''
+}
 
 /**
  * If the value referenced in a query is missing, the query resolves to null
  * The `and` query resolves to null if any of the sub-queries is null,
  * while the `or` query resolves to null if all of the sub-queries are null
+ *
+ * @param eventConfigs the configurations to look fields up in: the record's own version
+ * first, then the other versions of its event in lookup order. A field of the other
+ * records (`matchAgainst`) may exist only in another version.
  */
-
 export function generateElasticsearchQuery(
   eventIndex: EncodedEventIndex,
   queryInput: ClauseOutput,
-  eventConfig: EventConfig
+  eventConfigs: EventConfig[]
 ): elasticsearch.estypes.QueryDslQueryContainer | null {
   if (queryInput.type === 'not') {
     const resolvedQuery = generateElasticsearchQuery(
       eventIndex,
       queryInput.clause,
-      eventConfig
+      eventConfigs
     )
     if (resolvedQuery === null) {
       return null
@@ -78,7 +91,7 @@ export function generateElasticsearchQuery(
   }
   if (queryInput.type === 'and') {
     const resolvedQueries = queryInput.clauses.map((clause) => {
-      return generateElasticsearchQuery(eventIndex, clause, eventConfig)
+      return generateElasticsearchQuery(eventIndex, clause, eventConfigs)
     })
 
     if (resolvedQueries.some((q) => q === null)) {
@@ -95,7 +108,7 @@ export function generateElasticsearchQuery(
     }
   } else if (queryInput.type === 'or') {
     const resolvedQueries = queryInput.clauses.map((clause) => {
-      return generateElasticsearchQuery(eventIndex, clause, eventConfig)
+      return generateElasticsearchQuery(eventIndex, clause, eventConfigs)
     })
 
     if (resolvedQueries.every((q) => q === null)) {
@@ -112,7 +125,11 @@ export function generateElasticsearchQuery(
   }
 
   function resolveFieldPath(fieldId: string): string {
-    const fieldConfig = getDeclarationFieldById(eventConfig, fieldId)
+    // When several versions have the field, `find` takes it from the first one: the record's own version.
+    const fieldConfig = getOrThrow(
+      eventConfigs.flatMap(getAllUniqueFields).find(({ id }) => id === fieldId),
+      `Field with id ${fieldId} not found in any version of event ${eventIndex.type}`
+    )
     const encodedFieldId = encodeFieldId(fieldId)
     if (fieldConfig.type == FieldType.NAME) {
       return nameQueryKey(encodedFieldId)
@@ -129,8 +146,9 @@ export function generateElasticsearchQuery(
     eventIndex.declaration,
     resolveFieldPath(queryInput.fieldId)
   )
-  if (!queryValue) {
-    logger.warn(
+  if (isMissingQueryValue(queryValue)) {
+    // Expected for mutually exclusive fields (e.g. dob or age), so not a warning.
+    logger.debug(
       `No value found for field ${queryInput.fieldId} in the current event. Skipping query clause.`
     )
     return null
@@ -223,21 +241,45 @@ export function generateElasticsearchQuery(
   }
 }
 
-export async function searchForDuplicates(
-  eventIndex: EventIndex,
-  configuration: DeduplicationConfig,
-  eventConfig: EventConfig
-): Promise<{ score: number; event: EventIndex }[]> {
+/**
+ * @param today the date in the country's time zone, which orders the versions to look
+ * fields up in
+ */
+export async function searchForDuplicates({
+  eventIndex,
+  deduplication,
+  versionedConfig,
+  today
+}: {
+  eventIndex: EventIndex
+  deduplication: DeduplicationConfig
+  versionedConfig: VersionedEventConfig
+  today: PlainDate
+}): Promise<{ score: number; event: EventIndex }[]> {
   const esClient = getOrCreateClient()
-  const query = configuration.query
+  const query = deduplication.query
+  const eventConfig = getEventConfigForRecord(versionedConfig, eventIndex)
+  const otherVersionConfigs = getEventConfigsInLookupOrder(
+    versionedConfig,
+    today
+  ).filter((config) => config !== eventConfig)
 
   const esQuery = generateElasticsearchQuery(
     encodeEventIndex(eventIndex, eventConfig),
     query,
-    eventConfig
+    // Own version first, so a field is read with the type that the record was stored with.
+    [eventConfig, ...otherVersionConfigs]
   )
 
   if (!esQuery) {
+    logger.warn(
+      {
+        deduplicationId: deduplication.id,
+        eventId: eventIndex.id,
+        eventType: eventIndex.type
+      },
+      'Deduplication rule resolved to no query; no duplicate search was run'
+    )
     return []
   }
 
@@ -283,7 +325,20 @@ export async function assertCanReviewDuplicatesOf(
   ])
   const access = await Promise.all(
     duplicateEventIds.map(async (duplicateEventId) => {
-      const duplicate = await getEventById(duplicateEventId)
+      const duplicate = await getEventById(duplicateEventId).catch(
+        (error: unknown) => {
+          if (error instanceof EventNotFoundError) {
+            return null
+          }
+          throw error
+        }
+      )
+
+      // A duplicate that no longer exists exposes nothing; getDuplicateEvents skips it (#13906)
+      if (!duplicate) {
+        return true
+      }
+
       const eventConfig = await getEventConfigurationForRecord({
         event: duplicate,
         token: ctx.token

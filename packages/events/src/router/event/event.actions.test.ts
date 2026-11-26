@@ -44,8 +44,7 @@ import {
   TEST_USER_DEFAULT_SCOPES,
   UNSTABLE_EVENT_FIELDS
 } from '@events/tests/utils'
-import { createIndex } from '@events/service/indexing/indexing'
-import { getEventIndexName } from '@events/storage/elasticsearch'
+import { createEventIndex } from '@events/tests/createEventIndex'
 import { mswServer } from '../../tests/msw'
 import { env } from '../../environment'
 
@@ -167,7 +166,7 @@ describe('Action drafts', () => {
         'applicant.image': {
           type: 'image/png',
           originalFilename: 'abcd.png',
-          path: '4f095fc4-4312-4de2-aa38-86dcc0f71044.png'
+          path: `events/${originalEvent.id}/4f095fc4-4312-4de2-aa38-86dcc0f71044.png`
         }
       },
       transactionId: getUUID(),
@@ -201,7 +200,7 @@ describe('Action drafts', () => {
         'applicant.image': {
           type: 'image/png',
           originalFilename: 'abcd.png',
-          path: '4f095fc4-4312-4de2-aa38-86dcc0f71044.png'
+          path: `events/${originalEvent.id}/4f095fc4-4312-4de2-aa38-86dcc0f71044.png`
         }
       },
       transactionId: getUUID(),
@@ -269,8 +268,8 @@ const multiFileConfig = withDeclaration(
 ) satisfies EventConfig
 
 beforeEach(async () => {
-  return createIndex(
-    getEventIndexName(multiFileConfig.id),
+  return createEventIndex(
+    multiFileConfig.id,
     getDeclarationFields(tennisClubMembershipEvent)
   )
 })
@@ -309,27 +308,27 @@ describe('Action updates', () => {
     )
   })
 
-  const declarationWithFiles = {
+  const declarationWithFiles = (eventId: string) => ({
     'documents.singleFile': {
       type: 'image/svg+xml',
       originalFilename: 'tree.svg',
-      path: 'tree.svg'
+      path: `events/${eventId}/tree.svg`
     },
     'documents.multiFile': [
       {
         type: 'image/svg+xml',
         originalFilename: 'multi-file-1.svg',
-        path: 'fish.svg',
+        path: `events/${eventId}/fish.svg`,
         option: 'multifile1'
       },
       {
         type: 'image/svg+xml',
         originalFilename: 'multi-file-2.svg',
-        path: 'mountain.svg',
+        path: `events/${eventId}/mountain.svg`,
         option: 'multifile2'
       }
     ]
-  }
+  })
 
   it('partial declaration update accounts for conditional field values not in payload', async () => {
     const { user, generator } = await setupTestCase()
@@ -363,7 +362,9 @@ describe('Action updates', () => {
 
     const event = await client.event.get({ eventId: originalEvent.id })
     const eventState = getCurrentEventState(event, tennisClubMembershipEvent)
-    expect(eventState.declaration).toMatchSnapshot()
+    expect(
+      sanitizeForSnapshot(eventState.declaration, UNSTABLE_EVENT_FIELDS)
+    ).toMatchSnapshot()
   })
 
   it('declaration including hidden fields throws error', async () => {
@@ -442,7 +443,7 @@ describe('Action updates', () => {
     await client.event.actions.declare.request({
       eventId: originalEvent.id,
       type: ActionType.DECLARE,
-      declaration: declarationWithFiles,
+      declaration: declarationWithFiles(originalEvent.id),
       transactionId: generateTransactionId(),
       keepAssignment: true
     })
@@ -517,7 +518,7 @@ describe('Action updates', () => {
     await client.event.actions.declare.request({
       eventId: originalEvent.id,
       type: ActionType.DECLARE,
-      declaration: declarationWithFiles,
+      declaration: declarationWithFiles(originalEvent.id),
       transactionId: generateTransactionId(),
       keepAssignment: true
     })
@@ -538,7 +539,9 @@ describe('Action updates', () => {
     expect(eventAfterDeclare.declaration['documents.singleFile']).toBeDefined()
     expect(eventAfterDeclare.declaration['documents.multiFile']).toHaveLength(2)
 
-    expect(fileExistsMock.mock.calls[0]).toEqual(['tree.svg'])
+    expect(fileExistsMock.mock.calls[0]).toEqual([
+      `events/${originalEvent.id}/tree.svg`
+    ])
 
     await client.event.actions.register.request({
       eventId: originalEvent.id,
