@@ -44,7 +44,7 @@ import {
   userOnlyProcedure
 } from '@events/router/trpc'
 import {
-  getApplicationConfig,
+  getPublicApplicationConfig,
   getInMemoryRoles
 } from '@events/service/config/config'
 import { generateHash } from '@events/service/auth/hash'
@@ -136,7 +136,7 @@ function getAuditLogIdentifiers(token: TokenWithBearer) {
 }
 
 async function validateMobile(mobile: string) {
-  const config = await getApplicationConfig()
+  const config = await getPublicApplicationConfig()
   let pattern: RegExp
   try {
     pattern = new RegExp(config.PHONE_NUMBER_PATTERN)
@@ -406,9 +406,7 @@ export const userRouter = router({
     .query(async ({ input }) => getUsersById(input)),
   search: searchUsersRoute(userAndSystemProcedure.use(canSearchUsers)),
   roles: router({
-    list: userOnlyProcedure.query(async ({ ctx }) =>
-      getInMemoryRoles(ctx.token)
-    )
+    list: userOnlyProcedure.query(async () => getInMemoryRoles())
   }),
   changePassword: userOnlyProcedure
     .input(

@@ -333,6 +333,38 @@ test('UNAUTHORIZED error is thrown when internal request is made with token is n
     })
   ).rejects.toMatchObject({ data: { code: 'UNAUTHORIZED' } })
 })
+// ─── configuration ───────────────────────────────────────────────────────────
+
+test('config.application rejects requests with no authorization header', async () => {
+  await expect(
+    appClient.config.application.query(undefined, { context: { headers: {} } })
+  ).rejects.toMatchObject({ data: { code: 'UNAUTHORIZED' } })
+})
+
+test('config.application answers requests with a valid token', async () => {
+  const { user } = await setupTestCase()
+  const token = createTestToken({
+    userId: user.id,
+    scopes: [],
+    userType: TokenUserType.enum.user,
+    role: user.role
+  })
+
+  await expect(
+    appClient.config.application.query(undefined, {
+      context: { headers: { authorization: token } }
+    })
+  ).resolves.toHaveProperty('APPLICATION_NAME')
+})
+
+test('config.publicApplication answers requests with no authorization header', async () => {
+  await expect(
+    appClient.config.publicApplication.query(undefined, {
+      context: { headers: {} }
+    })
+  ).resolves.toHaveProperty('APPLICATION_NAME')
+})
+
 // ─── upstream failures ───────────────────────────────────────────────────────
 
 describe('upstream error handling', () => {

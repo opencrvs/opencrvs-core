@@ -85,6 +85,7 @@ import {
   onRegisterHandler
 } from './api/registration'
 import { isServiceToken } from '@opencrvs/toolkit/authentication'
+import { coreRequestAuth } from '@opencrvs/toolkit/request-signing'
 import { env } from './environment'
 
 import { workqueueconfigHandler } from './api/workqueue/handler'
@@ -206,6 +207,10 @@ export async function createServer() {
   server.listener.requestTimeout = THIRTY_MINUTES_IN_MILLISECONDS
 
   await server.register(getPlugins())
+  await server.register({
+    plugin: coreRequestAuth,
+    options: { jwksUrl: new URL('/.well-known/jwks.json', AUTH_URL).toString() }
+  })
 
   let publicKey = await getPublicKey()
   let publicKeyUpdatedAt = Date.now()
@@ -268,6 +273,7 @@ export async function createServer() {
     path: '/certificates',
     handler: certificateHandler,
     options: {
+      auth: 'core',
       tags: ['api', 'certificates'],
       description: 'Returns certificate metadata'
     }
@@ -431,7 +437,7 @@ export async function createServer() {
     path: '/config/application',
     handler: applicationConfigHandler,
     options: {
-      auth: false,
+      auth: 'core',
       tags: ['api', 'application-config'],
       description: 'Returns default application configuration'
     }
@@ -442,7 +448,7 @@ export async function createServer() {
     path: '/config/workqueues',
     handler: workqueueconfigHandler,
     options: {
-      auth: false,
+      auth: 'core',
       tags: ['api', 'workqueue'],
       description: 'Returns workqueue configurations'
     }
@@ -453,7 +459,7 @@ export async function createServer() {
     path: '/config/locations',
     handler: locationsHandler,
     options: {
-      auth: false,
+      auth: 'core',
       tags: ['api', 'locations'],
       description: 'Returns the locations metadata'
     }
@@ -464,7 +470,7 @@ export async function createServer() {
     path: '/config/roles',
     handler: rolesHandler,
     options: {
-      auth: false,
+      auth: 'core',
       tags: ['api', 'user-roles'],
       description: 'Returns user roles metadata'
     }
@@ -475,6 +481,7 @@ export async function createServer() {
     path: '/config/users',
     handler: usersHandler,
     options: {
+      auth: 'core',
       tags: ['api', 'users'],
       description: 'Returns users metadata'
     }
@@ -575,7 +582,7 @@ export async function createServer() {
     path: '/config/events',
     handler: getEventsHandler,
     options: {
-      auth: false,
+      auth: 'core',
       tags: ['api', 'events'],
       description: 'Serves custom events'
     }
