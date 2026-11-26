@@ -24,12 +24,18 @@ import {
   trpcOptionsProxy,
   useTRPC
 } from '@client/v2-events/trpc'
-import { useEventConfigurations } from '../useEventConfiguration'
+import { useEventConfigurationResolver } from '../useEventConfiguration'
 
 const MutationVariables = z.object({
   eventId: z.string(),
   declaration: EventState.optional()
 })
+
+type MutationVariables = z.infer<typeof MutationVariables>
+
+function isMutationVariables(value: unknown): value is MutationVariables {
+  return MutationVariables.validate(value)
+}
 
 function assignmentMutation(mutationKey: MutationKey) {
   return [
@@ -43,7 +49,7 @@ export type OutboxEventIndex = EventIndex & {
 }
 export function useOutbox() {
   const trpc = useTRPC()
-  const eventConfigurations = useEventConfigurations()
+  const findEventConfiguration = useEventConfigurationResolver()
 
   const pendingMutations = useMutationState({
     filters: {
@@ -62,15 +68,13 @@ export function useOutbox() {
           return null
         }
 
-        const maybeVariables = mutation.state.variables
+        const variables = mutation.state.variables
 
-        const parsedVariables = MutationVariables.safeParse(maybeVariables)
-
-        if (!parsedVariables.success) {
+        if (!isMutationVariables(variables)) {
           return null
         }
 
-        const { eventId, declaration } = parsedVariables.data
+        const { eventId, declaration } = variables
         const event = queryClient.getQueryData(
           trpc.event.get.queryKey({ eventId })
         )
@@ -79,10 +83,14 @@ export function useOutbox() {
           return null
         }
 
-        const eventConfiguration = eventConfigurations.find(
-          (config) => config.id === event.type
-        )
+        const eventConfiguration = findEventConfiguration(event)
         if (!eventConfiguration) {
+          // The mutation stays in the queue and is still sent. Only its row
+          // is hidden.
+          // eslint-disable-next-line no-console
+          console.error(
+            `Outbox entry of event ${event.id} is hidden: its configuration version "${event.configVersionId}" is not available.`
+          )
           return null
         }
 
@@ -103,7 +111,7 @@ export function useOutbox() {
         /* uniqueById */
         (e, i, arr) => arr.findIndex((a) => a.id === e.id) === i
       )
-  }, [pendingMutations, eventConfigurations, trpc.event.get])
+  }, [pendingMutations, findEventConfiguration, trpc.event.get])
 
   return outboxEvents
 }

@@ -12,7 +12,7 @@
 import { TRPCError } from '@trpc/server'
 import { http, HttpResponse } from 'msw'
 import { sql } from 'kysely'
-import { getUUID, TokenUserType } from '@opencrvs/commons'
+import { encodeScope, getUUID, TokenUserType } from '@opencrvs/commons'
 import {
   createInternalServiceToken,
   createInternalTestClient,
@@ -167,12 +167,14 @@ test('returns CONFLICT when user has no security questions', async () => {
 
 test('returns user info and a valid security question key on success (mobile)', async () => {
   const { eventsDb, locations } = await setupTestCase()
+  const scopes = [
+    encodeScope({ type: 'record.declare' }),
+    encodeScope({ type: 'record.read' })
+  ]
 
   mswServer.use(
     http.get(`${env.COUNTRY_CONFIG_URL}/config/roles`, () =>
-      HttpResponse.json([
-        { id: 'REGISTRATION_AGENT', scopes: ['record.declare', 'record.read'] }
-      ])
+      HttpResponse.json([{ id: 'REGISTRATION_AGENT', scopes }])
     )
   )
 
@@ -214,7 +216,7 @@ test('returns user info and a valid security question key on success (mobile)', 
     email: 'jane@example.com',
     status: 'active',
     name: { firstname: 'Jane', surname: 'Smith' },
-    scope: ['record.declare', 'record.read']
+    scope: scopes
   })
   expect(['BIRTH_TOWN', 'FIRST_CHILD_NAME']).toContain(
     result.securityQuestionKey

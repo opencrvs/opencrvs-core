@@ -14,20 +14,31 @@ import { defineMessages, useIntl } from 'react-intl'
 import { useNavigate } from 'react-router-dom'
 import { useTypedSearchParams } from 'react-router-typesafe-routes/dom'
 import { useSelector } from 'react-redux'
-import { AppBar } from '@opencrvs/components/lib/AppBar'
-import { Button } from '@opencrvs/components/lib/Button'
-import { Content, ContentSize } from '@opencrvs/components/lib/Content'
-import { ErrorText } from '@opencrvs/components/lib/ErrorText'
-import { Frame } from '@opencrvs/components/lib/Frame'
-import { Icon } from '@opencrvs/components/lib/Icon'
-import { RadioGroup, RadioSize } from '@opencrvs/components/lib/Radio'
-import { Stack } from '@opencrvs/components/lib/Stack'
-import { canUserCreateEvent } from '@opencrvs/commons/client'
+import {
+  AppBar,
+  Button,
+  Content,
+  ContentSize,
+  ErrorText,
+  Frame,
+  Icon,
+  RadioGroup,
+  RadioSize,
+  Stack,
+  Text
+} from '@opencrvs/components'
+import {
+  canUserCreateEvent,
+  canUserNotifyEvent,
+  getOrThrow,
+  getVersionsInEffect
+} from '@opencrvs/commons/client'
 import { SuspenseLoadingFallback } from '@client/v2-events/components/SuspenseLoadingFallback'
 import { ROUTES } from '@client/v2-events/routes'
 import { createTemporaryId } from '@client/v2-events/utils'
 import { getScope, getUserDetails } from '@client/profile/profileSelectors'
-import { useEventConfigurations } from './useEventConfiguration'
+import { useCountryTimeZone } from '@client/v2-events/hooks/useCountryToday'
+import { useVersionedEventConfigurations } from './useEventConfiguration'
 import { useEventFormData } from './useEventFormData'
 import { useEventFormNavigation } from './useEventFormNavigation'
 import { useEvents } from './useEvents/useEvents'
@@ -54,6 +65,12 @@ const messages = defineMessages({
     defaultMessage: 'Please select the type of event',
     description: 'Error Message to show when no event is being selected'
   },
+  configVersionHeading: {
+    id: 'register.selectVitalEvent.configVersion',
+    defaultMessage: 'Form version',
+    description:
+      'Heading of the choice of the configuration version of a new record, shown when the country allows legacy records'
+  },
   exitButton: {
     defaultMessage: 'EXIT',
     description: 'Label for Exit button on EventTopBar',
@@ -74,46 +91,66 @@ function EventSelector() {
   const intl = useIntl()
   const navigate = useNavigate()
   const [eventType, setEventType] = useState('')
+  const [versionId, setVersionId] = useState<string>()
   const [noEventSelectedError, setNoEventSelectedError] = useState(false)
-  const eventConfigurations = useEventConfigurations()
+  const versionedEventConfigurations = useVersionedEventConfigurations()
+  const timeZone = useCountryTimeZone()
   const events = useEvents()
   const scopes = useSelector(getScope) ?? []
   const clearForm = useEventFormData((state) => state.clear)
   const clearAnnotation = useActionAnnotation((state) => state.clear)
-  const createEvent = events.createEvent()
+  const createEvent = events.useCreateEvent()
   const user = useSelector(getUserDetails)
 
-  const allowedEventConfigurations = eventConfigurations.filter(({ id }) =>
-    canUserCreateEvent(scopes, id)
+  const allowedEventConfigurations = versionedEventConfigurations.filter(
+    ({ id }) => canUserCreateEvent(scopes, id)
   )
+
+  const selectedEventConfiguration = allowedEventConfigurations.find(
+    ({ id }) => id === eventType
+  )
+  const versionsInEffect = selectedEventConfiguration
+    ? getVersionsInEffect(selectedEventConfiguration, new Date(), timeZone)
+    : []
+  const currentVersion = versionsInEffect.at(-1)
+  // A country that allows legacy records lets the user create a record under a past version
+  const canPickVersion =
+    window.config.FEATURES._EXPERIMENTAL_LEGACY_RECORDS &&
+    versionsInEffect.length > 1
+  const selectedVersionId = canPickVersion
+    ? (versionId ?? currentVersion?.id)
+    : currentVersion?.id
 
   function handleContinue() {
     if (eventType === '') {
       return setNoEventSelectedError(true)
     }
-    const transactionId = createTemporaryId()
-    const eventConfig = allowedEventConfigurations.find(
-      ({ id }) => id === eventType
+
+    const version = getOrThrow(
+      versionsInEffect.find(({ id }) => id === selectedVersionId),
+      `Event '${eventType}' has no version '${selectedVersionId}' in effect today`
     )
 
-    if (!eventConfig) {
-      throw new Error(`Configuration for event '${eventType}' not found`)
-    }
+    const eventId = createTemporaryId()
 
     createEvent.mutate({
       type: eventType,
-      transactionId,
-      createdAtLocation: user?.primaryOfficeId
+      transactionId: eventId,
+      createdAtLocation: user?.primaryOfficeId,
+      configVersionId: version.id
     })
 
     clearForm()
     clearAnnotation()
 
-    navigate(
-      ROUTES.V2.EVENTS.DECLARE.buildPath({
-        eventId: transactionId
-      })
-    )
+    // If the user is allowed to notify, it means that they will go to the notify flow instead of the declare flow.
+    // We no longer support user roles which can both notify and declare records.
+    const path = canUserNotifyEvent(scopes, eventType)
+      ? ROUTES.V2.EVENTS.NOTIFY
+      : ROUTES.V2.EVENTS.DECLARE
+
+    navigate(path.buildPath({ eventId }))
+    return
   }
 
   return (
@@ -134,9 +171,28 @@ function EventSelector() {
           value={eventType}
           onChange={(val) => {
             setEventType(val)
+            setVersionId(undefined)
             setNoEventSelectedError(false)
           }}
         />
+
+        {canPickVersion && (
+          <>
+            <Text element="h2" variant="h3">
+              {intl.formatMessage(messages.configVersionHeading)}
+            </Text>
+            <RadioGroup
+              name="configVersionId"
+              options={versionsInEffect.map((version) => ({
+                value: version.id,
+                label: intl.formatMessage(version.label)
+              }))}
+              size={RadioSize.LARGE}
+              value={selectedVersionId ?? ''}
+              onChange={setVersionId}
+            />
+          </>
+        )}
 
         <Button
           key="select-vital-event-continue"

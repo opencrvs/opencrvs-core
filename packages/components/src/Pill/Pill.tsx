@@ -10,7 +10,7 @@
  */
 import React from 'react'
 import styled from 'styled-components'
-import { IFont } from '../fonts'
+import { IFont } from '../tokens'
 
 type IPillType = 'active' | 'inactive' | 'pending' | 'default'
 
@@ -23,11 +23,6 @@ export interface IPillProps {
   type?: IPillType
   size?: IPillSize
   pillTheme?: IPillTheme
-}
-
-const heightMap: Record<IPillSize, string> = {
-  small: '28px',
-  medium: '36px'
 }
 
 const fontMap: Record<IPillSize, IFont> = {
@@ -73,12 +68,15 @@ const StyledPill = styled.span<{
   `}
   color: var(--color);
   background: var(--background-color);
-  height: ${({ size }) => heightMap[size]};
   ${({ size, theme }) => theme.fonts[fontMap[size]]}
   display: inline-flex;
-  padding: 0 0.8em;
+  padding: 0.2em 0.8em;
   align-items: center;
-  border-radius: 100px;
+  border-radius: 10px;
+  /*
+   * A label stays on one line, so a list column can fit the whole pill. To let
+   * a long label wrap, give the pill white-space: normal.
+   */
   white-space: nowrap;
 `
 

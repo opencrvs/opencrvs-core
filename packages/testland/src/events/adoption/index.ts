@@ -13,6 +13,8 @@ import {
   ConditionalType,
   defineConfig,
   or,
+  toNotificationForm,
+  toNotificationReview,
   user
 } from '@opencrvs/toolkit/events'
 import {
@@ -119,6 +121,8 @@ export const adoptionEvent = defineConfig({
           'This is shown as the action name anywhere the user can trigger the action from',
         id: 'event.adoption.action.notify.label'
       },
+      notificationForm: toNotificationForm(ADOPTION_DECLARATION_FORM),
+      review: toNotificationReview(ADOPTION_DECLARATION_REVIEW),
       form: [
         {
           id: 'comments',
@@ -190,7 +194,7 @@ export const adoptionEvent = defineConfig({
           'This is shown as the action name anywhere the user can trigger the action from',
         id: 'event.adoption.action.reject.label'
       },
-      supportingCopy: {
+      dialogCopy: {
         id: 'rejectModal.description',
         defaultMessage:
           'Rejecting this declaration will return it to the submitter for updates. Please ensure a valid reason for rejection has been recorded.',
@@ -206,8 +210,8 @@ export const adoptionEvent = defineConfig({
           'This is shown as the action name anywhere the user can trigger the action from',
         id: 'event.adoption.action.register.label'
       },
-      supportingCopy: {
-        id: 'event.adoption.action.register.supportingCopy',
+      dialogCopy: {
+        id: 'event.adoption.action.register.dialogCopy',
         description: 'Confirmation text for the register action',
         defaultMessage:
           'Registering this adoption will create an official civil registration record and seal the original birth record.'
@@ -222,7 +226,7 @@ export const adoptionEvent = defineConfig({
           'This is shown as the action name anywhere the user can trigger the action from',
         id: 'event.adoption.action.archive.label'
       },
-      supportingCopy: {
+      dialogCopy: {
         id: 'recordAudit.archive.confirmation.body',
         defaultMessage:
           'Archiving will remove this declaration from active processing while retaining it for record purposes. Archived declarations cannot be modified unless reinstated.',
@@ -237,7 +241,7 @@ export const adoptionEvent = defineConfig({
           'This is shown as the action name anywhere the user can trigger the action from',
         id: 'event.adoption.action.unarchive.label'
       },
-      supportingCopy: {
+      dialogCopy: {
         id: 'recordAudit.unarchive.confirmation.body',
         defaultMessage:
           'This record will become active again and will be able to progress through registration.',

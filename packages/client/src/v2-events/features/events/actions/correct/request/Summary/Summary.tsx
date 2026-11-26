@@ -33,11 +33,11 @@ import {
   Frame,
   Icon
 } from '@opencrvs/components'
-import { Check } from '@opencrvs/components/lib/icons'
+import { Check } from '@opencrvs/components/icons'
 import { messages as registerMessages } from '@client/i18n/messages/views/register'
 import { messages as correctionMessages } from '@client/i18n/messages/views/correction'
 import { constantsMessages } from '@client/i18n/messages'
-import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
+import { useEventConfigurationForRecord } from '@client/v2-events/features/events/useEventConfiguration'
 import { useEventFormData } from '@client/v2-events/features/events/useEventFormData'
 import { useEventFormNavigation } from '@client/v2-events/features/events/useEventFormNavigation'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
@@ -90,9 +90,9 @@ export function Summary() {
   const intl = useIntl()
 
   const events = useEvents()
-  const event = events.getEvent.getFromCache(eventId)
+  const event = events.getEvent.useGetEventFromCache(eventId)
   const validatorContext = useValidatorContext(event)
-  const { eventConfiguration } = useEventConfiguration(event.type)
+  const { eventConfiguration } = useEventConfigurationForRecord(event)
   const eventIndex = getCurrentEventState(event, eventConfiguration)
   const togglePrompt = () => setShowPrompt(!showPrompt)
 

@@ -10,7 +10,9 @@
  */
 import { Kysely, sql } from 'kysely'
 import { TRPCError } from '@trpc/server'
+import partition from 'lodash/partition'
 import { UUID } from '@opencrvs/commons/events'
+import { isUUID } from '@opencrvs/commons'
 import { getClient } from '@events/storage/postgres/events'
 import { SearchUsersPayload } from '@events/service/users/api'
 import { getAdministrativeHierarchyByIdCte } from '@events/storage/postgres/administrative-hierarchy/locations'
@@ -27,10 +29,12 @@ export interface SecurityQuestion {
 /**
  * The field each unique constraint on the user tables protects. Only the name
  * of the tripped constraint says which value was the duplicate, so the map is
- * keyed by it. Constraints absent here — the primary keys, `users_legacy_id_key`
- * — are none of a caller's business and stay unmapped.
+ * keyed by it. `users_pkey` is here because `user.create` accepts an id from
+ * the caller. Constraints absent here, for example `user_credentials_pkey` and
+ * `users_legacy_id_key`, are none of a caller's business and stay unmapped.
  */
 const UNIQUE_CONSTRAINT_FIELDS: Record<string, string> = {
+  users_pkey: 'id',
   users_email_key: 'email',
   users_mobile_key: 'mobile',
   user_credentials_username_key: 'username'
@@ -428,8 +432,9 @@ export async function getUsersAndSystemsByIds(ids: string[]) {
   if (ids.length === 0) {
     return { users: [], systems: [] }
   }
-  const legacyIds = ids.filter((id) => !UUID.safeParse(id).success)
-  const uuidIds = ids.filter((id) => UUID.safeParse(id).success) as UUID[]
+
+  const [uuidIds, legacyIds] = partition(ids, (id) => isUUID(id))
+
   const db = getClient()
 
   const usersQuery =

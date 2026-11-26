@@ -9,11 +9,21 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { omit } from 'lodash'
-import { EventDocument, getUUID, TokenWithBearer } from '@opencrvs/commons'
+import { TRPCError } from '@trpc/server'
+import {
+  EventDocument,
+  getUUID,
+  TokenWithBearer,
+  VersionedEventConfig
+} from '@opencrvs/commons'
 import { upsertEventWithActions } from '@events/storage/postgres/events/import'
 import { assertImportedFilesBelongToEvent } from '@events/service/files'
-import { getInMemoryEventConfigurations } from '../config/config'
-import { indexEventsInBulk, type BulkResponse } from '../indexing/indexing'
+import { getInMemoryVersionedEventConfigurations } from '../config/config'
+import {
+  ensureVersionIndicesExist,
+  indexEventsInBulk,
+  type BulkResponse
+} from '../indexing/indexing'
 
 function mapEventActions(actions: EventDocument['actions']) {
   return actions.map(({ type, ...action }) => ({
@@ -38,6 +48,32 @@ function mapEventActions(actions: EventDocument['actions']) {
   }))
 }
 
+/**
+ * Every record must name a configured event type and version, checked before any
+ * record is written, so a rejected import leaves nothing behind.
+ * @throws {TRPCError} HTTP 400 naming the first record's event type or version that is not configured
+ */
+function assertEventsConfigured(
+  events: EventDocument[],
+  configs: VersionedEventConfig[]
+) {
+  for (const { type, configVersionId } of events) {
+    const config = configs.find(({ id }) => id === type)
+    if (!config) {
+      throw new TRPCError({
+        code: 'BAD_REQUEST',
+        message: `No configuration found for event type: ${type}`
+      })
+    }
+    if (!config.versions.some(({ id }) => id === configVersionId)) {
+      throw new TRPCError({
+        code: 'BAD_REQUEST',
+        message: `Event '${type}' has no version '${configVersionId}'`
+      })
+    }
+  }
+}
+
 export async function bulkImportEvents(
   events: EventDocument[],
   token: TokenWithBearer
@@ -46,7 +82,8 @@ export async function bulkImportEvents(
 
   events.forEach(assertImportedFilesBelongToEvent)
 
-  const eventConfigs = await getInMemoryEventConfigurations(token)
+  const eventConfigs = await getInMemoryVersionedEventConfigurations(token)
+  assertEventsConfigured(events, eventConfigs)
 
   for (const eventDocument of events) {
     const transactionId = getUUID()
@@ -56,11 +93,21 @@ export async function bulkImportEvents(
     const eventActions = mapEventActions(actions)
 
     const createdEvent = await upsertEventWithActions(
-      { ...omit(event, 'type'), eventType, transactionId },
+      {
+        ...omit(event, 'type'),
+        eventType,
+        transactionId
+      },
       eventActions
     )
 
     toIndex.push(createdEvent)
+  }
+
+  for (const config of eventConfigs) {
+    if (events.some(({ type }) => type === config.id)) {
+      await ensureVersionIndicesExist(config)
+    }
   }
 
   return indexEventsInBulk(toIndex, eventConfigs)

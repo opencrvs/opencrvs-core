@@ -10,3 +10,5 @@
  */
 export * from './User'
 export * from './userReferences'
+export * from './roleValidations'
+export * from './Role'

@@ -8,36 +8,29 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { expect, Page, test } from '@playwright/test'
+import { expect, test } from '@playwright/test'
 
 import { formatName, login } from '@e2e/support/helpers'
 import { mockNetworkConditions } from '@e2e/support/mock-network-conditions'
 import { faker } from '@faker-js/faker'
 import { openRecordByTitle } from '@e2e/support/print-certificate/birth/helpers'
+import { CREDENTIALS } from '@e2e/support/constants'
 
-test.describe.serial('Can Open Draft offline', () => {
-  let page: Page
+test('Can Open Draft offline', async ({ page }) => {
   const name = {
     firstNames: faker.person.firstName('male'),
     familyName: faker.person.lastName('male')
   }
-  test.beforeAll(async ({ browser }) => {
-    page = await browser.newPage()
-  })
 
-  test.afterAll(async () => {
-    await page.close()
-  })
-
-  test('Login', async () => {
-    await login(page)
+  await test.step('Login', async () => {
+    await login(page, CREDENTIALS.FIELD_AGENT)
     await expect(page.getByText('Farajaland CRS')).toBeVisible({
       timeout: 30000
     })
     await expect(page.locator('#content-name')).toHaveText('Assigned to you')
   })
 
-  test('Create a draft', async () => {
+  await test.step('Create a draft', async () => {
     await page.click('#header-new-event')
     await page.getByLabel('Birth').click()
     await page.getByRole('button', { name: 'Continue' }).click()
@@ -55,7 +48,10 @@ test.describe.serial('Can Open Draft offline', () => {
     await draftResponse
   })
 
-  test('Open the draft offline', async () => {
+  await test.step('Open the draft offline', async () => {
+    // Executing previous test steps takes milliseconds, and there is no time to sync local cache throttle.
+    // Wait for a few seconds to allow for caching to complete and resemble 'real life' scenario.
+    await page.waitForTimeout(5000)
     await mockNetworkConditions(page, 'offline')
     await page.getByRole('button', { name: 'Drafts' }).click()
     await expect(page.locator('#content-name')).toHaveText('Drafts')

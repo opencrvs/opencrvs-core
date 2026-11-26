@@ -11,8 +11,8 @@
 import React, { useEffect, useState } from 'react'
 import styled from 'styled-components'
 import { Select, ISelectOption as SelectComponentOptions } from '../Select'
-import PanViewer from './components/PanViewer'
-import PanControls from './components/PanControls'
+import { PanViewer } from './components/PanViewer'
+import { PanControls } from './components/PanControls'
 
 const ViewerWrapper = styled.div`
   position: relative;

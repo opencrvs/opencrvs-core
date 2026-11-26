@@ -246,7 +246,7 @@ export function useUsers() {
         ]
       }
     },
-    createUser: ({
+    useCreateUser: ({
       onSuccess
     }: {
       onSuccess?: (response: inferOutput<typeof trpc.user.create>) => void
@@ -263,7 +263,7 @@ export function useUsers() {
         }
       })
     },
-    updateUser: ({
+    useUpdateUser: ({
       onSuccess,
       onError
     }: {
@@ -294,7 +294,7 @@ export function useUsers() {
         }
       })
     },
-    activateUser: ({
+    useActivateUser: ({
       onSuccess,
       onError
     }: { onSuccess?: () => void; onError?: () => void } = {}) => {

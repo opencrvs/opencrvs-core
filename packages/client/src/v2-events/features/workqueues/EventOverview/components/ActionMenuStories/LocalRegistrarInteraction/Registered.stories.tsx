@@ -44,7 +44,8 @@ const registeredScenariosForLocalRegistrar: Scenario[] = [
       ...getHiddenActions(),
       ['Assign']: AssertType.ENABLED,
       ['Print certificate']: AssertType.DISABLED,
-      ['Request correction']: AssertType.DISABLED
+      ['Request correction']: AssertType.DISABLED,
+      ['Revoke registration']: AssertType.DISABLED
     }
   },
   {
@@ -60,7 +61,8 @@ const registeredScenariosForLocalRegistrar: Scenario[] = [
       ...getHiddenActions(),
       ['Unassign']: AssertType.ENABLED,
       ['Print certificate']: AssertType.ENABLED,
-      ['Request correction']: AssertType.ENABLED
+      ['Request correction']: AssertType.ENABLED,
+      ['Revoke registration']: AssertType.ENABLED
     }
   },
   {
@@ -78,7 +80,8 @@ const registeredScenariosForLocalRegistrar: Scenario[] = [
       ...getHiddenActions(),
       ['Unassign']: AssertType.ENABLED,
       ['Print certificate']: AssertType.DISABLED,
-      ['Request correction']: AssertType.DISABLED
+      ['Request correction']: AssertType.DISABLED,
+      ['Revoke registration']: AssertType.DISABLED
     }
   }
 ]

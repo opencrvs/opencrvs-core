@@ -13,8 +13,8 @@ import {
   ScopeType,
   ScopeOptionKey,
   getScopeOptionValue
-} from '../scopes'
-import { getAcceptedScopesFromToken } from '../authentication'
+} from './scopes'
+import { getAcceptedScopesFromToken } from './authentication'
 import z from 'zod/v4'
 
 const ScopeOptionReference = z.object({
@@ -40,10 +40,7 @@ function isJurisdictionFilter(
   if (typeof jurisdiction !== 'string') {
     return false
   }
-
-  // Do this instead of using safeParse for performance reasons.
-  const allowedJurisdictionFilters: string[] = JurisdictionFilter.options
-  return allowedJurisdictionFilters.includes(jurisdiction)
+  return JurisdictionFilter.validate(jurisdiction)
 }
 
 /**

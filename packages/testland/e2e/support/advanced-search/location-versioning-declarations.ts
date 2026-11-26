@@ -9,7 +9,6 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { v4 as uuidv4 } from 'uuid'
-import { Page } from '@playwright/test'
 import { faker } from '@faker-js/faker'
 import { createClient } from '@opencrvs/toolkit/api'
 import { ActionType, AddressType } from '@opencrvs/toolkit/events'
@@ -18,7 +17,6 @@ import {
   getAuthTokens,
   getClientToken,
   getToken,
-  loginWithNewUser,
   NEW_USER_PASSWORD
 } from '@e2e/support/helpers'
 import {
@@ -28,9 +26,14 @@ import {
 } from '@e2e/support/birth/helpers'
 import {
   createDeclaration as createBirthDeclaration,
-  getDeclaration as getBirthDeclaration
+  getDeclaration as getBirthDeclaration,
+  getNotificationDeclaration
 } from '@e2e/support/test-data/birth-declaration'
 import { createDeclaration as createDeathDeclaration } from '@e2e/support/test-data/death-declaration'
+import {
+  activateUserViaApi,
+  getExpectedUsername
+} from '@e2e/support/test-data/api-actions'
 
 function getUserIdFromToken(token: string) {
   return JSON.parse(Buffer.from(token.split('.')[1], 'base64').toString()).sub
@@ -50,7 +53,7 @@ async function getNotifyOnlySystemClientToken() {
     `Bearer ${systemAdminToken}`
   )
   const integration = await integrationClient.integrations.create.mutate({
-    name: `Notify-only client ${uuidv4()}`,
+    name: `Test Notifier ${faker.string.alphanumeric(6)}`,
     scopes: [
       'type=record.create',
       'type=record.search',
@@ -70,7 +73,7 @@ async function getNotifyOnlySystemClientToken() {
  * allows a user whose own office is *already* inactive to act at all is a
  * separate, unconfirmed restriction — this avoids depending on it.
  */
-export async function registerDeclarationsThenDeactivateOffice(page: Page) {
+export async function registerDeclarationsThenDeactivateOffice() {
   const adminToken = await getToken(CREDENTIALS.NATIONAL_SYSTEM_ADMIN)
   const client = createClient(GATEWAY_HOST + '/events', `Bearer ${adminToken}`)
 
@@ -88,9 +91,7 @@ export async function registerDeclarationsThenDeactivateOffice(page: Page) {
     firstname: faker.person.firstName(),
     surname: `${faker.person.lastName()}${faker.string.alphanumeric(6)}`
   }
-  const username = `${name.firstname[0]}.${name.surname}`
-    .toLowerCase()
-    .replace(/[^a-z0-9.]/g, '')
+  const username = getExpectedUsername(name)
 
   await client.user.create.mutate({
     name,
@@ -103,7 +104,7 @@ export async function registerDeclarationsThenDeactivateOffice(page: Page) {
     data: {}
   })
 
-  await loginWithNewUser(page, username)
+  await activateUserViaApi(username)
   const { token: registrarToken } = await getAuthTokens(
     username,
     NEW_USER_PASSWORD
@@ -242,13 +243,12 @@ export async function createBirthNotifiedInactiveAddress() {
   const offices = await getLocations('CRVS_OFFICE', token)
   const officeId = getIdByName(offices, 'Ibombo District Office')
 
-  const declaration = await getBirthDeclaration({
+  // NOTIFY only accepts the fields of the birth notification form
+  const declaration = await getNotificationDeclaration({
     token,
     partialDeclaration: {
-      'mother.nid': null,
-      'mother.dob': null,
       'child.placeOfBirth': 'OTHER',
-      'child.birthLocation.privateHome': null,
+      'child.birthLocation': undefined,
       'child.birthLocation.other': {
         country: 'FAR',
         addressType: AddressType.DOMESTIC,

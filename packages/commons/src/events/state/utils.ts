@@ -36,14 +36,9 @@ function getActionRequests(actionType: ActionType, actions: Action[]) {
     (action) => action.status === ActionStatus.Accepted
   )
 
-  // Prefer the request the accepted action resolves: earlier requests may have no outcome.
-  // Fall back to the first one for accepted actions stored without `originalActionId`.
-  const request =
-    filtered.find(
-      (action) =>
-        action.status === ActionStatus.Requested &&
-        action.id === accept?.originalActionId
-    ) ?? filtered.find((action) => action.status === ActionStatus.Requested)
+  const request = filtered.find(
+    (action) => action.status === ActionStatus.Requested
+  )
 
   const reject = filtered.find(
     (action) => action.status === ActionStatus.Rejected
@@ -109,6 +104,8 @@ const updateActions = new Set<ActionType>(
     ActionType.REQUEST_CORRECTION,
     ActionType.APPROVE_CORRECTION,
     ActionType.REJECT_CORRECTION,
+    ActionType.REVOKE_REGISTRATION,
+    ActionType.REINSTATE_REGISTRATION,
     ActionType.CUSTOM
   ]).options
 )
@@ -158,7 +155,7 @@ export function getActionUpdateMetadata(actions: Action[]) {
  * @returns the legal statuses of the event. Event is considered legal if it has been accepted.
  * @see EventIndex for the description of the returned object.
  */
-export function getLegalStatuses(actions: Action[]) {
+export function getLegalStatuses(actions: Action[], status: EventStatus) {
   return {
     [EventStatus.enum.NOTIFIED]: getDeclarationActionCreationMetadata(
       ActionType.NOTIFY,
@@ -171,6 +168,14 @@ export function getLegalStatuses(actions: Action[]) {
     [EventStatus.enum.REGISTERED]: getDeclarationActionCreationMetadata(
       ActionType.REGISTER,
       actions
-    )
+    ),
+    // A later reinstate does not remove the revoke action, so only report it while the record is still revoked.
+    [EventStatus.enum.REVOKED]:
+      status === EventStatus.enum.REVOKED
+        ? getDeclarationActionCreationMetadata(
+            ActionType.REVOKE_REGISTRATION,
+            actions
+          )
+        : null
   }
 }

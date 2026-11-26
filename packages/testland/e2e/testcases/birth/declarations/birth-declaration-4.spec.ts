@@ -8,7 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { test, expect, type Page } from '@playwright/test'
+import { test, expect } from '@playwright/test'
 import {
   continueForm,
   drawSignature,
@@ -26,8 +26,7 @@ import { CREDENTIALS } from '@e2e/support/constants'
 import { fillDate, validateAddress } from '@e2e/support/birth/helpers'
 import { openRecordByTitle } from '@e2e/support/print-certificate/birth/helpers'
 
-test.describe.serial('4. Birth declaration case - 4', () => {
-  let page: Page
+test('4. Birth declaration case - 4', async ({ page }) => {
   const declaration = {
     child: {
       name: {
@@ -95,7 +94,6 @@ test.describe.serial('4. Birth declaration case - 4', () => {
         addressLine3: faker.location.buildingNumber(),
         postcodeOrZip: faker.location.zipCode()
       },
-      maritalStatus: 'Divorced',
       levelOfEducation: 'Tertiary'
     },
     father: {
@@ -108,7 +106,6 @@ test.describe.serial('4. Birth declaration case - 4', () => {
       identifier: {
         type: 'None'
       },
-      maritalStatus: 'Divorced',
       levelOfEducation: 'Tertiary',
       address: {
         sameAsMother: false,
@@ -123,24 +120,15 @@ test.describe.serial('4. Birth declaration case - 4', () => {
       }
     }
   }
-  test.beforeAll(async ({ browser }) => {
-    page = await browser.newPage()
-  })
 
-  test.afterAll(async () => {
-    await page.close()
-  })
+  await test.step('4.1 Declaration started by RO', async () => {
+    await login(page, CREDENTIALS.REGISTRATION_OFFICER_VILLAGE)
+    await page.click('#header-new-event')
+    await page.getByLabel('Birth').click()
+    await page.getByRole('button', { name: 'Continue' }).click()
+    await page.getByRole('button', { name: 'Continue' }).click()
 
-  test.describe('4.1 Declaration started by RO', async () => {
-    test.beforeAll(async () => {
-      await login(page, CREDENTIALS.REGISTRATION_OFFICER_VILLAGE)
-      await page.click('#header-new-event')
-      await page.getByLabel('Birth').click()
-      await page.getByRole('button', { name: 'Continue' }).click()
-      await page.getByRole('button', { name: 'Continue' }).click()
-    })
-
-    test('4.1.1 Fill child details', async () => {
+    await test.step('4.1.1 Fill child details', async () => {
       await page.locator('#firstname').fill(declaration.child.name.firstNames)
       await page.locator('#firstname').blur()
       await page.locator('#surname').fill(declaration.child.name.familyName)
@@ -194,7 +182,7 @@ test.describe.serial('4. Birth declaration case - 4', () => {
       await continueForm(page)
     })
 
-    test('4.1.2 Fill informant details', async () => {
+    await test.step('4.1.2 Fill informant details', async () => {
       await page.locator('#informant____relation').click()
       await page
         .getByText(declaration.informantType, {
@@ -273,7 +261,7 @@ test.describe.serial('4. Birth declaration case - 4', () => {
       await continueForm(page)
     })
 
-    test("4.1.3 Fill mother's details", async () => {
+    await test.step("4.1.3 Fill mother's details", async () => {
       await page.locator('#firstname').fill(declaration.mother.name.firstNames)
       await page.locator('#firstname').blur()
       await page.locator('#surname').fill(declaration.mother.name.familyName)
@@ -315,11 +303,6 @@ test.describe.serial('4. Birth declaration case - 4', () => {
         .locator('#postcodeOrZip')
         .fill(declaration.mother.address.postcodeOrZip)
 
-      await page.locator('#mother____maritalStatus').click()
-      await page
-        .getByText(declaration.mother.maritalStatus, { exact: true })
-        .click()
-
       await page.locator('#mother____educationalAttainment').click()
       await page
         .getByText(declaration.mother.levelOfEducation, { exact: true })
@@ -328,7 +311,7 @@ test.describe.serial('4. Birth declaration case - 4', () => {
       await continueForm(page)
     })
 
-    test("4.1.4 Fill father's details", async () => {
+    await test.step("4.1.4 Fill father's details", async () => {
       await page.locator('#firstname').fill(declaration.father.name.firstNames)
       await page.locator('#firstname').blur()
       await page.locator('#surname').fill(declaration.father.name.familyName)
@@ -366,11 +349,6 @@ test.describe.serial('4. Birth declaration case - 4', () => {
         .locator('#postcodeOrZip')
         .fill(declaration.father.address.postcodeOrZip)
 
-      await page.locator('#father____maritalStatus').click()
-      await page
-        .getByText(declaration.father.maritalStatus, { exact: true })
-        .click()
-
       await page.locator('#father____educationalAttainment').click()
       await page
         .getByText(declaration.father.levelOfEducation, { exact: true })
@@ -379,11 +357,11 @@ test.describe.serial('4. Birth declaration case - 4', () => {
       await page.getByRole('button', { name: 'Continue' }).click()
     })
 
-    test('4.1.5 Go to review', async () => {
+    await test.step('4.1.5 Go to review', async () => {
       await goToSection(page, 'review')
     })
 
-    test('4.1.6 Verify information on review page', async () => {
+    await test.step('4.1.6 Verify information on review page', async () => {
       /*
        * Expected result: should include
        * - Child's First Name
@@ -538,14 +516,6 @@ test.describe.serial('4. Birth declaration case - 4', () => {
 
       /*
        * Expected result: should include
-       * - Mother's Marital status
-       */
-      await expect(page.getByTestId('mother.maritalStatus-value')).toHaveText(
-        declaration.mother.maritalStatus
-      )
-
-      /*
-       * Expected result: should include
        * - Mother's level of education
        */
       await expect(
@@ -608,14 +578,6 @@ test.describe.serial('4. Birth declaration case - 4', () => {
 
       /*
        * Expected result: should include
-       * - Father's Marital status
-       */
-      await expect(page.getByTestId('father.maritalStatus-value')).toHaveText(
-        declaration.father.maritalStatus
-      )
-
-      /*
-       * Expected result: should include
        * - Father's level of education
        */
       await expect(
@@ -632,7 +594,7 @@ test.describe.serial('4. Birth declaration case - 4', () => {
         'father.address-value'
       )
     })
-    test('4.1.7 Fill up informant signature', async () => {
+    await test.step('4.1.7 Fill up informant signature', async () => {
       await page.locator('#review____comment').fill(faker.lorem.sentence())
       await page.getByRole('button', { name: 'Sign', exact: true }).click()
       await drawSignature(page, 'review____signature_canvas_element', false)
@@ -643,7 +605,7 @@ test.describe.serial('4. Birth declaration case - 4', () => {
 
       await expect(page.getByRole('dialog')).not.toBeVisible()
     })
-    test('4.1.8 Declare', async () => {
+    await test.step('4.1.8 Declare', async () => {
       await triggerDeclarationAction(page, 'Declare')
 
       await page.getByText('Recent').click()
@@ -656,8 +618,8 @@ test.describe.serial('4. Birth declaration case - 4', () => {
     })
   })
 
-  test.describe('4.2 Declaration Review by Registrar', async () => {
-    test('4.2.1 Navigate to the declaration "Record" -tab', async () => {
+  await test.step('4.2 Declaration Review by Registrar', async () => {
+    await test.step('4.2.1 Navigate to the declaration "Record" -tab', async () => {
       await logout(page)
       await login(page, CREDENTIALS.REGISTRAR_VILLAGE)
 
@@ -668,7 +630,7 @@ test.describe.serial('4. Birth declaration case - 4', () => {
       await switchEventTab(page, 'Record')
     })
 
-    test('4.2.2 Verify information on "Record" tab', async () => {
+    await test.step('4.2.2 Verify information on "Record" tab', async () => {
       /*
        * Expected result: should include
        * - Child's First Name
@@ -817,14 +779,6 @@ test.describe.serial('4. Birth declaration case - 4', () => {
 
       /*
        * Expected result: should include
-       * - Mother's Marital status
-       */
-      await expect(page.getByTestId('mother.maritalStatus-value')).toHaveText(
-        declaration.mother.maritalStatus
-      )
-
-      /*
-       * Expected result: should include
        * - Mother's level of education
        */
       await expect(
@@ -883,14 +837,6 @@ test.describe.serial('4. Birth declaration case - 4', () => {
        */
       await expect(page.getByTestId('father.idType-value')).toHaveText(
         declaration.father.identifier.type
-      )
-
-      /*
-       * Expected result: should include
-       * - Father's Marital status
-       */
-      await expect(page.getByTestId('father.maritalStatus-value')).toHaveText(
-        declaration.father.maritalStatus
       )
 
       /*

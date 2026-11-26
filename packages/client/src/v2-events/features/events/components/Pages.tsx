@@ -22,8 +22,7 @@ import {
   AttachmentPath,
   ValidatorContext
 } from '@opencrvs/commons/client'
-import { MAIN_CONTENT_ANCHOR_ID } from '@opencrvs/components/lib/Frame/components/SkipToContent'
-import { Button } from '@opencrvs/components/lib/Button'
+import { MAIN_CONTENT_ANCHOR_ID, Button } from '@opencrvs/components'
 import {
   FormFieldGenerator,
   FormFieldGeneratorHandle

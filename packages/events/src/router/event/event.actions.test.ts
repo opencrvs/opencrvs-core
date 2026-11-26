@@ -28,9 +28,14 @@ import {
   AddressType,
   deepMerge,
   encodeScope,
-  getDeclarationFields
+  getDeclarationFields,
+  withDeclaration,
+  toVersionedEventConfig
 } from '@opencrvs/commons'
-import { tennisClubMembershipEvent } from '@opencrvs/commons/fixtures'
+import {
+  tennisClubMembershipEvent,
+  versionedTennisClubMembershipEvent
+} from '@opencrvs/commons/fixtures'
 import {
   createEvent,
   createTestClient,
@@ -39,8 +44,7 @@ import {
   TEST_USER_DEFAULT_SCOPES,
   UNSTABLE_EVENT_FIELDS
 } from '@events/tests/utils'
-import { createIndex } from '@events/service/indexing/indexing'
-import { getEventIndexName } from '@events/storage/elasticsearch'
+import { createEventIndex } from '@events/tests/createEventIndex'
 import { mswServer } from '../../tests/msw'
 import { env } from '../../environment'
 
@@ -219,10 +223,13 @@ describe('Action drafts', () => {
   })
 })
 
-const multiFileConfig = {
-  ...tennisClubMembershipEvent,
-  id: 'death', // using existing event type id here, so that the user has the required scope to it
-  declaration: {
+const multiFileConfig = withDeclaration(
+  {
+    ...tennisClubMembershipEvent,
+    id: 'death', // using existing event type id here, so that the user has the required scope to it
+    advancedSearch: []
+  },
+  {
     label: generateTranslationConfig('File club form'),
     pages: [
       defineFormPage({
@@ -257,13 +264,12 @@ const multiFileConfig = {
         ]
       })
     ]
-  },
-  advancedSearch: []
-} satisfies EventConfig
+  }
+) satisfies EventConfig
 
 beforeEach(async () => {
-  return createIndex(
-    getEventIndexName(multiFileConfig.id),
+  return createEventIndex(
+    multiFileConfig.id,
     getDeclarationFields(tennisClubMembershipEvent)
   )
 })
@@ -278,7 +284,10 @@ describe('Action updates', () => {
 
     mswServer.use(
       http.get(`${env.COUNTRY_CONFIG_URL}/config/events`, () => {
-        return HttpResponse.json([multiFileConfig, tennisClubMembershipEvent])
+        return HttpResponse.json([
+          toVersionedEventConfig(multiFileConfig),
+          versionedTennisClubMembershipEvent
+        ])
       }),
       http.head(`${env.DOCUMENTS_URL}/files/:filePath*`, (req) => {
         fileExistsMock(

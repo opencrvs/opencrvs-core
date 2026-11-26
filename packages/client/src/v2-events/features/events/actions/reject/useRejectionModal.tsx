@@ -12,30 +12,27 @@
 import React from 'react'
 import { v4 as uuid } from 'uuid'
 import {
-  UUID,
-  getActionConfig,
+  EventIndex,
+  findActionDialogCopy,
   getActionFormFields,
   ActionType,
   eventAttachmentPath
 } from '@opencrvs/commons/client'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
+import { findLocalEventDocument } from '@client/v2-events/features/events/useEvents/api'
 import { useModal } from '@client/v2-events/hooks/useModal'
 import {
   Review as ReviewComponent,
   RejectActionModalResult
 } from '@client/v2-events/features/events/components/Review'
-import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
+import { useEventConfigurationForRecord } from '@client/v2-events/features/events/useEventConfiguration'
 
-export function useRejectionModal(eventId: UUID, eventType: string) {
+export function useRejectionModal(event: EventIndex) {
+  const eventId = event.id
   const [modal, openModal] = useModal()
   const events = useEvents()
-  const { eventConfiguration } = useEventConfiguration(eventType)
-  const rejectActionConfig = getActionConfig({
-    eventConfiguration,
-    actionType: ActionType.REJECT
-  })
-
-  const supportingCopy = rejectActionConfig?.supportingCopy
+  const { eventConfiguration } = useEventConfigurationForRecord(event)
+  const dialogCopy = findActionDialogCopy(eventConfiguration, ActionType.REJECT)
   const fields = getActionFormFields(eventConfiguration, ActionType.REJECT)
 
   async function handleRejection(onClose: () => void) {
@@ -44,9 +41,10 @@ export function useRejectionModal(eventId: UUID, eventType: string) {
         <ReviewComponent.ActionModal.Reject
           attachmentPath={eventAttachmentPath(eventId)}
           close={close}
+          dialogCopy={dialogCopy}
+          event={findLocalEventDocument(eventId)}
           eventConfiguration={eventConfiguration}
           fields={fields}
-          supportingCopy={supportingCopy}
         />
       )
     )

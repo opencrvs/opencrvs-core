@@ -14,15 +14,13 @@ import {
   ClientSpecificAction,
   EventIndex,
   getActionConfig,
-  WorkqueueActionType,
   isValidIcon
 } from '@opencrvs/commons/client'
-import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
+import { useEventConfigurationForRecord } from '@client/v2-events/features/events/useEventConfiguration'
 import { useValidatorContext } from '@client/v2-events/hooks/useValidatorContext'
 import { useOnlineStatus } from '@client/utils'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
 import { useDrafts } from '@client/v2-events/features/drafts/useDrafts'
-import { buttonMessages } from '@client/i18n/messages'
 import {
   DuplicatesAvailability,
   useDuplicatesAvailable
@@ -35,9 +33,13 @@ import {
   ActionCtaConfig,
   actionIcons,
   actionLabels,
-  ActionMenuItem
+  ActionMenuItem,
+  WorkqueueCtaType
 } from './utils'
-import { resolveActionConditionals } from './resolveActionConditionals'
+import {
+  resolveActionConditionals,
+  resolveBaseActionConditionals
+} from './resolveActionConditionals'
 import { useUserAllowedActions } from './useUserAllowedActions'
 
 /**
@@ -47,10 +49,10 @@ import { useUserAllowedActions } from './useUserAllowedActions'
  * Pattern needs to return a resolver function, since a hook should not be mapped through.
  */
 export function useEventActionConfigurationResolver(event: EventIndex) {
-  const { getDisplayableDrafts } = useDrafts()
-  const drafts = getDisplayableDrafts()
-  const { eventConfiguration } = useEventConfiguration(event.type)
-  const { onClick, modals } = useEventActionsOnClick(event)
+  const { useDisplayableDrafts } = useDrafts()
+  const drafts = useDisplayableDrafts()
+  const { eventConfiguration } = useEventConfigurationForRecord(event)
+  const { onClick, continueDraft, modals } = useEventActionsOnClick(event)
   const { isActionAllowed: isActionAllowedForUser } =
     useUserAllowedActions(event)
 
@@ -60,7 +62,7 @@ export function useEventActionConfigurationResolver(event: EventIndex) {
   const cachedEvent = useFindEventFromCache(event.id)
   const isDownloaded = Boolean(cachedEvent.data)
   const validatorContext = useValidatorContext(cachedEvent.data)
-  const isAssigning = events.actions.assignment.assign.isAssigning(event.id)
+  const isAssigning = events.actions.assignment.assign.useIsAssigning(event.id)
   // Don't offer a review that may turn out to have nothing to show.
   const areDuplicatesAvailable =
     useDuplicatesAvailable(
@@ -68,19 +70,40 @@ export function useEventActionConfigurationResolver(event: EventIndex) {
       isActionAllowedForUser(ActionType.MARK_AS_DUPLICATE)
     ) === DuplicatesAvailability.AVAILABLE
 
+  const draftActionType = drafts.find((draft) => draft.eventId === event.id)
+    ?.action.type
+
   const resolveAction = useCallback(
-    <T extends WorkqueueActionType | ClientSpecificAction>(
+    <T extends WorkqueueCtaType | ClientSpecificAction>(
       actionType: T
     ): ActionCtaConfig<T> => {
-      const isDeclareDraftOpen = drafts.some(
-        (draft) =>
-          draft.action.type === ActionType.DECLARE && draft.eventId === event.id
-      )
+      if (actionType === ClientSpecificAction.CONTINUE_DRAFT) {
+        // The draft's own action must still be available to the user. A draft opens
+        // without assignment or a connection, so the action's internal rules don't apply.
+        const { enabled, visible } = draftActionType
+          ? resolveBaseActionConditionals({
+              event,
+              actionType: draftActionType,
+              validatorContext,
+              isActionAllowedForUser,
+              eventConfiguration
+            })
+          : { enabled: false, visible: false }
+
+        return {
+          label: actionLabels[actionType],
+          type: actionType,
+          icon: actionIcons[actionType],
+          onClick: (backTo?: string) =>
+            draftActionType && continueDraft(draftActionType, backTo),
+          disabled: !enabled,
+          hidden: !visible
+        }
+      }
 
       const { enabled, visible } = resolveActionConditionals({
         event,
         actionType,
-        isDeclareDraftOpen,
         validatorContext,
         isActionAllowedForUser,
         eventConfiguration,
@@ -90,14 +113,12 @@ export function useEventActionConfigurationResolver(event: EventIndex) {
         areDuplicatesAvailable
       })
 
-      const actionConfig = getActionConfig({ eventConfiguration, actionType })
-      const replaceLabelForDeclareDraft =
-        isDeclareDraftOpen && actionType === ActionType.DECLARE
+      const actionConfig = getActionConfig<
+        WorkqueueCtaType | ClientSpecificAction
+      >({ eventConfiguration, actionType })
 
       return {
-        label: replaceLabelForDeclareDraft
-          ? buttonMessages.update
-          : (actionConfig?.label ?? actionLabels[actionType]),
+        label: actionConfig?.label ?? actionLabels[actionType],
         type: actionType,
         icon: isValidIcon(actionConfig?.icon)
           ? actionConfig.icon
@@ -108,7 +129,7 @@ export function useEventActionConfigurationResolver(event: EventIndex) {
       }
     },
     [
-      drafts,
+      draftActionType,
       event,
       validatorContext,
       isActionAllowedForUser,
@@ -117,7 +138,8 @@ export function useEventActionConfigurationResolver(event: EventIndex) {
       isDownloaded,
       isAssigning,
       areDuplicatesAvailable,
-      onClick
+      onClick,
+      continueDraft
     ]
   )
 
@@ -135,7 +157,7 @@ export function useEventActionConfigurationResolver(event: EventIndex) {
  * per-row (e.g. `DownloadButton`), unlike the full resolver.
  */
 export function useResolveAssignmentActionConditionals(event: EventIndex) {
-  const { eventConfiguration } = useEventConfiguration(event.type)
+  const { eventConfiguration } = useEventConfigurationForRecord(event)
   const { isActionAllowed: isActionAllowedForUser } =
     useUserAllowedActions(event)
   const events = useEvents()
@@ -144,7 +166,7 @@ export function useResolveAssignmentActionConditionals(event: EventIndex) {
   const cachedEvent = useFindEventFromCache(event.id)
   const isDownloaded = Boolean(cachedEvent.data)
   const validatorContext = useValidatorContext(cachedEvent.data)
-  const isAssigning = events.actions.assignment.assign.isAssigning(event.id)
+  const isAssigning = events.actions.assignment.assign.useIsAssigning(event.id)
 
   const resolveConditionals = useCallback(
     (
@@ -156,7 +178,6 @@ export function useResolveAssignmentActionConditionals(event: EventIndex) {
       const { enabled, visible } = resolveActionConditionals({
         event,
         actionType,
-        isDeclareDraftOpen: false,
         validatorContext,
         isActionAllowedForUser,
         eventConfiguration,
@@ -188,7 +209,7 @@ export function useResolveAssignmentActionConditionals(event: EventIndex) {
  * Pattern needs to return a resolver function, since a hook should not be mapped through.
  */
 export function useAssignmentActionConfigurationResolver(event: EventIndex) {
-  const { eventConfiguration } = useEventConfiguration(event.type)
+  const { eventConfiguration } = useEventConfigurationForRecord(event)
   const { resolveConditionals } = useResolveAssignmentActionConditionals(event)
   const { onAssign, onUnassign, modal } = useAssignmentActions(event)
 

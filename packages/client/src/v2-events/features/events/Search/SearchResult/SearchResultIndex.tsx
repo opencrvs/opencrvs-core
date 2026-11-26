@@ -18,9 +18,13 @@ import { useLocation } from 'react-router-dom'
 import {
   EventState,
   mandatoryColumns,
-  ActionType
+  ActionType,
+  getEventConfigById
 } from '@opencrvs/commons/client'
-import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
+import {
+  useEventConfigurations,
+  useSearchableFields
+} from '@client/v2-events/features/events/useEventConfiguration'
 import { ROUTES } from '@client/v2-events/routes'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
 import { SearchCriteriaPanel } from '@client/v2-events/features/events/Search/SearchCriteriaPanel'
@@ -29,8 +33,10 @@ import {
   buildSearchQuery,
   toAdvancedSearchQueryType,
   deserializeSearchParams,
-  resolveAdvancedSearchConfig
+  resolveAdvancedSearchConfig,
+  splitSearchParamsByFit
 } from '../utils'
+import { useUnfitSearchCriteriaNotice } from '../useUnfitSearchCriteriaNotice'
 import { SearchResultComponent } from './SearchResult'
 
 export const SearchResultIndex = () => {
@@ -39,61 +45,71 @@ export const SearchResultIndex = () => {
   const { searchEvent } = useEvents()
   const { eventType } = useTypedParams(ROUTES.V2.SEARCH_RESULT)
   const location = useLocation()
-  const { eventConfiguration: eventConfig } = useEventConfiguration(eventType)
+  // The search sections are shared by every version, so today's config gives them. Their fields come from every version.
+  const eventConfig = getEventConfigById(useEventConfigurations(), eventType)
+  const searchableFields = useSearchableFields()(eventType)
   const adminStructure = useAdminStructure()
 
   const fields = useMemo(() => {
-    const sections = resolveAdvancedSearchConfig(eventConfig, adminStructure)
+    const sections = resolveAdvancedSearchConfig(
+      eventConfig,
+      adminStructure,
+      searchableFields
+    )
     return sections.flatMap((section) => section.fields)
-  }, [eventConfig, adminStructure])
+  }, [eventConfig, adminStructure, searchableFields])
 
   /*
    * SelectDateRangeValue's are converted to DateTime values which would
    * return a new value on every render, hence we need to memoize.
    */
-  const formValues = useMemo(() => {
+  const { values: formValues, unfitFieldIds } = useMemo(() => {
     /*
      * Deliberately not parsed with `SearchQueryParams`. Its catchall is a plain
      * union of every field-value shape, and some members are objects whose keys
      * are all optional. Those match any object and strip it to `{}`. An address
      * filter is held as a FIELD_GROUP value, so it would not survive.
      *
-     * Safe to skip: the filter below drops any key that is not a known field,
-     * and every value that reaches a query is checked by the branch that
-     * consumes it.
+     * Safe to skip: `splitSearchParamsByFit` drops any key that is not a known
+     * field, and any value that does not fit its field.
      */
     const searchParams = deserializeSearchParams(location.search)
 
-    return Object.fromEntries(
-      Object.entries(searchParams).filter(([key]) =>
-        fields.some((field) => field.id === key)
-      )
-    ) as EventState
+    return splitSearchParamsByFit(fields, searchParams)
   }, [location.search, fields])
+
+  // Warns when values of the link were left out because they no longer fit their field.
+  useUnfitSearchCriteriaNotice(unfitFieldIds)
 
   const searchQuery = useMemo(
     () =>
-      buildSearchQuery(
+      buildSearchQuery({
         formValues,
-        fields,
-        eventConfig.advancedSearch.flatMap((section) => section.fields),
-        eventConfig
-      ),
-    [formValues, eventConfig, fields]
+        resolvedFieldConfigs: fields,
+        searchFieldConfigs: eventConfig.advancedSearch.flatMap(
+          (section) => section.fields
+        ),
+        eventConfig,
+        fields: searchableFields
+      }),
+    [formValues, eventConfig, fields, searchableFields]
   )
 
   /*
    * useSuspenseQuery unmounts the component causing the searchQuery to be
    * re-evaluated, which leads to an infinite loop.
    */
-  const queryData = searchEvent.useQuery({
-    query: toAdvancedSearchQueryType(
-      searchQuery,
-      eventConfig.advancedSearch.flatMap((section) => section.fields),
-      eventType
-    ),
-    ...typedSearchParams
-  }).data ?? {
+  const queryData = searchEvent.useQuery(
+    {
+      query: toAdvancedSearchQueryType(
+        searchQuery,
+        eventConfig.advancedSearch.flatMap((section) => section.fields),
+        eventType
+      ),
+      ...typedSearchParams
+    },
+    ['adhoc']
+  ).data ?? {
     results: [],
     total: 0
   }
@@ -102,7 +118,6 @@ export const SearchResultIndex = () => {
     <SearchResultComponent
       action={{ type: ActionType.READ }}
       columns={mandatoryColumns}
-      eventConfigs={[eventConfig]}
       queryData={queryData.results}
       tabBarContent={
         <SearchCriteriaPanel

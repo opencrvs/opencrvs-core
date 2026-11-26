@@ -43,7 +43,10 @@ import {
   userAndSystemProcedure,
   userOnlyProcedure
 } from '@events/router/trpc'
-import { getApplicationConfig, getRoles } from '@events/service/config/config'
+import {
+  getApplicationConfig,
+  getInMemoryRoles
+} from '@events/service/config/config'
 import { generateHash } from '@events/service/auth/hash'
 import { presignFiles } from '@events/service/files'
 import { getReadableUserFiles } from '@events/service/users/files'
@@ -55,6 +58,7 @@ import {
   queryClientAuditLog,
   writeAuditLog
 } from '@events/storage/postgres/events/auditLog'
+import { fileExists } from '@events/service/files'
 import {
   activateUser,
   createUser,
@@ -154,6 +158,15 @@ export async function handleCreateUser(
   input: CreateUserInput | CreateUserInputInternal,
   ctx: { token: TokenWithBearer }
 ): Promise<User> {
+  if (
+    'id' in input &&
+    input.id &&
+    (await getUsersById([input.id])).length > 0
+  ) {
+    logger.error(`The id ${input.id} is already in use`)
+    throw new TRPCError({ code: 'CONFLICT', message: 'DUPLICATE_ID' })
+  }
+
   if (input.mobile) {
     await validateMobile(input.mobile)
     const existingWithMobile = await searchUsers({
@@ -185,6 +198,19 @@ export async function handleCreateUser(
       )
       throw new TRPCError({ code: 'CONFLICT', message: 'DUPLICATE_EMAIL' })
     }
+  }
+
+  /*
+   * The client uploads the signature in the background, so the upload can still
+   * be in progress. The client sends the request again until the file exists.
+   */
+  const signature = 'signature' in input ? input.signature : undefined
+
+  if (signature && !(await fileExists(signature.path, ctx.token))) {
+    throw new TRPCError({
+      code: 'BAD_REQUEST',
+      message: `File not found: ${signature.path}`
+    })
   }
 
   const user = await createUser(input, ctx.token)
@@ -380,7 +406,9 @@ export const userRouter = router({
     .query(async ({ input }) => getUsersById(input)),
   search: searchUsersRoute(userAndSystemProcedure.use(canSearchUsers)),
   roles: router({
-    list: userOnlyProcedure.query(async () => getRoles())
+    list: userOnlyProcedure.query(async ({ ctx }) =>
+      getInMemoryRoles(ctx.token)
+    )
   }),
   changePassword: userOnlyProcedure
     .input(

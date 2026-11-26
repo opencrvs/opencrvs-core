@@ -10,13 +10,13 @@
  */
 import { test, expect, type Page } from '@playwright/test'
 import { getToken } from '@e2e/support/helpers'
-import { CLIENT_URL } from '@e2e/support/constants'
 import {
   createDeclaration,
   Declaration
 } from '@e2e/support/test-data/birth-declaration'
 import {
-  openRecordByTitle,
+  expectImageToRender,
+  openPrintAction,
   printCertificateViaApi,
   selectCertificationType,
   selectRequesterType
@@ -25,8 +25,6 @@ import {
   createRegistrarWithSignature,
   loginAsNewUser
 } from '@e2e/support/team/helpers'
-import { ensureAssignedToFullName, selectAction } from '@e2e/support/utils'
-import { formatV2ChildName } from '@e2e/support/birth/helpers'
 
 const OFFICE = 'Ibombo District Office'
 const COLLECTOR = 'Print and issue to Informant (Mother)'
@@ -34,33 +32,6 @@ const PRINT_IN_ADVANCE = 'Print in advance of issuance'
 
 function signature(page: Page) {
   return page.locator('#print [data-testid="registrar-signature"]')
-}
-
-async function expectSignatureToRender(page: Page) {
-  const href = await signature(page).getAttribute('xlink:href')
-
-  const contentType = await page.evaluate(async (url) => {
-    const response = await fetch(url!)
-    return response.headers.get('content-type')
-  }, href)
-
-  expect(contentType).toMatch(/^image\//)
-}
-
-async function openPrintAction(
-  page: Page,
-  declaration: Declaration,
-  registrarFullName: string
-) {
-  await page.goto(CLIENT_URL)
-  await page
-    .getByRole('textbox', { name: 'Search for a record' })
-    .fill(formatV2ChildName(declaration))
-
-  await page.getByRole('button', { name: 'Search' }).click()
-  await openRecordByTitle(page, formatV2ChildName(declaration))
-  await ensureAssignedToFullName(page, registrarFullName)
-  await selectAction(page, 'Print')
 }
 
 test.describe('Certificates printed in advance of issuance carry no signature', () => {
@@ -97,7 +68,7 @@ test.describe('Certificates printed in advance of issuance carry no signature', 
       await page.getByRole('button', { name: 'Continue' }).click()
 
       await expect(signature(page)).toHaveCount(1)
-      await expectSignatureToRender(page)
+      await expectImageToRender(signature(page))
     })
 
     await test.step('Printed in advance, the signature is gone', async () => {
@@ -142,7 +113,7 @@ test.describe('Certificates printed in advance of issuance carry no signature', 
       await page.getByRole('button', { name: 'Continue' }).click()
 
       await expect(signature(page)).toHaveCount(1)
-      await expectSignatureToRender(page)
+      await expectImageToRender(signature(page))
     })
 
     await test.step('Printed in advance, the signature is gone', async () => {

@@ -143,10 +143,10 @@ export const messages = defineMessages({
     description: 'Text for audit list',
     id: 'user.profile.audit.list.noDataFound'
   },
-  inProgressAuditAction: {
-    defaultMessage: 'Sent incomplete',
-    description: 'Description for incomplete declaration',
-    id: 'user.profile.audit.description.inProgress'
+  notifiedAuditAction: {
+    defaultMessage: 'Notified',
+    description: 'Description for notified record',
+    id: 'user.profile.audit.description.notified'
   },
   declaredAuditAction: {
     defaultMessage: 'Declaration started',
@@ -207,6 +207,16 @@ export const messages = defineMessages({
     defaultMessage: 'Archived',
     description: 'Description for declaration archived',
     id: 'user.profile.auditList.archived'
+  },
+  registrationRevokedAuditAction: {
+    defaultMessage: 'Registration revoked',
+    description: 'Description for registration revoked',
+    id: 'user.profile.auditList.registrationRevoked'
+  },
+  registrationReinstatedAuditAction: {
+    defaultMessage: 'Registration reinstated',
+    description: 'Description for registration reinstated',
+    id: 'user.profile.auditList.registrationReinstated'
   },
   loggedInAuditAction: {
     defaultMessage: 'Logged in',

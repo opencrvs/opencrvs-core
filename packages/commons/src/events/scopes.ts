@@ -22,7 +22,7 @@ import {
   RecordScopeV2,
   ScopeType,
   UserScopeV2
-} from '../scopes'
+} from '../users/scopes'
 import {
   canAccessOtherUserWithScopes,
   EventIndexWithAdministrativeHierarchy,
@@ -49,8 +49,12 @@ export const ACTION_SCOPE_MAP = {
     'record.correct'
   ],
   [ClientSpecificAction.REVIEW_CORRECTION_REQUEST]: ['record.correct'],
+  // Not granted by a scope: the client checks the draft's own action instead
+  [ClientSpecificAction.CONTINUE_DRAFT]: [],
   [ActionType.REJECT_CORRECTION]: ['record.correct'],
   [ActionType.APPROVE_CORRECTION]: ['record.correct'],
+  [ActionType.REVOKE_REGISTRATION]: ['record.revoke-registration'],
+  [ActionType.REINSTATE_REGISTRATION]: ['record.reinstate-registration'],
   [ActionType.MARK_AS_DUPLICATE]: ['record.review-duplicates'],
   [ActionType.MARK_AS_NOT_DUPLICATE]: ['record.review-duplicates'],
   [ActionType.ARCHIVE]: ['record.archive'],
@@ -95,6 +99,8 @@ export const DOCUMENT_DELETE_SCOPES: ScopeType[] = [
   'record.print-certified-copies',
   'record.request-correction',
   'record.correct',
+  'record.revoke-registration',
+  'record.reinstate-registration',
   'record.review-duplicates',
   'record.archive',
   'record.unarchive',

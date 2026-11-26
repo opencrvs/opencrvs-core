@@ -12,7 +12,7 @@ import * as z from 'zod/v4'
 import { TranslationConfig } from './TranslationConfig'
 import { ActionType } from './ActionType'
 import { FieldConfig } from './FieldConfig'
-import { ActionFormConfig } from './FormConfig'
+import { ActionFormConfig, DeclarationFormConfig } from './FormConfig'
 import { DeduplicationConfig } from './DeduplicationConfig'
 import { ActionFlagConfig } from './Flag'
 import { ActionConditional } from './Conditional'
@@ -35,9 +35,6 @@ export const ActionConfigBase = z.object({
     .optional()
     .default([])
     .describe('Flag actions which are executed when the action is performed.'),
-  supportingCopy: TranslationConfig.optional().describe(
-    'Text displayed on the confirmation dialog'
-  ),
   /**
    * Icon representing the action.
    *
@@ -63,6 +60,10 @@ const actionConfirmationForm = z
     'Fields rendered on the action confirmation dialog. Submitted values are stored in the action annotation and shown in the audit history.'
   )
 
+const dialogCopy = TranslationConfig.optional().describe(
+  'Text shown at the top of the confirmation dialog of the action.'
+)
+
 const ReadActionConfig = ActionConfigBase.extend(
   z.object({
     type: z.literal(ActionType.READ),
@@ -85,7 +86,14 @@ const ReadActionConfig = ActionConfigBase.extend(
 const NotifyConfig = ActionConfigBase.extend(
   z.object({
     type: z.literal(ActionType.NOTIFY),
-    form: actionConfirmationForm
+    notificationForm: DeclarationFormConfig.describe(
+      'Notification form configuration. Its fields must be a subset of the declaration form fields, with matching types. The values submitted on the notification form pre-fill the declaration.'
+    ),
+    review: DeclarationReviewConfig.describe(
+      'Review page configuration for the notify action. Values of its fields are stored as the NOTIFY action annotation.'
+    ),
+    form: actionConfirmationForm,
+    dialogCopy
   }).shape
 )
 
@@ -98,7 +106,6 @@ const DuplicateDetectedConfig = ActionConfigBase.extend(
       .describe(
         'DUPLICATE_DETECTED is system-generated and never shown as a button, so it has no label.'
       ),
-    supportingCopy: z.never().optional(),
     icon: z
       .never()
       .optional()
@@ -159,36 +166,45 @@ const DeleteConfig = ActionConfigBase.extend(
 const DeclareConfig = DeclarationActionBase.extend(
   z.object({
     type: z.literal(ActionType.DECLARE),
+    declaration: DeclarationFormConfig.describe(
+      'Configuration of the form used to gather event data.'
+    ),
     review: DeclarationReviewConfig.describe(
       'Configuration of the review page fields.'
     ),
     form: actionConfirmationForm,
-    dialogCopy: z
-      .object({
-        notify: TranslationConfig.describe(
-          'Confirmation text for the notify action'
-        ),
-        declare: TranslationConfig.describe(
-          'Confirmation text for the declare action'
-        ),
-        register: TranslationConfig.describe(
-          'Confirmation text for the register action'
-        )
-      })
-      .optional()
+    dialogCopy
   }).shape
 )
 
 const ArchiveConfig = ActionConfigBase.extend(
   z.object({
     type: z.literal(ActionType.ARCHIVE),
-    form: actionConfirmationForm
+    form: actionConfirmationForm,
+    dialogCopy
   }).shape
 )
 
 const UnarchiveConfig = ActionConfigBase.extend(
   z.object({
-    type: z.literal(ActionType.UNARCHIVE)
+    type: z.literal(ActionType.UNARCHIVE),
+    dialogCopy
+  }).shape
+)
+
+const RevokeRegistrationConfig = ActionConfigBase.extend(
+  z.object({
+    type: z.literal(ActionType.REVOKE_REGISTRATION),
+    form: actionConfirmationForm,
+    dialogCopy
+  }).shape
+)
+
+const ReinstateRegistrationConfig = ActionConfigBase.extend(
+  z.object({
+    type: z.literal(ActionType.REINSTATE_REGISTRATION),
+    form: actionConfirmationForm,
+    dialogCopy
   }).shape
 )
 
@@ -197,13 +213,13 @@ const EditActionConfig = ActionConfigBase.extend(
     type: z.literal(ActionType.EDIT),
     dialogCopy: z.object({
       notify: TranslationConfig.describe(
-        'Confirmation text for the notify with edits action'
+        "Confirmation text for the 'Notify with edits' action"
       ),
       declare: TranslationConfig.describe(
-        'Confirmation text for the declare with edits action'
+        "Confirmation text for the 'Declare with edits' action"
       ),
       register: TranslationConfig.describe(
-        'Confirmation text for the register with edits action'
+        "Confirmation text for the 'Register with edits' action"
       )
     })
   }).shape
@@ -212,14 +228,16 @@ const EditActionConfig = ActionConfigBase.extend(
 const RejectConfig = ActionConfigBase.extend(
   z.object({
     type: z.literal(ActionType.REJECT),
-    form: actionConfirmationForm
+    form: actionConfirmationForm,
+    dialogCopy
   }).shape
 )
 
 const RegisterConfig = DeclarationActionBase.extend(
   z.object({
     type: z.literal(ActionType.REGISTER),
-    form: actionConfirmationForm
+    form: actionConfirmationForm,
+    dialogCopy
   }).shape
 )
 
@@ -238,15 +256,11 @@ const RequestCorrectionConfig = ActionConfigBase.extend(
 )
 
 const ApproveCorrectionConfig = ActionConfigBase.extend(
-  z.object({
-    type: z.literal(ActionType.APPROVE_CORRECTION)
-  }).shape
+  z.object({ type: z.literal(ActionType.APPROVE_CORRECTION) }).shape
 )
 
 const RejectCorrectionConfig = ActionConfigBase.extend(
-  z.object({
-    type: z.literal(ActionType.REJECT_CORRECTION)
-  }).shape
+  z.object({ type: z.literal(ActionType.REJECT_CORRECTION) }).shape
 )
 
 const CustomActionConfig = ActionConfigBase.extend(
@@ -263,7 +277,8 @@ const CustomActionConfig = ActionConfigBase.extend(
       ),
     auditHistoryLabel: TranslationConfig.describe(
       'The label to show in audit history for this action. For example "Approved".'
-    )
+    ),
+    dialogCopy
   }).shape
 )
 
@@ -296,12 +311,12 @@ export const ActionConfig = z
     NotifyConfig.meta({
       id: 'NotifyActionConfig',
       description:
-        'Configuration for the notify action. When present, NOTIFY uses this config independently from DECLARE. When absent, NOTIFY falls back to the DeclareActionConfig.'
+        'Configuration for the notify action: the notification form and its review page. An event without a NOTIFY action cannot be notified.'
     }),
     DeclareConfig.meta({
       id: 'DeclareActionConfig',
       description:
-        'Configuration for the declare action. Includes review-page fields. NOTIFY falls back to this config when no dedicated NotifyActionConfig is provided.'
+        'Configuration for the declare action. Includes the declaration form and review-page fields.'
     }),
     DuplicateDetectedConfig.meta({
       id: 'DuplicateDetectedActionConfig',
@@ -355,6 +370,15 @@ export const ActionConfig = z
       id: 'UnarchiveActionConfig',
       description: 'Configuration for unarchiving a record.'
     }),
+    RevokeRegistrationConfig.meta({
+      id: 'RevokeRegistrationActionConfig',
+      description: 'Configuration for revoking a registered record.'
+    }),
+    ReinstateRegistrationConfig.meta({
+      id: 'ReinstateRegistrationActionConfig',
+      description:
+        'Configuration for reinstating a revoked record back to registered.'
+    }),
     CustomActionConfig.meta({
       id: 'CustomActionConfig',
       description:
@@ -367,6 +391,7 @@ export const ActionConfig = z
   .meta({ id: 'ActionConfig' })
 
 export type ActionConfig = z.infer<typeof ActionConfig>
+export type DeclareActionConfig = z.infer<typeof DeclareConfig>
 
 // Build a runtime set directly from the schema
 export const actionConfigTypes: Set<ActionConfigTypes> = new Set(

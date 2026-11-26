@@ -9,35 +9,54 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import * as z from 'zod/v4'
-import { EventConfig } from './EventConfig'
+import {
+  DEFAULT_EFFECTIVE_FROM,
+  EventConfig,
+  EventConfigInput,
+  VersionedEventConfig
+} from './EventConfig'
 import { ActionType, WorkqueueActionType } from './ActionType'
 import { InherentFlags } from './Flag'
-import { findAllFields, getDeclarationFields } from './utils'
+import {
+  findAllFields,
+  getDeclarationFields,
+  getDeclarationPages
+} from './utils'
 import { FieldType } from './FieldType'
+import { mapFieldTypeToZod } from './FieldTypeMapping'
 import { EventFieldId } from './AdvancedSearchConfig'
 import { isFieldReference } from '../conditionals/conditionals'
 import { EventMetadataDateFieldIdInput } from './EventMetadata'
 
-export function validateAdvancedSearchConfig(
-  event: EventConfig,
-  ctx: z.RefinementCtx<EventConfig>
+/** Field types that accept a text, number or date defaultValue in advanced search */
+const SEARCH_DEFAULT_VALUE_FIELD_TYPES = [
+  FieldType.TEXT,
+  FieldType.TEXTAREA,
+  FieldType.EMAIL,
+  FieldType.PHONE,
+  FieldType.ID,
+  FieldType.SELECT,
+  FieldType.RADIO_GROUP,
+  FieldType.COUNTRY,
+  FieldType.LOCATION,
+  FieldType.ADMINISTRATIVE_AREA,
+  FieldType.NUMBER,
+  FieldType.DATE
+]
+
+/**
+ * Rejects advanced search fields that match a field of none of the `versions`, nor a
+ * metadata field. A field that only some versions have can still be searched.
+ * Each version must have exactly one DECLARE action, as `validateEventConfig` checks.
+ */
+export function validateAdvancedSearchFieldIds(
+  event: Pick<EventConfig, 'id' | 'advancedSearch'>,
+  versions: EventConfig[],
+  ctx: Pick<z.RefinementCtx<unknown>, 'addIssue'>
 ) {
-  const allFields = findAllFields(event)
-  const fieldIds = allFields.map((field) => field.id)
-
-  const advancedSearchFields = event.advancedSearch.flatMap((section) =>
-    section.fields.flatMap((field) => field.fieldId)
+  const fieldIds = versions.flatMap((version) =>
+    findAllFields(version).map((field) => field.id)
   )
-
-  const advancedSearchFieldsSet = new Set(advancedSearchFields)
-
-  if (advancedSearchFieldsSet.size !== advancedSearchFields.length) {
-    ctx.addIssue({
-      code: 'custom',
-      message: 'Advanced search field ids must be unique',
-      path: ['advancedSearch']
-    })
-  }
 
   const invalidFields = event.advancedSearch.flatMap((section) =>
     // Check if the fieldId is not in the fieldIds array
@@ -64,6 +83,114 @@ export function validateAdvancedSearchConfig(
       path: ['advancedSearch']
     })
   }
+}
+
+export function validateAdvancedSearchConfig(
+  event: EventConfig,
+  ctx: z.RefinementCtx<EventConfig>
+) {
+  const advancedSearchFields = event.advancedSearch.flatMap((section) =>
+    section.fields.flatMap((field) => field.fieldId)
+  )
+
+  const advancedSearchFieldsSet = new Set(advancedSearchFields)
+
+  if (advancedSearchFieldsSet.size !== advancedSearchFields.length) {
+    ctx.addIssue({
+      code: 'custom',
+      message: 'Advanced search field ids must be unique',
+      path: ['advancedSearch']
+    })
+  }
+}
+
+/**
+ * Rejects search field default values that can't be filled into the field. Each field is
+ * read from the newest of the `versions` that has it.
+ * Each version must have exactly one DECLARE action, as `validateEventConfig` checks.
+ *
+ * @param versions newest first
+ */
+export function validateAdvancedSearchDefaultValues(
+  event: Pick<EventConfig, 'advancedSearch'>,
+  versions: EventConfig[],
+  ctx: Pick<z.RefinementCtx<unknown>, 'addIssue'>
+) {
+  const fieldsOfEachVersion = versions.map(findAllFields)
+
+  event.advancedSearch.forEach((section, sectionIndex) => {
+    section.fields.forEach((searchField, fieldIndex) => {
+      if (
+        searchField.fieldType !== 'field' ||
+        searchField.defaultValue === undefined
+      ) {
+        return
+      }
+
+      const path = [
+        'advancedSearch',
+        sectionIndex,
+        'fields',
+        fieldIndex,
+        'defaultValue'
+      ]
+
+      if (
+        searchField.config.searchFields &&
+        searchField.config.searchFields.length > 0
+      ) {
+        ctx.addIssue({
+          code: 'custom',
+          message: `Advanced search field ${searchField.fieldId} searches across several form fields, so it does not support a defaultValue.`,
+          path
+        })
+        return
+      }
+
+      if (typeof searchField.defaultValue === 'boolean') {
+        return
+      }
+
+      const formField = fieldsOfEachVersion
+        .map((fields) => fields.find(({ id }) => id === searchField.fieldId))
+        .find((found) => found !== undefined)
+
+      // An unknown field id is reported by validateAdvancedSearchFieldIds
+      if (!formField) {
+        return
+      }
+
+      if (
+        !SEARCH_DEFAULT_VALUE_FIELD_TYPES.some(
+          (type) => type === formField.type
+        )
+      ) {
+        ctx.addIssue({
+          code: 'custom',
+          message: `Advanced search field ${searchField.fieldId} is a ${formField.type} field, which does not support a defaultValue value, only true or false. Field types that support a defaultValue value: ${SEARCH_DEFAULT_VALUE_FIELD_TYPES.join(', ')}.`,
+          path
+        })
+      } else if (
+        formField.type === FieldType.DATE &&
+        searchField.config.type === 'range'
+      ) {
+        ctx.addIssue({
+          code: 'custom',
+          message: `Advanced search field ${searchField.fieldId} is searched as a date range, so its defaultValue can only be true or false.`,
+          path
+        })
+      } else if (
+        !mapFieldTypeToZod(formField).safeParse(searchField.defaultValue)
+          .success
+      ) {
+        ctx.addIssue({
+          code: 'custom',
+          message: `Advanced search field ${searchField.fieldId} has defaultValue "${searchField.defaultValue}", which is not a valid ${formField.type} value.`,
+          path
+        })
+      }
+    })
+  })
 }
 
 export function validateDateOfEvent(
@@ -174,4 +301,186 @@ export function validateActionOrder(
       }
     }
   }
+}
+
+/**
+ * Runs on both the `defineConfig` input and the parsed `EventConfig`.
+ *
+ * @returns whether the event has exactly one DECLARE action.
+ */
+export function validateExactlyOneDeclareAction<
+  T extends { id: string; actions: Array<{ type: string }> }
+>(event: T, ctx: z.RefinementCtx<T>): boolean {
+  const declareActionCount = event.actions.filter(
+    (action) => action.type === ActionType.DECLARE
+  ).length
+
+  if (declareActionCount !== 1) {
+    ctx.addIssue({
+      code: 'custom',
+      message: `Event must have exactly one ${ActionType.DECLARE} action. Found ${declareActionCount} for event ${event.id}`,
+      path: ['actions']
+    })
+    return false
+  }
+
+  return true
+}
+
+/**
+ * `declaration` must be given exactly once: at the top level (kept for backwards
+ * compatibility) or on the DECLARE action.
+ */
+export function validateDeclarationGivenExactlyOnce(
+  config: EventConfigInput,
+  ctx: z.RefinementCtx<EventConfigInput>
+) {
+  const declareActionIndex = config.actions.findIndex(
+    (action) => action.type === ActionType.DECLARE
+  )
+  const declareAction = config.actions[declareActionIndex]
+  const onDeclareAction =
+    declareAction.type === ActionType.DECLARE && !!declareAction.declaration
+  const onTopLevel = !!config.declaration
+  const declareActionPath = `actions[${declareActionIndex}].declaration`
+
+  if (onTopLevel && onDeclareAction) {
+    ctx.addIssue({
+      code: 'custom',
+      message: `Event '${config.id}' defines \`declaration\` both at the top level and on the ${ActionType.DECLARE} action (\`${declareActionPath}\`). Define it in only one of these places.`,
+      path: ['declaration']
+    })
+  }
+
+  if (!onTopLevel && !onDeclareAction) {
+    ctx.addIssue({
+      code: 'custom',
+      message: `Event '${config.id}' does not define \`declaration\`. Define it either at the top level or on the ${ActionType.DECLARE} action (\`${declareActionPath}\`).`,
+      path: ['declaration']
+    })
+  }
+}
+
+/**
+ * Validation which ensures that a NOTIFY notificationForm:
+ *  - only includes fields with ids that are also in the declaration form
+ *  - the field types match the ones on the declaration form
+ *
+ * This is because the notification form is used as pre-filled values during declaration.
+ * For now we have made the design decision to not allow fields that are not present in the declaration form.
+ */
+export function validateNotificationForm(
+  event: EventConfig,
+  ctx: z.RefinementCtx<EventConfig>
+) {
+  const declarationFields = getDeclarationPages(event).flatMap((page) =>
+    page.fields.map((field) => ({ field, pageId: page.id }))
+  )
+
+  event.actions.forEach((action, actionIndex) => {
+    if (action.type !== ActionType.NOTIFY) {
+      return
+    }
+
+    action.notificationForm.pages.forEach((page, pageIndex) => {
+      page.fields.forEach((field, fieldIndex) => {
+        const path = [
+          'actions',
+          actionIndex,
+          'notificationForm',
+          'pages',
+          pageIndex,
+          'fields',
+          fieldIndex
+        ]
+
+        const matchingFields = declarationFields.filter(
+          (declarationField) => declarationField.field.id === field.id
+        )
+
+        if (matchingFields.length === 0) {
+          ctx.addIssue({
+            code: 'custom',
+            message: `Notification form field '${field.id}' does not exist in the declaration form of event '${event.id}'. Notification form fields must also be defined in the ${ActionType.DECLARE} action's declaration.`,
+            path
+          })
+          return
+        }
+
+        if (
+          !matchingFields.some(
+            (declarationField) => declarationField.field.type === field.type
+          )
+        ) {
+          const [declarationField] = matchingFields
+          ctx.addIssue({
+            code: 'custom',
+            message: `Notification form field '${field.id}' on page '${page.id}' is of type ${field.type}, but the declaration form field with the same id in event '${event.id}' (${ActionType.DECLARE} declaration, page '${declarationField.pageId}') is of type ${declarationField.field.type}.`,
+            path
+          })
+        }
+      })
+    })
+  })
+}
+
+type VersionListCtx = z.RefinementCtx<VersionedEventConfig>
+
+function validateVersionIdsAreUnique(
+  config: VersionedEventConfig,
+  ctx: VersionListCtx
+) {
+  const ids = new Set<string>()
+
+  config.versions.forEach((version, index) => {
+    if (ids.has(version.id)) {
+      ctx.addIssue({
+        code: 'custom',
+        message: `Event '${config.id}' has more than one version with id '${version.id}'. Each version must have a different id.`,
+        path: ['versions', index, 'id']
+      })
+    }
+    ids.add(version.id)
+  })
+}
+
+/** At most one version may omit `effectiveFrom` (effective from the beginning of time). */
+function validateVersionEffectiveFromsAreUnique(
+  config: VersionedEventConfig,
+  ctx: VersionListCtx
+) {
+  /** Id of the first version with each `effectiveFrom` */
+  const versionIdByEffectiveFrom = new Map<string, string>()
+
+  config.versions.forEach((version, index) => {
+    const sameEffectiveFromId = versionIdByEffectiveFrom.get(
+      version.effectiveFrom
+    )
+
+    if (sameEffectiveFromId === undefined) {
+      versionIdByEffectiveFrom.set(version.effectiveFrom, version.id)
+      return
+    }
+
+    const versionIds = `'${sameEffectiveFromId}', '${version.id}'`
+    ctx.addIssue({
+      code: 'custom',
+      message:
+        version.effectiveFrom !== DEFAULT_EFFECTIVE_FROM
+          ? `Event '${config.id}' has more than one version with \`effectiveFrom\` '${version.effectiveFrom}' (${versionIds}). Each version must have a different \`effectiveFrom\`.`
+          : `Event '${config.id}' has more than one version without \`effectiveFrom\` (${versionIds}). At most one version may omit it.`,
+      path: ['versions', index, 'effectiveFrom']
+    })
+  })
+}
+
+/**
+ * Versions are told apart by `id` and by `effectiveFrom`: no two versions may share either of them.
+ */
+export function validateVersionList(
+  config: VersionedEventConfig,
+  ctx: VersionListCtx
+) {
+  validateVersionIdsAreUnique(config, ctx)
+  validateVersionEffectiveFromsAreUnique(config, ctx)
 }

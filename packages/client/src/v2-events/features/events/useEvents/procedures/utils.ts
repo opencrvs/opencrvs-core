@@ -27,7 +27,8 @@ import {
   deepMerge,
   FileFieldValue,
   FileFieldValueWithOption,
-  FileFieldWithOptionValue
+  isFileFieldValue,
+  isFileFieldWithOptionValue
 } from '@opencrvs/commons/client'
 import {
   getCreatedEvent,
@@ -42,12 +43,6 @@ export function waitUntilEventIsCreated<T extends { eventId: string }, R>(
   return async (params) => {
     const { eventId } = params
 
-    if (!isTemporaryId(eventId)) {
-      return canonicalMutationFn({ ...params, eventId })
-    }
-
-    const localVersion = getCreatedEvent(eventId)
-
     const replaceTemporaryIdInDocumentPath = (
       fieldValue: FileFieldValue | FileFieldValueWithOption
     ) => ({ ...fieldValue, path: resolveTemporaryIdInPath(fieldValue.path) })
@@ -55,13 +50,11 @@ export function waitUntilEventIsCreated<T extends { eventId: string }, R>(
     const replaceTemporaryIdInObject = (obj: object) => {
       return Object.fromEntries(
         Object.entries(obj).map(([key, value]) => {
-          const maybeFile = FileFieldValue.safeParse(value)
-          if (maybeFile.success) {
-            return [key, replaceTemporaryIdInDocumentPath(maybeFile.data)]
+          if (isFileFieldValue(value)) {
+            return [key, replaceTemporaryIdInDocumentPath(value)]
           }
-          const maybeFileWithOptions = FileFieldWithOptionValue.safeParse(value)
-          if (maybeFileWithOptions.success) {
-            const filesWithActualUrls = maybeFileWithOptions.data.map((file) =>
+          if (isFileFieldWithOptionValue(value)) {
+            const filesWithActualUrls = value.map((file) =>
               replaceTemporaryIdInDocumentPath(file)
             )
             return [key, filesWithActualUrls]
@@ -83,8 +76,22 @@ export function waitUntilEventIsCreated<T extends { eventId: string }, R>(
         ? replaceTemporaryIdInObject(params.annotation)
         : {}
 
+    const paramsWithResolvedFiles = deepMerge(
+      deepMerge(params, { declaration }),
+      {
+        annotation
+      }
+    )
+
+    if (!isTemporaryId(eventId)) {
+      // Files attached before the event synced keep the temporary id in their path.
+      return canonicalMutationFn({ ...paramsWithResolvedFiles, eventId })
+    }
+
+    const localVersion = getCreatedEvent(eventId)
+
     return canonicalMutationFn({
-      ...deepMerge(deepMerge(params, { declaration }), { annotation }),
+      ...paramsWithResolvedFiles,
       eventId: localVersion.id,
       eventType: localVersion.type
     })
@@ -131,7 +138,7 @@ export function setMutationDefaults<
 }
 
 /**
- * Sets the default options for a mutation procedure.
+ * Sets the default options for a query procedure.
  */
 export function setQueryDefaults<
   // eslint-disable-next-line @typescript-eslint/no-explicit-any

@@ -11,7 +11,7 @@
 import { Locator, Page, expect } from '@playwright/test'
 import { CLIENT_URL } from './constants'
 import { isMobile } from './mobile-helpers'
-import { waitForActionResponses } from './helpers'
+import { getEventIdFromUrl, waitForActionResponses } from './helpers'
 
 // tRPC route fragments fired when confirming a correction action. The same
 // approve endpoint backs both "approve a request" and "make a direct correction".
@@ -110,11 +110,6 @@ export async function selectAction(
     .click()
 }
 
-/** Assumes events/:eventId pattern */
-function getEventIdFromUrl(url: string): string | undefined {
-  return new URL(url).pathname.match(/\/events\/([^/]+)/)?.[1]
-}
-
 const usernameToFullNameMap = {
   'k.cwalya': 'Kalusha Cwalya',
   'h.habazoka': 'Hakainde Habazoka',
@@ -132,6 +127,7 @@ const usernameToFullNameMap = {
   'e.mayuka': 'Emmanuel Mayuka',
   'm.musonda': 'Mutale Musonda',
   't.mwila': 'Toukira Mwila',
+  'a.nala': 'Amara Nala',
   'j.banda': 'Joseph Banda'
 } as const
 /**
@@ -168,7 +164,7 @@ export async function ensureAssignedToFullName(
     return
   }
 
-  const eventId = getEventIdFromUrl(page.url())
+  const eventId = getEventIdFromUrl(page)
 
   await page.getByRole('button', { name: 'Action', exact: true }).click()
 
@@ -211,6 +207,100 @@ export async function selectLocationOption(page: Page, locationName: string) {
 export async function type(page: Page, locator: string, text: string) {
   await page.locator(locator).fill(text)
   await page.locator(locator).blur()
+}
+
+/**
+ * Reads values from the `keyvaluepairs` store of the client's `OpenCRVS`
+ * IndexedDB database. With a key, it reads only that value. Without a key, it
+ * reads all values. If the database or the store does not exist yet, or a read
+ * fails, it returns an empty list, so that `expect.poll` tries again. It does
+ * not create the database, and it closes the connection after each read.
+ */
+async function readKeyValuePairs(page: Page, key?: string) {
+  return page.evaluate(
+    (storeKey) =>
+      new Promise<unknown[]>((resolve) => {
+        const request = indexedDB.open('OpenCRVS')
+
+        request.onupgradeneeded = () => request.transaction?.abort()
+        request.onerror = () => resolve([])
+        request.onsuccess = () => {
+          const db = request.result
+          const finish = (values: unknown[]) => {
+            db.close()
+            resolve(values)
+          }
+
+          if (!db.objectStoreNames.contains('keyvaluepairs')) {
+            finish([])
+            return
+          }
+
+          const store = db
+            .transaction('keyvaluepairs')
+            .objectStore('keyvaluepairs')
+          const read =
+            storeKey === undefined ? store.getAll() : store.get(storeKey)
+
+          read.onsuccess = () =>
+            finish(storeKey === undefined ? read.result : [read.result])
+          read.onerror = () => finish([])
+        }
+      }),
+    key
+  )
+}
+
+/**
+ * The client saves form edits to IndexedDB asynchronously, so reloading right
+ * after typing can lose them. Call this before `page.reload()`.
+ */
+export async function waitForLocalDraftToContain(page: Page, text: string) {
+  const readLocalDraft = async () => {
+    const [draft] = await readKeyValuePairs(page, 'local-drafts')
+    return String(draft ?? '')
+  }
+
+  await expect.poll(readLocalDraft).toContain(text)
+}
+
+/**
+ * The client saves the query cache to IndexedDB with a 250 ms throttle. If
+ * the page reloads before that write, the restored cache has no `event.get`
+ * entry for the event, and the action page cannot open the record. Call this
+ * before `page.reload()` on an action page that has an event ID in its URL.
+ * See `throttlePersister` in core.
+ */
+export async function waitForPersistedEvent(page: Page) {
+  const eventId = getEventIdFromUrl(page)
+
+  const isEventPersisted = async () => {
+    const entries = await readKeyValuePairs(page)
+    const queries = entries.flatMap(
+      (entry) =>
+        (
+          entry as {
+            clientState?: {
+              queries?: { queryKey: unknown[]; state: { status: string } }[]
+            }
+          } | null
+        )?.clientState?.queries ?? []
+    )
+
+    return queries.some(({ queryKey, state }) => {
+      const [path, options] = queryKey as [
+        string[],
+        { input?: { eventId?: string } } | undefined
+      ]
+      return (
+        path.join('.') === 'event.get' &&
+        options?.input?.eventId === eventId &&
+        state.status === 'success'
+      )
+    })
+  }
+
+  await expect.poll(isEventPersisted).toBe(true)
 }
 
 export const assertTexts = async ({

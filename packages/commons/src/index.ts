@@ -8,21 +8,24 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
+
+// eslint-disable-next-line import/no-unassigned-import
+import 'zod/compile' // enables compile-by-default. Perf boost.
+
 export * from './token-verifier'
 export * from './uuid'
 export * from './documents'
 export * from './http'
 export * from './url'
 export * from './logger'
-export * from './roles'
+export * from './users'
 export * from './search'
 export * from './events'
 export * from './users'
-export * from './authentication'
+export * from './users/authentication'
 export * from './utils'
 export * from './countryconfig'
 export * from './icons'
 export * from './notification'
-export * from './scopes'
+export * from './users/scopes'
 export * from './application-config'
-export * from './scopes.deprecated.do-not-use'

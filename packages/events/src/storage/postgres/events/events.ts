@@ -293,7 +293,8 @@ async function getOrCreateEventInTrx(
       transactionId: input.transactionId,
       trackingId: input.trackingId,
       createdAt: input.createdAt,
-      updatedAt: input.updatedAt
+      updatedAt: input.updatedAt,
+      configVersionId: input.configVersionId
     })
     .onConflict((oc) => oc.columns(['transactionId', 'eventType']).doNothing())
     .execute()
@@ -334,7 +335,8 @@ async function getOrCreateEventAndAssignInTrx(
       transactionId: input.transactionId,
       trackingId: input.trackingId,
       createdAt: input.createdAt,
-      updatedAt: input.updatedAt
+      updatedAt: input.updatedAt,
+      configVersionId: input.configVersionId
     })
     .onConflict((oc) => oc.columns(['transactionId', 'eventType']).doNothing())
     .execute()

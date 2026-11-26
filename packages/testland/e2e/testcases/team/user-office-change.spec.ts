@@ -21,7 +21,6 @@ import {
   getAuthTokens,
   getToken,
   login,
-  loginWithNewUser,
   logout,
   NEW_USER_PASSWORD,
   searchFromSearchBar,
@@ -29,37 +28,20 @@ import {
 } from '@e2e/support/helpers'
 import { createDeclaration } from '@e2e/support/test-data/birth-declaration'
 import {
-  fillChildDetails,
   formatV2ChildName,
   getIdByName,
   getLocations,
-  openBirthDeclaration,
   showPageWith
 } from '@e2e/support/birth/helpers'
+import {
+  activateUserViaApi,
+  createBirthDraftViaApi,
+  getExpectedUsername
+} from '@e2e/support/test-data/api-actions'
 
 const OPENCRVS_VERSION: string = JSON.parse(
   fs.readFileSync(path.join(__dirname, '../../../package.json'), 'utf8')
 ).version
-
-const createDraft = async (page: Page) => {
-  await page.goto(CLIENT_URL)
-  await openBirthDeclaration(page)
-
-  const childName = await fillChildDetails(page)
-  const draftResponse = page.waitForResponse(
-    (res) => res.url().includes('event.draft.create') && res.ok()
-  )
-
-  await page.getByRole('button', { name: 'Save & Exit' }).click()
-  await page.getByRole('button', { name: 'Confirm' }).click()
-  await draftResponse
-  await page.getByRole('button', { name: 'Drafts' }).click()
-  await expect(
-    page.getByRole('button', { name: childName, exact: true })
-  ).toBeVisible()
-
-  return childName
-}
 
 const countDraftRows = async (page: Page, expectedCount?: number) => {
   await page.getByRole('button', { name: 'Drafts' }).click()
@@ -136,9 +118,7 @@ const setupRegistrarWithDrafts = async (page: Page, draftCount: number) =>
     }
 
     const fullName = `${name.firstname} ${name.surname}`
-    const username = `${name.firstname[0]}.${name.surname}`
-      .toLowerCase()
-      .replace(/[^a-z0-9.]/g, '')
+    const username = getExpectedUsername(name)
 
     const offices = await getLocations('CRVS_OFFICE', adminToken)
     const ibomboDistrictOfficeId = getIdByName(
@@ -157,16 +137,12 @@ const setupRegistrarWithDrafts = async (page: Page, draftCount: number) =>
       data: {}
     })
 
-    await loginWithNewUser(page, username)
+    await activateUserViaApi(username)
 
     const { token, refreshToken } = await getAuthTokens(
       username,
       NEW_USER_PASSWORD
     )
-
-    await waitForAuthenticatedLanding(page, refreshToken)
-    await createPIN(page)
-    await page.goto(CLIENT_URL)
 
     const declaration = await createDeclaration(
       token,
@@ -177,15 +153,20 @@ const setupRegistrarWithDrafts = async (page: Page, draftCount: number) =>
     const trackingId = declaration.trackingId!
     const childName = formatV2ChildName(declaration.declaration)
 
+    const draftNames: string[] = []
+    for (let i = 0; i < draftCount; i++) {
+      draftNames.push(await createBirthDraftViaApi(token))
+    }
+
+    await waitForAuthenticatedLanding(page, refreshToken)
+    await createPIN(page)
+    await page.goto(CLIENT_URL)
+
     await searchFromSearchBar(page, childName, true)
     await expect(page.getByTestId('tracking-id-value')).toContainText(
       trackingId
     )
-
-    const draftNames: string[] = []
-    for (let i = 0; i < draftCount; i++) {
-      draftNames.push(await createDraft(page))
-    }
+    await page.goto(CLIENT_URL)
 
     const draftCountBeforeChange = await countDraftRows(page, draftNames.length)
     expect(draftCountBeforeChange).toBe(draftNames.length)
@@ -210,8 +191,6 @@ const setupRegistrarWithDrafts = async (page: Page, draftCount: number) =>
 test('Scope changes after office change - user loses access when the office changes', async ({
   browser
 }) => {
-  test.setTimeout(180_000)
-
   const page = await browser.newPage()
   const { username, fullName, trackingId, eventId, draftCountBeforeChange } =
     await setupRegistrarWithDrafts(page, 3)
@@ -253,10 +232,17 @@ test('Scope changes after office change - user loses access when the office chan
 
     await page.getByRole('button', { name: 'Continue' }).click()
     await page.getByRole('button', { name: 'Confirm' }).click()
+
+    const userResponse = page.waitForResponse(
+      (res) => res.url().includes('user.update') && res.ok()
+    )
+
     await page
       .getByRole('dialog')
       .getByRole('button', { name: 'Confirm' })
       .click()
+
+    await userResponse
 
     await expect(page.getByTestId('office-link-value')).toHaveText(
       'Isamba District Office'
@@ -289,9 +275,8 @@ test('Scope changes after office change - user loses access when the office chan
 })
 
 test('Scope changes after office and role changes', async ({ browser }) => {
-  test.setTimeout(180_000)
-
   const page = await browser.newPage()
+
   const { username, fullName, trackingId, eventId, draftCountBeforeChange } =
     await setupRegistrarWithDrafts(page, 3)
 
@@ -339,10 +324,17 @@ test('Scope changes after office and role changes', async ({ browser }) => {
     await expect(page.getByTestId('role-value')).toHaveText('Hospital Official')
 
     await page.getByRole('button', { name: 'Confirm' }).click()
+
+    const userResponse = page.waitForResponse(
+      (res) => res.url().includes('user.update') && res.ok()
+    )
+
     await page
       .getByRole('dialog')
       .getByRole('button', { name: 'Confirm' })
       .click()
+
+    await userResponse
 
     await expect(page.getByTestId('office-link-value')).toHaveText(
       'Isamba District Office'
@@ -386,8 +378,6 @@ test('Scope changes after office and role changes', async ({ browser }) => {
 })
 
 test('Drafts are removed when only the role changes', async ({ browser }) => {
-  test.setTimeout(180_000)
-
   const page = await browser.newPage()
   const { username, fullName, childName, trackingId, draftCountBeforeChange } =
     await setupRegistrarWithDrafts(page, 3)
@@ -449,10 +439,15 @@ test('Drafts are removed when only the role changes', async ({ browser }) => {
       )
     ).toBeVisible()
 
+    const userResponse = page.waitForResponse(
+      (res) => res.url().includes('user.update') && res.ok()
+    )
     await page
       .getByRole('dialog')
       .getByRole('button', { name: 'Confirm' })
       .click()
+
+    await userResponse
 
     await expect(
       page.getByText('Registration Officer', { exact: true })
@@ -468,8 +463,9 @@ test('Drafts are removed when only the role changes', async ({ browser }) => {
     const { refreshToken } = await getAuthTokens(username, NEW_USER_PASSWORD)
     expect(refreshToken).toBeDefined()
 
+    // No extra page.goto() here: reloading straight after the landing races
+    // the client persisting the exchanged token and bounces to the login page.
     await waitForAuthenticatedLanding(page, refreshToken)
-    await page.goto(CLIENT_URL)
 
     await expectVersionCard(
       page,

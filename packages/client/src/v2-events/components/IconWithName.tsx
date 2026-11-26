@@ -26,6 +26,7 @@ export const Flex = styled.div`
 export const STATUS_TO_COLOR_MAP = {
   OUTBOX: 'grey',
   ARCHIVED: 'grey',
+  REVOKED: 'grey',
   DRAFT: 'purple',
   CREATED: 'purple',
   IN_PROGRESS: 'purple',

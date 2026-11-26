@@ -11,11 +11,14 @@
 
 // Must stay first: the pino instrumentation only patches loggers created after the SDK starts.
 import '@opencrvs/commons/monitoring'
-import { logger } from '@opencrvs/commons'
+import { logger, TokenWithBearer } from '@opencrvs/commons'
 import { env } from './environment'
 import { server } from './server'
 import { getServiceToken } from './service/auth'
-import { getInMemoryEventConfigurations } from './service/config/config'
+import {
+  getInMemoryRoles,
+  getInMemoryVersionedEventConfigurations
+} from './service/config/config'
 import { triggerSystemReady } from './service/config/systemReady'
 import { ensureIndexExists } from './service/indexing/indexing'
 import { ensureConnection } from './storage/postgres/events'
@@ -33,9 +36,12 @@ export async function main() {
   try {
     await ensureConnection()
     const serviceToken = await getServiceToken()
-    const configurations = await getInMemoryEventConfigurations(
-      `Bearer ${serviceToken}`
-    )
+    const token: TokenWithBearer = `Bearer ${serviceToken}`
+    const configurations = await getInMemoryVersionedEventConfigurations(token)
+
+    // Fetch roles here to validate them early on
+    await getInMemoryRoles(token)
+
     for (const configuration of configurations) {
       logger.info(`Loaded event configuration: ${configuration.id}`)
       await ensureIndexExists(configuration)

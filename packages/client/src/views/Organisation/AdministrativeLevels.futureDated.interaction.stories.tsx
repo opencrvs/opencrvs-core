@@ -10,6 +10,7 @@
  */
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import { createTRPCMsw, httpLink } from '@vafanassieff/msw-trpc'
+import { locationListHandlers } from '../../../.storybook/default-request-handlers'
 import superjson from 'superjson'
 import { expect, within } from 'storybook/test'
 import {
@@ -59,14 +60,13 @@ const meta: Meta<typeof OrganisationPage> = {
     msw: {
       handlers: {
         eventLocations: [
-          tRPCMsw.locations.list.query(() => [
-            ...V2_DEFAULT_MOCK_LOCATIONS,
-            FUTURE_OFFICE
-          ]),
-          tRPCMsw.administrativeAreas.list.query(() => [
-            ...V2_DEFAULT_MOCK_ADMINISTRATIVE_AREAS,
-            FUTURE_AREA
-          ])
+          ...locationListHandlers({
+            locations: [...V2_DEFAULT_MOCK_LOCATIONS, FUTURE_OFFICE],
+            administrativeAreas: [
+              ...V2_DEFAULT_MOCK_ADMINISTRATIVE_AREAS,
+              FUTURE_AREA
+            ]
+          })
         ]
       }
     },

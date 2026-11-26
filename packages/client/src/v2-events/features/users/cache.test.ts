@@ -24,7 +24,8 @@ import {
   getUUID,
   TENNIS_CLUB_MEMBERSHIP,
   TokenUserType,
-  UUID
+  UUID,
+  INITIAL_EVENT_CONFIG_VERSION_ID
 } from '@opencrvs/commons/client'
 import {
   AppRouter,
@@ -68,6 +69,7 @@ const EVENT_DOCUMENT: EventDocument = {
   type: TENNIS_CLUB_MEMBERSHIP,
   id: getUUID() as UUID,
   trackingId: 'CACHE01',
+  configVersionId: INITIAL_EVENT_CONFIG_VERSION_ID,
   createdAt: new Date().toISOString(),
   updatedAt: new Date().toISOString(),
   actions: USER_IDS.map((userId) => ({

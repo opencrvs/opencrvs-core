@@ -160,17 +160,24 @@ const EMAIL_DEFAULT = 'a@b.co'
 
 const eventWithEmailDefault: EventConfig = {
   ...tennisClubMembershipEvent,
-  declaration: {
-    ...tennisClubMembershipEvent.declaration,
-    pages: tennisClubMembershipEvent.declaration.pages.map((page) => ({
-      ...page,
-      fields: page.fields.map((field) =>
-        field.id === 'applicant.email'
-          ? ({ ...field, defaultValue: EMAIL_DEFAULT } as FieldConfig)
-          : field
-      )
-    }))
-  }
+  actions: tennisClubMembershipEvent.actions.map((action) =>
+    action.type === ActionType.DECLARE
+      ? {
+          ...action,
+          declaration: {
+            ...action.declaration,
+            pages: action.declaration.pages.map((page) => ({
+              ...page,
+              fields: page.fields.map((field) =>
+                field.id === 'applicant.email'
+                  ? ({ ...field, defaultValue: EMAIL_DEFAULT } as FieldConfig)
+                  : field
+              )
+            }))
+          }
+        }
+      : action
+  )
 }
 
 export const ClearRestoresDefaults: Story = {
@@ -216,9 +223,6 @@ export const ClearRestoresDefaults: Story = {
         event: [
           tRPCMsw.event.get.query(() => {
             return undeclaredDraftEvent
-          }),
-          tRPCMsw.event.config.get.query(() => {
-            return [eventWithEmailDefault]
           }),
           tRPCMsw.event.search.query(() => {
             return { results: [], total: 0 }

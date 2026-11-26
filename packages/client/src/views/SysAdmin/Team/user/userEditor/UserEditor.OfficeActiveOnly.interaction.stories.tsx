@@ -11,6 +11,7 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import { expect, userEvent, waitFor, within } from 'storybook/test'
 import { createTRPCMsw, httpLink } from '@vafanassieff/msw-trpc'
+import { locationListHandlers } from '../../../../../../.storybook/default-request-handlers'
 import superjson from 'superjson'
 import {
   TestUserRole,
@@ -22,7 +23,6 @@ import { AppRouter } from '@client/v2-events/trpc'
 import { ROUTES } from '@client/v2-events/routes/routes'
 import { routesConfig } from '@client/v2-events/routes/config'
 import { testDataGenerator } from '@client/tests/test-data-generators'
-import { createTemporaryId } from '@client/v2-events/utils'
 import { buildInactiveLocation } from '@client/tests/v2-events/location.utils'
 import { useUserFormState } from './useUserFormState'
 
@@ -56,13 +56,10 @@ const meta: Meta = {
       handlers: {
         userRoles: [tRPCMsw.user.roles.list.query(() => mockRoles)],
         eventLocations: [
-          tRPCMsw.locations.list.query(() => [
-            ...V2_DEFAULT_MOCK_LOCATIONS,
-            INACTIVE_OFFICE
-          ]),
-          tRPCMsw.administrativeAreas.list.query(
-            () => V2_DEFAULT_MOCK_ADMINISTRATIVE_AREAS
-          )
+          ...locationListHandlers({
+            locations: [...V2_DEFAULT_MOCK_LOCATIONS, INACTIVE_OFFICE],
+            administrativeAreas: V2_DEFAULT_MOCK_ADMINISTRATIVE_AREAS
+          })
         ]
       }
     }
@@ -94,8 +91,7 @@ export const CreateUserOfficePickerExcludesInactiveOffice: StoryObj = {
   parameters: {
     reactRouter: {
       router: routesConfig,
-      initialPath: ROUTES.V2.SETTINGS.USER.EDIT.buildPath({
-        userId: createTemporaryId(),
+      initialPath: ROUTES.V2.SETTINGS.USER.NEW.EDIT.buildPath({
         pageId: 'user.office'
       })
     }

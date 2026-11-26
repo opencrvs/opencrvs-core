@@ -35,6 +35,8 @@ export const ActionType = {
   REQUEST_CORRECTION: 'REQUEST_CORRECTION',
   REJECT_CORRECTION: 'REJECT_CORRECTION',
   APPROVE_CORRECTION: 'APPROVE_CORRECTION',
+  REVOKE_REGISTRATION: 'REVOKE_REGISTRATION',
+  REINSTATE_REGISTRATION: 'REINSTATE_REGISTRATION',
   // General actions
   READ: 'READ',
   ASSIGN: 'ASSIGN',
@@ -57,6 +59,8 @@ export const ConfirmableActions = [
   ActionType.REQUEST_CORRECTION,
   ActionType.APPROVE_CORRECTION,
   ActionType.REJECT_CORRECTION,
+  ActionType.REVOKE_REGISTRATION,
+  ActionType.REINSTATE_REGISTRATION,
   ActionType.CUSTOM
 ] as const
 
@@ -78,6 +82,8 @@ export const ActionTypes = z.enum([
   'REQUEST_CORRECTION',
   'REJECT_CORRECTION',
   'APPROVE_CORRECTION',
+  'REVOKE_REGISTRATION',
+  'REINSTATE_REGISTRATION',
   'READ',
   'ASSIGN',
   'UNASSIGN',
@@ -90,7 +96,9 @@ export type ActionTypes = z.infer<typeof ActionTypes>
  * Non-persisted actions that are used in the client to control the UI.
  */
 export const ClientSpecificAction = {
-  REVIEW_CORRECTION_REQUEST: 'REVIEW_CORRECTION_REQUEST'
+  REVIEW_CORRECTION_REQUEST: 'REVIEW_CORRECTION_REQUEST',
+  /** Opens the user's declare or notify draft of the event in its own flow */
+  CONTINUE_DRAFT: 'CONTINUE_DRAFT'
 } as const
 
 export type ClientSpecificAction =
@@ -146,7 +154,9 @@ export const WorkqueueActionType = ActionTypes.extract([
   ActionType.ARCHIVE,
   ActionType.UNARCHIVE,
   ActionType.PRINT_CERTIFICATE,
-  ActionType.REQUEST_CORRECTION
+  ActionType.REQUEST_CORRECTION,
+  ActionType.REVOKE_REGISTRATION,
+  ActionType.REINSTATE_REGISTRATION
 ])
 export type WorkqueueActionType = z.infer<typeof WorkqueueActionType>
 

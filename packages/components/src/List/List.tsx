@@ -112,15 +112,23 @@ export const List = ({ children, redactedLabel, ...props }: ListProps) => {
     value2: header?.props.value2
   }
 
+  /*
+   * The label and value columns share the width equally. The start and actions
+   * columns get their minimum width from their cells, and become wider when
+   * their content needs more space.
+   */
+  const textColumnCount = 1 + Number(columns.value) + Number(columns.value2)
+  const textColumnWidth = `${100 / textColumnCount}%`
+
   return (
     <ListContext.Provider value={{ columns, columnNames, redactedLabel }}>
       <Table {...props} role="table">
         <colgroup>
-          {columns.start && <col width={styles.START_COLUMN_WIDTH} />}
-          <col />
-          {columns.value && <col />}
-          {columns.value2 && <col />}
-          {columns.actions && <col width={styles.ACTIONS_COLUMN_WIDTH} />}
+          {columns.start && <col />}
+          <col width={textColumnWidth} />
+          {columns.value && <col width={textColumnWidth} />}
+          {columns.value2 && <col width={textColumnWidth} />}
+          {columns.actions && <col />}
         </colgroup>
 
         {header && <HeadGroup role="rowgroup">{header}</HeadGroup>}

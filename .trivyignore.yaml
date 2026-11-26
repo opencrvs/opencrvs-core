@@ -27,3 +27,13 @@ vulnerabilities:
     statement: Transitive dependency of react-router 5.3.4. Only affects client-side code ocrvs-7682
   - id: CVE-2024-47068
     statement: Transitive dependency of Vite. Not run in production and there is currently no fix.
+  - id: CVE-2026-109383
+    statement: &npm-undici undici 6.29.0 in the npm 11.21.1 of the base image. Only node-gyp loads it, to download Node headers for native builds with npm. The services do not use it. Remove when an npm release bundles undici 6.29.1 or later.
+    paths: &npm-undici-paths
+      - 'usr/local/lib/node_modules/npm/node_modules/undici/package.json'
+  - id: CVE-2026-109869
+    statement: *npm-undici
+    paths: *npm-undici-paths
+  - id: CVE-2026-87018
+    statement: *npm-undici
+    paths: *npm-undici-paths

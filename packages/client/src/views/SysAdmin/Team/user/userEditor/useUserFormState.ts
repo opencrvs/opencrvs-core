@@ -8,7 +8,12 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { deepDropNulls, FileFieldValue } from '@opencrvs/commons/client'
+import {
+  deepDropNulls,
+  FileFieldValue,
+  getUUID,
+  UUID
+} from '@opencrvs/commons/client'
 import { create } from 'zustand'
 
 type EventState = {
@@ -25,6 +30,13 @@ type EventState = {
 
 interface UserFormState {
   userId?: string
+  /**
+   * The id of the next user that the user editor creates. The editor uploads
+   * files of the new user, for example the signature, to `users/<newUserId>/`
+   * before the user exists, and sends the id to `user.create`. `clear()` sets
+   * a new id, so each new user gets a different id.
+   */
+  newUserId: UUID
   userForm?: EventState
   setUserForm: (data: EventState, userId?: string) => void
   getUserForm: (initialValues?: EventState) => EventState
@@ -33,6 +45,7 @@ interface UserFormState {
 }
 
 export const useUserFormState = create<UserFormState>()((set, get) => ({
+  newUserId: getUUID(),
   getUserForm: (initialValues?: EventState) =>
     get().userForm || deepDropNulls(initialValues ?? {}),
   setUserForm: (data: EventState, userId?: string) => {
@@ -42,5 +55,10 @@ export const useUserFormState = create<UserFormState>()((set, get) => ({
     Object.fromEntries(
       Object.entries(get().getUserForm()).map(([key]) => [key, true])
     ),
-  clear: () => set(() => ({ userForm: undefined, userId: undefined }))
+  clear: () =>
+    set(() => ({
+      userForm: undefined,
+      userId: undefined,
+      newUserId: getUUID()
+    }))
 }))

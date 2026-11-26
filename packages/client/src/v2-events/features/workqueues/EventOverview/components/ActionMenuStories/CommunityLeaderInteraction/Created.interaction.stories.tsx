@@ -16,9 +16,11 @@ import superjson from 'superjson'
 import {
   ActionType,
   generateEventDocument,
+  generateEventDraftDocument,
   getCurrentEventState,
   tennisClubMembershipEvent,
-  TestUserRole
+  TestUserRole,
+  versionedTennisClubMembershipEvent
 } from '@opencrvs/commons/client'
 import { AppRouter, TRPCProvider } from '@client/v2-events/trpc'
 import { testDataGenerator } from '@client/tests/test-data-generators'
@@ -70,8 +72,9 @@ export default {
 
 /**
  * Regression: Community leaders have record.notify (not record.declare).
- * Before the fix, the Declare (Update) button was disabled and Delete was hidden
- * for CREATED drafts owned by the community leader.
+ * Before the fix, Delete was hidden for CREATED drafts owned by the community leader.
+ *
+ * With a notify draft open, Update continues it, see AssignedToSelfWithNotifyDraft.
  *
  * NOTE: This story requires the communityLeader token in test-data-generators.ts
  * to be regenerated after the scopes were corrected from record.declare to
@@ -111,7 +114,7 @@ export const AssignedToSelf: StoryObj<typeof ActionMenu> = {
     </React.Suspense>
   ),
   beforeEach: () => {
-    addLocalEventConfig(tennisClubMembershipEvent)
+    addLocalEventConfig(versionedTennisClubMembershipEvent)
     setEventData(createdEventDocument.id, createdEventDocument)
   },
   play: async () => {
@@ -119,18 +122,38 @@ export const AssignedToSelf: StoryObj<typeof ActionMenu> = {
     await expect(actionButton).toBeVisible()
     await userEvent.click(actionButton)
 
-    // Declare (Update) must be enabled — community leader can open the declare form
-    // even though they only hold record.notify, not record.declare.
-    // tennisClubMembershipEvent configures DECLARE's label as "Send an application".
-    const declareItem = await screen.findByText('Send an application')
-    await waitFor(async () => {
-      await expect(declareItem.hasAttribute('disabled')).toBe(false)
-    })
-
     // Delete must be visible and enabled — record.notify satisfies the delete scope.
     const deleteItem = await screen.findByText('Delete')
     await waitFor(async () => {
       await expect(deleteItem.hasAttribute('disabled')).toBe(false)
+    })
+  }
+}
+
+const notifyDraft = generateEventDraftDocument({
+  eventId: createdEventDocument.id,
+  actionType: ActionType.NOTIFY
+})
+
+/**
+ * A community leader with a notify draft open gets Update (CONTINUE_DRAFT), which
+ * continues the draft in the notify flow. It's checked against NOTIFY, which they hold.
+ */
+export const AssignedToSelfWithNotifyDraft: StoryObj<typeof ActionMenu> = {
+  ...AssignedToSelf,
+  parameters: {
+    ...AssignedToSelf.parameters,
+    offline: {
+      drafts: [notifyDraft]
+    }
+  },
+  play: async () => {
+    const actionButton = await screen.findByRole('button', { name: 'Action' })
+    await userEvent.click(actionButton)
+
+    const updateItem = await screen.findByText('Update')
+    await waitFor(async () => {
+      await expect(updateItem.hasAttribute('disabled')).toBe(false)
     })
   }
 }

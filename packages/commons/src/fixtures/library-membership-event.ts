@@ -8,9 +8,11 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
+import { resolveEventConfig } from '../events/EventConfig'
 import { defineDeclarationForm } from '../events/EventConfigInput'
 import { defineConfig } from '../events/defineConfig'
 import { FieldType } from '../events/FieldType'
+import { ActionType } from '../events/ActionType'
 
 const libraryMembershipForm = defineDeclarationForm({
   label: {
@@ -57,7 +59,7 @@ const libraryMembershipForm = defineDeclarationForm({
 /**
  * @knipignore
  */
-export const libraryMembershipEvent = defineConfig({
+export const versionedLibraryMembershipEvent = defineConfig({
   id: 'library-membership',
   label: {
     defaultMessage: 'Library membership application',
@@ -70,6 +72,29 @@ export const libraryMembershipEvent = defineConfig({
     id: 'event.library-membership.title'
   },
   summary: { fields: [] },
-  actions: [],
+  actions: [
+    {
+      type: ActionType.DECLARE,
+      label: {
+        defaultMessage: 'Declare',
+        description:
+          'This is shown as the action name anywhere the user can trigger the action from',
+        id: 'event.library-membership.action.declare.label'
+      },
+      review: {
+        title: {
+          defaultMessage: 'Library membership application',
+          description: 'Title of the review page',
+          id: 'event.library-membership.action.declare.form.review.title'
+        },
+        fields: []
+      }
+    }
+  ],
   declaration: libraryMembershipForm
 })
+
+/** The configuration of the first version of `versionedLibraryMembershipEvent`. */
+export const libraryMembershipEvent = resolveEventConfig(
+  versionedLibraryMembershipEvent
+)

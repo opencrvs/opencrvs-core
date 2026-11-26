@@ -26,6 +26,7 @@ import {
   FieldConfig,
   FieldUpdateValue,
   getActionConfig,
+  findActionDialogCopy,
   runFieldValidations,
   UUID,
   getCurrentEventState,
@@ -49,16 +50,19 @@ import { actionLabels } from '../../../workqueues/Actions/utils'
 import { register } from './register'
 import { archive } from './archive'
 import { unarchive } from './unarchive'
+import { revoke } from './revoke'
+import { reinstate } from './reinstate'
 
 const quickActions = {
   [ActionType.REGISTER]: register,
   [ActionType.ARCHIVE]: archive,
-  [ActionType.UNARCHIVE]: unarchive
+  [ActionType.UNARCHIVE]: unarchive,
+  [ActionType.REVOKE_REGISTRATION]: revoke,
+  [ActionType.REINSTATE_REGISTRATION]: reinstate
 } as const satisfies Partial<Record<ActionType, QuickActionConfig>>
 
 interface ModalConfig {
   label?: MessageDescriptor
-  supportingCopy?: MessageDescriptor
   confirmButtonType?: ButtonType
   confirmButtonLabel?: MessageDescriptor
   fields?: FieldConfig[]
@@ -93,17 +97,21 @@ interface ModalResult {
 const DefaultIcons = {
   [ActionType.REGISTER]: 'PencilLine',
   [ActionType.ARCHIVE]: 'Archive',
-  [ActionType.UNARCHIVE]: 'ArchiveTray'
+  [ActionType.UNARCHIVE]: 'ArchiveTray',
+  [ActionType.REVOKE_REGISTRATION]: 'XCircle',
+  [ActionType.REINSTATE_REGISTRATION]: 'ArrowCounterClockwise'
 } as const
 
 function QuickActionModal({
   close,
   config,
+  dialogCopy,
   eventId,
   eventConfiguration
 }: {
   close: (result: ModalResult) => void
   config: ModalConfig & { label: MessageDescriptor }
+  dialogCopy?: MessageDescriptor
   eventId: UUID
   eventConfiguration: EventConfig
 }) {
@@ -185,11 +193,11 @@ function QuickActionModal({
       onClose={() => close({ result: false })}
     >
       <Stack alignItems="left" direction="column" gap={16}>
-        {config.supportingCopy && (
+        {dialogCopy && (
           <TranslationTextWithFormatModifier
             color="supportingCopy"
             element="p"
-            message={config.supportingCopy}
+            message={dialogCopy}
             variant="reg16"
           />
         )}
@@ -226,7 +234,7 @@ export function useQuickActionModal(
     const config = quickActions[actionType]
     const label = actionLabels[actionType]
     const actionConfig = getActionConfig({ actionType, eventConfiguration })
-    const supportingCopy = actionConfig?.supportingCopy
+    const dialogCopy = findActionDialogCopy(eventConfiguration, actionType)
 
     const { result, values } = await openModal<ModalResult>((close) => (
       <QuickActionModal
@@ -235,13 +243,13 @@ export function useQuickActionModal(
           label,
           actionType,
           icon: isValidIcon(actionConfig?.icon) ? actionConfig.icon : undefined,
-          supportingCopy,
           fields:
             actionConfig && 'form' in actionConfig
               ? actionConfig.form
               : undefined,
           ...config.modal
         }}
+        dialogCopy={dialogCopy}
         eventConfiguration={eventConfiguration}
         eventId={eventIndex.id}
       />
@@ -297,10 +305,10 @@ export function useCustomActionModal(
         config={{
           ...customActionConfigBase,
           label: actionConfig.label,
-          supportingCopy: actionConfig.supportingCopy,
           fields: actionConfig.form,
           icon: isValidIcon(actionConfig.icon) ? actionConfig.icon : undefined
         }}
+        dialogCopy={actionConfig.dialogCopy}
         eventConfiguration={eventConfiguration}
         eventId={eventId}
       />

@@ -26,7 +26,7 @@ import {
   createTRPCContext,
   createTRPCOptionsProxy
 } from '@trpc/tanstack-react-query'
-import { partition } from 'lodash'
+import { partition, throttle } from 'lodash'
 import React from 'react'
 import superjson from 'superjson'
 import { getUUID } from '@opencrvs/commons/client'
@@ -95,9 +95,17 @@ function getQueryClient() {
   })
 }
 
-function createIDBPersister(storageIdentifier: string) {
+export function createIDBPersister(storageIdentifier: string) {
   const fullStorageIdentifier = `react-query-${storageIdentifier}`
   const largeQueryStorageIdentifier = `react-query-large-query-storage-${storageIdentifier}`
+
+  /**
+   * The `data` of each large query as it was last written to, or restored
+   * from, storage. Dehydration keeps the reference to `query.state.data`, so
+   * a query whose `queryFn` returned the cached object again has not changed.
+   * `dataUpdatedAt` cannot tell this, because every successful fetch sets it.
+   */
+  const persistedLargeQueryData = new Map<string, unknown>()
 
   return {
     /** By default, client is persisted whenever a query/mutation occurs */
@@ -122,25 +130,32 @@ function createIDBPersister(storageIdentifier: string) {
       // 2. Persist the main client without large queries
       await storage.setItem(fullStorageIdentifier, clientWithoutLargeQueries)
 
-      // 3. Persist large queries only if they have changed since the last persist to avoid unnecessary serialization.
-      const changed = largeQueries.some((query) => {
-        if (query.state.status !== 'success') {
-          return false
-        }
+      // 3. Persist large queries only if their data has changed since the last persist to avoid unnecessary serialization.
+      // When a large query is removed, the count changes. The persister then
+      // writes again, so that the removed query leaves storage.
+      const removed = largeQueries.length !== persistedLargeQueryData.size
+      const changed =
+        removed ||
+        largeQueries.some((query) => {
+          if (query.state.status !== 'success') {
+            return false
+          }
 
-        if (query.state.fetchStatus === 'fetching') {
-          return false
-        }
+          if (query.state.fetchStatus === 'fetching') {
+            return false
+          }
 
-        const updatedAt = query.state.dataUpdatedAt
-        const dehydratedAt = query.dehydratedAt
-
-        // During the first load updatedAt === dehydratedAt.
-        return dehydratedAt === undefined || updatedAt >= dehydratedAt
-      })
+          return (
+            persistedLargeQueryData.get(query.queryHash) !== query.state.data
+          )
+        })
 
       if (changed) {
         await storage.setItem(largeQueryStorageIdentifier, largeQueries)
+        persistedLargeQueryData.clear()
+        for (const query of largeQueries) {
+          persistedLargeQueryData.set(query.queryHash, query.state.data)
+        }
       }
     },
     /** Restore client from storage on page change / refresh. Expected to happen more rarely. */
@@ -159,6 +174,12 @@ function createIDBPersister(storageIdentifier: string) {
 
       // 4. Re-attach large queries to the client to provide consistent state.
       if (largeQueries) {
+        // Hydration keeps these references. When the restored data does not
+        // change, the next persist does not write it back.
+        for (const query of largeQueries) {
+          persistedLargeQueryData.set(query.queryHash, query.state.data)
+        }
+
         return {
           ...client,
           clientState: {
@@ -177,6 +198,47 @@ function createIDBPersister(storageIdentifier: string) {
   } satisfies Persister
 }
 
+/**
+ * TL;DR: Throttle cache writes because it is expensive and blocking operation.
+ *
+ * For offline use, we persist all the queries to IndexedDb.
+ * Since we cache all the queries, even if one of them is (re)fetched, it means that the full cache is (re)serialized.
+ * With sufficient amount of events, every page change takes a long time, since each query does this, in a row.
+ * As a side-effect, we won't be able to cache files while we wait for indexed db.
+ *
+ * As we use custom persister, we won't be able to do a drop-in replacement createAsyncStoragePersister library from tan-stack, which would use throttling by default.
+ *
+ * SOLUTION: Throttle cache writes, so queries invoked by the same event are cached more or less together, and do not block other operations.
+ */
+function throttlePersister(persister: Persister): Persister {
+  const persistThrottled = throttle(
+    async (client: PersistedClient) => {
+      try {
+        await persister.persistClient(client)
+      } catch (error) {
+        // eslint-disable-next-line no-console
+        console.error('Failed to persist query cache', error)
+      }
+    },
+    250, // tanstack defaults to 1000
+    { leading: false, trailing: true }
+  )
+
+  // If tab is about to be closed, persist immediately.
+  window.addEventListener('pagehide', async () => persistThrottled.flush())
+
+  return {
+    ...persister,
+    persistClient: async (client) => {
+      await persistThrottled(client)
+    },
+    removeClient: async () => {
+      persistThrottled.cancel()
+      await persister.removeClient()
+    }
+  }
+}
+
 export const trpcClient = getTrpcClient()
 
 export const queryClient = getQueryClient()
@@ -184,6 +246,50 @@ export const trpcOptionsProxy = createTRPCOptionsProxy({
   queryClient,
   client: trpcClient
 })
+
+/**
+ * Drops untagged `event.search` entries restored from IndexedDB, which would
+ * never be collected (gcTime is Infinity). Bumping CACHE_VERSION instead would
+ * also discard the offline outbox.
+ *
+ * @deprecated - ships in v2.2, can be removed after it. A one-off migration of
+ * the client cache, done once every client has started on v2.2 or later. Remove
+ * with its call in `onSuccess` below and its test in `search.test.ts`.
+ */
+export function purgeLegacySearchQueries(client: QueryClient) {
+  client.removeQueries({
+    queryKey: [['event', 'search']],
+    predicate: (query) => (query.queryKey[0] as string[]).length < 3
+  })
+}
+
+/**
+ * Drops the location and administrative area list entries that earlier
+ * client versions left in the cache, which would never be collected (gcTime
+ * is Infinity):
+ *
+ * - The entries under a key with filter input, which the list hooks filled.
+ * - The entries that hold the raw list array, which `PrefetchQueries` filled
+ *   under the shared key. The hooks now read that key and expect a Map.
+ *
+ * @deprecated - A one-off migration of the client cache. Remove one release
+ * after it ships in 2.2, with its call in `onSuccess` below and its test.
+ */
+export function purgeLegacyLocationListQueries(client: QueryClient) {
+  for (const path of [
+    ['locations', 'list'],
+    ['administrativeAreas', 'list']
+  ]) {
+    client.removeQueries({
+      queryKey: [path],
+      predicate: (query) => {
+        const [, options] = query.queryKey as [string[], object | undefined]
+        const hasInput = options !== undefined && 'input' in options
+        return hasInput || Array.isArray(query.state.data)
+      }
+    })
+  }
+}
 
 export function TRPCProvider({
   children,
@@ -209,11 +315,16 @@ export function TRPCProvider({
 }) {
   const [queriesRestored, setQueriesRestored] = React.useState(false)
 
+  const persister = React.useMemo(
+    () => throttlePersister(createIDBPersister(storeIdentifier)),
+    [storeIdentifier]
+  )
+
   return (
     <PersistQueryClientProvider
       client={queryClient}
       persistOptions={{
-        persister: createIDBPersister(storeIdentifier),
+        persister,
         buster: `persisted-indexed-db-v${CACHE_VERSION}-${userCacheKey}`,
         maxAge: Infinity,
         dehydrateOptions: {
@@ -223,6 +334,7 @@ export function TRPCProvider({
             }
             return query.state.status === 'success'
           },
+
           shouldDehydrateMutation: (mutation) => {
             if (mutation.state.status === 'error') {
               const error = mutation.state.error
@@ -238,6 +350,9 @@ export function TRPCProvider({
         }
       }}
       onSuccess={async () => {
+        purgeLegacySearchQueries(queryClient)
+        purgeLegacyLocationListQueries(queryClient)
+
         setQueriesRestored(true)
         await queryClient.resumePausedMutations()
 

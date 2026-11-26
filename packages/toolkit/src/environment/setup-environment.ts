@@ -54,10 +54,12 @@ import { generateInventory, copyChartsValues } from './templates'
 import { generateSSHKeyPair } from './ssh-keygen'
 import { updateWorkflowEnvironments } from './update-workflows'
 import {
-  dockerhubQuestions,
+  registryQuestions,
   githubQuestions,
   githubTokenQuestion,
   githubOtherQuestions,
+  githubApprovalRequiredQuestion,
+  githubApproversQuestion,
   infrastructureQuestions,
   staticSSLCertQuestions,
   countryQuestions,
@@ -66,7 +68,8 @@ import {
   sentryQuestions,
   emailQuestions,
   metabaseAdminQuestions,
-  backupQuestions
+  backupQuestions,
+  e2eQuestions
 } from './questions'
 
 import {
@@ -81,6 +84,7 @@ import {
 
 import { askQuestionWithEditor } from './editor-questions'
 import { selectWithCustom, getIndexFromChoices } from './questions-helper'
+import { validateRegistryCredentials } from './registry'
 import { manageUsers } from './manage-users'
 import { getEnvironmentInventoryPath } from './paths'
 
@@ -88,6 +92,8 @@ function questionToPrompt<T extends string>({
   valueType,
 
   valueLabel,
+
+  legacyValueLabel,
 
   scope,
   ...promptOptions
@@ -164,6 +170,18 @@ function getAnswers(existingValues: (Secret | Variable)[]): Answers {
   })
 }
 
+// The value of a variable that exists, as the initial value of its question.
+// A select question takes the index of the choice.
+function getInitialValue(
+  question: QuestionDescriptor<any>,
+  variable: Variable
+): string | number {
+  if (question.type === 'select' && Array.isArray(question.choices)) {
+    return getIndexFromChoices(question.choices, variable.value)
+  }
+  return variable.value
+}
+
 async function promptAndStoreAnswer(
   questions: Array<QuestionDescriptor<any>>,
   existingValues: Array<Secret | Variable>
@@ -185,19 +203,29 @@ async function promptAndStoreAnswer(
         questionWithVariableLabel.scope,
         existingValues
       )
-      if (existingVariable) {
-        let initial_value: string | number = existingVariable.value
-        // Get correct initial value for select questions
-        if (
-          questionWithVariableLabel.type === 'select' &&
-          Array.isArray(questionWithVariableLabel.choices)
-        ) {
-          initial_value = getIndexFromChoices(
-            questionWithVariableLabel.choices,
-            existingVariable.value
-          )
-        }
+      // Unlike a secret, the value of a variable can be read, so one that only exists
+      // under its previous name is the default of the question
+      const legacyVariable =
+        !existingVariable && questionWithVariableLabel.legacyValueLabel
+          ? findExistingValue(
+              questionWithVariableLabel.legacyValueLabel,
+              'VARIABLE',
+              questionWithVariableLabel.scope,
+              existingValues
+            )
+          : undefined
 
+      if (legacyVariable) {
+        return {
+          ...questionWithVariableLabel,
+          message: `${questionWithVariableLabel.message} ${kleur.gray(
+            `(default taken from ${legacyVariable.name}, the previous name of this variable)`
+          )}`,
+          initial: getInitialValue(questionWithVariableLabel, legacyVariable)
+        }
+      }
+
+      if (existingVariable) {
         return [
           {
             name: 'overWrite' + questionWithVariableLabel.name,
@@ -213,7 +241,10 @@ async function promptAndStoreAnswer(
             ...questionWithVariableLabel,
             type: ((prev: boolean) =>
               prev ? questionWithVariableLabel.type : null) as any,
-            initial: initial_value
+            initial: getInitialValue(
+              questionWithVariableLabel,
+              existingVariable
+            )
           }
         ]
       }
@@ -226,6 +257,43 @@ async function promptAndStoreAnswer(
         questionWithVariableLabel.scope,
         existingValues
       )
+      // The value of a secret that only exists under its previous name can't be read, so
+      // it is left to the secrets migration workflow, unless a new value is entered here
+      const legacySecret =
+        !existingSecret && questionWithVariableLabel.legacyValueLabel
+          ? findExistingValue(
+              questionWithVariableLabel.legacyValueLabel,
+              'SECRET',
+              questionWithVariableLabel.scope,
+              existingValues
+            )
+          : undefined
+
+      if (legacySecret) {
+        return [
+          {
+            name: 'overWrite' + questionWithVariableLabel.name,
+            type: 'confirm' as const,
+            scope: questionWithVariableLabel.scope,
+            message: `${kleur.yellow(
+              `${
+                legacySecret.scope === 'REPOSITORY'
+                  ? 'Repository secret'
+                  : 'Secret'
+              } ${kleur.cyan(
+                legacySecret.name
+              )} already exists in Github under the previous name of ${kleur.cyan(
+                questionWithVariableLabel.valueLabel
+              )}. The secrets migration workflow copies it. Do you want to enter a new value instead?`
+            )}`
+          },
+          {
+            ...questionWithVariableLabel,
+            type: ((prev: boolean) =>
+              prev ? questionWithVariableLabel.type : null) as any
+          }
+        ]
+      }
 
       if (existingSecret) {
         return [
@@ -280,10 +348,77 @@ async function promptAndStoreAnswer(
   return { ...Object.fromEntries(existingValuesForQuestions), ...result }
 }
 
+/**
+ * The value of a secret or variable that is generated rather than asked for, or
+ * null when it exists. One that only exists under its previous name counts as
+ * existing: the secrets migration workflow copies it, and a generated value
+ * would replace the credential that is in use.
+ */
+function defineIfMissing(
+  existingValues: Array<Secret | Variable>,
+  name: string,
+  type: 'SECRET' | 'VARIABLE',
+  scope: 'REPOSITORY' | 'ENVIRONMENT',
+  newValue: string
+) {
+  if (findExistingValue(name, type, scope, existingValues)) {
+    return null
+  }
+
+  const legacyName = ALL_QUESTIONS.find(
+    (question) =>
+      question.valueLabel === name &&
+      question.valueType === type &&
+      question.scope === scope
+  )?.legacyValueLabel
+  if (
+    legacyName &&
+    findExistingValue(legacyName, type, scope, existingValues)
+  ) {
+    log(
+      kleur.bold().green('✔'),
+      kleur
+        .bold()
+        .yellow(
+          `${legacyName} exists, the secrets migration workflow copies it to ${name}`
+        )
+    )
+    return null
+  }
+
+  return process.env[name] || newValue
+}
+
+async function promptAndValidateRegistry(
+  existingValues: Array<Secret | Variable>
+) {
+  const answers = await promptAndStoreAnswer(registryQuestions, existingValues)
+  const result = await validateRegistryCredentials(
+    answers.registryHost,
+    answers.registryOrganisation,
+    answers.registryRepository,
+    answers.registryUsername,
+    answers.registryToken
+  )
+  if (result.status === 'valid' || result.status === 'skipped') {
+    return
+  }
+
+  error(`\n${result.status}: ${result.reason || 'Generic error'}\n`)
+  const continueNotValidated = await confirm({
+    message:
+      'Container registry credentials are not validated. Continue anyway?',
+    default: false
+  })
+  if (!continueNotValidated) {
+    process.exit(1)
+  }
+}
+
 ALL_QUESTIONS.push(
   ...githubTokenQuestion,
   ...githubOtherQuestions,
-  ...dockerhubQuestions,
+  ...registryQuestions,
   ...diskQuestions,
   ...infrastructureQuestions,
   ...backupQuestions,
@@ -292,7 +427,8 @@ ALL_QUESTIONS.push(
   ...emailQuestions,
   ...sentryQuestions,
   ...derivedVariables,
-  ...metabaseAdminQuestions
+  ...metabaseAdminQuestions,
+  ...e2eQuestions
 )
 export async function runSetupEnvironment() {
   log('\n', kleur.bold().underline('Github'), '\n')
@@ -414,6 +550,71 @@ export async function runSetupEnvironment() {
     ...existingEnvironmentSecrets
   ]
 
+  log('\n', kleur.bold().underline('Two-factor authentication (2FA)'))
+
+  const existingTwoFaEnabled = findExistingValue(
+    'TWO_FA_ENABLED',
+    'VARIABLE',
+    'ENVIRONMENT',
+    existingValues
+  )
+
+  const twoFaDefault = process.env.TWO_FA_ENABLED || existingTwoFaEnabled?.value
+  const two_fa_enabled = await confirm({
+    message:
+      'Enable two-factor authentication (2FA)? This should be enabled for any environment that hosts PII data.',
+    default: twoFaDefault
+      ? twoFaDefault === 'true'
+      : environment_type === 'production'
+  })
+
+  if (!two_fa_enabled && environment_type === 'production') {
+    warn(
+      '2FA is disabled on a production-like environment. Logins will accept the fixed test code 000000, exposing real citizen data. Only do this if you know what you are doing.'
+    )
+  }
+
+  log('\n', kleur.bold().underline('End-to-end (E2E) tests'))
+
+  const existingE2EEnabled = findExistingValue(
+    'E2E_ENABLED',
+    'VARIABLE',
+    'ENVIRONMENT',
+    existingValues
+  )
+  // E2E tests create records, so they are never offered on environments that host PII data
+  const e2e_enabled =
+    environment_type !== 'production' &&
+    (await confirm({
+      message:
+        'Would you like to configure e2e tests for this environment? Tests run after every deployment and create test records.',
+      default: process.env.E2E_ENABLED
+        ? process.env.E2E_ENABLED === 'true'
+        : existingE2EEnabled?.value === 'true'
+    }))
+
+  if (environment_type === 'production') {
+    log(
+      kleur.bold().green('✔'),
+      kleur
+        .bold()
+        .grey(
+          existingE2EEnabled?.value === 'true'
+            ? 'Environment hosts PII data, E2E_ENABLED will be set to false'
+            : 'Environment hosts PII data, skipping e2e tests configuration'
+        )
+    )
+  }
+
+  if (e2e_enabled) {
+    if (two_fa_enabled) {
+      warn(
+        'E2E tests usually sign in with the fixed 2FA code 000000, which is only accepted when 2FA is disabled.'
+      )
+    }
+    await promptAndStoreAnswer(e2eQuestions, existingValues)
+  }
+
   if (
     existingEnvironmentVariables.length > 0 ||
     existingEnvironmentSecrets.length > 0
@@ -438,34 +639,29 @@ export async function runSetupEnvironment() {
           'WARNING! You are setting up a production environment.\n Make sure you have read the deployment guide carefully before proceeding.\n'
         )
     )
-    await promptAndStoreAnswer(githubOtherQuestions, existingValues)
   }
 
-log('\n', kleur.bold().underline('Two-factor authentication (2FA)'))
-
-  const existingTwoFaEnabled = findExistingValue(
-    'TWO_FA_ENABLED',
-    'VARIABLE',
-    'ENVIRONMENT',
+  log('\n', kleur.bold().underline('Workflow approvals'))
+  // The workflows require approval unless APPROVAL_REQUIRED is 'false'
+  const { approvalRequired } = await promptAndStoreAnswer(
+    [
+      {
+        ...githubApprovalRequiredQuestion,
+        initial: getIndexFromChoices(
+          githubApprovalRequiredQuestion.choices,
+          process.env.APPROVAL_REQUIRED ||
+            (environment_type === 'production' ? 'true' : 'false')
+        )
+      }
+    ],
     existingValues
   )
-  const twoFaDefault = process.env.TWO_FA_ENABLED || existingTwoFaEnabled?.value
-  const two_fa_enabled = await confirm({
-    message:
-      'Enable two-factor authentication (2FA)? This should be enabled for any environment that hosts PII data.',
-    default: twoFaDefault
-      ? twoFaDefault === 'true'
-      : environment_type === 'production'
-  })
-
-  if (!two_fa_enabled && ['production', 'staging'].includes(environment_type)) {
-    warn(
-      '2FA is disabled on a production-like environment. Logins will accept the fixed test code 000000, exposing real citizen data. Only do this if you know what you are doing.'
-    )
+  if (approvalRequired !== 'false') {
+    await promptAndStoreAnswer([githubApproversQuestion], existingValues)
   }
 
-  log('\n', kleur.bold().underline('Docker Hub'))
-  await promptAndStoreAnswer(dockerhubQuestions, existingValues)
+  log('\n', kleur.bold().underline('Container registry'))
+  await promptAndValidateRegistry(existingValues)
 
   log('\n', kleur.bold().underline('Kubernetes & Runtime'))
 
@@ -572,6 +768,27 @@ log('\n', kleur.bold().underline('Two-factor authentication (2FA)'))
       )
     }
   }
+
+  // Where RustFS keeps its data. A new environment starts on RustFS in
+  // /data/rustfs. An environment that already exists ran MinIO, so RustFS takes over
+  // /data/minio in place. The directory is not renamed, because the running MinIO
+  // would lose it before the deployment replaces it. The value is decided once and
+  // read back on the next run, otherwise an environment created on RustFS would
+  // look like an existing one from then on.
+  const existingRustfsHostDataPath = findExistingValue(
+    'RUSTFS_HOST_DATA_PATH',
+    'VARIABLE',
+    'ENVIRONMENT',
+    existingValues
+  )
+  const rustfs_host_data_path =
+    existingRustfsHostDataPath?.value ||
+    (environment_exists ? '/data/minio' : '/data/rustfs')
+  // The PVC that RustFS uses follows the same decision. The name `minio` makes RustFS
+  // take over the PVC of MinIO, so it does not depend on the storage type.
+  const rustfs_pvc_name = rustfs_host_data_path.endsWith('/minio')
+    ? 'minio'
+    : 'rustfs'
 
   // Backup and restore configuration
   let backupHost =
@@ -681,7 +898,25 @@ log('\n', kleur.bold().underline('Two-factor authentication (2FA)'))
   }
 
   log('\n', kleur.bold().underline('Monitoring'))
-  await promptAndStoreAnswer(databaseAndMonitoringQuestions, existingValues)
+  const existingMonitoringEnabled = findExistingValue(
+    'MONITORING_ENABLED',
+    'VARIABLE',
+    'ENVIRONMENT',
+    existingValues
+  )
+  const monitoringDefault =
+    process.env.MONITORING_ENABLED || existingMonitoringEnabled?.value
+  const monitoring_enabled = await confirm({
+    message:
+      'Enable monitoring (Kibana, APM, Filebeat, Metricbeat, Elastalert, OpenTelemetry Collector and tracing)? Disable it if this environment does not need its own monitoring stack.',
+    default: monitoringDefault ? monitoringDefault === 'true' : true
+  })
+
+  if (monitoring_enabled) {
+    await promptAndStoreAnswer(databaseAndMonitoringQuestions, existingValues)
+  } else {
+    log(kleur.bold().green('✔'), kleur.bold().yellow('Monitoring is disabled'))
+  }
   const sentryDSNExists = findExistingValue(
     'SENTRY_DSN',
     'SECRET',
@@ -727,16 +962,12 @@ log('\n', kleur.bold().underline('Two-factor authentication (2FA)'))
     fn: (value: string | undefined) => string
   ) => fn(variable || existingValue?.value) || ''
 
-  function findExistingOrDefine(
+  const findExistingOrDefine = (
     name: string,
     type: 'SECRET' | 'VARIABLE',
     scope: 'REPOSITORY' | 'ENVIRONMENT',
     newValue: string
-  ) {
-    return findExistingValue(name, type, scope, existingValues)
-      ? null
-      : process.env[name] || newValue
-  }
+  ) => defineIfMissing(existingValues, name, type, scope, newValue)
 
   const derivedUpdates: AnswerWithNullValue[] = [
     {
@@ -780,6 +1011,32 @@ log('\n', kleur.bold().underline('Two-factor authentication (2FA)'))
     didExist: existingTwoFaEnabled,
     // Always stored, so the next run defaults to the current answer
     value: two_fa_enabled ? 'true' : 'false',
+    scope: 'ENVIRONMENT' as const
+  })
+  // Read by the deployment workflows (vars.MONITORING_ENABLED) to decide
+  // whether the OpenTelemetry Collector is installed
+  derivedUpdates.push({
+    name: 'MONITORING_ENABLED',
+    type: 'VARIABLE' as const,
+    didExist: existingMonitoringEnabled,
+    value: monitoring_enabled ? 'true' : 'false',
+    scope: 'ENVIRONMENT' as const
+  })
+  derivedUpdates.push({
+    name: 'E2E_ENABLED',
+    type: 'VARIABLE' as const,
+    didExist: existingE2EEnabled,
+    // Only store 'false' to switch off an environment that previously had e2e enabled
+    value: e2e_enabled ? 'true' : existingE2EEnabled ? 'false' : null,
+    scope: 'ENVIRONMENT' as const
+  })
+  // Read back on the next run, to keep the volume of MinIO for an environment
+  // that migrated
+  derivedUpdates.push({
+    name: 'RUSTFS_HOST_DATA_PATH',
+    type: 'VARIABLE' as const,
+    didExist: existingRustfsHostDataPath,
+    value: rustfs_host_data_path,
     scope: 'ENVIRONMENT' as const
   })
   derivedUpdates.push(...ssl_answers)
@@ -839,16 +1096,16 @@ log('\n', kleur.bold().underline('Two-factor authentication (2FA)'))
       scope: 'ENVIRONMENT' as const
     },
     {
-      name: 'MINIO_ROOT_USER',
+      name: 'S3_ADMIN_ACCESS_KEY',
       type: 'SECRET' as const,
       didExist: findExistingValue(
-        'MINIO_ROOT_USER',
+        'S3_ADMIN_ACCESS_KEY',
         'SECRET',
         'ENVIRONMENT',
         existingValues
       ),
       value: findExistingOrDefine(
-        'MINIO_ROOT_USER',
+        'S3_ADMIN_ACCESS_KEY',
         'SECRET',
         'ENVIRONMENT',
         generateLongPassword()
@@ -856,16 +1113,16 @@ log('\n', kleur.bold().underline('Two-factor authentication (2FA)'))
       scope: 'ENVIRONMENT' as const
     },
     {
-      name: 'MINIO_ROOT_PASSWORD',
+      name: 'S3_ADMIN_SECRET_KEY',
       type: 'SECRET' as const,
       didExist: findExistingValue(
-        'MINIO_ROOT_PASSWORD',
+        'S3_ADMIN_SECRET_KEY',
         'SECRET',
         'ENVIRONMENT',
         existingValues
       ),
       value: findExistingOrDefine(
-        'MINIO_ROOT_PASSWORD',
+        'S3_ADMIN_SECRET_KEY',
         'SECRET',
         'ENVIRONMENT',
         generateLongPassword()
@@ -1149,7 +1406,8 @@ log('\n', kleur.bold().underline('Two-factor authentication (2FA)'))
   const unknownVariables = existingValues.filter((value) => {
     return !ALL_QUESTIONS.find(
       (question) =>
-        question.valueLabel === value.name &&
+        (question.valueLabel === value.name ||
+          question.legacyValueLabel === value.name) &&
         question.valueType === value.type &&
         question.scope === value.scope
     )
@@ -1388,6 +1646,9 @@ log('\n', kleur.bold().underline('Two-factor authentication (2FA)'))
     env: environment,
     environment_type: environment_type,
     two_fa_enabled,
+    monitoring_enabled,
+    rustfs_host_data_path,
+    rustfs_pvc_name,
     traefik_mode: traefikConfOption,
     restore_enabled: restoreEnvironmentName ? true : false,
     restore_environment_name: restoreEnvironmentName || '',

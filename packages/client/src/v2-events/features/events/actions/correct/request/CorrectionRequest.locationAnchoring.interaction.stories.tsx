@@ -23,11 +23,16 @@ import {
   Location,
   PageTypes,
   TestUserRole,
-  UUID
+  UUID,
+  withDeclaration,
+  getDeclaration,
+  getDeclarationPages,
+  toVersionedEventConfig
 } from '@opencrvs/commons/client'
 import { testDataGenerator } from '@client/tests/test-data-generators'
 import { ROUTES } from '@client/v2-events/routes'
 import { AppRouter } from '@client/v2-events/trpc'
+import { locationListHandlers } from '../../../../../../../.storybook/default-request-handlers'
 import { router } from './router'
 import * as Request from './index'
 
@@ -55,6 +60,7 @@ const IBOMBO_ADMIN_AREA_ID = '62a0ccb4-880d-4f30-8882-f256007dfff9' as UUID
  */
 const RENAMED_FACILITY: Location = {
   id: 'a1a1a1a1-1111-4111-8111-111111111111' as UUID,
+  updatedAt: '2024-01-01T00:00:00.000Z',
   name: 'New Riverside Health Post',
   locationType: 'HEALTH_FACILITY',
   administrativeAreaId: IBOMBO_ADMIN_AREA_ID,
@@ -84,47 +90,49 @@ const RENAMED_FACILITY: Location = {
  * `anchorToDateOfEvent`, and correction added as an available action — none
  * of which the shared fixture needs for its other (non-correction) uses.
  */
-const correctableChildOnboardingEvent: EventConfig = {
-  ...ChildOnboardingEvent,
-  // A plain literal, not `field('child.dob')` — the story seeds this config
-  // directly into IndexedDB (bypassing the network boundary that would
-  // otherwise strip `field()`'s attached methods), which chokes on them.
-  dateOfEvent: { $$field: 'child.dob', $$subfield: [] },
-  actions: [
-    ...ChildOnboardingEvent.actions,
-    {
-      type: ActionType.REQUEST_CORRECTION,
-      label: {
-        defaultMessage: 'Request correction',
-        description: 'Action label',
-        id: 'event.childOnboarding.action.requestCorrection.label'
-      },
-      flags: [],
-      correctionForm: {
+const correctableChildOnboardingEvent: EventConfig = withDeclaration(
+  {
+    ...ChildOnboardingEvent,
+    // A plain literal, not `field('child.dob')` — the story seeds this config
+    // directly into IndexedDB (bypassing the network boundary that would
+    // otherwise strip `field()`'s attached methods), which chokes on them.
+    dateOfEvent: { $$field: 'child.dob', $$subfield: [] },
+    actions: [
+      ...ChildOnboardingEvent.actions,
+      {
+        type: ActionType.REQUEST_CORRECTION,
         label: {
           defaultMessage: 'Request correction',
-          description: 'Correction form label',
-          id: 'event.childOnboarding.action.requestCorrection.form.label'
+          description: 'Action label',
+          id: 'event.childOnboarding.action.requestCorrection.label'
         },
-        pages: [
-          {
-            id: 'correction-requester',
-            type: PageTypes.enum.FORM,
-            title: {
-              defaultMessage: 'Correction requester',
-              description: 'Page title',
-              id: 'event.childOnboarding.action.requestCorrection.form.section.corrector'
-            },
-            requireCompletionToContinue: false,
-            fields: []
-          }
-        ]
+        flags: [],
+        correctionForm: {
+          label: {
+            defaultMessage: 'Request correction',
+            description: 'Correction form label',
+            id: 'event.childOnboarding.action.requestCorrection.form.label'
+          },
+          pages: [
+            {
+              id: 'correction-requester',
+              type: PageTypes.enum.FORM,
+              title: {
+                defaultMessage: 'Correction requester',
+                description: 'Page title',
+                id: 'event.childOnboarding.action.requestCorrection.form.section.corrector'
+              },
+              requireCompletionToContinue: false,
+              fields: []
+            }
+          ]
+        }
       }
-    }
-  ],
-  declaration: {
-    ...ChildOnboardingEvent.declaration,
-    pages: ChildOnboardingEvent.declaration.pages.map((page) =>
+    ]
+  },
+  {
+    ...getDeclaration(ChildOnboardingEvent),
+    pages: getDeclarationPages(ChildOnboardingEvent).map((page) =>
       page.id === 'child'
         ? {
             ...page,
@@ -143,7 +151,7 @@ const correctableChildOnboardingEvent: EventConfig = {
         : page
     )
   }
-}
+)
 
 // A birth in 1995 — well before the facility's 2023 rename.
 const declarationOverrides = {
@@ -170,12 +178,16 @@ const mockUserFull = generator.user.registrationAgent().v2
 const mswConfig = {
   handlers: {
     events: [
-      tRPCMsw.event.config.get.query(() => [correctableChildOnboardingEvent])
+      tRPCMsw.event.config.get.query(() => [
+        toVersionedEventConfig(correctableChildOnboardingEvent)
+      ])
     ],
     event: [tRPCMsw.event.get.query(() => birthEventDocument)],
     eventLocations: [
-      tRPCMsw.locations.list.query(() => [RENAMED_FACILITY]),
-      tRPCMsw.administrativeAreas.list.query(() => [])
+      ...locationListHandlers({
+        locations: [RENAMED_FACILITY],
+        administrativeAreas: []
+      })
     ],
     user: [
       tRPCMsw.user.list.query(() => [mockUser]),
@@ -267,12 +279,16 @@ const birthEventDocumentPostRename = generateEventDocument({
 const mswConfigPostRename = {
   handlers: {
     events: [
-      tRPCMsw.event.config.get.query(() => [correctableChildOnboardingEvent])
+      tRPCMsw.event.config.get.query(() => [
+        toVersionedEventConfig(correctableChildOnboardingEvent)
+      ])
     ],
     event: [tRPCMsw.event.get.query(() => birthEventDocumentPostRename)],
     eventLocations: [
-      tRPCMsw.locations.list.query(() => [RENAMED_FACILITY]),
-      tRPCMsw.administrativeAreas.list.query(() => [])
+      ...locationListHandlers({
+        locations: [RENAMED_FACILITY],
+        administrativeAreas: []
+      })
     ],
     user: [
       tRPCMsw.user.list.query(() => [mockUser]),

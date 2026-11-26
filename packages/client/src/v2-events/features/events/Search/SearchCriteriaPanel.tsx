@@ -13,7 +13,7 @@ import { defineMessages, useIntl } from 'react-intl'
 import { useNavigate } from 'react-router-dom'
 import styled from 'styled-components'
 import { capitalize } from 'lodash'
-import { Pill, Link as StyledLink } from '@opencrvs/components/lib'
+import { Pill, Link as StyledLink } from '@opencrvs/components'
 import {
   EventConfig,
   EventState,
@@ -25,6 +25,7 @@ import { ROUTES } from '@client/v2-events/routes'
 import { filterEmptyValues } from '@client/v2-events/utils'
 import { ValueOutput } from '@client/v2-events/features/events/components/Output'
 import { useAdminStructure } from '@client/v2-events/hooks/useAdminStructure'
+import { useSearchableFields } from '@client/v2-events/features/events/useEventConfiguration'
 import { getSearchParamsFieldConfigs, serializeSearchParams } from './utils'
 
 const messagesToDefine = {
@@ -43,16 +44,17 @@ const messagesToDefine = {
 const messages = defineMessages(messagesToDefine)
 
 const SearchParamContainer = styled.div`
-  margin: 16px 0px;
+  margin: 16px 16px 16px 0;
   display: flex;
   gap: 10px;
   flex-wrap: wrap;
   align-items: center;
   color: ${({ theme }) => theme.colors.primaryDark};
-  @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
-    max-height: 200px;
-    overflow-y: scroll;
-  }
+`
+
+/* A search criterion can be long, so its label wraps inside the pill. */
+const SearchParamPill = styled(Pill)`
+  white-space: normal;
 `
 
 function convertPathToLabel(path?: string): string {
@@ -104,7 +106,14 @@ function SearchParamLabel({
       {':'} {valueOutput}
     </>
   )
-  return <Pill key={field.id} label={output} size="small" type="default"></Pill>
+  return (
+    <SearchParamPill
+      key={field.id}
+      label={output}
+      size="small"
+      type="default"
+    ></SearchParamPill>
+  )
 }
 
 export function SearchCriteriaPanel({
@@ -118,20 +127,22 @@ export function SearchCriteriaPanel({
   const intl = useIntl()
 
   const adminStructure = useAdminStructure()
-  const searchFieldConfigs = getSearchParamsFieldConfigs(
+  const getSearchableFields = useSearchableFields()
+  const searchFieldConfigs = getSearchParamsFieldConfigs({
     eventConfig,
-    formValues,
-    adminStructure
-  )
+    searchParams: formValues,
+    adminStructure,
+    fields: getSearchableFields(eventConfig.id)
+  })
   return (
     <>
       <SearchParamContainer>
-        <Pill
+        <SearchParamPill
           key={messagesToDefine.event.id}
           label={`${intl.formatMessage(messagesToDefine.event)}: ${convertPathToLabel(eventConfig.id)}`}
           size="small"
           type="default"
-        ></Pill>
+        ></SearchParamPill>
         {Object.entries(formValues).map(([key, value]) => (
           <SearchParamLabel
             key={key}

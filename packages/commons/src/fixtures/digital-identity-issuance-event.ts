@@ -8,6 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
+import { resolveEventConfig } from '../events/EventConfig'
 import { defineConfig } from '../events/defineConfig'
 import { ActionType } from '../events/ActionType'
 import { PageTypes } from '../events/PageConfig'
@@ -216,7 +217,7 @@ const digitalIdentityForm = defineDeclarationForm({
 /**
  * @knipignore
  */
-export const digitalIdentityEvent = defineConfig({
+export const versionedDigitalIdentityEvent = defineConfig({
   id: 'digital-identity',
   label: {
     defaultMessage: 'Digital identity issuance',
@@ -231,6 +232,23 @@ export const digitalIdentityEvent = defineConfig({
   summary: { fields: [] },
   actions: [
     {
+      type: ActionType.DECLARE,
+      label: {
+        defaultMessage: 'Declare',
+        description:
+          'This is shown as the action name anywhere the user can trigger the action from',
+        id: 'event.digital-identity.action.declare.label'
+      },
+      review: {
+        title: {
+          defaultMessage: 'Digital identity issuance',
+          description: 'Title of the review page',
+          id: 'event.digital-identity.action.declare.form.review.title'
+        },
+        fields: []
+      }
+    },
+    {
       type: ActionType.PRINT_CERTIFICATE,
       label: {
         id: 'event.football-club-membership.action.collect-certificate.label',
@@ -243,3 +261,8 @@ export const digitalIdentityEvent = defineConfig({
   ],
   declaration: digitalIdentityForm
 })
+
+/** The configuration of the first version of `versionedDigitalIdentityEvent`. */
+export const digitalIdentityEvent = resolveEventConfig(
+  versionedDigitalIdentityEvent
+)

@@ -26,8 +26,13 @@ import {
   defineDeclarationForm,
   generateUuid,
   generateActionDocument,
+  generateActionDocuments,
   generateTranslationConfig,
-  FieldUpdateValue
+  FieldUpdateValue,
+  withDeclaration,
+  getDeclaration,
+  toVersionedEventConfig,
+  INITIAL_EVENT_CONFIG_VERSION_ID
 } from '@opencrvs/commons/client'
 import { ROUTES } from '@client/v2-events/routes'
 import { AppRouter } from '@client/v2-events/trpc'
@@ -66,11 +71,13 @@ const recommenderOtherThanClubMembers = and(
   not(field('recommender.relation').isFalsy())
 )
 
-const overriddenEventConfig = {
-  ...tennisClubMembershipEvent,
-  id: 'death', // use an existing event id, so that permissions to it are in scopes
-  declaration: defineDeclarationForm({
-    ...tennisClubMembershipEvent.declaration,
+const overriddenEventConfig = withDeclaration(
+  {
+    ...tennisClubMembershipEvent,
+    id: 'death' // use an existing event id, so that permissions to it are in scopes
+  },
+  defineDeclarationForm({
+    ...getDeclaration(tennisClubMembershipEvent),
     pages: [
       {
         id: 'recommender',
@@ -161,11 +168,12 @@ const overriddenEventConfig = {
       }
     ]
   })
-}
+)
 
 // --- Event data ---
 const overriddenEvent = {
   trackingId: generateUuid(),
+  configVersionId: INITIAL_EVENT_CONFIG_VERSION_ID,
   type: overriddenEventConfig.id,
   id: generateUuid(),
   createdAt: new Date().toISOString(),
@@ -175,7 +183,7 @@ const overriddenEvent = {
       configuration: overriddenEventConfig,
       action: ActionType.CREATE
     }),
-    generateActionDocument({
+    ...generateActionDocuments({
       configuration: overriddenEventConfig,
       action: ActionType.DECLARE,
       defaults: {
@@ -186,7 +194,7 @@ const overriddenEvent = {
         }
       }
     }),
-    generateActionDocument({
+    ...generateActionDocuments({
       configuration: overriddenEventConfig,
       action: ActionType.REGISTER,
       defaults: { declaration: {} }
@@ -204,7 +212,7 @@ const draft = generator.event.draft({
 export const CleanedUpCorrectionPayload: Story = {
   beforeEach: () => {
     useEventFormData.setState({ formValues: {} })
-    addLocalEventConfig(overriddenEventConfig)
+    addLocalEventConfig(toVersionedEventConfig(overriddenEventConfig))
     setEventData(overriddenEvent.id, overriddenEvent)
   },
   loaders: [
@@ -259,7 +267,11 @@ export const CleanedUpCorrectionPayload: Story = {
     },
     msw: {
       handlers: {
-        events: [tRPCMsw.event.config.get.query(() => [overriddenEventConfig])],
+        events: [
+          tRPCMsw.event.config.get.query(() => [
+            toVersionedEventConfig(overriddenEventConfig)
+          ])
+        ],
         event: [tRPCMsw.event.get.query(() => overriddenEvent)],
         actions: [
           tRPCMsw.event.actions.correction.request.request.mutation(
@@ -279,7 +291,7 @@ export const CleanedUpCorrectionPayload: Story = {
                 ...overriddenEvent,
                 actions: [
                   ...overriddenEvent.actions,
-                  generateActionDocument({
+                  ...generateActionDocuments({
                     configuration: overriddenEventConfig,
                     action: ActionType.REQUEST_CORRECTION,
                     defaults: {
@@ -301,7 +313,7 @@ export const CleanedUpCorrectionPayload: Story = {
             ...overriddenEvent,
             actions: [
               ...overriddenEvent.actions,
-              generateActionDocument({
+              ...generateActionDocuments({
                 configuration: overriddenEventConfig,
                 action: ActionType.APPROVE_CORRECTION
               })

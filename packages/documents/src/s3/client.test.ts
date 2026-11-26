@@ -1,0 +1,349 @@
+/*
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at https://mozilla.org/MPL/2.0/.
+ *
+ * OpenCRVS is also distributed under the terms of the Civil Registration
+ * & Healthcare Disclaimer located at http://opencrvs.org/license.
+ *
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
+ */
+import { randomUUID } from 'crypto'
+import {
+  BucketAlreadyOwnedByYou,
+  CreateMultipartUploadCommand,
+  DeleteBucketCommand,
+  PutBucketPolicyCommand,
+  PutObjectCommand,
+  S3Client,
+  S3ServiceException
+} from '@aws-sdk/client-s3'
+import {
+  ensureDefaultBucket,
+  ensureDefaultBucketIsPrivate,
+  listObjectKeys,
+  putObject,
+  removeObject,
+  removeObjects,
+  statObjectIfExists
+} from '@documents/s3/client'
+import { env } from '@documents/s3/constants'
+import { Readable } from 'stream'
+import { getObject, s3 } from '../../test/s3'
+
+/*
+ * These tests run against the RustFS that test/global-setup.ts starts. The
+ * spy passes every request through to it, except where a test makes the store
+ * fail in a way that a real store cannot be made to.
+ */
+const send = jest.spyOn(S3Client.prototype, 'send') as unknown as jest.Mock
+
+/** The shape the AWS SDK gives to an error that it has no class for. */
+const storeError = (name: string, httpStatusCode: number) =>
+  new S3ServiceException({
+    name,
+    message: name,
+    $fault: httpStatusCode < 500 ? 'client' : 'server',
+    $metadata: { httpStatusCode }
+  })
+
+const sentCommands = (type: new (...args: never[]) => unknown) =>
+  send.mock.calls.map(([command]) => command).filter((c) => c instanceof type)
+
+/** A record's prefix, shaped like the ones the service stores attachments under. */
+const newPrefix = () => `events/${randomUUID()}/`
+
+const anonymousGet = (key: string) =>
+  fetch(`${env.S3_ENDPOINT}/${env.S3_BUCKET}/${key}`)
+
+beforeEach(async () => {
+  await ensureDefaultBucket()
+})
+
+beforeEach(() => {
+  send.mockClear()
+})
+
+afterAll(() => {
+  send.mockRestore()
+})
+
+describe('ensureDefaultBucket', () => {
+  it('creates the bucket when it does not exist', async () => {
+    // The bucket of this test holds nothing yet, so the store lets it be deleted
+    await s3.send(new DeleteBucketCommand({ Bucket: env.S3_BUCKET }))
+
+    await ensureDefaultBucket()
+
+    const key = `${newPrefix()}a.png`
+    await putObject(key, Buffer.from('content'))
+    expect(await statObjectIfExists(key)).not.toBeNull()
+  })
+
+  it('keeps what an existing bucket holds', async () => {
+    const key = `${newPrefix()}a.png`
+    await putObject(key, Buffer.from('content'))
+
+    await ensureDefaultBucket()
+
+    expect(await statObjectIfExists(key)).not.toBeNull()
+  })
+
+  it('accepts a bucket that another replica created first', async () => {
+    // The check runs before the other replica creates the bucket. RustFS
+    // answers 200 to the create.
+    send.mockRejectedValueOnce(storeError('NotFound', 404))
+
+    await expect(ensureDefaultBucket()).resolves.toBeUndefined()
+  })
+
+  it('accepts a store that answers that another replica created the bucket first', async () => {
+    // What MinIO and SeaweedFS answer
+    send.mockRejectedValueOnce(storeError('NotFound', 404))
+    send.mockRejectedValueOnce(
+      new BucketAlreadyOwnedByYou({ message: 'owned', $metadata: {} })
+    )
+
+    await expect(ensureDefaultBucket()).resolves.toBeUndefined()
+  })
+
+  it('fails when the store refuses to say whether the bucket exists', async () => {
+    send.mockRejectedValueOnce(storeError('Forbidden', 403))
+
+    await expect(ensureDefaultBucket()).rejects.toThrow('Forbidden')
+  })
+
+  it('fails when the bucket could not be created', async () => {
+    send.mockRejectedValueOnce(storeError('NotFound', 404))
+    send.mockRejectedValueOnce(new Error('store is unreachable'))
+
+    await expect(ensureDefaultBucket()).rejects.toThrow('store is unreachable')
+  })
+})
+
+describe('ensureDefaultBucketIsPrivate', () => {
+  it('removes any bucket policy so nothing is served anonymously', async () => {
+    const key = `${newPrefix()}a.png`
+    await putObject(key, Buffer.from('content'))
+    await s3.send(
+      new PutBucketPolicyCommand({
+        Bucket: env.S3_BUCKET,
+        Policy: JSON.stringify({
+          Version: '2012-10-17',
+          Statement: [
+            {
+              Effect: 'Allow',
+              Principal: { AWS: ['*'] },
+              Action: ['s3:GetObject'],
+              Resource: [`arn:aws:s3:::${env.S3_BUCKET}/*`]
+            }
+          ]
+        })
+      })
+    )
+    expect((await anonymousGet(key)).status).toBe(200)
+
+    await ensureDefaultBucketIsPrivate()
+
+    expect((await anonymousGet(key)).status).toBe(403)
+  })
+
+  it('can run again on a bucket that is already private', async () => {
+    await ensureDefaultBucketIsPrivate()
+
+    await expect(ensureDefaultBucketIsPrivate()).resolves.toBeUndefined()
+  })
+
+  it('accepts a store that answers that there is no policy to remove', async () => {
+    // What SeaweedFS answers. RustFS and MinIO answer 204.
+    send.mockRejectedValueOnce(storeError('NoSuchBucketPolicy', 404))
+
+    await expect(ensureDefaultBucketIsPrivate()).resolves.toBeUndefined()
+  })
+
+  it('fails when the policy could not be removed', async () => {
+    send.mockRejectedValueOnce(storeError('AccessDenied', 403))
+
+    await expect(ensureDefaultBucketIsPrivate()).rejects.toThrow('AccessDenied')
+  })
+})
+
+describe('statObjectIfExists', () => {
+  it('returns the user metadata of an existing object', async () => {
+    const key = `${newPrefix()}a.png`
+    await putObject(key, Buffer.from('content'), {
+      metadata: { 'created-by': 'user-1' }
+    })
+
+    expect(await statObjectIfExists(key)).toEqual({
+      metadata: { 'created-by': 'user-1' }
+    })
+  })
+
+  it('returns empty metadata for an object that has none', async () => {
+    const key = `${newPrefix()}a.png`
+    await putObject(key, Buffer.from('content'))
+
+    expect(await statObjectIfExists(key)).toEqual({ metadata: {} })
+  })
+
+  it('returns null for a key that does not exist', async () => {
+    expect(await statObjectIfExists(`${newPrefix()}a.png`)).toBeNull()
+  })
+
+  it('returns null when a store answers a bare 404', async () => {
+    // What some stores other than AWS S3 and RustFS answer
+    send.mockRejectedValueOnce(storeError('UnknownError', 404))
+
+    expect(await statObjectIfExists('a.png')).toBeNull()
+  })
+
+  it('does not mistake a store failure for a missing object', async () => {
+    send.mockRejectedValueOnce(storeError('InternalError', 500))
+
+    await expect(statObjectIfExists('a.png')).rejects.toThrow('InternalError')
+  })
+})
+
+describe('putObject', () => {
+  it('stores the body with its content type and user metadata', async () => {
+    const key = `${newPrefix()}a.png`
+
+    await putObject(key, Buffer.from('content'), {
+      contentType: 'image/png',
+      metadata: { 'created-by': 'user-1' }
+    })
+
+    expect(await getObject(key)).toEqual({
+      contentType: 'image/png',
+      metadata: { 'created-by': 'user-1' },
+      body: 'content'
+    })
+  })
+
+  it('leaves the content type to the store when none is given', async () => {
+    await putObject(`${newPrefix()}a.png`, Buffer.from('content'))
+
+    const [put] = sentCommands(PutObjectCommand) as PutObjectCommand[]
+    expect(put.input.ContentType).toBeUndefined()
+    expect(put.input.Metadata).toEqual({})
+  })
+
+  it('fails when the upload fails', async () => {
+    send.mockRejectedValueOnce(storeError('InternalError', 500))
+
+    await expect(
+      putObject(`${newPrefix()}a.png`, Buffer.from('content'))
+    ).rejects.toThrow('InternalError')
+  })
+
+  it('streams a large body of unknown length as a multipart upload', async () => {
+    const key = `${newPrefix()}large.pdf`
+    // Larger than one 5 MB part
+    const part = Buffer.alloc(1024 * 1024, 'a')
+    const body = Readable.from(Array.from({ length: 6 }, () => part))
+
+    await putObject(key, body, { contentType: 'application/pdf' })
+
+    expect(sentCommands(CreateMultipartUploadCommand)).toHaveLength(1)
+    const stored = await getObject(key)
+    expect(stored.body).toHaveLength(6 * part.length)
+    expect(stored.contentType).toBe('application/pdf')
+  })
+})
+
+describe('removeObject', () => {
+  it('deletes the key from the bucket', async () => {
+    const key = `${newPrefix()}a.png`
+    await putObject(key, Buffer.from('content'))
+
+    await removeObject(key)
+
+    expect(await statObjectIfExists(key)).toBeNull()
+  })
+})
+
+describe('removeObjects', () => {
+  const keys = (prefix: string, count: number) =>
+    Array.from({ length: count }, (_, index) => `${prefix}${index}.png`)
+
+  const deleteErrors = (failedKeys: string[]) => ({
+    Errors: failedKeys.map((Key) => ({ Key, Code: 'AccessDenied' }))
+  })
+
+  it('accepts an empty list', async () => {
+    // A store refuses a delete request that names no key
+    await expect(removeObjects([])).resolves.toBeUndefined()
+  })
+
+  it('deletes more than 1000 keys, the most one delete request accepts', async () => {
+    const prefix = newPrefix()
+    const toDelete = keys(prefix, 2500)
+
+    // S3 gives OK with 'deleting' files that have never existed, so lets only add 2 real keys
+    await putObject(toDelete[0], Buffer.from(''))
+    await putObject(toDelete[2499], Buffer.from(''))
+
+    // ...and then 'delete' 2500 keys
+    await removeObjects(toDelete)
+
+    expect(await listObjectKeys(prefix)).toEqual([])
+  })
+
+  it('fails when the store could not delete a key', async () => {
+    send.mockResolvedValueOnce(deleteErrors(['events/e1/0.png']))
+
+    await expect(removeObjects(keys('events/e1/', 2))).rejects.toThrow(
+      'Failed to delete 1 object(s), the first of them: events/e1/0.png (AccessDenied)'
+    )
+  })
+
+  it('deletes the remaining keys after some could not be deleted, then fails', async () => {
+    const prefix = newPrefix()
+    const toDelete = keys(prefix, 2500)
+    await putObject(toDelete[1500], Buffer.from(''))
+    await putObject(toDelete[2499], Buffer.from(''))
+    send.mockResolvedValueOnce(deleteErrors(toDelete.slice(0, 15)))
+
+    const error = await removeObjects(toDelete).catch((e: Error) => e)
+
+    expect(await listObjectKeys(prefix)).toEqual([])
+    expect(error).toBeInstanceOf(Error)
+    expect((error as Error).message).toMatch(/^Failed to delete 15 object\(s\)/)
+    // Names only the first ten, so a large sweep does not make a huge message
+    expect((error as Error).message).toContain(`${prefix}9.png`)
+    expect((error as Error).message).not.toContain(`${prefix}10.png`)
+  })
+})
+
+describe('listObjectKeys', () => {
+  it('lists every key under the prefix, at any depth', async () => {
+    const prefix = newPrefix()
+    await putObject(`${prefix}a.png`, Buffer.from(''))
+    await putObject(`${prefix}nested/b.png`, Buffer.from(''))
+    await putObject(`${newPrefix()}elsewhere.png`, Buffer.from(''))
+
+    const found = await listObjectKeys(prefix)
+
+    expect(found.sort()).toEqual([`${prefix}a.png`, `${prefix}nested/b.png`])
+  })
+
+  it('lists more keys than fit on one page', async () => {
+    const prefix = newPrefix()
+    // A page holds at most 1000 keys
+    const stored = Array.from({ length: 1001 }, (_, i) => `${prefix}${i}.png`)
+    await Promise.all(
+      stored.map((Key) =>
+        s3.send(new PutObjectCommand({ Bucket: env.S3_BUCKET, Key, Body: '' }))
+      )
+    )
+
+    const found = await listObjectKeys(prefix)
+
+    expect(found.sort()).toEqual(stored.sort())
+  })
+
+  it('returns nothing for a prefix that holds no object', async () => {
+    expect(await listObjectKeys(newPrefix())).toEqual([])
+  })
+})

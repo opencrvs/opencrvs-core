@@ -13,7 +13,7 @@ import React from 'react'
 import { useTypedParams } from 'react-router-typesafe-routes/dom'
 import { useIntl } from 'react-intl'
 import { Frame } from '@opencrvs/components'
-import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
+import { useEventConfigurationForRecord } from '@client/v2-events/features/events/useEventConfiguration'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
 import { SuspenseLoadingFallback } from '@client/v2-events/components/SuspenseLoadingFallback'
 import { FormHeader } from './FormHeader'
@@ -39,10 +39,9 @@ export function FormLayout({
   const intl = useIntl()
   const { eventId } = useTypedParams(route)
   const events = useEvents()
-  const event = events.getEvent.getFromCache(eventId)
-  const { eventConfiguration: configuration } = useEventConfiguration(
-    event.type
-  )
+  const event = events.getEvent.useGetEventFromCache(eventId)
+  const { eventConfiguration: configuration } =
+    useEventConfigurationForRecord(event)
 
   return (
     <Frame

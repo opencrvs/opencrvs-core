@@ -11,7 +11,7 @@
 import {
   ActionType,
   DocumentPath,
-  generateActionDocument,
+  generateActionDocuments,
   tennisClubMembershipEvent
 } from '@opencrvs/commons/client'
 import { getFilepathsFromActionDocument } from './cache'
@@ -19,7 +19,7 @@ import { getFilepathsFromActionDocument } from './cache'
 describe('getFilepathsFromActionDocument', () => {
   test('extracts document and signature filepaths', () => {
     const filepaths = getFilepathsFromActionDocument([
-      generateActionDocument({
+      ...generateActionDocuments({
         configuration: tennisClubMembershipEvent,
         action: ActionType.DECLARE,
         defaults: {

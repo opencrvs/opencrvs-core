@@ -9,6 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
+import { INITIAL_EVENT_CONFIG_VERSION_ID } from '../events/EventConfig'
 import { validate, compileClientFunction } from './validate'
 import {
   user,
@@ -28,9 +29,10 @@ import { ActionType } from '../events/ActionType'
 import { ActionStatus, EventState } from '../events/ActionDocument'
 import { field } from '../events/field'
 import { event } from '../events/event'
-import { EncodedScope, TokenUserType } from '../authentication'
+import { EncodedScope, TokenUserType } from '../users/authentication'
 import { UUID } from '../uuid'
 import { EventStatus, InherentFlags } from '../client'
+import { getEventWithCompleteAcceptedActions } from '../events/utils'
 
 /* eslint-disable max-lines */
 const DEFAULT_FORM = {
@@ -1050,7 +1052,7 @@ describe('"flag" conditionals', () => {
       $online: true
     } satisfies EventStateConditionalParameters
 
-    expect(validate(flag(InherentFlags.INCOMPLETE), params)).toBe(false)
+    expect(validate(flag(InherentFlags.REJECTED), params)).toBe(false)
     expect(validate(flag(InherentFlags.CORRECTION_REQUESTED), params)).toBe(
       true
     )
@@ -1119,6 +1121,7 @@ describe('"event" conditionals', () => {
         id: '123' as UUID,
         type: 'birth',
         trackingId: 'TEST12',
+        configVersionId: INITIAL_EVENT_CONFIG_VERSION_ID,
         createdAt: now,
         updatedAt: now,
         actions: [
@@ -1156,6 +1159,7 @@ describe('"event" conditionals', () => {
         id: '123' as UUID,
         type: 'birth',
         trackingId: 'TEST12',
+        configVersionId: INITIAL_EVENT_CONFIG_VERSION_ID,
         createdAt: now,
         updatedAt: now,
         actions: [
@@ -1261,6 +1265,430 @@ describe('"event" conditionals', () => {
         )
       ).toBe(false)
     })
+
+    it('counts a Requested and Accepted pair as a single action', () => {
+      const [acceptedPrint] = baseEvent.$event.actions
+      const requestedPrint = {
+        ...acceptedPrint,
+        id: 'a0' as UUID,
+        status: ActionStatus.Requested
+      }
+      const eventWithOnePrint = {
+        ...baseEvent,
+        $event: {
+          ...baseEvent.$event,
+          actions: [
+            requestedPrint,
+            { ...acceptedPrint, originalActionId: requestedPrint.id }
+          ]
+        }
+      }
+
+      expect(
+        validate(
+          event.hasAction(ActionType.PRINT_CERTIFICATE).minCount(2),
+          eventWithOnePrint
+        )
+      ).toBe(false)
+      expect(
+        validate(
+          event.hasAction(ActionType.PRINT_CERTIFICATE).maxCount(1),
+          eventWithOnePrint
+        )
+      ).toBe(true)
+    })
+
+    it('does not count pending or rejected actions', () => {
+      const [print] = baseEvent.$event.actions
+      const eventWithoutAcceptedPrint = {
+        ...baseEvent,
+        $event: {
+          ...baseEvent.$event,
+          actions: [
+            { ...print, status: ActionStatus.Requested },
+            { ...print, id: 'a2' as UUID, status: ActionStatus.Rejected }
+          ]
+        }
+      }
+
+      expect(
+        validate(
+          event.hasAction(ActionType.PRINT_CERTIFICATE),
+          eventWithoutAcceptedPrint
+        )
+      ).toBe(false)
+      expect(
+        validate(
+          event.hasAction(ActionType.PRINT_CERTIFICATE).minCount(1),
+          eventWithoutAcceptedPrint
+        )
+      ).toBe(false)
+    })
+
+    describe('given a print confirmed by country config', () => {
+      const [print] = baseEvent.$event.actions
+      const requestedPrint = {
+        ...print,
+        id: 'r1' as UUID,
+        status: ActionStatus.Requested,
+        annotation: { 'collector.type': 'MOTHER' }
+      }
+      // A sync confirmation keeps the request input without its annotation.
+      const { annotation: _annotation, ...syncAcceptedPrint } = {
+        ...requestedPrint,
+        id: 'a3' as UUID,
+        status: ActionStatus.Accepted,
+        originalActionId: requestedPrint.id
+      }
+      // An async `accept` holds only what country config sent, created by the
+      // system user.
+      const asyncAcceptedPrint = {
+        id: 'a4' as UUID,
+        type: ActionType.PRINT_CERTIFICATE,
+        status: ActionStatus.Accepted,
+        originalActionId: requestedPrint.id,
+        createdAt: now,
+        transactionId: 'tx1',
+        createdByUserType: TokenUserType.enum.system,
+        createdBy: 'country-config',
+        createdAtLocation: 'loc1' as UUID,
+        declaration: {}
+      }
+      const printedOnce = (fields: Record<string, unknown>) =>
+        event
+          .hasAction(ActionType.PRINT_CERTIFICATE)
+          .withFields(fields)
+          .minCount(1)
+
+      it.each([
+        ['sync', syncAcceptedPrint],
+        ['async', asyncAcceptedPrint]
+      ])(
+        "matches the request's template, user and annotation once %s-confirmed",
+        (_, acceptedPrint) => {
+          const params = {
+            ...baseEvent,
+            $event: getEventWithCompleteAcceptedActions({
+              ...baseEvent.$event,
+              actions: [requestedPrint, acceptedPrint]
+            })
+          }
+
+          expect(
+            validate(
+              event
+                .hasAction(ActionType.PRINT_CERTIFICATE)
+                .withTemplate('TEMPLATE_1')
+                .minCount(1),
+              params
+            )
+          ).toBe(true)
+          expect(validate(printedOnce({ createdBy: 'user1' }), params)).toBe(
+            true
+          )
+          expect(
+            validate(printedOnce({ createdByRole: 'role1' }), params)
+          ).toBe(true)
+          expect(
+            validate(
+              printedOnce({ annotation: { 'collector.type': 'MOTHER' } }),
+              params
+            )
+          ).toBe(true)
+          expect(
+            validate(
+              event.hasAction(ActionType.PRINT_CERTIFICATE).maxCount(1),
+              params
+            )
+          ).toBe(true)
+        }
+      )
+    })
+  })
+})
+
+describe('date comparisons against an action', () => {
+  const DAY = 24 * 60 * 60 * 1000
+  const today = new Date()
+  const daysAgo = (n: number) => new Date(today.getTime() - n * DAY)
+  // The event happened 45 days ago; day N after it is (45 - N) days ago.
+  const dob = formatISO(daysAgo(45), { representation: 'date' })
+  const onDay = (n: number) => daysAgo(45 - n).toISOString()
+
+  const action = (
+    type: ActionType,
+    day: number,
+    extra: Record<string, unknown> = {}
+  ) => ({
+    id: `${type}-${day}` as UUID,
+    type,
+    createdAt: onDay(day),
+    createdBy: '12345',
+    createdByUserType: TokenUserType.enum.user,
+    createdByRole: 'some-role',
+    declaration: {},
+    createdAtLocation: '123456' as UUID,
+    status: ActionStatus.Accepted,
+    transactionId: '123456',
+    ...extra
+  })
+
+  const params = (actions: ReturnType<typeof action>[]) => ({
+    $now: formatISO(today, { representation: 'date' }),
+    $online: false,
+    $form: { 'child.dob': dob },
+    $event: {
+      id: '123' as UUID,
+      type: 'birth',
+      trackingId: 'TEST12',
+      createdAt: onDay(0),
+      updatedAt: onDay(0),
+      actions
+    }
+  })
+
+  const onTimeIfDeclaredWithin30Days = field('child.dob')
+    .isAfter()
+    .days(30)
+    .beforeAction(event.firstAction(ActionType.DECLARE))
+
+  it('compares against today until the action has happened', () => {
+    expect(validate(onTimeIfDeclaredWithin30Days, params([]))).toBe(false)
+  })
+
+  it('compares against the first matching action', () => {
+    expect(
+      validate(
+        onTimeIfDeclaredWithin30Days,
+        params([
+          action(ActionType.DECLARE, 10),
+          action(ActionType.REJECT, 40),
+          action(ActionType.DECLARE, 44)
+        ])
+      )
+    ).toBe(true)
+    expect(
+      validate(
+        onTimeIfDeclaredWithin30Days,
+        params([action(ActionType.DECLARE, 31)])
+      )
+    ).toBe(false)
+  })
+
+  it('compares against the last matching action', () => {
+    const lastDeclare = field('child.dob')
+      .isAfter()
+      .days(30)
+      .beforeAction(event.lastAction(ActionType.DECLARE))
+    expect(
+      validate(
+        lastDeclare,
+        params([action(ActionType.DECLARE, 10), action(ActionType.DECLARE, 44)])
+      )
+    ).toBe(false)
+  })
+
+  it('takes whichever of several action types came first', () => {
+    const notifyOrDeclare = field('child.dob')
+      .isAfter()
+      .days(30)
+      .beforeAction(event.firstAction(ActionType.NOTIFY, ActionType.DECLARE))
+    expect(
+      validate(
+        notifyOrDeclare,
+        params([action(ActionType.NOTIFY, 5), action(ActionType.DECLARE, 40)])
+      )
+    ).toBe(true)
+  })
+
+  it('matches custom actions by customActionType', () => {
+    const received = field('child.dob')
+      .isAfter()
+      .days(30)
+      .beforeAction(
+        event.firstAction({
+          type: ActionType.CUSTOM,
+          customActionType: 'RECEIVE'
+        })
+      )
+    expect(
+      validate(
+        received,
+        params([
+          action(ActionType.CUSTOM, 5, { customActionType: 'OTHER' }),
+          action(ActionType.CUSTOM, 40, { customActionType: 'RECEIVE' })
+        ])
+      )
+    ).toBe(false)
+    expect(
+      validate(
+        received,
+        params([action(ActionType.CUSTOM, 5, { customActionType: 'RECEIVE' })])
+      )
+    ).toBe(true)
+  })
+
+  it('rejects anchors that cannot match a specific action', () => {
+    // @ts-expect-error at least one action is required
+    event.firstAction()
+    // @ts-expect-error a bare CUSTOM would match every custom action
+    event.firstAction(ActionType.CUSTOM)
+    // @ts-expect-error a custom action must name its customActionType
+    event.lastAction({ type: ActionType.CUSTOM })
+    // @ts-expect-error customActionType is only for custom actions
+    event.firstAction({ type: ActionType.DECLARE, customActionType: 'X' })
+  })
+
+  /** A request and the country config's reply to it, as the events service stores them. */
+  const confirmed = (
+    type: ActionType,
+    day: number,
+    outcome: typeof ActionStatus.Accepted | typeof ActionStatus.Rejected,
+    replyDay = day
+  ) => [
+    action(type, day, { status: ActionStatus.Requested }),
+    action(type, replyDay, {
+      id: `${type}-${day}-${outcome}` as UUID,
+      status: outcome,
+      originalActionId: `${type}-${day}` as UUID
+    })
+  ]
+
+  it('skips an action that the country config rejected', () => {
+    expect(
+      validate(
+        onTimeIfDeclaredWithin30Days,
+        params([
+          ...confirmed(ActionType.DECLARE, 10, ActionStatus.Rejected),
+          ...confirmed(ActionType.DECLARE, 40, ActionStatus.Accepted)
+        ])
+      )
+    ).toBe(false)
+  })
+
+  it('skips an action that the country config has not accepted yet', () => {
+    expect(
+      validate(
+        onTimeIfDeclaredWithin30Days,
+        params([
+          action(ActionType.DECLARE, 10, { status: ActionStatus.Requested })
+        ])
+      )
+    ).toBe(false)
+  })
+
+  it('uses an action once the country config accepts it', () => {
+    expect(
+      validate(
+        onTimeIfDeclaredWithin30Days,
+        params(confirmed(ActionType.DECLARE, 10, ActionStatus.Accepted))
+      )
+    ).toBe(true)
+  })
+
+  it('uses the date of the request when the country config accepts it later', () => {
+    expect(
+      validate(
+        onTimeIfDeclaredWithin30Days,
+        params(confirmed(ActionType.DECLARE, 10, ActionStatus.Accepted, 40))
+      )
+    ).toBe(true)
+  })
+})
+
+describe('date comparisons against the local date of an action', () => {
+  // Local times, so that the tests hold in any time zone the tests run in
+  const declaredAt = (hours: number, minutes: number) =>
+    new Date(2026, 1, 10, hours, minutes).toISOString()
+
+  const params = (dob: string, createdAt?: string) => ({
+    $now: '2026-02-10',
+    $online: false,
+    $form: { 'child.dob': dob },
+    $event: {
+      id: '123' as UUID,
+      type: 'birth',
+      trackingId: 'TEST12',
+      createdAt: declaredAt(0, 0),
+      updatedAt: declaredAt(0, 0),
+      actions: createdAt
+        ? [
+            {
+              id: 'declare' as UUID,
+              type: ActionType.DECLARE,
+              createdAt,
+              createdBy: '12345',
+              createdByUserType: TokenUserType.enum.user,
+              createdByRole: 'some-role',
+              declaration: {},
+              createdAtLocation: '123456' as UUID,
+              status: ActionStatus.Accepted,
+              transactionId: '123456'
+            }
+          ]
+        : []
+    }
+  })
+
+  it('gives the same result after the action as in the form on that day', () => {
+    // After midnight local time, the UTC date is the day before in a UTC+ zone
+    const onTime = field('child.dob')
+      .isAfter()
+      .days(30)
+      .beforeAction(event.firstAction(ActionType.DECLARE))
+    const dob = '2026-01-11'
+
+    expect(validate(onTime, params(dob))).toBe(false)
+    expect(validate(onTime, params(dob, declaredAt(0, 30)))).toBe(false)
+  })
+
+  it('ignores the time of day of the action', () => {
+    const lateBy30Days = field('child.dob')
+      .isBefore()
+      .days(30)
+      .beforeAction(event.firstAction(ActionType.DECLARE))
+
+    expect(
+      validate(lateBy30Days, params('2026-01-11', declaredAt(15, 0)))
+    ).toBe(false)
+    expect(
+      validate(lateBy30Days, params('2026-01-10', declaredAt(15, 0)))
+    ).toBe(true)
+    expect(validate(lateBy30Days, params('2026-01-11'))).toBe(false)
+  })
+
+  // Declared on 2026-02-10, so the boundaries are 2026-01-11 and 2026-03-12
+  const declared = declaredAt(12, 0)
+  const declare = event.firstAction(ActionType.DECLARE)
+
+  it.each([
+    ['isAfter().days(30).beforeAction()', '2026-01-12', '2026-01-11'],
+    ['isBefore().days(30).beforeAction()', '2026-01-10', '2026-01-11'],
+    ['isAfter().days(30).afterAction()', '2026-03-13', '2026-03-12'],
+    ['isBefore().days(30).afterAction()', '2026-03-11', '2026-03-12']
+  ])('%s is true on %s and false on %s', (name, trueOn, falseOn) => {
+    const conditionals = {
+      'isAfter().days(30).beforeAction()': field('child.dob')
+        .isAfter()
+        .days(30)
+        .beforeAction(declare),
+      'isBefore().days(30).beforeAction()': field('child.dob')
+        .isBefore()
+        .days(30)
+        .beforeAction(declare),
+      'isAfter().days(30).afterAction()': field('child.dob')
+        .isAfter()
+        .days(30)
+        .afterAction(declare),
+      'isBefore().days(30).afterAction()': field('child.dob')
+        .isBefore()
+        .days(30)
+        .afterAction(declare)
+    }
+    const conditional = conditionals[name as keyof typeof conditionals]
+
+    expect(validate(conditional, params(trueOn, declared))).toBe(true)
+    expect(validate(conditional, params(falseOn, declared))).toBe(false)
   })
 })
 

@@ -161,7 +161,7 @@ export const FieldValue: z.ZodType<FieldValue> = z.union([
 ])
 
 // Priority order for schema matching.
-// When multiple schemas pass validation (safeParse succeeds),
+// When multiple schemas pass validation
 // we’ll pick the one that appears *earlier* in this list.
 //
 // Example: if both TextValue and PlainDate succeed for "2050-01-01",
@@ -206,7 +206,7 @@ function schemaPriority(schema: z.ZodTypeAny) {
 export function safeUnion<T extends [z.ZodTypeAny, ...z.ZodTypeAny[]]>(
   schemas: T
 ) {
-  // Sort once at definition time so the first successful safeParse is always
+  // Sort once at definition time so the first successful validate is always
   // the highest-priority match. This avoids trying all schemas on every value.
   const sortedSchemas = [...schemas].sort(
     (a, b) => schemaPriority(a) - schemaPriority(b)
@@ -216,7 +216,7 @@ export function safeUnion<T extends [z.ZodTypeAny, ...z.ZodTypeAny[]]>(
     .any()
     .superRefine((val, ctx) => {
       for (const schema of sortedSchemas) {
-        if (schema.safeParse(val).success) {
+        if (schema.validate(val)) {
           return
         }
       }

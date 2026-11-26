@@ -14,10 +14,19 @@ import Ajv from 'ajv/dist/2019'
 import addFormats from 'ajv-formats'
 import * as z from 'zod/v4'
 import { $ZodIssue } from 'zod/v4/core'
-import { formatISO, isAfter, isBefore } from 'date-fns'
+import { formatISO, isAfter, isBefore, parseISO } from 'date-fns'
 
-import { ConditionalParameters, JSONSchema } from './conditionals'
-import { ActionUpdate, EventState } from '../events/ActionDocument'
+import {
+  ActionDateReference,
+  ConditionalParameters,
+  isActionDateReference,
+  JSONSchema
+} from './conditionals'
+import {
+  ActionStatus,
+  ActionUpdate,
+  EventState
+} from '../events/ActionDocument'
 import { ConditionalType, FieldConditional } from '../events/Conditional'
 import { FieldConfig } from '../events/FieldConfig'
 import {
@@ -31,13 +40,18 @@ import {
   AgeValue
 } from '../events/FieldValue'
 import { TranslationConfig } from '../events/TranslationConfig'
-import { EncodedScope, ITokenPayload, TokenUserType } from '../authentication'
+import {
+  EncodedScope,
+  ITokenPayload,
+  TokenUserType
+} from '../users/authentication'
 import { UUID } from '../uuid'
 import {
   ageToDate,
   buildFormState,
   flattenFormState,
-  FormState
+  FormState,
+  getEventWithCompleteAcceptedActions
 } from '../events/utils'
 import { ActionConfig } from '../events/ActionConfig'
 import { ActionType } from '../events/ActionType'
@@ -47,6 +61,7 @@ import { EventIndex } from '../events/EventIndex'
 import { Location } from '../events/locations'
 import { SystemVariables } from '../events/TemplateConfig'
 import { getCurrentEventState } from '../events/state'
+import { isPlainDate } from '../events/PlainDate'
 
 const ajv = new Ajv({
   $data: true,
@@ -98,6 +113,38 @@ function resolveDataPath(
   }
 
   return current
+}
+
+function resolveActionDate(
+  event: EventDocument | undefined,
+  { match, occurrence }: ActionDateReference['$action']
+): string | undefined {
+  const actions = event?.actions ?? []
+  const dates = actions
+    .filter(({ status }) => status === ActionStatus.Accepted)
+    .filter((action) =>
+      match.some(
+        ({ type, customActionType }) =>
+          action.type === type &&
+          (!customActionType ||
+            ('customActionType' in action &&
+              action.customActionType === customActionType))
+      )
+    )
+    // An async accept is a second row with the time of the accept. Use the
+    // time of the original request, as getActionUpdateMetadata does.
+    .map(
+      (action) =>
+        (action.originalActionId &&
+          actions.find(({ id }) => id === action.originalActionId)
+            ?.createdAt) ||
+        action.createdAt
+    )
+    .sort()
+
+  const date = occurrence === 'first' ? dates[0] : dates[dates.length - 1]
+
+  return date && formatISO(parseISO(date), { representation: 'date' })
 }
 
 /** Returns today's date as a {@link PlainDate} (YYYY-MM-DD), device-local. */
@@ -175,7 +222,11 @@ export function buildClientFunctionContext(input: {
     // eslint-disable-next-line @typescript-eslint/no-use-before-define
     $online: isOnline(),
     $user: input.validatorContext?.user,
-    $event: input.validatorContext?.event?.document,
+    $event: input.validatorContext?.event?.document
+      ? getEventWithCompleteAcceptedActions(
+          input.validatorContext.event.document
+        )
+      : undefined,
     $leafAdminStructureLocationIds:
       input.validatorContext?.leafAdminStructureLocationIds ?? [],
     user: input.systemVariables?.user,
@@ -211,6 +262,10 @@ export function runClientFunction(
  *       }
  *    }
  * }
+ *
+ * The reference date can also be the date of an action on the event, resolved
+ * against $event. Until such an action exists, it defaults to $now:
+ *   "referenceDate": { "$action": { "match": [{ "type": "DECLARE" }], "occurrence": "first" } }
  */
 ajv.addKeyword({
   keyword: 'daysFromDate',
@@ -222,7 +277,7 @@ ajv.addKeyword({
     schema: {
       days: number
       clause: 'after' | 'before'
-      referenceDate?: string | { $data: string }
+      referenceDate?: string | { $data: string } | ActionDateReference
     },
     data: string,
     _: unknown,
@@ -251,6 +306,11 @@ ajv.addKeyword({
     }
 
     let referenceDate = schema.referenceDate
+
+    if (isActionDateReference(referenceDate)) {
+      const rootData = dataContext.rootData as { $event?: EventDocument }
+      referenceDate = resolveActionDate(rootData.$event, referenceDate.$action)
+    }
 
     if (
       referenceDate &&
@@ -329,12 +389,7 @@ export function precompileActionSchemas(eventConfigurations: EventConfig[]) {
 }
 
 function isAgeValue(value: unknown): value is AgeValue {
-  return (
-    typeof value === 'object' &&
-    value !== null &&
-    'age' in value &&
-    typeof value.age === 'number'
-  )
+  return AgeValue.validate(value)
 }
 
 function mergeWithBaseFormState(
@@ -374,24 +429,20 @@ export function validate(schema: JSONSchema, data: ConditionalParameters) {
 
   if ('$form' in data) {
     const entries = Object.entries(data.$form).map(([key, value]) => {
-      // This was previously checked with AgeValue.safeParse(), but due to performance issues we need to check "manually".
       if (!isAgeValue(value)) {
         return [key, value]
       }
 
       const age = value.age
-      const maybeAsOfDate = PlainDate.safeParse(data.$form[value.asOfDateRef])
+
+      const asOf: unknown = data.$form[value.asOfDateRef]
+      const asOfDate = isPlainDate(asOf) ? asOf : PlainDate.parse(data.$now)
 
       return [
         key,
         {
           age,
-          dob: ageToDate(
-            age,
-            maybeAsOfDate.success
-              ? maybeAsOfDate.data
-              : PlainDate.parse(data.$now)
-          )
+          dob: ageToDate(age, asOfDate)
         }
       ]
     })
@@ -693,6 +744,13 @@ export const errorMessages = {
     defaultMessage: 'Unexpected field',
     description: 'Error message when field is not expected',
     id: 'error.unexpectedField'
+  },
+  notInNotifyForm: {
+    defaultMessage:
+      'Field is not part of the notify form. Notify-only data belongs in annotation',
+    description:
+      'Error message when a notify declaration contains a field outside the notify form',
+    id: 'error.notInNotifyForm'
   },
   correctionNotAllowed: {
     defaultMessage: 'Correction not allowed for field',

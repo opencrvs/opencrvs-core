@@ -147,3 +147,36 @@ export const HistoryLinksAreLeftAligned: Story = {
     })
   }
 }
+
+/**
+ * The audit history lists the latest action first.
+ */
+export const LatestActionFirst: Story = {
+  parameters: {
+    ...auditRouteParameters,
+    chromatic: { disableSnapshot: true }
+  },
+  play: async ({ canvasElement, step }) => {
+    const getActionTitles = () =>
+      Array.from(
+        // The action title is the second cell of each row
+        canvasElement.querySelectorAll(
+          '#listTable-task-history [id^="row_"] > :nth-child(2)'
+        )
+      ).map((element) => element.textContent)
+
+    await step('Wait for the event history table to load', async () => {
+      await waitFor(async () => expect(getActionTitles()).toHaveLength(3), {
+        timeout: 10000
+      })
+    })
+
+    await step('Actions are ordered latest first', async () => {
+      await expect(getActionTitles()).toEqual([
+        'Assigned',
+        'Registered',
+        'Declared'
+      ])
+    })
+  }
+}

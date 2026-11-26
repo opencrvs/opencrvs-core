@@ -34,28 +34,29 @@ import { useUserFormState } from '@client/views/SysAdmin/Team/user/userEditor/us
 import {
   ClientLocation,
   isSelectableAtAnchor,
+  maybeUuid,
   todayISO,
   User,
   UUID
 } from '@opencrvs/commons/client'
-import { Link } from '@opencrvs/components'
-import { Button } from '@opencrvs/components/lib/Button'
-import { LinkButton } from '@opencrvs/components/lib/buttons'
 import {
+  Link,
+  Button,
   BodyContent,
   Content,
-  ContentSize
-} from '@opencrvs/components/lib/Content'
-import { Icon } from '@opencrvs/components/lib/Icon'
-import { NoWifi } from '@opencrvs/components/lib/icons'
-import { List } from '@opencrvs/components/lib/List'
-import { Pagination } from '@opencrvs/components/lib/Pagination'
-import { Pill } from '@opencrvs/components/lib/Pill'
-import { Dialog } from '@opencrvs/components/lib/Dialog'
-import { Stack } from '@opencrvs/components/lib/Stack'
-import { ITheme } from '@opencrvs/components/lib/theme'
-import { Toast } from '@opencrvs/components/lib/Toast'
-import { ToggleMenu } from '@opencrvs/components/lib/ToggleMenu'
+  ContentSize,
+  Icon,
+  List,
+  Pagination,
+  Pill,
+  Dialog,
+  Stack,
+  ITheme,
+  Toast,
+  ToggleMenu
+} from '@opencrvs/components'
+import { LinkButton } from '@opencrvs/components/legacy'
+import { NoWifi } from '@opencrvs/components/icons'
 import { parse } from 'qs'
 import { stringify } from 'querystring'
 import React, { useCallback, useState } from 'react'
@@ -174,6 +175,13 @@ const LinkButtonModified = styled(LinkButton)`
   height: 24px;
 `
 
+/* Takes the space of the menu on rows without one, so the pills line up. */
+const MenuSpace = styled.span`
+  visibility: hidden;
+`
+
+const menuIcon = <Icon name="DotsThreeVertical" color="primary" size="large" />
+
 interface SearchParams {
   locationId?: UUID
 }
@@ -267,10 +275,10 @@ function UserListComponent({ userDetails }: UserListProps) {
   const [currentPageNumber, setCurrentPageNumber] =
     useState<number>(DEFAULT_PAGE_NUMBER)
 
-  const parsedId = UUID.safeParse(locationId)
+  const maybeLocationId = maybeUuid(locationId)
 
-  const searchedLocation: ClientLocation | undefined = parsedId.success
-    ? locations.get(parsedId.data)
+  const searchedLocation: ClientLocation | undefined = maybeLocationId
+    ? locations.get(maybeLocationId)
     : undefined
 
   const deliveryMethod = window.config.USER_NOTIFICATION_DELIVERY_METHOD
@@ -478,14 +486,14 @@ function UserListComponent({ userDetails }: UserListProps) {
           justifyContent="flex-start"
         >
           <Status status={status || 'pending'} />
-          {canEditUser(user) && (
+          {canEditUser(user) ? (
             <ToggleMenu
               id={`user-item-${index}-menu`}
-              toggleButton={
-                <Icon name="DotsThreeVertical" color="primary" size="large" />
-              }
+              toggleButton={menuIcon}
               menuItems={getMenuItems(user)}
             />
+          ) : (
+            <MenuSpace aria-hidden>{menuIcon}</MenuSpace>
           )}
         </Stack>
       )
@@ -778,7 +786,7 @@ function UserListComponent({ userDetails }: UserListProps) {
   }
 
   // Block access to a location outside the user's jurisdiction
-  if (!parsedId.success || !canAccessOffice({ id: parsedId.data })) {
+  if (!maybeLocationId || !canAccessOffice({ id: maybeLocationId })) {
     return <Navigate to={routes.HOME} replace />
   }
 

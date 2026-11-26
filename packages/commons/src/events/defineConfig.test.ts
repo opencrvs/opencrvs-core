@@ -1,0 +1,558 @@
+/*
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at https://mozilla.org/MPL/2.0/.
+ *
+ * OpenCRVS is also distributed under the terms of the Civil Registration
+ * & Healthcare Disclaimer located at http://opencrvs.org/license.
+ *
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
+ */
+import { defineConfig } from './defineConfig'
+import {
+  INITIAL_EVENT_CONFIG_VERSION_ID,
+  EventConfigInput,
+  resolveEventConfig,
+  VersionedEventConfig
+} from './EventConfig'
+import { ActionType } from './ActionType'
+import { FieldType } from './FieldType'
+import { field } from './field'
+import { getActionConfig, getDeclaration } from './utils'
+import { withDeclarationField } from './test.utils'
+import { tennisClubMembershipEvent } from '../fixtures'
+
+const declaration = getDeclaration(tennisClubMembershipEvent)
+
+const declareActionIndex = tennisClubMembershipEvent.actions.findIndex(
+  (action) => action.type === ActionType.DECLARE
+)
+
+const actionsWithoutDeclaration: EventConfigInput['actions'] =
+  tennisClubMembershipEvent.actions.map((action) => {
+    if (action.type !== ActionType.DECLARE) {
+      return action
+    }
+    const { declaration: _, ...rest } = action
+    return rest
+  })
+
+/** The configuration of the only version of an event defined without `versions`. */
+function defineResolvedConfig(config: EventConfigInput) {
+  return resolveEventConfig(defineConfig(config))
+}
+
+describe('defineConfig()', () => {
+  let warn: jest.SpyInstance
+
+  beforeEach(() => {
+    warn = jest.spyOn(console, 'warn').mockImplementation(() => undefined)
+  })
+
+  afterEach(() => {
+    warn.mockRestore()
+  })
+
+  it('should keep a declaration given on the DECLARE action', () => {
+    const config = defineResolvedConfig(tennisClubMembershipEvent)
+
+    expect(getDeclaration(config)).toEqual(declaration)
+    expect(warn).not.toHaveBeenCalledWith(
+      expect.stringContaining('defines `declaration` at the top level')
+    )
+  })
+
+  it('should move a top-level declaration onto the DECLARE action', () => {
+    const config = defineResolvedConfig({
+      ...tennisClubMembershipEvent,
+      actions: actionsWithoutDeclaration,
+      declaration
+    })
+
+    expect(getDeclaration(config)).toEqual(declaration)
+    expect(config).not.toHaveProperty('declaration')
+  })
+
+  it('should warn that a top-level declaration is deprecated', () => {
+    defineConfig({
+      ...tennisClubMembershipEvent,
+      actions: actionsWithoutDeclaration,
+      declaration
+    })
+
+    expect(warn).toHaveBeenCalledWith(
+      `Event '${tennisClubMembershipEvent.id}' defines \`declaration\` at the top level, which is deprecated and will be removed in a future release. Define it on the DECLARE action instead.`
+    )
+  })
+
+  it('should throw when declaration is given both at the top level and on the DECLARE action', () => {
+    expect(() =>
+      defineConfig({ ...tennisClubMembershipEvent, declaration })
+    ).toThrow(
+      `Event '${tennisClubMembershipEvent.id}' defines \`declaration\` both at the top level and on the DECLARE action (\`actions[${declareActionIndex}].declaration\`). Define it in only one of these places.`
+    )
+  })
+
+  it('should throw when declaration is given nowhere', () => {
+    expect(() =>
+      defineConfig({
+        ...tennisClubMembershipEvent,
+        actions: actionsWithoutDeclaration
+      })
+    ).toThrow(
+      `Event '${tennisClubMembershipEvent.id}' does not define \`declaration\`. Define it either at the top level or on the DECLARE action (\`actions[${declareActionIndex}].declaration\`).`
+    )
+  })
+
+  it('should throw when there is more than one DECLARE action', () => {
+    expect(() =>
+      defineConfig({
+        ...tennisClubMembershipEvent,
+        actions: [
+          ...tennisClubMembershipEvent.actions,
+          tennisClubMembershipEvent.actions[declareActionIndex]
+        ],
+        declaration
+      })
+    ).toThrow(
+      `Event must have exactly one DECLARE action. Found 2 for event ${tennisClubMembershipEvent.id}`
+    )
+  })
+
+  it('should throw when the event has no DECLARE action', () => {
+    expect(() =>
+      defineConfig({
+        ...tennisClubMembershipEvent,
+        actions: actionsWithoutDeclaration.filter(
+          (action) => action.type !== ActionType.DECLARE
+        ),
+        declaration
+      })
+    ).toThrow(
+      `Event must have exactly one DECLARE action. Found 0 for event ${tennisClubMembershipEvent.id}`
+    )
+  })
+
+  describe('NOTIFY action', () => {
+    const notifyActionIndex = tennisClubMembershipEvent.actions.findIndex(
+      (action) => action.type === ActionType.NOTIFY
+    )
+
+    const notifyAction = tennisClubMembershipEvent.actions[notifyActionIndex]
+    if (notifyAction.type !== ActionType.NOTIFY) {
+      throw new Error('Expected the NOTIFY action')
+    }
+
+    it('should keep the configured notification form and review', () => {
+      const config = defineResolvedConfig(tennisClubMembershipEvent)
+
+      expect(
+        getActionConfig({
+          eventConfiguration: config,
+          actionType: ActionType.NOTIFY
+        })
+      ).toMatchObject({
+        notificationForm: notifyAction.notificationForm,
+        review: notifyAction.review
+      })
+    })
+
+    // Guards against defineConfig filling in NOTIFY config before EventConfig parses it
+    it.each(['notificationForm', 'review'] as const)(
+      'should throw when NOTIFY has no %s',
+      (key) => {
+        const { [key]: _omitted, ...notifyActionWithoutKey } = notifyAction
+
+        expect(() =>
+          defineConfig({
+            ...tennisClubMembershipEvent,
+            actions: tennisClubMembershipEvent.actions.map((action, index) =>
+              index === notifyActionIndex
+                ? (notifyActionWithoutKey as EventConfigInput['actions'][number])
+                : action
+            )
+          })
+        ).toThrow(`"${key}"`)
+      }
+    )
+
+    // Guards against defineConfig generating a NOTIFY action
+    it('should accept an event without a NOTIFY action, and not add one', () => {
+      const config = defineResolvedConfig({
+        ...tennisClubMembershipEvent,
+        actions: tennisClubMembershipEvent.actions.filter(
+          (action) => action.type !== ActionType.NOTIFY
+        )
+      })
+
+      expect(
+        config.actions.some((action) => action.type === ActionType.NOTIFY)
+      ).toBe(false)
+    })
+  })
+
+  describe('versions', () => {
+    const {
+      id: eventId,
+      label,
+      advancedSearch,
+      ...versionFields
+    } = tennisClubMembershipEvent
+
+    const v1 = {
+      ...versionFields,
+      id: INITIAL_EVENT_CONFIG_VERSION_ID,
+      label: { id: 'v1.label', defaultMessage: 'V1', description: 'Version 1' }
+    }
+    const v2 = {
+      ...versionFields,
+      id: 'v2',
+      label: { id: 'v2.label', defaultMessage: 'V2', description: 'Version 2' },
+      effectiveFrom: '2027-03-01'
+    }
+
+    it('should keep the label of each version', () => {
+      const config = defineConfig({
+        id: eventId,
+        label,
+        advancedSearch,
+        versions: [v1, v2]
+      })
+
+      expect(config.versions.map((version) => version.label)).toEqual([
+        v1.label,
+        v2.label
+      ])
+    })
+
+    it('should give the single version of an event without versions the label of the event', () => {
+      const config = defineConfig(tennisClubMembershipEvent)
+
+      expect(config.versions).toHaveLength(1)
+      expect(config.versions[0].label).toEqual(tennisClubMembershipEvent.label)
+    })
+
+    it('should accept two versions with distinct ids and dates', () => {
+      const config = defineConfig({
+        id: eventId,
+        label,
+        advancedSearch,
+        versions: [v1, v2]
+      })
+
+      expect(config.versions.map(({ id }) => id)).toEqual([
+        INITIAL_EVENT_CONFIG_VERSION_ID,
+        'v2'
+      ])
+      expect(config.versions[1].effectiveFrom).toBe('2027-03-01')
+      expect(config).toMatchObject({ id: eventId, label, advancedSearch })
+    })
+
+    it('should take an event without versions as one version with id `initial`, effective from the beginning of time', () => {
+      const config = defineConfig(tennisClubMembershipEvent)
+
+      expect(config.versions).toHaveLength(1)
+      expect(config.versions[0].id).toBe(INITIAL_EVENT_CONFIG_VERSION_ID)
+      expect(config.versions[0].effectiveFrom).toBe('0001-01-01')
+      expect(config).not.toHaveProperty('actions')
+    })
+
+    it('should reject two versions with the same id, naming the event and the id', () => {
+      expect(() =>
+        defineConfig({
+          id: eventId,
+          label,
+          advancedSearch,
+          versions: [v1, { ...v2, id: INITIAL_EVENT_CONFIG_VERSION_ID }]
+        })
+      ).toThrow(
+        `Event '${eventId}' has more than one version with id 'initial'. Each version must have a different id.`
+      )
+    })
+
+    it('should reject a version id with characters other than a-z, 0-9 and underscores, naming the id', () => {
+      expect(() =>
+        defineConfig({
+          id: eventId,
+          label,
+          advancedSearch,
+          versions: [v1, { ...v2, id: 'Birth-V2' }]
+        })
+      ).toThrow(
+        `Version id 'Birth-V2' must contain only lower-case letters (a-z), digits (0-9) and underscores (_).`
+      )
+    })
+
+    it('should accept a version id of lower-case letters, digits and underscores', () => {
+      expect(() =>
+        defineConfig({
+          id: eventId,
+          label,
+          advancedSearch,
+          versions: [v1, { ...v2, id: 'birth_v2_2027' }]
+        })
+      ).not.toThrow()
+    })
+
+    it('should reject a version id longer than 64 characters, naming the id', () => {
+      const id = 'v'.repeat(65)
+      expect(() =>
+        defineConfig({
+          id: eventId,
+          label,
+          advancedSearch,
+          versions: [v1, { ...v2, id }]
+        })
+      ).toThrow(`Version id '${id}' must have at most 64 characters.`)
+    })
+
+    it('should accept a version id of 64 characters', () => {
+      expect(() =>
+        defineConfig({
+          id: eventId,
+          label,
+          advancedSearch,
+          versions: [v1, { ...v2, id: 'v'.repeat(64) }]
+        })
+      ).not.toThrow()
+    })
+
+    it('should reject two versions with the same `effectiveFrom`, naming the event and the date', () => {
+      expect(() =>
+        defineConfig({
+          id: eventId,
+          label,
+          advancedSearch,
+          versions: [
+            { ...v1, effectiveFrom: '2020-01-01' },
+            { ...v2, effectiveFrom: '2020-01-01' }
+          ]
+        })
+      ).toThrow(
+        `Event '${eventId}' has more than one version with \`effectiveFrom\` '2020-01-01' ('initial', 'v2'). Each version must have a different \`effectiveFrom\`.`
+      )
+    })
+
+    it('should reject two versions without `effectiveFrom`', () => {
+      expect(() =>
+        defineConfig({
+          id: eventId,
+          label,
+          advancedSearch,
+          versions: [v1, { ...v2, effectiveFrom: undefined }]
+        })
+      ).toThrow(
+        `Event '${eventId}' has more than one version without \`effectiveFrom\` ('initial', 'v2'). At most one version may omit it.`
+      )
+    })
+
+    it('should reject an event with no version in effect today', () => {
+      expect(() =>
+        defineConfig({
+          id: eventId,
+          label,
+          advancedSearch,
+          versions: [{ ...v1, effectiveFrom: '2999-01-01' }]
+        })
+      ).toThrow(`Event '${eventId}' has no version in effect today`)
+    })
+
+    it('should reject a version until its date has begun in every time zone, as the country may be west of UTC', () => {
+      // 2026-11-04 in UTC, still 2026-11-03 in UTC−12
+      jest.useFakeTimers('modern')
+      jest.setSystemTime(new Date('2026-11-04T10:00:00.000Z'))
+      const versionsFrom = (effectiveFrom: string) => ({
+        id: eventId,
+        label,
+        advancedSearch,
+        versions: [{ ...v1, effectiveFrom }]
+      })
+
+      try {
+        expect(() => defineConfig(versionsFrom('2026-11-04'))).toThrow(
+          `Event '${eventId}' has no version in effect today (2026-11-03, UTC−12`
+        )
+        expect(() => defineConfig(versionsFrom('2026-11-03'))).not.toThrow()
+      } finally {
+        jest.useRealTimers()
+      }
+    })
+
+    it('should accept an event whose earliest version took effect in the past', () => {
+      expect(() =>
+        defineConfig({
+          id: eventId,
+          label,
+          advancedSearch,
+          versions: [{ ...v1, effectiveFrom: '2020-01-01' }, v2]
+        })
+      ).not.toThrow()
+    })
+
+    it('should report an invalid version under its index', () => {
+      const result = VersionedEventConfig.safeParse({
+        id: eventId,
+        label,
+        advancedSearch,
+        versions: [
+          v1,
+          {
+            ...v2,
+            actions: v2.actions.filter(
+              (action) => action.type !== ActionType.DECLARE
+            )
+          }
+        ]
+      })
+
+      expect(result.success).toBe(false)
+      expect(result.error?.issues).toContainEqual(
+        expect.objectContaining({ path: ['versions', 1, 'actions'] })
+      )
+    })
+
+    it('should resolve to the first version, until #13602 resolves the version from the record', () => {
+      const config = defineConfig({
+        id: eventId,
+        label,
+        advancedSearch,
+        versions: [
+          v1,
+          { ...v2, title: { ...v2.title, defaultMessage: 'Version 2' } }
+        ]
+      })
+
+      expect(resolveEventConfig(config).title).toEqual(v1.title)
+    })
+
+    it('should return the same object each time for the same version, so caches keyed on it are hit', () => {
+      const config = defineConfig({
+        id: eventId,
+        label,
+        advancedSearch,
+        versions: [v1]
+      })
+
+      expect(resolveEventConfig(config)).toBe(resolveEventConfig(config))
+    })
+
+    it('should not return a stale label from the cache after the event is refetched', () => {
+      const config = defineConfig({
+        id: eventId,
+        label,
+        advancedSearch,
+        versions: [v1]
+      })
+      const refetched = {
+        ...config,
+        label: { ...label, defaultMessage: 'Renamed' }
+      }
+
+      expect(resolveEventConfig(config).label).toEqual(label)
+      expect(resolveEventConfig(refetched).label).toEqual(refetched.label)
+    })
+
+    describe('advanced search', () => {
+      const NICKNAME_FIELD_ID = 'applicant.nickname'
+
+      function nicknameField(
+        type: typeof FieldType.TEXT | typeof FieldType.NUMBER
+      ) {
+        return {
+          id: NICKNAME_FIELD_ID,
+          type,
+          label: {
+            id: 'nickname.label',
+            defaultMessage: 'Nickname',
+            description: 'Field that the fixture does not have'
+          }
+        }
+      }
+
+      const v2WithExtraField = withDeclarationField(
+        v2,
+        nicknameField(FieldType.TEXT)
+      )
+
+      function searchingNickname(defaultValue?: string) {
+        return [
+          ...advancedSearch,
+          {
+            title: advancedSearch[1].title,
+            fields: [{ ...field(NICKNAME_FIELD_ID).exact(), defaultValue }]
+          }
+        ]
+      }
+
+      const advancedSearchWithExtraField = searchingNickname()
+
+      it('should accept a search field that only one version has', () => {
+        expect(() =>
+          defineConfig({
+            id: eventId,
+            label,
+            advancedSearch: advancedSearchWithExtraField,
+            versions: [v1, v2WithExtraField]
+          })
+        ).not.toThrow()
+      })
+
+      it('should reject a search field that no version has, naming the field', () => {
+        expect(() =>
+          defineConfig({
+            id: eventId,
+            label,
+            advancedSearch: advancedSearchWithExtraField,
+            versions: [v1, v2]
+          })
+        ).toThrow(
+          `Invalid AdvancedSearch field IDs for event ${eventId}: ${NICKNAME_FIELD_ID}`
+        )
+      })
+
+      it('should check a defaultValue against the newest version that has the field', () => {
+        const textInV1 = withDeclarationField(v1, nicknameField(FieldType.TEXT))
+        const numberInV1 = withDeclarationField(
+          v1,
+          nicknameField(FieldType.NUMBER)
+        )
+        const numberInV2 = withDeclarationField(
+          v2,
+          nicknameField(FieldType.NUMBER)
+        )
+
+        expect(() =>
+          defineConfig({
+            id: eventId,
+            label,
+            advancedSearch: searchingNickname('Ace'),
+            versions: [numberInV1, v2WithExtraField]
+          })
+        ).not.toThrow()
+
+        expect(() =>
+          defineConfig({
+            id: eventId,
+            label,
+            advancedSearch: searchingNickname('Ace'),
+            versions: [textInV1, numberInV2]
+          })
+        ).toThrow('which is not a valid NUMBER value.')
+      })
+    })
+
+    it('should reject a version field (e.g. actions) at the top level of an event with versions', () => {
+      expect(() =>
+        defineConfig({
+          id: eventId,
+          label,
+          advancedSearch,
+          actions: v1.actions,
+          versions: [v1]
+        })
+      ).toThrow(
+        `Event '${eventId}' defines \`versions\`, so \`actions\` must be defined on each version, not at the top level.`
+      )
+    })
+  })
+})

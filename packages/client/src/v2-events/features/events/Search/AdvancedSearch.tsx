@@ -11,6 +11,7 @@
 import React, { useCallback, useState } from 'react'
 import { defineMessages, useIntl } from 'react-intl'
 import { useLocation } from 'react-router-dom'
+import { useSelector } from 'react-redux'
 import {
   Content,
   ContentSize,
@@ -22,9 +23,14 @@ import {
   FieldValue,
   SearchQueryParams
 } from '@opencrvs/commons/client'
-import { useEventConfigurations } from '@client/v2-events/features/events/useEventConfiguration'
+import {
+  useEventConfigurations,
+  useSearchableFields
+} from '@client/v2-events/features/events/useEventConfiguration'
 import { useAdminStructure } from '@client/v2-events/hooks/useAdminStructure'
+import { getScope } from '@client/profile/profileSelectors'
 import { TabSearch } from './TabSearch'
+import { useUnfitSearchCriteriaNotice } from './useUnfitSearchCriteriaNotice'
 import {
   checkScopeForEventSearch,
   parseFieldSearchParams,
@@ -51,6 +57,7 @@ export function AdvancedSearch() {
   const intl = useIntl()
   const allEvents = useEventConfigurations()
   const location = useLocation()
+  const scopes = useSelector(getScope)
 
   /*
    * Deliberately not parsed with `SearchQueryParams`. Its catchall is a plain
@@ -67,31 +74,42 @@ export function AdvancedSearch() {
 
   const advancedSearchEvents = allEvents.filter(
     (event) =>
-      event.advancedSearch.length > 0 && checkScopeForEventSearch(event.id)
+      event.advancedSearch.length > 0 &&
+      checkScopeForEventSearch(event.id, scopes)
   )
 
   const adminStructure = useAdminStructure()
+  const getSearchableFields = useSearchableFields()
+  const [{ formValuesByTabId: initialFormValuesByTabId, unfitFieldIds }] =
+    useState(() => {
+      const initialState: Record<string, EventState> = {}
+      let unfit: string[] = []
+      const currentEvent = advancedSearchEvents.find(
+        (e) => e.id === searchParams.eventType
+      )
+      for (const event of advancedSearchEvents) {
+        if (currentEvent && currentEvent.id === event.id) {
+          const parsedParams = parseFieldSearchParams({
+            eventConfig: event,
+            searchParams,
+            adminStructure,
+            fields: getSearchableFields(event.id)
+          })
+          initialState[event.id] = parsedParams.values
+          unfit = parsedParams.unfitFieldIds
+        } else {
+          initialState[event.id] = {}
+        }
+      }
+      return { formValuesByTabId: initialState, unfitFieldIds: unfit }
+    })
+
+  // Warns when values of the link were left out because they no longer fit their field.
+  useUnfitSearchCriteriaNotice(unfitFieldIds)
+
   const [formValuesByTabId, setFormValuesByTabId] = useState<
     Record<string, EventState>
-  >(() => {
-    const initialState: Record<string, EventState> = {}
-    const currentEvent = advancedSearchEvents.find(
-      (e) => e.id === searchParams.eventType
-    )
-    for (const event of advancedSearchEvents) {
-      if (currentEvent && currentEvent.id === event.id) {
-        const parsedParams = parseFieldSearchParams(
-          event,
-          searchParams,
-          adminStructure
-        )
-        initialState[event.id] = parsedParams
-      } else {
-        initialState[event.id] = {}
-      }
-    }
-    return initialState
-  })
+  >(initialFormValuesByTabId)
 
   const formTabSections = advancedSearchEvents.map((a) => ({
     id: a.id,
@@ -104,6 +122,16 @@ export function AdvancedSearch() {
 
   const [activeTabId, setActiveTabId] = useState<string>(selectedTabId)
 
+  const handleFormChange = useCallback(
+    (updatedForm: Record<string, FieldValue>) => {
+      setFormValuesByTabId((prev) => ({
+        ...prev,
+        [activeTabId]: updatedForm
+      }))
+    },
+    [activeTabId]
+  )
+
   const currentEvent = allEvents.find((e) => e.id === activeTabId)
   if (!currentEvent) {
     return null
@@ -115,16 +143,6 @@ export function AdvancedSearch() {
   const handleTabClick = (tabId: string) => {
     setActiveTabId(tabId)
   }
-
-  const handleFormChange = useCallback(
-    (updatedForm: Record<string, FieldValue>) => {
-      setFormValuesByTabId((prev) => ({
-        ...prev,
-        [activeTabId]: updatedForm
-      }))
-    },
-    [activeTabId]
-  )
 
   return (
     <Content

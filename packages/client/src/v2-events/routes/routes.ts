@@ -42,6 +42,11 @@ export const ROUTES = {
                   backTo: string()
                 }
               }),
+              DOCUMENTS: route('documents', {
+                searchParams: {
+                  backTo: string()
+                }
+              }),
               AUDIT: route('audit', {
                 searchParams: {
                   backTo: string()
@@ -59,6 +64,21 @@ export const ROUTES = {
               backTo: string()
             }
           }),
+          NOTIFY: route(
+            'notify/:eventId',
+            {
+              params: { eventId: uuid().defined() },
+              searchParams: { backTo: string() }
+            },
+            {
+              REVIEW: route('review', { searchParams: { backTo: string() } }),
+              PAGES: route('pages/:pageId', {
+                params: { pageId: string() },
+                searchParams: { from: string(), backTo: string() },
+                hash: hashValues()
+              })
+            }
+          ),
           DECLARE: route(
             'declare/:eventId',
             {
@@ -166,6 +186,22 @@ export const ROUTES = {
                   from: string()
                 }
               }),
+              NEW: route(
+                'new',
+                {
+                  searchParams: {
+                    from: string()
+                  }
+                },
+                {
+                  REVIEW: route('review'),
+                  EDIT: route('edit/:pageId', {
+                    params: {
+                      pageId: string()
+                    }
+                  })
+                }
+              ),
               VIEW: route(':userId/view', {
                 params: {
                   userId: uuid().defined()
