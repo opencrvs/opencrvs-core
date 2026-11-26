@@ -34,7 +34,7 @@ export type FormConditionalContext =
 function hasEvent(
   context: FormConditionalContext
 ): context is ActionFormConditionalContext {
-  return 'eventDocument' in context && context.eventDocument !== undefined
+  return 'eventDocument' in context
 }
 
 export function findEventDocument(

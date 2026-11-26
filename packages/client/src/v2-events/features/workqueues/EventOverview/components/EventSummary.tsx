@@ -140,9 +140,9 @@ export function EventSummary({
 }) {
   const intl = useIntlFormatMessageWithFlattenedParams()
   const actionContext = useActionConditionalContext(
-    eventIndex,
-    eventDocument,
-    eventConfiguration
+    eventDocument
+      ? { eventDocument, eventConfig: eventConfiguration }
+      : { eventIndex }
   )
   const summaryForm = { declaration: event }
   const flagLabels = useFlagLabelsString(eventConfiguration, eventIndex.flags)

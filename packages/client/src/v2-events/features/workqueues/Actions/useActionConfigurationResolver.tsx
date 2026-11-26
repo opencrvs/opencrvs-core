@@ -62,9 +62,9 @@ export function useEventActionConfigurationResolver(event: EventIndex) {
   const cachedEvent = useFindEventFromCache(event.id)
   const isDownloaded = Boolean(cachedEvent.data)
   const actionContext = useActionConditionalContext(
-    event,
-    cachedEvent.data,
-    eventConfiguration
+    cachedEvent.data
+      ? { eventDocument: cachedEvent.data, eventConfig: eventConfiguration }
+      : { eventIndex: event }
   )
   const isAssigning = events.actions.assignment.assign.useIsAssigning(event.id)
   // Don't offer a review that may turn out to have nothing to show.
@@ -170,9 +170,9 @@ export function useResolveAssignmentActionConditionals(event: EventIndex) {
   const cachedEvent = useFindEventFromCache(event.id)
   const isDownloaded = Boolean(cachedEvent.data)
   const actionContext = useActionConditionalContext(
-    event,
-    cachedEvent.data,
-    eventConfiguration
+    cachedEvent.data
+      ? { eventDocument: cachedEvent.data, eventConfig: eventConfiguration }
+      : { eventIndex: event }
   )
   const isAssigning = events.actions.assignment.assign.useIsAssigning(event.id)
 

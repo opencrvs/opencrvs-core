@@ -212,11 +212,10 @@ function useEditActions(event: EventDocument) {
   const [modal, openModal] = useModal()
   const events = useEvents()
   const declaration = useEventFormData((state) => state.getFormValues())
-  const actionContext = useActionConditionalContext(
-    eventIndex,
-    event,
-    eventConfiguration
-  )
+  const actionContext = useActionConditionalContext({
+    eventDocument: event,
+    eventConfig: eventConfiguration
+  })
   const conditionalContext = useActionFormConditionalContext(
     event,
     eventConfiguration

@@ -60,11 +60,7 @@ export const DuplicateForm = ({ eventIndex }: { eventIndex: EventIndex }) => {
 
   const { eventConfiguration: configuration } =
     useEventConfigurationForRecord(eventIndex)
-  const actionContext = useActionConditionalContext(
-    eventIndex,
-    undefined,
-    configuration
-  )
+  const actionContext = useActionConditionalContext({ eventIndex })
   const form = { declaration: eventIndex.declaration }
 
   const [modal, openModal] = useModal()

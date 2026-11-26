@@ -69,26 +69,48 @@ export function useActionFormConditionalContext(
 }
 
 /**
- *  * @TODO: Fix, this should need to pass both eventIndex and eventDocument. use object as prop.
- * Returns the context for action conditionals: whether an action is visible or enabled.
- * The context uses the event document if the event is downloaded. Otherwise it uses the event index.
- *
- * @param eventIndex the event index from the server. Do not change it. Put changed values in the form.
- * @param eventDocument the event document, if the event is downloaded.
- * @param eventConfig the configuration of the version that the event was created under.
+ * The event that an action conditional reads: the event document with its configuration, or the event index.
+ * The type does not allow both.
  */
-export function useActionConditionalContext(
-  eventIndex: EventIndex,
-  eventDocument: EventDocument | undefined,
-  eventConfig: EventConfig
-): ActionConditionalContext {
+type ActionConditionalEvent =
+  | {
+      /** The event document, when the event is downloaded. */
+      eventDocument: EventDocument
+      /** The configuration of the version that the event was created under. */
+      eventConfig: EventConfig
+      eventIndex?: never
+    }
+  | {
+      /** The event index from the server. Do not change it. Put changed values in the form. */
+      eventIndex: EventIndex
+      eventDocument?: never
+      eventConfig?: never
+    }
+
+/**
+ * Returns the context for action conditionals: whether an action is visible or enabled.
+ * Give the event document when the event is downloaded. Otherwise give the event index.
+ */
+export function useActionConditionalContext({
+  eventDocument,
+  eventConfig,
+  eventIndex
+}: ActionConditionalEvent): ActionConditionalContext {
   const user = useUser()
 
-  return useMemo(
-    () =>
-      eventDocument
-        ? { eventDocument, eventConfig, user }
-        : { eventIndex, user },
-    [eventIndex, eventDocument, eventConfig, user]
-  )
+  return useMemo(() => {
+    if (eventIndex) {
+      return { eventIndex, user }
+    }
+
+    // The type makes sure that the event document comes with its configuration.
+    return {
+      eventDocument: getOrThrow(eventDocument, 'The event document is missing'),
+      eventConfig: getOrThrow(
+        eventConfig,
+        'The event configuration is missing'
+      ),
+      user
+    }
+  }, [eventIndex, eventDocument, eventConfig, user])
 }

@@ -33,11 +33,9 @@ export function useCanDirectlyRegister(event: EventDocument) {
   const userDetails = useSelector(getUserDetails)
   const { eventConfiguration } = useEventConfigurationForRecord(event)
   const currentEventIndex = getCurrentEventState(event, eventConfiguration)
-  const actionContext = useActionConditionalContext(
-    currentEventIndex,
-    undefined,
-    eventConfiguration
-  )
+  const actionContext = useActionConditionalContext({
+    eventIndex: currentEventIndex
+  })
   const declaration = useEventFormData((state) => state.getFormValues())
   const { getAnnotation } = useActionAnnotation()
   const annotation = getAnnotation()

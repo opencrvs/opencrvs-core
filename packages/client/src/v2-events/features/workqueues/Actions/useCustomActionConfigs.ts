@@ -45,9 +45,9 @@ export function useCustomActionConfigs(event: EventIndex): {
 
   const { eventConfiguration } = useEventConfigurationForRecord(event)
   const actionContext = useActionConditionalContext(
-    event,
-    cachedEvent.data,
-    eventConfiguration
+    cachedEvent.data
+      ? { eventDocument: cachedEvent.data, eventConfig: eventConfiguration }
+      : { eventIndex: event }
   )
   const userId = actionContext.user.sub
   const { customActionModal, onCustomAction } = useCustomActionModal(

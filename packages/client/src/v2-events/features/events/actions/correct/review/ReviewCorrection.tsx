@@ -275,11 +275,10 @@ export function ReviewCorrection({
   const eventIndex = getCurrentEventState(event, eventConfiguration)
 
   // @TODO: check if we should pass this as prop.
-  const actionContext = useActionConditionalContext(
-    eventIndex,
-    event,
-    eventConfiguration
-  )
+  const actionContext = useActionConditionalContext({
+    eventDocument: event,
+    eventConfig: eventConfiguration
+  })
   const actionForm = { declaration: eventIndex.declaration }
   const { isActionAllowed } = useUserAllowedActions(eventIndex)
   const [modal, openModal] = useModal()
