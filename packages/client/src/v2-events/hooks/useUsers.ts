@@ -81,7 +81,7 @@ setQueryDefaults(trpcOptionsProxy.user.list, {
       queryKey: [procedurePath, input]
     } = params[0]
 
-    const requestedIds = input.input ?? []
+    const requestedIds = input.input
 
     const cachedUserMap = new Map(
       queryClient

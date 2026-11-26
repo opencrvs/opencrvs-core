@@ -8,4 +8,6 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-export type { AppRouter } from '@opencrvs/events/src/router'
+// The routers that only other services call, with a service token.
+export type { InternalRouter } from './internalRouter'
+export type { InitialisationRouter } from './initialisation'

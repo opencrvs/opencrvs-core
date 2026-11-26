@@ -43,7 +43,12 @@ module.exports = defineConfig([
                 'Importing directly from `@opencrvs/commons` is not allowed. Use `@opencrvs/commons/client` instead.'
             }
           ],
-          patterns: ['@opencrvs/commons/*', '!@opencrvs/commons/client']
+          patterns: [
+            '@opencrvs/commons/*',
+            '!@opencrvs/commons/client',
+            // Types of the routers that only other services call
+            '@opencrvs/events/router/*'
+          ]
         }
       ],
       'react/no-unescaped-entities': 'off',
