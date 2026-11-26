@@ -1,3 +1,4 @@
+/* eslint-disable max-lines */
 /*
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -528,8 +529,8 @@ describe('runFieldValidations on a cleared (null) value', () => {
       runFieldValidations({
         field: nameField(false),
         value: null,
-        form: { 'member.name': null },
-        context: {}
+        form: { declaration: { 'member.name': null } },
+        context: generateEmptyTestConditionalContext(tennisClubMembershipEvent)
       })
     ).toEqual([])
   })
@@ -539,8 +540,8 @@ describe('runFieldValidations on a cleared (null) value', () => {
       runFieldValidations({
         field: nameField(true),
         value: null,
-        form: { 'member.name': null },
-        context: {}
+        form: { declaration: { 'member.name': null } },
+        context: generateEmptyTestConditionalContext(tennisClubMembershipEvent)
       })
     ).not.toEqual([])
   })

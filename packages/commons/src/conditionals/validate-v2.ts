@@ -14,6 +14,7 @@ import { EventConfig } from '../events/EventConfig'
 import { EventDocument } from '../events/EventDocument'
 import { EventIndex } from '../events/EventIndex'
 import { getCurrentEventState } from '../events/state'
+import { getEventWithCompleteAcceptedActions } from '../events/utils'
 import { EncodedScope, TokenUserType } from '../users/authentication'
 import { UUID } from '../uuid'
 import { isOnline, todayISO } from './validate'
@@ -69,12 +70,42 @@ export type EventConditionalContext =
   | EventIndexConditionalContext
 
 /**
+ * The event index for each event document and event configuration.
+ * The keys are weak, so an entry goes away when the document or the configuration is garbage collected.
+ *
+ * Single form may have multiple conditionals, so we cannot afford to calculate it each time.
+ */
+const eventIndexCache = new WeakMap<
+  EventDocument,
+  WeakMap<EventConfig, EventIndex>
+>()
+
+function getCachedEventIndex(
+  eventDocument: EventDocument,
+  eventConfig: EventConfig
+): EventIndex {
+  let indexesByConfig = eventIndexCache.get(eventDocument)
+  if (!indexesByConfig) {
+    indexesByConfig = new WeakMap()
+    eventIndexCache.set(eventDocument, indexesByConfig)
+  }
+
+  const cached = indexesByConfig.get(eventConfig)
+  if (cached) {
+    return cached
+  }
+
+  const eventIndex = getCurrentEventState(eventDocument, eventConfig)
+  indexesByConfig.set(eventConfig, eventIndex)
+
+  return eventIndex
+}
+
+/**
  * The flags, the status and the stored declaration of the event.
  * All cases read them through this function, so they always come from the same source.
  *
- * TODO: Add a cache for `getCurrentEventState`, with the event document as the key. https://github.com/opencrvs/opencrvs-core/issues/14485
- * With an event document, each conditional call calculates the event state again.
- * The client form evaluates conditionals for each field on each render, so the time adds up.
+ * NOTE: For an event document, the function caches the result. The same document and configuration objects give the same object. Do not change it.
  */
 export function resolveEventState(
   context: EventConditionalContext
@@ -83,7 +114,7 @@ export function resolveEventState(
     return context.eventIndex
   }
 
-  return getCurrentEventState(context.eventDocument, context.eventConfig)
+  return getCachedEventIndex(context.eventDocument, context.eventConfig)
 }
 
 /** Parameters that every context has. */
@@ -139,7 +170,10 @@ export function buildActionFormConditionalParameters(
 ): ActionFormConditionalParameters {
   return {
     ...buildCommonConditionalParameters(form, context),
-    $event: context.eventDocument,
+    // TODO: this should not affect all $events. https://github.com/opencrvs/opencrvs-core/issues/14485
+    $event: context.eventDocument
+      ? getEventWithCompleteAcceptedActions(context.eventDocument)
+      : context.eventDocument,
     $user: context.user,
     $leafAdminStructureLocationIds: context.leafAdminStructureLocationIds
   }
@@ -167,7 +201,6 @@ export function buildActionConditionalParameters(
 ): ActionConditionalParameters {
   return {
     ...buildCommonConditionalParameters(form, context),
-    $event: 'eventDocument' in context ? context.eventDocument : undefined,
     $user: context.user
   }
 }
@@ -189,7 +222,10 @@ export function buildCertificateTemplateConditionalParameters(
 ): CertificateTemplateConditionalParameters {
   return {
     ...buildCommonConditionalParameters(form, context),
+    // TODO: this should not affect all $events. https://github.com/opencrvs/opencrvs-core/issues/14485
     $event: context.eventDocument
+      ? getEventWithCompleteAcceptedActions(context.eventDocument)
+      : context.eventDocument
   }
 }
 
