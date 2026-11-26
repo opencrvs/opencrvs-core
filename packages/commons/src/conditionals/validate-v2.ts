@@ -70,8 +70,42 @@ export type EventConditionalContext =
   | EventIndexConditionalContext
 
 /**
+ * The event index for each event document and event configuration.
+ * The keys are weak, so an entry goes away when the document or the configuration is garbage collected.
+ *
+ * Single form may have multiple conditionals, so we cannot afford to calculate it each time.
+ */
+const eventIndexCache = new WeakMap<
+  EventDocument,
+  WeakMap<EventConfig, EventIndex>
+>()
+
+function getCachedEventIndex(
+  eventDocument: EventDocument,
+  eventConfig: EventConfig
+): EventIndex {
+  let indexesByConfig = eventIndexCache.get(eventDocument)
+  if (!indexesByConfig) {
+    indexesByConfig = new WeakMap()
+    eventIndexCache.set(eventDocument, indexesByConfig)
+  }
+
+  const cached = indexesByConfig.get(eventConfig)
+  if (cached) {
+    return cached
+  }
+
+  const eventIndex = getCurrentEventState(eventDocument, eventConfig)
+  indexesByConfig.set(eventConfig, eventIndex)
+
+  return eventIndex
+}
+
+/**
  * The flags, the status and the stored declaration of the event.
  * All cases read them through this function, so they always come from the same source.
+ *
+ * NOTE: For an event document, the function caches the result. The same document and configuration objects give the same object. Do not change it.
  */
 export function resolveEventState(
   context: EventConditionalContext
@@ -80,7 +114,7 @@ export function resolveEventState(
     return context.eventIndex
   }
 
-  return getCurrentEventState(context.eventDocument, context.eventConfig)
+  return getCachedEventIndex(context.eventDocument, context.eventConfig)
 }
 
 /** Parameters that every context has. */
