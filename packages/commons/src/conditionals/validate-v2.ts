@@ -190,8 +190,8 @@ export type ActionConditionalContext = EventConditionalContext & {
 }
 
 export type ActionConditionalParameters = CommonConditionalParameters & {
-  // @todo: should be stricter.
-  $event?: EventDocument
+  /** The event document, or `undefined` when the context has only an event index. The key is required, so a builder cannot leave it out. */
+  $event: EventDocument | undefined
   $user: UserConditionalContext
 }
 
@@ -201,6 +201,11 @@ export function buildActionConditionalParameters(
 ): ActionConditionalParameters {
   return {
     ...buildCommonConditionalParameters(form, context),
+    // TODO: this should not affect all $events. https://github.com/opencrvs/opencrvs-core/issues/14485
+    $event:
+      'eventDocument' in context
+        ? getEventWithCompleteAcceptedActions(context.eventDocument)
+        : undefined,
     $user: context.user
   }
 }

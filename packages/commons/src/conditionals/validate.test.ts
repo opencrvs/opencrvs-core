@@ -32,6 +32,7 @@ import {
   validateFieldInput
 } from './validate'
 import { field } from '../events/field'
+import { event } from '../events/event'
 import { flag, status } from './conditionals'
 import { ActionConfig } from '../events/ActionConfig'
 /**
@@ -544,6 +545,51 @@ describe('runFieldValidations on a cleared (null) value', () => {
         context: generateEmptyTestConditionalContext(tennisClubMembershipEvent)
       })
     ).not.toEqual([])
+  })
+})
+
+describe('isActionVisible with event.hasAction()', () => {
+  const registerConfig = {
+    type: ActionType.REGISTER,
+    label: {
+      id: 'event.action.register.label',
+      defaultMessage: 'Register',
+      description: 'Label for the register action'
+    },
+    conditionals: [
+      {
+        type: ConditionalType.SHOW,
+        conditional: event.hasAction(ActionType.DECLARE)
+      }
+    ]
+  } as ActionConfig
+
+  it('reads the actions of the event document', () => {
+    const eventDocument = generateEventDocument({
+      configuration: tennisClubMembershipEvent,
+      actions: [{ type: ActionType.CREATE }, { type: ActionType.DECLARE }]
+    })
+
+    expect(
+      isActionVisible(
+        registerConfig,
+        { declaration: {}, annotation: {} },
+        {
+          ...generateEmptyTestConditionalContext(tennisClubMembershipEvent),
+          eventDocument
+        }
+      )
+    ).toBe(true)
+  })
+
+  it('is hidden when the event document is not part of the context', () => {
+    expect(
+      isActionVisible(
+        registerConfig,
+        { declaration: {}, annotation: {} },
+        generateEmptyTestConditionalContext(tennisClubMembershipEvent)
+      )
+    ).toBe(false)
   })
 })
 
