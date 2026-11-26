@@ -6,6 +6,10 @@
 
 - The events service now validates and serializes the event configurations once and reuses the result for every request that gets them, until the configurations change. Before, each request validated and serialized the full configurations again. This could take most of the CPU of a busy events service, so that all requests were slow. [#14194](https://github.com/opencrvs/opencrvs-core/issues/14194)
 
+### Bug fixes
+
+- A print button in the form of a custom action no longer crashes when the action opens from the action menu of a record. The fix from 2.0.3 was lost when 2.0.x was merged into 2.1.x. [#13821](https://github.com/opencrvs/opencrvs-core/pull/13821)
+
 ## 2.1.3
 
 ### Security
