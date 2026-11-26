@@ -558,6 +558,7 @@ event.tennis-club-membership.action.requestCorrection.form.section.corrector,Thi
 event.tennis-club-membership.action.requestCorrection.form.section.verify,This is the title of the section,Verify their identity,Vérifier leur identité
 event.tennis-club-membership.action.requestCorrection.label,This is shown as the action name anywhere the user can trigger the action from,Request correction,Request correction
 event.tennis-club-membership.fallbackTitle,This is a fallback title if actual title resolves to empty string,No name provided,Aucun nom fourni
+event.tennis-club-membership.flag.junior-member,Flag label for an applicant who was under 18 when the application was declared,Junior member,Membre junior
 event.tennis-club-membership.label,This is what this event is referred as in the system,Tennis club membership application,Tennis club membership application
 event.tennis-club-membership.search.applicants,Applicant details search field section title,Applicant's details,Détails du demandeur
 event.tennis-club-membership.search.recommender,Recommender details search field section title,Recommender's details,Détails du référent
