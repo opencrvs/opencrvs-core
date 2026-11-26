@@ -24,7 +24,6 @@ import {
   NameFieldValue,
   isDateRangeFieldType,
   isNameFieldType,
-  isFieldVisible,
   ValidatorContext,
   flattenFormState
 } from '@opencrvs/commons/client'
@@ -34,6 +33,7 @@ import { ROUTES } from '@client/v2-events/routes'
 import { useValidatorContext } from '@client/v2-events/hooks/useValidatorContext'
 import { useDefaultValue } from '@client/v2-events/hooks/useDefaultValue'
 import { useAdminStructure } from '@client/v2-events/hooks/useAdminStructure'
+import { isFieldVisible } from '@client/v2-events/conditionals'
 import { useSearchableFields } from '@client/v2-events/features/events/useEventConfiguration'
 import {
   getAdvancedSearchFieldErrors,

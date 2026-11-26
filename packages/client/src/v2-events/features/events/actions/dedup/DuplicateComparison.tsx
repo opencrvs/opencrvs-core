@@ -23,8 +23,6 @@ import {
   getDeclaration,
   getDeclarationFields,
   getDeclarationPages,
-  isFieldDisplayedOnReview,
-  isPageVisible,
   PlainDate,
   resolveVersion,
   toPlainDate,
@@ -50,6 +48,10 @@ import { useUsers } from '@client/v2-events/hooks/useUsers'
 import { useValidatorContext } from '@client/v2-events/hooks/useValidatorContext'
 import { useLocations } from '@client/v2-events/hooks/useLocations'
 import { useAdministrativeAreas } from '@client/v2-events/hooks/useAdministrativeAreas'
+import {
+  isFieldDisplayedOnReview,
+  isPageVisible
+} from '@client/v2-events/conditionals'
 import { Output, ValueOutput } from '../../components/Output'
 import { DocumentViewer } from '../../components/DocumentViewer'
 import { duplicateMessages } from './ReviewDuplicate'

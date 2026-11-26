@@ -520,8 +520,7 @@ export const eventRouter = router({
         eventConfigs,
         versionedEventConfigs,
         user: ctx.user,
-        acceptedScopes: ctx.acceptedScopes,
-        token: ctx.token
+        acceptedScopes: ctx.acceptedScopes
       })
 
       if (ctx.user.type === 'system') {

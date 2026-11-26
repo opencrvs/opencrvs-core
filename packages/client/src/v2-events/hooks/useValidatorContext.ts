@@ -11,9 +11,13 @@
 
 import { useMemo } from 'react'
 import {
+  ActionFormConditionalContext,
+  ActionUpdate,
   EventConfig,
   EventDocument,
+  EventIndex,
   EventValidatorContext,
+  FormValues,
   getEventValidatorContext,
   getOrThrow,
   ValidatorContext
@@ -51,6 +55,42 @@ export function resolveEventValidatorContext(
   }
 
   return getEventValidatorContext(event, eventConfig)
+}
+
+/**
+ * TODO: Pass `FormValues` and `ActionFormConditionalContext` through the components, and remove these two functions. https://github.com/opencrvs/opencrvs-core/issues/14485
+ */
+export function toFormValues(
+  values: ActionUpdate,
+  context: ValidatorContext
+): FormValues {
+  // `baseFormState` holds values that the conditionals read in addition to the form values.
+  // We are deprecating baseFormState in favor of typed contexts.
+  return context.baseFormState === undefined
+    ? { declaration: values }
+    : { declaration: context.baseFormState, annotation: values }
+}
+
+/**
+ * TODO: Some forms have no event, e.g. the user form. Remove the cast when we have client specific context for forms without an event. https://github.com/opencrvs/opencrvs-core/issues/14485
+ */
+export function getFormConditionalContext(
+  context: ValidatorContext,
+  eventIndex?: Pick<EventIndex, 'flags' | 'status' | 'declaration'>
+): ActionFormConditionalContext {
+  const conditionalContext = {
+    eventDocument: context.event?.document,
+    eventIndex: eventIndex ??
+      context.event?.state ?? {
+        flags: [],
+        status: undefined,
+        declaration: {}
+      },
+    user: context.user,
+    leafAdminStructureLocationIds: context.leafAdminStructureLocationIds ?? []
+  }
+  /** TODO: Remove casting */
+  return conditionalContext as unknown as ActionFormConditionalContext
 }
 
 export function useValidatorContext(event?: EventDocument): ValidatorContext {

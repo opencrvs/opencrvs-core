@@ -11,6 +11,7 @@
 
 import {
   flattenDeep,
+  mapValues,
   omitBy,
   mergeWith,
   isArray,
@@ -43,9 +44,14 @@ import { PageConfig, PageTypes, VerificationPageConfig } from './PageConfig'
 import {
   isConditionMet,
   isFieldSecured,
-  isFieldVisible,
-  ValidatorContext
+  isFieldVisible
 } from '../conditionals/validate'
+import {
+  ActionFormConditionalContext,
+  FormValues,
+  SecuredConditionalContext,
+  AnnotationFormValues
+} from '../conditionals/validate-v2'
 import { Draft } from './Draft'
 import { EventDocument } from './EventDocument'
 import { getUUID, UUID } from '../uuid'
@@ -343,52 +349,50 @@ export function getActionReviewFields(
 
 export function isPageVisible(
   page: PageConfig,
-  formValues: ActionUpdate,
-  context: ValidatorContext
+  form: FormValues,
+  context: ActionFormConditionalContext
 ) {
   if (!page.conditional) {
     return true
   }
 
-  return isConditionMet(page.conditional, formValues, context)
+  return isConditionMet(page.conditional, form, context)
 }
 
 /**
- * Removes values from the form that correspond to hidden fields.
- * This function recursively omits any fields from the form values that are not visible
- * according to their FieldConfig and the current form state. It ensures that only values
- * for visible fields are retained, which is useful for conditional forms where hidden field
- * values should not affect validation or submission.
+ * Removes the values of hidden fields from the declaration and the annotation of the form.
+ * Only the values of `fields` are checked. Other values stay as they are.
  *
- * @template T - The type of the form values
- * @param {T} formValues - The current form values
- * @param {FieldConfig[]} fields - The list of field configurations to check visibility against
- * * @param validatorContext - custom validation context
- * @returns {Partial<T>} A new object containing only the values for visible fields
+ * A removed value can change the visibility of other fields.
+ * Thus the function removes the hidden values again until the result does not change.
+ *
+ * @param fields - The field configurations to check visibility against
+ * @param includeHiddenFieldsWithNullValues - When `true`, a hidden field with the value `null` stays in the form
+ * @returns The form without the values of hidden fields
  */
-export function omitHiddenFields<T extends EventState | ActionUpdate>(
+export function omitHiddenFields(
   fields: FieldConfig[],
-  formValues: T,
-  validatorContext: ValidatorContext,
+  form: FormValues,
+  context: ActionFormConditionalContext,
   includeHiddenFieldsWithNullValues: boolean = false
-): Partial<T> {
-  const base = cloneDeep(formValues)
+): FormValues {
+  // A deep copy, so that the result does not share nested values (e.g. an address) with the input.
+  const formCopy = cloneDeep(form)
 
-  // The omitting is done recursively until the object does not change.
-  // This is because the previously removed fields might affect the visibility of other fields.
-  function fn(prevVisibilityContext: Partial<T>): Partial<T> {
-    const cleaned = omitBy<Partial<T>>(base, (value, fieldId) => {
-      const fieldConfig = fields.filter((f) => f.id === fieldId)
+  function removeHiddenValues(formForVisibility: FormValues): FormValues {
+    const isHiddenValue = (value: unknown, fieldId: string) => {
+      const fieldsWithId = fields.filter((field) => field.id === fieldId)
 
-      if (!fieldConfig.length) {
+      if (fieldsWithId.length === 0) {
         return false
       }
 
-      const isHidden = fieldConfig.every(
-        (f) => !isFieldVisible(f, prevVisibilityContext, validatorContext)
+      // Fields can have the same id. The value is hidden only when all of these fields are hidden.
+      const allFieldsHidden = fieldsWithId.every(
+        (field) => !isFieldVisible(field, formForVisibility, context)
       )
 
-      if (!isHidden) {
+      if (!allFieldsHidden) {
         return false
       }
 
@@ -397,39 +401,58 @@ export function omitHiddenFields<T extends EventState | ActionUpdate>(
       }
 
       return true
-    })
+    }
 
-    return isEqual(cleaned, prevVisibilityContext) ? cleaned : fn(cleaned)
+    // Remove the hidden values from the declaration and from the annotation.
+    const formWithoutHiddenValues = mapValues(formCopy, (values) =>
+      omitBy(values, isHiddenValue)
+    )
+
+    if (isEqual(formWithoutHiddenValues, formForVisibility)) {
+      return formWithoutHiddenValues
+    }
+
+    return removeHiddenValues(formWithoutHiddenValues)
   }
 
-  return fn(base)
+  return removeHiddenValues(formCopy)
 }
 
-export function omitHiddenPaginatedFields<T extends EventState | ActionUpdate>(
+/**
+ * Removes the values of hidden pages and hidden fields from the declaration and the annotation of the form.
+ */
+export function omitHiddenPaginatedFields(
   formConfig: FormConfig,
-  values: T,
-  validatorContext: ValidatorContext,
+  form: FormValues,
+  context: ActionFormConditionalContext,
   includeHiddenFieldsWithNullValues: boolean = false
-) {
-  const visibleFields = formConfig.pages
-    .filter((p) => isPageVisible(p, values, validatorContext))
-    .flatMap((p) => p.fields)
+): FormValues {
+  const visiblePages = formConfig.pages.filter((page) =>
+    isPageVisible(page, form, context)
+  )
+  const hiddenPages = formConfig.pages.filter(
+    (page) => !isPageVisible(page, form, context)
+  )
 
-  const hiddenFields = formConfig.pages
-    .filter((p) => !isPageVisible(p, values, validatorContext))
-    .flatMap((p) => p.fields)
+  const fieldsOnVisiblePages = visiblePages.flatMap((page) => page.fields)
+  const fieldsOnHiddenPages = hiddenPages.flatMap((page) => page.fields)
 
-  const valuesExceptHiddenPage = omitBy(values, (_, fieldId) => {
-    return (
-      hiddenFields.some((f) => f.id === fieldId) &&
-      !visibleFields.some((f) => f.id === fieldId)
-    )
-  })
+  // A field id can be on more than one page.
+  // The value is removed only when no visible page has a field with the same id.
+  const isOnHiddenPageOnly = (_value: unknown, fieldId: string) =>
+    fieldsOnHiddenPages.some((field) => field.id === fieldId) &&
+    !fieldsOnVisiblePages.some((field) => field.id === fieldId)
 
+  const formWithoutHiddenPages = mapValues(form, (values) =>
+    omitBy(values, isOnHiddenPageOnly)
+  )
+
+  // Field visibility is checked against the form without the hidden pages.
+  // Otherwise a value on a hidden page could make a field visible.
   return omitHiddenFields(
-    visibleFields,
-    valuesExceptHiddenPage,
-    validatorContext,
+    fieldsOnVisiblePages,
+    formWithoutHiddenPages,
+    context,
     includeHiddenFieldsWithNullValues
   )
 }
@@ -490,27 +513,29 @@ export function isVerificationPage(
 
 export function getVisibleVerificationPageIds(
   pages: PageConfig[],
-  annotation: ActionUpdate,
-  context: ValidatorContext
+  form: FormValues,
+  context: ActionFormConditionalContext
 ): string[] {
   return pages
     .filter((page) => isVerificationPage(page))
-    .filter((page) => isPageVisible(page, annotation, context))
+    .filter((page) => isPageVisible(page, form, context))
     .map((page) => page.id)
 }
 
+/**
+ * Removes the values of hidden annotation fields of the action.
+ * Annotation conditionals can read declaration values, so the whole form is evaluated.
+ *
+ * @returns The annotation without the values of hidden fields
+ */
 export function omitHiddenAnnotationFields(
   actionConfig: ActionConfig,
-  declaration: EventState,
-  annotation: ActionUpdate,
-  context: ValidatorContext
-) {
+  form: AnnotationFormValues,
+  context: ActionFormConditionalContext
+): ActionUpdate {
   const annotationFields = getActionAnnotationFields(actionConfig)
 
-  return omitHiddenFields(annotationFields, annotation, {
-    ...context,
-    baseFormState: declaration
-  })
+  return omitHiddenFields(annotationFields, form, context).annotation ?? {}
 }
 
 /**
@@ -1167,13 +1192,14 @@ export function aggregateActionAnnotations(event: EventDocument): EventState {
 export function dropSecuredDeclarationFields(
   eventConfig: EventConfig,
   eventIndex: EventIndex,
-  validatorContext: ValidatorContext
+  context: SecuredConditionalContext
 ): EventIndex {
   const declarationFields = getDeclarationFields(eventConfig)
+  const form = { declaration: eventIndex.declaration }
   const securedFieldIds = new Set(
     declarationFields
       .filter((declarationField) =>
-        isFieldSecured(declarationField, eventIndex, validatorContext)
+        isFieldSecured(declarationField, form, context)
       )
       .map((declarationField) => declarationField.id)
   )

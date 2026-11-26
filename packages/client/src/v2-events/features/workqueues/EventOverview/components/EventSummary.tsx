@@ -14,11 +14,9 @@ import { List } from '@opencrvs/components'
 import {
   EventConfig,
   getDeclarationFields,
-  areConditionsMet,
   getMixedPath,
   EventIndex,
   EventDocument,
-  isFieldSecured,
   FieldValue
 } from '@opencrvs/commons/client'
 import { useIntlFormatMessageWithFlattenedParams } from '@client/v2-events/messages/utils'
@@ -28,6 +26,10 @@ import { recordAnchorDate } from '@client/v2-events/utils'
 import { convertDateFieldsToUnixTimestamps } from '@client/v2-events/utils'
 import { useFlagLabelsString } from '@client/v2-events/messages/flags'
 import { useConfigVersionLabel } from '@client/v2-events/features/events/useEventConfiguration'
+import {
+  areConditionsMet,
+  isFieldSecured
+} from '@client/v2-events/conditionals'
 import { InfoBox } from './InfoBox'
 
 const messages = {

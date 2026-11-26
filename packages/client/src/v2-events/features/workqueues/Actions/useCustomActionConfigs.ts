@@ -15,8 +15,6 @@ import {
   EventIndex,
   CustomActionConfig,
   getOrThrow,
-  isActionEnabled,
-  isActionVisible,
   getAvailableActionsForEvent,
   isValidIcon,
   getAcceptedScopesByType,
@@ -30,6 +28,10 @@ import { getScope } from '@client/profile/profileSelectors'
 import { useCustomActionModal } from '@client/v2-events/features/events/actions/quick-actions/useQuickActionModal'
 import { useValidatorContext } from '@client/v2-events/hooks/useValidatorContext'
 import { useCanAccessEventWithScopes } from '@client/v2-events/hooks/useCanAccessEventWithScopes'
+import {
+  isActionEnabled,
+  isActionVisible
+} from '@client/v2-events/conditionals'
 import { ActionMenuItem } from './utils'
 
 export function useCustomActionConfigs(event: EventIndex): {

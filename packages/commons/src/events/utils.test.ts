@@ -53,8 +53,8 @@ import {
 import {
   eventQueryDataGenerator,
   generateActionDocument,
+  generateEmptyTestValidatorContext,
   generateTranslationConfig,
-  generateTestValidatorContext,
   withDeclaration
 } from './test.utils'
 import { DeclarationFormConfig } from './FormConfig'
@@ -608,9 +608,9 @@ describe('omitHiddenPaginatedFields', () => {
     const declaration = fieldConfigsToActionPayload(fields, rng)
     const declarationWithoutHiddenFields = omitHiddenPaginatedFields(
       declarationConfig,
-      declaration,
-      {}
-    )
+      { declaration, annotation: {} },
+      generateEmptyTestValidatorContext(tennisClubMembershipEvent)
+    ).declaration
 
     const missingKeys = difference(
       Object.keys(declaration),
@@ -638,10 +638,17 @@ describe('omitHiddenPaginatedFields', () => {
     const declaration = fieldConfigsToActionPayload(fields, rng)
     const declarationWithoutHiddenFields = omitHiddenPaginatedFields(
       declarationConfig,
-      { ...declaration, 'recommender.name': null, 'recommender.id': null },
-      {},
+      {
+        declaration: {
+          ...declaration,
+          'recommender.name': null,
+          'recommender.id': null
+        },
+        annotation: {}
+      },
+      generateEmptyTestValidatorContext(tennisClubMembershipEvent),
       true
-    )
+    ).declaration
 
     const missingKeys = difference(
       Object.keys(declaration),
@@ -694,7 +701,11 @@ describe('omitHiddenPaginatedFields', () => {
     }
 
     const values = { 'shared.field': 'value', toggle: 'false' }
-    const result = omitHiddenPaginatedFields(formConfig, values, {})
+    const result = omitHiddenPaginatedFields(
+      formConfig,
+      { declaration: values, annotation: {} },
+      generateEmptyTestValidatorContext(tennisClubMembershipEvent)
+    ).declaration
 
     expect(result).toMatchObject({ 'shared.field': 'value' })
   })
@@ -1134,7 +1145,7 @@ describe('getActionAnnotationFields() with dialog form', () => {
         dropSecuredDeclarationFields(
           tennisClubMembershipEvent,
           eventIndexWithSecuredData,
-          generateTestValidatorContext()
+          { eventIndex: eventIndexWithSecuredData }
         ).declaration
       ).toEqual({
         'applicant.name': {

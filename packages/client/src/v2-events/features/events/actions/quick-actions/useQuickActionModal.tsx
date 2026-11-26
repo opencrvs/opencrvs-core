@@ -27,11 +27,9 @@ import {
   FieldUpdateValue,
   getActionConfig,
   findActionDialogCopy,
-  runFieldValidations,
   UUID,
   getCurrentEventState,
   EventConfig,
-  omitHiddenFields,
   EventIndex,
   isValidIcon,
   flattenFormState,
@@ -44,6 +42,10 @@ import { FormFieldGenerator } from '@client/v2-events/components/forms/FormField
 import { useDialogFormState } from '@client/v2-events/hooks/useDialogFormState'
 import { useValidatorContext } from '@client/v2-events/hooks/useValidatorContext'
 import { useUserAllowedActions } from '@client/v2-events/features/workqueues/Actions/useUserAllowedActions'
+import {
+  omitHiddenFields,
+  runFieldValidations
+} from '@client/v2-events/conditionals'
 import { TranslationTextWithFormatModifier } from '../../components/TranslationTextWithFormatModifier'
 import { useModal } from '../../../../hooks/useModal'
 import { actionLabels } from '../../../workqueues/Actions/utils'

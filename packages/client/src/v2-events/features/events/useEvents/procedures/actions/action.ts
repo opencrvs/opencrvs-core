@@ -20,7 +20,6 @@ import {
   ActionType,
   EventDocument,
   getActionAnnotationFields,
-  omitHiddenFields,
   deepDropNulls,
   deepMerge,
   getCurrentEventState,
@@ -59,6 +58,7 @@ import {
   retryDelay,
   retryUnlessConflict
 } from '@client/v2-events/features/events/useEvents/procedures/actions/mutationHandlers'
+import { omitHiddenFields } from '@client/v2-events/conditionals'
 
 setMutationDefaults(trpcOptionsProxy.event.actions.custom.request, {
   mutationFn: createEventActionMutationFn(

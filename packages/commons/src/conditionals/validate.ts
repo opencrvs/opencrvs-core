@@ -62,6 +62,17 @@ import { Location } from '../events/locations'
 import { SystemVariables } from '../events/TemplateConfig'
 import { getCurrentEventState } from '../events/state'
 import { isPlainDate } from '../events/PlainDate'
+import {
+  ActionConditionalContext,
+  ActionFormConditionalContext,
+  buildActionConditionalParameters,
+  buildActionFormConditionalParameters,
+  buildCertificateTemplateConditionalParameters,
+  buildSecuredConditionalParameters,
+  CertificateTemplateConditionalContext,
+  FormValues,
+  SecuredConditionalContext
+} from './validate-v2'
 
 const ajv = new Ajv({
   $data: true,
@@ -200,6 +211,14 @@ export function compileClientFunction(code: string): CompiledClientFunction {
 // https://ajv.js.org/packages/ajv-formats.html
 addFormats(ajv)
 
+export function isOnline() {
+  if (typeof window !== 'undefined' && typeof navigator !== 'undefined') {
+    return navigator.onLine
+  }
+  // Server-side: assume always online
+  return true
+}
+
 // `$now` / `$online` are sampled fresh on each call — callers that care
 // about a stable timestamp/online flag should snapshot it themselves.
 export function buildClientFunctionContext(input: {
@@ -219,7 +238,6 @@ export function buildClientFunctionContext(input: {
     $form: input.form,
     $flags: input.validatorContext?.event?.state.flags ?? [],
     $now: todayISO(),
-    // eslint-disable-next-line @typescript-eslint/no-use-before-define
     $online: isOnline(),
     $user: input.validatorContext?.user,
     $event: input.validatorContext?.event?.document
@@ -392,13 +410,6 @@ function isAgeValue(value: unknown): value is AgeValue {
   return AgeValue.validate(value)
 }
 
-function mergeWithBaseFormState(
-  values: EventState | ActionUpdate,
-  context: ValidatorContext
-) {
-  return { ...context.baseFormState, ...values }
-}
-
 ajv.addKeyword({
   keyword: 'customClientValidator',
   schemaType: 'object',
@@ -465,25 +476,14 @@ export function validateValue(schema: JSONSchema, data: unknown) {
   return result
 }
 
-export function isOnline() {
-  if (typeof window !== 'undefined' && typeof navigator !== 'undefined') {
-    return navigator.onLine
-  }
-  // Server-side: assume always online
-  return true
-}
-
 export function isConditionMet(
   conditional: JSONSchema,
-  values: EventState | ActionUpdate,
-  context: ValidatorContext
+  form: FormValues,
+  context: ActionFormConditionalContext
 ) {
   return validate(
     conditional,
-    buildClientFunctionContext({
-      form: mergeWithBaseFormState(values, context),
-      validatorContext: context
-    })
+    buildActionFormConditionalParameters(form, context)
   )
 }
 
@@ -502,20 +502,13 @@ function getConditionalActionsForField(
 
 export function areConditionsMet(
   conditions: FieldConditional[],
-  values: Record<string, FieldValue>,
-  context: ValidatorContext,
-  event: EventIndex
+  form: FormValues,
+  context: ActionFormConditionalContext
 ) {
-  // Overrides `$flags`/`$status` with the real event data (same as `isActionConditionMet`)
-  // so `flag(...)`/`status(...)` conditionals work for data-display fields, e.g. in EventSummary.
-  const clientFunctionContext = {
-    ...buildClientFunctionContext({
-      form: mergeWithBaseFormState(values, context),
-      validatorContext: context
-    }),
-    $flags: event.flags,
-    $status: event.status
-  }
+  const clientFunctionContext = buildActionFormConditionalParameters(
+    form,
+    context
+  )
 
   return conditions.every((condition) =>
     validate(condition.conditional, clientFunctionContext)
@@ -524,28 +517,22 @@ export function areConditionsMet(
 
 /**
  * Given a field's `secured` property (a boolean, or a JSONSchema conditional
- * evaluated against the event, e.g. `flag('sealed')`), returns whether the
+ * evaluated against the event state, e.g. `flag('sealed')`), returns whether the
  * field is currently secured for the given event.
  */
 export function isFieldSecured(
   field: Pick<FieldConfig, 'secured'>,
-  event: EventIndex,
-  context: ValidatorContext
+  form: FormValues,
+  context: SecuredConditionalContext
 ): boolean {
   if (typeof field.secured !== 'object' || field.secured === null) {
     return Boolean(field.secured)
   }
 
-  const clientFunctionContext = {
-    ...buildClientFunctionContext({
-      form: mergeWithBaseFormState(event.declaration, context),
-      validatorContext: context
-    }),
-    $flags: event.flags,
-    $status: event.status
-  }
-
-  return validate(field.secured as JSONSchema, clientFunctionContext)
+  return validate(
+    field.secured as JSONSchema,
+    buildSecuredConditionalParameters(form, context)
+  )
 }
 
 export type EventValidatorContext = {
@@ -584,9 +571,9 @@ export type StrictValidatorContext = {
 
 function isFieldConditionMet(
   field: FieldConfig,
-  form: ActionUpdate | EventState,
+  form: FormValues,
   conditionalType: ConditionalType,
-  context: ValidatorContext
+  context: ActionFormConditionalContext
 ) {
   const hasRule = (field.conditionals ?? []).some(
     (conditional) => conditional.type === conditionalType
@@ -598,10 +585,7 @@ function isFieldConditionMet(
 
   const validConditionals = getConditionalActionsForField(
     field,
-    buildClientFunctionContext({
-      form: mergeWithBaseFormState(form, context),
-      validatorContext: context
-    })
+    buildActionFormConditionalParameters(form, context)
   )
 
   return validConditionals.includes(conditionalType)
@@ -609,8 +593,8 @@ function isFieldConditionMet(
 
 export function isFieldVisible(
   field: FieldConfig,
-  form: Partial<ActionUpdate | EventState>,
-  context: ValidatorContext
+  form: FormValues,
+  context: ActionFormConditionalContext
 ) {
   return isFieldConditionMet(field, form, ConditionalType.SHOW, context)
 }
@@ -630,8 +614,8 @@ function isFieldEmptyAndNotRequired(field: FieldConfig, form: ActionUpdate) {
 
 export function isFieldEnabled(
   field: FieldConfig,
-  form: ActionUpdate | EventState,
-  context: ValidatorContext
+  form: FormValues,
+  context: ActionFormConditionalContext
 ) {
   return isFieldConditionMet(field, form, ConditionalType.ENABLE, context)
 }
@@ -639,8 +623,8 @@ export function isFieldEnabled(
 // Fields are displayed on review if both the 'ConditionalType.SHOW' and 'ConditionalType.DISPLAY_ON_REVIEW' conditions are met
 export function isFieldDisplayedOnReview(
   field: FieldConfig,
-  form: ActionUpdate | EventState,
-  context: ValidatorContext
+  form: FormValues,
+  context: ActionFormConditionalContext
 ) {
   return (
     isFieldVisible(field, form, context) &&
@@ -650,8 +634,8 @@ export function isFieldDisplayedOnReview(
 
 function isActionConditionMet(
   actionConfig: ActionConfig,
-  event: EventIndex,
-  context: ValidatorContext,
+  form: FormValues,
+  context: ActionConditionalContext,
   conditionalType: ConditionalType
 ) {
   if (!actionConfig.conditionals) {
@@ -666,24 +650,20 @@ function isActionConditionMet(
     return true
   }
 
-  return validate(rule.conditional, {
-    ...buildClientFunctionContext({
-      form: mergeWithBaseFormState(event.declaration, context),
-      validatorContext: context
-    }),
-    $flags: event.flags,
-    $status: event.status
-  })
+  return validate(
+    rule.conditional,
+    buildActionConditionalParameters(form, context)
+  )
 }
 
 export function isActionEnabled(
   actionConfig: ActionConfig,
-  event: EventIndex,
-  context: ValidatorContext
+  form: FormValues,
+  context: ActionConditionalContext
 ) {
   return isActionConditionMet(
     actionConfig,
-    event,
+    form,
     context,
     ConditionalType.ENABLE
   )
@@ -691,25 +671,20 @@ export function isActionEnabled(
 
 export function isActionVisible(
   actionConfig: ActionConfig,
-  event: EventIndex,
-  context: ValidatorContext
+  form: FormValues,
+  context: ActionConditionalContext
 ) {
-  return isActionConditionMet(
-    actionConfig,
-    event,
-    context,
-    ConditionalType.SHOW
-  )
+  return isActionConditionMet(actionConfig, form, context, ConditionalType.SHOW)
 }
 
 export function isActionAvailable(
   actionConfig: ActionConfig,
-  event: EventIndex,
-  context: ValidatorContext
+  form: FormValues,
+  context: ActionConditionalContext
 ) {
   return (
-    isActionVisible(actionConfig, event, context) &&
-    isActionEnabled(actionConfig, event, context)
+    isActionVisible(actionConfig, form, context) &&
+    isActionEnabled(actionConfig, form, context)
   )
 }
 
@@ -898,17 +873,18 @@ export function validateFieldInput({
 
 export function runStructuralValidations({
   field,
-  values,
+  form,
   context,
   actionType
 }: {
   field: FieldConfig
-  values: ActionUpdate
-  context: ValidatorContext
+  form: FormValues
+  context: ActionFormConditionalContext
   actionType?: ActionType
 }) {
+  const { $form: values } = buildActionFormConditionalParameters(form, context)
   if (
-    !isFieldVisible(field, values, context) ||
+    !isFieldVisible(field, form, context) ||
     isFieldEmptyAndNotRequired(field, values)
   ) {
     return []
@@ -931,8 +907,8 @@ export function runFieldValidations({
 }: {
   field: FieldConfig
   value: FieldUpdateValue
-  form: ActionUpdate
-  context: ValidatorContext
+  form: FormValues
+  context: ActionFormConditionalContext
 }): FormState<Array<{ message: TranslationConfig }>> {
   const field = { config, value }
   if (!isFieldVisible(field.config, form, context)) {
@@ -949,10 +925,10 @@ export function runFieldValidations({
    * can be hundreds of thousands of locations in real deployments and
    * loading them all into memory chokes the app.
    */
-  const conditionalParameters = buildClientFunctionContext({
-    form: mergeWithBaseFormState(form, context),
-    validatorContext: context
-  })
+  const conditionalParameters = buildActionFormConditionalParameters(
+    form,
+    context
+  )
 
   if (isFieldGroupFieldType(field)) {
     const subfieldErrors: FormState<Array<{ message: TranslationConfig }>> =
@@ -960,8 +936,8 @@ export function runFieldValidations({
         runFieldValidations({
           field: subfield,
           value: field.value?.[subfield.id],
-          form,
-          context
+          context,
+          form
         })
       )
 
@@ -977,7 +953,7 @@ export function runFieldValidations({
   }
 
   // FIELD_GROUP does not need the "required" property
-  if (isFieldEmptyAndNotRequired(field.config, form)) {
+  if (isFieldEmptyAndNotRequired(field.config, conditionalParameters.$form)) {
     return []
   }
 
@@ -1122,9 +1098,15 @@ export function getValidatorsForField(
 
 export function areCertificateConditionsMet(
   conditions: FieldConditional[],
-  values: ConditionalParameters
+  form: FormValues,
+  context: CertificateTemplateConditionalContext
 ) {
-  return conditions.every((condition) => {
-    return validate(condition.conditional, values)
-  })
+  const parameters = buildCertificateTemplateConditionalParameters(
+    form,
+    context
+  )
+
+  return conditions.every((condition) =>
+    validate(condition.conditional, parameters)
+  )
 }

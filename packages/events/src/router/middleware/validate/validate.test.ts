@@ -13,7 +13,6 @@ import {
   ActionType,
   ConditionalType,
   errorMessages,
-  eventQueryDataGenerator,
   field,
   FieldConfig,
   FieldType,
@@ -25,8 +24,11 @@ import {
   user
 } from '@opencrvs/commons'
 import { tennisClubMembershipEvent } from '@opencrvs/commons/fixtures'
-import { getEventValidatorContext } from '@opencrvs/commons/events'
-import { getFieldErrors, validateNotifyAction } from './index'
+import {
+  getAnnotationFieldErrors,
+  getDeclarationFieldErrors,
+  validateNotifyAction
+} from './index'
 
 export const testContext = {
   user: {
@@ -35,17 +37,26 @@ export const testContext = {
     role: TestUserRole.enum.LOCAL_REGISTRAR,
     userType: TokenUserType.enum.user
   },
-  leafAdminStructureLocationIds: []
+  leafAdminStructureLocationIds: [],
+  eventDocument: generateEventDocument({
+    configuration: tennisClubMembershipEvent,
+    actions: [{ type: ActionType.CREATE }]
+  }),
+  eventConfig: tennisClubMembershipEvent
 }
 
 describe('getFieldErrors()', () => {
   it('should return an empty array there are no fields to validate', () => {
-    const errors = getFieldErrors([], {}, {})
+    const errors = getDeclarationFieldErrors(
+      [],
+      { declaration: {} },
+      testContext
+    )
     expect(errors).toEqual([])
   })
 
   it('should return an error if a required field is not provided', () => {
-    const errors = getFieldErrors(
+    const errors = getDeclarationFieldErrors(
       [
         {
           id: 'test.checkbox',
@@ -59,14 +70,14 @@ describe('getFieldErrors()', () => {
           }
         }
       ],
-      {},
+      { declaration: {} },
       testContext
     )
     expect(errors).toMatchSnapshot()
   })
 
   it('should not return an error if a required field is provided', () => {
-    const errors = getFieldErrors(
+    const errors = getDeclarationFieldErrors(
       [
         {
           id: 'test.checkbox',
@@ -80,7 +91,7 @@ describe('getFieldErrors()', () => {
           }
         }
       ],
-      { 'test.checkbox': true },
+      { declaration: { 'test.checkbox': true } },
       testContext
     )
 
@@ -88,7 +99,7 @@ describe('getFieldErrors()', () => {
   })
 
   it('should return an error if a value for a conditionally hidden required field is provided', () => {
-    const errors = getFieldErrors(
+    const errors = getDeclarationFieldErrors(
       [
         {
           id: 'test.checkbox',
@@ -108,7 +119,7 @@ describe('getFieldErrors()', () => {
           ]
         }
       ],
-      { 'test.checkbox': true },
+      { declaration: { 'test.checkbox': true } },
       testContext
     )
 
@@ -116,7 +127,7 @@ describe('getFieldErrors()', () => {
   })
 
   it('should not return an error if a value for a conditionally hidden required field is not provided', () => {
-    const errors = getFieldErrors(
+    const errors = getDeclarationFieldErrors(
       [
         {
           id: 'test.checkbox',
@@ -136,7 +147,7 @@ describe('getFieldErrors()', () => {
           ]
         }
       ],
-      {},
+      { declaration: {} },
       testContext
     )
 
@@ -144,7 +155,7 @@ describe('getFieldErrors()', () => {
   })
 
   it('should not return an error if a value for a user-based conditionally hidden required field is not provided', () => {
-    const errors = getFieldErrors(
+    const errors = getDeclarationFieldErrors(
       [
         {
           id: 'test.checkbox',
@@ -164,7 +175,7 @@ describe('getFieldErrors()', () => {
           ]
         }
       ],
-      {},
+      { declaration: {} },
       testContext
     )
 
@@ -172,7 +183,7 @@ describe('getFieldErrors()', () => {
   })
 
   it('should return an error if a value for a user-based conditionally required field is not provided', () => {
-    const errors = getFieldErrors(
+    const errors = getDeclarationFieldErrors(
       [
         {
           id: 'test.text',
@@ -191,7 +202,7 @@ describe('getFieldErrors()', () => {
           ]
         }
       ],
-      {},
+      { declaration: {} },
       testContext
     )
 
@@ -199,7 +210,7 @@ describe('getFieldErrors()', () => {
   })
 
   it('should not return an error if a value for a user-based conditionally required field is provided', () => {
-    const errors = getFieldErrors(
+    const errors = getDeclarationFieldErrors(
       [
         {
           id: 'test.text',
@@ -219,7 +230,9 @@ describe('getFieldErrors()', () => {
         }
       ],
       {
-        'test.text': 'some value'
+        declaration: {
+          'test.text': 'some value'
+        }
       },
       testContext
     )
@@ -228,7 +241,7 @@ describe('getFieldErrors()', () => {
   })
 
   it('should not return an error if a value for a conditionally visible required field is provided', () => {
-    const errors = getFieldErrors(
+    const errors = getAnnotationFieldErrors(
       [
         {
           id: 'test.checkbox',
@@ -248,15 +261,18 @@ describe('getFieldErrors()', () => {
           ]
         }
       ],
-      { 'test.checkbox': true },
-      { ...testContext, baseFormState: { 'test.text': 'helloooo' } }
+      {
+        declaration: { 'test.text': 'helloooo' },
+        annotation: { 'test.checkbox': true }
+      },
+      testContext
     )
 
     expect(errors).toMatchSnapshot()
   })
 
   it('should not return error if multiple fields with same id are configured, and value is provided', () => {
-    const errors = getFieldErrors(
+    const errors = getDeclarationFieldErrors(
       [
         {
           id: 'test.input',
@@ -291,7 +307,9 @@ describe('getFieldErrors()', () => {
           ]
         }
       ],
-      { 'test.input': 'not empty', 'test.text': 'helloooo' },
+      {
+        declaration: { 'test.input': 'not empty', 'test.text': 'helloooo' }
+      },
       testContext
     )
 
@@ -314,7 +332,7 @@ describe('getFieldErrors()', () => {
         description: 'Test Field Description'
       },
       conditionals: [
-        { type: ConditionalType.SHOW, conditional: flag('sealed') }
+        { type: ConditionalType.SHOW, conditional: flag('rejected') }
       ]
     }
 
@@ -323,30 +341,30 @@ describe('getFieldErrors()', () => {
       actions: [{ type: ActionType.CREATE }, { type: ActionType.DECLARE }]
     })
 
+    const rejectedDocument = generateEventDocument({
+      configuration: tennisClubMembershipEvent,
+      actions: [
+        { type: ActionType.CREATE },
+        { type: ActionType.DECLARE },
+        { type: ActionType.REJECT }
+      ]
+    })
+
     it('accepts a value when the event carries the flag that makes the field visible', () => {
-      const errors = getFieldErrors(
+      const errors = getDeclarationFieldErrors(
         [flaggedField],
-        { 'test.input': 'not empty' },
-        {
-          ...testContext,
-          event: {
-            document,
-            state: eventQueryDataGenerator({ flags: ['sealed'] })
-          }
-        }
+        { declaration: { 'test.input': 'not empty' } },
+        { ...testContext, eventDocument: rejectedDocument }
       )
 
       expect(errors).toEqual([])
     })
 
     it('rejects a value when the event does not carry the flag', () => {
-      const errors = getFieldErrors(
+      const errors = getDeclarationFieldErrors(
         [flaggedField],
-        { 'test.input': 'not empty' },
-        {
-          ...testContext,
-          event: { document, state: eventQueryDataGenerator({ flags: [] }) }
-        }
+        { declaration: { 'test.input': 'not empty' } },
+        { ...testContext, eventDocument: document }
       )
 
       expect(errors).toEqual([
@@ -360,7 +378,7 @@ describe('getFieldErrors()', () => {
   })
 
   it('should return errors for field with custom validation if value does not pass validation', () => {
-    const errors = getFieldErrors(
+    const errors = getDeclarationFieldErrors(
       [
         {
           id: 'test.input',
@@ -383,7 +401,7 @@ describe('getFieldErrors()', () => {
           ]
         }
       ],
-      { 'test.input': 'not hello!' },
+      { declaration: { 'test.input': 'not hello!' } },
       testContext
     )
 
@@ -391,7 +409,7 @@ describe('getFieldErrors()', () => {
   })
 
   it('should not return errors for field with custom validations if value passes validation', () => {
-    const errors = getFieldErrors(
+    const errors = getDeclarationFieldErrors(
       [
         {
           id: 'test.input',
@@ -414,7 +432,7 @@ describe('getFieldErrors()', () => {
           ]
         }
       ],
-      { 'test.input': 'helloooo' },
+      { declaration: { 'test.input': 'helloooo' } },
       testContext
     )
 
@@ -678,7 +696,8 @@ describe('NOTIFY review field validation', () => {
       declaration: { 'applicant.name': declaration['applicant.name'] },
       context: {
         ...testContext,
-        event: getEventValidatorContext(document, eventConfig)
+        eventDocument: document,
+        eventConfig
       }
     })
 
@@ -941,7 +960,8 @@ describe('NOTIFY notification form validation', () => {
       declaration: { 'applicant.email': 'notifier@example.com' },
       context: {
         ...testContext,
-        event: getEventValidatorContext(document, eventConfig)
+        eventDocument: document,
+        eventConfig
       }
     })
 

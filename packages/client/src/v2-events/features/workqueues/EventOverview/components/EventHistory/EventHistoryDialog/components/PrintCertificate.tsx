@@ -19,7 +19,6 @@ import {
   PageTypes,
   getPrintCertificatePages,
   getCurrentEventState,
-  isFieldDisplayedOnReview,
   ValidatorContext
 } from '@opencrvs/commons/client'
 import { useEventConfigurationForRecord } from '@client/v2-events/features/events/useEventConfiguration'
@@ -30,6 +29,7 @@ import {
 import { useCertificateTemplateSelectorFieldConfig } from '@client/v2-events/features/events/useCertificateTemplateSelectorFieldConfig'
 import { useAppConfig } from '@client/v2-events/hooks/useAppConfig'
 import { recordAnchorDate } from '@client/v2-events/utils'
+import { isFieldDisplayedOnReview } from '@client/v2-events/conditionals'
 
 const verifiedMessage = {
   id: 'verified',
