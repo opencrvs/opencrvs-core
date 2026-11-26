@@ -61,7 +61,6 @@ import sendUserNameHandler, {
 import { tokenHandler } from '@auth/features/oauthToken/handler'
 import { logger } from '@opencrvs/commons'
 import { getPublicKey } from '@auth/features/authenticate/service'
-import serviceTokenHandler from './features/serviceToken/handler'
 import { jwksHandler } from '@auth/features/wellKnown/handler'
 import reindexingTokenHandler, {
   responseSchema as reindexResponseSchema
@@ -123,22 +122,6 @@ export async function createServer() {
     handler: getPublicKey,
     options: {
       tags: ['api']
-    }
-  })
-
-  // curl -H 'Content-Type: application/json' http://localhost:4040/internal/service-token
-  server.route({
-    method: 'GET',
-    path: '/internal/service-token',
-    handler: serviceTokenHandler,
-    options: {
-      tags: ['api', 'deprecated'],
-      description: `
-      Deprecated: Authenticate as the OpenCRVS service user.
-      This is still used by events service to fetch events configuration from country config on startup
-      when there is no user interaction involved.`,
-      notes:
-        'Returns a token to be used for endpoints that allow unauthorized access such as certificate verification endpoints. Token contains no scopes.'
     }
   })
   server.route({
