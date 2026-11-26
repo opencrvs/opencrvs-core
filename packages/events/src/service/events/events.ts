@@ -121,8 +121,7 @@ export async function throwConflictIfActionNotAllowed(
 ) {
   const event = existingEvent ?? (await getEventById(eventId))
   const eventConfiguration = await getEventConfigurationForRecord({
-    event: event,
-    token
+    event: event
   })
 
   const eventIndex = getCurrentEventState(event, eventConfiguration)
@@ -509,8 +508,7 @@ export async function processAction(
     await indexEvent(
       updatedEvent,
       await getVersionedEventConfigurationById({
-        eventType: updatedEvent.type,
-        token
+        eventType: updatedEvent.type
       }),
       input.waitFor
     )

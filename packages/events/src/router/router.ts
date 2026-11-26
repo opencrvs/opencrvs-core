@@ -18,6 +18,7 @@ import { administrativeAreaRouter } from './administrative-areas'
 import { integrationsRouter } from './integrations'
 import { attachmentsRouter } from './attachments'
 import { announcementRouter } from './announcement'
+import { configRouter } from './config'
 
 export const appRouter = router({
   event: eventRouter,
@@ -27,7 +28,8 @@ export const appRouter = router({
   administrativeAreas: administrativeAreaRouter,
   integrations: integrationsRouter,
   attachments: attachmentsRouter,
-  announcement: announcementRouter
+  announcement: announcementRouter,
+  config: configRouter
 })
 
 /** @knipignore */

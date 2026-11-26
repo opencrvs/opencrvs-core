@@ -9,10 +9,12 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
+import { pick } from 'lodash'
 import fetch from 'node-fetch'
 import { array } from 'zod'
 import {
   ApplicationConfig,
+  CertificateConfig,
   EventDocument,
   getEventConfigById,
   getEventConfigForRecord,
@@ -21,12 +23,19 @@ import {
   resolveEventConfigInTimeZone,
   Role,
   toPlainDateInTimeZone,
-  TokenWithBearer,
   validateRoles,
   VersionedEventConfig,
   WorkqueueConfig
 } from '@opencrvs/commons'
+import { withCoreSignature } from '@opencrvs/commons/request-signing'
 import { env } from '@events/environment'
+import { getCoreSigningKey } from '@events/request-signing'
+
+/** Reads a configuration endpoint of country config, signed as core. */
+async function fetchConfig(path: string) {
+  const url = new URL(path, env.COUNTRY_CONFIG_URL)
+  return fetch(url, withCoreSignature(getCoreSigningKey(), url))
+}
 
 /**
  * Configuration is served from countryconfig, which can be deployed
@@ -36,18 +45,15 @@ import { env } from '@events/environment'
  * while bounding how stale it can be to `EVENT_CONFIG_CACHE_TTL_MS` — no events
  * restart is required to pick up a config change.
  */
-function createTtlConfigCache<T>(
-  label: string,
-  fetcher: (token: TokenWithBearer) => Promise<T>
-) {
+function createTtlConfigCache<T>(label: string, fetcher: () => Promise<T>) {
   let value: T | null = null
   let fetchedAt = 0
   let inFlight: Promise<T> | null = null
 
-  return async function getCached(token: TokenWithBearer): Promise<T> {
+  return async function getCached(): Promise<T> {
     // In development always fetch, so config changes are picked up immediately.
     if (!env.isProduction) {
-      return fetcher(token)
+      return fetcher()
     }
 
     if (
@@ -61,7 +67,7 @@ function createTtlConfigCache<T>(
     // stampede countryconfig from the many call sites.
     if (!inFlight) {
       logger.info(`Refetching ${label} from countryconfig`)
-      inFlight = fetcher(token)
+      inFlight = fetcher()
         .then((fetched) => {
           value = fetched
           fetchedAt = Date.now()
@@ -90,13 +96,8 @@ function createTtlConfigCache<T>(
   }
 }
 
-async function getEventConfigurations(token: TokenWithBearer) {
-  const res = await fetch(new URL('/config/events', env.COUNTRY_CONFIG_URL), {
-    headers: {
-      'Content-Type': 'application/json',
-      Authorization: token
-    }
-  })
+async function getEventConfigurations() {
+  const res = await fetchConfig('/config/events')
 
   if (!res.ok) {
     throw new Error(
@@ -116,46 +117,67 @@ export const getInMemoryVersionedEventConfigurations = createTtlConfigCache(
   getEventConfigurations
 )
 
-export async function getApplicationConfig() {
-  const res = await fetch(
-    new URL('/config/application', env.COUNTRY_CONFIG_URL),
-    { headers: { 'Content-Type': 'application/json' } }
-  )
+async function fetchApplicationConfig(): Promise<unknown> {
+  const res = await fetchConfig('/config/application')
 
   if (!res.ok) {
     throw new Error(`Failed to fetch application config: ${res.status}`)
   }
 
-  return ApplicationConfig.parse(await res.json())
+  return res.json()
 }
 
 /**
  * @returns application configuration, cached in production for up to
- * `EVENT_CONFIG_CACHE_TTL_MS` (always fresh in development).
+ * `EVENT_CONFIG_CACHE_TTL_MS` (always fresh in development). It keeps the
+ * fields that core does not know, because a country config may add some for
+ * its own client code.
  */
 const getInMemoryApplicationConfig = createTtlConfigCache(
   'application configuration',
-  async () => getApplicationConfig()
+  async () => ApplicationConfig.loose().parse(await fetchApplicationConfig())
 )
 
+/** @returns the application configuration for signed-in users and systems. */
+export async function getClientApplicationConfig() {
+  return getInMemoryApplicationConfig()
+}
+
+/** The application configuration fields the login page shows before sign-in. */
+const PUBLIC_APPLICATION_CONFIG_FIELDS = [
+  'APPLICATION_NAME',
+  'COUNTRY_LOGO',
+  'PHONE_NUMBER_PATTERN',
+  'USER_NOTIFICATION_DELIVERY_METHOD',
+  'INFORMANT_NOTIFICATION_DELIVERY_METHOD'
+] as const
+
+/** @returns only the application configuration fields that anyone may read. */
+export async function getPublicApplicationConfig() {
+  return pick(
+    await getInMemoryApplicationConfig(),
+    PUBLIC_APPLICATION_CONFIG_FIELDS
+  )
+}
+
 /** @returns the country's time zone (IANA), in which configuration versions take effect. */
-export async function getCountryTimeZone(token: TokenWithBearer) {
-  return (await getInMemoryApplicationConfig(token)).SYSTEM_IANA_TIMEZONE
+export async function getCountryTimeZone() {
+  return (await getInMemoryApplicationConfig()).SYSTEM_IANA_TIMEZONE
 }
 
 /** @returns today's date in the country's time zone. */
-export async function getCountryToday(token: TokenWithBearer) {
-  return toPlainDateInTimeZone(new Date(), await getCountryTimeZone(token))
+export async function getCountryToday() {
+  return toPlainDateInTimeZone(new Date(), await getCountryTimeZone())
 }
 
 /**
  * @returns the configuration of each event, at the version in effect today in the
  * country's time zone. For a record, use `getEventConfigurationForRecord` instead.
  */
-export async function getInMemoryEventConfigurations(token: TokenWithBearer) {
+export async function getInMemoryEventConfigurations() {
   const [configurations, timeZone] = await Promise.all([
-    getInMemoryVersionedEventConfigurations(token),
-    getCountryTimeZone(token)
+    getInMemoryVersionedEventConfigurations(),
+    getCountryTimeZone()
   ])
   return configurations.map((config) =>
     resolveEventConfigInTimeZone(config, timeZone)
@@ -166,12 +188,10 @@ export async function getInMemoryEventConfigurations(token: TokenWithBearer) {
  * @returns the configuration of every version of every event. The versions of each event
  * are in the order to look up a field in, so the first match is the newest version in effect.
  */
-export async function getInMemoryEventConfigurationsInLookupOrder(
-  token: TokenWithBearer
-) {
+export async function getInMemoryEventConfigurationsInLookupOrder() {
   const [configurations, timeZone] = await Promise.all([
-    getInMemoryVersionedEventConfigurations(token),
-    getCountryTimeZone(token)
+    getInMemoryVersionedEventConfigurations(),
+    getCountryTimeZone()
   ])
   const today = toPlainDateInTimeZone(new Date(), timeZone)
   return configurations.flatMap((config) =>
@@ -180,14 +200,12 @@ export async function getInMemoryEventConfigurationsInLookupOrder(
 }
 
 export async function getVersionedEventConfigurationById({
-  eventType,
-  token
+  eventType
 }: {
   eventType: string
-  token: TokenWithBearer
 }) {
   return getEventConfigById(
-    await getInMemoryVersionedEventConfigurations(token),
+    await getInMemoryVersionedEventConfigurations(),
     eventType
   )
 }
@@ -197,28 +215,18 @@ export async function getVersionedEventConfigurationById({
  * a record uses the version it was created under.
  */
 export async function getEventConfigurationForRecord({
-  event,
-  token
+  event
 }: {
   event: Pick<EventDocument, 'type' | 'configVersionId'>
-  token: TokenWithBearer
 }) {
   return getEventConfigForRecord(
-    await getVersionedEventConfigurationById({ eventType: event.type, token }),
+    await getVersionedEventConfigurationById({ eventType: event.type }),
     event
   )
 }
 
-async function getWorkqueueConfigurations(token: TokenWithBearer) {
-  const res = await fetch(
-    new URL('/config/workqueues', env.COUNTRY_CONFIG_URL),
-    {
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${token}`
-      }
-    }
-  )
+async function getWorkqueueConfigurations() {
+  const res = await fetchConfig('/config/workqueues')
 
   if (!res.ok) {
     throw new Error('Failed to fetch workqueue config')
@@ -236,19 +244,14 @@ export const getInMemoryWorkqueueConfigurations = createTtlConfigCache(
   getWorkqueueConfigurations
 )
 
-async function getRoles(token: TokenWithBearer) {
-  const res = await fetch(new URL('/config/roles', env.COUNTRY_CONFIG_URL), {
-    headers: {
-      'Content-Type': 'application/json'
-    }
-  })
+async function getRoles() {
+  const res = await fetchConfig('/config/roles')
 
   if (!res.ok) {
     throw new Error('Failed to fetch roles config')
   }
 
-  const eventConfigurations =
-    await getInMemoryVersionedEventConfigurations(token)
+  const eventConfigurations = await getInMemoryVersionedEventConfigurations()
   const roles = array(Role).parse(await res.json())
 
   validateRoles(roles, eventConfigurations)
@@ -257,3 +260,22 @@ async function getRoles(token: TokenWithBearer) {
 }
 
 export const getInMemoryRoles = createTtlConfigCache('roles', getRoles)
+
+async function getCertificateConfigurations() {
+  const res = await fetchConfig('/certificates')
+
+  if (!res.ok) {
+    throw new Error(`Failed to fetch certificates config: ${res.status}`)
+  }
+
+  return array(CertificateConfig.loose()).parse(await res.json())
+}
+
+/**
+ * @returns certificate configurations, cached in production for up to
+ * `EVENT_CONFIG_CACHE_TTL_MS` (always fresh in development).
+ */
+export const getInMemoryCertificateConfigurations = createTtlConfigCache(
+  'certificate configurations',
+  getCertificateConfigurations
+)

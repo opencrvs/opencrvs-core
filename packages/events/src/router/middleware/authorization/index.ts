@@ -297,8 +297,7 @@ function canAccessEventWithInputScopes(
 
     const event = await getEventById(input.eventId)
     const eventConfig = await getEventConfigurationForRecord({
-      event,
-      token: ctx.token
+      event
     })
 
     const eventIndex = getCurrentEventState(event, eventConfig)
@@ -506,7 +505,7 @@ export const userCanCreateEvent: MiddlewareFunction<
   TrpcContext,
   unknown
 > = async ({ next, ctx, getRawInput }) => {
-  const eventConfigs = await getInMemoryEventConfigurations(ctx.token)
+  const eventConfigs = await getInMemoryEventConfigurations()
 
   if (!hasScope(ctx.token, 'record.create')) {
     throw new TRPCError({ code: 'FORBIDDEN' })
