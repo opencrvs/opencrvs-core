@@ -873,6 +873,10 @@ paths:
                           - name
                           - status
                         additionalProperties: false
+                    updatedAt:
+                      type: string
+                      format: date-time
+                      pattern: ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d:[0-5]\d(?:\.\d+)?(?:Z))$
                   required:
                     - id
                     - name
@@ -880,6 +884,7 @@ paths:
                     - locationType
                     - status
                     - versions
+                    - updatedAt
                   additionalProperties: false
         "400": *a1
         "401": *a2
@@ -1003,6 +1008,10 @@ paths:
                         - name
                         - status
                       additionalProperties: false
+                  updatedAt:
+                    type: string
+                    format: date-time
+                    pattern: ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d:[0-5]\d(?:\.\d+)?(?:Z))$
                 required:
                   - id
                   - name
@@ -1010,6 +1019,7 @@ paths:
                   - locationType
                   - status
                   - versions
+                  - updatedAt
                 additionalProperties: false
         "400": *a1
         "401": *a2
@@ -1133,6 +1143,10 @@ paths:
                         - name
                         - status
                       additionalProperties: false
+                  updatedAt:
+                    type: string
+                    format: date-time
+                    pattern: ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d:[0-5]\d(?:\.\d+)?(?:Z))$
                 required:
                   - id
                   - name
@@ -1140,6 +1154,7 @@ paths:
                   - locationType
                   - status
                   - versions
+                  - updatedAt
                 additionalProperties: false
         "400": *a1
         "401": *a2
@@ -1234,6 +1249,10 @@ paths:
                         - name
                         - status
                       additionalProperties: false
+                  updatedAt:
+                    type: string
+                    format: date-time
+                    pattern: ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d:[0-5]\d(?:\.\d+)?(?:Z))$
                 required:
                   - id
                   - name
@@ -1241,6 +1260,7 @@ paths:
                   - locationType
                   - status
                   - versions
+                  - updatedAt
                 additionalProperties: false
         "400": *a1
         "401": *a2
@@ -1330,12 +1350,17 @@ paths:
                           - name
                           - status
                         additionalProperties: false
+                    updatedAt:
+                      type: string
+                      format: date-time
+                      pattern: ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d:[0-5]\d(?:\.\d+)?(?:Z))$
                   required:
                     - id
                     - name
                     - parentId
                     - status
                     - versions
+                    - updatedAt
                   additionalProperties: false
         "400": *a1
         "401": *a2
@@ -1450,12 +1475,17 @@ paths:
                         - name
                         - status
                       additionalProperties: false
+                  updatedAt:
+                    type: string
+                    format: date-time
+                    pattern: ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d:[0-5]\d(?:\.\d+)?(?:Z))$
                 required:
                   - id
                   - name
                   - parentId
                   - status
                   - versions
+                  - updatedAt
                 additionalProperties: false
         "400": *a1
         "401": *a2
@@ -1575,12 +1605,17 @@ paths:
                         - name
                         - status
                       additionalProperties: false
+                  updatedAt:
+                    type: string
+                    format: date-time
+                    pattern: ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d:[0-5]\d(?:\.\d+)?(?:Z))$
                 required:
                   - id
                   - name
                   - parentId
                   - status
                   - versions
+                  - updatedAt
                 additionalProperties: false
         "400": *a1
         "401": *a2
@@ -1672,12 +1707,17 @@ paths:
                         - name
                         - status
                       additionalProperties: false
+                  updatedAt:
+                    type: string
+                    format: date-time
+                    pattern: ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d:[0-5]\d(?:\.\d+)?(?:Z))$
                 required:
                   - id
                   - name
                   - parentId
                   - status
                   - versions
+                  - updatedAt
                 additionalProperties: false
         "400": *a1
         "401": *a2
@@ -2459,8 +2499,11 @@ components:
             properties:
               id:
                 type: string
+                maxLength: 64
+                pattern: ^[a-z0-9_]+$
                 description: Identifier of the version, unique within the event (e.g.
-                  "birth-v2").
+                  "birth_v2"). It can contain only lower-case letters (a-z),
+                  digits (0-9) and underscores (_), and at most 64 characters.
               label:
                 description: Name of the version, which the UI shows wherever it names the
                   version. For example, "{event.configVersionLabel}" in the
