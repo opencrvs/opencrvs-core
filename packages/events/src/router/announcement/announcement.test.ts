@@ -12,6 +12,7 @@
 import { TRPCError } from '@trpc/server'
 import { http, HttpResponse } from 'msw'
 import { encodeScope, getUUID, UUID } from '@opencrvs/commons'
+import { CoreRequestVerification } from '@opencrvs/commons/request-signing'
 import { createTestClient, setupTestCase } from '@events/tests/utils'
 import { getClient } from '@events/storage/postgres/events'
 import {
@@ -472,10 +473,10 @@ describe('processNextAnnouncement', () => {
       .execute()
 
     const capturedBcc: string[] = []
-    const signatures: unknown[] = []
+    const verifications: CoreRequestVerification[] = []
     mswServer.use(
       http.post(ALL_USER_NOTIFICATION_URL, async ({ request }) => {
-        signatures.push(await verifySignedByCore(request))
+        verifications.push(await verifySignedByCore(request))
         const body = (await request.json()) as { recipient: { bcc: string[] } }
         capturedBcc.push(...body.recipient.bcc)
         return HttpResponse.json({ ok: true })
@@ -495,7 +496,7 @@ describe('processNextAnnouncement', () => {
      * Asserted explicitly: if the worker stops signing, country config rejects
      * the dispatch with a 403 and no announcement is ever delivered.
      */
-    expect(signatures).toEqual([expect.objectContaining({ valid: true })])
+    expect(verifications).toEqual([expect.objectContaining({ valid: true })])
   })
 
   test('sends recipients in chunks of BCC_CHUNK_SIZE and updates progress after each', async () => {

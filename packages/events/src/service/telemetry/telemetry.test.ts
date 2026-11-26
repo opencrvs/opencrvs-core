@@ -18,6 +18,7 @@ import {
   TokenUserType
 } from '@opencrvs/commons'
 import { tennisClubMembershipEvent } from '@opencrvs/commons/fixtures'
+import { CoreRequestVerification } from '@opencrvs/commons/request-signing'
 import { setupTestCase, seedEvent } from '@events/tests/utils'
 import { mswServer } from '@events/tests/msw'
 import { env } from '@events/environment'
@@ -104,11 +105,11 @@ describe('sendTelemetryReport', () => {
   it('posts the report to countryconfig signed as core and maps a 2xx to sent', async () => {
     let capturedBody: unknown = null
     let capturedAuth: string | null = null
-    let signature: unknown = null
+    let verification: CoreRequestVerification | null = null
 
     mswServer.use(
       http.post(TELEMETRY_TRIGGER_URL, async ({ request }) => {
-        signature = await verifySignedByCore(request)
+        verification = await verifySignedByCore(request)
         capturedBody = await request.json()
         capturedAuth = request.headers.get('authorization')
         return HttpResponse.json({ status: 'forwarded' }, {
@@ -124,7 +125,7 @@ describe('sendTelemetryReport', () => {
     const result = await sendTelemetryReport(report)
 
     expect(result).toEqual({ status: 'sent' })
-    expect(signature).toMatchObject({ valid: true })
+    expect(verification).toMatchObject({ valid: true })
     expect(capturedAuth).toBeNull()
     // core sends only the window, its own version, and the metrics — no
     // country code / domain / environment (countryconfig stamps those).
@@ -163,10 +164,10 @@ describe('runDailyTelemetry', () => {
     let receivedBody:
       | { reported_at: string; metrics: Record<string, unknown> }
       | undefined
-    let signature: unknown = null
+    let verification: CoreRequestVerification | null = null
     mswServer.use(
       http.post(TELEMETRY_TRIGGER_URL, async ({ request }) => {
-        signature = await verifySignedByCore(request)
+        verification = await verifySignedByCore(request)
         receivedBody = (await request.json()) as typeof receivedBody
         return HttpResponse.json({ status: 'forwarded' }, {
           status: 202
@@ -180,6 +181,6 @@ describe('runDailyTelemetry', () => {
     expect(result.status).toBe('sent')
     expect(receivedBody?.reported_at).toBe(reportedAt)
     expect(receivedBody?.metrics['events.total']).toBeDefined()
-    expect(signature).toMatchObject({ valid: true })
+    expect(verification).toMatchObject({ valid: true })
   })
 })
