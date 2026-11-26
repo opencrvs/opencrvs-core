@@ -237,7 +237,7 @@ describe('runDestroy', () => {
     const failing: EnvironmentDataServices = {
       ...services,
       removeBucket() {
-        throw new Error('minio is not running')
+        throw new Error('rustfs is not running')
       }
     }
 
@@ -246,7 +246,7 @@ describe('runDestroy', () => {
         plan: planForTest({ name: 'feature-a', snapshot: registry }),
         services: failing
       })
-    ).toThrow(/minio is not running/)
+    ).toThrow(/rustfs is not running/)
 
     expect(operations).not.toContain('releaseRegistryEntry feature_a')
   })
@@ -436,17 +436,50 @@ describe('createDockerDataServices', () => {
     const { services, specs } = capturing()
 
     expect(services.removeBucket('feature-a--ocrvs')).toBe('removed')
-    expect(specs[0].args).toContain('deps/feature-a--ocrvs')
+    expect(specs[0].args.slice(-4)).toEqual([
+      's3',
+      'rb',
+      '--force',
+      's3://feature-a--ocrvs'
+    ])
+  })
+
+  it('runs the AWS CLI on the network of the RustFS container', () => {
+    const { services, specs } = capturing()
+
+    services.removeBucket('feature-a--ocrvs')
+
+    expect(specs[0].args).toEqual(
+      expect.arrayContaining([
+        '--network',
+        'container:opencrvs-deps-rustfs-1',
+        '--endpoint-url',
+        'http://localhost:3535'
+      ])
+    )
+  })
+
+  it('passes the S3 credentials in the environment, not in the argv', () => {
+    const { services, specs } = capturing()
+
+    services.removeBucket('feature-a--ocrvs')
+
+    expect(specs[0].env).toMatchObject({
+      AWS_ACCESS_KEY_ID: 'rustfsadmin',
+      AWS_SECRET_ACCESS_KEY: 'rustfsadmin'
+    })
+    expect(specs[0].args.join(' ')).not.toContain('rustfsadmin')
   })
 
   it('treats a missing bucket as success, so destroy stays idempotent', () => {
-    // What `mc rb` prints when the bucket is not there: the S3 `NoSuchBucket`
-    // message, rendered by `mc`, on a non-zero exit.
+    // What `aws s3 rb --force` prints when the bucket is not there.
     const { services, specs } = capturing('', {
-      status: 1,
+      status: 255,
       stderr:
-        'mc: <ERROR> Unable to validate target `deps/feature-a--ocrvs`. ' +
-        'The specified bucket does not exist.\n'
+        'fatal error: An error occurred (NoSuchBucket) when calling the ' +
+        'ListObjectsV2 operation: The specified bucket does not exist\n' +
+        'aws: [ERROR]: remove_bucket failed: Unable to delete all objects in ' +
+        'the bucket, bucket will not be deleted.\n'
     })
 
     expect(services.removeBucket('feature-a--ocrvs')).toBe('absent')
@@ -456,19 +489,20 @@ describe('createDockerDataServices', () => {
 
   it.each([
     [
-      'MinIO unreachable',
-      'mc: <ERROR> Unable to validate target `deps/feature-a--ocrvs`. ' +
-        'Get "http://localhost:3535/feature-a--ocrvs/": dial tcp ' +
-        '127.0.0.1:3535: connect: connection refused'
+      'RustFS is unreachable',
+      'Could not connect to the endpoint URL: ' +
+        '"http://localhost:3535/feature-a--ocrvs?list-type=2"'
     ],
     [
       'the credentials are rejected',
-      'mc: <ERROR> Unable to remove bucket `deps/feature-a--ocrvs`. ' +
-        'Access Denied.'
+      'fatal error: An error occurred (SignatureDoesNotMatch) when calling ' +
+        'the ListObjectsV2 operation: The request signature we calculated ' +
+        'does not match the signature you provided.'
     ],
     [
       'the dependency singleton is not running',
-      'Error response from daemon: No such container: opencrvs-deps-minio-1'
+      'docker: Error response from daemon: joining network namespace of ' +
+        'container: No such container: opencrvs-deps-rustfs-1'
     ]
   ])(
     'raises rather than reporting success when %s',
@@ -476,7 +510,7 @@ describe('createDockerDataServices', () => {
       const { services } = capturing('', { status: 1, stderr })
 
       expect(() => services.removeBucket('feature-a--ocrvs')).toThrow(
-        /Could not remove the MinIO bucket "feature-a--ocrvs"/
+        /Could not remove the S3 bucket "feature-a--ocrvs"/
       )
       // The message has to say the data survived, because the developer's next
       // move — believing the environment is gone — is the dangerous one.
@@ -517,20 +551,20 @@ describe('createDockerDataServices', () => {
 
     expect(services.emptyBucket('feature-a--ocrvs')).toBe('removed')
     expect(specs[0].args.slice(-4)).toEqual([
+      's3',
       'rm',
       '--recursive',
-      '--force',
-      'deps/feature-a--ocrvs'
+      's3://feature-a--ocrvs'
     ])
   })
 
   it('treats emptying a missing bucket as nothing to do', () => {
-    // What `mc rm --recursive` prints for a bucket that is not there.
+    // What `aws s3 rm --recursive` prints for a bucket that is not there.
     const { services } = capturing('', {
       status: 1,
       stderr:
-        'mc: <ERROR> Failed to remove `deps/feature-a--ocrvs` recursively. ' +
-        'The specified bucket does not exist'
+        'fatal error: An error occurred (NoSuchBucket) when calling the ' +
+        'ListObjectsV2 operation: The specified bucket does not exist\n'
     })
 
     expect(services.emptyBucket('feature-a--ocrvs')).toBe('absent')
@@ -543,7 +577,7 @@ describe('createDockerDataServices', () => {
     })
 
     expect(() => services.emptyBucket('feature-a--ocrvs')).toThrow(
-      /Could not empty the MinIO bucket "feature-a--ocrvs"/
+      /Could not empty the S3 bucket "feature-a--ocrvs"/
     )
   })
 
@@ -560,13 +594,13 @@ describe('createDockerDataServices', () => {
     fs.rmSync(dir, { recursive: true, force: true })
   })
 
-  it('honours POSTGRES_CONTAINER and MINIO_CONTAINER, like the shell scripts do', () => {
+  it('honours POSTGRES_CONTAINER and RUSTFS_CONTAINER, like the shell scripts do', () => {
     const specs: CommandSpec[] = []
     const services = createDockerDataServices({
       registry: stubRegistry,
       environment: {
         POSTGRES_CONTAINER: 'my-postgres',
-        MINIO_CONTAINER: 'my-minio'
+        RUSTFS_CONTAINER: 'my-rustfs'
       },
       run: (spec) => {
         specs.push(spec)
@@ -578,7 +612,7 @@ describe('createDockerDataServices', () => {
     services.emptyBucket('feature-a--ocrvs')
 
     expect(specs[0].args).toContain('my-postgres')
-    expect(specs[1].args).toContain('my-minio')
+    expect(specs[1].args).toContain('container:my-rustfs')
   })
 
   it('flushes only the named logical database', () => {
@@ -592,27 +626,24 @@ describe('createDockerDataServices', () => {
 })
 
 describe('isMissingBucket', () => {
-  it('recognises the message mc renders for a bucket that is not there', () => {
+  it('recognises what the AWS CLI prints for a bucket that is not there', () => {
     expect(
       isMissingBucket(
-        'mc: <ERROR> Unable to validate target `deps/gone--ocrvs`. ' +
-          'The specified bucket does not exist.'
+        'fatal error: An error occurred (NoSuchBucket) when calling the ' +
+          'ListObjectsV2 operation: The specified bucket does not exist'
       )
     ).toBe(true)
   })
 
-  it('recognises the raw S3 error code, which is what --json output carries', () => {
-    expect(
-      isMissingBucket(
-        '{"status":"error","error":{"cause":{"error":{"Code":"NoSuchBucket"}}}}'
-      )
-    ).toBe(true)
+  it('recognises the S3 error message without the error code', () => {
+    expect(isMissingBucket('The specified bucket does not exist')).toBe(true)
   })
 
   it.each([
     'dial tcp 127.0.0.1:3535: connect: connection refused',
-    'mc: <ERROR> Unable to remove bucket `deps/x--ocrvs`. Access Denied.',
-    'Error response from daemon: No such container: opencrvs-deps-minio-1',
+    'An error occurred (AccessDenied) when calling the DeleteBucket operation: Access Denied',
+    'An error occurred (SignatureDoesNotMatch) when calling the ListObjectsV2 operation',
+    'docker: Error response from daemon: No such container: opencrvs-deps-rustfs-1',
     'The Access Key Id you provided does not exist in our records.',
     ''
   ])('does not mistake %j for a missing bucket', (output) => {

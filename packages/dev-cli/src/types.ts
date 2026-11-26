@@ -41,7 +41,7 @@
  * stack. They *are* in the sweep, so they must be slot-shifted, but see
  * `PORT_STRIDES`: their bases are too high for the default stride.
  *
- * Dependency ports (Postgres 5432, Elasticsearch 9200, Redis 6379, MinIO
+ * Dependency ports (Postgres 5432, Elasticsearch 9200, Redis 6379, RustFS
  * 3535/3536) are deliberately absent: dependencies are a machine-wide
  * singleton shared by every environment, so they are never slot-shifted.
  */
@@ -141,7 +141,7 @@ export interface EnvironmentDescriptor {
    * alone does not isolate it.
    */
   esReindexingStatusIndex: string
-  /** MinIO bucket for uploaded documents. */
+  /** S3 bucket for uploaded documents (`S3_BUCKET`). */
   bucket: string
   /**
    * SQLite file `packages/mosip-api` keeps its record-only tokens in, relative

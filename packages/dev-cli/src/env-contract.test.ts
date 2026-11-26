@@ -36,7 +36,7 @@ describe('toEnvironmentVariables', () => {
         'postgres://events_reference_data:reference_data_password@localhost:5432/events',
       ES_INDEX_PREFIX: 'events',
       ES_REINDEXING_STATUS_INDEX: 'reindexing_status',
-      MINIO_BUCKET: 'ocrvs',
+      S3_BUCKET: 'ocrvs',
       REDIS_DB: '0',
 
       CLIENT_PORT: '3000',
@@ -114,7 +114,7 @@ describe('toEnvironmentVariables', () => {
     expect(vars.ES_REINDEXING_STATUS_INDEX).toBe(
       'events_feature_a_reindexing_status'
     )
-    expect(vars.MINIO_BUCKET).toBe('feature-a--ocrvs')
+    expect(vars.S3_BUCKET).toBe('feature-a--ocrvs')
   })
 
   it('shifts the manually-launched tool ports too, so two worktrees can each run one', () => {

@@ -44,7 +44,7 @@ export interface EnvironmentDataServices {
   /** Delete one index. Called only for indices the plan positively claims. */
   deleteIndex(index: string): void
   /**
-   * Remove the environment's MinIO bucket and its contents. Reports whether
+   * Remove the environment's S3 bucket and its contents. Reports whether
    * there was one; throws if there was and it could not be removed.
    */
   removeBucket(bucket: string): BucketRemoval

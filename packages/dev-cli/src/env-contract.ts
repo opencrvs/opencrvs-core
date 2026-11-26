@@ -84,7 +84,7 @@ export function toEnvironmentVariables(
      * every environment would share one `reindexing_status` index.
      */
     ES_REINDEXING_STATUS_INDEX: descriptor.esReindexingStatusIndex,
-    MINIO_BUCKET: descriptor.bucket,
+    S3_BUCKET: descriptor.bucket,
     REDIS_DB: String(descriptor.redisDb),
 
     // Listen ports.

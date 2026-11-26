@@ -66,7 +66,7 @@ export interface RunDepsDownInput extends DepsDownOptions {
  * Stop the shared dependency singleton.
  *
  * Volume wiping is loud rather than silent, because `-v` deletes the Postgres,
- * Elasticsearch and MinIO volumes shared by *every* environment on the machine
+ * Elasticsearch and RustFS volumes shared by *every* environment on the machine
  * — not just the current worktree's — and the flag is one character long.
  */
 export function runDepsDown(input: RunDepsDownInput = {}): number {

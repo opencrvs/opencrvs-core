@@ -97,7 +97,7 @@ describe('resolveEnvironment: primary worktree', () => {
     })
 
     // Today's values: packages/events EVENTS_POSTGRES_URL devDefault database
-    // and ES_INDEX_PREFIX default, packages/documents MINIO_BUCKET default.
+    // and ES_INDEX_PREFIX default, packages/documents S3_BUCKET default.
     expect(descriptor.dbName).toBe('events')
     expect(descriptor.esPrefix).toBe('events')
     expect(descriptor.esReindexingStatusIndex).toBe('reindexing_status')
@@ -437,7 +437,7 @@ describe('resolveEnvironment: derived identifiers', () => {
     expect(descriptor.esReindexingStatusIndex).toBe(
       'events_my_feature_branch_reindexing_status'
     )
-    // Underscores are illegal in S3/MinIO bucket names, so the bucket keeps
+    // Underscores are illegal in S3 bucket names, so the bucket keeps
     // hyphens — the ADR table's literal `<name>--ocrvs`.
     expect(descriptor.bucket).toBe('my-feature-branch--ocrvs')
   })
@@ -624,7 +624,7 @@ describe('portsForSlot: the whole allocatable port map', () => {
   })
 
   it('never lands on a port the shared dependency singleton owns', () => {
-    // Postgres, Elasticsearch, Redis, MinIO and its console. Fixed, never
+    // Postgres, Elasticsearch, Redis, RustFS and its console. Fixed, never
     // slot-shifted, because the dependencies are machine-wide (ADR-0005).
     const dependencyPorts = [5432, 9200, 6379, 3535, 3536]
 
@@ -688,7 +688,7 @@ describe('sanitizeEnvironmentName', () => {
 
 describe('bucketNameForEnvironment', () => {
   /**
-   * S3/MinIO bucket rules exercised here: 3-63 characters, only lowercase
+   * S3 bucket rules exercised here: 3-63 characters, only lowercase
    * letters, digits and hyphens, first and last character alphanumeric.
    * (Adjacent hyphens are legal — only adjacent dots are not — which is what
    * makes the ADR's `--ocrvs` separator safe.)
@@ -757,7 +757,7 @@ describe('hasExplicitName', () => {
 describe('legacy identifier constants', () => {
   it('match the defaults the services ship today', () => {
     // packages/events: EVENTS_POSTGRES_URL devDefault database, ES_INDEX_PREFIX
-    // packages/documents: MINIO_BUCKET
+    // packages/documents: S3_BUCKET
     expect(LEGACY_DB_NAME).toBe('events')
     expect(LEGACY_ES_PREFIX).toBe('events')
     // packages/events: ES_REINDEXING_STATUS_INDEX default

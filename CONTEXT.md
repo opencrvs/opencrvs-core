@@ -129,7 +129,7 @@ An isolated run of OpenCRVS on a developer machine — its own set of host node 
 _Avoid_: instance; stack, or an environment's stack, as a name for one of these. "Stack" stays correct for a set of services generically ("the dev stack", "start the stack") — it is wrong only when it stands in for one environment.
 
 **Name**:
-The identifier for an environment, derived from the git worktree directory basename (sanitized, `-` → `_`). Keys all per-environment data — database name, Elasticsearch index prefix, MinIO bucket, mosip-api SQLite file.
+The identifier for an environment, derived from the git worktree directory basename (sanitized, `-` → `_`). Keys all per-environment data — database name, Elasticsearch index prefix, S3 bucket, mosip-api SQLite file.
 
 **Slot**:
 A small integer (0–5) assigned to an environment by the registry. Determines the host port block (`base + slot * stride`) and the Redis logical DB index. Slot 0 is the default environment's alone and matches historical single-environment ports; every other environment, a named one in the primary worktree included, gets 1–5.
@@ -144,5 +144,5 @@ The main (non-linked) git checkout. Without `--env` it runs the default environm
 The machine-level file (`~/.local/state/opencrvs/envs.json`) mapping each environment `name` to its `slot`.
 
 **Dependency singleton**:
-The single shared set of backing services (Postgres, Elasticsearch, Redis, MinIO) that all local environments share, run under docker compose project `opencrvs-deps`. Contrast with the per-environment node processes.
+The single shared set of backing services (Postgres, Elasticsearch, Redis, RustFS) that all local environments share, run under docker compose project `opencrvs-deps`. Contrast with the per-environment node processes.
 _Avoid_: deps stack, dependency stack, backend services. "Singleton" is the load-bearing word — there is exactly one per machine, and calling it a stack invites the reader to assume one per environment.

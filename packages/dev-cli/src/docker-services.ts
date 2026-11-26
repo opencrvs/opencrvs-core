@@ -20,14 +20,14 @@ import { Registry } from './registry'
 /**
  * Containers of the shared dependency singleton, named by docker compose from
  * the project name `opencrvs-deps` (see `docker-compose.dev-deps.yml`).
- * `POSTGRES_CONTAINER`, `MINIO_CONTAINER` and `ELASTICSEARCH_CONTAINER`
+ * `POSTGRES_CONTAINER`, `RUSTFS_CONTAINER` and `ELASTICSEARCH_CONTAINER`
  * override them, so an unusual local setup is not locked out.
  */
 export const DEPS_CONTAINERS = {
   postgres: 'opencrvs-deps-postgres-1',
   redis: 'opencrvs-deps-redis-1',
   elasticsearch: 'opencrvs-deps-elasticsearch-1',
-  minio: 'opencrvs-deps-minio-1'
+  rustfs: 'opencrvs-deps-rustfs-1'
 } as const
 
 export type DepsContainers = Record<keyof typeof DEPS_CONTAINERS, string>
@@ -38,14 +38,19 @@ export type DepsContainers = Record<keyof typeof DEPS_CONTAINERS, string>
  * environment's data lives in the same four services.
  */
 const ELASTICSEARCH_INTERNAL_PORT = 9200
-const MINIO_INTERNAL_PORT = 3535
+const RUSTFS_INTERNAL_PORT = 3535
 
-/** The dev credentials the stack ships with (`packages/documents`). */
-const MINIO_DEFAULT_ACCESS_KEY = 'minioadmin'
-const MINIO_DEFAULT_SECRET_KEY = 'minioadmin'
+/** The dev credentials the stack ships with (`docker-compose.deps.yml`). */
+const RUSTFS_DEFAULT_ACCESS_KEY = 'rustfsadmin'
+const RUSTFS_DEFAULT_SECRET_KEY = 'rustfsadmin'
 
-/** `mc` alias name. Supplied per-invocation via `MC_HOST_<alias>`. */
-const MC_ALIAS = 'deps'
+/**
+ * The RustFS image has no S3 client, so bucket operations run the AWS CLI in a
+ * one-off container. The container joins the network namespace of the RustFS
+ * container, so it reaches RustFS on `localhost`. The tag is pinned so that
+ * the error output that `isMissingBucket` reads does not change.
+ */
+const AWS_CLI_IMAGE = 'amazon/aws-cli:2.42.4'
 
 export interface DiscoverEnvironmentsOptions {
   /** Injected in tests so no container is ever contacted. */
@@ -117,9 +122,9 @@ export interface DockerDataServicesOptions {
  *
  * `docker exec` rather than network clients on purpose: this package is the
  * bootstrap step that runs before a developer's checkout is installed, so it
- * carries no `pg`, no Elasticsearch client and no S3 SDK. Every tool it needs
- * (`psql`, `curl`, `mc`, `redis-cli`) already ships inside the image that owns
- * the data.
+ * carries no `pg`, no Elasticsearch client and no S3 SDK. `psql`, `curl` and
+ * `redis-cli` ship inside the image that owns the data. The RustFS image has
+ * no S3 client, so bucket operations use the AWS CLI image instead.
  */
 export function createDockerDataServices(
   options: DockerDataServicesOptions
@@ -129,48 +134,55 @@ export function createDockerDataServices(
   const containers: DepsContainers = {
     ...DEPS_CONTAINERS,
     ...(env.POSTGRES_CONTAINER && { postgres: env.POSTGRES_CONTAINER }),
-    ...(env.MINIO_CONTAINER && { minio: env.MINIO_CONTAINER }),
+    ...(env.RUSTFS_CONTAINER && { rustfs: env.RUSTFS_CONTAINER }),
     ...(env.ELASTICSEARCH_CONTAINER && {
       elasticsearch: env.ELASTICSEARCH_CONTAINER
     }),
     ...options.containers
   }
 
-  const minioAccessKey =
-    env.MINIO_ROOT_USER ?? env.MINIO_ACCESS_KEY ?? MINIO_DEFAULT_ACCESS_KEY
-  const minioSecretKey =
-    env.MINIO_ROOT_PASSWORD ?? env.MINIO_SECRET_KEY ?? MINIO_DEFAULT_SECRET_KEY
-
-  function mcArgs(args: string[]): string[] {
-    return [
-      'exec',
-      '-e',
-      `MC_HOST_${MC_ALIAS}=http://${encodeURIComponent(minioAccessKey)}:${encodeURIComponent(minioSecretKey)}@localhost:${MINIO_INTERNAL_PORT}`,
-      containers.minio,
-      'mc',
-      ...args
-    ]
+  const s3Credentials = {
+    AWS_ACCESS_KEY_ID:
+      env.S3_ACCESS_KEY ?? env.RUSTFS_ACCESS_KEY ?? RUSTFS_DEFAULT_ACCESS_KEY,
+    AWS_SECRET_ACCESS_KEY:
+      env.S3_SECRET_KEY ?? env.RUSTFS_SECRET_KEY ?? RUSTFS_DEFAULT_SECRET_KEY,
+    // RustFS accepts any region, and the CLI refuses to run without one.
+    AWS_DEFAULT_REGION: 'us-east-1',
+    // Stops the CLI from looking for EC2 instance credentials.
+    AWS_EC2_METADATA_DISABLED: 'true'
   }
 
   /*
-   * Credentials travel in `MC_HOST_<alias>` rather than an `mc alias set`
-   * call, so nothing is written to the container's config and the secret
-   * never appears in an argv a `docker inspect` or `ps` would show.
+   * The credentials travel in the environment of the `docker` process. The
+   * argv names only the variables (`-e NAME`), so the secret does not appear
+   * in what `ps` or `docker inspect` shows.
    *
-   * Non-zero is inspected here rather than thrown by the runner, because
-   * exactly one non-zero case — "there was no bucket" — is a success for
-   * both callers. Every other one must reach the caller (see
-   * `isMissingBucket`), so the registry entry is never released over
-   * surviving data.
+   * The runner does not throw on a non-zero exit here. One non-zero case,
+   * "there was no bucket", is a success for both callers. Every other one must
+   * reach the caller (see `isMissingBucket`), so the registry entry is never
+   * released while the data survives.
    */
   function bucketOperation(
-    mcCommand: string[],
+    s3Command: string[],
     bucket: string,
     verb: 'remove' | 'empty'
   ): BucketRemoval {
     const spec = {
       command: 'docker',
-      args: mcArgs([...mcCommand, `${MC_ALIAS}/${bucket}`]),
+      args: [
+        'run',
+        '--rm',
+        '--network',
+        `container:${containers.rustfs}`,
+        ...Object.keys(s3Credentials).flatMap((name) => ['-e', name]),
+        AWS_CLI_IMAGE,
+        '--endpoint-url',
+        `http://localhost:${RUSTFS_INTERNAL_PORT}`,
+        's3',
+        ...s3Command,
+        `s3://${bucket}`
+      ],
+      env: s3Credentials,
       allowFailure: true
     }
 
@@ -185,7 +197,7 @@ export function createDockerDataServices(
     }
 
     throw new Error(
-      `Could not ${verb} the MinIO bucket "${bucket}": \`${describe(spec)}\` ` +
+      `Could not ${verb} the S3 bucket "${bucket}": \`${describe(spec)}\` ` +
         `exited ${outcome.status}.\n` +
         `${[outcome.stderr, outcome.stdout]
           .map((stream) => stream.trim())
@@ -318,7 +330,7 @@ export function createDockerDataServices(
     emptyBucket(bucket) {
       // `rm --recursive` on the bucket itself removes every object but leaves
       // the bucket, so the documents service needs nothing recreated.
-      return bucketOperation(['rm', '--recursive', '--force'], bucket, 'empty')
+      return bucketOperation(['rm', '--recursive'], bucket, 'empty')
     },
 
     removeFile(filePath) {
@@ -333,25 +345,25 @@ export function createDockerDataServices(
 }
 
 /**
- * The one `mc rb` failure `env:destroy` is allowed to treat as success.
+ * The one bucket failure that `env:destroy` and `env:clear` treat as success.
  *
- * `mc` exits non-zero for a bucket that is not there *and* for MinIO being
- * unreachable, the credentials being wrong, the container not existing, or the
- * removal being denied — so the exit code alone cannot tell idempotency from a
- * genuine failure, and a blanket `allowFailure` reports every one of them as
- * "removed bucket X" while the data survives and the slot is freed.
+ * The AWS CLI exits non-zero for a bucket that is not there. It also exits
+ * non-zero when RustFS is unreachable, the credentials are wrong, the container
+ * does not exist or the removal is denied. So the exit code alone cannot tell
+ * a repeated run from a real failure. A blanket `allowFailure` would report
+ * each of them as "removed bucket X" while the data survives and the slot is
+ * freed.
  *
- * Two signatures, because `mc` renders the same underlying S3 error two ways:
+ * The CLI prints the S3 error code and its message:
  *
- * - `mc: <ERROR> Unable to validate target 'deps/x--ocrvs'. The specified
- *   bucket does not exist.` — the human-readable rendering, which is the S3
- *   `NoSuchBucket` error's `Message` verbatim.
- * - `NoSuchBucket` — the S3 error *code*, which is what surfaces in `--json`
- *   output and in some `mc` versions' plain rendering.
+ * - `An error occurred (NoSuchBucket) when calling the ListObjectsV2
+ *   operation: The specified bucket does not exist`
  *
- * Deliberately narrow: an unmatched failure throws, which is the safe way to be
- * wrong. "Connection refused", "No such container" and "Access Denied" all miss
- * both patterns.
+ * Both patterns are kept, so that a change in how the code or the message is
+ * printed does not break the check. The check is narrow on purpose: an
+ * unmatched failure throws, which is the safe way to be wrong. "Connection
+ * refused", "No such container", "SignatureDoesNotMatch" and "Access Denied"
+ * all miss both patterns.
  */
 export function isMissingBucket(...streams: string[]): boolean {
   const output = streams.join('\n')

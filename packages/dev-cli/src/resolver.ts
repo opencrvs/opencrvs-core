@@ -66,7 +66,7 @@ export class InvalidEnvironmentNameError extends Error {
  * - `events`             database, from `packages/events` `EVENTS_POSTGRES_URL` devDefault
  * - `events`             index prefix, from `packages/events` `ES_INDEX_PREFIX` default
  * - `reindexing_status`  from `packages/events` `ES_REINDEXING_STATUS_INDEX` default
- * - `ocrvs`              bucket, from `packages/documents/src/minio/constants.ts`
+ * - `ocrvs`              bucket, from `packages/documents/src/s3/constants.ts`
  * - `data/sqlite/mosip-api.db` from `packages/mosip-api` `SQLITE_DATABASE_PATH` devDefault
  */
 export const LEGACY_DB_NAME = 'events'
@@ -78,7 +78,7 @@ export const LEGACY_MOSIP_DATABASE_FILE = 'data/sqlite/mosip-api.db'
 /** Directory holding every environment's mosip-api SQLite file. */
 export const MOSIP_DATABASE_DIR = 'data/sqlite'
 
-/** S3/MinIO caps a bucket name at 63 characters. */
+/** S3 caps a bucket name at 63 characters. */
 const MAX_BUCKET_LENGTH = 63
 
 /** The ADR's bucket separator: `<name>--ocrvs`. */
@@ -89,7 +89,7 @@ const BUCKET_SUFFIX = '--ocrvs'
  * in a Postgres database name and an Elasticsearch index prefix. `-` becomes
  * `_`, as does anything else outside `[a-z0-9_]`.
  *
- * Not used for the bucket: underscores are illegal in S3/MinIO bucket names.
+ * Not used for the bucket: underscores are illegal in S3 bucket names.
  * See `bucketNameForEnvironment`.
  */
 export function sanitizeEnvironmentName(raw: string): string {
@@ -109,7 +109,7 @@ export function sanitizeEnvironmentName(raw: string): string {
 }
 
 /**
- * Fold a raw name into an S3/MinIO-legal bucket name, `<name>--ocrvs`.
+ * Fold a raw name into an S3-legal bucket name, `<name>--ocrvs`.
  *
  * Bucket names may not contain underscores, so this is a *hyphen* fold rather
  * than the underscore fold `sanitizeEnvironmentName` applies — the two are
@@ -141,7 +141,7 @@ export function bucketNameForEnvironment(raw: string): string {
     throw new InvalidEnvironmentNameError(
       `Environment name ${JSON.stringify(raw)} is too long: it yields the ` +
         `${bucket.length}-character bucket "${bucket}", over the ` +
-        `${MAX_BUCKET_LENGTH}-character limit MinIO enforces. Pass a shorter ` +
+        `${MAX_BUCKET_LENGTH}-character limit S3 enforces. Pass a shorter ` +
         `--env <name> (at most ${MAX_BUCKET_LENGTH - BUCKET_SUFFIX.length} ` +
         'characters).'
     )

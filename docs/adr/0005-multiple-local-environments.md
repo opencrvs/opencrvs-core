@@ -9,7 +9,7 @@ accepted
 Developers (and coding agents working in git worktrees) need to run several
 isolated OpenCRVS stacks on one machine at once — one per branch/worktree — so
 that parallel work does not clobber a shared database or fight over ports.
-Running N full sets of dependencies (Postgres, Elasticsearch, Redis, MinIO) per
+Running N full sets of dependencies (Postgres, Elasticsearch, Redis, RustFS) per
 environment is too heavy. The production e2e setup
 (`opencrvs/e2e`) already solves the analogous problem in Kubernetes: many
 feature environments in one cluster, each a namespace, all sharing a single
@@ -55,7 +55,7 @@ singleton.
 | Postgres      | one database, shared schemas within | `events_<name>` via `EVENTS_POSTGRES_URL` + `TARGET_DB`           |
 | Elasticsearch | index prefix                        | `ES_INDEX_PREFIX=events_<name>`                                   |
 | Elasticsearch | reindexing-status index             | `ES_REINDEXING_STATUS_INDEX=events_<name>_reindexing_status`      |
-| MinIO         | bucket                              | `MINIO_BUCKET=<name>--ocrvs`                                      |
+| RustFS        | bucket                              | `S3_BUCKET=<name>--ocrvs`                                         |
 | Redis         | logical DB index                    | `REDIS_DB=<slot>` (0–15)                                          |
 | SQLite        | one file per environment            | `SQLITE_DATABASE_PATH=<worktree>/data/sqlite/mosip-api-<name>.db` |
 
@@ -76,8 +76,8 @@ singleton.
 Both were decided during implementation, where a literal reading of this ADR
 would have produced a broken or backward-incompatible stack:
 
-1. **The MinIO bucket keeps hyphens.** The `-` → `_` fold that makes a name safe
-   as a Postgres identifier produces an _invalid_ S3/MinIO bucket name —
+1. **The S3 bucket keeps hyphens.** The `-` → `_` fold that makes a name safe
+   as a Postgres identifier produces an _invalid_ S3 bucket name —
    underscores are not permitted. So `dbName` and `esPrefix` fold to `_`, while
    the bucket folds to `-`: worktree `feature-a` yields database
    `events_feature_a` but bucket `feature-a--ocrvs`. This matches the literal
@@ -133,7 +133,7 @@ would have produced a broken or backward-incompatible stack:
   `migration` package** (reusable by CI): guarded `CREATE DATABASE events_<name>`
   - shared roles, then migrations. `testland`'s `setup-analytics` /
     `setup-reference-data` receive `TARGET_DB=events_<name>`. Elasticsearch indices
-    and the MinIO bucket are auto-created by services on boot.
+    and the S3 bucket are auto-created by services on boot.
 - `env:destroy <name>` drops the database, ES indices, bucket, and runs
   `FLUSHDB` on the slot's Redis index, then frees the slot. Lazy GC frees slots
   whose worktree directory no longer exists but **never silently drops data** —
