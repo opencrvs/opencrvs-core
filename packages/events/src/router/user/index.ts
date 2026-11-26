@@ -213,7 +213,7 @@ export async function handleCreateUser(
     })
   }
 
-  const user = await createUser(input, ctx.token)
+  const user = await createUser(input)
 
   const auditLogIdentifiers = getAuditLogIdentifiers(ctx.token)
   await writeAuditLog({
@@ -685,7 +685,7 @@ export const userRouter = router({
     .mutation(async ({ input, ctx }) => {
       const userId = UUID.parse(input)
 
-      await resendInvite(userId, ctx.token)
+      await resendInvite(userId)
       const auditLogIdentifiers = getAuditLogIdentifiers(ctx.token)
       await writeAuditLog({
         operation: 'user.resend_invite',

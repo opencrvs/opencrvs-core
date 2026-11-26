@@ -401,7 +401,6 @@ async function sendCredentialsNotification(
   name: UserName,
   username: string,
   password: string,
-  token: string,
   msisdn?: string,
   email?: string
 ) {
@@ -452,8 +451,7 @@ function resolveCreateUserInput(
 }
 
 export async function createUser(
-  input: CreateUserInput | CreateUserInputInternal,
-  _token: string
+  input: CreateUserInput | CreateUserInputInternal
 ) {
   const usernameCandidate = input.username ?? generateUsername(input.name)
   const username = await findAvailableUsername(usernameCandidate)
@@ -499,7 +497,6 @@ export async function createUser(
     input.name,
     userCredentialPayload.username,
     resolvedUser.password,
-    _token,
     userPayload.mobile ?? undefined,
     userPayload.email
   )
@@ -530,7 +527,7 @@ export async function activateUser(input: {
   await activateUserWithCredentials(userId, hash, salt, securityQuestions)
 }
 
-export async function resendInvite(userId: UUID, token: string): Promise<void> {
+export async function resendInvite(userId: UUID): Promise<void> {
   const user = await getUserById(userId)
 
   if (!user) {
@@ -560,7 +557,6 @@ export async function resendInvite(userId: UUID, token: string): Promise<void> {
     userName,
     user.username,
     password,
-    token,
     user.mobile ?? undefined,
     user.email ?? undefined
   )
