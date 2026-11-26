@@ -14,6 +14,7 @@ import { EventConfig } from '../events/EventConfig'
 import { EventDocument } from '../events/EventDocument'
 import { EventIndex } from '../events/EventIndex'
 import { getCurrentEventState } from '../events/state'
+import { getEventWithCompleteAcceptedActions } from '../events/utils'
 import { EncodedScope, TokenUserType } from '../users/authentication'
 import { UUID } from '../uuid'
 import { isOnline, todayISO } from './validate'
@@ -169,7 +170,10 @@ export function buildActionFormConditionalParameters(
 ): ActionFormConditionalParameters {
   return {
     ...buildCommonConditionalParameters(form, context),
-    $event: context.eventDocument,
+    // TODO: this should not affect all $events. https://github.com/opencrvs/opencrvs-core/issues/14485
+    $event: context.eventDocument
+      ? getEventWithCompleteAcceptedActions(context.eventDocument)
+      : context.eventDocument,
     $user: context.user,
     $leafAdminStructureLocationIds: context.leafAdminStructureLocationIds
   }
@@ -193,7 +197,10 @@ export function buildActionConditionalParameters(
 ): ActionConditionalParameters {
   return {
     ...buildCommonConditionalParameters(form, context),
-    $event: context.eventDocument,
+    // TODO: this should not affect all $events. https://github.com/opencrvs/opencrvs-core/issues/14485
+    $event: context.eventDocument
+      ? getEventWithCompleteAcceptedActions(context.eventDocument)
+      : context.eventDocument,
     $user: context.user
   }
 }
@@ -215,7 +222,10 @@ export function buildCertificateTemplateConditionalParameters(
 ): CertificateTemplateConditionalParameters {
   return {
     ...buildCommonConditionalParameters(form, context),
+    // TODO: this should not affect all $events. https://github.com/opencrvs/opencrvs-core/issues/14485
     $event: context.eventDocument
+      ? getEventWithCompleteAcceptedActions(context.eventDocument)
+      : context.eventDocument
   }
 }
 
