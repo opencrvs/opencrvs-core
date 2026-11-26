@@ -9,50 +9,48 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import fetch from 'node-fetch'
+import { z } from 'zod'
 import {
   AUTH_URL,
   COUNTRY_CONFIG_CLIENT_ID,
   COUNTRY_CONFIG_CLIENT_SECRET
 } from '@countryconfig/constants'
-import { logger } from '@countryconfig/logger'
 
 /** System tokens live 10 minutes; one is reused for less than that. */
 const REUSE_FOR_MS = 5 * 60 * 1000
+
+const TokenResponse = z.object({ access_token: z.string() })
 
 let cached: { token: string; fetchedAt: number } | undefined
 
 /**
  * A token of country config's own system client, for calls to core. Core's
  * requests to country config are signed and carry no token to reuse.
- * Undefined when auth does not answer; the caller then skips its call to core.
+ *
+ * @throws when auth refuses the client or answers with no token. A caller
+ * that can continue without core catches the error.
  */
-export async function getCoreApiToken(): Promise<string | undefined> {
+export async function getCoreApiToken(): Promise<string> {
   if (cached && Date.now() - cached.fetchedAt < REUSE_FOR_MS) {
     return cached.token
   }
 
-  try {
-    const response = await fetch(new URL('/token', AUTH_URL), {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-      body: new URLSearchParams({
-        client_id: COUNTRY_CONFIG_CLIENT_ID,
-        client_secret: COUNTRY_CONFIG_CLIENT_SECRET,
-        grant_type: 'client_credentials'
-      })
+  const response = await fetch(new URL('/token', AUTH_URL), {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+    body: new URLSearchParams({
+      client_id: COUNTRY_CONFIG_CLIENT_ID,
+      client_secret: COUNTRY_CONFIG_CLIENT_SECRET,
+      grant_type: 'client_credentials'
     })
-    if (!response.ok) {
-      throw new Error(`HTTP ${response.status}`)
-    }
-    const { access_token: token } = (await response.json()) as {
-      access_token: string
-    }
-    cached = { token, fetchedAt: Date.now() }
-    return token
-  } catch (error) {
-    logger.error(
-      `Could not get a token for the country config system client: ${String(error)}`
+  })
+  if (!response.ok) {
+    throw new Error(
+      `Could not get a token for the country config system client: HTTP ${response.status}`
     )
-    return undefined
   }
+
+  const { access_token: token } = TokenResponse.parse(await response.json())
+  cached = { token, fetchedAt: Date.now() }
+  return token
 }

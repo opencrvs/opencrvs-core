@@ -841,9 +841,11 @@ export async function createServer() {
     const now = Date.now()
     // Sync locations at most once per hour rather than every call
     if (now - lastLocationSyncAt > ONE_HOUR_MS) {
-      const token = await getCoreApiToken()
-      if (!token) {
-        logger.warn('Reindex: no token for core, locations not synced.')
+      let token: string
+      try {
+        token = await getCoreApiToken()
+      } catch (error) {
+        logger.warn(`Reindex: locations not synced. ${String(error)}`)
         return
       }
       const url = new URL('events', GATEWAY_URL).toString()
