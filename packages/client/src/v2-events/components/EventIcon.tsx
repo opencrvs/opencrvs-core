@@ -12,43 +12,34 @@
 import * as React from 'react'
 import {
   AvailableIcons,
-  buildClientFunctionContext,
+  buildEventIndexConditionalParameters,
   EventConfig,
   EventIndex,
   JSONSchema,
   validate
 } from '@opencrvs/commons/client'
-import { useEventlessFormConditionalContext } from '@client/v2-events/hooks/useConditionalContext'
-import { EventlessFormConditionalContext } from '@client/v2-events/components/forms/formConditionalContext'
 import { IconWithName } from './IconWithName'
 import { IconWithNameEvent } from './IconWithNameEvent'
 
 /**
- * Given an EventConfig's `icon` map (icon name -> conditional) and a real
- * event, returns the name of the first icon (in definition order) whose
- * conditional matches, or `undefined` if there's no icon config or nothing
- * matches — callers should fall back to a default icon in that case.
+ * Returns the name of the first icon (in definition order) whose conditional matches the event.
+ * Returns `undefined` when the event configuration has no icons or no conditional matches.
+ * Then the caller shows the default icon.
  */
 function resolveEventIcon(
   iconConfig: EventConfig['icon'],
-  event: EventIndex,
-  context: EventlessFormConditionalContext
+  eventIndex: EventIndex
 ): AvailableIcons | undefined {
   if (!iconConfig) {
     return undefined
   }
 
-  const clientFunctionContext = {
-    ...buildClientFunctionContext({
-      form: event.declaration,
-      conditionalContext: context
-    }),
-    $flags: event.flags,
-    $status: event.status
-  }
-
+  const parameters = buildEventIndexConditionalParameters(
+    { declaration: eventIndex.declaration },
+    { eventIndex }
+  )
   const match = Object.entries(iconConfig).find(([, conditional]) =>
-    validate(conditional as JSONSchema, clientFunctionContext)
+    validate(conditional as JSONSchema, parameters)
   )
 
   return match?.[0] as AvailableIcons | undefined
@@ -74,10 +65,7 @@ export function EventIcon({
   isArchived?: boolean
   isValidatedOnReview?: boolean
 }) {
-  // @TODO: seems weird to use eventless conditionals for event icon.
-  // The icon reads the flags and the status of the event index. It needs no event document.
-  const conditionalContext = useEventlessFormConditionalContext()
-  const iconName = resolveEventIcon(eventConfig.icon, event, conditionalContext)
+  const iconName = resolveEventIcon(eventConfig.icon, event)
 
   if (displayEventType) {
     return (

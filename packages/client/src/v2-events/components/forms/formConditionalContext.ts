@@ -11,17 +11,14 @@
 import {
   ActionFormConditionalContext,
   EventDocument,
-  EventDocumentConditionalContext
+  UserAndLocationsConditionalContext
 } from '@opencrvs/commons/client'
 
 /**
  * The context of a form that has no event, e.g. the user form or the advanced search form.
- * It is the context of an action form without the event.
+ * It has only the user and the locations.
  */
-export type EventlessFormConditionalContext = Omit<
-  ActionFormConditionalContext,
-  keyof EventDocumentConditionalContext
->
+export type EventlessFormConditionalContext = UserAndLocationsConditionalContext
 
 /**
  * The context for conditionals in a form.

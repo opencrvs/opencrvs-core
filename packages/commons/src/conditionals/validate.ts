@@ -62,13 +62,13 @@ import {
   buildActionConditionalParameters,
   buildActionFormConditionalParameters,
   buildCertificateTemplateConditionalParameters,
-  buildSecuredConditionalParameters,
+  buildEventIndexConditionalParameters,
   CertificateTemplateConditionalContext,
   ClientFunctionConditionalContext,
   FormValues,
   hasClientFunctionEvent,
   resolveEventState,
-  SecuredConditionalContext,
+  EventIndexConditionalContext,
   UserConditionalContext
 } from './validate-v2'
 
@@ -175,9 +175,13 @@ export type ClientFunctionContext = {
   $user?: UserConditionalContext
   $event?: EventDocument
   $leafAdminStructureLocationIds: Array<{ id: UUID }>
+  /** The profile of the user. Only `$$code` default values get it. */
   user?: SystemVariables['user']
+  /** The location of the browser window. Only `$$code` default values get it. */
   $window?: SystemVariables['$window']
+  /** No caller sets it at the moment, so it is always `undefined`. */
   locations?: Location[]
+  /** The ids of the levels of the administrative structure. Only `$$code` default values get it. */
   adminLevelIds?: string[]
   $flags?: string[]
   $status?: string
@@ -238,17 +242,18 @@ export function buildClientFunctionContext(input: {
     conditionalContext && hasClientFunctionEvent(conditionalContext)
       ? conditionalContext
       : undefined
+  const eventState = event ? resolveEventState(event) : undefined
 
   return {
     $form: input.form,
-    $flags: event ? resolveEventState(event).flags : [],
+    $flags: eventState?.flags ?? [],
+    $status: eventState?.status,
     $now: todayISO(),
     $online: isOnline(),
     $user: input.conditionalContext?.user,
-    $event:
-      event && 'eventDocument' in event
-        ? getEventWithCompleteAcceptedActions(event.eventDocument)
-        : undefined,
+    $event: event?.eventDocument
+      ? getEventWithCompleteAcceptedActions(event.eventDocument)
+      : undefined,
     $leafAdminStructureLocationIds:
       input.conditionalContext?.leafAdminStructureLocationIds ?? [],
     user: input.systemVariables?.user,
@@ -528,7 +533,7 @@ export function areConditionsMet(
 export function isFieldSecured(
   field: Pick<FieldConfig, 'secured'>,
   form: FormValues,
-  context: SecuredConditionalContext
+  context: EventIndexConditionalContext
 ): boolean {
   if (typeof field.secured !== 'object' || field.secured === null) {
     return Boolean(field.secured)
@@ -536,7 +541,7 @@ export function isFieldSecured(
 
   return validate(
     field.secured as JSONSchema,
-    buildSecuredConditionalParameters(form, context)
+    buildEventIndexConditionalParameters(form, context)
   )
 }
 

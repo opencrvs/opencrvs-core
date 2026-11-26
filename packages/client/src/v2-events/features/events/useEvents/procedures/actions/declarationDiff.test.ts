@@ -14,7 +14,6 @@ import {
   ConditionalType,
   EventConfig,
   EventState,
-  eventQueryDataGenerator,
   flag,
   generateEventDocument,
   getDeclarationFields,
@@ -486,23 +485,31 @@ describe('getCleanedDeclarationDiff', () => {
       }))
     })
 
-    const document = generateEventDocument({
-      configuration: eventConfiguration,
-      actions: [{ type: ActionType.CREATE }, { type: ActionType.DECLARE }]
-    })
+    // The DECLARE action of this configuration adds the flag `sealed`.
+    const configWithSealingDeclare = {
+      ...configWithFlaggedField,
+      actions: configWithFlaggedField.actions.map((action) =>
+        action.type === ActionType.DECLARE
+          ? { ...action, flags: [{ id: 'sealed', operation: 'add' as const }] }
+          : action
+      )
+    }
 
     /**
-     * The flags come from the event index, not from the document.
-     * Commons reads `eventIndex` before `eventDocument`, so the index decides the flags.
+     * The flags come from the actions of the event document.
+     * The event has the flag `sealed` only after the DECLARE action.
      */
     function contextWithFlags(flags: string[]): ActionFormConditionalContext {
-      const context = {
+      return {
         ...conditionalContext,
-        eventDocument: document,
-        eventConfig: configWithFlaggedField,
-        eventIndex: eventQueryDataGenerator({ flags })
+        eventDocument: generateEventDocument({
+          configuration: configWithSealingDeclare,
+          actions: flags.includes('sealed')
+            ? [{ type: ActionType.CREATE }, { type: ActionType.DECLARE }]
+            : [{ type: ActionType.CREATE }]
+        }),
+        eventConfig: configWithSealingDeclare
       }
-      return context
     }
 
     function cleanDiffForFlags(flags: string[]) {
