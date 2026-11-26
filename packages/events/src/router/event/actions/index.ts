@@ -55,6 +55,7 @@ import {
   addAction,
   addAsyncRejectAction,
   throwConflictIfActionNotAllowed,
+  withoutOwnRequestedAction,
   processAction
 } from '@events/service/events/events'
 import {
@@ -266,12 +267,15 @@ export async function defaultRequestHandler(
     input.keepAssignmentIfRejected
   ].some((i) => !!i)
 
+  // A request sent again with the same transaction id (for example after a country config
+  // failure) is not refused because of its own requested action. The insert keeps the stored
+  // action, and it is sent to country config again.
   await throwConflictIfActionNotAllowed(
     input.eventId,
     input.type,
     token,
     'customActionType' in input ? input.customActionType : undefined,
-    event
+    withoutOwnRequestedAction(event, input)
   )
 
   const eventActionToken = await getServiceToken()
@@ -465,7 +469,12 @@ export function getDefaultActionProcedures(
           token
         })
 
-        if (existingAction) {
+        // An action with an outcome has been handled already. A requested action without one
+        // goes on, so a retry is sent to country config again (as in declare and custom).
+        if (
+          existingAction &&
+          existingAction.status !== ActionStatus.Requested
+        ) {
           return ctx.event
         }
 

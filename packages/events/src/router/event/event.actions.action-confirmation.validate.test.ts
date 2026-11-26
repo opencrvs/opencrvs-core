@@ -38,6 +38,10 @@ import {
   tennisClubMembershipEventWithCustomAction
 } from '@events/tests/msw'
 import { env } from '@events/environment'
+import {
+  getEventIndexName,
+  getOrCreateClient
+} from '@events/storage/elasticsearch'
 
 type PendingAction = {
   actionId: UUID
@@ -974,6 +978,32 @@ describe('assignment on an async confirmation', () => {
     expect(unassignCountOf(response)).toBe(unassignCountOf(requested))
     expect(assignedToOf(response)).toBeUndefined()
   })
+})
+
+test('async reject of an undeclared event does not index it', async () => {
+  const { user, generator } = await setupTestCase()
+  const client = createTestClient(user)
+  const event = await client.event.create(generator.event.create())
+
+  mockActionApi(ActionType.DECLARE, 202)
+
+  const requested = await client.event.actions.declare.request(
+    generator.event.actions.declare(event.id, { waitFor: false })
+  )
+
+  await confirmer.event.actions.declare.reject({
+    eventId: event.id,
+    actionId: requestedActionId(requested, ActionType.DECLARE),
+    transactionId: getUUID(),
+    waitFor: true
+  })
+
+  await expect(
+    getOrCreateClient().exists({
+      index: getEventIndexName(event.type),
+      id: event.id
+    })
+  ).resolves.toBe(false)
 })
 
 const BAD_DECLARATION = {

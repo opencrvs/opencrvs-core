@@ -133,7 +133,7 @@ export async function editAndDeclareViaApi(
   const client = getClient(token)
   const annotation = {
     'review.comment': faker.lorem.sentence(),
-    'review.signature': await uploadFile(getSignatureFile(), token)
+    'review.signature': await uploadFile(getSignatureFile(), token, eventId)
   }
 
   await client.event.actions.edit.request.mutate({
@@ -366,7 +366,7 @@ export async function createCompleteBirthDraftViaApi(token: string) {
     token,
     partialDeclaration: { 'child.name': { firstname, surname } }
   })
-  const signature = await uploadFile(getSignatureFile(), token)
+  const signature = await uploadFile(getSignatureFile(), token, event.id)
 
   await client.event.draft.create.mutate({
     eventId: event.id,

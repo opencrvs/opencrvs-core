@@ -1090,7 +1090,7 @@ importers:
         specifier: ^2.6.7
         version: 2.7.0(encoding@0.1.13)
       pg:
-        specifier: ^8.16.0
+        specifier: ^8.22.0
         version: 8.22.0
       pg-cursor:
         specifier: ^2.15.3
@@ -1540,7 +1540,7 @@ importers:
         specifier: ^8.0.3
         version: 8.0.4(@types/pg@8.20.0)(pg@8.22.0)
       pg:
-        specifier: ^8.16.0
+        specifier: ^8.22.0
         version: 8.22.0
     devDependencies:
       '@types/bcryptjs':

@@ -17,6 +17,7 @@ import {
   VersionedEventConfig
 } from '@opencrvs/commons'
 import { upsertEventWithActions } from '@events/storage/postgres/events/import'
+import { assertImportedFilesBelongToEvent } from '@events/service/files'
 import { getInMemoryVersionedEventConfigurations } from '../config/config'
 import {
   ensureVersionIndicesExist,
@@ -78,6 +79,8 @@ export async function bulkImportEvents(
   token: TokenWithBearer
 ): Promise<BulkResponse> {
   const toIndex = []
+
+  events.forEach(assertImportedFilesBelongToEvent)
 
   const eventConfigs = await getInMemoryVersionedEventConfigurations(token)
   assertEventsConfigured(events, eventConfigs)

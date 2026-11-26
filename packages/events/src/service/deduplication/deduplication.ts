@@ -51,8 +51,13 @@ import {
 } from '@events/service/indexing/utils'
 import { TrpcContext } from '../../context'
 import { getEventsAuditTrailed } from '../../storage/postgres/events/events'
-import { getEventById } from '../events/events'
+import { EventNotFoundError, getEventById } from '../events/events'
 import { getEventConfigurationForRecord } from '../config/config'
+
+/** `0` and `false` are values; an empty string means nothing was entered. */
+function isMissingQueryValue(value: unknown) {
+  return value === undefined || value === null || value === ''
+}
 
 /**
  * If the value referenced in a query is missing, the query resolves to null
@@ -141,8 +146,9 @@ export function generateElasticsearchQuery(
     eventIndex.declaration,
     resolveFieldPath(queryInput.fieldId)
   )
-  if (!queryValue) {
-    logger.warn(
+  if (isMissingQueryValue(queryValue)) {
+    // Expected for mutually exclusive fields (e.g. dob or age), so not a warning.
+    logger.debug(
       `No value found for field ${queryInput.fieldId} in the current event. Skipping query clause.`
     )
     return null
@@ -266,6 +272,14 @@ export async function searchForDuplicates({
   )
 
   if (!esQuery) {
+    logger.warn(
+      {
+        deduplicationId: deduplication.id,
+        eventId: eventIndex.id,
+        eventType: eventIndex.type
+      },
+      'Deduplication rule resolved to no query; no duplicate search was run'
+    )
     return []
   }
 
@@ -311,7 +325,20 @@ export async function assertCanReviewDuplicatesOf(
   ])
   const access = await Promise.all(
     duplicateEventIds.map(async (duplicateEventId) => {
-      const duplicate = await getEventById(duplicateEventId)
+      const duplicate = await getEventById(duplicateEventId).catch(
+        (error: unknown) => {
+          if (error instanceof EventNotFoundError) {
+            return null
+          }
+          throw error
+        }
+      )
+
+      // A duplicate that no longer exists exposes nothing; getDuplicateEvents skips it (#13906)
+      if (!duplicate) {
+        return true
+      }
+
       const eventConfig = await getEventConfigurationForRecord({
         event: duplicate,
         token: ctx.token

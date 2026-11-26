@@ -28,6 +28,8 @@ const NATIONAL_SYSTEM_ADMIN_PASSWORD = 'test'
 
 const SEALING_SERVICE_SCOPES = defineScopes([
   { type: 'record.search' },
+  // The seal requires a court order copy stored on the birth record itself
+  { type: 'attachment.upload' },
   {
     type: 'record.custom-action',
     options: { event: ['birth'], customActionTypes: ['SEAL'] }

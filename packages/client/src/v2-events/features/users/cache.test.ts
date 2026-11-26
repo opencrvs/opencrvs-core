@@ -19,6 +19,7 @@ import { vi } from 'vitest'
 import {
   ActionStatus,
   ActionType,
+  DocumentPath,
   EventDocument,
   getUUID,
   TENNIS_CLUB_MEMBERSHIP,
@@ -26,7 +27,12 @@ import {
   UUID,
   INITIAL_EVENT_CONFIG_VERSION_ID
 } from '@opencrvs/commons/client'
-import { AppRouter, queryClient, TRPCProvider } from '@client/v2-events/trpc'
+import {
+  AppRouter,
+  queryClient,
+  TRPCProvider,
+  trpcOptionsProxy
+} from '@client/v2-events/trpc'
 import { createTestStore } from '@client/tests/util'
 import { checkAuth } from '@client/profile/profileActions'
 // Importing useUsers registers the smart queryFn for user.list via setQueryDefaults
@@ -211,5 +217,48 @@ describe('user summary caching after event download', () => {
     // The cross-cache scan in the smart queryFn found the 3 users inside the
     // existing 5-user cache entry — no new HTTP request was needed.
     expect(userListSpy).not.toHaveBeenCalled()
+  })
+})
+
+describe('user summary refresh after an avatar change', () => {
+  test('returns the new avatar once changeAvatar invalidates user.list', async () => {
+    // No service worker cache in jsdom; precaching just logs and returns
+    vi.stubGlobal('caches', { keys: vi.fn().mockResolvedValue([]) })
+    vi.spyOn(console, 'error').mockImplementation(() => undefined)
+
+    const wrapper = await makeWrapper()
+    const [userId] = USER_IDS
+    const newAvatar = `users/${userId}/${getUUID()}.png` as DocumentPath
+
+    // e.g. the workqueue showing the assignee
+    const { result } = renderHook(
+      () => useUsers().getUsers.useQuery([userId]),
+      { wrapper }
+    )
+    await waitFor(() => expect(result.current.isSuccess).toBe(true))
+    expect(result.current.data?.[0]).not.toHaveProperty('avatar')
+
+    // The user uploads a new avatar
+    server.use(
+      tRPCMsw.user.list.query((ids) => {
+        userListSpy(ids)
+        return USER_SUMMARIES.filter((u) =>
+          (ids as string[]).includes(u.id)
+        ).map((u) => (u.id === userId ? { ...u, avatar: newAvatar } : u))
+      })
+    )
+    userListSpy.mockClear()
+
+    // What the changeAvatar mutation does on success
+    await queryClient.invalidateQueries({
+      queryKey: trpcOptionsProxy.user.list.queryKey()
+    })
+
+    await waitFor(() =>
+      expect(result.current.data?.[0]).toMatchObject({ avatar: newAvatar })
+    )
+    expect(userListSpy).toHaveBeenCalled()
+
+    vi.unstubAllGlobals()
   })
 })

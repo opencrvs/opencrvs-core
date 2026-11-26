@@ -36,7 +36,7 @@ const imageOption: Option<DocumentViewerOptionValue> = {
   value: {
     id: 'test-image',
     filename: 'test-image.png',
-    url: 'events/test-event-id/test-image.png' as DocumentPath
+    url: 'events/3f1e9a52-7c4b-4d2e-9a6f-1b8c5d7e2f40/test-image.png' as DocumentPath
   }
 }
 
@@ -48,8 +48,9 @@ export const ImageFailsThenRetrySucceeds: Story = {
     msw: {
       handlers: {
         files: [
-          tRPCMsw.event.file.getPresignedUrl.query(() => ({
-            presignedURL: 'http://localhost:3535/ocrvs/tree.svg'
+          tRPCMsw.event.files.presign.query(({ eventId }) => ({
+            [`events/${eventId}/test-image.png`]:
+              'http://localhost:3535/ocrvs/tree.svg'
           })),
           http.get(
             'http://localhost:3535/ocrvs/:id',
@@ -100,7 +101,7 @@ const pdfOption: Option<DocumentViewerOptionValue> = {
   value: {
     id: 'test-document',
     filename: 'test-document.pdf',
-    url: 'events/test-event-id/test-document.pdf' as DocumentPath
+    url: 'events/3f1e9a52-7c4b-4d2e-9a6f-1b8c5d7e2f40/test-document.pdf' as DocumentPath
   }
 }
 
@@ -113,8 +114,9 @@ export const PdfFailsThenRetrySucceeds: Story = {
     msw: {
       handlers: {
         files: [
-          tRPCMsw.event.file.getPresignedUrl.query(() => ({
-            presignedURL: 'http://localhost:3535/ocrvs/test.pdf'
+          tRPCMsw.event.files.presign.query(({ eventId }) => ({
+            [`events/${eventId}/test-document.pdf`]:
+              'http://localhost:3535/ocrvs/test.pdf'
           })),
           http.get(
             'http://localhost:3535/ocrvs/:id',

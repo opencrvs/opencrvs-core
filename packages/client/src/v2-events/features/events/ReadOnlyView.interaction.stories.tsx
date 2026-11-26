@@ -124,8 +124,9 @@ export const AssignOnRecordTabKeepsDocuments: StoryObj<
           })
         ],
         files: [
-          tRPCMsw.event.file.getPresignedUrl.query(() => ({
-            presignedURL: 'http://localhost:3535/ocrvs/proof.pdf'
+          tRPCMsw.event.files.presign.query(() => ({
+            [`events/${eventId}/proof.pdf`]:
+              'http://localhost:3535/ocrvs/proof.pdf'
           })),
           http.get(
             'http://localhost:3535/ocrvs/:id',
