@@ -9,8 +9,22 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { env } from '@gateway/environment'
+import { notFound } from '@hapi/boom'
 import { ServerRoute } from '@hapi/hapi'
 import { logger } from '@opencrvs/commons'
+
+/**
+ * The events service serves `internalRouter` and `initialisationRouter` under
+ * these paths, see `packages/events/src/server.ts`. Only other services call
+ * them, directly on the events service, so the gateway does not forward them.
+ */
+const SERVICE_ROUTER_PATHS = ['/internal', '/initialisation']
+
+function isServiceRouterPath(pathname: string) {
+  return SERVICE_ROUTER_PATHS.some(
+    (path) => pathname === path || pathname.startsWith(`${path}/`)
+  )
+}
 
 export const trpcProxy = [
   {
@@ -22,6 +36,11 @@ export const trpcProxy = [
       // Prevent open redirect / SSRF attacks by ensuring the proxied URL is within env.EVENTS_URL
       const uri = new URL(env.EVENTS_URL)
       uri.pathname = req.params.path
+
+      // The URL resolves `..` and `.`, so check the path after it does
+      if (isServiceRouterPath(uri.pathname)) {
+        throw notFound()
+      }
 
       return h.proxy({
         uri: uri.toString() + req.url.search,

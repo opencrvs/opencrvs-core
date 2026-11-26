@@ -422,6 +422,7 @@ Date rules could only compare with today, so a record declared on time became la
 
 ### Security
 
+- The gateway does not forward `/events/internal/*` and `/events/initialisation/*` to the events service any more. It returns 404 for these paths. Only other services call these routers, and they call the events service directly. The data seeder now calls the initialisation router on `EVENTS_URL` instead of through the gateway. The services chart sets `EVENTS_URL` for the `data-seed` job. If you run the data seeder image without the chart, set `EVENTS_URL` to the URL of the events service, for example `http://events:5555/`.
 - Removed the unused `POST /upload` endpoint from the documents service, together with the `file-type` library it used. That library had a denial-of-service vulnerability, where a crafted file could stop the service from responding ([CVE-2026-31808](https://nvd.nist.gov/vuln/detail/CVE-2026-31808), Medium). The endpoint has had no consumer since the user-mgnt service was removed, and file uploads go through `POST /files`, so nothing changes in the application. The documents service is not reachable from outside the cluster. Only a country configuration that calls `http://documents:9050/upload` directly is affected, and it should send the file to `POST /files` instead. [#14326](https://github.com/opencrvs/opencrvs-core/pull/14326)
 
 ## 2.1.3 Release Candidate
