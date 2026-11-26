@@ -17,8 +17,13 @@ import {
   VersionedEventConfig
 } from '@opencrvs/commons'
 import { upsertEventWithActions } from '@events/storage/postgres/events/import'
+import { assertImportedFilesBelongToEvent } from '@events/service/files'
 import { getInMemoryVersionedEventConfigurations } from '../config/config'
-import { indexEventsInBulk, type BulkResponse } from '../indexing/indexing'
+import {
+  ensureVersionIndicesExist,
+  indexEventsInBulk,
+  type BulkResponse
+} from '../indexing/indexing'
 
 function mapEventActions(actions: EventDocument['actions']) {
   return actions.map(({ type, ...action }) => ({
@@ -75,6 +80,8 @@ export async function bulkImportEvents(
 ): Promise<BulkResponse> {
   const toIndex = []
 
+  events.forEach(assertImportedFilesBelongToEvent)
+
   const eventConfigs = await getInMemoryVersionedEventConfigurations(token)
   assertEventsConfigured(events, eventConfigs)
 
@@ -95,6 +102,12 @@ export async function bulkImportEvents(
     )
 
     toIndex.push(createdEvent)
+  }
+
+  for (const config of eventConfigs) {
+    if (events.some(({ type }) => type === config.id)) {
+      await ensureVersionIndicesExist(config)
+    }
   }
 
   return indexEventsInBulk(toIndex, eventConfigs)

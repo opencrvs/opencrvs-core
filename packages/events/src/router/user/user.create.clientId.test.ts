@@ -89,7 +89,9 @@ test('creates the user with the id from the input', async () => {
 
 test('creates an id when the input has none', async () => {
   const { user, client } = await setup()
-  const { id, ...input } = newUserInput(user.primaryOfficeId)
+  const { id, ...withoutId } = newUserInput(user.primaryOfficeId)
+  // Without an id, a signature under users/<id>/ can't be the new user's own
+  const input = { ...withoutId, signature: undefined }
 
   const created = await client.user.create(input)
 

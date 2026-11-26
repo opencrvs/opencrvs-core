@@ -1,0 +1,102 @@
+{
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "usage",
+    "maintenance",
+    "buildOrRuntime",
+    "appliesTo",
+    "affected",
+    "recommendation"
+  ],
+  "properties": {
+    "usage": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["dependencyType", "explanation", "evidence"],
+      "properties": {
+        "dependencyType": {
+          "enum": [
+            "direct",
+            "transitive",
+            "direct and transitive",
+            "not installed"
+          ]
+        },
+        "explanation": { "type": "string", "maxLength": 600 },
+        "evidence": {
+          "type": "array",
+          "maxItems": 8,
+          "items": { "type": "string", "maxLength": 300 }
+        }
+      }
+    },
+    "maintenance": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["status", "explanation"],
+      "properties": {
+        "status": { "enum": ["maintained", "not maintained", "deprecated"] },
+        "alternative": { "type": "string", "maxLength": 200 },
+        "explanation": { "type": "string", "maxLength": 400 }
+      }
+    },
+    "buildOrRuntime": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["answer", "explanation"],
+      "properties": {
+        "answer": {
+          "enum": [
+            "build time",
+            "runtime",
+            "build time and runtime",
+            "not installed"
+          ]
+        },
+        "explanation": { "type": "string", "maxLength": 400 }
+      }
+    },
+    "appliesTo": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["answer", "explanation"],
+      "properties": {
+        "answer": {
+          "enum": [
+            "client",
+            "server",
+            "client and server",
+            "tooling only",
+            "not installed"
+          ]
+        },
+        "explanation": { "type": "string", "maxLength": 400 }
+      }
+    },
+    "affected": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["answer", "explanation", "evidence"],
+      "properties": {
+        "answer": { "enum": ["yes", "no", "unclear"] },
+        "explanation": { "type": "string", "maxLength": 800 },
+        "evidence": {
+          "type": "array",
+          "maxItems": 8,
+          "items": { "type": "string", "maxLength": 300 }
+        }
+      }
+    },
+    "recommendation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["action", "reason"],
+      "properties": {
+        "action": { "enum": ["merge now", "merge later", "close"] },
+        "reason": { "type": "string", "maxLength": 600 },
+        "followUp": { "type": "string", "maxLength": 400 }
+      }
+    }
+  }
+}

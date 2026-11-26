@@ -18,7 +18,7 @@
   "dependencies": {
     "bcryptjs": "^2.4.3",
     "node-pg-migrate": "^8.0.3",
-    "pg": "^8.16.0"
+    "pg": "^8.22.0"
   },
   "devDependencies": {
     "@types/bcryptjs": "^2.4.2",

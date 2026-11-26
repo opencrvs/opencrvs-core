@@ -369,6 +369,49 @@ async function findBirthRecordByBrn(
 
 type SealResult = { success: true } | { success: false; reason: string }
 
+// A 1x1 transparent PNG
+const PLACEHOLDER_PNG = Buffer.from(
+  'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg==',
+  'base64'
+)
+
+/**
+ * The seal requires a court order copy, and a record can only name files
+ * stored under its own prefix. The court order itself stays on the adoption
+ * record, so the birth record's seal gets a placeholder of its own.
+ */
+async function uploadCourtOrderPlaceholder(eventId: string, token: string) {
+  const file = {
+    originalFilename: 'court-order-held-on-adoption-record.png',
+    type: 'image/png'
+  }
+
+  const form = new FormData()
+  form.append(
+    'file',
+    new Blob([PLACEHOLDER_PNG], { type: file.type }),
+    file.originalFilename
+  )
+  form.append('transactionId', uuidv4())
+  form.append('eventId', eventId)
+
+  const response = await fetch(new URL('events/attachments', GATEWAY_URL), {
+    method: 'POST',
+    headers: { Authorization: `Bearer ${token}` },
+    body: form
+  })
+
+  if (!response.ok) {
+    throw new Error(
+      `Failed to upload the court order placeholder: ${response.status}`
+    )
+  }
+
+  const body = (await response.json()) as { result: { data: { json: string } } }
+
+  return { ...file, path: body.result.data.json }
+}
+
 /**
  * Sealing targets the original birth record, not the adoption record.
  * The token core sends carries no scopes, so we use the sealing service's own token.
@@ -410,6 +453,11 @@ async function sealOriginalBirthRecord(
   }
 
   try {
+    const courtOrderCopy = await uploadCourtOrderPlaceholder(
+      birthRecord.id,
+      sealingToken
+    )
+
     await client.event.actions.custom.request.mutate({
       eventId: birthRecord.id,
       transactionId: uuidv4(),
@@ -417,7 +465,7 @@ async function sealOriginalBirthRecord(
       annotation: {
         reason: 'ADOPTION',
         courtOrderReference: declaration['adoptionOrder.reference'],
-        courtOrderCopy: declaration['documents.courtOrderCopy']
+        courtOrderCopy
       }
     })
 

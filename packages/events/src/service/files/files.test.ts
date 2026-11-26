@@ -8,8 +8,8 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { UUID } from '@opencrvs/commons'
-import { getUploadPath } from '@events/service/files'
+import { DocumentPath, UUID } from '@opencrvs/commons'
+import { getUploadPath, presignFiles } from '@events/service/files'
 
 const eventId = '105b69b3-415f-4e53-b912-ef71484cb6c0' as UUID
 
@@ -52,5 +52,28 @@ describe('getUploadPath', () => {
         transactionId: 'transaction-1'
       })
     ).toThrow(/eventId or path/)
+  })
+})
+
+describe('presignFiles', () => {
+  const token = 'Bearer test-token'
+
+  test('keys each URL by the path it signs', async () => {
+    const paths = [
+      `events/${eventId}/proof.png`,
+      `users/${eventId}/signature.png`,
+      `${eventId}.png`
+    ] as DocumentPath[]
+
+    const urls = await presignFiles(paths, token)
+
+    expect(Object.keys(urls)).toEqual(paths)
+    for (const path of paths) {
+      expect(urls[path]).toContain(`/ocrvs/${path}?`)
+    }
+  })
+
+  test('returns nothing without asking documents-service for no paths', async () => {
+    await expect(presignFiles([], token)).resolves.toEqual({})
   })
 })

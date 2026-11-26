@@ -55,9 +55,13 @@ import {
   addAction,
   addAsyncRejectAction,
   throwConflictIfActionNotAllowed,
+  withoutOwnRequestedAction,
   processAction
 } from '@events/service/events/events'
-import { getEventConfigurationForRecord } from '@events/service/config/config'
+import {
+  getEventConfigurationForRecord,
+  getVersionedEventConfigurationById
+} from '@events/service/config/config'
 import { TrpcUserContext } from '@events/context'
 import { getServiceToken } from '@events/service/auth'
 import { writeAuditLog } from '@events/storage/postgres/events/auditLog'
@@ -263,12 +267,15 @@ export async function defaultRequestHandler(
     input.keepAssignmentIfRejected
   ].some((i) => !!i)
 
+  // A request sent again with the same transaction id (for example after a country config
+  // failure) is not refused because of its own requested action. The insert keeps the stored
+  // action, and it is sent to country config again.
   await throwConflictIfActionNotAllowed(
     input.eventId,
     input.type,
     token,
     'customActionType' in input ? input.customActionType : undefined,
-    event
+    withoutOwnRequestedAction(event, input)
   )
 
   const eventActionToken = await getServiceToken()
@@ -462,7 +469,12 @@ export function getDefaultActionProcedures(
           token
         })
 
-        if (existingAction) {
+        // An action with an outcome has been handled already. A requested action without one
+        // goes on, so a retry is sent to country config again (as in declare and custom).
+        if (
+          existingAction &&
+          existingAction.status !== ActionStatus.Requested
+        ) {
           return ctx.event
         }
 
@@ -586,8 +598,8 @@ export function getDefaultActionProcedures(
           return getEventById(input.eventId)
         }
 
-        const configuration = await getEventConfigurationForRecord({
-          event: event,
+        const configuration = await getVersionedEventConfigurationById({
+          eventType: event.type,
           token: ctx.token
         })
 

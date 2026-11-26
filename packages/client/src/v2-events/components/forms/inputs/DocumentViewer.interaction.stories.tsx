@@ -13,7 +13,7 @@ import type { Meta, StoryObj } from '@storybook/react-vite'
 import { expect, waitFor, userEvent, within } from 'storybook/test'
 import { http, HttpResponse } from 'msw'
 import { DocumentPath } from '@opencrvs/commons/client'
-import { CACHE_NAME } from '@client/v2-events/cache'
+import { CACHE_NAME, cacheFile } from '@client/v2-events/cache'
 import { Option } from '@client/v2-events/utils'
 import {
   TestImage,
@@ -36,7 +36,7 @@ const imageOption: Option<DocumentViewerOptionValue> = {
   value: {
     id: 'test-image',
     filename: 'test-image.png',
-    url: 'events/test-event-id/test-image.png' as DocumentPath
+    url: 'events/3f1e9a52-7c4b-4d2e-9a6f-1b8c5d7e2f40/test-image.png' as DocumentPath
   }
 }
 
@@ -48,8 +48,9 @@ export const ImageFailsThenRetrySucceeds: Story = {
     msw: {
       handlers: {
         files: [
-          tRPCMsw.event.file.getPresignedUrl.query(() => ({
-            presignedURL: 'http://localhost:3535/ocrvs/tree.svg'
+          tRPCMsw.event.files.presign.query(({ eventId }) => ({
+            [`events/${eventId}/test-image.png`]:
+              'http://localhost:3535/ocrvs/tree.svg'
           })),
           http.get(
             'http://localhost:3535/ocrvs/:id',
@@ -100,7 +101,7 @@ const pdfOption: Option<DocumentViewerOptionValue> = {
   value: {
     id: 'test-document',
     filename: 'test-document.pdf',
-    url: 'events/test-event-id/test-document.pdf' as DocumentPath
+    url: 'events/3f1e9a52-7c4b-4d2e-9a6f-1b8c5d7e2f40/test-document.pdf' as DocumentPath
   }
 }
 
@@ -113,8 +114,9 @@ export const PdfFailsThenRetrySucceeds: Story = {
     msw: {
       handlers: {
         files: [
-          tRPCMsw.event.file.getPresignedUrl.query(() => ({
-            presignedURL: 'http://localhost:3535/ocrvs/test.pdf'
+          tRPCMsw.event.files.presign.query(({ eventId }) => ({
+            [`events/${eventId}/test-document.pdf`]:
+              'http://localhost:3535/ocrvs/test.pdf'
           })),
           http.get(
             'http://localhost:3535/ocrvs/:id',
@@ -155,6 +157,76 @@ export const PdfFailsThenRetrySucceeds: Story = {
         { timeout: 10000 }
       )
     })
+  },
+  render: () => <DocumentViewer id="document_section" options={[pdfOption]} />
+}
+
+function createPdfWithPages(pageCount: number) {
+  const pageIds = Array.from({ length: pageCount }, (_, i) => i + 5)
+  const content = 'BT /F1 12 Tf 10 20 Td (page) Tj ET'
+  const objects = [
+    '<</Type/Catalog/Pages 2 0 R>>',
+    `<</Type/Pages/Kids[${pageIds.map((id) => `${id} 0 R`).join(' ')}]/Count ${pageCount}>>`,
+    '<</Type/Font/Subtype/Type1/BaseFont/Helvetica>>',
+    `<</Length ${content.length}>>\nstream\n${content}\nendstream`,
+    ...pageIds.map(
+      () =>
+        '<</Type/Page/MediaBox[0 0 200 50]/Parent 2 0 R/Resources<</Font<</F1 3 0 R>>>>/Contents 4 0 R>>'
+    )
+  ]
+
+  let pdf = '%PDF-1.4\n'
+  const offsets = objects.map((object, i) => {
+    const offset = pdf.length
+    pdf += `${i + 1} 0 obj${object}endobj\n`
+    return offset
+  })
+  const xrefOffset = pdf.length
+  pdf += `xref\n0 ${objects.length + 1}\n0000000000 65535 f \n`
+  pdf += offsets
+    .map((o) => `${String(o).padStart(10, '0')} 00000 n \n`)
+    .join('')
+  pdf += `trailer<</Size ${objects.length + 1}/Root 1 0 R>>\nstartxref\n${xrefOffset}\n%%EOF`
+  return pdf
+}
+
+const longPdfPageCount = 1000
+
+export const FirstPdfPageShowsBeforeAllPagesLoad: Story = {
+  name: 'First page of a long PDF shows before all pages load',
+  loaders: [
+    async () => {
+      await caches.delete(CACHE_NAME)
+      await cacheFile(
+        {
+          url: pdfOption.value.url,
+          file: new File(
+            [createPdfWithPages(longPdfPageCount)],
+            'test-document.pdf',
+            { type: 'application/pdf' }
+          )
+        },
+        await caches.open(CACHE_NAME)
+      )
+    }
+  ],
+  parameters: {
+    chromatic: { disableSnapshot: true },
+    msw: { handlers: { files: [passiveFileRoute] } }
+  },
+  play: async ({ canvasElement }) => {
+    await waitFor(
+      async () => {
+        await expect(canvasElement.querySelector('canvas')).not.toBeNull()
+        await expect(
+          within(canvasElement).queryByText('Loading...')
+        ).not.toBeInTheDocument()
+      },
+      { timeout: 5000 }
+    )
+    await expect(canvasElement.querySelectorAll('canvas').length).toBeLessThan(
+      longPdfPageCount
+    )
   },
   render: () => <DocumentViewer id="document_section" options={[pdfOption]} />
 }

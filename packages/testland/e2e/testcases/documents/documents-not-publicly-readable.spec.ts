@@ -9,7 +9,10 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { expect, test } from '@playwright/test'
-import { CLIENT_URL, CREDENTIALS } from '@e2e/support/constants'
+import { v4 as uuidv4 } from 'uuid'
+import { createClient } from '@opencrvs/toolkit/api'
+import { ActionStatus, ActionType } from '@opencrvs/toolkit/events'
+import { CLIENT_URL, CREDENTIALS, GATEWAY_HOST } from '@e2e/support/constants'
 import { getToken } from '@e2e/support/helpers'
 
 /*
@@ -23,12 +26,6 @@ import { getToken } from '@e2e/support/helpers'
  * @see https://github.com/opencrvs/opencrvs-core/issues/13436
  */
 test.describe('Document storage', () => {
-  /*
-   * The store does not check that the object exists when it signs a URL. Any key is
-   * sufficient to test the bucket policy. An upload is not necessary.
-   *
-   * users/, not events/: it needs no real, pre-existing event to presign.
-   */
   const objectPath = 'users/00000000-0000-4000-8000-000000000000/probe.png'
 
   // This gateway route had no record-level check; presigning now goes through events-service.
@@ -45,27 +42,39 @@ test.describe('Document storage', () => {
 
   test('refuses anonymous reads but honours presigned ones', async () => {
     const token = await getToken(CREDENTIALS.REGISTRAR)
+    const client = createClient(GATEWAY_HOST + '/events', `Bearer ${token}`)
 
-    const response = await fetch(
-      `${CLIENT_URL}/api/events/event.file.getPresignedUrl`,
-      {
-        method: 'POST',
-        headers: {
-          Authorization: `Bearer ${token}`,
-          'content-type': 'application/json'
-        },
-        body: JSON.stringify({ json: { filePath: objectPath } })
+    /*
+     * The store does not check that the object exists when it signs a URL, so any
+     * key the record names is sufficient to test the bucket policy. A draft
+     * can name one without an upload.
+     */
+    const { id: eventId } = await client.event.create.mutate({
+      type: 'birth',
+      transactionId: uuidv4()
+    })
+    const probePath = `events/${eventId}/probe.png`
+
+    await client.event.draft.create.mutate({
+      eventId,
+      transactionId: uuidv4(),
+      type: ActionType.DECLARE,
+      status: ActionStatus.Requested,
+      declaration: {},
+      annotation: {
+        'review.signature': {
+          path: probePath,
+          originalFilename: 'probe.png',
+          type: 'image/png'
+        }
       }
-    )
+    })
 
-    expect(response.status).toBe(200)
+    const urls = await client.event.files.presign.query({ eventId })
+    const presignedURL = urls[probePath]
 
-    const {
-      result: {
-        data: { json }
-      }
-    } = await response.json()
-    const { presignedURL } = json
+    expect(presignedURL).toBeDefined()
+
     const unsignedURL = new URL(presignedURL)
     unsignedURL.search = ''
 

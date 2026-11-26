@@ -88,10 +88,8 @@ test('A signature attached while creating a user is shown to other sessions', as
     expect.soft(signature).not.toContain('tmp-')
     expect.soft(signature).toMatch(new RegExp(`^users/${userId}/`))
 
-    const { presignedURL } = await client.event.file.getPresignedUrl.query({
-      filePath: signature!
-    })
-    const file = await fetch(presignedURL)
+    const urls = await client.user.files.presign.query({ userIds: [userId] })
+    const file = await fetch(urls[signature!])
 
     expect.soft(file.status).toBe(200)
   })

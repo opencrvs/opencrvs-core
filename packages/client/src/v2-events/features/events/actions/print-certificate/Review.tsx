@@ -48,6 +48,7 @@ import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents
 import { useModal } from '@client/v2-events/hooks/useModal'
 import { FormLayout } from '@client/v2-events/layouts'
 import { usePrintableCertificate } from '@client/v2-events/hooks/usePrintableCertificate'
+import { useCertificateFonts } from '@client/v2-events/hooks/useCertificateFonts'
 import { useAppConfig } from '@client/v2-events/hooks/useAppConfig'
 import { useUsers } from '@client/v2-events/hooks/useUsers'
 import { useLocations } from '@client/v2-events/hooks/useLocations'
@@ -238,6 +239,9 @@ export function Review() {
     certificateConfig,
     language
   })
+
+  const fontsLoaded = useCertificateFonts(certificateConfig?.fonts)
+
   /**
    * If there are validation errors in the form, redirect to the
    * print certificate form page, since the user should not be able to
@@ -263,7 +267,8 @@ export function Review() {
     )
   }
 
-  if (!svgCode) {
+  // Wait until the certificate is generated and the fonts are loaded before showing the review page.
+  if (!svgCode || !fontsLoaded) {
     return <Spinner id="review-certificate-loading" />
   }
 

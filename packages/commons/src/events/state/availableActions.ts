@@ -71,6 +71,10 @@ const AVAILABLE_ACTIONS_BY_EVENT_STATUS = {
 const ACTION_FILTERS: {
   [K in DisplayableAction]?: (flags: Flag[]) => boolean
 } = {
+  [ActionType.NOTIFY]: (flags) =>
+    !flags.some((flag) => flag.endsWith(':requested')),
+  [ActionType.DECLARE]: (flags) =>
+    !flags.some((flag) => flag.endsWith(':requested')),
   [ActionType.PRINT_CERTIFICATE]: (flags) =>
     !flags.includes(InherentFlags.CORRECTION_REQUESTED) &&
     !flags.some((flag) => flag.endsWith(':requested')),

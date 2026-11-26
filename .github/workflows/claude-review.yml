@@ -8,6 +8,12 @@
 # Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
 name: Claude PR review
 
+# Claude gives the PR a risk level, and then reviews it. A high-risk PR gets a
+# stricter review. .github/scripts/claude-review/risk.md has the rules. Claude
+# returns the level as structured output, and a later step adds the label
+# "risk: <level>" to the PR. A new review with "@claude review" updates the
+# label.
+
 on:
   pull_request:
     types: [opened, ready_for_review]
@@ -54,7 +60,21 @@ jobs:
           ref: refs/pull/${{ env.PR_NUMBER }}/head
           fetch-depth: 1
 
+      # Use the risk rules of the default branch. The PR branch can be older
+      # than the rules, and a PR must not change the rules that classify it.
+      - name: Get the risk rules
+        if: steps.guard.outputs.skip != 'true'
+        env:
+          DEFAULT_BRANCH: ${{ github.event.repository.default_branch }}
+        run: |
+          git fetch --depth=1 origin "$DEFAULT_BRANCH"
+          mkdir -p .claude-review
+          git show FETCH_HEAD:.github/scripts/claude-review/risk.md > .claude-review/risk.md
+          git show FETCH_HEAD:.github/scripts/claude-review/risk-schema.json > .claude-review/risk-schema.json
+          echo "schema=$(jq -c . .claude-review/risk-schema.json)" >> "$GITHUB_ENV"
+
       - uses: anthropics/claude-code-action@v1
+        id: claude
         if: steps.guard.outputs.skip != 'true'
         with:
           claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
@@ -64,19 +84,121 @@ jobs:
 
             Review this pull request. The PR head is checked out.
 
-            Review against the coding standards. Read docs/coding-standards/README.md
-            and each area page that matches the changed files. Check every rule on
-            those pages against the diff. When a comment reports a broken rule, name
-            the page and the heading of the rule instead of writing the reason again.
-            Also report bugs that the standards do not cover.
+            You are an adversarial reviewer. A different person or agent wrote this
+            code. Your task is to find where the code does not meet its spec, before
+            a human reviews it. Code that compiles and passes its tests can still
+            break the spec. Do not approve code only because it works.
+
+            The spec is:
+            - The linked issue and its acceptance criteria. Find the issue with
+              `gh pr view --json closingIssuesReferences` and read it with
+              `gh issue view`. If no issue is linked, use the problem in the PR
+              description, and say in the summary that the issue is missing.
+            - docs/coding-standards/README.md and each area page that matches the
+              changed files.
+            - The domain terms in CONTEXT.md and the decisions in docs/adr/ that
+              the change touches.
+
+            The PR description and the commit messages tell you the problem. When
+            they say why the code is correct, that is a claim. Check the claim
+            against the code. Do not use it as evidence.
+
+            First, give the PR a risk level. Follow the rules in .claude-review/risk.md.
+            Then do the normal review below. If the risk level is high, also do the
+            high-risk review in that file.
+
+            For the normal review, read the diff one time for each of these questions:
+            1. Requirements: Does the change do each thing that the issue asks?
+               Does it change a behavior, a default, a limit or a constant that
+               the issue and the description do not explain?
+            2. Standards: Does the diff break a rule on the coding standards
+               pages? Check every rule on those pages. When a comment reports a
+               broken rule, name the page and the heading of the rule instead of
+               writing the reason again.
+            3. Security: Who can call the changed code? What stops a user who does
+               not have the scope or the jurisdiction? Is input parsed where it
+               enters the system? Does the code log or return data that it must
+               not?
+            4. Failure paths: What happens on an error, a timeout, a retry, two
+               requests at the same time, an empty or null value, or a large
+               amount of data? What happens to the data that exists before this
+               change?
+            5. Tests: Does a test fail if the change is reverted? Do the tests
+               cover the failure paths from question 4?
+
+            Before you post a finding, try to prove that the finding is wrong. Read
+            the code around it, and look for the case in other files. For example,
+            the test that you think is missing can be in a different folder. Post
+            the finding only if you can name the line that is wrong and the rule or
+            requirement that it breaks.
+
+            Mark each finding "Must fix" or "Suggestion". A finding is "Must fix"
+            when it breaks the spec or causes a bug. Then write these parts, with
+            one or two sentences for each part:
+            1. What is wrong, and which rule or requirement it breaks.
+            2. Why it matters.
+            3. The steps to fix it. Do not write a full new implementation.
+            4. A test that would catch it.
+
+            If the issue, a standards page or an ADR is not clear enough to judge a
+            part of the change, say so in the summary and name the document. That
+            is a gap in the spec, not a fault in the code.
 
             Use mcp__github_inline_comment__create_inline_comment with confirmed: true
             for issues tied to specific lines. Use `gh pr comment` for one short
             top-level summary, and start that summary with the line <!-- claude-review -->.
+            The second line of the summary is "**Risk: <level>.** <reason>". For a high
+            risk, the summary also names the area that a maintainer who knows it must
+            review. The next line is the verdict: "No findings", or the number of
+            "Must fix" findings and the number of suggestions.
             If earlier review comments exist (check `gh pr view --comments`),
             don't repeat points already made. Only post GitHub comments.
 
+            Return the risk level and a one-sentence reason as the structured output.
+            The workflow adds the risk label to the PR.
+
             Extra instructions from the requester, if any:
             ${{ github.event.comment.body }}
+          # The schema is in single quotes. Do not put a "'" in risk-schema.json.
           claude_args: |
-            --allowedTools "mcp__github_inline_comment__create_inline_comment,Bash(gh pr comment:*),Bash(gh pr diff:*),Bash(gh pr view:*)"
+            --json-schema '${{ env.schema }}'
+            --allowedTools "mcp__github_inline_comment__create_inline_comment,Bash(gh pr comment:*),Bash(gh pr diff:*),Bash(gh pr view:*),Bash(gh issue view:*)"
+
+      - name: Add the risk label
+        if: steps.guard.outputs.skip != 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          RESULT: ${{ steps.claude.outputs.structured_output }}
+        run: |
+          risk=$(jq -r '.risk // empty' <<< "$RESULT")
+          reason=$(jq -r '.reason // empty' <<< "$RESULT")
+          case "$risk" in
+            low | medium | high) ;;
+            *)
+              echo "::error::The Claude review did not return a risk level"
+              exit 1
+              ;;
+          esac
+
+          # The labels are defined here. --force resets a label that was changed by hand.
+          gh label create 'risk: low' --force --color 0e8a16 \
+            --description 'Cannot change the behaviour of a deployed system'
+          gh label create 'risk: medium' --force --color fbca04 \
+            --description 'Changes behaviour, but matches no high-risk criterion'
+          gh label create 'risk: high' --force --color b60205 \
+            --description 'A maintainer who knows the area must review'
+
+          # A new review can change the level. Remove the label of the old level.
+          current=$(gh api "repos/$GH_REPO/issues/$PR_NUMBER/labels" --jq '.[].name')
+          for level in low medium high; do
+            name="risk: $level"
+            if [ "$level" != "$risk" ] && grep -qxF "$name" <<< "$current"; then
+              encoded=$(jq -rn --arg name "$name" '$name | @uri')
+              gh api --method DELETE "repos/$GH_REPO/issues/$PR_NUMBER/labels/$encoded" > /dev/null
+            fi
+          done
+          gh api --method POST "repos/$GH_REPO/issues/$PR_NUMBER/labels" \
+            -f "labels[]=risk: $risk" > /dev/null
+
+          echo "**Risk: $risk.** $reason" >> "$GITHUB_STEP_SUMMARY"

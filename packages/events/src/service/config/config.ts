@@ -16,9 +16,11 @@ import {
   EventDocument,
   getEventConfigById,
   getEventConfigForRecord,
+  getEventConfigsInLookupOrder,
   logger,
   resolveEventConfigInTimeZone,
   Role,
+  toPlainDateInTimeZone,
   TokenWithBearer,
   validateRoles,
   VersionedEventConfig,
@@ -141,6 +143,11 @@ export async function getCountryTimeZone(token: TokenWithBearer) {
   return (await getInMemoryApplicationConfig(token)).SYSTEM_IANA_TIMEZONE
 }
 
+/** @returns today's date in the country's time zone. */
+export async function getCountryToday(token: TokenWithBearer) {
+  return toPlainDateInTimeZone(new Date(), await getCountryTimeZone(token))
+}
+
 /**
  * @returns the configuration of each event, at the version in effect today in the
  * country's time zone. For a record, use `getEventConfigurationForRecord` instead.
@@ -152,6 +159,23 @@ export async function getInMemoryEventConfigurations(token: TokenWithBearer) {
   ])
   return configurations.map((config) =>
     resolveEventConfigInTimeZone(config, timeZone)
+  )
+}
+
+/**
+ * @returns the configuration of every version of every event. The versions of each event
+ * are in the order to look up a field in, so the first match is the newest version in effect.
+ */
+export async function getInMemoryEventConfigurationsInLookupOrder(
+  token: TokenWithBearer
+) {
+  const [configurations, timeZone] = await Promise.all([
+    getInMemoryVersionedEventConfigurations(token),
+    getCountryTimeZone(token)
+  ])
+  const today = toPlainDateInTimeZone(new Date(), timeZone)
+  return configurations.flatMap((config) =>
+    getEventConfigsInLookupOrder(config, today)
   )
 }
 

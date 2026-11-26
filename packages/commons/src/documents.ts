@@ -90,3 +90,62 @@ const ATTACHMENT_PATH = /^(events|users)\/[^/]+\/$/
 export function isAttachmentPath(value: string): value is AttachmentPath {
   return ATTACHMENT_PATH.test(value)
 }
+
+/**
+ * A storage key in one of the shapes the system writes, with its owner:
+ * - `events/{eventId}/{file}`: a record attachment
+ * - `users/{userId}/{file}`: a user's avatar or signature
+ * - `{file}`: a key from before attachment prefixes existed (record or user)
+ */
+export type ParsedDocumentPath =
+  | { kind: 'event'; eventId: UUID; path: DocumentPath }
+  | { kind: 'user'; userId: UUID; path: DocumentPath }
+  | { kind: 'legacy'; path: DocumentPath }
+
+/**
+ * A file name segment. It can't start with a dot, so `.` and `..` are rejected,
+ * and it can't contain `%`, `/` or `\`, so nothing gets decoded or collapsed
+ * into a different key later on.
+ */
+const FILE_SEGMENT = /^[A-Za-z0-9_][A-Za-z0-9_.-]*$/
+
+// A regex test rather than the UUID schema: this runs for every path signed
+const UUID_PATTERN = z.regexes.uuid()
+
+function isUuid(value: string): value is UUID {
+  return UUID_PATTERN.test(value)
+}
+
+/**
+ * Parses a storage key strictly. Returns null for anything that isn't exactly
+ * one of the known shapes, so authorization and the key that gets used are
+ * always decided from the same string.
+ */
+export function parseDocumentPath(value: string): ParsedDocumentPath | null {
+  const segments = value.split('/')
+  const path = DocumentPath.parse(value)
+
+  if (segments.length === 1) {
+    return FILE_SEGMENT.test(value) ? { kind: 'legacy', path } : null
+  }
+
+  if (segments.length !== 3) {
+    return null
+  }
+
+  const [prefix, ownerId, file] = segments
+
+  if (!isUuid(ownerId) || !FILE_SEGMENT.test(file)) {
+    return null
+  }
+
+  if (prefix === 'events') {
+    return { kind: 'event', eventId: ownerId, path }
+  }
+
+  if (prefix === 'users') {
+    return { kind: 'user', userId: ownerId, path }
+  }
+
+  return null
+}

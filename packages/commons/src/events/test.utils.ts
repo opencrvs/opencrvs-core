@@ -224,6 +224,51 @@ export function locationVersion(
 }
 
 /**
+ * File keys the mock generators put into file fields. The server only accepts
+ * files stored under the record's own prefix, so action and draft payloads
+ * move them there once the record's id is known.
+ */
+const MOCK_FILE_PATHS = [
+  '4f095fc4-4312-4de2-aa38-86dcc0f71044.png',
+  'e56d1dd3-2cd4-452a-b54e-bf3e2d830605.png'
+] as DocumentPath[]
+
+function scopeMockFiles<T>(eventId: string, value: T): T {
+  if (Array.isArray(value)) {
+    return value.map((item) => scopeMockFiles(eventId, item)) as T
+  }
+
+  if (typeof value !== 'object' || value === null) {
+    return value
+  }
+
+  return Object.fromEntries(
+    Object.entries(value).map(([key, item]) => [
+      key,
+      key === 'path' && MOCK_FILE_PATHS.includes(item as DocumentPath)
+        ? `events/${eventId}/${item}`
+        : scopeMockFiles(eventId, item)
+    ])
+  ) as T
+}
+
+/**
+ * Wraps every `(eventId, ...) => payload` builder so its payload's mock files
+ * are stored under that record.
+ */
+function scopeMockFilesToEvent<T extends object>(builders: T): T {
+  return Object.fromEntries(
+    Object.entries(builders).map(([key, builder]) => [
+      key,
+      typeof builder === 'function'
+        ? (eventId: string, ...rest: unknown[]) =>
+            scopeMockFiles(eventId, builder(eventId, ...rest))
+        : scopeMockFilesToEvent(builder)
+    ])
+  ) as T
+}
+
+/**
  * Quick-and-dirty mock data generator for event actions.
  */
 function mapFieldTypeToMockValue(
@@ -340,7 +385,7 @@ function mapFieldTypeToMockValue(
     case FieldType.SIGNATURE:
     case FieldType.FILE:
       return {
-        path: '4f095fc4-4312-4de2-aa38-86dcc0f71044.png' as DocumentPath,
+        path: MOCK_FILE_PATHS[0],
         originalFilename: 'abcd.png',
         type: 'image/png'
       } satisfies FileFieldValue
@@ -540,7 +585,7 @@ export function eventPayloadGenerator(
             },
             'applicant.dob': '2020-01-02',
             'applicant.image': {
-              path: 'e56d1dd3-2cd4-452a-b54e-bf3e2d830605.png' as DocumentPath,
+              path: MOCK_FILE_PATHS[1],
               originalFilename: 'Screenshot.png',
               type: 'image/png'
             }
@@ -559,9 +604,9 @@ export function eventPayloadGenerator(
       }
 
       base.action.declaration = omit(base.action.declaration, omitFields)
-      return merge(base, input)
+      return scopeMockFiles(eventId, merge(base, input))
     },
-    actions: {
+    actions: scopeMockFilesToEvent({
       declare: (
         eventId: string,
         input: Partial<
@@ -1024,7 +1069,7 @@ export function eventPayloadGenerator(
           keepAssignment: input.keepAssignment
         })
       }
-    }
+    })
   }
 }
 
@@ -1587,6 +1632,32 @@ export function withDeclaration(
       }
 
       return action
+    })
+  }
+}
+
+/** @returns a copy of the configuration with `field` added to the first page of its declaration. */
+export function withDeclarationField<T extends Pick<EventConfig, 'actions'>>(
+  configuration: T,
+  field: FieldConfig
+): T {
+  return {
+    ...configuration,
+    actions: configuration.actions.map((action) => {
+      if (action.type !== ActionType.DECLARE) {
+        return action
+      }
+      const [firstPage, ...otherPages] = action.declaration.pages
+      return {
+        ...action,
+        declaration: {
+          ...action.declaration,
+          pages: [
+            { ...firstPage, fields: [...firstPage.fields, field] },
+            ...otherPages
+          ]
+        }
+      }
     })
   }
 }
