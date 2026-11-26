@@ -528,8 +528,8 @@ describe('runFieldValidations on a cleared (null) value', () => {
       runFieldValidations({
         field: nameField(false),
         value: null,
-        form: { 'member.name': null },
-        context: {}
+        form: { declaration: { 'member.name': null } },
+        context: generateEmptyTestValidatorContext(tennisClubMembershipEvent)
       })
     ).toEqual([])
   })
@@ -539,8 +539,8 @@ describe('runFieldValidations on a cleared (null) value', () => {
       runFieldValidations({
         field: nameField(true),
         value: null,
-        form: { 'member.name': null },
-        context: {}
+        form: { declaration: { 'member.name': null } },
+        context: generateEmptyTestValidatorContext(tennisClubMembershipEvent)
       })
     ).not.toEqual([])
   })
