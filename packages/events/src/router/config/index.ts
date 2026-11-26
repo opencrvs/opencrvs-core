@@ -9,7 +9,6 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { z } from 'zod'
-import { getAcceptedScopesFromToken } from '@opencrvs/commons/authentication'
 import {
   publicProcedure,
   router,
@@ -19,7 +18,7 @@ import {
 import {
   getClientApplicationConfig,
   getPublicApplicationConfig,
-  getInMemoryCertificateConfigurations
+  getPrintableCertificateConfigurations
 } from '@events/service/config/config'
 
 export const configRouter = router({
@@ -32,22 +31,7 @@ export const configRouter = router({
     .query(async () => getPublicApplicationConfig()),
 
   /** The certificate templates the user may print. */
-  certificates: userOnlyProcedure.input(z.void()).query(async ({ ctx }) => {
-    const printScopes = getAcceptedScopesFromToken(ctx.token, [
-      'record.print-certified-copies'
-    ])
-    if (printScopes.length === 0) {
-      return []
-    }
-
-    const certificates = await getInMemoryCertificateConfigurations()
-    if (printScopes.some((scope) => !scope.options?.templates?.length)) {
-      return certificates
-    }
-
-    const allowed = new Set(
-      printScopes.flatMap((scope) => scope.options?.templates ?? [])
-    )
-    return certificates.filter(({ id }) => allowed.has(id))
-  })
+  certificates: userOnlyProcedure
+    .input(z.void())
+    .query(async ({ ctx }) => getPrintableCertificateConfigurations(ctx.token))
 })

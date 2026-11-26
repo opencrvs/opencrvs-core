@@ -16,6 +16,7 @@ import {
   ApplicationConfig,
   CertificateConfig,
   EventDocument,
+  getAcceptedScopesFromToken,
   getEventConfigById,
   getEventConfigForRecord,
   getEventConfigsInLookupOrder,
@@ -23,6 +24,7 @@ import {
   resolveEventConfigInTimeZone,
   Role,
   toPlainDateInTimeZone,
+  TokenWithBearer,
   validateRoles,
   VersionedEventConfig,
   WorkqueueConfig
@@ -275,7 +277,32 @@ async function getCertificateConfigurations() {
  * @returns certificate configurations, cached in production for up to
  * `EVENT_CONFIG_CACHE_TTL_MS` (always fresh in development).
  */
-export const getInMemoryCertificateConfigurations = createTtlConfigCache(
+const getInMemoryCertificateConfigurations = createTtlConfigCache(
   'certificate configurations',
   getCertificateConfigurations
 )
+
+/**
+ * @returns the certificate configurations that the token may print. A print
+ * scope without template options allows all templates.
+ */
+export async function getPrintableCertificateConfigurations(
+  token: TokenWithBearer
+) {
+  const printScopes = getAcceptedScopesFromToken(token, [
+    'record.print-certified-copies'
+  ])
+  if (printScopes.length === 0) {
+    return []
+  }
+
+  const certificates = await getInMemoryCertificateConfigurations()
+  if (printScopes.some((scope) => !scope.options?.templates?.length)) {
+    return certificates
+  }
+
+  const allowed = new Set(
+    printScopes.flatMap((scope) => scope.options?.templates ?? [])
+  )
+  return certificates.filter(({ id }) => allowed.has(id))
+}
