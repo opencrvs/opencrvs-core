@@ -61,7 +61,7 @@ export function declareActionProcedures() {
         }
 
         const event = ctx.event
-        const config = await getEventConfigurationForRecord({ event, token })
+        const config = await getEventConfigurationForRecord({ event })
 
         const declaredEvent = await defaultRequestHandler(
           input,
@@ -97,10 +97,9 @@ export function declareActionProcedures() {
           eventIndex: declaredEventState,
           deduplication: dedupConfig,
           versionedConfig: await getVersionedEventConfigurationById({
-            eventType: event.type,
-            token
+            eventType: event.type
           }),
-          today: await getCountryToday(token)
+          today: await getCountryToday()
         })
 
         if (duplicates.length > 0) {

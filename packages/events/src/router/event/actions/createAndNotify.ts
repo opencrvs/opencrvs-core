@@ -110,7 +110,7 @@ export function createAndNotifyProcedure() {
 
         // Authorization
         const eventConfigs =
-          await getInMemoryVersionedEventConfigurations(token)
+          await getInMemoryVersionedEventConfigurations()
         const tokenScopes = getScopes(token)
 
         const versionedConfig = eventConfigs.find((c) => c.id === eventType)
@@ -176,7 +176,7 @@ export function createAndNotifyProcedure() {
           transactionId: createTransactionId,
           createdAtLocation,
           config: versionedConfig,
-          timeZone: await getCountryTimeZone(token)
+          timeZone: await getCountryTimeZone()
         })
         const eventConfig = getEventConfigForRecord(versionedConfig, event)
 

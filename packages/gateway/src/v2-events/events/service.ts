@@ -11,18 +11,20 @@
 import { AppRouter } from './router'
 import { env } from '@gateway/environment'
 
-import { createTRPCClient, httpBatchLink, HTTPHeaders } from '@trpc/client'
+import { createTRPCClient, httpLink, HTTPHeaders } from '@trpc/client'
 
 import superjson from 'superjson'
 
 export const api = createTRPCClient<AppRouter>({
   links: [
-    httpBatchLink({
+    // One request for each call: gateway calls events for many users at once,
+    // and a batch would send all its calls with the headers of the first one.
+    httpLink({
       url: env.EVENTS_URL,
       transformer: superjson,
-      headers({ opList }) {
-        const headers = opList[0].context?.headers
-        return headers as HTTPHeaders
+      headers({ op }) {
+        // A call without context, e.g. for public configuration, sends none.
+        return (op.context?.headers ?? {}) as HTTPHeaders
       }
     })
   ]

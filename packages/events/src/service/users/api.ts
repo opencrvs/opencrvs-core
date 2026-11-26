@@ -27,11 +27,11 @@ import {
   isUUID,
   logger,
   parseDocumentPath,
-  triggerUserEventNotification,
-  TokenWithBearer
+  triggerUserEventNotification
 } from '@opencrvs/commons'
 import { EventStatus, getStatusFromActions } from '@opencrvs/commons/events'
 import { env } from '@events/environment'
+import { getCoreSigningKey } from '@events/request-signing'
 import {
   getSystemByLegacyId,
   getSystemClientById
@@ -174,14 +174,12 @@ async function handleUsernameUpdate(
     userId,
     oldUsername,
     incomingName,
-    input,
-    token
+    input
   }: {
     userId: UUID
     oldUsername: string
     incomingName: UserName
     input: Pick<UpdateUserInput, 'email' | 'mobile'>
-    token: string
   }
 ) {
   const newUsernameCandidate = generateUsername(incomingName)
@@ -210,7 +208,7 @@ async function handleUsernameUpdate(
       newUsername
     },
     countryConfigUrl: env.COUNTRY_CONFIG_URL,
-    authHeader: { Authorization: token }
+    signingKey: getCoreSigningKey()
   })
 }
 
@@ -371,8 +369,7 @@ export async function updateUser(
         userId,
         incomingName,
         oldUsername: existingUser.username,
-        input,
-        token
+        input
       })
     }
 
@@ -404,7 +401,6 @@ async function sendCredentialsNotification(
   name: UserName,
   username: string,
   password: string,
-  token: string,
   msisdn?: string,
   email?: string
 ) {
@@ -421,7 +417,7 @@ async function sendCredentialsNotification(
         temporaryPassword: password
       },
       countryConfigUrl: env.COUNTRY_CONFIG_URL,
-      authHeader: { Authorization: token }
+      signingKey: getCoreSigningKey()
     })
   } catch (err) {
     logger.error(`Unable to send ${event} notification for error : ${err}`)
@@ -455,8 +451,7 @@ function resolveCreateUserInput(
 }
 
 export async function createUser(
-  input: CreateUserInput | CreateUserInputInternal,
-  _token: string
+  input: CreateUserInput | CreateUserInputInternal
 ) {
   const usernameCandidate = input.username ?? generateUsername(input.name)
   const username = await findAvailableUsername(usernameCandidate)
@@ -502,7 +497,6 @@ export async function createUser(
     input.name,
     userCredentialPayload.username,
     resolvedUser.password,
-    _token,
     userPayload.mobile ?? undefined,
     userPayload.email
   )
@@ -533,7 +527,7 @@ export async function activateUser(input: {
   await activateUserWithCredentials(userId, hash, salt, securityQuestions)
 }
 
-export async function resendInvite(userId: UUID, token: string): Promise<void> {
+export async function resendInvite(userId: UUID): Promise<void> {
   const user = await getUserById(userId)
 
   if (!user) {
@@ -563,7 +557,6 @@ export async function resendInvite(userId: UUID, token: string): Promise<void> {
     userName,
     user.username,
     password,
-    token,
     user.mobile ?? undefined,
     user.email ?? undefined
   )
@@ -688,10 +681,7 @@ export async function verifyPasswordById(
   }
 }
 
-export async function verifyUser(
-  input: { mobile?: string; email?: string },
-  token: TokenWithBearer
-) {
+export async function verifyUser(input: { mobile?: string; email?: string }) {
   const user = await getUserByMobileOrEmail(
     input.mobile ? { mobile: input.mobile } : { email: input.email ?? '' }
   )
@@ -707,7 +697,7 @@ export async function verifyUser(
   const securityQuestionKey =
     questions[Math.floor(Math.random() * questions.length)].questionKey
 
-  const roles = await getInMemoryRoles(token)
+  const roles = await getInMemoryRoles()
   const scope = roles.find((r) => r.id === user.role)?.scopes ?? []
 
   return {
@@ -727,8 +717,7 @@ export async function verifyUser(
 
 export async function sendResetPasswordInvite(
   userId: UUID,
-  admin: { id: string; name: UserName; role: string },
-  token: string
+  admin: { id: string; name: UserName; role: string }
 ): Promise<void> {
   const user = await getUser(userId)
 
@@ -754,7 +743,7 @@ export async function sendResetPasswordInvite(
         }
       },
       countryConfigUrl: env.COUNTRY_CONFIG_URL,
-      authHeader: { Authorization: token }
+      signingKey: getCoreSigningKey()
     })
   } catch (err) {
     logger.error(`Unable to send reset password notification for error: ${err}`)
@@ -765,10 +754,7 @@ export async function sendResetPasswordInvite(
   }
 }
 
-export async function sendUsernameReminder(
-  userId: UUID,
-  token: string
-): Promise<void> {
+export async function sendUsernameReminder(userId: UUID): Promise<void> {
   const user = await getUser(userId)
 
   try {
@@ -783,7 +769,7 @@ export async function sendUsernameReminder(
         username: user.username
       },
       countryConfigUrl: env.COUNTRY_CONFIG_URL,
-      authHeader: { Authorization: token }
+      signingKey: getCoreSigningKey()
     })
   } catch (err) {
     logger.error(

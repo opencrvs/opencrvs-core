@@ -17,6 +17,7 @@ import {
   logger
 } from '@opencrvs/commons'
 import { env } from '@events/environment'
+import { getCoreSigningKey } from '@events/request-signing'
 
 const CODE_EXPIRY_SECONDS = 300
 
@@ -73,14 +74,12 @@ type VerifyUserChangeTrigger =
 
 export async function generateAndSendVerificationCode({
   nonce,
-  token,
   notificationEvent,
   recipientName,
   phoneNumber,
   email
 }: {
   nonce: string
-  token: string
   notificationEvent: VerifyUserChangeTrigger
   recipientName: NameFieldValue
   phoneNumber?: string
@@ -117,9 +116,7 @@ export async function generateAndSendVerificationCode({
         code: verificationCode
       },
       countryConfigUrl: env.COUNTRY_CONFIG_URL,
-      authHeader: {
-        Authorization: `Bearer ${token}`
-      }
+      signingKey: getCoreSigningKey()
     })
   }
 }
