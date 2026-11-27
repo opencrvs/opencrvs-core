@@ -15,18 +15,12 @@ const childDobWithin5Days = field('child.dob').dateRangeMatches({ days: 5 })
 const similarNamedMother = field('mother.name').fuzzyMatches()
 const similarAgedMother = or(
   field('mother.dob').dateRangeMatches({
-    days: 365
-  }),
-  field('mother.age').dateRangeMatches({
-    days: 365
-  }),
-  field('mother.dob').dateRangeMatches({
     days: 365,
-    matchAgainst: 'mother.age'
+    matchAgainst: ['mother.dob', 'mother.age']
   }),
   field('mother.age').dateRangeMatches({
     days: 365,
-    matchAgainst: 'mother.dob'
+    matchAgainst: ['mother.age', 'mother.dob']
   })
 )
 
