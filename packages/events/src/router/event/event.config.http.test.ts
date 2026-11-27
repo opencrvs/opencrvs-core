@@ -9,9 +9,8 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import superjson from 'superjson'
 import { createTRPCClient, httpLink } from '@trpc/client'
-import { TokenUserType } from '@opencrvs/commons'
+import { jsonTransformer, TokenUserType } from '@opencrvs/commons'
 import { AppRouter } from '@events/router'
 import { server } from '@events/server'
 import {
@@ -43,7 +42,7 @@ beforeAll(async () => {
 
 afterAll(() => serverInstance.close())
 
-test('a reused event config response survives the HTTP and SuperJSON round trip', async () => {
+test('a reused event config response survives the HTTP round trip', async () => {
   const { user } = await setupTestCase()
   const token = createTestToken({
     userId: user.id,
@@ -55,28 +54,19 @@ test('a reused event config response survives the HTTP and SuperJSON round trip'
     links: [
       httpLink({
         url,
-        transformer: superjson,
+        transformer: jsonTransformer,
         headers: { authorization: token }
       })
     ]
   })
   const expected = await createTestClient(user, []).event.config.get()
 
-  // The first call builds and stores the serialized response.
+  // The first call builds and stores the response.
   expect(await client.event.config.get.query()).toEqual(expected)
 
-  const serialize = vi.spyOn(superjson, 'serialize')
   const second = await client.event.config.get.query()
   const third = await client.event.config.get.query()
 
-  // The test's tRPC client runs in this same process and also calls superjson.serialize on request inputs,
-  // so count only array calls, which can only be the server serializing the config response.
-  const serializedConfigurations = serialize.mock.calls.filter(([value]) =>
-    Array.isArray(value)
-  )
-  serialize.mockRestore()
-
   expect(second).toEqual(expected)
   expect(third).toEqual(expected)
-  expect(serializedConfigurations).toHaveLength(0)
 })

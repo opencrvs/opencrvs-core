@@ -18,7 +18,6 @@ import { VersionedEventConfig } from '@opencrvs/commons/events'
 import { TrpcContext } from '@events/context'
 import { env } from '@events/environment'
 import { getInMemoryVersionedEventConfigurations } from '@events/service/config/config'
-import { reuseSerializedResponse } from '@events/router/serialization'
 
 let cached: {
   configurations: VersionedEventConfig[]
@@ -26,7 +25,7 @@ let cached: {
 } | null = null
 
 /**
- * Reuses the validated and serialized event configuration response until the
+ * Reuses the validated event configuration response until the
  * in-memory configurations are refetched. Must run before `.output()` so the
  * output validation is skipped too.
  */
@@ -53,13 +52,7 @@ export const reuseEventConfigResponse: MiddlewareFunction<
   }
 
   // Runs the rest of the chain (output validation, then the query); the response is still building or already built.
-  const response = next().then((result) => {
-    // Keep the serialized form for later calls with the same configurations.
-    if (result.ok && typeof result.data === 'object' && result.data !== null) {
-      reuseSerializedResponse(result.data)
-    }
-    return result
-  })
+  const response = next()
 
   // Stored before awaiting, so calls arriving during the rebuild wait for it instead of rebuilding too.
   cached = { configurations, result: response }

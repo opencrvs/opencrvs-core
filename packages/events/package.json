@@ -41,7 +41,6 @@
     "pg": "^8.22.0",
     "pg-cursor": "^2.15.3",
     "pino-http": "^7.1.0",
-    "superjson": "1.9.0-0",
     "trpc-to-openapi": "^3.2.0",
     "tsconfig-paths": "^4.2.0",
     "zod": "^4.6.5",
