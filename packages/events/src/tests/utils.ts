@@ -41,7 +41,8 @@ import {
   TokenWithBearer,
   User,
   UserFilter,
-  UUID
+  UUID,
+  INITIAL_EVENT_CONFIG_VERSION_ID
 } from '@opencrvs/commons'
 import { tennisClubMembershipEvent } from '@opencrvs/commons/fixtures'
 import { SystemContext, UserContext } from '@opencrvs/commons'
@@ -195,6 +196,18 @@ export const TEST_USER_DEFAULT_SCOPES = [
     }
   }),
   encodeScope({
+    type: 'record.revoke-registration',
+    options: {
+      event: ['birth', 'death', 'tennis-club-membership', 'child-onboarding']
+    }
+  }),
+  encodeScope({
+    type: 'record.reinstate-registration',
+    options: {
+      event: ['birth', 'death', 'tennis-club-membership', 'child-onboarding']
+    }
+  }),
+  encodeScope({
     type: 'record.register',
     options: {
       event: ['birth', 'death', 'tennis-club-membership', 'child-onboarding']
@@ -305,6 +318,13 @@ export function createSystemTestClient(
   })
 
   return caller
+}
+
+export async function createUnauthenticatedTestClient() {
+  const ctx = await createContext({
+    req: { headers: {} } as unknown as IncomingMessage
+  })
+  return createCallerFactory(appRouter)(ctx)
 }
 
 export async function createServiceTokenTestClient() {
@@ -524,6 +544,22 @@ function actionToClientAction(
             waitFor
           })
         )
+    case ActionType.REVOKE_REGISTRATION:
+      return async (eventId: string) =>
+        client.event.actions.revocation.revoke.request(
+          generator.event.actions.revokeRegistration(eventId, {
+            keepAssignment: true,
+            waitFor
+          })
+        )
+    case ActionType.REINSTATE_REGISTRATION:
+      return async (eventId: string) =>
+        client.event.actions.revocation.reinstate.request(
+          generator.event.actions.reinstateRegistration(eventId, {
+            keepAssignment: true,
+            waitFor
+          })
+        )
 
     case ActionType.NOTIFY:
     case ActionType.DUPLICATE_DETECTED:
@@ -591,6 +627,7 @@ type SeedAction =
   | typeof ActionType.UNASSIGN
   | typeof ActionType.REQUEST_CORRECTION
   | typeof ActionType.ARCHIVE
+  | typeof ActionType.REVOKE_REGISTRATION
 
 /**
  * Seeds an event with the specified actions directly into the database.
@@ -636,7 +673,8 @@ export async function seedEvent(
       .values({
         eventType: eventConfig.id,
         transactionId: getUUID(),
-        trackingId: getUUID()
+        trackingId: getUUID(),
+        configVersionId: INITIAL_EVENT_CONFIG_VERSION_ID
       })
       .returning(['id'])
       .executeTakeFirstOrThrow()
@@ -1062,6 +1100,7 @@ export async function setupScopeTestFixture(
         | typeof ActionType.REQUEST_CORRECTION
         | typeof ActionType.UNASSIGN
         | typeof ActionType.ARCHIVE
+        | typeof ActionType.REVOKE_REGISTRATION
       )[]
     | fc.Arbitrary<
         (
@@ -1069,6 +1108,7 @@ export async function setupScopeTestFixture(
           | typeof ActionType.REQUEST_CORRECTION
           | typeof ActionType.UNASSIGN
           | typeof ActionType.ARCHIVE
+          | typeof ActionType.REVOKE_REGISTRATION
         )[]
       >
 ) {

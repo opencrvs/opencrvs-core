@@ -35,6 +35,7 @@ function mockVersionFields(id: UUID, name: string) {
 
 const province: AdministrativeArea = {
   id: 'aaaaaaaa-aaaa-4aaa-aaaa-aaaaaaaaaaaa' as UUID,
+  updatedAt: '2024-01-01T00:00:00.000Z',
   name: 'Province',
   externalId: null,
   parentId: null,
@@ -46,6 +47,7 @@ const province: AdministrativeArea = {
 
 const district: AdministrativeArea = {
   id: 'bbbbbbbb-bbbb-4bbb-bbbb-bbbbbbbbbbbb' as UUID,
+  updatedAt: '2024-01-01T00:00:00.000Z',
   name: 'District',
   externalId: null,
   parentId: province.id,
@@ -57,6 +59,7 @@ const district: AdministrativeArea = {
 
 const office: Location = {
   id: 'cccccccc-cccc-4ccc-cccc-cccccccccccc' as UUID,
+  updatedAt: '2024-01-01T00:00:00.000Z',
   name: 'District Office',
   externalId: null,
   administrativeAreaId: district.id,
@@ -69,6 +72,7 @@ const office: Location = {
 
 const officeWithoutArea: Location = {
   id: 'dddddddd-dddd-4ddd-dddd-dddddddddddd' as UUID,
+  updatedAt: '2024-01-01T00:00:00.000Z',
   name: 'Standalone Office',
   externalId: null,
   administrativeAreaId: null,

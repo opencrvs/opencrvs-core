@@ -243,6 +243,7 @@ describe('isLocationUnderJurisdiction', () => {
     const locations = new Map(V2_DEFAULT_MOCK_CLIENT_LOCATIONS_MAP)
     locations.set(rootLocationId, {
       id: rootLocationId,
+      updatedAt: '2024-01-01T00:00:00.000Z',
       locationType: 'CRVS_OFFICE',
       administrativeAreaId: null,
       versions: [
@@ -278,6 +279,7 @@ describe('isLocationUnderJurisdiction', () => {
     const locations = new Map(V2_DEFAULT_MOCK_CLIENT_LOCATIONS_MAP)
     locations.set(otherLocationId, {
       id: otherLocationId,
+      updatedAt: '2024-01-01T00:00:00.000Z',
       locationType: 'CRVS_OFFICE',
       administrativeAreaId: null,
       versions: [

@@ -19,12 +19,17 @@ import {
   FieldType,
   generateEventDocument,
   Location,
-  UUID
+  UUID,
+  withDeclaration,
+  getDeclaration,
+  getDeclarationPages,
+  toVersionedEventConfig
 } from '@opencrvs/commons/client'
 import * as selectEvent from '@client/v2-events/select-event'
 import { localDraftStore } from '@client/v2-events/features/drafts/useDrafts'
 import { ROUTES, routesConfig } from '@client/v2-events/routes'
 import { AppRouter } from '@client/v2-events/trpc'
+import { locationListHandlers } from '../../../../../../.storybook/default-request-handlers'
 import { useActionAnnotation } from '../../useActionAnnotation'
 import { useEventFormData } from '../../useEventFormData'
 import { Pages } from './index'
@@ -55,6 +60,7 @@ const IBOMBO_ADMIN_AREA_ID = '62a0ccb4-880d-4f30-8882-f256007dfff9' as UUID
  */
 const INACTIVATED_FACILITY: Location = {
   id: 'e5e5e5e5-1111-4111-8111-111111111111' as UUID,
+  updatedAt: '2024-01-01T00:00:00.000Z',
   name: 'Mercy Clinic',
   locationType: 'HEALTH_FACILITY',
   administrativeAreaId: IBOMBO_ADMIN_AREA_ID,
@@ -83,12 +89,14 @@ const INACTIVATED_FACILITY: Location = {
  * and `child.birthLocation` opted into both `anchorToDateOfEvent` and
  * `activeOnly`, matching #13143's anchored-and-excluding configuration.
  */
-const anchoredChildOnboardingEvent: EventConfig = {
-  ...ChildOnboardingEvent,
-  dateOfEvent: { $$field: 'child.dob', $$subfield: [] },
-  declaration: {
-    ...ChildOnboardingEvent.declaration,
-    pages: ChildOnboardingEvent.declaration.pages.map((page) =>
+const anchoredChildOnboardingEvent: EventConfig = withDeclaration(
+  {
+    ...ChildOnboardingEvent,
+    dateOfEvent: { $$field: 'child.dob', $$subfield: [] }
+  },
+  {
+    ...getDeclaration(ChildOnboardingEvent),
+    pages: getDeclarationPages(ChildOnboardingEvent).map((page) =>
       page.id === 'child'
         ? {
             ...page,
@@ -108,7 +116,7 @@ const anchoredChildOnboardingEvent: EventConfig = {
         : page
     )
   }
-}
+)
 
 const freshDraftEvent = generateEventDocument({
   configuration: anchoredChildOnboardingEvent,
@@ -131,15 +139,19 @@ const storyParams = {
   msw: {
     handlers: {
       events: [
-        tRPCMsw.event.config.get.query(() => [anchoredChildOnboardingEvent])
+        tRPCMsw.event.config.get.query(() => [
+          toVersionedEventConfig(anchoredChildOnboardingEvent)
+        ])
       ],
       event: [
         tRPCMsw.event.get.query(() => freshDraftEvent),
         tRPCMsw.event.search.query(() => ({ results: [], total: 0 }))
       ],
       eventLocations: [
-        tRPCMsw.locations.list.query(() => [INACTIVATED_FACILITY]),
-        tRPCMsw.administrativeAreas.list.query(() => [])
+        ...locationListHandlers({
+          locations: [INACTIVATED_FACILITY],
+          administrativeAreas: []
+        })
       ]
     }
   }

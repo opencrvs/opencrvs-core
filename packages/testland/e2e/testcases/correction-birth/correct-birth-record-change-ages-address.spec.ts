@@ -66,7 +66,7 @@ test('Correct record - Change ages', async ({ page }) => {
       .split('T')[0]
 
     const payload = {
-      'informant.relation': 'BROTHER',
+      'informant.relation': 'LEGAL_GUARDIAN',
       'informant.email': 'brothers@email.com',
       'informant.name': {
         firstname: faker.person.firstName(),
@@ -297,7 +297,14 @@ test('Correct record - Change ages', async ({ page }) => {
       .getByRole('button', { name: 'Submit correction request' })
       .click()
 
+    const correctionResponse = page.waitForResponse(
+      (res) =>
+        res.url().includes('event.actions.correction.request') && res.ok()
+    )
+
     await page.getByRole('button', { name: 'Confirm' }).click()
+
+    await correctionResponse
   })
 
   await test.step('Logout', async () => {

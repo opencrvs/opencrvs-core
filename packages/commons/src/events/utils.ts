@@ -11,6 +11,7 @@
 
 import {
   flattenDeep,
+  mapValues,
   omitBy,
   mergeWith,
   isArray,
@@ -43,20 +44,26 @@ import { PageConfig, PageTypes, VerificationPageConfig } from './PageConfig'
 import {
   isConditionMet,
   isFieldSecured,
-  isFieldVisible,
-  ValidatorContext
+  isFieldVisible
 } from '../conditionals/validate'
+import {
+  ActionFormConditionalContext,
+  FormValues,
+  SecuredConditionalContext,
+  AnnotationFormValues
+} from '../conditionals/validate-v2'
 import { Draft } from './Draft'
 import { EventDocument } from './EventDocument'
 import { getUUID, UUID } from '../uuid'
 import {
   ActionConfig,
   actionConfigTypes,
-  ActionConfigTypes
+  ActionConfigTypes,
+  DeclareActionConfig
 } from './ActionConfig'
-import { FormConfig } from './FormConfig'
+import { DeclarationFormConfig, FormConfig } from './FormConfig'
 import { getOrThrow } from '../utils'
-import { TokenUserType } from '../authentication'
+import { TokenUserType } from '../users/authentication'
 import {
   PlainDate,
   plainDateToLocalDate,
@@ -64,6 +71,7 @@ import {
 } from './FieldValue'
 import { subDays, subYears, format } from 'date-fns'
 import { FieldType } from './FieldType'
+import { TranslationConfig } from './TranslationConfig'
 import { EventIndex } from './EventIndex'
 
 /* eslint-disable max-lines */
@@ -73,18 +81,80 @@ export function ageToDate(age: number, asOfDate: PlainDate) {
   return PlainDate.parse(format(subYears(date, age), 'yyyy-MM-dd'))
 }
 
-export function getDeclarationFields(
-  configuration: EventConfig
-): FieldConfig[] {
-  return configuration.declaration.pages.flatMap(({ fields }) => fields)
+export function getDeclaration(configuration: EventConfig) {
+  const declareAction = configuration.actions.find(
+    (action): action is DeclareActionConfig =>
+      action.type === ActionType.DECLARE
+  )
+
+  if (!declareAction) {
+    throw new Error(
+      `Event '${configuration.id}' has no ${ActionType.DECLARE} action to read the declaration from`
+    )
+  }
+
+  return declareAction.declaration
 }
 
 export function getDeclarationPages(configuration: EventConfig) {
-  return configuration.declaration.pages
+  return getDeclaration(configuration).pages
 }
 
-export function getDeclaration(configuration: EventConfig) {
-  return configuration.declaration
+export function getDeclarationFields(
+  configuration: EventConfig
+): FieldConfig[] {
+  return getDeclarationPages(configuration).flatMap(({ fields }) => fields)
+}
+
+/**
+ * @returns the notification form of the NOTIFY action, or undefined when the event has no NOTIFY action.
+ */
+function findNotificationForm(configuration: EventConfig) {
+  const notifyAction = configuration.actions.find(
+    (action) => action.type === ActionType.NOTIFY
+  )
+
+  return notifyAction?.type === ActionType.NOTIFY
+    ? notifyAction.notificationForm
+    : undefined
+}
+
+/**
+ * @returns the notification form configured on the NOTIFY action.
+ * @throws when the event has no NOTIFY action.
+ */
+export function getNotificationForm(
+  configuration: EventConfig
+): DeclarationFormConfig {
+  const notificationForm = findNotificationForm(configuration)
+  if (!notificationForm) {
+    throw new Error(
+      `Event '${configuration.id}' has no ${ActionType.NOTIFY} action.`
+    )
+  }
+
+  return notificationForm
+}
+
+export function getNotificationFields(
+  configuration: EventConfig
+): FieldConfig[] {
+  return getNotificationForm(configuration).pages.flatMap(
+    ({ fields }) => fields
+  )
+}
+
+/**
+ * Form a user fills in to submit the given action:
+ * the notification form for NOTIFY, the declaration form for DECLARE.
+ */
+export function getActionForm(
+  configuration: EventConfig,
+  actionType: typeof ActionType.NOTIFY | typeof ActionType.DECLARE
+) {
+  return actionType === ActionType.NOTIFY
+    ? getNotificationForm(configuration)
+    : getDeclaration(configuration)
 }
 
 export function isActionConfigType(
@@ -94,34 +164,33 @@ export function isActionConfigType(
   return actionConfigTypes.has(type as any)
 }
 
-// @TODO: see if we can make this function generic so it returns a typed ActionConfig based on the given actionType (e.g. `Extract<ActionConfig, { type: T }>`),
-// instead of the current wide `ActionConfig | undefined`. Note NOTIFY's fallback to DECLARE needs special-casing in the return type, since it can resolve to a DeclareConfig.
-// Perhaps this function should also throw an error if the action config is not found.
-export function getActionConfig({
+/**
+ * Returns the config of the action of the given type, typed as the config of that type.
+ * For a client-specific action, which has no config, it returns `undefined`.
+ * @TODO: Perhaps this function should throw an error if the action config is not found.
+ */
+export function getActionConfig<T extends DisplayableAction>({
   eventConfiguration,
   actionType,
   customActionType
 }: {
   eventConfiguration: EventConfig
-  actionType: DisplayableAction
+  actionType: T
   customActionType?: string
-}): ActionConfig | undefined {
-  // Notify uses its own config when present, otherwise falls back to declare
-  if (actionType === ActionType.NOTIFY) {
-    return (
-      eventConfiguration.actions.find((a) => a.type === ActionType.NOTIFY) ??
-      eventConfiguration.actions.find((a) => a.type === ActionType.DECLARE)
-    )
-  }
+}): Extract<ActionConfig, { type: T }> | undefined {
+  return eventConfiguration.actions.find(
+    (a): a is Extract<ActionConfig, { type: T }> => {
+      // We can have multiple custom actions configured, we specify the custom action with 'customActionType'
+      if (a.type === ActionType.CUSTOM && customActionType) {
+        return (
+          actionType === ActionType.CUSTOM &&
+          a.customActionType === customActionType
+        )
+      }
 
-  return eventConfiguration.actions.find((a) => {
-    // We can have multiple custom actions configured, we specify the custom action with 'customActionType'
-    if (a.type === ActionType.CUSTOM && customActionType) {
-      return a.customActionType === customActionType
+      return a.type === actionType
     }
-
-    return a.type === actionType
-  })
+  )
 }
 
 export function getCustomActionFields(
@@ -134,19 +203,11 @@ export function getCustomActionFields(
     actionType: ActionType.CUSTOM
   })
 
-  if (!actionConfig || actionConfig.type !== ActionType.CUSTOM) {
-    return []
-  }
-
-  return actionConfig.form
+  return actionConfig?.form ?? []
 }
 
 /**
  * Returns the fields configured for an action's confirmation dialog.
- *
- * Unlike review fields and supporting copy, NOTIFY does NOT fall back to the
- * DECLARE config here: dialog fields always come from the action's own
- * configuration entry.
  */
 export function getActionFormFields(
   eventConfiguration: EventConfig,
@@ -166,6 +227,25 @@ export function getActionFormFields(
   }
 
   return actionConfig.form
+}
+
+/**
+ * Returns the copy of the confirmation dialog of the action, or `undefined` when the action gives none.
+ * The EDIT action gives one copy for each of its dialogs, so for edit flow dialogs, you should read `dialogCopy` of the EDIT action instead.
+ * The action type alone does not find a CUSTOM action, so read `dialogCopy` of the custom action config that matches its `customActionType`.
+ */
+export function findActionDialogCopy(
+  eventConfiguration: EventConfig,
+  actionType: Exclude<
+    ActionType,
+    typeof ActionType.EDIT | typeof ActionType.CUSTOM
+  >
+): TranslationConfig | undefined {
+  const actionConfig = getActionConfig({ eventConfiguration, actionType })
+
+  return actionConfig && 'dialogCopy' in actionConfig
+    ? actionConfig.dialogCopy
+    : undefined
 }
 
 export function getPrintCertificatePages(configuration: EventConfig) {
@@ -269,52 +349,50 @@ export function getActionReviewFields(
 
 export function isPageVisible(
   page: PageConfig,
-  formValues: ActionUpdate,
-  context: ValidatorContext
+  form: FormValues,
+  context: ActionFormConditionalContext
 ) {
   if (!page.conditional) {
     return true
   }
 
-  return isConditionMet(page.conditional, formValues, context)
+  return isConditionMet(page.conditional, form, context)
 }
 
 /**
- * Removes values from the form that correspond to hidden fields.
- * This function recursively omits any fields from the form values that are not visible
- * according to their FieldConfig and the current form state. It ensures that only values
- * for visible fields are retained, which is useful for conditional forms where hidden field
- * values should not affect validation or submission.
+ * Removes the values of hidden fields from the declaration and the annotation of the form.
+ * Only the values of `fields` are checked. Other values stay as they are.
  *
- * @template T - The type of the form values
- * @param {T} formValues - The current form values
- * @param {FieldConfig[]} fields - The list of field configurations to check visibility against
- * * @param validatorContext - custom validation context
- * @returns {Partial<T>} A new object containing only the values for visible fields
+ * A removed value can change the visibility of other fields.
+ * Thus the function removes the hidden values again until the result does not change.
+ *
+ * @param fields - The field configurations to check visibility against
+ * @param includeHiddenFieldsWithNullValues - When `true`, a hidden field with the value `null` stays in the form
+ * @returns The form without the values of hidden fields
  */
-export function omitHiddenFields<T extends EventState | ActionUpdate>(
+export function omitHiddenFields(
   fields: FieldConfig[],
-  formValues: T,
-  validatorContext: ValidatorContext,
+  form: FormValues,
+  context: ActionFormConditionalContext,
   includeHiddenFieldsWithNullValues: boolean = false
-): Partial<T> {
-  const base = cloneDeep(formValues)
+): FormValues {
+  // A deep copy, so that the result does not share nested values (e.g. an address) with the input.
+  const formCopy = cloneDeep(form)
 
-  // The omitting is done recursively until the object does not change.
-  // This is because the previously removed fields might affect the visibility of other fields.
-  function fn(prevVisibilityContext: Partial<T>): Partial<T> {
-    const cleaned = omitBy<Partial<T>>(base, (value, fieldId) => {
-      const fieldConfig = fields.filter((f) => f.id === fieldId)
+  function removeHiddenValues(formForVisibility: FormValues): FormValues {
+    const isHiddenValue = (value: unknown, fieldId: string) => {
+      const fieldsWithId = fields.filter((field) => field.id === fieldId)
 
-      if (!fieldConfig.length) {
+      if (fieldsWithId.length === 0) {
         return false
       }
 
-      const isHidden = fieldConfig.every(
-        (f) => !isFieldVisible(f, prevVisibilityContext, validatorContext)
+      // Fields can have the same id. The value is hidden only when all of these fields are hidden.
+      const allFieldsHidden = fieldsWithId.every(
+        (field) => !isFieldVisible(field, formForVisibility, context)
       )
 
-      if (!isHidden) {
+      if (!allFieldsHidden) {
         return false
       }
 
@@ -323,39 +401,58 @@ export function omitHiddenFields<T extends EventState | ActionUpdate>(
       }
 
       return true
-    })
+    }
 
-    return isEqual(cleaned, prevVisibilityContext) ? cleaned : fn(cleaned)
+    // Remove the hidden values from the declaration and from the annotation.
+    const formWithoutHiddenValues = mapValues(formCopy, (values) =>
+      omitBy(values, isHiddenValue)
+    )
+
+    if (isEqual(formWithoutHiddenValues, formForVisibility)) {
+      return formWithoutHiddenValues
+    }
+
+    return removeHiddenValues(formWithoutHiddenValues)
   }
 
-  return fn(base)
+  return removeHiddenValues(formCopy)
 }
 
-export function omitHiddenPaginatedFields<T extends EventState | ActionUpdate>(
+/**
+ * Removes the values of hidden pages and hidden fields from the declaration and the annotation of the form.
+ */
+export function omitHiddenPaginatedFields(
   formConfig: FormConfig,
-  values: T,
-  validatorContext: ValidatorContext,
+  form: FormValues,
+  context: ActionFormConditionalContext,
   includeHiddenFieldsWithNullValues: boolean = false
-) {
-  const visibleFields = formConfig.pages
-    .filter((p) => isPageVisible(p, values, validatorContext))
-    .flatMap((p) => p.fields)
+): FormValues {
+  const visiblePages = formConfig.pages.filter((page) =>
+    isPageVisible(page, form, context)
+  )
+  const hiddenPages = formConfig.pages.filter(
+    (page) => !isPageVisible(page, form, context)
+  )
 
-  const hiddenFields = formConfig.pages
-    .filter((p) => !isPageVisible(p, values, validatorContext))
-    .flatMap((p) => p.fields)
+  const fieldsOnVisiblePages = visiblePages.flatMap((page) => page.fields)
+  const fieldsOnHiddenPages = hiddenPages.flatMap((page) => page.fields)
 
-  const valuesExceptHiddenPage = omitBy(values, (_, fieldId) => {
-    return (
-      hiddenFields.some((f) => f.id === fieldId) &&
-      !visibleFields.some((f) => f.id === fieldId)
-    )
-  })
+  // A field id can be on more than one page.
+  // The value is removed only when no visible page has a field with the same id.
+  const isOnHiddenPageOnly = (_value: unknown, fieldId: string) =>
+    fieldsOnHiddenPages.some((field) => field.id === fieldId) &&
+    !fieldsOnVisiblePages.some((field) => field.id === fieldId)
 
+  const formWithoutHiddenPages = mapValues(form, (values) =>
+    omitBy(values, isOnHiddenPageOnly)
+  )
+
+  // Field visibility is checked against the form without the hidden pages.
+  // Otherwise a value on a hidden page could make a field visible.
   return omitHiddenFields(
-    visibleFields,
-    valuesExceptHiddenPage,
-    validatorContext,
+    fieldsOnVisiblePages,
+    formWithoutHiddenPages,
+    context,
     includeHiddenFieldsWithNullValues
   )
 }
@@ -416,27 +513,29 @@ export function isVerificationPage(
 
 export function getVisibleVerificationPageIds(
   pages: PageConfig[],
-  annotation: ActionUpdate,
-  context: ValidatorContext
+  form: FormValues,
+  context: ActionFormConditionalContext
 ): string[] {
   return pages
     .filter((page) => isVerificationPage(page))
-    .filter((page) => isPageVisible(page, annotation, context))
+    .filter((page) => isPageVisible(page, form, context))
     .map((page) => page.id)
 }
 
+/**
+ * Removes the values of hidden annotation fields of the action.
+ * Annotation conditionals can read declaration values, so the whole form is evaluated.
+ *
+ * @returns The annotation without the values of hidden fields
+ */
 export function omitHiddenAnnotationFields(
   actionConfig: ActionConfig,
-  declaration: EventState,
-  annotation: ActionUpdate,
-  context: ValidatorContext
-) {
+  form: AnnotationFormValues,
+  context: ActionFormConditionalContext
+): ActionUpdate {
   const annotationFields = getActionAnnotationFields(actionConfig)
 
-  return omitHiddenFields(annotationFields, annotation, {
-    ...context,
-    baseFormState: declaration
-  })
+  return omitHiddenFields(annotationFields, form, context).annotation ?? {}
 }
 
 /**
@@ -640,7 +739,7 @@ export function flattenFieldReference(ref: FieldReference) {
 }
 
 export function isWriteAction(actionType: ActionType): boolean {
-  return writeActions.safeParse(actionType).success
+  return writeActions.validate(actionType)
 }
 
 /**
@@ -649,6 +748,8 @@ export function isWriteAction(actionType: ActionType): boolean {
 export const findAllFields = (config: EventConfig): FieldConfig[] => {
   return flattenDeep([
     ...getDeclarationFields(config),
+    ...(findNotificationForm(config)?.pages.flatMap(({ fields }) => fields) ??
+      []),
     ...getAllAnnotationFields(config)
   ])
 }
@@ -692,11 +793,14 @@ export function getMixedPath<T = unknown>(
   return isNil(result) ? defaultValue : result
 }
 
-export function getEventConfigById(eventConfigs: EventConfig[], id: string) {
-  const eventConfig = eventConfigs.find(
-    (eventConfiguration) => eventConfiguration.id === id
+export function getEventConfigById<T extends { id: string }>(
+  eventConfigs: T[],
+  id: string
+): T {
+  return getOrThrow(
+    eventConfigs.find((eventConfiguration) => eventConfiguration.id === id),
+    `No configuration found for event type: ${id}`
   )
-  return getOrThrow(eventConfig, `Event config for ${id} not found`)
 }
 
 export function timePeriodToDateRange(value: SelectDateRangeValue) {
@@ -868,12 +972,68 @@ export function getCompleteActionDeclaration<
   return deepMerge(declaration, action.declaration)
 }
 
-export function getAcceptedActions(event: EventDocument): ActionDocument[] {
-  return event.actions.filter(isAcceptedAction).map((action) => ({
+/**
+ * Completes an Accepted action's declaration and annotation with those of its
+ * original Requested action (the Accepted action's own values win).
+ */
+function completeAcceptedAction(
+  event: EventDocument,
+  action: ActionDocument
+): ActionDocument {
+  return {
     ...action,
     declaration: getCompleteActionDeclaration({}, event, action),
     annotation: getCompleteActionAnnotation(event, action)
-  }))
+  }
+}
+
+export function getAcceptedActions(event: EventDocument): ActionDocument[] {
+  return event.actions
+    .filter(isAcceptedAction)
+    .map((action) => completeAcceptedAction(event, action))
+}
+
+/**
+ * Returns the event with each Accepted action completed with the details of
+ * its original Requested action: who requested it, where, and the request's
+ * declaration, annotation and content (the Accepted action's own values win).
+ *
+ * `$event` conditionals match Accepted actions only, but an Accepted action
+ * does not carry everything its request did. A synchronous confirmation drops
+ * the request's annotation; an asynchronous `accept` is created by the system
+ * user and carries only what the country configuration sent. Without this,
+ * `event.hasAction(...).withTemplate(...)` / `.withFields(...)` would stop
+ * matching fields that matched the Requested action.
+ */
+export function getEventWithCompleteAcceptedActions(
+  event: EventDocument
+): EventDocument {
+  return {
+    ...event,
+    actions: event.actions.map((action) => {
+      if (!isAcceptedAction(action) || !action.originalActionId) {
+        return action
+      }
+      const requestedAction = event.actions.find(
+        ({ id }) => id === action.originalActionId
+      )
+      if (requestedAction?.status !== ActionStatus.Requested) {
+        return action
+      }
+      const content = getCompleteActionContent(event, action)
+      // Request and acceptance are the same action type, so the merged
+      // content keeps the action's shape.
+      return {
+        ...completeAcceptedAction(event, action),
+        // Who requested the action, as getActionUpdateMetadata resolves it.
+        createdBy: requestedAction.createdBy,
+        createdByRole: requestedAction.createdByRole,
+        createdByUserType: requestedAction.createdByUserType,
+        createdAtLocation: requestedAction.createdAtLocation,
+        ...(content ? { content } : {})
+      } as ActionDocument
+    })
+  }
 }
 
 // Action types that are not taken into the aggregate values
@@ -1032,13 +1192,14 @@ export function aggregateActionAnnotations(event: EventDocument): EventState {
 export function dropSecuredDeclarationFields(
   eventConfig: EventConfig,
   eventIndex: EventIndex,
-  validatorContext: ValidatorContext
+  context: SecuredConditionalContext
 ): EventIndex {
   const declarationFields = getDeclarationFields(eventConfig)
+  const form = { declaration: eventIndex.declaration }
   const securedFieldIds = new Set(
     declarationFields
       .filter((declarationField) =>
-        isFieldSecured(declarationField, eventIndex, validatorContext)
+        isFieldSecured(declarationField, form, context)
       )
       .map((declarationField) => declarationField.id)
   )

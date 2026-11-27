@@ -14,9 +14,8 @@ import * as z from 'zod'
 import {
   clearPendingDraftCreationRequests,
   deleteDraft,
-  refetchAllSearchQueries,
   refetchDraftsList,
-  refetchSearchQuery,
+  refetchSearchQueryById,
   setDraftData
 } from '@client/v2-events/features/events/useEvents/api'
 import { trpcOptionsProxy } from '@client/v2-events/trpc'
@@ -31,7 +30,8 @@ setMutationDefaults(trpcOptionsProxy.event.delete, {
   },
   retryDelay: 10000,
   onSuccess: async ({ id }) => {
-    void refetchAllSearchQueries()
+    // Only CREATED events are deletable and those are never indexed, so no
+    // search can change.
     deleteDraft(id)
     /*
      * The drafts list may have a fetch in flight that started before the event was
@@ -56,7 +56,7 @@ setMutationDefaults(trpcOptionsProxy.event.delete, {
    * Also check utils.event.create.onSuccess for the same logic but for when even is created.
    */
   mutationFn: async (variables) => {
-    await refetchSearchQuery(variables.eventId)
+    await refetchSearchQueryById(variables.eventId)
 
     const originalMutationFn =
       trpcOptionsProxy.event.delete.mutationOptions().mutationFn
@@ -80,8 +80,11 @@ export function usePendingDeleteEventIds(): string[] {
   })
 
   return pendingVariables.flatMap((variables) => {
-    const parsed = DeleteVariables.safeParse(variables)
-    return parsed.success ? [parsed.data.eventId] : []
+    if (DeleteVariables.validate(variables)) {
+      return [variables.eventId]
+    }
+
+    return []
   })
 }
 

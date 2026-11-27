@@ -8,7 +8,12 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { vi, describe, it, expect, beforeEach } from 'vitest'
+import { vi, describe, it, expect, beforeEach, afterEach } from 'vitest'
+
+// Core's requests carry no token; country config uses its own system client.
+vi.mock('../core-api-token', () => ({
+  getCoreApiToken: vi.fn().mockResolvedValue('mock-token')
+}))
 
 vi.mock('node-fetch', () => {
   return {
@@ -49,7 +54,7 @@ vi.mock('nodemailer', () => {
 })
 
 import { createServer } from '../../index'
-import { SERVICE_USER_ID } from '@opencrvs/toolkit/authentication'
+import { coreKey } from '../../tests/core-request'
 
 import { informantNotificationTestData } from './testData'
 
@@ -67,24 +72,27 @@ describe('Informant notification - Email', () => {
       id: OFFICE_ID,
       name: OFFICE_NAME
     })
+    // Serve the test key as auth's key list before the server starts.
+    vi.spyOn(global, 'fetch').mockResolvedValue(
+      new Response(JSON.stringify(coreKey.jwks))
+    )
     server = await createServer()
+  })
+
+  afterEach(() => {
+    vi.mocked(global.fetch).mockRestore()
   })
 
   informantNotificationTestData.forEach(
     ({ eventType, actionType, eventDocument }) =>
       it(`${eventType} - ${actionType}`, async () => {
-        await server.server.inject({
-          method: 'POST',
-          url: `/trigger/events/${eventType}/actions/${actionType}`,
-          payload: eventDocument,
-          auth: {
-            strategy: 'jwt',
-            // Action confirmation requests are only accepted from core's
-            // service token (see the onPostAuth guard in ../../index).
-            credentials: { sub: SERVICE_USER_ID },
-            artifacts: { token: 'mock-token' }
-          }
-        })
+        await server.server.inject(
+          coreKey.request(
+            'POST',
+            `/trigger/events/${eventType}/actions/${actionType}`,
+            eventDocument
+          )
+        )
 
         expect(sendMailMock).toHaveBeenCalledTimes(1)
         expect(sendMailMock.mock.calls[0][0]).toMatchSnapshot()
@@ -95,16 +103,13 @@ describe('Informant notification - Email', () => {
     informantNotificationTestData
 
   function trigger(payload: unknown) {
-    return server.server.inject({
-      method: 'POST',
-      url: `/trigger/events/${eventType}/actions/${actionType}`,
-      payload,
-      auth: {
-        strategy: 'jwt',
-        credentials: { sub: SERVICE_USER_ID },
-        artifacts: { token: 'mock-token' }
-      }
-    })
+    return server.server.inject(
+      coreKey.request(
+        'POST',
+        `/trigger/events/${eventType}/actions/${actionType}`,
+        payload
+      )
+    )
   }
 
   it('notifies with an empty office name when the office lookup fails', async () => {

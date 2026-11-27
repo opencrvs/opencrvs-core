@@ -38,7 +38,8 @@ import {
   FieldUpdateValue,
   FieldConfig,
   UserOrSystemSummary,
-  TokenUserType
+  TokenUserType,
+  isActionDocument
 } from '@opencrvs/commons/client'
 import { DateField } from '@client/v2-events/features/events/registered-fields'
 import { getHandlebarHelpers } from '@client/forms/handlebarHelpers'
@@ -383,43 +384,36 @@ export function compileSvg({
         return getMixedPath(resolvedDeclaration, propertyPath)
       }
 
-      const action = ActionDocument.safeParse(obj)
-      if (action.success) {
-        const actionConfig = config.actions.find(
-          (a) => a.type === action.data.type
-        )
+      if (isActionDocument(obj)) {
+        const actionConfig = config.actions.find((a) => a.type === obj.type)
 
         const annotationFields = actionConfig
           ? getActionAnnotationFields(actionConfig)
           : []
 
         const annotation =
-          action.data.annotation != null
+          obj.annotation != null
             ? stringifyDeclaration(
                 annotationFields,
-                pickAnnotationFieldValues(
-                  annotationFields,
-                  action.data.annotation
-                )
+                pickAnnotationFieldValues(annotationFields, obj.annotation)
               )
             : {}
-        const actionAnchor = toPlainDate(action.data.createdAt)
+        const actionAnchor = toPlainDate(obj.createdAt)
         const resolvedAction = {
-          id: action.data.id,
-          type: action.data.type,
-          createdAt: DateField.stringify(action.data.createdAt, {
+          id: obj.id,
+          type: obj.type,
+          createdAt: DateField.stringify(obj.createdAt, {
             intl,
             locations,
             administrativeAreas,
             anchor: actionAnchor
           }),
-          createdBy: users.find((user) => user.id === action.data.createdBy),
-          createdByUserType: action.data.createdByUserType,
+          createdBy: users.find((user) => user.id === obj.createdBy),
+          createdByUserType: obj.createdByUserType,
           createdBySignature:
-            action.data.createdBySignature &&
-            toFileUrl(action.data.createdBySignature),
+            obj.createdBySignature && toFileUrl(obj.createdBySignature),
           createdAtLocation: LocationSearch.toCertificateVariables(
-            action.data.createdAtLocation,
+            obj.createdAtLocation,
             {
               intl,
               locations,
@@ -428,7 +422,7 @@ export function compileSvg({
               anchor: actionAnchor
             }
           ),
-          createdByRole: action.data.createdByRole,
+          createdByRole: obj.createdByRole,
           annotation
         }
 

@@ -34,8 +34,7 @@ export async function uploadFile(file: File, token: string, eventId: string) {
   formData.append('transactionId', transactionId)
   formData.append('path', `events/${eventId}/`)
 
-  const url = new URL('/upload', GATEWAY_HOST)
-  const res = await fetch(url, {
+  const res = await fetch(`${GATEWAY_HOST}/upload`, {
     method: 'POST',
     headers: {
       Authorization: `Bearer ${token}`

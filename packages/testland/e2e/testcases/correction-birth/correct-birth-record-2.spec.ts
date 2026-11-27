@@ -14,6 +14,7 @@ import {
   formatName,
   getToken,
   login,
+  searchFromSearchBar,
   uploadImage
 } from '@e2e/support/helpers'
 import { faker } from '@faker-js/faker'
@@ -69,12 +70,11 @@ test('Correct record - 2', async ({ page }) => {
 
   await test.step('2.1 Certificate preview', async () => {
     await login(page, CREDENTIALS.REGISTRATION_OFFICER)
-    await page.getByRole('button', { name: 'Pending certification' }).click()
-    await navigateToCertificatePrintAction(
-      page,
-      declaration,
-      CREDENTIALS.REGISTRATION_OFFICER
-    )
+
+    await searchFromSearchBar(page, formatV2ChildName(declaration))
+
+    await ensureAssignedToUser(page, CREDENTIALS.REGISTRATION_OFFICER)
+    await selectAction(page, 'Print')
 
     await selectCertificationType(page, 'Birth Certificate')
     await selectRequesterType(page, 'Print and issue to Informant (Mother)')
@@ -171,11 +171,11 @@ test('Correct record - 2', async ({ page }) => {
 
       await expectInUrl(
         page,
-        `/events/request-correction/${eventId}/pages/informant?from=review&backTo=/workqueue/pending-certification#informant____relation`
+        `/events/request-correction/${eventId}/pages/informant?from=review#informant____relation`
       )
 
       await page.locator('#informant____relation').click()
-      await page.getByText('Brother', { exact: true }).click()
+      await page.getByText('Legal guardian', { exact: true }).click()
 
       await page.waitForTimeout(SAFE_INPUT_CHANGE_TIMEOUT_MS)
 
@@ -209,7 +209,7 @@ test('Correct record - 2', async ({ page }) => {
       ).toHaveText('Mother')
 
       await expect(page.getByTestId('informant.relation-value')).toContainText(
-        'Brother'
+        'Legal guardian'
       )
     })
 
@@ -218,7 +218,7 @@ test('Correct record - 2', async ({ page }) => {
 
       await expectInUrl(
         page,
-        `/events/request-correction/${eventId}/pages/child?from=review&backTo=/workqueue/pending-certification#child____placeOfBirth`
+        `/events/request-correction/${eventId}/pages/child?from=review#child____placeOfBirth`
       )
 
       await page.locator('#child____placeOfBirth').click()
@@ -269,7 +269,7 @@ test('Correct record - 2', async ({ page }) => {
     ).toBeVisible()
 
     await expect(
-      page.getByText('Relationship to child' + 'Mother' + 'Brother')
+      page.getByText('Relationship to child' + 'Mother' + 'Legal guardian')
     ).toBeVisible()
 
     const correctionRequest = page.waitForResponse(
@@ -283,7 +283,7 @@ test('Correct record - 2', async ({ page }) => {
     await page.getByRole('button', { name: 'Confirm' }).click()
     await correctionRequest
 
-    await expectInUrl(page, `/workqueue/pending-certification`)
+    await expectInUrl(page, `/events/${eventId}`)
   })
 
   await test.step('2.8 Correction Review', async () => {
@@ -316,7 +316,7 @@ test('Correct record - 2', async ({ page }) => {
       await expect(
         page
           .locator('#listTable-corrections-table-informant')
-          .getByText('Relationship to child' + 'Mother' + 'Brother')
+          .getByText('Relationship to child' + 'Mother' + 'Legal guardian')
       ).toBeVisible()
 
       await expect(
@@ -408,7 +408,7 @@ test('Correct record - 2', async ({ page }) => {
         ).toBeVisible()
 
         await expect(
-          page.getByText('Relationship to child' + 'Mother' + 'Brother')
+          page.getByText('Relationship to child' + 'Mother' + 'Legal guardian')
         ).toBeVisible()
 
         await expect(
@@ -418,7 +418,6 @@ test('Correct record - 2', async ({ page }) => {
         ).toBeVisible()
 
         await page.locator('#close-dialog').click()
-        await page.getByRole('button', { name: 'Next page' }).click()
       })
 
       await test.step('2.8.4.4 Validate correction rejected modal', async () => {
@@ -429,6 +428,18 @@ test('Correct record - 2', async ({ page }) => {
         await expect(page.getByText('Reason' + 'No legal proof')).toBeVisible()
 
         await page.locator('#close-dialog').click()
+      })
+
+      await test.step('2.8.4.5 Documents tab shows the correction supporting document', async () => {
+        await page
+          .getByRole('button', { name: 'Documents', exact: true })
+          .click()
+
+        await expect(
+          page
+            .locator('#listTable-documents')
+            .getByText('Supporting documents (Affidavit)')
+        ).toBeVisible()
       })
     })
   })

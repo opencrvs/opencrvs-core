@@ -14,13 +14,16 @@ import '@opencrvs/commons/monitoring'
 import { logger } from '@opencrvs/commons'
 import { env } from './environment'
 import { server } from './server'
-import { getServiceToken } from './service/auth'
-import { getInMemoryEventConfigurations } from './service/config/config'
+import {
+  getInMemoryRoles,
+  getInMemoryVersionedEventConfigurations
+} from './service/config/config'
 import { triggerSystemReady } from './service/config/systemReady'
 import { ensureIndexExists } from './service/indexing/indexing'
 import { ensureConnection } from './storage/postgres/events'
 import { startAnnouncementWorker } from './workers/announcementWorker'
 import { startTelemetryWorker } from './workers/telemetryWorker'
+import { getCoreSigningKey } from './request-signing'
 
 // eslint-disable-next-line @typescript-eslint/no-require-imports
 const path = require('path')
@@ -30,12 +33,15 @@ const appModulePath = require('app-module-path')
 appModulePath.addPath(path.join(__dirname, '../'))
 
 export async function main() {
+  // Fail at startup rather than on the first request to country config.
+  getCoreSigningKey()
   try {
     await ensureConnection()
-    const serviceToken = await getServiceToken()
-    const configurations = await getInMemoryEventConfigurations(
-      `Bearer ${serviceToken}`
-    )
+    const configurations = await getInMemoryVersionedEventConfigurations()
+
+    // Fetch roles here to validate them early on
+    await getInMemoryRoles()
+
     for (const configuration of configurations) {
       logger.info(`Loaded event configuration: ${configuration.id}`)
       await ensureIndexExists(configuration)

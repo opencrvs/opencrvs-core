@@ -25,7 +25,8 @@ import { AppRouter, TRPCProvider } from '@client/v2-events/trpc'
 import { testDataGenerator } from '@client/tests/test-data-generators'
 import {
   tennisClubMembershipEventDocument,
-  tennisClubMembershipEventWithArchiveAndUnarchive
+  tennisClubMembershipEventWithArchiveAndUnarchive,
+  tennisClubMembershipEventWithRevokeAndReinstate
 } from '../../events/fixtures'
 import { EventOverviewIndex } from './EventOverview'
 
@@ -105,7 +106,7 @@ export const WithConfigurableSummaryFieldHavingEventMetadataValue: Story = {
             return [
               generateEventDraftDocument({
                 eventId: tennisClubMembershipEventDocument.id,
-                actionType: ActionType.REGISTER,
+                actionType: ActionType.DECLARE,
                 declaration: {
                   'applicant.name': {
                     firstname: 'Riku',
@@ -154,6 +155,56 @@ export const WithConfigurableSummaryFieldHavingEventMetadataValue: Story = {
   }
 }
 
+const tennisClubMembershipEventWithConfigVersionInSummary: EventConfig = {
+  ...tennisClubMembershipEvent,
+  summary: {
+    ...tennisClubMembershipEvent.summary,
+    fields: [
+      ...tennisClubMembershipEvent.summary.fields,
+      {
+        id: 'configVersion',
+        label: {
+          defaultMessage: 'Form version',
+          description: 'This is the label for the configuration version',
+          id: 'event.tennis-club-membership.summary.configVersion.label'
+        },
+        value: {
+          defaultMessage: '{event.configVersionLabel}',
+          description:
+            'This is the label of the configuration version that the record was created under',
+          id: 'event.tennis-club-membership.summary.configVersion.value'
+        }
+      }
+    ]
+  }
+}
+
+export const WithConfigVersionLabelInSummary: Story = {
+  parameters: {
+    offline: {
+      events: [tennisClubMembershipEventDocument],
+      configs: [tennisClubMembershipEventWithConfigVersionInSummary]
+    },
+    reactRouter: {
+      router: routesConfig,
+      initialPath: ROUTES.V2.EVENTS.EVENT.buildPath({
+        eventId: tennisClubMembershipEventDocument.id
+      })
+    }
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+    const configVersionRow = await canvas.findByTestId('configVersion')
+
+    // An event without versions gives its single version the label of the event
+    await expect(
+      await within(configVersionRow).findByText(
+        'Tennis club membership application'
+      )
+    ).toBeInTheDocument()
+  }
+}
+
 export const ArchiveAndUnarchiveShowInAuditHistory: Story = {
   parameters: {
     offline: {
@@ -190,6 +241,51 @@ export const ArchiveAndUnarchiveShowInAuditHistory: Story = {
 
         await expect(await canvas.findByText('Archived')).toBeInTheDocument()
         await expect(await canvas.findByText('Unarchived')).toBeInTheDocument()
+      }
+    )
+  }
+}
+
+export const RevokeAndReinstateShowInAuditHistory: Story = {
+  parameters: {
+    offline: {
+      events: [tennisClubMembershipEventWithRevokeAndReinstate]
+    },
+    reactRouter: {
+      router: routesConfig,
+      initialPath: ROUTES.V2.EVENTS.EVENT.buildPath({
+        eventId: tennisClubMembershipEventWithRevokeAndReinstate.id
+      })
+    },
+    msw: {
+      handlers: {
+        user: [
+          tRPCMsw.user.list.query(() => {
+            return [generator.user.localRegistrar().summary]
+          }),
+          tRPCMsw.user.get.query(() => {
+            return generator.user.localRegistrar().v2
+          })
+        ]
+      }
+    }
+  },
+  play: async ({ canvasElement, step }) => {
+    const canvas = within(canvasElement)
+
+    await step(
+      'Revoke and reinstate actions show correct labels in Audit history',
+      async () => {
+        await userEvent.click(
+          await canvas.findByRole('button', { name: 'Audit' })
+        )
+
+        await expect(
+          await canvas.findByText('Registration revoked')
+        ).toBeInTheDocument()
+        await expect(
+          await canvas.findByText('Registration reinstated')
+        ).toBeInTheDocument()
       }
     )
   }

@@ -24,11 +24,16 @@ import {
   EventDocument,
   FieldType,
   generateActionDocument,
+  generateActionDocuments,
   generateRandomDatetime,
   getCurrentEventState,
   getUUID,
   tennisClubMembershipEvent,
-  TestUserRole
+  TestUserRole,
+  withDeclaration,
+  getDeclaration,
+  getDeclarationPages,
+  toVersionedEventConfig
 } from '@opencrvs/commons/client'
 import { AppRouter, TRPCProvider } from '@client/v2-events/trpc'
 import { ROUTES, routesConfig } from '@client/v2-events/routes'
@@ -50,8 +55,9 @@ const refData = testDataGenerator()
 const GATED_FIELD_ID = 'applicant.registrationNumber'
 const GATED_FIELD_LABEL = 'Registration number'
 
-const [applicantPage, ...otherPages] =
-  tennisClubMembershipEvent.declaration.pages
+const [applicantPage, ...otherPages] = getDeclarationPages(
+  tennisClubMembershipEvent
+)
 
 /**
  * A configuration where one declaration field is only shown once the record has
@@ -63,10 +69,9 @@ const [applicantPage, ...otherPages] =
  * schema. They cannot be stored in the offline cache.
  */
 const eventConfig = JSON.parse(
-  JSON.stringify({
-    ...tennisClubMembershipEvent,
-    declaration: {
-      ...tennisClubMembershipEvent.declaration,
+  JSON.stringify(
+    withDeclaration(tennisClubMembershipEvent, {
+      ...getDeclaration(tennisClubMembershipEvent),
       pages: [
         {
           ...applicantPage,
@@ -91,9 +96,9 @@ const eventConfig = JSON.parse(
         },
         ...otherPages
       ]
-    }
-  })
-) as EventConfig
+    })
+  )
+) satisfies EventConfig
 
 const actionDefaults = {
   createdAt: generateRandomDatetime(
@@ -127,7 +132,7 @@ const registeredEvent: EventDocument = {
         assignedTo: refData.user.id.localRegistrar
       }
     }),
-    generateActionDocument({
+    ...generateActionDocuments({
       configuration: eventConfig,
       action: ActionType.DECLARE,
       defaults: {
@@ -138,7 +143,7 @@ const registeredEvent: EventDocument = {
         }
       }
     }),
-    generateActionDocument({
+    ...generateActionDocuments({
       configuration: eventConfig,
       action: ActionType.REGISTER,
       defaults: {
@@ -150,7 +155,7 @@ const registeredEvent: EventDocument = {
       }
     }),
 
-    generateActionDocument({
+    ...generateActionDocuments({
       configuration: eventConfig,
       action: ActionType.EDIT,
       defaults: {
@@ -215,7 +220,7 @@ export const ShowsEventDependentFieldInUpdateDetails: Story = {
       handlers: {
         events: [
           tRPCMsw.event.config.get.query(() => {
-            return [eventConfig]
+            return [toVersionedEventConfig(eventConfig)]
           }),
           tRPCMsw.event.get.query(() => {
             return registeredEvent

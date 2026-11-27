@@ -8,14 +8,17 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
+import { pick } from 'lodash'
 import {
   Action,
   ActionType,
   DeclarationUpdateActionType,
   Draft,
+  EventConfig,
   EventDocument,
   EventState,
-  getActionAnnotation
+  getActionAnnotation,
+  getActionReviewFields
 } from '@opencrvs/commons/client'
 
 export type AvailableActionTypes = Extract<
@@ -88,29 +91,39 @@ export function getPreviousDeclarationActionType(
 /**
  * Returns the annotation for a given action type from an event.
  *
- * NOTIFY shares the DECLARE action config, so when resolving DECLARE annotation
- * both DECLARE and NOTIFY annotations are merged together.
+ * When resolving DECLARE annotation, the NOTIFY annotation values of fields that
+ * DECLARE's review also has are merged in. Notify-only fields stay on the NOTIFY action.
  * For all other action types, if no annotation exists the NOTIFY annotation is
  * returned as a fallback (NOTIFY is the earliest action that can capture annotation).
  */
 export function getAnnotationForActionType({
   event,
+  eventConfiguration,
   actionType,
   draft
 }: {
   event: EventDocument
+  eventConfiguration: EventConfig
   actionType: ActionType
   draft?: Draft
 }): EventState {
   const annotation = getActionAnnotation({ event, actionType, draft })
 
   if (actionType === ActionType.DECLARE) {
-    // NOTIFY shares the DECLARE action config — merge both
-    const notifyAnnotation = getActionAnnotation({
-      event,
-      actionType: ActionType.NOTIFY,
-      draft
-    })
+    const declareReviewFieldIds = getActionReviewFields(
+      eventConfiguration,
+      ActionType.DECLARE
+    ).map((field) => field.id)
+
+    const notifyAnnotation = pick(
+      getActionAnnotation({
+        event,
+        actionType: ActionType.NOTIFY,
+        draft
+      }),
+      declareReviewFieldIds
+    )
+
     return { ...notifyAnnotation, ...annotation }
   }
 

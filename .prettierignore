@@ -12,3 +12,8 @@
 # dependency change into a diff thousands of lines long.
 pnpm-lock.yaml
 **/pnpm-lock.yaml
+
+# Handlebars templates that `opencrvs environment` renders into Helm values and
+# the inventory. Prettier reads `{{env}}` as a YAML flow mapping and rewrites it
+# to `{ { env } }`, which no longer renders.
+packages/toolkit/src/environment/templates/**

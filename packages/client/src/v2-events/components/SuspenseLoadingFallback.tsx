@@ -12,7 +12,7 @@ import React from 'react'
 import styled from 'styled-components'
 import { defineMessages, useIntl } from 'react-intl'
 import { Spinner } from '@opencrvs/components'
-import { ConnectionError } from '@opencrvs/components/lib/icons'
+import { ConnectionError } from '@opencrvs/components/icons'
 import { useOnlineStatus } from '@client/utils'
 
 const messages = defineMessages({

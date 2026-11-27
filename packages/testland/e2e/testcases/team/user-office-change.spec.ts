@@ -232,10 +232,17 @@ test('Scope changes after office change - user loses access when the office chan
 
     await page.getByRole('button', { name: 'Continue' }).click()
     await page.getByRole('button', { name: 'Confirm' }).click()
+
+    const userResponse = page.waitForResponse(
+      (res) => res.url().includes('user.update') && res.ok()
+    )
+
     await page
       .getByRole('dialog')
       .getByRole('button', { name: 'Confirm' })
       .click()
+
+    await userResponse
 
     await expect(page.getByTestId('office-link-value')).toHaveText(
       'Isamba District Office'
@@ -269,6 +276,7 @@ test('Scope changes after office change - user loses access when the office chan
 
 test('Scope changes after office and role changes', async ({ browser }) => {
   const page = await browser.newPage()
+
   const { username, fullName, trackingId, eventId, draftCountBeforeChange } =
     await setupRegistrarWithDrafts(page, 3)
 
@@ -316,10 +324,17 @@ test('Scope changes after office and role changes', async ({ browser }) => {
     await expect(page.getByTestId('role-value')).toHaveText('Hospital Official')
 
     await page.getByRole('button', { name: 'Confirm' }).click()
+
+    const userResponse = page.waitForResponse(
+      (res) => res.url().includes('user.update') && res.ok()
+    )
+
     await page
       .getByRole('dialog')
       .getByRole('button', { name: 'Confirm' })
       .click()
+
+    await userResponse
 
     await expect(page.getByTestId('office-link-value')).toHaveText(
       'Isamba District Office'
@@ -424,10 +439,15 @@ test('Drafts are removed when only the role changes', async ({ browser }) => {
       )
     ).toBeVisible()
 
+    const userResponse = page.waitForResponse(
+      (res) => res.url().includes('user.update') && res.ok()
+    )
     await page
       .getByRole('dialog')
       .getByRole('button', { name: 'Confirm' })
       .click()
+
+    await userResponse
 
     await expect(
       page.getByText('Registration Officer', { exact: true })

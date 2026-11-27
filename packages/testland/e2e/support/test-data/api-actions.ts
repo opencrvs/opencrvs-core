@@ -23,7 +23,11 @@ import {
   TEST_USER_PASSWORD
 } from '@e2e/support/constants'
 import { formatName, NEW_USER_PASSWORD } from '@e2e/support/helpers'
-import { getPlaceOfBirth } from './birth-declaration'
+import {
+  getDeclaration,
+  getNotificationDeclaration,
+  NOTIFY_ANNOTATION
+} from './birth-declaration'
 import { getSignatureFile, uploadFile } from './utils'
 
 /*
@@ -76,28 +80,24 @@ export async function notifyChildDetailsViaApi(
   })
 
   const { dd, mm, yyyy } = inputs.child.birthDate
-  const declaration = {
-    'child.name': {
-      firstname: inputs.child.name.firstNames,
-      surname: inputs.child.name.familyName
-    },
-    'child.gender': inputs.child.gender.toLowerCase(),
-    'child.dob': `${yyyy}-${mm}-${dd}`,
-    ...(await getPlaceOfBirth(
-      'HEALTH_FACILITY',
-      token,
-      inputs.birthLocation.facility
-    ))
-  }
+  const declaration = await getNotificationDeclaration({
+    token,
+    facility: inputs.birthLocation.facility,
+    partialDeclaration: {
+      'child.name': {
+        firstname: inputs.child.name.firstNames,
+        surname: inputs.child.name.familyName
+      },
+      'child.gender': inputs.child.gender.toLowerCase(),
+      'child.dob': `${yyyy}-${mm}-${dd}`
+    }
+  })
 
   await client.event.actions.notify.request.mutate({
     eventId,
     transactionId: uuidv4(),
     declaration,
-    annotation: {
-      'review.comment': faker.lorem.sentence(),
-      'review.signature': await uploadFile(getSignatureFile(), token, eventId)
-    }
+    annotation: NOTIFY_ANNOTATION
   })
 
   return { eventId: eventId as string }
@@ -116,6 +116,38 @@ export async function rejectViaApi(
     declaration: {},
     annotation: {},
     content: { reason }
+  })
+}
+
+/**
+ * Assigns the event to the token's user and applies `declaration` as an edit,
+ * the same edit + declare sequence the client sends for "Declare with edits".
+ * The event is left unassigned.
+ */
+export async function editAndDeclareViaApi(
+  token: string,
+  eventId: string,
+  declaration: Record<string, unknown>
+) {
+  await assignToSelf(token, eventId)
+  const client = getClient(token)
+  const annotation = {
+    'review.comment': faker.lorem.sentence(),
+    'review.signature': await uploadFile(getSignatureFile(), token, eventId)
+  }
+
+  await client.event.actions.edit.request.mutate({
+    eventId,
+    transactionId: uuidv4(),
+    declaration,
+    annotation,
+    keepAssignmentIfAccepted: true
+  })
+  await client.event.actions.declare.request.mutate({
+    eventId,
+    transactionId: uuidv4(),
+    declaration,
+    annotation
   })
 }
 
@@ -162,6 +194,20 @@ export async function validateViaApi(token: string, eventId: string) {
     token,
     eventId,
     customActionType: 'VALIDATE_DECLARATION'
+  })
+}
+
+/**
+ * Assigns the event to the token's user and registers it. Use it when the
+ * user who declared the record is not the user who registers it.
+ */
+export async function registerViaApi(token: string, eventId: string) {
+  await assignToSelf(token, eventId)
+  await getClient(token).event.actions.register.request.mutate({
+    eventId,
+    transactionId: uuidv4(),
+    declaration: {},
+    annotation: {}
   })
 }
 
@@ -300,6 +346,38 @@ export async function createBirthDraftViaApi(token: string) {
     status: ActionStatus.Requested,
     declaration: { 'child.name': { firstname, surname } },
     annotation: {}
+  })
+
+  return formatName({ firstNames: firstname, familyName: surname })
+}
+
+export async function createCompleteBirthDraftViaApi(token: string) {
+  const client = getClient(token)
+
+  const event = await client.event.create.mutate({
+    type: 'birth',
+    transactionId: uuidv4()
+  })
+
+  const firstname = faker.person.firstName('female')
+  const surname = faker.person.lastName('female')
+
+  const declaration = await getDeclaration({
+    token,
+    partialDeclaration: { 'child.name': { firstname, surname } }
+  })
+  const signature = await uploadFile(getSignatureFile(), token, event.id)
+
+  await client.event.draft.create.mutate({
+    eventId: event.id,
+    transactionId: uuidv4(),
+    type: ActionType.DECLARE,
+    status: ActionStatus.Requested,
+    declaration,
+    annotation: {
+      'review.comment': 'My comment',
+      'review.signature': signature
+    }
   })
 
   return formatName({ firstNames: firstname, familyName: surname })

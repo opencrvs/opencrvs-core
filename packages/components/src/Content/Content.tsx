@@ -11,22 +11,29 @@
 import * as React from 'react'
 import { ReactElement } from 'react'
 import styled from 'styled-components'
-import { colors } from '../colors'
+import { colors } from '../tokens'
 
 const Container = styled.div<{ size: ContentSize }>`
   position: relative;
   border-radius: 4px;
   box-sizing: border-box;
   margin: 24px auto;
+  /*
+   * The 48px is the gutter. It has to come off the width rather than go on as
+   * a margin, because 'margin: auto' only shares out space that is left over:
+   * once the region is narrower than the card there is none, the margins
+   * compute to zero, and the card sits flush against the navigation and the
+   * window.
+   */
   max-width: ${({ size }) => {
     switch (size) {
       case 'large':
-        return '1140px'
+        return 'min(1140px, 100% - 48px)'
       case 'normal':
-        return '778px'
+        return 'min(778px, 100% - 48px)'
       case 'small':
       default:
-        return '568px'
+        return 'min(568px, 100% - 48px)'
     }
   }};
   border: 1px solid ${({ theme }) => theme.colors.grey300};

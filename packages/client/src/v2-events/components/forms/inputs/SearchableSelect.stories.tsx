@@ -64,7 +64,7 @@ export const WithInternalState: StoryObj<SearchableSelectProps> = {
     ],
     value: options[0]
   },
-  render(args) {
+  render: function Component(args) {
     const [value, setValue] = React.useState<Option | null>(args.value)
     return (
       <SearchableSelect

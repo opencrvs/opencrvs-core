@@ -24,24 +24,32 @@ import {
   buildVersions,
   clearAdministrativeHierarchyCache,
   parseVersions,
-  resolveVersionFields
+  resolveVersionFields,
+  writtenSinceCondition
 } from './locations'
 
 export async function getAdministrativeAreas({
   ids,
   isActive,
-  externalId
+  externalId,
+  writtenSince
 }: {
   ids?: UUID[]
   isActive?: boolean
   externalId?: string
+  /** When set, returns only the rows that {@link writtenSinceCondition} matches. */
+  writtenSince?: string
 } = {}) {
   const db = getClient()
 
   let query = db
     .selectFrom('administrativeAreas')
-    .select(['id', 'parentId', 'versions'])
+    .select(['id', 'parentId', 'versions', 'updatedAt'])
     .where('deletedAt', 'is', null)
+
+  if (writtenSince) {
+    query = query.where(writtenSinceCondition(writtenSince))
+  }
 
   if (externalId) {
     // Containment only narrows to rows that carried the code at some point;

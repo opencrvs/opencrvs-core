@@ -17,18 +17,18 @@ import {
   dangerouslyGetCurrentEventStateWithDrafts,
   EventIndex,
   applyDraftToEventIndex,
-  deepDropNulls,
-  dropSecuredDeclarationFields
+  deepDropNulls
 } from '@opencrvs/commons/client'
-import { Content, ContentSize } from '@opencrvs/components/lib/Content'
+import { Content, ContentSize } from '@opencrvs/components'
 import { EventIcon } from '@client/v2-events/components/EventIcon'
 import { ROUTES } from '@client/v2-events/routes'
-import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
+import { useEventConfigurationForRecord } from '@client/v2-events/features/events/useEventConfiguration'
 import { useUsers } from '@client/v2-events/hooks/useUsers'
 import { withSuspense } from '@client/v2-events/components/withSuspense'
 import { flattenEventIndex, getUsersFullName } from '@client/v2-events/utils'
 import { useEventTitle } from '@client/v2-events/features/events/useEvents/useEventTitle'
 import { useValidatorContext } from '@client/v2-events/hooks/useValidatorContext'
+import { dropSecuredDeclarationFields } from '@client/v2-events/conditionals'
 import { useDrafts } from '../../drafts/useDrafts'
 import { DuplicateWarning } from '../../events/actions/dedup/DuplicateWarning'
 import { DuplicateReviewUnavailable } from '../../events/actions/dedup/DuplicateReviewUnavailable'
@@ -44,12 +44,12 @@ import { useEventOverviewInfo } from './components/useEventOverviewInfo'
  * Renders the event overview page which shows a summary of the event.
  */
 function EventOverviewFull({ event }: { event: EventDocument }) {
-  const { eventConfiguration } = useEventConfiguration(event.type)
+  const { eventConfiguration } = useEventConfigurationForRecord(event)
   const validatorContext = useValidatorContext(event)
   const eventIndex = getCurrentEventState(event, eventConfiguration)
   const { status } = eventIndex
-  const { getRemoteDraftByEventId } = useDrafts()
-  const draft = getRemoteDraftByEventId(eventIndex.id, {
+  const { useRemoteDraftByEventId } = useDrafts()
+  const draft = useRemoteDraftByEventId(eventIndex.id, {
     refetchOnMount: 'always'
   })
 
@@ -121,10 +121,10 @@ function EventOverviewFull({ event }: { event: EventDocument }) {
  * Renders the protected event overview page with PII hidden in the event summary
  */
 function EventOverviewProtected({ eventIndex }: { eventIndex: EventIndex }) {
-  const { eventConfiguration } = useEventConfiguration(eventIndex.type)
+  const { eventConfiguration } = useEventConfigurationForRecord(eventIndex)
   const { status } = eventIndex
-  const { getRemoteDraftByEventId } = useDrafts()
-  const draft = getRemoteDraftByEventId(eventIndex.id)
+  const { useRemoteDraftByEventId } = useDrafts()
+  const draft = useRemoteDraftByEventId(eventIndex.id)
 
   const eventWithDrafts = draft
     ? deepDropNulls(

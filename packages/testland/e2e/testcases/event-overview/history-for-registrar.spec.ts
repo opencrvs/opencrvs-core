@@ -45,10 +45,10 @@ test('History rows when Registrar registers a birth from scratch', async ({
 
     const expectedActions = [
       'Assigned',
-      'Declared',
-      'Registered',
-      'Unassigned',
       'Viewed',
+      'Unassigned',
+      'Registered',
+      'Declared',
       'Assigned'
     ]
 
@@ -67,5 +67,9 @@ test('History rows when Registrar registers a birth from scratch', async ({
       await expect(modal.getByRole('heading')).toHaveText(expectedActions[i])
       await modal.locator('#close-dialog').click()
     }
+  })
+  await test.step('Documents tab shows no documents', async () => {
+    await switchEventTab(page, 'Documents')
+    await expect(page.getByText('No documents found')).toBeVisible()
   })
 })

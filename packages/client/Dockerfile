@@ -1,6 +1,6 @@
 ARG  BRANCH=develop
 ARG  BASE_IMAGE=ghcr.io/opencrvs/ocrvs-base
-FROM ${BASE_IMAGE}:${BRANCH}
+FROM ${BASE_IMAGE}:${BRANCH} AS base
 
 USER node
 
@@ -23,7 +23,7 @@ WORKDIR /app/packages/client
 COPY --chown=node:node packages/client /app/packages/client
 RUN pnpm install --frozen-lockfile && pnpm build
 
-FROM nginxinc/nginx-unprivileged:1.28-alpine-otel
+FROM nginx/nginx-unprivileged:1.31-alpine-otel
 
 USER root
 RUN sed -i '1iload_module modules/ngx_otel_module.so;' /etc/nginx/nginx.conf
@@ -35,7 +35,7 @@ ENV OTEL_NGINX_SERVICE_NAME=opencrvs_client
 ENV OTEL_NGINX_SERVICE_NAMESPACE=opencrvs
 ENV OTEL_NGINX_DEPLOYMENT_ENVIRONMENT=production
 
-COPY --from=0 --chown=nginx:nginx /app/packages/client/build/ /usr/share/nginx/html/
+COPY --from=base --chown=nginx:nginx /app/packages/client/build/ /usr/share/nginx/html/
 
 COPY --chmod=555 packages/client/nginx-deploy-config.sh /docker-entrypoint.d/11-nginx-deploy-config.sh
 COPY --chown=nginx:nginx packages/client/nginx.conf /etc/nginx/conf.d/default.conf

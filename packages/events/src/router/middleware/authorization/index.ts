@@ -15,6 +15,7 @@ import { OpenApiMeta } from 'trpc-to-openapi'
 import * as z from 'zod/v4'
 import { findLast } from 'lodash'
 import {
+  ACTION_SCOPE_MAP,
   Action,
   ActionDocument,
   ActionInputWithType,
@@ -32,7 +33,6 @@ import {
   RecordScopeTypeV2,
   RecordScopeV2,
   canUserCreateEvent,
-  getEventConfigById,
   userCanAccessEventWithScopes,
   getAcceptedScopesFromToken,
   ScopeType,
@@ -43,7 +43,8 @@ import {
   canAccessOtherUserWithScopes,
   UserScopeType,
   CreateUserInput,
-  canAccessUserWithScope
+  canAccessUserWithScope,
+  maybeUuid
 } from '@opencrvs/commons'
 import { EventNotFoundError, getEventById } from '@events/service/events/events'
 import { ServiceTrpcContext, TrpcContext } from '@events/context'
@@ -52,20 +53,14 @@ import { getSystemInitialisation } from '@events/service/auth'
 import { getLocationHierarchy } from '@events/service/locations/locations'
 import { assertCanReadOtherUser } from '@events/service/users/access'
 import { findUserOrSystem, getUser } from '../../../service/users/api'
-import { getInMemoryEventConfigurations } from '../../../service/config/config'
+import {
+  getEventConfigurationForRecord,
+  getInMemoryEventConfigurations
+} from '../../../service/config/config'
 import {
   getEventIndexWithAdministrativeHierarchy,
   hasLocationJurisdictionFilter
 } from '../../../service/indexing/utils'
-
-/**
- * Depending on how the API is called, there might or might not be Bearer keyword in the header.
- * To allow for usage with both direct HTTP calls and TRPC, ensure it's present to be able to use shared scope auth functions.
- */
-export function setBearerForToken(token: string) {
-  const bearer = 'Bearer'
-  return token.startsWith(bearer) ? token : `${bearer} ${token}`
-}
 
 /**
  * Middleware to check if the user has any of the specified allowed scopes.
@@ -165,6 +160,10 @@ export const EventIdParam = z.object({
   customActionType: z.string().optional()
 })
 
+function isEventIdParam(param: unknown): param is EventIdParam {
+  return EventIdParam.validate(param)
+}
+
 export type EventIdParam = z.infer<typeof EventIdParam>
 
 export const requireAssignment: MiddlewareFunction<
@@ -244,37 +243,54 @@ export const requireScopeForWorkqueues: MiddlewareFunction<
   return next()
 }
 
-/**
- * Given scope types, determines whether the user has relevant scopes to access the event based on the current state.
- *
- */
-export const canAccessEventWithScopes = (scopes: RecordScopeTypeV2[]) => {
+/** Actions that are granted by scopes, rather than always allowed */
+type ScopedActionType = {
+  [A in keyof typeof ACTION_SCOPE_MAP]: (typeof ACTION_SCOPE_MAP)[A] extends null
+    ? never
+    : A
+}[keyof typeof ACTION_SCOPE_MAP]
+
+/** `getRequiredScopes` returns `undefined` for input that names no scopes */
+function canAccessEventWithInputScopes(
+  getRequiredScopes: (rawInput: unknown) => RecordScopeTypeV2[] | undefined
+) {
   const fn: MiddlewareFunction<
     TrpcContext,
     OpenApiMeta,
     TrpcContext,
-    TrpcContext & { eventId: UUID; eventType: string },
+    TrpcContext & {
+      eventId: UUID
+      eventType: string
+      configVersionId: string
+    },
     unknown
   > = async ({ next, ctx, getRawInput }) => {
-    const eventConfigs = await getInMemoryEventConfigurations(ctx.token)
+    // Since determining access requires knowing the event type, we need to parse the input before we can check access.
+    // default .input(...) throws 400, which is something that we want to return only if the user should have access.
+    const rawInput = await getRawInput()
 
-    const acceptedScopes = getAcceptedScopesFromToken(ctx.token, scopes)
+    const requiredScopes = getRequiredScopes(rawInput)
+
+    if (!requiredScopes) {
+      throw new TRPCError({ code: 'BAD_REQUEST' })
+    }
+
+    const acceptedScopes = getAcceptedScopesFromToken(ctx.token, requiredScopes)
 
     if (acceptedScopes.length === 0) {
       throw new TRPCError({ code: 'FORBIDDEN' })
     }
 
-    // Since determining access requires knowing the event type, we need to parse the input before we can check access.
-    // default .input(...) throws 400, which is something that we want to return only if the user should have access.
-    const rawInput = await getRawInput()
-    const input = EventIdParam.safeParse(rawInput).data
-
-    if (!input) {
+    if (!isEventIdParam(rawInput)) {
       throw new TRPCError({ code: 'BAD_REQUEST' })
     }
 
+    const input = rawInput
+
     const event = await getEventById(input.eventId)
-    const eventConfig = getEventConfigById(eventConfigs, event.type)
+    const eventConfig = await getEventConfigurationForRecord({
+      event
+    })
 
     const eventIndex = getCurrentEventState(event, eventConfig)
     const eventIndexWithLocationHierarchy =
@@ -296,13 +312,33 @@ export const canAccessEventWithScopes = (scopes: RecordScopeTypeV2[]) => {
         ...ctx,
         acceptedScopes,
         eventId: input.eventId,
-        eventType: event.type
+        eventType: event.type,
+        configVersionId: event.configVersionId
       }
     })
   }
 
   return fn
 }
+
+/**
+ * Given scope types, determines whether the user has relevant scopes to access the event based on the current state.
+ */
+export const canAccessEventWithScopes = (scopes: RecordScopeTypeV2[]) =>
+  canAccessEventWithInputScopes(() => scopes)
+
+/**
+ * Like {@link canAccessEventWithScopes}, for an endpoint that takes one of several actions:
+ * the scopes are those of the input's `type`, see `ACTION_SCOPE_MAP`.
+ * Input whose `type` is not one of `actionTypes` is a bad request.
+ */
+export const canAccessEventWithActionScopes = (
+  actionTypes: readonly ScopedActionType[]
+) =>
+  canAccessEventWithInputScopes((rawInput) => {
+    const input = z.object({ type: z.enum(actionTypes) }).safeParse(rawInput)
+    return input.success ? ACTION_SCOPE_MAP[input.data.type] : undefined
+  })
 
 const ActionConfirmationParams = z.object({
   eventId: UUID,
@@ -312,6 +348,14 @@ const ActionConfirmationParams = z.object({
   // action below so a confirmer cannot accept one custom action as another.
   customActionType: z.string().optional()
 })
+
+type ActionConfirmationParams = z.infer<typeof ActionConfirmationParams>
+
+function isActionConfirmationParams(
+  params: unknown
+): params is ActionConfirmationParams {
+  return ActionConfirmationParams.validate(params)
+}
 
 /**
  * Resolves the action an accept/reject call names, and refuses anything other
@@ -332,11 +376,11 @@ export function requireConfirmableAction(actionType: ActionType) {
     },
     unknown
   > = async ({ ctx, next, getRawInput }) => {
-    const input = ActionConfirmationParams.safeParse(await getRawInput()).data
-
-    if (!input) {
+    const rawInput = await getRawInput()
+    if (!isActionConfirmationParams(rawInput)) {
       throw new TRPCError({ code: 'BAD_REQUEST' })
     }
+    const input = rawInput
 
     const event = await getEventById(input.eventId)
     const originalAction = event.actions.find(({ id }) => id === input.actionId)
@@ -453,7 +497,7 @@ export const userCanCreateEvent: MiddlewareFunction<
   TrpcContext,
   unknown
 > = async ({ next, ctx, getRawInput }) => {
-  const eventConfigs = await getInMemoryEventConfigurations(ctx.token)
+  const eventConfigs = await getInMemoryEventConfigurations()
 
   if (!hasScope(ctx.token, 'record.create')) {
     throw new TRPCError({ code: 'FORBIDDEN' })
@@ -496,10 +540,8 @@ export function canAccessUserWithScopes(scopes: UserScopeType[]) {
     TrpcContext & { id: UUID },
     { id: UUID } | UUID
   > = async ({ next, ctx, input }) => {
-    const parseResult = UUID.safeParse(input)
-    const incomingId: UUID = parseResult.success
-      ? parseResult.data
-      : (input as { id: UUID }).id
+    const maybeId = maybeUuid(input)
+    const incomingId: UUID = maybeId ?? (input as { id: UUID }).id
 
     const acceptedScopes = getAcceptedScopesFromToken(ctx.token, scopes)
 

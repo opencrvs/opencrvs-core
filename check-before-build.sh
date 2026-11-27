@@ -9,17 +9,18 @@
 set -e
 
 print_usage_and_exit () {
-    echo 'Usage: ./check-before-build.sh DOCKERHUB_USERNAME DOCKERHUB_PASSWORD IMAGE_TAG'
+    echo 'Usage: ./check-before-build.sh REGISTRY_USERNAME REGISTRY_TOKEN IMAGE_TAG [REGISTRY_HOST]'
+    echo 'REGISTRY_HOST is the host of the container registry (default: $REGISTRY_HOST, or docker.io)'
     exit 1
 }
 
 if [ -z "$1" ] ; then
-    echo 'Error: Argument DOCKERHUB_USERNAME is required in position 1.'
+    echo 'Error: Argument REGISTRY_USERNAME is required in position 1.'
     print_usage_and_exit
 fi
 
 if [ -z "$2" ] ; then
-    echo 'Error: Argument DOCKERHUB_PASSWORD is required in position 2.'
+    echo 'Error: Argument REGISTRY_TOKEN is required in position 2.'
     print_usage_and_exit
 fi
 
@@ -29,13 +30,22 @@ if [ -z "$3" ] ; then
 fi
 
 COMPOSE_FILE="docker-compose.yml"
-DOCKERHUB_USERNAME=$1
-DOCKERHUB_PASSWORD=$2
+REGISTRY_USERNAME=$1
+REGISTRY_TOKEN=$2
 IMAGE_TAG=$3
+REGISTRY_HOST=${4:-${REGISTRY_HOST:-docker.io}}
 
+# Images that name no registry host (e.g. opencrvs/ocrvs-auth) live in REGISTRY_HOST
+function qualified_image() {
+    case "${1%%/*}" in
+        *.* | *:* | localhost) echo "$1" ;;
+        *) echo "$REGISTRY_HOST/$1" ;;
+    esac
+}
+
+# Asks the registry through the Docker CLI, which speaks to every OCI registry
 function docker_tag_exists() {
-    TOKEN=$(curl -s -H "Content-Type: application/json" -X POST -d '{"username": "'${DOCKERHUB_USERNAME}'", "password": "'${DOCKERHUB_PASSWORD}'"}' https://hub.docker.com/v2/users/login/ | jq -r .token)
-    curl --silent -f --head -lL https://hub.docker.com/v2/repositories/$1/tags/$2/ > /dev/null
+    docker manifest inspect "$(qualified_image $1):$2" > /dev/null 2>&1
 }
 
 # Takes in a docker-compose.yml file name and returns
@@ -51,6 +61,8 @@ get_docker_tags_from_compose_files() {
    IMAGE_TAG_LIST=$(echo $IMAGE_TAG_LIST_WITH_VERSION | sed s/':${VERSION:-latest}'//g)
    echo $IMAGE_TAG_LIST
 }
+
+echo "$REGISTRY_TOKEN" | docker login "$REGISTRY_HOST" -u "$REGISTRY_USERNAME" --password-stdin
 
 imagesAlreadyBuilt="true"
 IMAGE_TAGS_TO_CHECK=$(get_docker_tags_from_compose_files "$COMPOSE_FILE")

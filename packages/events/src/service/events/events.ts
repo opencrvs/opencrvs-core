@@ -26,6 +26,7 @@ import {
   ActionUpdate,
   AsyncRejectActionDocument,
   EventConfig,
+  VersionedEventConfig,
   EventDocument,
   EventIndex,
   EventInput,
@@ -41,10 +42,16 @@ import {
   getStatusFromActions,
   isActionVisible,
   isActionEnabled,
-  isWriteAction
+  isWriteAction,
+  isFileFieldValue
 } from '@opencrvs/commons/events'
+
 import { TrpcUserContext } from '@events/context'
-import { getEventConfigurationById } from '@events/service/config/config'
+import {
+  getEventConfigurationForRecord,
+  getVersionedEventConfigurationById
+} from '@events/service/config/config'
+import { resolveVersionForNewRecord } from '@events/service/events/configVersion'
 import {
   sweepUnreferencedFiles,
   deleteFilesByPrefix,
@@ -54,7 +61,7 @@ import {
 import { indexEvent } from '@events/service/indexing/indexing'
 import * as draftsRepo from '@events/storage/postgres/events/drafts'
 import * as eventsRepo from '@events/storage/postgres/events/events'
-import { getValidatorContext } from '@events/router/middleware/validate/utils'
+import { getUserConditionalContext } from '@events/router/middleware/validate/utils'
 
 export class EventNotFoundError extends TRPCError {
   constructor(id: string) {
@@ -92,11 +99,12 @@ function getValidFileValue(
 ) {
   const isFileType =
     fieldTypes.find((field) => field.id === fieldKey)?.type === FieldType.FILE
-  const validFieldValue = FileFieldValue.safeParse(fieldValue)
-  if (!isFileType || !validFieldValue.success) {
+
+  if (!isFileType || !isFileFieldValue(fieldValue)) {
     return undefined
   }
-  return validFieldValue.data
+
+  return fieldValue
 }
 
 /** Throws tRPC HTTP 409 if the status and the flags of the event do not allow the action. */
@@ -115,6 +123,28 @@ function throwConflictIfActionNotAvailable(
 }
 
 /**
+ * Returns the event without the requested action that this request stored before (same
+ * transaction id and type), for example when country config failed and the client sends the
+ * request again. The check for one requested action then refuses only other requests.
+ */
+export function withoutOwnRequestedAction(
+  event: EventDocument,
+  input: Pick<ActionInputWithType, 'transactionId' | 'type'>
+): EventDocument {
+  return {
+    ...event,
+    actions: event.actions.filter(
+      (action) =>
+        !(
+          action.status === ActionStatus.Requested &&
+          action.transactionId === input.transactionId &&
+          action.type === input.type
+        )
+    )
+  }
+}
+
+/**
  * Ensure that an action is allowed depending on the current event state. This does two checks:
  * 1. Check that the action is allowed in the current event status and flags
  * 2. Check that any conditionals defined for the action are met
@@ -129,9 +159,8 @@ export async function throwConflictIfActionNotAllowed(
   existingEvent?: EventDocument
 ) {
   const event = existingEvent ?? (await getEventById(eventId))
-  const eventConfiguration = await getEventConfigurationById({
-    eventType: event.type,
-    token
+  const eventConfiguration = await getEventConfigurationForRecord({
+    event: event
   })
 
   const eventIndex = getCurrentEventState(event, eventConfiguration)
@@ -149,12 +178,14 @@ export async function throwConflictIfActionNotAllowed(
     return
   }
 
-  const context = await getValidatorContext({
-    token,
-    event: { document: event, state: eventIndex }
-  })
-  const actionIsEnabled = isActionEnabled(actionConfig, eventIndex, context)
-  const actionIsAvailable = isActionVisible(actionConfig, eventIndex, context)
+  const form = { declaration: eventIndex.declaration }
+  const context = {
+    eventDocument: event,
+    eventConfig: eventConfiguration,
+    user: getUserConditionalContext(token)
+  }
+  const actionIsEnabled = isActionEnabled(actionConfig, form, context)
+  const actionIsAvailable = isActionVisible(actionConfig, form, context)
 
   if (!actionIsEnabled || !actionIsAvailable) {
     throw new TRPCError({
@@ -207,15 +238,25 @@ export async function createEvent({
   eventInput,
   user,
   transactionId,
-  createdAtLocation
+  createdAtLocation,
+  config,
+  timeZone
 }: {
   eventInput: z.infer<typeof EventInput>
   user: TrpcUserContext
   transactionId: string
   createdAtLocation?: UUID | null | undefined
-  config: EventConfig
+  config: VersionedEventConfig
+  /** The country's time zone, in which configuration versions take effect. */
+  timeZone: string
 }): Promise<EventDocument> {
   const isSystem = user.type === TokenUserType.enum.system
+  const version = resolveVersionForNewRecord(
+    config,
+    eventInput.configVersionId,
+    new Date(),
+    timeZone
+  )
 
   const getOrCreateEvent = isSystem
     ? eventsRepo.getOrCreateEvent // System users create events without assignment
@@ -231,7 +272,8 @@ export async function createEvent({
     createdByRole:
       user.type === TokenUserType.enum.user ? user.role : undefined,
     createdBySignature: user.signature,
-    createdAtLocation: eventLocation
+    createdAtLocation: eventLocation,
+    configVersionId: version.id
   })
 
   return event
@@ -319,6 +361,8 @@ export function buildAction(
     case ActionType.REJECT:
     case ActionType.ARCHIVE:
     case ActionType.UNARCHIVE:
+    case ActionType.REVOKE_REGISTRATION:
+    case ActionType.REINSTATE_REGISTRATION:
     case ActionType.PRINT_CERTIFICATE:
     case ActionType.READ:
     case ActionType.CREATE:
@@ -339,7 +383,8 @@ export function buildAction(
  *
  * The event is locked while it is checked and the action is stored. Of two requests that
  * arrive together, the second one waits, sees the requested action of the first and gets
- * 409: an event has at most one requested action waiting for its outcome.
+ * 409: an event has at most one requested action waiting for its outcome. A request sent
+ * again with the same transaction id is not refused: the insert keeps its stored action.
  */
 async function addRequestedAction(
   input: ActionInputWithType,
@@ -348,13 +393,41 @@ async function addRequestedAction(
 ) {
   await eventsRepo.transaction(async (trx) => {
     const event = await eventsRepo.getEventByIdWithLockInTrx(input.eventId, trx)
-    const eventIndex = getCurrentEventState(event, configuration)
+    const eventIndex = getCurrentEventState(
+      withoutOwnRequestedAction(event, input),
+      configuration
+    )
     throwConflictIfActionNotAvailable(eventIndex, input.type)
 
     await eventsRepo.createActionInTrx(
       buildAction(input, ActionStatus.Requested, user),
       trx
     )
+  })
+}
+
+/**
+ * Stores accept/reject action while locking the event.
+ */
+async function addConfirmationAction(
+  action: Parameters<typeof eventsRepo.createActionInTrx>[0]
+) {
+  await eventsRepo.transaction(async (trx) => {
+    const event = await eventsRepo.getEventByIdWithLockInTrx(
+      action.eventId,
+      trx
+    )
+
+    if (
+      event.actions.some((a) => a.originalActionId === action.originalActionId)
+    ) {
+      throw new TRPCError({
+        code: 'CONFLICT',
+        message: 'Action has already been accepted or rejected.'
+      })
+    }
+
+    await eventsRepo.createActionInTrx(action, trx)
   })
 }
 
@@ -411,6 +484,9 @@ export async function addAction(
 
   if (status === ActionStatus.Requested) {
     await addRequestedAction(input, user, configuration)
+  } else if (input.originalActionId) {
+    await addConfirmationAction(buildAction(input, status, user))
+    // Actions that are accepted by default: e.g. READ, ASSIGN, UNASSIGN and DUPLICATE_DETECTED.
   } else {
     await eventsRepo.createAction(buildAction(input, status, user))
   }
@@ -528,7 +604,13 @@ export async function processAction(
     )
   }
   if (isEventIndexable(updatedEvent, input.type)) {
-    await indexEvent(updatedEvent, configuration, input.waitFor)
+    await indexEvent(
+      updatedEvent,
+      await getVersionedEventConfigurationById({
+        eventType: updatedEvent.type
+      }),
+      input.waitFor
+    )
   }
 
   return updatedEvent
@@ -561,11 +643,11 @@ export async function addAsyncRejectAction(
   }: {
     user: TrpcUserContext
     event: EventDocument
-    configuration: EventConfig
+    configuration: VersionedEventConfig
   }
 ) {
   const eventId = event.id
-  await eventsRepo.createAction({
+  await addConfirmationAction({
     eventId,
     transactionId,
     actionType: type,

@@ -9,12 +9,19 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { defineConditional, flag, status } from '../conditionals/conditionals'
+import {
+  ActionDateReference,
+  ActionMatcher,
+  defineConditional,
+  flag,
+  status
+} from '../conditionals/conditionals'
 import {
   createEventFieldConfig,
   NonSearchableEventMetadataTimeFieldIdInput,
   AdvancedSearchConfig
 } from '../event-config/event-configuration'
+import { ActionStatus } from './ActionStatus'
 import { ActionType } from './ActionType'
 import { EventFieldIdInput } from './AdvancedSearchConfig'
 import { EventStatus } from './EventMetadata'
@@ -43,10 +50,33 @@ function eventFn(
   return createEventFieldConfig(fieldId)
 }
 
+/**
+ * An action type, or a matcher for a custom action. A bare `ActionType.CUSTOM`
+ * is not allowed because it would match every custom action.
+ */
+type ActionAnchor =
+  | Exclude<ActionType, typeof ActionType.CUSTOM>
+  | ActionMatcher
+
+function actionDateReference(
+  match: ActionAnchor[],
+  occurrence: 'first' | 'last'
+): ActionDateReference {
+  return {
+    $action: {
+      match: match.map((m) => (typeof m === 'string' ? { type: m } : m)),
+      occurrence
+    }
+  }
+}
+
 // Attach conditional helpers directly to the function
 const event = Object.assign(eventFn, {
   /**
-   * Checks if the event contains a specific action type.
+   * Checks if the event contains a specific accepted action type.
+   * Only Accepted actions are matched: a confirmable action is stored as a
+   * Requested and an Accepted action, and a pending or rejected request must
+   * not count as the action having happened.
    * Can be used directly as a conditional or chained with additional methods.
    * @param action - The action type to check for.
    */
@@ -64,9 +94,12 @@ const event = Object.assign(eventFn, {
                 properties: {
                   type: {
                     const: action
+                  },
+                  status: {
+                    const: ActionStatus.Accepted
                   }
                 },
-                required: ['type']
+                required: ['type', 'status']
               }
             }
           },
@@ -80,9 +113,10 @@ const event = Object.assign(eventFn, {
       additionalFields?: Record<string, unknown>
     ) => {
       const actionProperties: Record<string, unknown> = {
-        type: { const: action }
+        type: { const: action },
+        status: { const: ActionStatus.Accepted }
       }
-      const requiredFields = ['type']
+      const requiredFields = ['type', 'status']
 
       if (additionalFields) {
         Object.entries(additionalFields).forEach(([key, value]) => {
@@ -173,6 +207,18 @@ const event = Object.assign(eventFn, {
       $event: field
     }
   },
+  /**
+   * References the date of the first action matching any of the given types,
+   * e.g. `field('child.dob').isAfter().days(30).beforeAction(event.firstAction(ActionType.DECLARE))`.
+   * Until a matching action exists, the comparison uses $now.
+   */
+  firstAction: (first: ActionAnchor, ...rest: ActionAnchor[]) =>
+    actionDateReference([first, ...rest], 'first'),
+  /**
+   * Like {@link event.firstAction}, but references the most recent matching action.
+   */
+  lastAction: (first: ActionAnchor, ...rest: ActionAnchor[]) =>
+    actionDateReference([first, ...rest], 'last'),
   /**
    * Checks if the event currently has the given status.
    * @param eventStatus - The status to check for.

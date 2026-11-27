@@ -152,7 +152,6 @@ export const userOnlyProcedure = authedProcedure.use(async (opts) => {
   })
 })
 
-
 /**
  * Procedures that are only available to system (API key) users
  * and will throw an error if a human user tries to access them
@@ -164,7 +163,7 @@ export const systemOnlyProcedure = authedProcedure.use(async (opts) => {
     logger.error(
       `Non-system user tried to access system-only procedure. User id: '${user.id}'`
     )
-    throw new TRPCError({ code: "FORBIDDEN" })
+    throw new TRPCError({ code: 'FORBIDDEN' })
   }
 
   return opts.next({

@@ -1,3 +1,4 @@
+/* eslint-disable max-lines */
 /*
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -18,19 +19,21 @@ import { ActionType } from '../events/ActionType'
 import { tennisClubMembershipEvent } from '../fixtures'
 import {
   eventQueryDataGenerator,
-  generateEventDocument,
-  generateTestValidatorContext
+  generateEmptyTestValidatorContext,
+  generateEventDocument
 } from '../events/test.utils'
 import {
   errorMessages,
   areConditionsMet,
+  isActionVisible,
   isFieldSecured,
   isFieldVisible,
   runFieldValidations,
   validateFieldInput
 } from './validate'
 import { field } from '../events/field'
-import { flag } from './conditionals'
+import { flag, status } from './conditionals'
+import { ActionConfig } from '../events/ActionConfig'
 /**
  * Goal of testing is to ensure right error messages are returned, and our custom logic holds.
  * We should be able to trust zod validation for the rest.
@@ -190,8 +193,8 @@ describe('runFieldValidations with customClientValidator', () => {
       runFieldValidations({
         field: fieldConfig,
         value: '123456',
-        form: { nid: '123456' },
-        context: {}
+        form: { declaration: { nid: '123456' }, annotation: {} },
+        context: generateEmptyTestValidatorContext(tennisClubMembershipEvent)
       })
     ).toEqual([])
   })
@@ -216,8 +219,8 @@ describe('runFieldValidations with customClientValidator', () => {
       runFieldValidations({
         field: fieldConfig,
         value: '12345',
-        form: { nid: '12345' },
-        context: {}
+        form: { declaration: { nid: '12345' }, annotation: {} },
+        context: generateEmptyTestValidatorContext(tennisClubMembershipEvent)
       })
     ).toEqual([{ message: errorMessage }])
   })
@@ -246,8 +249,11 @@ describe('runFieldValidations with customClientValidator', () => {
       runFieldValidations({
         field: fieldConfig,
         value: 10,
-        form: { itemA: 3, itemB: 7, itemSum: 10 },
-        context: {}
+        form: {
+          declaration: { itemA: 3, itemB: 7, itemSum: 10 },
+          annotation: {}
+        },
+        context: generateEmptyTestValidatorContext(tennisClubMembershipEvent)
       })
     ).toEqual([])
 
@@ -255,8 +261,11 @@ describe('runFieldValidations with customClientValidator', () => {
       runFieldValidations({
         field: fieldConfig,
         value: 8,
-        form: { itemA: 3, itemB: 7, itemSum: 8 },
-        context: {}
+        form: {
+          declaration: { itemA: 3, itemB: 7, itemSum: 8 },
+          annotation: {}
+        },
+        context: generateEmptyTestValidatorContext(tennisClubMembershipEvent)
       })
     ).toEqual([{ message: errorMessage }])
   })
@@ -299,8 +308,8 @@ describe('runFieldValidations with customClientValidator', () => {
       runFieldValidations({
         field: fieldConfig,
         value: 4,
-        form: { amount: 4 },
-        context: {}
+        form: { declaration: { amount: 4 }, annotation: {} },
+        context: generateEmptyTestValidatorContext(tennisClubMembershipEvent)
       })
     ).toEqual([])
 
@@ -309,8 +318,8 @@ describe('runFieldValidations with customClientValidator', () => {
       runFieldValidations({
         field: fieldConfig,
         value: -2,
-        form: { amount: -2 },
-        context: {}
+        form: { declaration: { amount: -2 }, annotation: {} },
+        context: generateEmptyTestValidatorContext(tennisClubMembershipEvent)
       })
     ).toEqual([
       {
@@ -327,8 +336,8 @@ describe('runFieldValidations with customClientValidator', () => {
       runFieldValidations({
         field: fieldConfig,
         value: 3,
-        form: { amount: 3 },
-        context: {}
+        form: { declaration: { amount: 3 }, annotation: {} },
+        context: generateEmptyTestValidatorContext(tennisClubMembershipEvent)
       })
     ).toEqual([
       {
@@ -343,32 +352,61 @@ describe('runFieldValidations with customClientValidator', () => {
 })
 
 describe('areConditionsMet', () => {
+  // `health-worker-notified` is a flag that the event configuration defines. The NOTIFY action adds it.
   const flagConditional = {
     type: ConditionalType.SHOW,
-    conditional: flag('sealed')
+    conditional: flag('health-worker-notified')
   }
 
   it('is met when the event carries the flag', () => {
-    const eventIndex = eventQueryDataGenerator({ flags: ['sealed'] })
+    const eventDocument = generateEventDocument({
+      configuration: tennisClubMembershipEvent,
+      actions: [ActionType.CREATE, ActionType.NOTIFY].map((type) => ({ type }))
+    })
 
-    expect(areConditionsMet([flagConditional], {}, {}, eventIndex)).toBe(true)
+    expect(
+      areConditionsMet(
+        [flagConditional],
+        { declaration: {}, annotation: {} },
+        {
+          ...generateEmptyTestValidatorContext(tennisClubMembershipEvent),
+          eventDocument
+        }
+      )
+    ).toBe(true)
   })
 
   it('is not met when the event does not carry the flag', () => {
-    const eventIndex = eventQueryDataGenerator({ flags: [] })
+    const eventDocument = generateEventDocument({
+      configuration: tennisClubMembershipEvent,
+      actions: [ActionType.CREATE, ActionType.DECLARE].map((type) => ({ type }))
+    })
 
-    expect(areConditionsMet([flagConditional], {}, {}, eventIndex)).toBe(false)
+    expect(
+      areConditionsMet(
+        [flagConditional],
+        { declaration: {}, annotation: {} },
+        {
+          ...generateEmptyTestValidatorContext(tennisClubMembershipEvent),
+          eventDocument
+        }
+      )
+    ).toBe(false)
   })
 })
 
 describe('isFieldVisible', () => {
-  // Unlike `areConditionsMet` / `isActionEnabled`, this path takes no `EventIndex`
-  // argument, so `flag(...)` can only resolve through `context.event.state`.
+  // `flag(...)` resolves through the event state of `context.eventDocument`.
   const flaggedField = {
-    id: 'sealedOnly',
+    id: 'notifiedOnly',
     type: FieldType.TEXT,
     label: { id: '', defaultMessage: '', description: '' },
-    conditionals: [{ type: ConditionalType.SHOW, conditional: flag('sealed') }]
+    conditionals: [
+      {
+        type: ConditionalType.SHOW,
+        conditional: flag('health-worker-notified')
+      }
+    ]
   } satisfies FieldConfig
 
   const document = generateEventDocument({
@@ -376,16 +414,19 @@ describe('isFieldVisible', () => {
     actions: [ActionType.CREATE, ActionType.DECLARE].map((type) => ({ type }))
   })
 
-  it('resolves flag() against the event state carried on the context', () => {
+  const notifiedDocument = generateEventDocument({
+    configuration: tennisClubMembershipEvent,
+    actions: [ActionType.CREATE, ActionType.NOTIFY].map((type) => ({ type }))
+  })
+
+  it('resolves flag() against the event document carried on the context', () => {
     expect(
       isFieldVisible(
         flaggedField,
-        {},
+        { declaration: {}, annotation: {} },
         {
-          event: {
-            document,
-            state: eventQueryDataGenerator({ flags: ['sealed'] })
-          }
+          ...generateEmptyTestValidatorContext(tennisClubMembershipEvent),
+          eventDocument: notifiedDocument
         }
       )
     ).toBe(true)
@@ -393,14 +434,23 @@ describe('isFieldVisible', () => {
     expect(
       isFieldVisible(
         flaggedField,
-        {},
-        { event: { document, state: eventQueryDataGenerator({ flags: [] }) } }
+        { declaration: {}, annotation: {} },
+        {
+          ...generateEmptyTestValidatorContext(tennisClubMembershipEvent),
+          eventDocument: document
+        }
       )
     ).toBe(false)
   })
 
-  it('treats flags as empty when the context carries no event', () => {
-    expect(isFieldVisible(flaggedField, {}, {})).toBe(false)
+  it('treats flags as empty when the event is only created', () => {
+    expect(
+      isFieldVisible(
+        flaggedField,
+        { declaration: {}, annotation: {} },
+        generateEmptyTestValidatorContext(tennisClubMembershipEvent)
+      )
+    ).toBe(false)
   })
 })
 
@@ -411,8 +461,8 @@ describe('isFieldSecured', () => {
     expect(
       isFieldSecured(
         { secured: true },
-        eventIndex,
-        generateTestValidatorContext()
+        { declaration: {}, annotation: {} },
+        { eventIndex }
       )
     ).toBe(true)
   })
@@ -423,15 +473,15 @@ describe('isFieldSecured', () => {
     expect(
       isFieldSecured(
         { secured: false },
-        eventIndex,
-        generateTestValidatorContext()
+        { declaration: {}, annotation: {} },
+        { eventIndex }
       )
     ).toBe(false)
     expect(
       isFieldSecured(
         { secured: undefined },
-        eventIndex,
-        generateTestValidatorContext()
+        { declaration: {}, annotation: {} },
+        { eventIndex }
       )
     ).toBe(false)
   })
@@ -442,15 +492,15 @@ describe('isFieldSecured', () => {
     expect(
       isFieldSecured(
         securedField,
-        eventQueryDataGenerator({ flags: ['sealed'] }),
-        generateTestValidatorContext()
+        { declaration: {}, annotation: {} },
+        { eventIndex: eventQueryDataGenerator({ flags: ['sealed'] }) }
       )
     ).toBe(true)
     expect(
       isFieldSecured(
         securedField,
-        eventQueryDataGenerator({ flags: [] }),
-        generateTestValidatorContext()
+        { declaration: {}, annotation: {} },
+        { eventIndex: eventQueryDataGenerator({ flags: [] }) }
       )
     ).toBe(false)
   })
@@ -479,8 +529,8 @@ describe('runFieldValidations on a cleared (null) value', () => {
       runFieldValidations({
         field: nameField(false),
         value: null,
-        form: { 'member.name': null },
-        context: {}
+        form: { declaration: { 'member.name': null } },
+        context: generateEmptyTestValidatorContext(tennisClubMembershipEvent)
       })
     ).toEqual([])
   })
@@ -490,9 +540,70 @@ describe('runFieldValidations on a cleared (null) value', () => {
       runFieldValidations({
         field: nameField(true),
         value: null,
-        form: { 'member.name': null },
-        context: {}
+        form: { declaration: { 'member.name': null } },
+        context: generateEmptyTestValidatorContext(tennisClubMembershipEvent)
       })
     ).not.toEqual([])
+  })
+})
+
+describe('isActionVisible with status()', () => {
+  const reinstateConfig = {
+    type: ActionType.REINSTATE_REGISTRATION,
+    label: {
+      id: 'event.action.reinstate-registration.label',
+      defaultMessage: 'Reinstate registration',
+      description: 'Label for the reinstate registration action'
+    },
+    conditionals: [
+      { type: ConditionalType.SHOW, conditional: status('REVOKED') }
+    ]
+  } as ActionConfig
+
+  const documentAfter = (actions: ActionType[]) =>
+    generateEventDocument({
+      configuration: tennisClubMembershipEvent,
+      actions: actions.map((type) => ({ type }))
+    })
+
+  it('is visible once the record is revoked', () => {
+    const eventDocument = documentAfter([
+      ActionType.CREATE,
+      ActionType.DECLARE,
+      ActionType.REGISTER,
+      ActionType.REVOKE_REGISTRATION
+    ])
+
+    expect(
+      isActionVisible(
+        reinstateConfig,
+        { declaration: {}, annotation: {} },
+        {
+          ...generateEmptyTestValidatorContext(tennisClubMembershipEvent),
+          eventDocument
+        }
+      )
+    ).toBe(true)
+  })
+
+  it('is hidden again after the record is reinstated', () => {
+    const eventDocument = documentAfter([
+      ActionType.CREATE,
+      ActionType.DECLARE,
+      ActionType.REGISTER,
+      ActionType.REVOKE_REGISTRATION,
+      ActionType.REINSTATE_REGISTRATION
+    ])
+
+    expect(
+      isActionVisible(
+        reinstateConfig,
+        { declaration: {}, annotation: {} },
+        {
+          ...generateEmptyTestValidatorContext(tennisClubMembershipEvent),
+          eventDocument
+        }
+      )
+    ).toBe(false)
   })
 })

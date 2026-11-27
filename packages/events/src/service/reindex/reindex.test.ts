@@ -21,11 +21,15 @@ import {
   generateEventDocument,
   generateUuid,
   getUUID,
+  INITIAL_EVENT_CONFIG_VERSION_ID,
   TENNIS_CLUB_MEMBERSHIP,
   TokenUserType,
   encodeScope
 } from '@opencrvs/commons'
-import { tennisClubMembershipEvent } from '@opencrvs/commons/fixtures'
+import {
+  tennisClubMembershipEvent,
+  versionedTennisClubMembershipEvent
+} from '@opencrvs/commons/fixtures'
 import {
   createSystemTestClient,
   createTestToken,
@@ -36,6 +40,7 @@ import {
 import {
   getEventAliasName,
   getEventIndexName,
+  getEventVersionIndexName,
   getOrCreateClient
 } from '@events/storage/elasticsearch'
 import { mswServer } from '@events/tests/msw'
@@ -45,10 +50,7 @@ import { cleanupOrphanedIndices } from '@events/service/reindex/indexing'
 import { getLocations } from '@events/storage/postgres/administrative-hierarchy/locations'
 import { getClient } from '@events/storage/postgres/events'
 import * as elasticsearchMocks from '@events/storage/__mocks__/elasticsearch'
-import {
-  getEventIndexName as getEventIndexNameMock,
-  getTemporaryIndexName
-} from '@events/storage/__mocks__/elasticsearch'
+import { getEventIndexName as getEventIndexNameMock } from '@events/storage/__mocks__/elasticsearch'
 
 // Mock reindex endpoint so there are no side effects
 vi.mock('@events/service/reindex', async (importOriginal) => {
@@ -84,7 +86,7 @@ const failingPostHandler = http.post(
 // Mock getEventConfigurations to return a single event config
 const singleEventConfigHandler = http.get(
   `${env.COUNTRY_CONFIG_URL}/config/events`,
-  () => HttpResponse.json([tennisClubMembershipEvent])
+  () => HttpResponse.json([versionedTennisClubMembershipEvent])
 )
 
 const reindexToken = createTestToken({
@@ -159,7 +161,8 @@ beforeEach(async () => {
       transactionId: getUUID(),
       trackingId: event.trackingId,
       createdAt: event.createdAt,
-      updatedAt: event.updatedAt
+      updatedAt: event.updatedAt,
+      configVersionId: event.configVersionId
     })
     .returning('id')
     .executeTakeFirst()
@@ -205,7 +208,8 @@ beforeEach(async () => {
       transactionId: getUUID(),
       trackingId: draftDocument.trackingId,
       createdAt: draftDocument.createdAt,
-      updatedAt: draftDocument.updatedAt
+      updatedAt: draftDocument.updatedAt,
+      configVersionId: draftDocument.configVersionId
     })
     .returning('id')
     .executeTakeFirst()
@@ -299,10 +303,13 @@ test('reindexing twice', async () => {
   )
 })
 
-test('reindex given original concrete index is replaced by a timestamped index', async () => {
+test('reindex given original concrete index of a version is replaced by a timestamped index', async () => {
   const esClient = getOrCreateClient()
 
-  const liveIndexName = getEventIndexName(TENNIS_CLUB_MEMBERSHIP)
+  const liveIndexName = getEventVersionIndexName(
+    TENNIS_CLUB_MEMBERSHIP,
+    INITIAL_EVENT_CONFIG_VERSION_ID
+  )
 
   const indicesPointingToAlias = Object.keys(
     await esClient.indices.getAlias({
@@ -311,10 +318,6 @@ test('reindex given original concrete index is replaced by a timestamped index',
   )
 
   expect(indicesPointingToAlias).toContain(liveIndexName)
-
-  getTemporaryIndexName.mockImplementation(
-    (eventType, time) => `${eventType}__new__${time}`
-  )
 
   await runReindex(reindexToken)
 
@@ -340,15 +343,17 @@ test('reindex given original concrete index is replaced by a timestamped index',
   })
 
   const indexesBehindAlias = Object.keys(aliasInfo)
-  expect(indexesBehindAlias.every((index) => index.includes('__new__'))).toBe(
-    true
-  )
+  expect(indexesBehindAlias).toHaveLength(1)
+  expect(indexesBehindAlias[0]).toMatch(new RegExp(`^${liveIndexName}_\\d+$`))
 })
 
-test('reindex given first-reindex and concrete index conflicts with alias name - write alias created after removing original concrete index to avoid conflicts', async () => {
+test('reindex given first-reindex and concrete index of a version conflicts with alias name - write alias created after removing original concrete index to avoid conflicts', async () => {
   const esClient = getOrCreateClient()
 
-  const writeAliasName = getEventIndexName(TENNIS_CLUB_MEMBERSHIP)
+  const writeAliasName = getEventVersionIndexName(
+    TENNIS_CLUB_MEMBERSHIP,
+    INITIAL_EVENT_CONFIG_VERSION_ID
+  )
 
   // Confirm we start with a bare concrete index (not yet an alias)
   const isConcreteBefore = await esClient.indices.exists({
@@ -463,7 +468,8 @@ test('runReindex skips events that cannot be read and reports them in its status
       transactionId: getUUID(),
       trackingId: getUUID(),
       createdAt: event.createdAt,
-      updatedAt: event.updatedAt
+      updatedAt: event.updatedAt,
+      configVersionId: event.configVersionId
     })
     .returning('id')
     .executeTakeFirstOrThrow()
@@ -481,6 +487,27 @@ test('runReindex skips events that cannot be read and reports them in its status
   expect(history[0].progress.skipped).toBe(1)
   expect(history[0].progress.errors).toHaveLength(1)
   expect(history[0].progress.errors[0]).toContain(unreadable.id)
+})
+
+test('runReindex fails when an event is stamped with a version that is not configured', async () => {
+  mswServer.use(postHandler)
+
+  await getClient()
+    .updateTable('events')
+    .set({ configVersionId: 'v9' })
+    .where('trackingId', '=', event.trackingId)
+    .execute()
+
+  await expect(runReindex(reindexToken)).rejects.toThrow(
+    `Event '${TENNIS_CLUB_MEMBERSHIP}' has no version 'v9'`
+  )
+
+  const client = createSystemTestClient(REINDEX_SYSTEM_ID, [
+    encodeScope({ type: 'record.reindex' })
+  ])
+  const history = await client.event.reindex.status()
+
+  expect(history[0].status).toBe('failed')
 })
 
 test('runReindex fails when no event in a chunk can be read', async () => {
@@ -516,12 +543,15 @@ test('runReindex records failed status when country config returns 500', async (
   expect(history[0].completed_at).not.toBeNull()
 })
 
-test('reindex per-type write alias is re-pointed on every subsequent reindex', async () => {
+test('reindex per-version write alias is re-pointed on every subsequent reindex', async () => {
   const esClient = getOrCreateClient()
 
   await runReindex(reindexToken)
 
-  const writeAliasName = getEventIndexName(TENNIS_CLUB_MEMBERSHIP)
+  const writeAliasName = getEventVersionIndexName(
+    TENNIS_CLUB_MEMBERSHIP,
+    INITIAL_EVENT_CONFIG_VERSION_ID
+  )
   const aliasAfterFirst = await esClient.indices.getAlias({
     name: writeAliasName
   })
@@ -537,6 +567,45 @@ test('reindex per-type write alias is re-pointed on every subsequent reindex', a
 
   expect(indexAfterSecond).not.toEqual(indexAfterFirst)
   expect(indexAfterSecond).toMatch(new RegExp(`^${writeAliasName}_\\d+$`))
+})
+
+test('reindex deletes the index of a version that was removed from the config', async () => {
+  const esClient = getOrCreateClient()
+  const [initialVersion] = versionedTennisClubMembershipEvent.versions
+  const v2Name = getEventVersionIndexName(TENNIS_CLUB_MEMBERSHIP, 'v2')
+
+  mswServer.use(
+    http.get(`${env.COUNTRY_CONFIG_URL}/config/events`, () =>
+      HttpResponse.json([
+        {
+          ...versionedTennisClubMembershipEvent,
+          versions: [
+            initialVersion,
+            { ...initialVersion, id: 'v2', effectiveFrom: '2999-01-01' }
+          ]
+        }
+      ])
+    )
+  )
+  await runReindex(reindexToken)
+  const [v2Index] = Object.keys(
+    await esClient.indices.getAlias({ name: v2Name })
+  )
+
+  // v2 never took effect, so no record uses it and it can be removed.
+  mswServer.use(singleEventConfigHandler)
+  await runReindex(reindexToken)
+
+  expect(await esClient.indices.exists({ index: v2Index })).toBe(false)
+
+  const eventIndexName = getEventIndexName(TENNIS_CLUB_MEMBERSHIP)
+  await esClient.indices.refresh({ index: eventIndexName })
+  const body = await esClient.search({
+    index: eventIndexName,
+    body: { query: { match_all: {} } }
+  })
+  // The declared record of the initial version is still found; the draft is not indexed.
+  expect(body.hits.hits).toHaveLength(1)
 })
 
 test('does not stop runReindex when the cleanup itself fails', async () => {
@@ -581,9 +650,42 @@ describe('cleanupOrphanedIndices', () => {
     const orphanIndex = `${getEventIndexNameMock(TENNIS_CLUB_MEMBERSHIP)}_${Date.now() - TWO_DAYS_MS}`
     await esClient.indices.create({ index: orphanIndex })
 
-    await cleanupOrphanedIndices([tennisClubMembershipEvent])
+    await cleanupOrphanedIndices([versionedTennisClubMembershipEvent])
 
     expect(await esClient.indices.exists({ index: orphanIndex })).toBe(false)
+  })
+
+  test('deletes an old temp index of a version with no alias', async () => {
+    const esClient = getOrCreateClient()
+    useProductionIndexNames()
+
+    const versionIndexName = getEventVersionIndexName(
+      TENNIS_CLUB_MEMBERSHIP,
+      INITIAL_EVENT_CONFIG_VERSION_ID
+    )
+    const orphanIndex = `${versionIndexName}_${Date.now() - TWO_DAYS_MS}`
+    await esClient.indices.create({ index: orphanIndex })
+
+    await cleanupOrphanedIndices([versionedTennisClubMembershipEvent])
+
+    expect(await esClient.indices.exists({ index: orphanIndex })).toBe(false)
+  })
+
+  test('leaves the bare index of a version (no timestamp suffix) untouched even without an alias', async () => {
+    const esClient = getOrCreateClient()
+    useProductionIndexNames()
+
+    const versionIndexName = getEventVersionIndexName(
+      TENNIS_CLUB_MEMBERSHIP,
+      INITIAL_EVENT_CONFIG_VERSION_ID
+    )
+    await esClient.indices.create({ index: versionIndexName })
+
+    await cleanupOrphanedIndices([versionedTennisClubMembershipEvent])
+
+    expect(await esClient.indices.exists({ index: versionIndexName })).toBe(
+      true
+    )
   })
 
   test('leaves a recent temp index alone, as it may belong to an in-progress reindex', async () => {
@@ -593,7 +695,7 @@ describe('cleanupOrphanedIndices', () => {
     const inProgressIndex = `${getEventIndexNameMock(TENNIS_CLUB_MEMBERSHIP)}_${Date.now()}`
     await esClient.indices.create({ index: inProgressIndex })
 
-    await cleanupOrphanedIndices([tennisClubMembershipEvent])
+    await cleanupOrphanedIndices([versionedTennisClubMembershipEvent])
 
     expect(await esClient.indices.exists({ index: inProgressIndex })).toBe(true)
   })
@@ -608,7 +710,7 @@ describe('cleanupOrphanedIndices', () => {
       aliases: { [getEventAliasName()]: {} }
     })
 
-    await cleanupOrphanedIndices([tennisClubMembershipEvent])
+    await cleanupOrphanedIndices([versionedTennisClubMembershipEvent])
 
     expect(await esClient.indices.exists({ index: liveIndex })).toBe(true)
   })
@@ -621,7 +723,7 @@ describe('cleanupOrphanedIndices', () => {
     const liveIndexName = getEventIndexNameMock(TENNIS_CLUB_MEMBERSHIP)
     await esClient.indices.create({ index: liveIndexName })
 
-    await cleanupOrphanedIndices([tennisClubMembershipEvent])
+    await cleanupOrphanedIndices([versionedTennisClubMembershipEvent])
 
     expect(await esClient.indices.exists({ index: liveIndexName })).toBe(true)
   })
@@ -632,7 +734,10 @@ describe('cleanupOrphanedIndices', () => {
 
     // `<prefix>_marriage_2025` ends in `_<digits>`, so a loose suffix match
     // would mistake it for a temp index.
-    const configuration = { ...tennisClubMembershipEvent, id: 'marriage_2025' }
+    const configuration = {
+      ...versionedTennisClubMembershipEvent,
+      id: 'marriage_2025'
+    }
     const liveIndexName = getEventIndexNameMock(configuration.id)
     await esClient.indices.create({ index: liveIndexName })
 
@@ -648,7 +753,7 @@ describe('cleanupOrphanedIndices', () => {
     const foreignIndex = `${getEventIndexNameMock('not-configured')}_${Date.now() - TWO_DAYS_MS}`
     await esClient.indices.create({ index: foreignIndex })
 
-    await cleanupOrphanedIndices([tennisClubMembershipEvent])
+    await cleanupOrphanedIndices([versionedTennisClubMembershipEvent])
 
     expect(await esClient.indices.exists({ index: foreignIndex })).toBe(true)
   })
@@ -671,7 +776,7 @@ describe('cleanupOrphanedIndices', () => {
     // A failed delete must not throw out of cleanupOrphanedIndices -- it's a
     // best-effort step that shouldn't be able to block the reindex it precedes.
     await expect(
-      cleanupOrphanedIndices([tennisClubMembershipEvent])
+      cleanupOrphanedIndices([versionedTennisClubMembershipEvent])
     ).resolves.not.toThrow()
 
     expect(deleteSpy).toHaveBeenCalledWith({ index: orphanIndex })

@@ -17,7 +17,8 @@ import {
   formatName,
   getToken,
   login,
-  triggerDeclarationAction
+  triggerDeclarationAction,
+  signReview
 } from '@e2e/support/helpers'
 import { CREDENTIALS } from '@e2e/support/constants'
 import { ensureAssignedToUser, selectAction } from '@e2e/support/utils'
@@ -93,7 +94,13 @@ test('3. Workqueue flow - 3', async ({ page }) => {
 
       await selectAction(page, 'Reject')
       await page.getByTestId('reject-reason').fill(faker.lorem.sentence())
+      const rejectResponse = page.waitForResponse(
+        (res) => res.url().includes('event.actions.reject') && res.ok()
+      )
+
       await page.getByRole('button', { name: 'Send For Update' }).click()
+
+      await rejectResponse
 
       await assertRecordInWorkqueue({
         page,
@@ -233,6 +240,7 @@ test('3. Workqueue flow - 3', async ({ page }) => {
     })
 
     await test.step('3.3.5 Declare with edits', async () => {
+      await signReview(page)
       await triggerDeclarationAction(page, 'Declare with edits')
     })
 
@@ -282,7 +290,13 @@ test('3. Workqueue flow - 3', async ({ page }) => {
 
       await selectAction(page, 'Reject')
       await page.getByTestId('reject-reason').fill(faker.lorem.sentence())
+      const rejectResponse = page.waitForResponse(
+        (res) => res.url().includes('event.actions.reject') && res.ok()
+      )
+
       await page.getByRole('button', { name: 'Send For Update' }).click()
+
+      await rejectResponse
 
       await assertRecordInWorkqueue({
         page,
@@ -350,6 +364,7 @@ test('3. Workqueue flow - 3', async ({ page }) => {
     })
 
     await test.step('3.5.4 Re-declare with edits', async () => {
+      await signReview(page)
       await triggerDeclarationAction(page, 'Declare with edits')
 
       await assertRecordInWorkqueue({
@@ -401,9 +416,7 @@ test('3. Workqueue flow - 3', async ({ page }) => {
       await openRecordByTitle(page, childName)
       await ensureAssignedToUser(page, CREDENTIALS.REGISTRAR)
 
-      await selectAction(page, 'Register')
-      await fillRegisterDialogRequiredFields(page)
-      await page.getByRole('button', { name: 'Confirm' }).click()
+      await triggerDeclarationAction(page, 'Register')
 
       await assertRecordInWorkqueue({
         page,

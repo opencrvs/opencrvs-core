@@ -15,21 +15,20 @@ import { omit } from 'lodash'
 import {
   EventState,
   EventConfig,
-  isPageVisible,
   isNonInteractiveFieldType,
   PageTypes,
   PageConfig,
   AttachmentPath,
   ValidatorContext
 } from '@opencrvs/commons/client'
-import { MAIN_CONTENT_ANCHOR_ID } from '@opencrvs/components/lib/Frame/components/SkipToContent'
-import { Button } from '@opencrvs/components/lib/Button'
+import { MAIN_CONTENT_ANCHOR_ID, Button } from '@opencrvs/components'
 import {
   FormFieldGenerator,
   FormFieldGeneratorHandle
 } from '@client/v2-events/components/forms/FormFieldGenerator'
 import { useClearFormModal } from '@client/v2-events/components/ClearFormModal'
 import { useDefaultValue } from '@client/v2-events/hooks/useDefaultValue'
+import { isPageVisible } from '@client/v2-events/conditionals'
 import { useEventFormData } from '../useEventFormData'
 import { VerificationWizard } from './VerificationWizard'
 import { FormWizard } from './FormWizard'

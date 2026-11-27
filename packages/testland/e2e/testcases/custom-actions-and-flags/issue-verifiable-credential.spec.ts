@@ -43,7 +43,7 @@ test('Issue verifiable credential', async ({ page }) => {
 
   const nonParentInformantDec = await getDeclaration({
     token,
-    informantRelation: 'BROTHER'
+    informantRelation: 'LEGAL_GUARDIAN'
   })
 
   const nonParentInformantRes = await createDeclaration(
@@ -69,7 +69,7 @@ test('Issue verifiable credential', async ({ page }) => {
     await expect(page.getByText('Mother', { exact: true })).toBeVisible()
     await expect(page.getByText('Father', { exact: true })).toHaveCount(0)
     await expect(
-      page.getByText('Brother (informant)', { exact: true })
+      page.getByText('Legal guardian (informant)', { exact: true })
     ).toHaveCount(0)
 
     await page.getByText('Mother', { exact: true }).click()
@@ -112,10 +112,10 @@ test('Issue verifiable credential', async ({ page }) => {
     await expect(page.getByText('Mother', { exact: true })).toBeVisible()
     await expect(page.getByText('Father', { exact: true })).toHaveCount(0)
     await expect(
-      page.getByText('Brother (informant)', { exact: true })
+      page.getByText('Legal guardian (informant)', { exact: true })
     ).toBeVisible()
 
-    await page.getByText('Brother (informant)', { exact: true }).click()
+    await page.getByText('Legal guardian (informant)', { exact: true }).click()
     await page.getByRole('button', { name: 'Generate', exact: true }).click()
 
     const actionQrCode = page.getByRole('dialog').locator('img')

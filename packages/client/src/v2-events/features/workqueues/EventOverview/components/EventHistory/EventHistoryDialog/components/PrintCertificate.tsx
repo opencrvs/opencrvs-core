@@ -10,7 +10,7 @@
  */
 import React from 'react'
 import { useIntl } from 'react-intl'
-import { Table } from '@opencrvs/components/lib/Table'
+import { Table, ColumnContentAlignment } from '@opencrvs/components'
 import {
   PrintCertificateAction,
   deepMerge,
@@ -19,11 +19,9 @@ import {
   PageTypes,
   getPrintCertificatePages,
   getCurrentEventState,
-  isFieldDisplayedOnReview,
   ValidatorContext
 } from '@opencrvs/commons/client'
-import { ColumnContentAlignment } from '@opencrvs/components'
-import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
+import { useEventConfigurationForRecord } from '@client/v2-events/features/events/useEventConfiguration'
 import {
   isEmptyValue,
   Output
@@ -31,6 +29,7 @@ import {
 import { useCertificateTemplateSelectorFieldConfig } from '@client/v2-events/features/events/useCertificateTemplateSelectorFieldConfig'
 import { useAppConfig } from '@client/v2-events/hooks/useAppConfig'
 import { recordAnchorDate } from '@client/v2-events/utils'
+import { isFieldDisplayedOnReview } from '@client/v2-events/conditionals'
 
 const verifiedMessage = {
   id: 'verified',
@@ -47,7 +46,7 @@ export function PrintCertificate({
   action: PrintCertificateAction
   validatorContext: ValidatorContext
 }) {
-  const { eventConfiguration } = useEventConfiguration(event.type)
+  const { eventConfiguration } = useEventConfigurationForRecord(event)
   const formPages = getPrintCertificatePages(eventConfiguration)
   const intl = useIntl()
 

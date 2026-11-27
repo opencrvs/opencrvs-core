@@ -15,7 +15,6 @@ import {
   getUUID,
   ActionType,
   getCurrentEventState,
-  omitHiddenAnnotationFields,
   EventDocument,
   EventConfig,
   ArchiveActionInput,
@@ -24,6 +23,7 @@ import {
   ValidatorContext
 } from '@opencrvs/commons/client'
 import { trpcClient } from '@client/v2-events/trpc'
+import { omitHiddenAnnotationFields } from '@client/v2-events/conditionals'
 
 // Defines custom API functions that are not part of the generated API from TRPC.
 
@@ -125,7 +125,7 @@ export async function editAndRegister({
   }
 
   const declaredEvent = await trpcClient.event.actions.declare.request.mutate({
-    declaration: {},
+    declaration,
     annotation,
     eventId,
     transactionId,

@@ -14,6 +14,7 @@ import { formatName, login } from '@e2e/support/helpers'
 import { mockNetworkConditions } from '@e2e/support/mock-network-conditions'
 import { faker } from '@faker-js/faker'
 import { openRecordByTitle } from '@e2e/support/print-certificate/birth/helpers'
+import { CREDENTIALS } from '@e2e/support/constants'
 
 test('Can Open Draft offline', async ({ page }) => {
   const name = {
@@ -22,7 +23,7 @@ test('Can Open Draft offline', async ({ page }) => {
   }
 
   await test.step('Login', async () => {
-    await login(page)
+    await login(page, CREDENTIALS.FIELD_AGENT)
     await expect(page.getByText('Farajaland CRS')).toBeVisible({
       timeout: 30000
     })

@@ -22,13 +22,11 @@ import {
   generateTransactionId,
   getActionConfig,
   getCurrentEventState,
-  isActionEnabled,
-  isActionVisible,
   RequestedCorrectionAction,
   ValidatorContext
 } from '@opencrvs/commons/client'
-import { Dialog } from '@opencrvs/components/lib/Dialog/Dialog'
 import {
+  Dialog,
   Button,
   Content,
   ContentSize,
@@ -45,7 +43,11 @@ import { useActionAnnotation } from '@client/v2-events/features/events/useAction
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
 import { CorrectionDetails } from '@client/v2-events/features/events/actions/correct/request/Summary/CorrectionDetails'
 import { useUserAllowedActions } from '@client/v2-events/features/workqueues/Actions/useUserAllowedActions'
-import { useEventConfiguration } from '../../../useEventConfiguration'
+import {
+  isActionEnabled,
+  isActionVisible
+} from '@client/v2-events/conditionals'
+import { useEventConfigurationForRecord } from '../../../useEventConfiguration'
 
 const reviewCorrectionMessages = defineMessages({
   actionModalCancel: {
@@ -272,8 +274,8 @@ export function ReviewCorrection({
   )
 
   const events = useEvents()
-  const event = events.getEvent.getFromCache(eventId)
-  const { eventConfiguration } = useEventConfiguration(event.type)
+  const event = events.getEvent.useGetEventFromCache(eventId)
+  const { eventConfiguration } = useEventConfigurationForRecord(event)
   const eventIndex = getCurrentEventState(event, eventConfiguration)
   const { isActionAllowed } = useUserAllowedActions(eventIndex)
   const [modal, openModal] = useModal()

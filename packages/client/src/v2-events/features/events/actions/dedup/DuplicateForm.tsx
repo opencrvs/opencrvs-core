@@ -17,21 +17,21 @@ import {
   useTypedParams,
   useTypedSearchParams
 } from 'react-router-typesafe-routes/dom'
-import { Content } from '@opencrvs/components/lib/Content'
-import { Button } from '@opencrvs/components/src/Button'
-import { Icon } from '@opencrvs/components/lib/Icon'
+import { Content, Button, Icon } from '@opencrvs/components'
 import {
   ActionType,
   EventIndex,
   getActionConfig,
-  getUUID,
-  isActionEnabled,
-  isActionVisible
+  getUUID
 } from '@opencrvs/commons/client'
 import { useModal } from '@client/v2-events/hooks/useModal'
 import { useValidatorContext } from '@client/v2-events/hooks/useValidatorContext'
 import { ROUTES } from '@client/v2-events/routes/routes'
-import { useEventConfiguration } from '../../useEventConfiguration'
+import {
+  isActionEnabled,
+  isActionVisible
+} from '@client/v2-events/conditionals'
+import { useEventConfigurationForRecord } from '../../useEventConfiguration'
 import { useEventTitle } from '../../useEvents/useEventTitle'
 import { useEvents } from '../../useEvents/useEvents'
 import { duplicateMessages } from './ReviewDuplicate'
@@ -60,9 +60,8 @@ export const DuplicateForm = ({ eventIndex }: { eventIndex: EventIndex }) => {
   const navigate = useNavigate()
   const { getEventTitle } = useEventTitle()
 
-  const { eventConfiguration: configuration } = useEventConfiguration(
-    eventIndex.type
-  )
+  const { eventConfiguration: configuration } =
+    useEventConfigurationForRecord(eventIndex)
   const validatorContext = useValidatorContext()
 
   const [modal, openModal] = useModal()

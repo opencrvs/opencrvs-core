@@ -144,6 +144,11 @@ test('Correcting a birth with a verified parent ID creates the child UIN (#13734
   })
 
   await test.step('Record audit shows the corrected record and the child UIN', async () => {
+    // MOSIP takes time to send the response, so simulate real-life by going back and forth to the event.
+    await page.getByTestId('exit-event').click()
+    await page.getByRole('button', { name: 'Pending certification' }).click()
+    await openRecordByTitle(page, formatV2ChildName(declaration))
+
     await page.getByRole('button', { name: 'Assign record' }).click()
     await page.getByRole('button', { name: 'Assign', exact: true }).click()
 

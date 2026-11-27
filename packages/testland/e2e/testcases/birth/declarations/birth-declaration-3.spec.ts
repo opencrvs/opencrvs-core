@@ -100,7 +100,6 @@ test('3. Birth declaration case - 3', async ({ page }) => {
         addressLine3: faker.location.buildingNumber(),
         postcodeOrZip: faker.location.zipCode()
       },
-      maritalStatus: 'Widowed',
       levelOfEducation: 'Secondary'
     },
     father: {
@@ -114,7 +113,6 @@ test('3. Birth declaration case - 3', async ({ page }) => {
         id: faker.string.numeric(11),
         type: 'Birth Registration Number'
       },
-      maritalStatus: 'Widowed',
       levelOfEducation: 'Secondary',
       address: {
         sameAsMother: false,
@@ -311,11 +309,6 @@ test('3. Birth declaration case - 3', async ({ page }) => {
         .locator('#postcodeOrZip')
         .fill(declaration.mother.address.postcodeOrZip)
 
-      await page.locator('#mother____maritalStatus').click()
-      await page
-        .getByText(declaration.mother.maritalStatus, { exact: true })
-        .click()
-
       await page.locator('#mother____educationalAttainment').click()
       await page
         .getByText(declaration.mother.levelOfEducation, { exact: true })
@@ -366,11 +359,6 @@ test('3. Birth declaration case - 3', async ({ page }) => {
       await page
         .locator('#zipCode')
         .fill(declaration.father.address.postcodeOrZip)
-
-      await page.locator('#father____maritalStatus').click()
-      await page
-        .getByText(declaration.father.maritalStatus, { exact: true })
-        .click()
 
       await page.locator('#father____educationalAttainment').click()
       await page
@@ -622,14 +610,6 @@ test('3. Birth declaration case - 3', async ({ page }) => {
 
       /*
        * Expected result: should include
-       * - Mother's Marital status
-       */
-      await expect(page.getByTestId('mother.maritalStatus-value')).toHaveText(
-        declaration.mother.maritalStatus
-      )
-
-      /*
-       * Expected result: should include
        * - Mother's level of education
        */
       await expect(
@@ -697,14 +677,6 @@ test('3. Birth declaration case - 3', async ({ page }) => {
 
       await expect(page.getByTestId('father.brn-value')).toHaveText(
         declaration.father.identifier.id
-      )
-
-      /*
-       * Expected result: should include
-       * - Father's Marital status
-       */
-      await expect(page.getByTestId('father.maritalStatus-value')).toHaveText(
-        declaration.father.maritalStatus
       )
 
       /*
@@ -928,14 +900,6 @@ test('3. Birth declaration case - 3', async ({ page }) => {
 
       /*
        * Expected result: should include
-       * - Mother's Marital status
-       */
-      await expect(page.getByTestId('mother.maritalStatus-value')).toHaveText(
-        declaration.mother.maritalStatus
-      )
-
-      /*
-       * Expected result: should include
        * - Mother's level of education
        */
       await expect(
@@ -1007,14 +971,6 @@ test('3. Birth declaration case - 3', async ({ page }) => {
 
       /*
        * Expected result: should include
-       * - Father's Marital status
-       */
-      await expect(page.getByTestId('father.maritalStatus-value')).toHaveText(
-        declaration.father.maritalStatus
-      )
-
-      /*
-       * Expected result: should include
        * - Father's level of education
        */
       await expect(
@@ -1030,6 +986,37 @@ test('3. Birth declaration case - 3', async ({ page }) => {
         declaration.father.address,
         'father.address-value'
       )
+    })
+
+    await test.step('3.2.3 Documents tab lists the documents uploaded during declaration', async () => {
+      await switchEventTab(page, 'Documents')
+
+      const documentRows = page.locator('#listTable-documents [id^="row_"]')
+      await expect(documentRows.first()).toBeVisible()
+      await expect(
+        page.locator('#listTable-documents').getByText('Proof of birth')
+      ).toBeVisible()
+    })
+
+    await test.step('3.2.4 Documents tab allows previewing of document', async () => {
+      await page
+        .locator('#listTable-documents')
+        .getByText('Proof of birth')
+        .click()
+
+      const img = page.locator('img')
+      await expect(img).toBeVisible()
+      const src = await img.getAttribute('src')
+
+      // Expect the src to be a valid URL to the uploaded file
+      await expect(src).toMatch(
+        /^\/events\/[0-9a-fA-F-]+\/[0-9a-fA-F-]+\.jfif$/
+      )
+    })
+
+    await test.step('3.2.5 Closing preview takes us back to documents tab', async () => {
+      await page.getByTestId('preview_close').click()
+      await expect(page.getByText('Documents (15)')).toBeVisible()
     })
   })
 })

@@ -158,7 +158,8 @@ export async function updateWorkflowEnvironments(): Promise<void> {
         '.github/workflows/clear-all-data.yml',
         '.github/workflows/seed-data.yml',
         '.github/workflows/reindex.yml',
-        '.github/workflows/github-to-k8s-sync-env.yml'
+        '.github/workflows/github-to-k8s-sync-env.yml',
+        '.github/workflows/e2e.yml'
       ]
       log('📋 Updating OpenCRVS application workflows:')
       await updateWorkflows(environments, {

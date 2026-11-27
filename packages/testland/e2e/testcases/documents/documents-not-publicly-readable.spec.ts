@@ -45,7 +45,7 @@ test.describe('Document storage', () => {
     const client = createClient(GATEWAY_HOST + '/events', `Bearer ${token}`)
 
     /*
-     * Minio does not check that the object exists when it signs a URL, so any
+     * The store does not check that the object exists when it signs a URL, so any
      * key the record names is sufficient to test the bucket policy. A draft
      * can name one without an upload.
      */
@@ -80,8 +80,8 @@ test.describe('Document storage', () => {
 
     /*
      * The bucket policy accepts a signed request. The key does not exist, and
-     * Minio thus answers 404. It does not refuse the request. This is the
-     * positive control. It shows that the request came to Minio, and that the
+     * the store thus answers 404. It does not refuse the request. This is the
+     * positive control. It shows that the request came to the store, and that the
      * signature is correct. The check below cannot pass only because the host
      * does not answer.
      */
@@ -89,7 +89,7 @@ test.describe('Document storage', () => {
     expect(signed.status).toBe(404)
 
     /*
-     * Minio must refuse the same object when the URL has no signature. A 404
+     * The store must refuse the same object when the URL has no signature. A 404
      * here shows that the bucket gives anonymous s3:GetObject. Then all persons
      * who see a document URL can read that document while the object exists.
      */

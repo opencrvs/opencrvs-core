@@ -11,7 +11,6 @@
 /* eslint-disable max-lines */
 import { isArray, isNil, isPlainObject, isString } from 'lodash'
 import { parse as parseQuery, stringify } from 'qs'
-import { useSelector } from 'react-redux'
 import { validate as validateEmail } from 'email-validator'
 import {
   EventConfig,
@@ -45,13 +44,15 @@ import {
   ValidatorContext,
   getAcceptedScopesByType,
   scopeUsesFullOptions,
-  user
+  user,
+  EncodedScope,
+  FieldUpdateValue,
+  validateFieldInput
 } from '@opencrvs/commons/client'
 import { getAllUniqueFields } from '@opencrvs/commons/client'
 import { isVersionedLocation } from '@client/v2-events/VersionedLocation'
 import { AdminStructureItem } from '@client/utils/referenceApi'
 import { generateAddressFields } from '@client/v2-events/features/events/registered-fields/Address'
-import { getScope } from '@client/profile/profileSelectors'
 import { Name } from '@client/v2-events/features/events/registered-fields/Name'
 import {
   IntlErrors,
@@ -59,6 +60,14 @@ import {
 } from '@client/v2-events/components/forms/validation'
 import { toLocationId } from '@client/v2-events/utils'
 import { statusOptions, timePeriodOptions } from './EventMetadataSearchOptions'
+
+function isNameFieldValue(value: unknown): value is NameFieldValue {
+  return NameFieldValue.validate(value)
+}
+
+function isFieldGroupValue(value: unknown): value is FieldGroupValue {
+  return FieldGroupValue.validate(value)
+}
 
 export function getAdvancedSearchFieldErrors(
   sections: AdvancedSearchConfigWithFieldsResolved[],
@@ -171,7 +180,7 @@ const defaultSearchFieldGenerator: Record<
 } satisfies Record<EventFieldId, (config: AdvancedSearchField) => FieldConfig>
 
 function isEventFieldId(id: string): id is EventFieldId {
-  return EventFieldId.safeParse(id).success
+  return EventFieldId.validate(id)
 }
 
 export const getMetadataFieldConfigs = (
@@ -351,18 +360,14 @@ function toAddressQueryValue(
   group: FieldGroup,
   addressField: AddressField | undefined
 ): AddressFieldValue | undefined {
-  /*
-   * Parsed rather than narrowed: a field value is a union, and narrowing it to a
-   * record keeps every object-shaped member of that union. This runs once while
-   * a query is built, not per keystroke, so the parse is affordable here.
-   */
-  const parsed = FieldGroupValue.safeParse(value)
+  const candidate: unknown = value
 
-  if (!parsed.success) {
+  if (!isFieldGroupValue(candidate)) {
     return undefined
   }
 
-  const entries = parsed.data
+  // This trick is needed for the 'proper' inference.
+  const entries = candidate
   const country =
     typeof entries.country === 'string' ? entries.country : undefined
 
@@ -462,24 +467,21 @@ function buildSearchQueryFields(
       }
 
       if (config.fieldConfig.type === FieldType.NAME) {
-        const parsedName = NameFieldValue.safeParse(value)
+        if (isNameFieldValue(value)) {
+          const name = Name.stringify(value)
 
-        if (parsedName.success) {
-          if (Name.stringify(parsedName.data) === '') {
+          if (name === '') {
             return result
           }
           return {
             ...result,
-            [fieldId]: buildSearchClause(
-              Name.stringify(parsedName.data),
-              searchType
-            )
+            [fieldId]: buildSearchClause(name, searchType)
           }
         }
       }
 
       if (config.fieldConfig.type === FieldType.ADDRESS) {
-        if (!AddressFieldValue.safeParse(value).success) {
+        if (!AddressFieldValue.validate(value)) {
           return result
         }
 
@@ -496,7 +498,7 @@ function buildSearchQueryFields(
           addressFields.get(config.fieldId)
         )
 
-        if (!address || !AddressFieldValue.safeParse(address).success) {
+        if (!address || !AddressFieldValue.validate(address)) {
           return result
         }
 
@@ -532,12 +534,35 @@ function buildSearchQueryFields(
 }
 
 /**
- * @returns the field configuration with overrides applied from the search field
+ * @returns the field with the default value its search field asks for: the
+ * form's (omitted or true), none (false), or the given value
  */
-function applySearchFieldOverridesToFieldConfig(
+function withSearchDefaultValue(
   field: FieldConfig,
   searchField: AdvancedSearchField
 ): FieldConfig {
+  if (
+    searchField.fieldType !== 'field' ||
+    searchField.defaultValue === undefined ||
+    searchField.defaultValue === true
+  ) {
+    return field
+  }
+  if (searchField.defaultValue === false) {
+    return { ...field, defaultValue: undefined } as FieldConfig
+  }
+  // Event config validation only lets a value through for field types that take it
+  return { ...field, defaultValue: searchField.defaultValue } as FieldConfig
+}
+
+/**
+ * @returns the field configuration with overrides applied from the search field
+ */
+function applySearchFieldOverridesToFieldConfig(
+  formField: FieldConfig,
+  searchField: AdvancedSearchField
+): FieldConfig {
+  const field = withSearchDefaultValue(formField, searchField)
   const commonConfig = {
     conditionals: searchField.conditionals ?? field.conditionals,
     validation: searchField.validations ?? field.validation,
@@ -628,7 +653,10 @@ function applySearchFieldOverridesToFieldConfig(
  * @returns the unique field configurations with search overrides applied for
  * the given event
  */
-function getFieldConfigsWithSearchOverrides(eventConfig: EventConfig) {
+function getFieldConfigsWithSearchOverrides(
+  eventConfig: EventConfig,
+  fields: FieldConfig[]
+) {
   const searchFieldMap = eventConfig.advancedSearch
     .flatMap((section) => section.fields)
     .reduce(
@@ -638,7 +666,7 @@ function getFieldConfigsWithSearchOverrides(eventConfig: EventConfig) {
       },
       {} as Record<string, AdvancedSearchField | undefined>
     )
-  return getAllUniqueFields(eventConfig).map((field) => {
+  return fields.map((field) => {
     const searchField = searchFieldMap[field.id]
     if (searchField) {
       return applySearchFieldOverridesToFieldConfig(field, searchField)
@@ -814,11 +842,16 @@ export function withSearchLocationBehaviour(
   return field
 }
 
+/**
+ * @param fields - The fields that the search can use. Defaults to those of `eventConfig`.
+ * Search screens pass the fields of all versions, from `useSearchableFields`.
+ */
 export function resolveAdvancedSearchConfig(
   eventConfig: EventConfig,
-  adminStructure: AdminStructureItem[]
+  adminStructure: AdminStructureItem[],
+  fields: FieldConfig[] = getAllUniqueFields(eventConfig)
 ): AdvancedSearchConfigWithFieldsResolved[] {
-  const declarationFieldsMap = getAllUniqueFields(eventConfig).reduce(
+  const declarationFieldsMap = fields.reduce(
     (acc, field) => {
       acc[field.id] = field
       return acc
@@ -849,20 +882,31 @@ export function resolveAdvancedSearchConfig(
   })
 }
 
+interface SearchParamsInput {
+  eventConfig: EventConfig
+  searchParams: SearchQueryParams
+  adminStructure: AdminStructureItem[]
+  /** The fields that the search can use. Defaults to those of `eventConfig`. A search screen passes those of every version (`useSearchableFields`). */
+  fields?: FieldConfig[]
+}
+
 /**
  * @returns field configurations for advanced search fields (@see EventFieldId) and declaration fields that are in the search parameters.
  */
-export function getSearchParamsFieldConfigs(
-  eventConfig: EventConfig,
-  searchParams: SearchQueryParams,
-  adminStructure: AdminStructureItem[]
-): FieldConfig[] {
+export function getSearchParamsFieldConfigs({
+  eventConfig,
+  searchParams,
+  adminStructure,
+  fields = getAllUniqueFields(eventConfig)
+}: SearchParamsInput): FieldConfig[] {
   // Flatten all advanced search fields across all sections
   const allSearchFields = eventConfig.advancedSearch.flatMap(
     (section) => section.fields
   )
-  const declarationFieldConfigs =
-    getFieldConfigsWithSearchOverrides(eventConfig)
+  const declarationFieldConfigs = getFieldConfigsWithSearchOverrides(
+    eventConfig,
+    fields
+  )
   const metadataFieldConfigs = getMetadataFieldConfigs(allSearchFields)
 
   const searchOnlyFieldConfigs = allSearchFields
@@ -885,31 +929,6 @@ export function getSearchParamsFieldConfigs(
 }
 
 /**
- * @returns A filtered object of search parameters that include only fields in the event configuration.
- *
- */
-export function parseFieldSearchParams(
-  eventConfig: EventConfig,
-  searchParams: SearchQueryParams,
-  adminStructure: AdminStructureItem[]
-) {
-  const searchFieldConfigs = getSearchParamsFieldConfigs(
-    eventConfig,
-    searchParams,
-    adminStructure
-  )
-
-  // filter out any unrelated search parameters
-  const filteredSearchParams = Object.fromEntries(
-    Object.entries(searchParams).filter(([key]) =>
-      searchFieldConfigs.some((config) => config.id === key)
-    )
-  )
-
-  return filteredSearchParams
-}
-
-/**
  * Builds a data condition object based on the provided event state and configuration.
  *
  * This function:
@@ -919,23 +938,32 @@ export function parseFieldSearchParams(
  * - Uses the filtered search keys and raw input to construct a query-compatible condition.
  *
  *
- * @param {EventState} formValues - A flat key-value object representing the current search
- * @param {FieldConfig[]} resolvedFieldConfigs - The resolved field configurations
+ * @param input.formValues - A flat key-value object representing the current search
+ * @param input.resolvedFieldConfigs - The resolved field configurations
  * for an advanced search form, including both metadata and declaration
  * fields.
- * @param {AdvancedSearchField[]} searchFieldConfigs - The search field configurations
+ * @param input.searchFieldConfigs - The search field configurations
  * the advanced search form
+ * @param input.fields - The fields that the search can use. Defaults to those of
+ * `eventConfig`. A search screen passes those of every version (`useSearchableFields`).
  * @returns {QueryInputType} A query object representing the current search condition,
  *                           ready to be used for filtering or querying data.
  */
-export function buildSearchQuery(
-  formValues: EventState,
-  resolvedFieldConfigs: FieldConfig[],
-  searchFieldConfigs: AdvancedSearchField[],
+export function buildSearchQuery({
+  formValues,
+  resolvedFieldConfigs,
+  searchFieldConfigs,
+  eventConfig,
+  fields = getAllUniqueFields(eventConfig)
+}: {
+  formValues: EventState
+  resolvedFieldConfigs: FieldConfig[]
+  searchFieldConfigs: AdvancedSearchField[]
   eventConfig: EventConfig
-): QueryInputType {
+  fields?: FieldConfig[]
+}): QueryInputType {
   const addressFields = new Map(
-    getAllUniqueFields(eventConfig)
+    fields
       .filter((field) => field.type === FieldType.ADDRESS)
       .map((field) => [field.id, field])
   )
@@ -1036,20 +1064,14 @@ function buildQueryFromQuickSearchFields(
  *
  * The resulting query uses `OR` logic (`type: 'or'`), meaning any matching clause is sufficient.
  *
- * @param searchParams - A flat object of field-value pairs submitted from the UI.
- * @param events - The event configurations to extract searchable fields from.
+ * @param term - The term the user typed.
+ * @param fieldsOfEvents - The fields to search: those of every version of each event (`useSearchableFields`).
  * @returns QueryType - A structured query used to hit Elasticsearch.
  */
 export function buildQuickSearchQuery(
   term: string,
-  events: EventConfig[]
+  fieldsOfEvents: FieldConfig[]
 ): QueryType {
-  // Flatten all searchable fields from the selected events
-  const fieldsOfEvents = events.reduce<FieldConfig[]>((acc, event) => {
-    const fields = getAllUniqueFields(event)
-    return [...acc, ...fields]
-  }, [])
-
   const isEmailTerm = validateEmail(term)
 
   // Filter fields to only include those that are supported in quick search
@@ -1065,11 +1087,12 @@ export function buildQuickSearchQuery(
 }
 
 /**
- * @returns a boolean indicating whether the current user has the scope to search for an event
+ * @returns a boolean indicating whether the given scopes allow searching for an event
  */
-export function checkScopeForEventSearch(eventId: string) {
-  const scopes = useSelector(getScope)
-
+export function checkScopeForEventSearch(
+  eventId: string,
+  scopes: EncodedScope[] | null
+) {
   const searchScopes = getAcceptedScopesByType({
     acceptedScopes: ['record.search'],
     scopes: scopes ?? []
@@ -1144,6 +1167,68 @@ function tryParse(value: unknown): unknown {
 
   return value
 }
+function fitsField(field: FieldConfig, value: unknown) {
+  return (
+    validateFieldInput({ field, value: value as FieldUpdateValue }).length === 0
+  )
+}
+
+/**
+ * A link holds every value as text, and `deserializeSearchParams` turns back only
+ * objects and arrays. So a NUMBER field's `5` comes back as `"5"`, and a boolean as
+ * `"true"`. When the text does not fit the field, it is read as JSON, and kept as that
+ * value if it fits. Without this, a valid number filter would be dropped as not fitting.
+ */
+function toFieldValue(field: FieldConfig, value: unknown) {
+  if (!isString(value) || fitsField(field, value)) {
+    return value
+  }
+  try {
+    const parsed: unknown = JSON.parse(value)
+    return fitsField(field, parsed) ? parsed : value
+  } catch {
+    return value
+  }
+}
+
+/**
+ * Splits the search params of a link into the values that fit their field, and the ids
+ * of the fields whose value no longer fits, e.g. after the field's type changed.
+ * Params that name none of `fields` are left out.
+ */
+export function splitSearchParamsByFit(
+  fields: FieldConfig[],
+  params: Record<string, unknown>
+): { values: EventState; unfitFieldIds: string[] } {
+  const values: EventState = {}
+  const unfitFieldIds: string[] = []
+
+  for (const field of fields) {
+    if (!(field.id in params)) {
+      continue
+    }
+    const value = toFieldValue(field, params[field.id])
+    if (fitsField(field, value)) {
+      values[field.id] = value as FieldValue
+    } else {
+      unfitFieldIds.push(field.id)
+    }
+  }
+
+  return { values, unfitFieldIds }
+}
+
+/**
+ * @returns the search parameters that are fields of the event and fit them, and the ids
+ * of the fields whose value no longer fits (see `splitSearchParamsByFit`).
+ */
+export function parseFieldSearchParams(input: SearchParamsInput) {
+  return splitSearchParamsByFit(
+    getSearchParamsFieldConfigs(input),
+    input.searchParams
+  )
+}
+
 export function deserializeSearchParams(
   queryParams: string
 ): Record<string, unknown> {

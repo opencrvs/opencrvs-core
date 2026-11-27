@@ -21,7 +21,8 @@ import {
   TokenUserType,
   TokenWithBearer,
   SystemContext,
-  UserContext
+  UserContext,
+  isTokenWithBearer
 } from '@opencrvs/commons'
 export { SystemContext, UserContext }
 import { env } from './environment'
@@ -177,7 +178,10 @@ async function resolveUserDetails(
 
 export async function createContext({ req }: { req: IncomingMessage }) {
   const normalizedHeaders = normalizeHeaders(req.headers)
-  const token = TokenWithBearer.safeParse(normalizedHeaders.authorization).data
+
+  const token = isTokenWithBearer(normalizedHeaders.authorization)
+    ? normalizedHeaders.authorization
+    : undefined
 
   return {
     token,

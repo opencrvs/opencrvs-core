@@ -15,8 +15,6 @@ import {
   EventIndex,
   CustomActionConfig,
   getOrThrow,
-  isActionEnabled,
-  isActionVisible,
   getAvailableActionsForEvent,
   isValidIcon,
   getAcceptedScopesByType,
@@ -25,11 +23,15 @@ import {
 } from '@opencrvs/commons/client'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
 
-import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
+import { useEventConfigurationForRecord } from '@client/v2-events/features/events/useEventConfiguration'
 import { getScope } from '@client/profile/profileSelectors'
 import { useCustomActionModal } from '@client/v2-events/features/events/actions/quick-actions/useQuickActionModal'
 import { useValidatorContext } from '@client/v2-events/hooks/useValidatorContext'
 import { useCanAccessEventWithScopes } from '@client/v2-events/hooks/useCanAccessEventWithScopes'
+import {
+  isActionEnabled,
+  isActionVisible
+} from '@client/v2-events/conditionals'
 import { ActionMenuItem } from './utils'
 
 export function useCustomActionConfigs(event: EventIndex): {
@@ -50,7 +52,7 @@ export function useCustomActionConfigs(event: EventIndex): {
     'Authentication is not available but is required'
   )
 
-  const { eventConfiguration } = useEventConfiguration(event.type)
+  const { eventConfiguration } = useEventConfigurationForRecord(event)
   const { customActionModal, onCustomAction } = useCustomActionModal(
     event.id,
     eventConfiguration
@@ -60,20 +62,17 @@ export function useCustomActionConfigs(event: EventIndex): {
   const isDownloadedAndAssignedToUser =
     assignmentStatus === AssignmentStatus.ASSIGNED_TO_SELF && isDownloaded
 
-  const customActionScopes = getAcceptedScopesByType({
-    acceptedScopes: ['record.custom-action'],
-    scopes: scopes ?? []
-  })
-
-  // If no custom action scopes are found, we can return early.
-  if (customActionScopes.length === 0) {
-    return {
-      customActionModal: null,
-      customActionConfigs: []
-    }
-  }
+  const hasCustomActionScope =
+    getAcceptedScopesByType({
+      acceptedScopes: ['record.custom-action'],
+      scopes: scopes ?? []
+    }).length > 0
 
   const customActionConfigs = useMemo(() => {
+    if (!hasCustomActionScope) {
+      return []
+    }
+
     // The event's status and flags decide whether custom actions are available
     // at all. The backend enforces the same list, so skipping this check would
     // offer actions that fail with a 409.
@@ -102,6 +101,7 @@ export function useCustomActionConfigs(event: EventIndex): {
         customActionType: action.customActionType
       }))
   }, [
+    hasCustomActionScope,
     eventConfiguration.actions,
     isDownloadedAndAssignedToUser,
     validatorContext,
@@ -110,5 +110,8 @@ export function useCustomActionConfigs(event: EventIndex): {
     canAccessEventWithScopes
   ])
 
-  return { customActionModal, customActionConfigs }
+  return {
+    customActionModal: hasCustomActionScope ? customActionModal : null,
+    customActionConfigs
+  }
 }

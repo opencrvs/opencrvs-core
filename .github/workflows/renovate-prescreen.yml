@@ -1,0 +1,202 @@
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at https://mozilla.org/MPL/2.0/.
+#
+# OpenCRVS is also distributed under the terms of the Civil Registration
+# & Healthcare Disclaimer located at http://opencrvs.org/license.
+#
+# Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
+
+name: Renovate security prescreen
+
+# Claude researches each Renovate security PR and posts one comment. The
+# comment tells if we use the dependency, where, if it is build time or
+# runtime, if the advisory affects us, and what to do with the PR.
+#
+# Claude only reads files and returns structured output. A later step builds
+# the comment from that output, so the advisory text in the PR body cannot
+# make Claude post or change anything.
+
+# The prescreen starts when CI on the PR is done, so that Claude can use the
+# CI result. "Lint and run unit tests" holds the "Required checks" gate.
+on:
+  workflow_run:
+    workflows: ['Lint and run unit tests']
+    types: [completed]
+  workflow_dispatch:
+    inputs:
+      pr_number:
+        description: 'The PR to prescreen. Leave it empty to prescreen all open Renovate security PRs.'
+        required: false
+        type: string
+
+permissions: {}
+
+jobs:
+  select:
+    # A new push to the PR cancels the CI run, and the CI run of the new push
+    # starts the prescreen.
+    if: |
+      github.event_name == 'workflow_dispatch' ||
+      (github.event.workflow_run.event == 'pull_request' &&
+        github.event.workflow_run.conclusion != 'cancelled' &&
+        github.event.workflow_run.head_repository.full_name == github.repository &&
+        startsWith(github.event.workflow_run.head_branch, 'renovate/'))
+    runs-on: ubuntu-26.04
+    permissions:
+      pull-requests: read
+    outputs:
+      prs: ${{ steps.select.outputs.prs }}
+    steps:
+      - name: Select the PRs
+        id: select
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          HEAD_BRANCH: ${{ github.event.workflow_run.head_branch }}
+          INPUT_PR: ${{ inputs.pr_number }}
+        run: |
+          if [ -n "$HEAD_BRANCH" ]; then
+            # Only the open Renovate security PR of the branch. Other Renovate
+            # PRs give an empty list, and the prescreen does not run.
+            prs=$(gh pr list --head "$HEAD_BRANCH" --author app/renovate \
+              --label Security --state open --json number --jq '[.[].number]')
+          elif [ -n "$INPUT_PR" ]; then
+            if ! [[ "$INPUT_PR" =~ ^[0-9]+$ ]]; then
+              echo "::error::pr_number must be a number"
+              exit 1
+            fi
+            prs="[$INPUT_PR]"
+          else
+            prs=$(gh pr list --author app/renovate --label Security --state open \
+              --limit 100 --json number --jq '[.[].number]')
+          fi
+          echo "prs=$prs" >> "$GITHUB_OUTPUT"
+
+  prescreen:
+    needs: select
+    if: needs.select.outputs.prs != '[]'
+    runs-on: ubuntu-26.04
+    timeout-minutes: 45
+    strategy:
+      fail-fast: false
+      max-parallel: 3
+      matrix:
+        pr: ${{ fromJSON(needs.select.outputs.prs) }}
+    # A manual run and a CI run can start a prescreen of the same PR at the
+    # same time. Run them one after the other, so that they do not both
+    # write a comment.
+    concurrency:
+      group: renovate-prescreen-${{ matrix.pr }}
+      cancel-in-progress: false
+    permissions:
+      contents: read
+      pull-requests: write
+      id-token: write
+      # Read the CI result and the logs of failed jobs on the PR.
+      checks: read
+      actions: read
+    env:
+      GH_TOKEN: ${{ github.token }}
+      GH_REPO: ${{ github.repository }}
+      PR_NUMBER: ${{ matrix.pr }}
+      MARKER: '<!-- renovate-prescreen -->'
+      # This job is also a check on the PR. The facts do not include it.
+      OWN_WORKFLOW: ${{ github.workflow }}
+    steps:
+      - name: Check the PR
+        id: pr
+        run: |
+          pr=$(gh pr view "$PR_NUMBER" --json author,baseRefName,labels,state)
+          author=$(jq -r '.author.login' <<< "$pr")
+          state=$(jq -r '.state' <<< "$pr")
+          if [ "$state" != 'OPEN' ]; then
+            echo "::error::PR $PR_NUMBER is $state, not open"
+            exit 1
+          fi
+          if [ "$author" != "app/renovate" ] ||
+            ! jq -e '.labels | map(.name) | index("Security")' <<< "$pr" > /dev/null; then
+            echo "::error::PR $PR_NUMBER is not a Renovate security PR"
+            exit 1
+          fi
+          echo "base=$(jq -r '.baseRefName' <<< "$pr")" >> "$GITHUB_OUTPUT"
+
+          # A manual run writes a new prescreen. A CI run does not prescreen
+          # a PR again, for example after a CI re-run or a Renovate rebase.
+          comment=$(gh api --paginate "repos/$GH_REPO/issues/$PR_NUMBER/comments" \
+            --jq ".[] | select(.user.login == \"github-actions[bot]\" and (.body | startswith(\"$MARKER\"))) | .id" | head -n 1)
+          echo "comment=$comment" >> "$GITHUB_OUTPUT"
+          if [ -n "$comment" ] && [ "${{ github.event_name }}" = 'workflow_run' ]; then
+            echo "skip=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      # Check out the base branch, not the PR head: Claude reads the code as
+      # it is before the update, and no file from the PR is used.
+      - uses: actions/checkout@v6
+        if: steps.pr.outputs.skip != 'true'
+        with:
+          ref: ${{ steps.pr.outputs.base }}
+          fetch-depth: 1
+          persist-credentials: false
+
+      - uses: actions/setup-node@v6
+        if: steps.pr.outputs.skip != 'true'
+        with:
+          node-version-file: .nvmrc
+
+      - name: Collect the facts
+        if: steps.pr.outputs.skip != 'true'
+        run: |
+          mkdir -p .renovate-prescreen
+          # yq is on the runner image. publish-charts.yml uses it too.
+          yq -o=json pnpm-lock.yaml > "$RUNNER_TEMP/lock.json"
+          yq -o=json packages/countryconfig-template/pnpm-lock.yaml > "$RUNNER_TEMP/lock-template.json"
+          node .github/scripts/renovate-prescreen/collect-facts.mjs "$PR_NUMBER" \
+            "$RUNNER_TEMP/lock.json:pnpm-lock.yaml" \
+            "$RUNNER_TEMP/lock-template.json:packages/countryconfig-template/pnpm-lock.yaml" \
+            > .renovate-prescreen/facts.json
+          echo "schema=$(jq -c . .github/scripts/renovate-prescreen/schema.json)" >> "$GITHUB_ENV"
+
+      - uses: anthropics/claude-code-action@4fa93a88de49bbef68b10eb15aabedf28ca0e1ed # v1.0.271
+        id: claude
+        if: steps.pr.outputs.skip != 'true'
+        with:
+          claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+          allowed_bots: 'renovate[bot]'
+          prompt: |
+            Follow the instructions in .github/scripts/renovate-prescreen/prompt.md.
+            The facts file is .renovate-prescreen/facts.json.
+          # The schema is in single quotes. Do not put a "'" in schema.json.
+          claude_args: |
+            --json-schema '${{ env.schema }}'
+            --allowedTools "Read,Grep,Glob"
+            --disallowedTools "Bash,Edit,Write,NotebookEdit,WebFetch,WebSearch,Agent"
+
+      - name: Post the comment
+        if: steps.pr.outputs.skip != 'true'
+        env:
+          RESULT: ${{ steps.claude.outputs.structured_output }}
+          COMMENT_ID: ${{ steps.pr.outputs.comment }}
+        run: |
+          printf '%s' "$RESULT" > .renovate-prescreen/result.json
+          node .github/scripts/renovate-prescreen/render-comment.mjs \
+            .renovate-prescreen/facts.json .renovate-prescreen/result.json \
+            "$(git rev-parse HEAD)" > .renovate-prescreen/comment.md
+          if [ -n "$COMMENT_ID" ]; then
+            gh api --method PATCH "repos/$GH_REPO/issues/comments/$COMMENT_ID" \
+              -F body=@.renovate-prescreen/comment.md > /dev/null
+          else
+            gh pr comment "$PR_NUMBER" --body-file .renovate-prescreen/comment.md
+          fi
+
+      # Keep the input and the output of Claude
+      - uses: actions/upload-artifact@v7
+        if: always() && steps.pr.outputs.skip != 'true'
+        with:
+          name: renovate-prescreen-${{ matrix.pr }}
+          path: .renovate-prescreen/
+          include-hidden-files: true
+          retention-days: 14
+          if-no-files-found: ignore
+          # A re-run of the job uploads the files again.
+          overwrite: true

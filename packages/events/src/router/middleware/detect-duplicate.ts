@@ -22,7 +22,11 @@ import {
 } from '@opencrvs/commons/events'
 import { getUUID, TokenUserType } from '@opencrvs/commons'
 import { TrpcContext } from '@events/context'
-import { getInMemoryEventConfigurations } from '@events/service/config/config'
+import {
+  getCountryToday,
+  getEventConfigurationForRecord,
+  getVersionedEventConfigurationById
+} from '@events/service/config/config'
 import { searchForDuplicates } from '@events/service/deduplication/deduplication'
 import { processAction } from '@events/service/events/events'
 
@@ -58,15 +62,10 @@ export const detectDuplicate: MiddlewareFunction<
     })
   }
   const { user, token } = ctx
-  const configs = await getInMemoryEventConfigurations(token)
   const storedEvent = ctx.event
-  const config = configs.find((c) => c.id === storedEvent.type)
-
-  if (!config) {
-    throw new Error(
-      `Event configuration not found with type: ${storedEvent.type}`
-    )
-  }
+  const config = await getEventConfigurationForRecord({
+    event: storedEvent
+  })
 
   const dedupConfig = config.actions.find(
     (action): action is DeclarationActionConfig => action.type === input.type
@@ -132,11 +131,14 @@ export const detectDuplicate: MiddlewareFunction<
     })
   }
 
-  const duplicates = await searchForDuplicates(
-    futureEventState,
-    dedupConfig,
-    config
-  )
+  const duplicates = await searchForDuplicates({
+    eventIndex: futureEventState,
+    deduplication: dedupConfig,
+    versionedConfig: await getVersionedEventConfigurationById({
+      eventType: storedEvent.type
+    }),
+    today: await getCountryToday()
+  })
 
   if (duplicates.length > 0) {
     const event = await processAction(

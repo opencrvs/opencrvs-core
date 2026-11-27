@@ -27,7 +27,8 @@ import {
   generateTranslationConfig,
   getDeclarationFields,
   getOrThrow,
-  pickRandom
+  pickRandom,
+  toVersionedEventConfig
 } from '@opencrvs/commons'
 import { tennisClubMembershipEvent } from '@opencrvs/commons/fixtures'
 import {
@@ -40,7 +41,7 @@ import {
   payloadGenerator,
   setupHierarchyWithUsers
 } from '@events/tests/generators'
-import { createIndex } from '@events/service/indexing/indexing'
+import { createEventIndex } from '@events/tests/createEventIndex'
 import { env } from '../../environment'
 import { getClient } from '../../storage/postgres/events'
 import {
@@ -686,13 +687,15 @@ test('placeOfEvent scope filters out results between locations and administrativ
     ],
     placeOfEventId: addressFieldId
   })
-  await createIndex(
-    getEventIndexName('event-with-optional-address'),
+  await createEventIndex(
+    'event-with-optional-address',
     getDeclarationFields(eventWithOptionalAddress)
   )
   mswServer.use(
     http.get(`${env.COUNTRY_CONFIG_URL}/config/events`, () => {
-      return HttpResponse.json([eventWithOptionalAddress])
+      return HttpResponse.json([
+        toVersionedEventConfig(eventWithOptionalAddress)
+      ])
     })
   )
 

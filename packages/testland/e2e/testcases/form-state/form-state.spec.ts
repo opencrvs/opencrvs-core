@@ -16,11 +16,13 @@ import {
   getToken,
   goToSection,
   triggerDeclarationAction,
+  searchFromSearchBar,
   waitForActionResponses
 } from '@e2e/support/helpers'
 import { faker } from '@faker-js/faker'
 import {
   fillChildDetails,
+  formatV2ChildName,
   openBirthDeclaration,
   REQUIRED_VALIDATION_ERROR
 } from '@e2e/support/birth/helpers'
@@ -30,9 +32,11 @@ import {
   Declaration
 } from '@e2e/support/test-data/birth-declaration'
 import {
+  ensureAssignedToUser,
   selectAction,
   type,
-  waitForLocalDraftToContain
+  waitForLocalDraftToContain,
+  waitForPersistedEvent
 } from '@e2e/support/utils'
 import {
   navigateToCertificatePrintAction,
@@ -165,12 +169,11 @@ test.describe('Form state', () => {
 
     await test.step('Open correction through Print action', async () => {
       expect(declaration).toBeDefined()
-      await page.getByRole('button', { name: 'Pending certification' }).click()
-      await navigateToCertificatePrintAction(
-        page,
-        declaration!,
-        CREDENTIALS.REGISTRAR
-      )
+      await searchFromSearchBar(page, formatV2ChildName(declaration))
+
+      await ensureAssignedToUser(page, CREDENTIALS.REGISTRAR)
+      await selectAction(page, 'Print')
+
       await selectRequesterType(page, 'Print and issue to Informant (Mother)')
       await continueForm(page)
       // HTTP call will override annotation on next step if we do not wait for this.
@@ -182,6 +185,7 @@ test.describe('Form state', () => {
       await page.getByRole('button', { name: 'Verified' }).click()
       await continueForm(page)
       await credentialResponse
+
       await page.getByRole('button', { name: 'No, make correction' }).click()
     })
 
@@ -214,6 +218,7 @@ test.describe('Form state', () => {
       await page.getByTestId('change-button-mother.name').click()
       await type(page, '#firstname', updatedMotherName)
       await waitForLocalDraftToContain(page, updatedMotherName)
+      await waitForPersistedEvent(page)
       await page.reload()
       await expect(page.locator('#firstname')).toHaveValue(updatedMotherName, {
         timeout: 30_000
@@ -222,14 +227,13 @@ test.describe('Form state', () => {
 
     await test.step('Form states and annotations are not persisted', async () => {
       expect(declaration).toBeDefined()
-
       await page.goto(CLIENT_URL)
-      await page.getByRole('button', { name: 'Pending certification' }).click()
-      await navigateToCertificatePrintAction(
-        page,
-        declaration!,
-        CREDENTIALS.REGISTRAR
-      )
+
+      await searchFromSearchBar(page, formatV2ChildName(declaration))
+
+      await ensureAssignedToUser(page, CREDENTIALS.REGISTRAR)
+      await selectAction(page, 'Print')
+
       await selectRequesterType(page, 'Print and issue to someone else')
 
       await page.getByTestId('text__firstname').fill(faker.person.firstName())
@@ -270,6 +274,7 @@ test.describe('Form state', () => {
 
     await test.step('refresh the page and verify fields are populated', async () => {
       await waitForLocalDraftToContain(page, 'bar')
+      await waitForPersistedEvent(page)
       await page.reload()
       await expect(page.locator('#firstname')).toHaveValue('foo', {
         timeout: 30_000

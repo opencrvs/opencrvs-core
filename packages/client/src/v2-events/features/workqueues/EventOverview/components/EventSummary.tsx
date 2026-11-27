@@ -10,15 +10,13 @@
  */
 
 import React from 'react'
-import { List } from '@opencrvs/components/lib/List'
+import { List } from '@opencrvs/components'
 import {
   EventConfig,
   getDeclarationFields,
-  areConditionsMet,
   getMixedPath,
   EventIndex,
   EventDocument,
-  isFieldSecured,
   FieldValue
 } from '@opencrvs/commons/client'
 import { useIntlFormatMessageWithFlattenedParams } from '@client/v2-events/messages/utils'
@@ -27,6 +25,11 @@ import { useValidatorContext } from '@client/v2-events/hooks/useValidatorContext
 import { recordAnchorDate } from '@client/v2-events/utils'
 import { convertDateFieldsToUnixTimestamps } from '@client/v2-events/utils'
 import { useFlagLabelsString } from '@client/v2-events/messages/flags'
+import { useConfigVersionLabel } from '@client/v2-events/features/events/useEventConfiguration'
+import {
+  areConditionsMet,
+  isFieldSecured
+} from '@client/v2-events/conditionals'
 import { InfoBox } from './InfoBox'
 
 const messages = {
@@ -62,7 +65,7 @@ const messages = {
     value: {
       id: 'event.summary.status.value',
       defaultMessage:
-        '{event.status, select, CREATED {Draft} NOTIFIED {Notified} VALIDATED {Validated} DRAFT {Draft} DECLARED {Declared} REGISTERED {Registered} CERTIFIED {Certified} REJECTED {Requires update} ARCHIVED {Archived} MARK_AS_DUPLICATE {Marked as a duplicate} other {Unknown}}',
+        '{event.status, select, CREATED {Draft} NOTIFIED {Notified} VALIDATED {Validated} DRAFT {Draft} DECLARED {Declared} REGISTERED {Registered} REVOKED {Revoked} CERTIFIED {Certified} REJECTED {Requires update} ARCHIVED {Archived} MARK_AS_DUPLICATE {Marked as a duplicate} other {Unknown}}',
       description: 'Status of the event'
     }
   },
@@ -139,6 +142,9 @@ export function EventSummary({
   const intl = useIntlFormatMessageWithFlattenedParams()
   const validatorContext = useValidatorContext(eventDocument)
   const flagLabels = useFlagLabelsString(eventConfiguration, eventIndex.flags)
+  const configVersionLabel = intl.formatMessage(
+    useConfigVersionLabel(eventIndex)
+  )
   const { summary, label: eventLabelMessage } = eventConfiguration
   const declarationFields = getDeclarationFields(eventConfiguration)
   const securedFields = declarationFields
@@ -203,7 +209,10 @@ export function EventSummary({
          * i.e. if the message is something like `{event.updatedAt, date, ::dd MM YYYY}`, then the value of `event.updatedAt`
          * needs to be a unix timestamp for it to be formatted correctly by `intl.formatMessage`.
          */
-        convertDateFieldsToUnixTimestamps(event)
+        {
+          ...convertDateFieldsToUnixTimestamps(event),
+          'event.configVersionLabel': configVersionLabel
+        }
       )
     }
   })

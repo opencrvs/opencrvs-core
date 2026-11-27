@@ -12,8 +12,10 @@
 import { describe, expect, test } from 'vitest'
 import {
   eventQueryDataGenerator,
+  getDeclarationFields,
   isFieldSecured,
-  isNonInteractiveFieldType
+  isNonInteractiveFieldType,
+  resolveEventConfig
 } from '@opencrvs/toolkit/events'
 import { birthEvent } from './index'
 
@@ -29,9 +31,9 @@ import { birthEvent } from './index'
  *
  */
 describe('sealed birth records', () => {
-  const declarationFields = birthEvent.declaration.pages
-    .flatMap((page) => page.fields)
-    .filter((field) => !isNonInteractiveFieldType(field))
+  const declarationFields = getDeclarationFields(
+    resolveEventConfig(birthEvent)
+  ).filter((field) => !isNonInteractiveFieldType(field))
 
   test('every declaration field is secured once the record is sealed', () => {
     const sealedEvent = eventQueryDataGenerator({
@@ -40,7 +42,14 @@ describe('sealed birth records', () => {
     })
 
     const unsecured = declarationFields
-      .filter((field) => !isFieldSecured(field, sealedEvent, {}))
+      .filter(
+        (field) =>
+          !isFieldSecured(
+            field,
+            { declaration: sealedEvent.declaration },
+            { eventIndex: sealedEvent }
+          )
+      )
       .map(({ id }) => id)
 
     expect(unsecured).toEqual([])
@@ -53,7 +62,14 @@ describe('sealed birth records', () => {
     })
 
     const readable = declarationFields
-      .filter((field) => !isFieldSecured(field, unsealedEvent, {}))
+      .filter(
+        (field) =>
+          !isFieldSecured(
+            field,
+            { declaration: unsealedEvent.declaration },
+            { eventIndex: unsealedEvent }
+          )
+      )
       .map(({ id }) => id)
 
     // Fields the search results and workqueues are built from stay readable

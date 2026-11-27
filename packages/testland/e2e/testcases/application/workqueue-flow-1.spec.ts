@@ -11,11 +11,12 @@
 import { test } from '@playwright/test'
 import {
   continueForm,
-  fillRegisterDialogRequiredFields,
   formatName,
   getToken,
   login,
-  triggerDeclarationAction
+  triggerDeclarationAction,
+  waitForActionResponses,
+  signReview
 } from '@e2e/support/helpers'
 import { CREDENTIALS } from '@e2e/support/constants'
 import { ensureAssignedToUser, selectAction } from '@e2e/support/utils'
@@ -176,6 +177,7 @@ test('1. Workqueue flow - 1', async ({ page }) => {
     })
 
     await test.step('1.2.6 Declare with edits', async () => {
+      await signReview(page)
       await triggerDeclarationAction(page, 'Declare with edits')
 
       await assertRecordInWorkqueue({
@@ -241,9 +243,8 @@ test('1. Workqueue flow - 1', async ({ page }) => {
       await openRecordByTitle(page, formatName(declaration.child.name))
 
       await ensureAssignedToUser(page, CREDENTIALS.REGISTRAR)
-      await selectAction(page, 'Register')
-      await fillRegisterDialogRequiredFields(page)
-      await page.getByRole('button', { name: 'Confirm' }).click()
+
+      await triggerDeclarationAction(page, 'Register')
 
       await assertRecordInWorkqueue({
         page,
@@ -300,12 +301,18 @@ test('1. Workqueue flow - 1', async ({ page }) => {
         name: 'Yes, print certificate'
       })
       .click()
-    await page
-      .getByRole('button', {
-        name: 'Print',
-        exact: true
-      })
-      .click()
+
+    await waitForActionResponses(
+      page,
+      ['event.actions.printCertificate'],
+      async () =>
+        await page
+          .getByRole('button', {
+            name: 'Print',
+            exact: true
+          })
+          .click()
+    )
 
     await assertRecordInWorkqueue({
       page,

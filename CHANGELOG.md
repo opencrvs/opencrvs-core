@@ -1,5 +1,435 @@
 # Changelog
 
+## 2.2.0 Release Candidate
+
+### Upgrade guidance
+
+#### MinIO replaced with plain S3
+
+##### What changed
+
+- **The documents service speaks plain S3.** It uses the AWS SDK for JavaScript instead of the MinIO client, and reads its settings from `S3_*` variables, not `MINIO_*`. [packages/documents/README.md](packages/documents/README.md) lists the settings and the stores that were tried.
+- **The dependencies chart deploys RustFS, not MinIO.** The `minio` values are not read any more, so move your settings to `rustfs`. RustFS has its own hostnames (`rustfs.<hostname>` and `rustfs-console.<hostname>`), its own Service (`rustfs`) and default credentials (`rustfsadmin`). The backup and restore jobs are now `rustfs-backup` and `rustfs-restore`.
+- **The client allows the S3 origin.** Its Content-Security-Policy allows the origin of the S3 public endpoint, so browsers can read documents from a store on another domain. The services chart sets it as `S3_PUBLIC_ORIGIN`. When it is not set, nothing is added.
+- **The data cleanup job keeps the bucket,** with its CORS and access rules, and a batch delete that the store partly refuses now fails.
+
+##### How to migrate
+
+###### Infrastructure
+
+**Back up the data.** After RustFS writes to the volume, going back to MinIO loses the user metadata of the objects that RustFS wrote. Use `minio-backup` kubernetes cronjob:
+
+```
+kubectl create job --from cronjob/minio-backup minio-backup-manual
+```
+
+**Add the `keep` annotation to the PVC of MinIO,** if you use `storage_type: pvc`:
+
+> [!WARNING]
+> Run this **before** `helm upgrade`, or you can lose all documents:
+>
+> ```bash
+> kubectl annotate pvc minio helm.sh/resource-policy=keep
+> ```
+>
+> The PVC `minio` has no `keep` annotation. If `rustfs.pvc.name` is not `minio`, `helm upgrade` deletes the PVC, and the objects can be deleted with it.
+
+###### Helm chart values
+
+Skip these steps if `environment:init` manages your environment. Otherwise update your values.
+
+1. Rename the `minio:` block to `s3:`. A `minio:` block that is left behind is ignored without a warning.
+2. Replace `external_url` and `external_protocol` with `public_endpoint`, a URL with the protocol. Without it, the chart signs document URLs for `rustfs.<hostname>`.
+
+   ```yaml
+   # Before
+   minio:
+     external_url: s3.example.org
+     external_protocol: https
+
+   # After
+   s3:
+     public_endpoint: https://s3.example.org
+   ```
+
+3. **Point RustFS at the data of MinIO,** so that it adopts the existing objects. Keep these values in later releases, or RustFS stops using that data:
+
+   - For `storage_type: host_path`: set `rustfs.host_data_path` to `/data/minio`
+   - For `storage_type: pvc`: set `rustfs.pvc.name: minio`, and copy `storage_class`, `storage_size` and `access_mode` from `minio.pvc`, unchanged.
+
+4. Rename the variables of the `documents` service:
+
+   | Before                        | After                                                                                  |
+   | ----------------------------- | -------------------------------------------------------------------------------------- |
+   | `MINIO_HOST`, `MINIO_PORT`    | `S3_ENDPOINT`, for example `http://rustfs:3535`. Required in production                |
+   | `MINIO_URL`, `MINIO_PROTOCOL` | `S3_PUBLIC_ENDPOINT`, for example `https://rustfs.example.org`. Required in production |
+   | `MINIO_BUCKET`                | `S3_BUCKET`                                                                            |
+   | `MINIO_BUCKET_REGION`         | `S3_BUCKET_REGION`                                                                     |
+   | `MINIO_ACCESS_KEY`            | `S3_ACCESS_KEY`                                                                        |
+   | `MINIO_SECRET_KEY`            | `S3_SECRET_KEY`                                                                        |
+
+See [Migrate from MinIO](charts/dependencies/README.md#migrate-from-minio) for more detail. [#13348](https://github.com/opencrvs/opencrvs-core/issues/13348)
+
+#### Outbox: empty it before you deploy
+
+2.2 changes the shape of the event configuration the client keeps offline, so the client clears its local cache the first time it loads after the upgrade. The outbox is part of that cache: **any action still waiting in a user's outbox when 2.2 loads is discarded** and cannot be recovered.
+
+Before the deploy, instruct every user, working offline in particular, to connect and wait until their outbox is empty. Anything still queued afterwards must be entered again. Users who had OpenCRVS open during the deploy should reload the page; until they do, the old version can fail to show records.
+
+[#13600](https://github.com/opencrvs/opencrvs-core/issues/13600)
+
+#### Revocation: moving from a custom action to the core `REVOKED` status (optional)
+
+2.2 adds core `REVOKE_REGISTRATION` and `REINSTATE_REGISTRATION` actions and a `REVOKED` status (see [New features](#revoked-status-with-revoke-and-reinstate-registration-actions)). Before 2.2, countries that needed revocation built it in their own config: a custom revoke action that adds a country-defined flag to mark the record as revoked, and a custom reinstate action that removes it. Each country names these itself. The template, for example, uses the `REVOKE_REGISTRATION` / `REINSTATE_REVOKE_REGISTRATION` custom actions and a flag with id `revoked`. A country revoking this way can keep doing so. Nothing changes until you move.
+
+Below, "your revoked flag" means the flag your custom revoke adds. The examples use the template's names (`'revoked'`, `'REVOKE_REGISTRATION'`, `'REINSTATE_REVOKE_REGISTRATION'`); replace them with the ids from your own config.
+
+**Do not delete the custom revoke action or your revoked flag.** Flags are recalculated from the current config, so removing them un-revokes every record revoked with them. Keep both, and stop new custom revocations instead:
+
+1. **Event config.** Add the core actions next to the custom ones. Copy the custom actions' `label`, `icon`, `dialogCopy` (`supportingCopy` before 2.2), `form` and `flags`, leaving out every operation on your revoked flag: the `REVOKED` status replaces it. Hide the core revoke on records revoked the old way:
+
+   ```ts
+   {
+     type: ActionType.REVOKE_REGISTRATION,
+     label: { ... },
+     form: [ ... ],
+     // The custom revoke's flag operations, without { id: 'revoked', operation: 'add' }
+     flags: [
+       { id: 'pending-first-certificate-issuance', operation: 'remove' },
+       ...
+     ],
+     conditionals: [
+       { type: ConditionalType.SHOW, conditional: not(flag('revoked')) }
+     ]
+   },
+   {
+     type: ActionType.REINSTATE_REGISTRATION,
+     label: { ... },
+     form: [ ... ]
+   }
+   ```
+
+   Add `ActionType.REINSTATE_REGISTRATION` to `actionOrder`. If your custom revoke is named `'REVOKE_REGISTRATION'`, its `actionOrder` entry already places the core revoke; otherwise add `ActionType.REVOKE_REGISTRATION` too.
+
+2. **Roles.** Every role that can perform the custom revoke should get `record.revoke-registration` instead: remove the custom revoke from its `record.custom-action` scope, so it can no longer be performed, and add `record.revoke-registration`. Keep the custom reinstate scope, so records revoked the old way can still be reinstated, and add `record.reinstate-registration` next to it. Carry over `event` and `placeOfEvent`:
+
+   ```diff
+   -{ type: 'record.custom-action', options: { event: ['birth'], customActionTypes: ['REVOKE_REGISTRATION', 'REINSTATE_REVOKE_REGISTRATION'] } },
+   +{ type: 'record.custom-action', options: { event: ['birth'], customActionTypes: ['REINSTATE_REVOKE_REGISTRATION'] } },
+   +{ type: 'record.revoke-registration', options: { event: ['birth'] } },
+   +{ type: 'record.reinstate-registration', options: { event: ['birth'] } },
+   ```
+
+3. **Checks on your revoked flag.** Wherever your config checks your revoked flag, also check the `REVOKED` status. Keep the flag check: records revoked the old way are still `REGISTERED`, so only the flag identifies them. Remove it only if no record carries the flag.
+
+   - **Workqueues.** Wherever a workqueue excludes your revoked flag (`flags: { noneOf: ['revoked'] }` in the template), exclude the status as well:
+
+     ```diff
+      query: {
+        ...registeredInMyAdminArea,
+     +  status: { type: 'noneOf', terms: ['REVOKED'] },
+        flags: { anyOf: ['pending-first-certificate-issuance'], noneOf: ['revoked'] }
+      }
+     ```
+
+   - **Action conditionals.** Keep the conditionals that hide print, correction and other actions on your revoked flag (`not(flag('revoked'))` in the template). Core already blocks these on `REVOKED` records, so they need no status check.
+
+4. **Dashboards.** Only if your dashboards report revocations or reinstatements: they are now recorded two ways, so count both. For revokes, `action_type = 'CUSTOM'` with your custom revoke's `custom_action_type` (the template's is `'REVOKE_REGISTRATION'`) and `action_type = 'REVOKE_REGISTRATION'`; for reinstatements, your custom reinstate's `custom_action_type` (the template's is `'REINSTATE_REVOKE_REGISTRATION'`) and `action_type = 'REINSTATE_REGISTRATION'`.
+
+Users will see two kinds of revoked record: ones revoked before the move show as Registered with your revoked flag, and new ones show the `Revoked` status.
+
+[#14052](https://github.com/opencrvs/opencrvs-core/issues/14052)
+
+### Breaking changes
+
+#### `POST /auth/token` no longer accepts parameters in the query string
+
+The query-string fallback deprecated in [#13626](https://github.com/opencrvs/opencrvs-core/pull/13626) has been removed. Sending `client_secret` in the URL leaks it into access logs and Sentry breadcrumbs (CWE-598). Parameters are now read only from the request body (form-encoded or JSON), and the gateway no longer forwards the query string. Requests that still use the URL fail with `unsupported_grant_type`.
+
+Integrations using the `client_credentials` grant must send `grant_type`, `client_id` and `client_secret` in the body:
+
+```diff
+-curl -X POST '<gateway>/auth/token?client_id=...&client_secret=...&grant_type=client_credentials'
++curl -X POST '<gateway>/auth/token' \
++  -H 'Content-Type: application/x-www-form-urlencoded' \
++  -d 'client_id=...&client_secret=...&grant_type=client_credentials'
+```
+
+Existing credentials keep working. Rotate any secret that has been sent in a URL, since it may still be in old logs.
+
+#### Event `declaration` moved onto the `DECLARE` action
+
+An event's declaration form was defined at the top level of `EventConfig`. It now lives on the event's `DECLARE` action, and every event must have exactly one `DECLARE` action:
+
+| Before                         | After                              |
+| ------------------------------ | ---------------------------------- |
+| `birthEvent.declaration.pages` | `getDeclaration(birthEvent).pages` |
+
+Core 2.2 reads event configurations only in the new shape, so **a country config built with `@opencrvs/toolkit` 2.1 or earlier stops loading entirely**: no event can be opened, declared or searched. Upgrade core and the country config together.
+
+**Country configs must read the form through `getDeclaration`.** `opencrvs upgrade` does it for you: the `read-declaration-through-helper` codemod rewrites every `declaration` read on an `EventConfig` under `src/` and imports `getDeclaration`, then lists every read it could not rewrite — an optional chain, a destructured `declaration`, an assignment — for you to change by hand.
+
+`defineConfig` still accepts a top-level `declaration` and moves it onto the `DECLARE` action, but logs a deprecation warning: a future release will remove the top-level `declaration`. `opencrvs upgrade` moves it for you: the `move-declaration-to-declare-action` codemod moves the top-level `declaration` of every `defineConfig` call under `src/` onto its `DECLARE` action, then lists every config it could not rewrite — `actions` built outside the call, a `DECLARE` action that is not written inline — for you to change by hand. `defineConfig` throws if `declaration` is given in both places. That includes `defineConfig({ ...birthEvent, declaration })`: `birthEvent` already carries a `declaration` on its `DECLARE` action, so replace that one instead. An event configuration built without `defineConfig` must use the new shape.
+
+[#13600](https://github.com/opencrvs/opencrvs-core/issues/13600)
+
+#### Event configurations are versioned with `effectiveFrom`
+
+An event configuration can now have several versions, each effective from a date. `defineConfig` takes them under `versions`, and fields shared by every version (`id`, `label`, `advancedSearch`) stay at the top level:
+
+```ts
+defineConfig({
+  id: 'birth',
+  label: { ... },
+  versions: [
+    { id: 'initial', label: { ... }, actions: [ ... ] },
+    { id: 'v2', label: { ... }, effectiveFrom: '2027-01-01', actions: [ ... ] }
+  ]
+})
+```
+
+A version without `effectiveFrom` is effective from the beginning of time. Version ids and `effectiveFrom` dates must be unique within an event. A version id can contain only lower-case letters (a-z), digits (0-9) and underscores (`_`), and at most 64 characters.
+
+Each version must have a `label`. It is the name of the version, which the UI shows wherever it names the version. An event configured without `versions` gives its single version the label of the event.
+
+A version takes effect at midnight in the country's time zone (`SYSTEM_IANA_TIMEZONE`). A record is created under the version in effect that day and keeps it for its whole life: every action on the record uses that version, even after a newer one takes effect. A record created offline keeps the version in effect when the user created it. The record stores the version's id as `configVersionId`.
+
+An event must have a version in effect today, and `defineConfig` rejects one that does not. It takes today in UTC−12, the last time zone to begin the day, so that the version is in effect whatever the country's time zone: east of it, a version taking effect today is rejected until midnight in UTC−12. Schedule an event's only version a day ahead.
+
+Records created before 2.2 are stamped with `initial`, the id `defineConfig` gives an event configured without versions. When you add `versions` to an existing event, give the version holding your current configuration the id `initial`, as above. Otherwise those records point at a version that does not exist: they fail to open, and the search reindex fails, naming the missing version. Never remove or rename a version that records use.
+
+`defineConfig` still accepts a flat configuration and wraps it in a single version, so existing event configurations need no change. It now returns a `VersionedEventConfig` instead of an `EventConfig`, though, so code that reads a version's fields off its result stops compiling:
+
+| Before                                | After                                                     |
+| ------------------------------------- | --------------------------------------------------------- |
+| `birthEvent.actions`                  | `resolveEventConfig(birthEvent).actions`                  |
+| `getCurrentEventState(e, birthEvent)` | `getCurrentEventState(e, resolveEventConfig(birthEvent))` |
+
+Core 2.2 reads event configurations only in the versioned shape, so a country config built with `@opencrvs/toolkit` 2.1 or earlier stops loading. Upgrade core and the country config together.
+
+`opencrvs upgrade` does it for you: the `resolve-versioned-event-config` codemod rewrites every read of a version's field on a `VersionedEventConfig` under `src/`, and every `VersionedEventConfig` passed where an `EventConfig` is expected, to go through `resolveEventConfig`, and imports it. It then lists every use it could not rewrite (an optional chain, a destructured field, an assignment, a value that may be `undefined`) for you to change by hand.
+
+**Analytics must use the version of each record.** The codemod makes `src/analytics/analytics.ts` read each event configuration through `resolveEventConfig`, which gives the version in effect today. This is correct while an event has one version. When you add a second version, read the configuration of each record through `getEventConfigForRecord(config, event)` instead. Otherwise, analytics drops the fields that only an older version has, and the Metabase cards that use those fields break. See `packages/testland/src/analytics/analytics.ts` in opencrvs-core for an example.
+
+**`GET /api/events/config` returns the versioned shape.** Each event in the response is now `{ id, label, advancedSearch, versions }`, and the fields of a version (`actions`, `title`, `summary`, `flags`...) are under `versions[]`, each with its `id` and `effectiveFrom`. An event configured without versions comes back as a single version with id `initial` and `effectiveFrom` `0001-01-01`. Integrations that read `actions` or another version field off an event must read it from a version instead.
+
+**Records carry `configVersionId`.** Event documents and search results have the id of the version the record was created under. `event.create` takes an optional `configVersionId`: without it, the record is created under the version in effect. A given `configVersionId` must be a configured version already in effect, or the call fails with HTTP 400.
+
+The record overview does not show the version. To show it, add a custom field to `summary.fields` with the value `{event.configVersionLabel}` (the label of the version) or `{event.configVersionId}` (its id).
+
+**The client shows each record with its own version.** Record pages, actions, validation, workqueue rows and the duplicate comparison use the version that the record was created under. When a new version takes effect at midnight, the client uses it for new records. A form that is already open does not change.
+
+**Search covers every version.** Each version has its own search index, and a record is indexed under its own version. An `advancedSearch` field may exist in only some versions. Advanced search, quick search, workqueue counts and deduplication then find the records of every version. A search field's input and label come from the newest version in effect that has the field. A search link whose value no longer fits its field drops that value and shows a notice.
+
+**The upgrade needs a reindex.** The search reindex builds the index of each version. The Helm `elasticsearch-reindex` job runs it after `helm upgrade`. Until it has run, records of every version still go to the old index, so search keeps working.
+
+[#13601](https://github.com/opencrvs/opencrvs-core/issues/13601) [#13602](https://github.com/opencrvs/opencrvs-core/issues/13602) [#13603](https://github.com/opencrvs/opencrvs-core/issues/13603) [#14335](https://github.com/opencrvs/opencrvs-core/issues/14335)
+
+#### `FEATURES.V2_EVENTS` is removed
+
+The client did not read `FEATURES.V2_EVENTS`, and the `?V2_EVENTS` query parameter had no effect, so both are removed. If your client config sets `V2_EVENTS` in `FEATURES`, remove it, because the config no longer compiles with it.
+
+#### The `incomplete` flag is removed
+
+`InherentFlags.INCOMPLETE` mirrored the `NOTIFIED` status, so it has been removed [#13985](https://github.com/opencrvs/opencrvs-core/issues/13985). References to `InherentFlags.INCOMPLETE` no longer compile. References written as the string `'incomplete'` (for example in encoded scope strings such as `record.read[flags=incomplete]`) still parse, but match nothing. Switch to the `NOTIFIED` status instead (`status` in workqueues and scope options, `event.status` in conditionals).
+
+`opencrvs upgrade` does it for workqueue queries: the `replace-incomplete-flag` codemod rewrites them as below, then lists every other `InherentFlags.INCOMPLETE` reference for you to change by hand:
+
+```diff
+ query: {
+-  flags: { anyOf: [InherentFlags.INCOMPLETE], noneOf: [InherentFlags.REJECTED] },
++  flags: { noneOf: [InherentFlags.REJECTED] },
++  status: { type: 'exact', term: EventStatus.enum.NOTIFIED },
+```
+
+Unlike the flag, an archived notification no longer matches, since its status is `ARCHIVED`. Remove the `flags.builtin.incomplete.label` translation, and reindex after upgrading. The `NOTIFIED` status now reads "Notified" in workqueues and search too, not "In progress".
+
+#### `NOTIFY` action supports `notificationForm` and `review` configuration
+
+`NOTIFY` used to read its form configuration from the `DECLARE` action. It now supports its own notification form and review:
+
+- **`actions[NOTIFY].notificationForm`** is the notify form. Every field in it must also exist in the `DECLARE` declaration form with the same type, and its values pre-fill the declaration. A `NOTIFY` is rejected when a required `notificationForm` field is missing or invalid, or when its `declaration` contains a field that is not in the notification form.
+- **`actions[NOTIFY].review`** holds the notify review page fields. Notify-only data, such as a notifier's signature, is configured as `NOTIFY` `review` or `form` fields and stored in the `NOTIFY` action annotation. Required `review` and dialog `form` fields are enforced on `NOTIFY`. When the record is later declared, `review` fields that also exist on the `DECLARE` review page are pre-filled with the values captured at notify.
+
+`NOTIFY` is optional: an event without a `NOTIFY` action cannot be notified. A `NOTIFY` action must configure both `notificationForm` and `review`, and nothing is generated from the `DECLARE` action. The notification form is validated like any form, so a plain copy of the declaration form would reject incomplete records. To keep `NOTIFY` accepting them, use `toNotificationForm(<declaration form>)` and `toNotificationReview(<DECLARE review>)`, which copy the `DECLARE` form and review with every field optional and without validations. A role holding `record.notify` for an event type needs a `NOTIFY` action on that event.
+
+`opencrvs upgrade` does it for you: the `add-notify-config` codemod adds `notificationForm: toNotificationForm(...)` and `review: toNotificationReview(...)`, copied from the `DECLARE` action, to every `NOTIFY` action under `src/` that lacks them, then lists every event without a `NOTIFY` action and every config it could not rewrite — a `DECLARE` form or review written inline, a `NOTIFY` action not written inline — for you to change by hand.
+
+#### Notifiers get their own notify flow
+
+A user whose role holds `record.notify` for an event type now fills in the notification form in a separate notify flow, instead of the declaration form [#13975](https://github.com/opencrvs/opencrvs-core/issues/13975):
+
+- **New records** open the notify flow. Notify is enabled once the notification form's required fields are complete.
+- **Editing a notified record** uses the notification form too, and "Notify with edits" requires its required fields.
+- **The declare flow** only offers Declare and Register, and requires `record.declare`.
+
+A role should hold either `record.notify` or `record.declare` for an event type, not both. Core now rejects a role that holds both for the same event type. Remove one of the two scopes. See "Core checks roles when it loads them".
+
+Update the client translations:
+
+- Rename `user.profile.audit.description.inProgress` to `user.profile.audit.description.notified` ("Notified").
+- Rename `review.declare.incomplete.confirmModal.title` to `review.notify.confirmModal.title` ("Notify event?").
+- Add `buttons.deleteDraft` ("Delete draft"), and reword `register.form.modal.description.deleteDeclarationConfirm` to refer to a draft, e.g. "Are you sure you want to delete this draft?".
+- `buttons.deleteDeclaration`, `changeModal.continue`, `changeModal.title` and `changeModal.description` are no longer used and can be removed.
+
+#### Core checks roles when it loads them
+
+The events service now checks the roles that country config serves at `GET /config/roles`. When a role breaks one of these rules, the events service does not start, and the error names each role and each problem [#13981](https://github.com/opencrvs/opencrvs-core/issues/13981):
+
+- Each event type in a scope must be a configured event.
+- A role must not hold `record.notify` and `record.declare` for the same event type.
+- A role that holds `record.notify` for an event type must not hold a `record.edit` that can match `DECLARED` records of that event type. Limit that `record.edit` to the status `NOTIFIED`.
+- Each event type that a role holds `record.notify` for must have a `NOTIFY` action.
+
+To find these problems before you deploy, wrap the roles in `src/api/roles/roles.ts` with `defineRoles` from `@opencrvs/toolkit/roles`. It checks the same rules when the country config loads the roles, so a country config with invalid roles does not start:
+
+```ts
+import { defineRoles, Roles } from '@opencrvs/toolkit/roles'
+import { eventConfigs } from '@countryconfig/events'
+
+const roles: Roles = [
+  // ...
+]
+
+export default defineRoles(roles, eventConfigs)
+```
+
+The data seeder checks the same rules, and reports each role that breaks them.
+
+#### `event.hasAction` counts only accepted actions
+
+`event.hasAction(...)` and its `minCount`, `maxCount`, `withFields` and `withTemplate` variants now match only actions with status `Accepted`. Before, an action awaiting confirmation (`Requested`) or refused by the country configuration (`Rejected`) counted too, and an action confirmed synchronously counted twice, once for its `Requested` and once for its `Accepted` document. A confirmed action is matched with the details of its request (`createdBy`, `createdByRole`, `createdAtLocation`, `declaration`, `annotation`, `content`), so `withTemplate` and `withFields` match what they matched before, also when the country configuration confirms the action asynchronously.
+
+Check conditionals that rely on the old counting:
+
+- `hasAction(PRINT_CERTIFICATE).maxCount(n)` now allows `n` confirmed prints, where a single synchronously confirmed print used to count as two.
+- `not(event.hasAction(DECLARE))` is now true while a `DECLARE` awaits confirmation, so actions hidden by it show again until the declaration is accepted.
+
+[#10876](https://github.com/opencrvs/opencrvs-core/issues/10876)
+
+#### `supportingCopy` is renamed to `dialogCopy`, and each action gives the copy of its own dialog
+
+`dialogCopy` is now the one key for the text at the top of a confirmation dialog:
+
+- `NOTIFY`, `DECLARE`, `REGISTER`, `REJECT`, `ARCHIVE`, `UNARCHIVE`, `REVOKE_REGISTRATION`, `REINSTATE_REGISTRATION` and custom actions give one message in `dialogCopy`. The dialog of the action shows it, wherever the dialog opens.
+- `EDIT` gives `dialogCopy.notify`, `dialogCopy.declare` and `dialogCopy.register` for the dialogs of the edit page, as before.
+- The other actions do not accept `dialogCopy`, because no dialog of these actions shows copy from the configuration.
+
+The `DECLARE` action no longer gives copy for the notify and register dialogs of the declaration review page. These dialogs show the `dialogCopy` of the `NOTIFY` and `REGISTER` actions.
+
+```diff
+ {
+   type: ActionType.DECLARE,
+-  dialogCopy: {
+-    notify: { id: 'event.birth.action.declare.notify.copy', ... },
+-    declare: { id: 'event.birth.action.declare.declare.copy', ... },
+-    register: { id: 'event.birth.action.declare.register.copy', ... }
+-  },
++  dialogCopy: { id: 'event.birth.action.declare.declare.copy', ... },
+   ...
+ },
+ {
+   type: ActionType.NOTIFY,
++  dialogCopy: { id: 'event.birth.action.declare.notify.copy', ... },
+   ...
+ },
+ {
+   type: ActionType.REGISTER,
++  dialogCopy: { id: 'event.birth.action.declare.register.copy', ... },
+   ...
+ },
+ {
+   type: ActionType.REJECT,
+-  supportingCopy: { id: 'event.birth.action.reject.supportingCopy', ... },
++  dialogCopy: { id: 'event.birth.action.reject.supportingCopy', ... },
+   ...
+ }
+```
+
+**Change in behaviour:** before 2.2, the register dialog of the declaration review page showed `dialogCopy.register` of the `DECLARE` action, and the register dialog of the action menu showed `supportingCopy` of the `REGISTER` action. Now both dialogs show the `dialogCopy` of the `REGISTER` action. If your config gives both, make sure that the copy of the `REGISTER` action fits both dialogs.
+
+**Country configs must change the old keys.** A `DECLARE` action whose `dialogCopy` has `notify`, `declare` and `register` fails validation. `opencrvs upgrade` changes them for you. Its `move-supporting-copy-to-dialog-copy` codemod:
+
+- renames `supportingCopy` to `dialogCopy`, and removes the `supportingCopy` that no dialog showed
+- gives the `declare` copy of the `DECLARE` action as its `dialogCopy`, and moves the `notify` and `register` copy to the `NOTIFY` and `REGISTER` actions. When one of these actions already gives copy, the codemod keeps that copy. When the event has no `NOTIFY` action, the codemod removes the `notify` copy, because an event without a `NOTIFY` action cannot be notified.
+- lists every place that it could not change, for you to change by hand
+
+The translation keys do not change.
+
+[#13697](https://github.com/opencrvs/opencrvs-core/issues/13697)
+
+- `event.file.getPresignedUrl` is removed. Use `event.files.presign({ eventId })` and `user.files.presign({ userIds })` (users only), which return presigned URLs keyed by the stored path.
+- Upload record attachments with `path: events/{eventId}/`.
+- Actions and drafts may only name files stored under their record's `events/{eventId}/`, or files the record already names. Imported records may also name pre-2.0 keys and their author's own signature. Any other file is rejected with `400`.
+- `user.create`, `user.update` and `user.changeAvatar` only accept a signature or avatar stored under the user's own `users/` path.
+
+### New features
+
+#### Create records under a past configuration version (experimental)
+
+A country can let users create a record under an earlier version of an event configuration, for example to enter a record that was registered on an older form. To turn this on, set `FEATURES: { _EXPERIMENTAL_LEGACY_RECORDS: true }` in the client config. Then, when an event has more than one version in effect, the event selection page asks for the form version. The version in effect today is selected by default. The feature is off by default.
+
+The feature is experimental. Its UI is not a supported feature in 2.2. It can change, or be removed, without notice.
+
+[#14015](https://github.com/opencrvs/opencrvs-core/issues/14015)
+
+#### `REVOKED` status with revoke and reinstate registration actions
+
+Added `EventStatus.REVOKED` and two core actions, `ActionType.REVOKE_REGISTRATION` and `ActionType.REINSTATE_REGISTRATION`, that move a record between `REGISTERED` and `REVOKED`, guarded by new `record.revoke-registration` and `record.reinstate-registration` scopes. Existing environments need a reindex for the new `legalStatuses.REVOKED` field. The confirmation dialogs of these actions show only the `dialogCopy` of the action, and core gives no default copy. [#4569](https://github.com/opencrvs/opencrvs-core/issues/4569)
+
+#### Exclude statuses in workqueue and search queries
+
+A query's `status` filter now accepts `{ type: 'noneOf', terms: [...] }`, matching records whose status is none of the listed ones, e.g. `noneOf: ['REVOKED']` to keep revoked records out of a workqueue. [#14052](https://github.com/opencrvs/opencrvs-core/issues/14052)
+
+#### Default values for advanced search fields
+
+Advanced search fields open with the declaration form's `defaultValue`, so a name defaulting to the logged-in user's name shows up pre-filled and counts towards the search. Set `defaultValue` on a search field to change that:
+
+- omitted or `true` keeps the form's default, e.g. an address defaulting to the user's area
+- `false` opens the field empty, e.g. `field('applicant.name', { defaultValue: false }).fuzzy()`
+- a text, number or date value opens the field with that value, e.g. `field('applicant.email', { defaultValue: 'applicant@example.com' }).exact()`
+
+Only TEXT, TEXTAREA, EMAIL, PHONE, ID, SELECT, RADIO_GROUP, COUNTRY, LOCATION, ADMINISTRATIVE_AREA, NUMBER and DATE fields take a value. Other field types, such as NAME and ADDRESS, and dates searched as a range accept only `true` or `false`. Fields using `config.searchFields` don't support `defaultValue`. An event configuration that breaks these rules fails validation. [#14047](https://github.com/opencrvs/opencrvs-core/issues/14047)
+
+#### Container registry other than Docker Hub
+
+The toolkit and the country configuration template work with any container registry that implements the OCI Registry v2 API, for example GHCR. The `DOCKERHUB_ACCOUNT`, `DOCKERHUB_REPO`, `DOCKER_USERNAME` and `DOCKER_TOKEN` secrets are renamed to `REGISTRY_ORGANISATION`, `REGISTRY_REPOSITORY`, `REGISTRY_USERNAME` and `REGISTRY_TOKEN`. The new repository variable `REGISTRY_HOST` (default `docker.io`) sets the registry, and the pull secret `dockerhub-credentials` is now `registry-credentials`. `environment:init` asks for these and checks them with the Registry v2 API. `check-before-build.sh` now takes `REGISTRY_USERNAME REGISTRY_TOKEN IMAGE_TAG [REGISTRY_HOST]`. [#14209](https://github.com/opencrvs/opencrvs-core/issues/14209)
+
+**Nothing has to change for a deployment to keep working.** The previous names are still read, and `dockerhub-credentials` is still created. To move to the new names:
+
+1. Update `.github/TEMPLATES/secret-migration.yaml`, `github-to-k8s-sync-env.yml` and `deploy-opencrvs.yml` from [opencrvs/infrastructure](https://github.com/opencrvs/infrastructure). The secrets are copied to the new names on the next deployment.
+2. Add `publish-to-registry.yml` from the template to your country configuration repository. **Do not delete `publish-to-dockerhub.yml`**: replace its content with the template's deprecated version, because release branches such as `release/2.1.1` still use it.
+
+#### Measure late registration from the declaration date
+
+Date rules could only compare with today, so a record declared on time became late when a registrar reviewed or corrected it after the deadline. Date rules can now compare with the date of an action on the record, for example `field('child.dob').isAfter().days(365).beforeAction(event.firstAction(ActionType.NOTIFY, ActionType.DECLARE))`. Use `event.firstAction(...)` or `event.lastAction(...)` with one or more action types, and `.beforeAction(...)` or `.afterAction(...)` after `isAfter().days(n)` or `isBefore().days(n)`. Only accepted actions count. Until one exists, the rule compares with today. To get the same behaviour, replace `.inPast()` with `.beforeAction(...)` in your late registration rules. [#14329](https://github.com/opencrvs/opencrvs-core/issues/14329)
+
+### Improvements
+
+- Review auth_mode secret management for OpenCRVS helm chart [#14234](https://github.com/opencrvs/opencrvs-core/issues/14234)
+- Roles no longer need a `label`. Nothing read it: the client names roles with the `event.history.role` message in `client.csv`, keyed by role id. The data seeder no longer rejects a role without a `label`, and ignores one that is still there. Country configurations can delete `label` from each role in `src/api/roles/roles.ts`, and the `userRole.*` rows it pointed to in `countryconfig.csv`. A role id that `event.history.role` does not list is shown as "Unknown". [#13981](https://github.com/opencrvs/opencrvs-core/issues/13981)
+- Refresh workqueues faster after an action on a record: only the searches the action can change are fetched again, instead of every search cached in the session [#14013](https://github.com/opencrvs/opencrvs-core/pull/14013)
+- Open the form page directly when changing a value on the declaration review page, without a confirmation dialog [#13975](https://github.com/opencrvs/opencrvs-core/issues/13975)
+- Show the record audit history latest first, so the most recent actions are at the top of the first page [#12144](https://github.com/opencrvs/opencrvs-core/issues/12144)
+- `environment:init` now checks the container registry username, token and repository against the registry before storing them, instead of leaving a bad value to fail at image-pull time during deployment. If the username/token is rejected, the repository is not found (it may be empty) or the registry cannot be reached, the reason is shown and you choose whether to continue without validation. Existing GitHub secrets cannot be read back, so validation is skipped unless all four values are entered in that run. [#13412](https://github.com/opencrvs/opencrvs-core/issues/13412), [#14209](https://github.com/opencrvs/opencrvs-core/issues/14209)
+- `environment:init` now asks whether to enable monitoring, so environments that do not need their own monitoring stack (for example `qa-hotfix` on a cluster that already hosts `qa`) can switch it off without editing the generated YAML. The answer is stored as the GitHub environment variable `MONITORING_ENABLED` and drives `monitoring.enabled`, `otel.enabled` and Traefik tracing in the generated Helm values, so OpenTelemetry is on exactly when monitoring is. The Kibana credential questions are skipped when monitoring is disabled. Re-run `environment:init` for existing environments to create the variable; it defaults to enabled, which matches the previous behaviour. [#13377](https://github.com/opencrvs/opencrvs-core/issues/13377)
+- `environment:init` now asks about workflow approvals for every environment, not only production, and always stores the GitHub environment variable `APPROVAL_REQUIRED` (default `true` for production, `false` for other environments). `GH_APPROVERS` is asked whenever approvals are enabled. The infrastructure workflows require manual approval unless `APPROVAL_REQUIRED` is `false`, so re-run `environment:init` for existing non-production environments (or set the variable by hand) before updating the infrastructure repository.
+- Upgrade Node.js to 22.23.4, a Node.js security release. This applies to every core image and to CI.
+- Sync locations and administrative areas incrementally. When the client has the lists cached, it asks the server only for the rows written since its last sync, instead of downloading the full lists again. The lists refresh every minute instead of once a day. The `Location` and `AdministrativeArea` responses of `GET /locations` and `GET /administrative-areas` now include `updatedAt`. [#14098](https://github.com/opencrvs/opencrvs-core/issues/14098)
+- Add e2e tests setup: `environment:init` asks whether to enable e2e tests for the environment, and `opencrvs upgrade` adds the sample Playwright tests of the country config template to country configs that have no `e2e/` directory [#13345](https://github.com/opencrvs/opencrvs-core/issues/13345)
+
+### Bug fixes
+
+- The loading screens of the client now show the country logo from `COUNTRY_LOGO` in the application config. Before, they always showed the OpenCRVS logo. The client gets the logo from the `/content/country-logo` endpoint of the country config. [#14180](https://github.com/opencrvs/opencrvs-core/issues/14180)
+- Keep a 24px gutter beside a `Content` card at every width, so the workqueue and other card pages no longer sit flush against the side navigation and the browser window on screens narrower than the card's maximum [#13391](https://github.com/opencrvs/opencrvs-core/issues/13391)
+- Show images from the declaration and from the print form on the certificate preview. Files from `FILE` and `FILE_WITH_OPTIONS` fields reached the certificate as relative paths, so the browser did not find them in its cache and showed a broken image [#14187](https://github.com/opencrvs/opencrvs-core/issues/14187)
+- Store the signature that an administrator attaches when they create a user. Before, the client did not upload the file, and the user was saved with a path to a file that did not exist. Other sessions showed a broken image on the "Edit details" page of the user and on certificates. Now the user editor chooses the id of the new user, uploads the signature to `users/<id>/`, and sends the id to `user.create`. `user.create` accepts an optional `id`, and rejects the request if the signature file does not exist yet. Users that were created with a signature before this fix have no stored file, so an administrator must add their signature again. To find these users: `SELECT id FROM app.users WHERE signature_path LIKE 'users/tmp-%';` [#14350](https://github.com/opencrvs/opencrvs-core/issues/14350)
+
+### Security
+
+- Fixes two security vulnerabilities. Details will be published in security advisories.
+- Removed the unused `POST /upload` endpoint from the documents service, together with the `file-type` library it used. That library had a denial-of-service vulnerability, where a crafted file could stop the service from responding ([CVE-2026-31808](https://nvd.nist.gov/vuln/detail/CVE-2026-31808), Medium). The endpoint has had no consumer since the user-mgnt service was removed, and file uploads go through `POST /files`, so nothing changes in the application. The documents service is not reachable from outside the cluster. Only a country configuration that calls `http://documents:9050/upload` directly is affected, and it should send the file to `POST /files` instead. [#14326](https://github.com/opencrvs/opencrvs-core/pull/14326)
+
 ## 2.1.4
 
 ### Improvements
@@ -12,40 +442,12 @@
 
 ## 2.1.3
 
-### Security
-
-- Fixes two security vulnerabilities. Details will be published in security advisories.
-
-### Breaking changes
-
-- `event.file.getPresignedUrl` is deprecated in favour of `event.files.presign({ eventId })` and `user.files.presign({ userIds })` (users only), which return presigned URLs keyed by the stored path. `getPresignedUrl` takes an `eventId` for files stored outside `events/{eventId}/`.
-- Upload record attachments with `path: events/{eventId}/`.
-- Actions and drafts may only name files stored under their record's `events/{eventId}/`, or files the record already names. Imported records may also name pre-2.0 keys and their author's own signature. Any other file is rejected with `400`.
-- `user.create`, `user.update` and `user.changeAvatar` only accept a signature or avatar stored under the user's own `users/` path.
-
 ### Bug fixes
 
+- The utilities image now includes `minio-client` and GNU `coreutils`. The S3 backup and restore jobs of the dependencies chart installed them with `apk` on every run, which fails without access to a package repository. [#14293](https://github.com/opencrvs/opencrvs-core/pull/14293)
+- Fix monitoring alerts that never fired or were never delivered: "Successful SSH login", backup and restore errors, and service errors. After upgrading, restart the `filebeat` DaemonSet and the `elastalert` Deployment. [#14343](https://github.com/opencrvs/opencrvs-core/pull/14343)
+- Fix ElastAlert notifications being blocked by the default-deny egress network policy. [#14343](https://github.com/opencrvs/opencrvs-core/pull/14343)
 - `npx @opencrvs/toolkit upgrade` removes `COPY typings ./typings` from a v2.0 country config's `Dockerfile`. The Tiltfile it installs no longer sends `typings/` to the image build, so `tilt up` stopped at `[runner 6/6] COPY typings ./typings`. If you already upgraded with 2.1.0, delete that line from your `Dockerfile` [#14050](https://github.com/opencrvs/opencrvs-core/issues/14050)
-- Two submissions of an action on the same record arriving at the same time no longer leave the record failing every later request with `Expected exactly one pending action`. A record now has at most one action request waiting for the country config: a request made meanwhile, including a second declaration or notification, is refused with a conflict error. A request whose confirmation failed completes when it is retried with the same transaction id, for every action, not only declare. The record's declaration and registration details come from the request that was accepted. [#13901](https://github.com/opencrvs/opencrvs-core/issues/13901)
-- Fetching the potential duplicates of a record no longer fails when one of them has been deleted, which can happen on deployments that index undeclared records. The duplicates that still exist are returned. [#13906](https://github.com/opencrvs/opencrvs-core/issues/13906)
-- A deduplication rule that matches on a number field with the value `0`, or on an unticked checkbox, now matches as configured. The clause was treated as having no value and dropped, and inside an `and` that switched off the whole rule. An empty text value still counts as no value. [#13897](https://github.com/opencrvs/opencrvs-core/issues/13897)
-- Saving a declaration no longer fails when a name field has no value, for example the father's name when the informant's relationship hides the father section. The events service returned an error (`Cannot convert undefined or null to object`) and the draft was not saved. [#13896](https://github.com/opencrvs/opencrvs-core/issues/13896)
-- Deduplication no longer logs a warning for every clause whose field is empty on a record, which is expected when a rule offers alternatives such as date of birth or age; those lines are now debug level. When a whole rule resolves to no query, so no duplicate search runs, the events service logs one warning naming the rule, the event and its type. [#13898](https://github.com/opencrvs/opencrvs-core/issues/13898)
-- A database query whose value could not be serialised left its Postgres connection permanently unusable and corrupted the next query sent on any connection, so unrelated requests to the events service failed with `invalid message format` until it restarted. The events service now requires `pg` 8.22.0 or later, which recovers from the failed query. [#13904](https://github.com/opencrvs/opencrvs-core/issues/13904)
-- Clearing a form page with the "Clear" button (`showClearButton`) no longer leaves data behind that keeps the page's section expanded on review pages and the record view. A field with a configured default value is now reset to that default; previously it was overwritten with an empty name, which was stored on the record and could stop the record being indexed for search. [#13459](https://github.com/opencrvs/opencrvs-core/issues/13459)
-
-  **Note:** records saved before this fix keep that value, so they may still be missing from search; this release does not repair them.
-
-- The image crop window now matches the `targetSize` configured on a file field. It was always a circle, so a non-square target stretched the saved image and gave the user no way to frame it accurately. [#12034](https://github.com/opencrvs/opencrvs-core/issues/12034)
-
-  ```ts
-  configuration: {
-    maxImageSize: { targetSize: { width: 350, height: 450 } }
-  }
-  ```
-
-- A print button placed in a custom action's form no longer breaks the page. Opening the action showed an "Oops!" error instead of the form, so configurations that let a user print something — a notification receipt, for example — part-way through a record's life could not be used at all. The button now works wherever it is configured, and custom action forms can read the record they act on, so fields in them can be shown or hidden based on it. [#13056](https://github.com/opencrvs/opencrvs-core/issues/13056)
-- Corrected the default country list, which had not been reviewed since 2017. Implementations maintaining their own `client.csv` should re-run `yarn extract:translations` and add any keys it reports as missing. [#11954](https://github.com/opencrvs/opencrvs-core/issues/11954)
 
 ## 2.1.2
 
@@ -359,6 +761,40 @@ Re-running after a partial failure requires clearing the data first. [#11207](ht
 - Keep the close button aligned in a dialog's header when the dialog's content scrolls, such as the Correction requested entry in a record's audit history. The header could shrink below its own content, dropping the button through the divider [#13659](https://github.com/opencrvs/opencrvs-core/issues/13659)
 - Tie a signature captured on the record review page to the record it belongs to, and delete a record's uploaded files when the record itself is deleted. Files uploaded on review, and files attached but never submitted, were written outside the record's storage prefix and survived its deletion [#13705](https://github.com/opencrvs/opencrvs-core/issues/13705)
 - Keep the Performance page's dashboards working for every user when `ingress.admin_console_allowlist` is set. The allowlist covered the whole Metabase host, so users outside it got a `403` inside the page. The public dashboard paths now follow `ingress.application_allowlist`, and only the Metabase admin console stays behind `admin_console_allowlist` [#13927](https://github.com/opencrvs/opencrvs-core/issues/13927)
+
+## 2.0.4
+
+### Security
+
+- Removed the unused `user.actions` endpoint from the events service. It was authorised only by a user-management permission, yet returned the full record declarations of every action the target user had taken, so administrators and other roles holding `user.read` could read records they had no permission to open. The endpoint has had no consumer since the v1 gateway bridge was removed, so removing it changes nothing in the application. [GHSA-hmgw-v78r-jjc4](https://github.com/opencrvs/opencrvs-core/security/advisories/GHSA-hmgw-v78r-jjc4) (High)
+- The events service no longer writes users' email addresses and phone numbers to the logs in full. When a user was created or updated with an email or phone number already in use, the value was logged verbatim; it is now masked. [GHSA-55j9-g2xv-4qrw](https://github.com/opencrvs/opencrvs-core/security/advisories/GHSA-55j9-g2xv-4qrw) (Low)
+
+  **Deployment notes:**
+
+  - Existing log stores may still hold unmasked emails and phone numbers from before the upgrade. Scrub them according to your retention policy.
+
+### Bug fixes
+
+- MinIO removed its images from quay.io and Docker Hub, so the MinIO server and client images could no longer be pulled. They now come from OpenCRVS-hosted copies: `ghcr.io/opencrvs/minio:release.2025-06-13t11-33-47z` for the server and `ghcr.io/opencrvs/minio-mc:release.2025-05-21t01-59-54z` for the client used by the data cleanup job. [#13893](https://github.com/opencrvs/opencrvs-core/pull/13893)
+
+  **Deployment notes:**
+
+  - If you pull images through a private registry, mirror the two new images there before upgrading.
+
+## 2.0.3
+
+### Bug fixes
+
+- The image crop window now matches the `targetSize` configured on a file field. It was always a circle, so a non-square target stretched the saved image and gave the user no way to frame it accurately. [#12034](https://github.com/opencrvs/opencrvs-core/issues/12034)
+
+  ```ts
+  configuration: {
+    maxImageSize: { targetSize: { width: 350, height: 450 } }
+  }
+  ```
+
+- A print button placed in a custom action's form no longer breaks the page. Opening the action showed an "Oops!" error instead of the form, so configurations that let a user print something — a notification receipt, for example — part-way through a record's life could not be used at all. The button now works wherever it is configured, and custom action forms can read the record they act on, so fields in them can be shown or hidden based on it. [#13056](https://github.com/opencrvs/opencrvs-core/issues/13056)
+- Corrected the default country list, which had not been reviewed since 2017. Implementations maintaining their own `client.csv` should re-run `yarn extract:translations` and add any keys it reports as missing. [#11954](https://github.com/opencrvs/opencrvs-core/issues/11954)
 
 ## 2.0.2
 

@@ -26,6 +26,9 @@ const uuidOrEmpty = makeValidator<string>((value) =>
   value === '' ? value : z.uuid().parse(value)
 )
 
+/** A UUID. Checked as strictly as `uuidOrEmpty`. */
+const uuid = makeValidator<string>((value) => z.uuid().parse(value))
+
 export const env = cleanEnv(process.env, {
   DOMAIN: str({ devDefault: '*' }),
   GATEWAY_URL: url({ devDefault: 'http://localhost:7070' }),
@@ -60,6 +63,14 @@ export const env = cleanEnv(process.env, {
     devDefault: '23953953-51aa-42ca-b443-2426a7d21c61',
     desc: "OpenCRVS system client ID to seed for the MOSIP integration on startup. Must be a UUID and match the mosip-api's OPENCRVS_CLIENT_ID. Leave empty to have events generate credentials instead (NSA reveals them via the Integrations page)."
   }),
+  COUNTRY_CONFIG_CLIENT_ID: uuid({
+    devDefault: '3c726498-2b2f-47ae-8e53-f6e406a0de13',
+    desc: "OpenCRVS system client ID that country config calls core with, e.g. to read locations after an action confirmation. Core's requests to country config carry no token."
+  }),
+  COUNTRY_CONFIG_CLIENT_SECRET: str({
+    devDefault: '0fe62f63-657a-40fb-a406-cec6657dc0cc',
+    desc: 'OpenCRVS system client secret for COUNTRY_CONFIG_CLIENT_ID.'
+  }),
   MOSIP_INTEGRATION_CLIENT_SECRET: str({
     default: '',
     devDefault: '7ce63d9f-5014-4f68-a0e3-8f681d23d508',
@@ -69,16 +80,6 @@ export const env = cleanEnv(process.env, {
     default: '',
     devDefault: '',
     desc: 'Comma separated list of URLs to forward action events to'
-  }),
-  SYSTEM_CLIENT_ID: str({
-    default: undefined,
-    devDefault: undefined,
-    desc: 'Client ID for system-to-system authentication on /api/ proxy endpoints'
-  }),
-  SYSTEM_CLIENT_SECRET: str({
-    default: undefined,
-    devDefault: undefined,
-    desc: 'Client secret for system-to-system authentication on /api/ proxy endpoints'
   }),
   VERIFIABLE_CREDENTIALS_SDJWT_ISSUE_URL: url({
     default: 'http://countryconfig:3040/_demo-issuer/openid4vc/sdjwt/issue',
@@ -91,6 +92,7 @@ export const env = cleanEnv(process.env, {
     desc: 'URL for signing raw JWTs for verifiable credentials issuance'
   }),
   REFERENCE_DATA_DATABASE_URL: url({
+    default: undefined,
     devDefault:
       'postgres://events_reference_data:reference_data_password@localhost:5432/events',
     desc: 'The database URL for reads and writes to `reference_data.icd10`. See `/infrastructure/postgres/setup-reference-data.sh` for how the default database is set up for your country.'

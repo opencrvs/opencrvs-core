@@ -20,11 +20,16 @@ import {
   EventConfig,
   FieldType,
   generateEventDocument,
-  UUID
+  UUID,
+  withDeclaration,
+  getDeclaration,
+  getDeclarationPages,
+  toVersionedEventConfig
 } from '@opencrvs/commons/client'
 import { localDraftStore } from '@client/v2-events/features/drafts/useDrafts'
 import { ROUTES, routesConfig } from '@client/v2-events/routes'
 import { AppRouter } from '@client/v2-events/trpc'
+import { locationListHandlers } from '../../../../../../.storybook/default-request-handlers'
 import { useActionAnnotation } from '../../useActionAnnotation'
 import { useEventFormData } from '../../useEventFormData'
 import { Pages } from './index'
@@ -54,6 +59,7 @@ const tRPCMsw = createTRPCMsw<AppRouter>({
  */
 const INACTIVATED_AREA: AdministrativeArea = {
   id: 'f6f6f6f6-1111-4111-8111-111111111111' as UUID,
+  updatedAt: '2024-01-01T00:00:00.000Z',
   name: 'Mercy District',
   externalId: null,
   parentId: null,
@@ -85,12 +91,14 @@ const INACTIVATED_AREA: AdministrativeArea = {
 function buildEventConfig(
   adminAreaConfiguration: Record<string, boolean>
 ): EventConfig {
-  return {
-    ...ChildOnboardingEvent,
-    dateOfEvent: { $$field: 'child.dob', $$subfield: [] },
-    declaration: {
-      ...ChildOnboardingEvent.declaration,
-      pages: ChildOnboardingEvent.declaration.pages.map((page) =>
+  return withDeclaration(
+    {
+      ...ChildOnboardingEvent,
+      dateOfEvent: { $$field: 'child.dob', $$subfield: [] }
+    },
+    {
+      ...getDeclaration(ChildOnboardingEvent),
+      pages: getDeclarationPages(ChildOnboardingEvent).map((page) =>
         page.id === 'child'
           ? {
               ...page,
@@ -116,7 +124,7 @@ function buildEventConfig(
           : page
       )
     }
-  }
+  )
 }
 
 function buildStoryParams(eventConfig: EventConfig) {
@@ -127,14 +135,20 @@ function buildStoryParams(eventConfig: EventConfig) {
 
   const mswConfig = {
     handlers: {
-      events: [tRPCMsw.event.config.get.query(() => [eventConfig])],
+      events: [
+        tRPCMsw.event.config.get.query(() => [
+          toVersionedEventConfig(eventConfig)
+        ])
+      ],
       event: [
         tRPCMsw.event.get.query(() => freshDraftEvent),
         tRPCMsw.event.search.query(() => ({ results: [], total: 0 }))
       ],
       eventLocations: [
-        tRPCMsw.locations.list.query(() => []),
-        tRPCMsw.administrativeAreas.list.query(() => [INACTIVATED_AREA])
+        ...locationListHandlers({
+          locations: [],
+          administrativeAreas: [INACTIVATED_AREA]
+        })
       ]
     }
   }

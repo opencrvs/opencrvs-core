@@ -22,7 +22,10 @@ import {
   tennisClubMembershipEvent,
   TestUserRole,
   UUID,
-  user
+  user,
+  toVersionedEventConfig,
+  versionedTennisClubMembershipEvent,
+  versionedFootballClubMembershipEvent
 } from '@opencrvs/commons/client'
 import * as selectEvent from '@client/v2-events/select-event'
 import { testDataGenerator } from '@client/tests/test-data-generators'
@@ -98,9 +101,9 @@ const mswConfig = {
     events: [
       tRPCMsw.event.config.get.query(() => {
         return [
-          childOnboardingWithHealthFacilitySearch,
-          tennisClubMembershipEvent,
-          footballClubMembershipEvent
+          toVersionedEventConfig(childOnboardingWithHealthFacilitySearch),
+          versionedTennisClubMembershipEvent,
+          versionedFootballClubMembershipEvent
         ]
       })
     ],

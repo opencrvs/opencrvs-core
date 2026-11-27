@@ -15,7 +15,7 @@ import {
   isActionInScope,
   RECORD_WRITE_SCOPES
 } from './scopes'
-import { encodeScope, UserScopeV2 } from '../scopes'
+import { encodeScope, UserScopeV2 } from '../users/scopes'
 import { ActionType } from './ActionType'
 import {
   EventIndexWithAdministrativeHierarchy,
@@ -172,6 +172,36 @@ describe('isActionInScope()', () => {
           currentUser: testUser
         })
       ).toBe(false)
+    })
+
+    it('should keep revoke and reinstate registration as separate scopes', () => {
+      const revokeScope = encodeScope({ type: 'record.revoke-registration' })
+      const reinstateScope = encodeScope({
+        type: 'record.reinstate-registration'
+      })
+      const event = makeEvent('tennis-club-membership')
+
+      const allowed = (
+        scope: ReturnType<typeof encodeScope>,
+        action: ActionType
+      ) =>
+        isActionInScope({
+          scopes: [scope],
+          action,
+          event,
+          currentUser: testUser
+        })
+
+      expect(allowed(revokeScope, ActionType.REVOKE_REGISTRATION)).toBe(true)
+      expect(allowed(revokeScope, ActionType.REINSTATE_REGISTRATION)).toBe(
+        false
+      )
+      expect(allowed(reinstateScope, ActionType.REINSTATE_REGISTRATION)).toBe(
+        true
+      )
+      expect(allowed(reinstateScope, ActionType.REVOKE_REGISTRATION)).toBe(
+        false
+      )
     })
   })
 

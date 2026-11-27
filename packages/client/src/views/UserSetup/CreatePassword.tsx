@@ -11,7 +11,7 @@
 import * as React from 'react'
 import { useIntl } from 'react-intl'
 import styled from 'styled-components'
-import { TickOff, TickOn } from '@opencrvs/components/lib/icons'
+import { TickOff, TickOn } from '@opencrvs/components/icons'
 import {
   Button,
   WarningMessage,

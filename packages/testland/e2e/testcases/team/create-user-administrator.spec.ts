@@ -131,10 +131,17 @@ test('1. Create and update user -1', async ({ page, browser }) => {
       await continueForm(page)
 
       await page.getByRole('button', { name: 'Confirm' }).click()
+
+      const userResponse = page.waitForResponse(
+        (res) => res.url().includes('user.update') && res.ok()
+      )
+
       await page
         .getByRole('dialog')
         .getByRole('button', { name: 'Confirm' })
         .click()
+
+      await userResponse
 
       await expect(page.getByText('Farajaland CRS')).toBeVisible()
     })

@@ -18,7 +18,7 @@ export const LOGIN_URL =
 export const AUTH_URL =
   process.env.NODE_ENV === 'development'
     ? 'http://localhost:4040'
-    : SCHEME + '://gateway.' + DOMAIN + '/auth'
+    : SCHEME + '://login.' + DOMAIN + '/api/auth'
 
 export const CLIENT_URL =
   process.env.NODE_ENV === 'development'
@@ -28,7 +28,7 @@ export const CLIENT_URL =
 export const GATEWAY_HOST =
   process.env.NODE_ENV === 'development'
     ? 'http://localhost:7070'
-    : SCHEME + '://gateway.' + DOMAIN
+    : SCHEME + '://register.' + DOMAIN + '/api'
 
 export const METABASE_URL =
   process.env.NODE_ENV === 'development'
@@ -67,5 +67,6 @@ export const CREDENTIALS = {
   LOCAL_SYSTEM_ADMIN: 'e.mayuka',
   PERFORMANCE_MANAGER: 'm.musonda',
   PROVINCIAL_REGISTRAR: 'm.owen',
-  EMBASSY_OFFICIAL: 't.mwila'
+  EMBASSY_OFFICIAL: 't.mwila',
+  FIELD_AGENT: 'a.nala'
 } as const

@@ -11,7 +11,12 @@
 import { http, HttpResponse, PathParams } from 'msw'
 import { setupServer } from 'msw/node'
 import { tennisClubMembershipEvent } from '@opencrvs/commons/fixtures'
-import { ActionType, ConditionalType, field } from '@opencrvs/commons'
+import {
+  ActionType,
+  ConditionalType,
+  field,
+  toVersionedEventConfig
+} from '@opencrvs/commons'
 import { env } from '@events/environment'
 
 export const tennisClubMembershipEventWithCustomAction = {
@@ -96,11 +101,11 @@ const handlers = [
   ),
   http.get(`${env.COUNTRY_CONFIG_URL}/config/events`, () => {
     return HttpResponse.json([
-      tennisClubMembershipEventWithCustomAction,
-      {
+      toVersionedEventConfig(tennisClubMembershipEventWithCustomAction),
+      toVersionedEventConfig({
         ...tennisClubMembershipEventWithCustomAction,
         id: 'tennis-club-membership_premium'
-      }
+      })
     ])
   }),
   // event.delete.test.ts
@@ -134,10 +139,6 @@ const handlers = [
   ),
   http.post(`${env.COUNTRY_CONFIG_URL}/trigger/telemetry`, () =>
     HttpResponse.json({ status: 'forwarded' }, { status: 202 })
-  ),
-  // Core sends its internal service token to the country config when requesting action confirmation
-  http.get(`${env.AUTH_URL}/internal/service-token`, () =>
-    HttpResponse.json({ token: 'service-token' })
   )
 ]
 

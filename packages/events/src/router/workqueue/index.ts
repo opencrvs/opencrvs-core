@@ -17,7 +17,7 @@ import {
 } from '@opencrvs/commons'
 import { router, userOnlyProcedure } from '@events/router/trpc'
 import {
-  getInMemoryEventConfigurations,
+  getInMemoryEventConfigurationsInLookupOrder,
   getInMemoryWorkqueueConfigurations
 } from '@events/service/config/config'
 import { getEventCount } from '@events/service/indexing/indexing'
@@ -28,8 +28,8 @@ export const workqueueRouter = router({
     list: userOnlyProcedure
       .input(z.void())
       .output(z.array(WorkqueueConfig))
-      .query(async (options) => {
-        return getInMemoryWorkqueueConfigurations(options.ctx.token)
+      .query(async () => {
+        return getInMemoryWorkqueueConfigurations()
       })
   }),
   count: userOnlyProcedure
@@ -41,7 +41,7 @@ export const workqueueRouter = router({
       return getEventCount({
         queries: input,
         user: ctx.user,
-        eventConfigs: await getInMemoryEventConfigurations(ctx.token),
+        eventConfigs: await getInMemoryEventConfigurationsInLookupOrder(),
         acceptedScopes: ctx.acceptedScopes
       })
     })

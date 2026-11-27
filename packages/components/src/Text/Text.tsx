@@ -10,8 +10,7 @@
  */
 
 import React from 'react'
-import { fonts, IFont } from '../fonts'
-import { colors, IColor } from '../colors'
+import { fonts, IFont, colors, IColor } from '../tokens'
 import styled from 'styled-components'
 import type { Property } from 'csstype'
 

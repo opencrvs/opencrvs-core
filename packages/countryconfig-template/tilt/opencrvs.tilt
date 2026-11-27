@@ -21,7 +21,6 @@ def setup_opencrvs(
     countryconfig_image_name="opencrvs/ocrvs-countryconfig",
     dependencies_namespace='opencrvs-deps-dev',
     opencrvs_namespace='opencrvs-dev',
-    security_enabled=False,
     monitoring_enabled=False,
     opencrvs_chart_repo='.'
 ):
@@ -30,11 +29,10 @@ def setup_opencrvs(
 
     Args:
         core_images_tag: OpenCRVS core images tag to use for deployment
-        countryconfig_image_name: Countryconfig image repository (e.g. your DockerHub repository or Farajaland demo repository)
+        countryconfig_image_name: Countryconfig image repository (e.g. your container registry repository or Farajaland demo repository)
         countryconfig_image_tag: Countryconfig image tag to use for deployment
-        dependencies_namespace: Kubernetes namespace for dependencies (e.g. MongoDB, MinIO, Elasticsearch)
+        dependencies_namespace: Kubernetes namespace for dependencies (e.g. MongoDB, RustFS, Elasticsearch)
         opencrvs_namespace: Kubernetes namespace for OpenCRVS services
-        security_enabled: If true, OpenCRVS and dependencies will be deployed in secure mode with authentication enabled. If false, OpenCRVS and dependencies will be deployed in non-secure mode with default passwords and no authentication.
         monitoring_enabled: If true, monitoring components like Kibana will be deployed together with dependencies
         opencrvs_chart_repo: Path to OpenCRVS charts directory (relative)
     """
@@ -43,18 +41,17 @@ def setup_opencrvs(
     namespace_create(dependencies_namespace)
     namespace_create(opencrvs_namespace)
 
-    # Select configuration files
-    if security_enabled:
-        print("🔑 Deploying OpenCRVS and Dependencies in secure mode")
-        deps_configuration_file = './tilt/examples/dependencies/values-secure.yaml'
-        opencrvs_configuration_file = './tilt/examples/opencrvs-services/values-secure.yaml'
-    else:
-        print("""🔑 Deploying OpenCRVS and Dependencies in non-secure mode
-        - Minio admin user/password: minioadmin/minioadmin
-        - Postgres admin user/password: postgres/postgres
-        - Authentication for Redis, MongoDB and Elasticsearch is disabled""")
-        deps_configuration_file = './tilt/examples/dependencies/values.yaml'
-        opencrvs_configuration_file = './tilt/examples/opencrvs-services/values.yaml'
+    print("""
+    *********************************************************************
+    🔑 OpenCRVS credentials for local deployment:
+    - RustFS admin user/password: rustfsadmin/rustfsadmin
+    - Postgres admin user/password: postgres/postgres
+    - Redis user/password: auth/auth, gateway/gateway
+    - Elasticsearch admin user/password: elastic/elasticadmin
+    *********************************************************************
+    """)
+    deps_configuration_file = './tilt/examples/dependencies/values.yaml'
+    opencrvs_configuration_file = './tilt/examples/opencrvs-services/values.yaml'
 
     # Country specific overrides, layered on top of the examples above.
     # tilt/examples/ is replaced on every upgrade, tilt/helm/ is left alone.
@@ -66,7 +63,7 @@ def setup_opencrvs(
         opencrvs_values.append('./tilt/helm/opencrvs-services/values.yaml')
 
     # Deploy dependencies
-    print("🚀 Deploying dependencies: mongo, minio, elasticsearch...")
+    print("🚀 Deploying dependencies: mongo, rustfs, elasticsearch...")
     dependencies_chart_path = '{}/charts/dependencies'.format(opencrvs_chart_repo)
     k8s_yaml(helm(dependencies_chart_path,
         namespace=dependencies_namespace,
@@ -132,5 +129,5 @@ def setup_opencrvs(
         opencrvs_chart_path
     )
 
-    if security_enabled:
-        copy_secrets(dependencies_namespace, opencrvs_namespace)
+
+    copy_secrets(dependencies_namespace, opencrvs_namespace)

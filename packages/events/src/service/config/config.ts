@@ -9,18 +9,36 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
+import { pick } from 'lodash'
 import fetch from 'node-fetch'
 import { array } from 'zod'
 import {
   ApplicationConfig,
-  EventConfig,
-  getOrThrow,
+  CertificateConfig,
+  EventDocument,
+  getAcceptedScopesFromToken,
+  getEventConfigById,
+  getEventConfigForRecord,
+  getEventConfigsInLookupOrder,
   logger,
+  resolveEventConfigInTimeZone,
   Role,
+  toPlainDateInTimeZone,
   TokenWithBearer,
+  validateRoles,
+  VersionedEventConfig,
   WorkqueueConfig
 } from '@opencrvs/commons'
+import { withCoreSignature } from '@opencrvs/commons/request-signing'
 import { env } from '@events/environment'
+import { getCoreSigningKey } from '@events/request-signing'
+
+/** Reads a configuration endpoint of country config, signed as core. */
+async function fetchConfig(path: string) {
+  const url = new URL(path, env.COUNTRY_CONFIG_URL)
+  return fetch(url, withCoreSignature(getCoreSigningKey(), url))
+}
+
 /**
  * Configuration is served from countryconfig, which can be deployed
  * independently of the events service (e.g. a Kubernetes rollout that updates
@@ -29,18 +47,15 @@ import { env } from '@events/environment'
  * while bounding how stale it can be to `EVENT_CONFIG_CACHE_TTL_MS` — no events
  * restart is required to pick up a config change.
  */
-function createTtlConfigCache<T>(
-  label: string,
-  fetcher: (token: TokenWithBearer) => Promise<T>
-) {
+function createTtlConfigCache<T>(label: string, fetcher: () => Promise<T>) {
   let value: T | null = null
   let fetchedAt = 0
   let inFlight: Promise<T> | null = null
 
-  return async function getCached(token: TokenWithBearer): Promise<T> {
+  return async function getCached(): Promise<T> {
     // In development always fetch, so config changes are picked up immediately.
     if (!env.isProduction) {
-      return fetcher(token)
+      return fetcher()
     }
 
     if (
@@ -54,7 +69,7 @@ function createTtlConfigCache<T>(
     // stampede countryconfig from the many call sites.
     if (!inFlight) {
       logger.info(`Refetching ${label} from countryconfig`)
-      inFlight = fetcher(token)
+      inFlight = fetcher()
         .then((fetched) => {
           value = fetched
           fetchedAt = Date.now()
@@ -83,13 +98,8 @@ function createTtlConfigCache<T>(
   }
 }
 
-async function getEventConfigurations(token: TokenWithBearer) {
-  const res = await fetch(new URL('/config/events', env.COUNTRY_CONFIG_URL), {
-    headers: {
-      'Content-Type': 'application/json',
-      Authorization: token
-    }
-  })
+async function getEventConfigurations() {
+  const res = await fetchConfig('/config/events')
 
   if (!res.ok) {
     throw new Error(
@@ -97,55 +107,128 @@ async function getEventConfigurations(token: TokenWithBearer) {
     )
   }
 
-  return array(EventConfig).parse(await res.json())
+  return array(VersionedEventConfig).parse(await res.json())
 }
 
 /**
- * @returns event configurations, cached in production for up to
+ * @returns event configurations with every version, cached in production for up to
  * `EVENT_CONFIG_CACHE_TTL_MS` (always fresh in development).
  */
-export const getInMemoryEventConfigurations = createTtlConfigCache(
+export const getInMemoryVersionedEventConfigurations = createTtlConfigCache(
   'event configurations',
   getEventConfigurations
 )
 
-async function findEventConfigurationById({
-  eventType,
-  token
-}: {
-  eventType: string
-  token: TokenWithBearer
-}) {
-  const configurations = await getInMemoryEventConfigurations(token)
-  return configurations.find((config) => config.id === eventType)
+async function fetchApplicationConfig(): Promise<unknown> {
+  const res = await fetchConfig('/config/application')
+
+  if (!res.ok) {
+    throw new Error(`Failed to fetch application config: ${res.status}`)
+  }
+
+  return res.json()
 }
 
-export async function getEventConfigurationById({
-  eventType,
-  token
-}: {
-  eventType: string
-  token: TokenWithBearer
-}) {
-  return getOrThrow(
-    await findEventConfigurationById({
-      eventType,
-      token
-    }),
-    `No configuration found for event type: ${eventType}`
+/**
+ * @returns application configuration, cached in production for up to
+ * `EVENT_CONFIG_CACHE_TTL_MS` (always fresh in development). It keeps the
+ * fields that core does not know, because a country config may add some for
+ * its own client code.
+ */
+const getInMemoryApplicationConfig = createTtlConfigCache(
+  'application configuration',
+  async () => ApplicationConfig.loose().parse(await fetchApplicationConfig())
+)
+
+/** @returns the application configuration for signed-in users and systems. */
+export async function getClientApplicationConfig() {
+  return getInMemoryApplicationConfig()
+}
+
+/** The application configuration fields the login page shows before sign-in. */
+const PUBLIC_APPLICATION_CONFIG_FIELDS = [
+  'APPLICATION_NAME',
+  'COUNTRY_LOGO',
+  'PHONE_NUMBER_PATTERN',
+  'USER_NOTIFICATION_DELIVERY_METHOD',
+  'INFORMANT_NOTIFICATION_DELIVERY_METHOD'
+] as const
+
+/** @returns only the application configuration fields that anyone may read. */
+export async function getPublicApplicationConfig() {
+  return pick(
+    await getInMemoryApplicationConfig(),
+    PUBLIC_APPLICATION_CONFIG_FIELDS
   )
 }
 
-async function getWorkqueueConfigurations(token: TokenWithBearer) {
-  const res = await fetch(
-    new URL('/config/workqueues', env.COUNTRY_CONFIG_URL),
-    {
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${token}`
-      }
-    }
+/** @returns the country's time zone (IANA), in which configuration versions take effect. */
+export async function getCountryTimeZone() {
+  return (await getInMemoryApplicationConfig()).SYSTEM_IANA_TIMEZONE
+}
+
+/** @returns today's date in the country's time zone. */
+export async function getCountryToday() {
+  return toPlainDateInTimeZone(new Date(), await getCountryTimeZone())
+}
+
+/**
+ * @returns the configuration of each event, at the version in effect today in the
+ * country's time zone. For a record, use `getEventConfigurationForRecord` instead.
+ */
+export async function getInMemoryEventConfigurations() {
+  const [configurations, timeZone] = await Promise.all([
+    getInMemoryVersionedEventConfigurations(),
+    getCountryTimeZone()
+  ])
+  return configurations.map((config) =>
+    resolveEventConfigInTimeZone(config, timeZone)
   )
+}
+
+/**
+ * @returns the configuration of every version of every event. The versions of each event
+ * are in the order to look up a field in, so the first match is the newest version in effect.
+ */
+export async function getInMemoryEventConfigurationsInLookupOrder() {
+  const [configurations, timeZone] = await Promise.all([
+    getInMemoryVersionedEventConfigurations(),
+    getCountryTimeZone()
+  ])
+  const today = toPlainDateInTimeZone(new Date(), timeZone)
+  return configurations.flatMap((config) =>
+    getEventConfigsInLookupOrder(config, today)
+  )
+}
+
+export async function getVersionedEventConfigurationById({
+  eventType
+}: {
+  eventType: string
+}) {
+  return getEventConfigById(
+    await getInMemoryVersionedEventConfigurations(),
+    eventType
+  )
+}
+
+/**
+ * @returns the configuration of the version `event` is stamped with: every action on
+ * a record uses the version it was created under.
+ */
+export async function getEventConfigurationForRecord({
+  event
+}: {
+  event: Pick<EventDocument, 'type' | 'configVersionId'>
+}) {
+  return getEventConfigForRecord(
+    await getVersionedEventConfigurationById({ eventType: event.type }),
+    event
+  )
+}
+
+async function getWorkqueueConfigurations() {
+  const res = await fetchConfig('/config/workqueues')
 
   if (!res.ok) {
     throw new Error('Failed to fetch workqueue config')
@@ -163,29 +246,63 @@ export const getInMemoryWorkqueueConfigurations = createTtlConfigCache(
   getWorkqueueConfigurations
 )
 
-export async function getRoles() {
-  const res = await fetch(new URL('/config/roles', env.COUNTRY_CONFIG_URL), {
-    headers: {
-      'Content-Type': 'application/json'
-    }
-  })
+async function getRoles() {
+  const res = await fetchConfig('/config/roles')
 
   if (!res.ok) {
     throw new Error('Failed to fetch roles config')
   }
 
-  return array(Role).parse(await res.json())
+  const eventConfigurations = await getInMemoryVersionedEventConfigurations()
+  const roles = array(Role).parse(await res.json())
+
+  validateRoles(roles, eventConfigurations)
+
+  return roles
 }
 
-export async function getApplicationConfig() {
-  const res = await fetch(
-    new URL('/config/application', env.COUNTRY_CONFIG_URL),
-    { headers: { 'Content-Type': 'application/json' } }
-  )
+export const getInMemoryRoles = createTtlConfigCache('roles', getRoles)
+
+async function getCertificateConfigurations() {
+  const res = await fetchConfig('/certificates')
 
   if (!res.ok) {
-    throw new Error(`Failed to fetch application config: ${res.status}`)
+    throw new Error(`Failed to fetch certificates config: ${res.status}`)
   }
 
-  return ApplicationConfig.parse(await res.json())
+  return array(CertificateConfig.loose()).parse(await res.json())
+}
+
+/**
+ * @returns certificate configurations, cached in production for up to
+ * `EVENT_CONFIG_CACHE_TTL_MS` (always fresh in development).
+ */
+const getInMemoryCertificateConfigurations = createTtlConfigCache(
+  'certificate configurations',
+  getCertificateConfigurations
+)
+
+/**
+ * @returns the certificate configurations that the token may print. A print
+ * scope without template options allows all templates.
+ */
+export async function getPrintableCertificateConfigurations(
+  token: TokenWithBearer
+) {
+  const printScopes = getAcceptedScopesFromToken(token, [
+    'record.print-certified-copies'
+  ])
+  if (printScopes.length === 0) {
+    return []
+  }
+
+  const certificates = await getInMemoryCertificateConfigurations()
+  if (printScopes.some((scope) => !scope.options?.templates?.length)) {
+    return certificates
+  }
+
+  const allowed = new Set(
+    printScopes.flatMap((scope) => scope.options?.templates ?? [])
+  )
+  return certificates.filter(({ id }) => allowed.has(id))
 }

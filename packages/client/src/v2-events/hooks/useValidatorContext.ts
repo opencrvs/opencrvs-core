@@ -11,15 +11,19 @@
 
 import { useMemo } from 'react'
 import {
+  ActionFormConditionalContext,
+  ActionUpdate,
   EventConfig,
   EventDocument,
+  EventIndex,
   EventValidatorContext,
+  FormValues,
   getEventValidatorContext,
   getOrThrow,
   ValidatorContext
 } from '@opencrvs/commons/client'
 import { useAuthentication } from '../../utils/userUtils'
-import { useEventConfigurations } from '../features/events/useEventConfiguration'
+import { useEventConfigurationResolver } from '../features/events/useEventConfiguration'
 import { useSuspenseGetLeafAdministrativeAreaIds } from './useAdministrativeAreas'
 
 /**
@@ -36,11 +40,15 @@ function useUser() {
   )
 }
 
+/**
+ * @param findEventConfiguration gives the configuration of the version `event` was
+ * created under.
+ */
 export function resolveEventValidatorContext(
-  configs: EventConfig[],
+  findEventConfiguration: (record: EventDocument) => EventConfig | undefined,
   event?: EventDocument
 ): EventValidatorContext | undefined {
-  const eventConfig = configs.find((c) => c.id === event?.type)
+  const eventConfig = event && findEventConfiguration(event)
 
   if (!event || !eventConfig) {
     return undefined
@@ -49,19 +57,55 @@ export function resolveEventValidatorContext(
   return getEventValidatorContext(event, eventConfig)
 }
 
+/**
+ * TODO: Pass `FormValues` and `ActionFormConditionalContext` through the components, and remove these two functions. https://github.com/opencrvs/opencrvs-core/issues/14485
+ */
+export function toFormValues(
+  values: ActionUpdate,
+  context: ValidatorContext
+): FormValues {
+  // `baseFormState` holds values that the conditionals read in addition to the form values.
+  // We are deprecating baseFormState in favor of typed contexts.
+  return context.baseFormState === undefined
+    ? { declaration: values }
+    : { declaration: context.baseFormState, annotation: values }
+}
+
+/**
+ * TODO: Some forms have no event, e.g. the user form. Remove the cast when we have client specific context for forms without an event. https://github.com/opencrvs/opencrvs-core/issues/14485
+ */
+export function getFormConditionalContext(
+  context: ValidatorContext,
+  eventIndex?: Pick<EventIndex, 'flags' | 'status' | 'declaration'>
+): ActionFormConditionalContext {
+  const conditionalContext = {
+    eventDocument: context.event?.document,
+    eventIndex: eventIndex ??
+      context.event?.state ?? {
+        flags: [],
+        status: undefined,
+        declaration: {}
+      },
+    user: context.user,
+    leafAdminStructureLocationIds: context.leafAdminStructureLocationIds ?? []
+  }
+  /** TODO: Remove casting */
+  return conditionalContext as unknown as ActionFormConditionalContext
+}
+
 export function useValidatorContext(event?: EventDocument): ValidatorContext {
   const leafAdminStructureLocationIds =
     useSuspenseGetLeafAdministrativeAreaIds()
   const user = useUser()
-  const configs = useEventConfigurations()
+  const findEventConfiguration = useEventConfigurationResolver()
 
   /**
    * Aggregating the action history is expensive and conditionals are evaluated
    * per field, per conditional type — so compute it once per (event, config).
    */
   const eventContext = useMemo(
-    () => resolveEventValidatorContext(configs, event),
-    [event, configs]
+    () => resolveEventValidatorContext(findEventConfiguration, event),
+    [event, findEventConfiguration]
   )
 
   return {

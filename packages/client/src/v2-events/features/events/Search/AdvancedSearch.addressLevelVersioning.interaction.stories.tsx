@@ -30,7 +30,14 @@ import {
   UUID,
   user,
   V2_DEFAULT_MOCK_ADMINISTRATIVE_AREAS,
-  V2_DEFAULT_MOCK_LOCATIONS
+  V2_DEFAULT_MOCK_LOCATIONS,
+  withDeclaration,
+  getDeclaration,
+  getDeclarationPages,
+  DeclarationFormConfig,
+  toVersionedEventConfig,
+  versionedTennisClubMembershipEvent,
+  versionedFootballClubMembershipEvent
 } from '@opencrvs/commons/client'
 import { toNamedVersions } from '@client/v2-events/VersionedLocation'
 import * as selectEvent from '@client/v2-events/select-event'
@@ -38,6 +45,7 @@ import { serializeSearchParams } from '@client/v2-events/features/events/Search/
 import { testDataGenerator } from '@client/tests/test-data-generators'
 import { TRPCProvider, AppRouter } from '@client/v2-events/trpc'
 import { ROUTES, routesConfig } from '@client/v2-events/routes'
+import { locationListHandlers } from '../../../../../.storybook/default-request-handlers'
 import { AdvancedSearch } from './index'
 
 const meta: Meta<typeof AdvancedSearch> = {
@@ -79,6 +87,7 @@ function renamedArea(
 
   return {
     id,
+    updatedAt: '2024-01-01T00:00:00.000Z',
     name: names[names.length - 1],
     externalId: null,
     parentId,
@@ -159,8 +168,8 @@ const STREET_FIELDS = STREET_IDS.map((id) => ({
 
 /** ChildOnboardingEvent, with street fields added to the searched address. */
 const childOnboardingDeclarationWithStreet = {
-  ...ChildOnboardingEvent.declaration,
-  pages: ChildOnboardingEvent.declaration.pages.map((page) => ({
+  ...getDeclaration(ChildOnboardingEvent),
+  pages: getDeclarationPages(ChildOnboardingEvent).map((page) => ({
     ...page,
     fields: page.fields.map((pageField) =>
       pageField.id === 'child.birthLocation.privateHome' &&
@@ -175,29 +184,31 @@ const childOnboardingDeclarationWithStreet = {
         : pageField
     )
   }))
-} as EventConfig['declaration']
+} satisfies DeclarationFormConfig
 
-const childOnboardingWithAddressSearch: EventConfig = {
-  ...ChildOnboardingEvent,
-  declaration: childOnboardingDeclarationWithStreet,
-  advancedSearch: [
-    {
-      title: {
-        defaultMessage: 'Event details',
-        description: 'Event details accordion title',
-        id: 'advancedSearch.form.eventDetails'
-      },
-      fields: [
-        field('child.placeOfBirth').exact(),
-        field('child.birthLocation.privateHome', {
-          allowedLocations: user.jurisdiction(
-            user.scope('record.search').attribute('placeOfEvent')
-          )
-        }).exact()
-      ]
-    }
-  ]
-}
+const childOnboardingWithAddressSearch: EventConfig = withDeclaration(
+  {
+    ...ChildOnboardingEvent,
+    advancedSearch: [
+      {
+        title: {
+          defaultMessage: 'Event details',
+          description: 'Event details accordion title',
+          id: 'advancedSearch.form.eventDetails'
+        },
+        fields: [
+          field('child.placeOfBirth').exact(),
+          field('child.birthLocation.privateHome', {
+            allowedLocations: user.jurisdiction(
+              user.scope('record.search').attribute('placeOfEvent')
+            )
+          }).exact()
+        ]
+      }
+    ]
+  },
+  childOnboardingDeclarationWithStreet
+)
 
 const generator = testDataGenerator()
 
@@ -215,14 +226,16 @@ const mswConfig = {
   handlers: {
     events: [
       tRPCMsw.event.config.get.query(() => [
-        childOnboardingWithAddressSearch,
-        tennisClubMembershipEvent,
-        footballClubMembershipEvent
+        toVersionedEventConfig(childOnboardingWithAddressSearch),
+        versionedTennisClubMembershipEvent,
+        versionedFootballClubMembershipEvent
       ])
     ],
     eventLocations: [
-      tRPCMsw.locations.list.query(() => V2_DEFAULT_MOCK_LOCATIONS),
-      tRPCMsw.administrativeAreas.list.query(() => mockAdministrativeAreas)
+      ...locationListHandlers({
+        locations: V2_DEFAULT_MOCK_LOCATIONS,
+        administrativeAreas: mockAdministrativeAreas
+      })
     ],
     user: [
       tRPCMsw.user.list.query(() => [mockUser]),

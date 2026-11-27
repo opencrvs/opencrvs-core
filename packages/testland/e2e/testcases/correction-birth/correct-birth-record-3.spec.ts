@@ -62,7 +62,6 @@ test(' Correct record - 3', async ({ page }) => {
       number: faker.location.buildingNumber(),
       zipCode: faker.location.zipCode()
     },
-    maritalStatus: 'Widowed',
     educationLevel: 'Primary'
   }
   const updatedChildDetails = {
@@ -121,7 +120,6 @@ test(' Correct record - 3', async ({ page }) => {
         'mother.nationality': 'FAR',
         'mother.idType': 'NATIONAL_ID',
         'mother.nid': faker.string.numeric(10),
-        'mother.maritalStatus': 'SINGLE',
         'mother.educationalAttainment': 'NO_SCHOOLING',
         'mother.occupation': 'Housewife',
         'mother.previousBirths': 0,
@@ -134,7 +132,6 @@ test(' Correct record - 3', async ({ page }) => {
         'father.idType': 'NATIONAL_ID',
         'father.nid': faker.string.numeric(10),
         'father.nationality': 'FAR',
-        'father.maritalStatus': 'SINGLE',
         'father.educationalAttainment': 'NONE',
         'father.occupation': 'Unemployed',
         'father.addressSameAs': 'YES'
@@ -565,47 +562,6 @@ test(' Correct record - 3', async ({ page }) => {
         ).toBeVisible()
       }) // <-- Add this closing brace for test('3.4.6 Change usual place of residence')
 
-      await test.step('3.4.7 Change marital status', async () => {
-        await page.getByTestId('change-button-mother.maritalStatus').click()
-
-        /*
-         * Expected result: should
-         * - redirect to mother's details page
-         * - focus on mother's marital status
-         */
-        await expectInUrl(page, 'correction')
-        await expectInUrl(page, 'mother')
-        await expectInUrl(page, '#mother____maritalStatus')
-
-        await page.locator('#mother____maritalStatus').click()
-        await page.getByText(updatedMotherDetails.maritalStatus).click()
-
-        await page.getByRole('button', { name: 'Go to review' }).click()
-
-        /*
-         * Expected result: should
-         * - redirect to review page
-         * - show previous marital status with strikethrough
-         * - show updated marital status
-         */
-        await expectInUrl(page, 'correction')
-        await expectInUrl(page, 'review')
-
-        await expect(
-          await page
-            .getByTestId('mother.maritalStatus-value')
-            .getByRole('deletion')
-        ).toHaveText(declaration['mother.maritalStatus'], {
-          ignoreCase: true
-        })
-
-        await expect(
-          await page
-            .getByTestId('mother.maritalStatus-value')
-            .getByText(updatedMotherDetails.maritalStatus)
-        ).toBeVisible()
-      })
-
       await test.step('3.4.8 Change level of education', async () => {
         await page
           .getByTestId('change-button-mother.educationalAttainment')
@@ -870,13 +826,6 @@ test(' Correct record - 3', async ({ page }) => {
 
     await visible(
       page.locator('#listTable-corrections-table-mother'),
-      'Marital Status',
-      'Single',
-      'Widowed'
-    )
-
-    await visible(
-      page.locator('#listTable-corrections-table-mother'),
       'Level of education',
       'No schooling',
       'Primary'
@@ -1050,12 +999,6 @@ test(' Correct record - 3', async ({ page }) => {
 
       await visible(
         page.locator('#listTable-corrections-table-mother'),
-        'Marital Status',
-        'Single',
-        'Widowed'
-      )
-      await visible(
-        page.locator('#listTable-corrections-table-mother'),
         'Level of education',
         'No schooling',
         'Primary'
@@ -1094,27 +1037,19 @@ test(' Correct record - 3', async ({ page }) => {
        * Expected result: should show in task history
        * - Correction requested
        * - Correction approved
-       *
-       * The history shows the oldest action first, 10 rows on each page. The
-       * page that holds a row depends on how many actions come before it, so
-       * go to the next page until the row shows.
        */
-      const nextPage = page.getByRole('button', { name: 'Next page' })
-      const expectInHistory = async (name: string) => {
-        const row = page
+
+      await expect(
+        page
           .locator('#listTable-task-history')
-          .getByRole('button', { name })
+          .getByRole('button', { name: 'Correction requested' })
+      ).toBeVisible()
 
-        await expect(async () => {
-          if (!(await row.isVisible())) {
-            await nextPage.click({ timeout: 2_000 })
-          }
-          await expect(row).toBeVisible({ timeout: 2_000 })
-        }).toPass({ timeout: 30_000 })
-      }
-
-      await expectInHistory('Correction requested')
-      await expectInHistory('Correction approved')
+      await expect(
+        page
+          .locator('#listTable-task-history')
+          .getByRole('button', { name: 'Correction approved' })
+      ).toBeVisible()
     })
   })
 })

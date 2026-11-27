@@ -17,7 +17,7 @@ import {
 } from '@e2e/support/test-data/death-declaration'
 import { navigateToCertificatePrintAction } from '@e2e/support/print-certificate/death/helpers'
 import { REQUIRED_VALIDATION_ERROR } from '@e2e/support/birth/helpers'
-import { expectInUrl } from '@e2e/support/utils'
+import { expectInUrl, waitForPersistedEvent } from '@e2e/support/utils'
 import { faker } from '@faker-js/faker'
 
 test('Certified copies', async ({ page }) => {
@@ -56,6 +56,7 @@ test('Certified copies', async ({ page }) => {
     })
 
     await test.step('2.3 Click continue after selecting requester type and template type', async () => {
+      await waitForPersistedEvent(page)
       await page.reload()
       await page.locator('#collector____requesterId').click()
 
@@ -125,6 +126,7 @@ test('Certified copies renders spouse age correctly', async ({ page }) => {
 
   await test.step('2.0 Validate "Certify record" page', async () => {
     await test.step('2.1 Ensure data content is visible for spouse', async () => {
+      await waitForPersistedEvent(page)
       await page.reload()
       await page.locator('#collector____requesterId').click()
       const selectOptionsLabels = [
@@ -208,6 +210,7 @@ test('Certified copies renders non-spouse informant age correctly', async ({
 
   await test.step('2.0 Validate "Certify record" page', async () => {
     await test.step('2.1 Ensure data content is visible for informant', async () => {
+      await waitForPersistedEvent(page)
       await page.reload()
       await page.locator('#collector____requesterId').click()
       const selectOptionsLabels = [
@@ -245,9 +248,9 @@ test('Certified copies renders non-spouse informant age correctly', async ({
       await page.getByText(joinValuesWith([informantAge, 'years'])).isVisible()
 
       await page.getByText('Nationality').isVisible()
-      await page
-        .getByText(declarationOverrides['informant.nationality'])
-        .isVisible()
+
+      // Previously matched by country code 'FAR' and it failed randomly when name was Farrel or similar.
+      await page.getByText('Farajaland', { exact: true }).isVisible()
     })
   })
 })

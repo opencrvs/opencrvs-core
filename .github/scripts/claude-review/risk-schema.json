@@ -1,0 +1,9 @@
+{
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["risk", "reason"],
+  "properties": {
+    "risk": { "enum": ["low", "medium", "high"] },
+    "reason": { "type": "string", "maxLength": 400 }
+  }
+}

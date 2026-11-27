@@ -31,6 +31,7 @@ import {
 } from '@opencrvs/commons'
 import { EventStatus, getStatusFromActions } from '@opencrvs/commons/events'
 import { env } from '@events/environment'
+import { getCoreSigningKey } from '@events/request-signing'
 import {
   getSystemByLegacyId,
   getSystemClientById
@@ -59,7 +60,7 @@ import * as eventsRepo from '@events/storage/postgres/events/events'
 import { deleteFilesByPrefix } from '@events/service/files'
 import { getClient } from '@events/storage/postgres/events'
 import Schema from '@events/storage/postgres/events/schema/Database'
-import { getRoles } from '../config/config'
+import { getInMemoryRoles } from '../config/config'
 import {
   generateRandomPassword,
   generateUsername,
@@ -173,14 +174,12 @@ async function handleUsernameUpdate(
     userId,
     oldUsername,
     incomingName,
-    input,
-    token
+    input
   }: {
     userId: UUID
     oldUsername: string
     incomingName: UserName
     input: Pick<UpdateUserInput, 'email' | 'mobile'>
-    token: string
   }
 ) {
   const newUsernameCandidate = generateUsername(incomingName)
@@ -209,7 +208,7 @@ async function handleUsernameUpdate(
       newUsername
     },
     countryConfigUrl: env.COUNTRY_CONFIG_URL,
-    authHeader: { Authorization: token }
+    signingKey: getCoreSigningKey()
   })
 }
 
@@ -370,8 +369,7 @@ export async function updateUser(
         userId,
         incomingName,
         oldUsername: existingUser.username,
-        input,
-        token
+        input
       })
     }
 
@@ -403,7 +401,6 @@ async function sendCredentialsNotification(
   name: UserName,
   username: string,
   password: string,
-  token: string,
   msisdn?: string,
   email?: string
 ) {
@@ -420,7 +417,7 @@ async function sendCredentialsNotification(
         temporaryPassword: password
       },
       countryConfigUrl: env.COUNTRY_CONFIG_URL,
-      authHeader: { Authorization: token }
+      signingKey: getCoreSigningKey()
     })
   } catch (err) {
     logger.error(`Unable to send ${event} notification for error : ${err}`)
@@ -454,16 +451,21 @@ function resolveCreateUserInput(
 }
 
 export async function createUser(
-  input: CreateUserInput | CreateUserInputInternal,
-  _token: string
+  input: CreateUserInput | CreateUserInputInternal
 ) {
   const usernameCandidate = input.username ?? generateUsername(input.name)
   const username = await findAvailableUsername(usernameCandidate)
   const resolvedUser = resolveCreateUserInput({ ...input, username })
-  // The user has no id yet, so only a temporary-id upload can be theirs
-  assertOwnSignaturePath(resolvedUser.signature?.path, { allowTemporary: true })
+  // Unless the id is given up front, the user has no id yet, so only a
+  // temporary-id upload can be theirs
+  assertOwnSignaturePath(resolvedUser.signature?.path, {
+    userId: resolvedUser.id,
+    allowTemporary: true
+  })
 
   const userPayload = {
+    // Undefined lets the database create the id.
+    id: resolvedUser.id,
     firstname: resolvedUser.name.firstname,
     surname: resolvedUser.name.surname,
     // Normalise to undefined for the same reason as mobile above.
@@ -495,7 +497,6 @@ export async function createUser(
     input.name,
     userCredentialPayload.username,
     resolvedUser.password,
-    _token,
     userPayload.mobile ?? undefined,
     userPayload.email
   )
@@ -526,7 +527,7 @@ export async function activateUser(input: {
   await activateUserWithCredentials(userId, hash, salt, securityQuestions)
 }
 
-export async function resendInvite(userId: UUID, token: string): Promise<void> {
+export async function resendInvite(userId: UUID): Promise<void> {
   const user = await getUserById(userId)
 
   if (!user) {
@@ -556,7 +557,6 @@ export async function resendInvite(userId: UUID, token: string): Promise<void> {
     userName,
     user.username,
     password,
-    token,
     user.mobile ?? undefined,
     user.email ?? undefined
   )
@@ -697,7 +697,7 @@ export async function verifyUser(input: { mobile?: string; email?: string }) {
   const securityQuestionKey =
     questions[Math.floor(Math.random() * questions.length)].questionKey
 
-  const roles = await getRoles()
+  const roles = await getInMemoryRoles()
   const scope = roles.find((r) => r.id === user.role)?.scopes ?? []
 
   return {
@@ -717,8 +717,7 @@ export async function verifyUser(input: { mobile?: string; email?: string }) {
 
 export async function sendResetPasswordInvite(
   userId: UUID,
-  admin: { id: string; name: UserName; role: string },
-  token: string
+  admin: { id: string; name: UserName; role: string }
 ): Promise<void> {
   const user = await getUser(userId)
 
@@ -744,7 +743,7 @@ export async function sendResetPasswordInvite(
         }
       },
       countryConfigUrl: env.COUNTRY_CONFIG_URL,
-      authHeader: { Authorization: token }
+      signingKey: getCoreSigningKey()
     })
   } catch (err) {
     logger.error(`Unable to send reset password notification for error: ${err}`)
@@ -755,10 +754,7 @@ export async function sendResetPasswordInvite(
   }
 }
 
-export async function sendUsernameReminder(
-  userId: UUID,
-  token: string
-): Promise<void> {
+export async function sendUsernameReminder(userId: UUID): Promise<void> {
   const user = await getUser(userId)
 
   try {
@@ -773,7 +769,7 @@ export async function sendUsernameReminder(
         username: user.username
       },
       countryConfigUrl: env.COUNTRY_CONFIG_URL,
-      authHeader: { Authorization: token }
+      signingKey: getCoreSigningKey()
     })
   } catch (err) {
     logger.error(

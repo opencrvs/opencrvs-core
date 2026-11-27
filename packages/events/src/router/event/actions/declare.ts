@@ -23,7 +23,11 @@ import {
   defaultRequestHandler,
   getDefaultActionProcedures
 } from '@events/router/event/actions'
-import { getInMemoryEventConfigurations } from '@events/service/config/config'
+import {
+  getCountryToday,
+  getEventConfigurationForRecord,
+  getVersionedEventConfigurationById
+} from '@events/service/config/config'
 import { searchForDuplicates } from '@events/service/deduplication/deduplication'
 import { writeAuditLog } from '@events/storage/postgres/events/auditLog'
 
@@ -56,16 +60,8 @@ export function declareActionProcedures() {
           return ctx.event
         }
 
-        const configs = await getInMemoryEventConfigurations(token)
         const event = ctx.event
-
-        const config = configs.find((c) => c.id === event.type)
-
-        if (!config) {
-          throw new Error(
-            `Event configuration not found with type: ${event.type}`
-          )
-        }
+        const config = await getEventConfigurationForRecord({ event })
 
         const declaredEvent = await defaultRequestHandler(
           input,
@@ -97,11 +93,14 @@ export function declareActionProcedures() {
         }
 
         const declaredEventState = getCurrentEventState(declaredEvent, config)
-        const duplicates = await searchForDuplicates(
-          declaredEventState,
-          dedupConfig,
-          config
-        )
+        const duplicates = await searchForDuplicates({
+          eventIndex: declaredEventState,
+          deduplication: dedupConfig,
+          versionedConfig: await getVersionedEventConfigurationById({
+            eventType: event.type
+          }),
+          today: await getCountryToday()
+        })
 
         if (duplicates.length > 0) {
           return processAction(

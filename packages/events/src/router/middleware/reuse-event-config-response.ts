@@ -14,14 +14,14 @@ import {
   MiddlewareResult
 } from '@trpc/server/unstable-core-do-not-import'
 import { OpenApiMeta } from 'trpc-to-openapi'
-import { EventConfig } from '@opencrvs/commons/events'
+import { VersionedEventConfig } from '@opencrvs/commons/events'
 import { TrpcContext } from '@events/context'
 import { env } from '@events/environment'
-import { getInMemoryEventConfigurations } from '@events/service/config/config'
+import { getInMemoryVersionedEventConfigurations } from '@events/service/config/config'
 import { reuseSerializedResponse } from '@events/router/serialization'
 
 let cached: {
-  configurations: EventConfig[]
+  configurations: VersionedEventConfig[]
   result: Promise<MiddlewareResult<TrpcContext>>
 } | null = null
 
@@ -36,13 +36,13 @@ export const reuseEventConfigResponse: MiddlewareFunction<
   TrpcContext,
   TrpcContext,
   unknown
-> = async ({ next, ctx }) => {
+> = async ({ next }) => {
   // Configurations are only cached in production.
   if (!env.isProduction) {
     return next()
   }
 
-  const configurations = await getInMemoryEventConfigurations(ctx.token)
+  const configurations = await getInMemoryVersionedEventConfigurations()
 
   if (cached?.configurations === configurations) {
     // Waits for the cached or still-rebuilding response instead of building another.

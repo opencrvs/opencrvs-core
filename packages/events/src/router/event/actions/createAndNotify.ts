@@ -20,17 +20,20 @@ import {
 import {
   ActionType,
   EventDocument,
-  getEventValidatorContext,
+  getEventConfigForRecord,
   NotifyActionInput
 } from '@opencrvs/commons/events'
 import { systemOnlyProcedure } from '@events/router/trpc'
-import { getInMemoryEventConfigurations } from '@events/service/config/config'
+import {
+  getCountryTimeZone,
+  getInMemoryVersionedEventConfigurations
+} from '@events/service/config/config'
 import { createEvent } from '@events/service/events/events'
 import { locationExists } from '@events/storage/postgres/administrative-hierarchy/locations'
 import { writeAuditLog } from '@events/storage/postgres/events/auditLog'
 import { validateNotifyAction } from '@events/router/middleware/validate'
 import {
-  getValidatorContext,
+  getActionFormConditionalContext,
   throwWhenNotEmpty
 } from '@events/router/middleware/validate/utils'
 import { defaultRequestHandler } from '@events/router/event/actions'
@@ -105,11 +108,12 @@ export function createAndNotifyProcedure() {
         } = input
 
         // Authorization
-        const eventConfigs = await getInMemoryEventConfigurations(token)
+        const eventConfigs =
+          await getInMemoryVersionedEventConfigurations()
         const tokenScopes = getScopes(token)
 
-        const eventConfig = eventConfigs.find((c) => c.id === eventType)
-        if (!eventConfig) {
+        const versionedConfig = eventConfigs.find((c) => c.id === eventType)
+        if (!versionedConfig) {
           throw new TRPCError({
             code: 'BAD_REQUEST',
             message: `No configuration found for event type: ${eventType}`
@@ -170,8 +174,10 @@ export function createAndNotifyProcedure() {
           user,
           transactionId: createTransactionId,
           createdAtLocation,
-          config: eventConfig
+          config: versionedConfig,
+          timeZone: await getCountryTimeZone()
         })
+        const eventConfig = getEventConfigForRecord(versionedConfig, event)
 
         // Step 2: Idempotency guard.
         // If we are replaying a request the event already exists and already has a NOTIFY
@@ -187,15 +193,16 @@ export function createAndNotifyProcedure() {
         }
 
         // Step 3: Validate notify fields against the event configuration.
-        const validatorContext = await getValidatorContext({
+        const context = await getActionFormConditionalContext({
           token,
-          event: getEventValidatorContext(event, eventConfig)
+          eventDocument: event,
+          eventConfig
         })
         const notifyErrors = validateNotifyAction({
           eventConfig,
           declaration: declaration,
           annotation,
-          context: validatorContext
+          context
         })
         throwWhenNotEmpty(notifyErrors)
 

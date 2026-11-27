@@ -347,11 +347,9 @@ function generateOptionalBirthInputs() {
         number: faker.location.buildingNumber(),
         postcodeOrZip: faker.location.zipCode()
       },
-      maritalStatus: 'Single',
       levelOfEducation: 'No schooling'
     },
     father: {
-      maritalStatus: 'Single',
       levelOfEducation: 'No schooling'
     }
   }

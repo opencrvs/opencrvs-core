@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import React, { useEffect, useMemo } from 'react'
+import React, { useEffect, useMemo, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
 import {
   useTypedParams,
@@ -33,8 +33,8 @@ import {
   AssignmentStatus,
   eventAttachmentPath
 } from '@opencrvs/commons/client'
-import { Content, ContentSize } from '@opencrvs/components/lib/Content'
-import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
+import { Content, ContentSize } from '@opencrvs/components'
+import { useEventConfigurationForRecord } from '@client/v2-events/features/events/useEventConfiguration'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
 import { ROUTES } from '@client/v2-events/routes'
 import { Review as ReviewComponent } from '@client/v2-events/features/events/components/Review'
@@ -80,11 +80,10 @@ function ReadonlyViewContent({ eventId }: { eventId: UUID }) {
     'Authentication is not available but is required'
   )
 
-  const { getRemoteDraftByEventId } = useDrafts()
-  const draft = getRemoteDraftByEventId(event.id)
-  const { eventConfiguration: configuration } = useEventConfiguration(
-    event.type
-  )
+  const { useRemoteDraftByEventId } = useDrafts()
+  const draft = useRemoteDraftByEventId(event.id)
+  const { eventConfiguration: configuration } =
+    useEventConfigurationForRecord(event)
 
   const eventStateWithDraft = useMemo(() => {
     const eventState = getCurrentEventState(event, configuration)
@@ -114,16 +113,19 @@ function ReadonlyViewContent({ eventId }: { eventId: UUID }) {
     return Object.keys(cleaned).length > 0 ? cleaned : undefined
   }, [event, draft])
 
+  // A new event object or assignment status must not remove the files. Only leaving the record does.
+  const latestRef = useRef({ event, assignmentStatus })
+  latestRef.current = { event, assignmentStatus }
+
   useEffect(() => {
     return () => {
-      if (assignmentStatus === AssignmentStatus.ASSIGNED_TO_SELF) {
+      const latest = latestRef.current
+      if (latest.assignmentStatus === AssignmentStatus.ASSIGNED_TO_SELF) {
         return
       }
-      void (async () => {
-        await removeCachedFiles(event)
-      })()
+      void removeCachedFiles(latest.event)
     }
-  }, [event, assignmentStatus])
+  }, [event.id])
 
   const actionConfiguration = configuration.actions.find(
     (a) => a.type === ActionType.READ

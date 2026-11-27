@@ -17,7 +17,6 @@ import {
   FieldProps,
   FieldType,
   FieldConfig,
-  isFieldVisible,
   DataFieldValue,
   DataField,
   StaticDataEntry,
@@ -28,11 +27,12 @@ import {
   todayISO,
   PlainDate
 } from '@opencrvs/commons/client'
-import { List } from '@opencrvs/components/lib/List'
+import { List } from '@opencrvs/components'
 import { Output } from '@client/v2-events/features/events/components/Output'
 import { useValidatorContext } from '@client/v2-events/hooks/useValidatorContext'
 import { makeFormikFieldIdOpenCRVSCompatible } from '@client/v2-events/components/forms/utils'
 import { parseFieldReferenceToValue } from '@client/v2-events/components/forms/FormFieldGenerator/utils'
+import { isFieldVisible } from '@client/v2-events/conditionals'
 
 function getFieldFromDataEntry({
   intl,

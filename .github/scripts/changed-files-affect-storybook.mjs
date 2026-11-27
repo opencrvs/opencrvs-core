@@ -20,13 +20,13 @@
  * empty, no changed file ends up in any story, so Chromatic can be
  * skipped.
  *
- * Cross-package source mapping: workspace packages whose stats entries
- * point at compiled output (`@opencrvs/commons`, `@opencrvs/components`)
- * are mapped back to their source paths so that diffs against the
- * `src/` tree match. Packages whose imports the client resolves
- * directly to source via `tsconfigPaths` (e.g. `@gateway/*`,
- * `@events/*`) need no mapping — backend-only changes there will not
- * appear in stats because type-only imports get erased.
+ * Cross-package source mapping: `@opencrvs/commons` stats entries point
+ * at compiled output and are mapped back to their source paths so that
+ * diffs against the `src/` tree match. Packages the client resolves
+ * directly to source (`@opencrvs/components` via its exports map,
+ * `@gateway/*` and `@events/*` via `tsconfigPaths`) need no mapping —
+ * backend-only changes there will not appear in stats because type-only
+ * imports get erased.
  *
  * Usage:
  *   node changed-files-affect-storybook.mjs \
@@ -94,13 +94,11 @@ for (const mod of rawModules) {
 }
 
 // 2. Map bundled compiled outputs back to their source files. Client
-//    code resolves `@opencrvs/commons` and `@opencrvs/components` via
-//    package.json exports → compiled dist, so stats reference build
-//    artifacts, not source.
+//    code resolves `@opencrvs/commons` via package.json exports →
+//    compiled dist, so stats reference build artifacts, not source.
 function mapToSourceCandidates(rel) {
   const out = []
-  let m
-  m = rel.match(
+  const m = rel.match(
     /^packages\/commons\/build\/dist\/(?:common|esm)\/(.+)\.(?:js|d\.ts)$/
   )
   if (m) {
@@ -110,16 +108,6 @@ function mapToSourceCandidates(rel) {
       `packages/commons/src/${stem}.tsx`,
       `packages/commons/src/${stem}/index.ts`,
       `packages/commons/src/${stem}/index.tsx`
-    )
-  }
-  m = rel.match(/^packages\/components\/lib\/(.+)\.(?:js|d\.ts)$/)
-  if (m) {
-    const stem = m[1].replace(/\/index$/, '')
-    out.push(
-      `packages/components/src/${stem}.ts`,
-      `packages/components/src/${stem}.tsx`,
-      `packages/components/src/${stem}/index.ts`,
-      `packages/components/src/${stem}/index.tsx`
     )
   }
   return out

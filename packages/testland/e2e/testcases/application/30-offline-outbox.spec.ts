@@ -22,32 +22,23 @@ import {
 import { CREDENTIALS } from '@e2e/support/constants'
 import { faker } from '@faker-js/faker'
 import { fillDate, generateBirthInputs } from '@e2e/support/birth/helpers'
+import {
+  fillNotificationForm,
+  generateBirthNotificationInputs,
+  startBirthNotification
+} from '@e2e/support/birth/notify'
 
 test('30: Validate user can send multiple complete and incomplete records offline', async ({
   page
 }) => {
   const declaration = generateBirthInputs({ includeOptionalFields: true })
 
-  const partialDeclaration1 = {
-    child: {
-      name: {
-        firstNames: faker.person.firstName('male'),
-        familyName: faker.person.lastName('male')
-      }
-    }
-  }
-
-  const partialDeclaration2 = {
-    child: {
-      name: {
-        firstNames: faker.person.firstName('male'),
-        familyName: faker.person.lastName('male')
-      }
-    }
-  }
+  // Notifications are sent by hospital officials, and need the required notification form fields
+  const notification1 = generateBirthNotificationInputs()
+  const notification2 = generateBirthNotificationInputs()
 
   await test.step('30.0 Login', async () => {
-    await login(page, CREDENTIALS.COMMUNITY_LEADER)
+    await login(page, CREDENTIALS.HOSPITAL_OFFICIAL)
 
     // this is needed to get eventConfig before going offline
     await page.click('#header-new-event')
@@ -180,11 +171,6 @@ test('30: Validate user can send multiple complete and incomplete records offlin
         .locator('#zipCode')
         .fill(declaration.mother.address.postcodeOrZip)
 
-      await page.locator('#mother____maritalStatus').click()
-      await page
-        .getByText(declaration.mother.maritalStatus, { exact: true })
-        .click()
-
       await page.locator('#mother____educationalAttainment').click()
       await page
         .getByText(declaration.mother.levelOfEducation, { exact: true })
@@ -214,11 +200,6 @@ test('30: Validate user can send multiple complete and incomplete records offlin
         .click()
 
       await page.locator('#father____addressSameAs_YES').click()
-
-      await page.locator('#father____maritalStatus').click()
-      await page
-        .getByText(declaration.father.maritalStatus, { exact: true })
-        .click()
 
       await page.locator('#father____educationalAttainment').click()
       await page
@@ -253,20 +234,11 @@ test('30: Validate user can send multiple complete and incomplete records offlin
     })
   })
 
-  await test.step('30.2 Send an incomplete declaration', async () => {
-    await page.click('#header-new-event')
-    await page.getByLabel('Birth').click()
-    await page.getByRole('button', { name: 'Continue' }).click()
-    await page.getByRole('button', { name: 'Continue' }).click()
+  await test.step('30.2 Send a notification', async () => {
+    await startBirthNotification(page)
 
-    await test.step('30.2.1 Fill child details', async () => {
-      await page
-        .locator('#firstname')
-        .fill(partialDeclaration1.child.name.firstNames)
-      await page
-        .locator('#surname')
-        .fill(partialDeclaration1.child.name.familyName)
-      await goToSection(page, 'review')
+    await test.step('30.2.1 Fill notification form', async () => {
+      await fillNotificationForm(page, notification1)
     })
     await test.step('30.2.2 Notify', async () => {
       await page.getByRole('button', { name: 'Action', exact: true }).click()
@@ -275,20 +247,11 @@ test('30: Validate user can send multiple complete and incomplete records offlin
     })
   })
 
-  await test.step('30.3 Send an incomplete declaration', async () => {
-    await page.click('#header-new-event')
-    await page.getByLabel('Birth').click()
-    await page.getByRole('button', { name: 'Continue' }).click()
-    await page.getByRole('button', { name: 'Continue' }).click()
+  await test.step('30.3 Send a notification', async () => {
+    await startBirthNotification(page)
 
-    await test.step('30.3.1 Fill child details', async () => {
-      await page
-        .locator('#firstname')
-        .fill(partialDeclaration2.child.name.firstNames)
-      await page
-        .locator('#surname')
-        .fill(partialDeclaration2.child.name.familyName)
-      await goToSection(page, 'review')
+    await test.step('30.3.1 Fill notification form', async () => {
+      await fillNotificationForm(page, notification2)
     })
     await test.step('30.3.2 Notify', async () => {
       await page.getByRole('button', { name: 'Action', exact: true }).click()
@@ -300,8 +263,8 @@ test('30: Validate user can send multiple complete and incomplete records offlin
   await test.step('30.4 Validate outbox', async () => {
     const rows = [
       // { row: '#row_2', name: formatName(declaration.child.name) },
-      { row: '#row_1', name: formatName(partialDeclaration1.child.name) },
-      { row: '#row_0', name: formatName(partialDeclaration2.child.name) }
+      { row: '#row_1', name: formatName(notification1.child.name) },
+      { row: '#row_0', name: formatName(notification2.child.name) }
     ]
     const searchResult = page.getByTestId('search-result')
 

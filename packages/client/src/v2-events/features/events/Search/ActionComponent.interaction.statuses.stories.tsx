@@ -17,7 +17,8 @@ import {
   eventQueryDataGenerator,
   EventStatus,
   generateEventDocument,
-  tennisClubMembershipEvent
+  tennisClubMembershipEvent,
+  versionedTennisClubMembershipEvent
 } from '@opencrvs/commons/client'
 import { TRPCProvider } from '@client/v2-events/trpc'
 import { ROUTES } from '@client/v2-events/routes'
@@ -70,7 +71,7 @@ export const DirectsCreatedToDeclare: Story = {
     /*
      * Ensure record is "downloaded offline" in the user's browser
      */
-    addLocalEventConfig(tennisClubMembershipEvent)
+    addLocalEventConfig(versionedTennisClubMembershipEvent)
     setEventData(createdEvent.event.id, createdEvent.event)
   },
 
@@ -141,7 +142,7 @@ export const DirectsNotifiedToEdit: Story = {
     /*
      * Ensure record is "downloaded offline" in the user's browser
      */
-    addLocalEventConfig(tennisClubMembershipEvent)
+    addLocalEventConfig(versionedTennisClubMembershipEvent)
     setEventData(notifiedEvent.event.id, notifiedEvent.event)
   },
 
@@ -213,7 +214,7 @@ export const directsRegisteredToPrint: Story = {
     /*
      * Ensure record is "downloaded offline" in the user's browser
      */
-    addLocalEventConfig(tennisClubMembershipEvent)
+    addLocalEventConfig(versionedTennisClubMembershipEvent)
     setEventData(registeredEvent.event.id, registeredEvent.event)
   },
 

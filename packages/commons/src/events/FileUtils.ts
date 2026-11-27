@@ -11,7 +11,10 @@
 
 import { DocumentPath } from '../documents'
 import { ActionBase } from './ActionDocument'
-import { FileFieldValue, FileFieldWithOptionValue } from './CompositeFieldValue'
+import {
+  isFileFieldValue,
+  isFileFieldWithOptionValue
+} from './CompositeFieldValue'
 import { EventDocument } from './EventDocument'
 import { uniq } from 'lodash'
 
@@ -34,14 +37,12 @@ export function getFilePathsFromValues({
 
   return uniq(
     values.flatMap((value) => {
-      const fileParsed = FileFieldValue.safeParse(value)
-      if (fileParsed.success) {
-        return [fileParsed.data.path]
+      if (isFileFieldValue(value)) {
+        return [value.path]
       }
 
-      const fileOptionParsed = FileFieldWithOptionValue.safeParse(value)
-      if (fileOptionParsed.success) {
-        return fileOptionParsed.data.map((val) => val.path)
+      if (isFileFieldWithOptionValue(value)) {
+        return value.map((val) => val.path)
       }
 
       return []

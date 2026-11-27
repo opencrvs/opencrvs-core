@@ -1,6 +1,6 @@
 {
   "name": "@opencrvs/mosip-mock",
-  "version": "2.1.4",
+  "version": "2.2.0",
   "license": "MPL-2.0",
   "engines": {
     "node": "22.x.x"
@@ -18,7 +18,7 @@
     "envalid": "^8.0.0",
     "fastify": "^5.0.0",
     "jose": "^6.0.10",
-    "nodemailer": "^8.0.0",
+    "nodemailer": "^10.0.0",
     "tsx": "^4.19.2"
   }
 }

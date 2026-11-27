@@ -11,8 +11,10 @@
 import { test, expect } from '@playwright/test'
 import {
   formatDateTo_dMMMMyyyy,
+  goToSection,
   login,
   switchEventTab,
+  uploadImage,
   validateActionMenuButton,
   getEventIdFromUrl,
   triggerDeclarationAction,
@@ -166,6 +168,14 @@ test('Approval of late birth registration -flag can be added during edit and red
       await page.locator('#child____reason').fill('Late registration reason')
     })
 
+    await test.step('Upload a document during edit', async () => {
+      await goToSection(page, 'documents')
+      await uploadImage(
+        page,
+        page.locator('button[name="documents____proofOfBirth"]')
+      )
+    })
+
     await test.step('Go back to review', async () => {
       await page.getByRole('button', { name: 'Go to review' }).click()
     })
@@ -211,6 +221,15 @@ test('Approval of late birth registration -flag can be added during edit and red
         page.getByText(
           'Reason for delayed registration-Late registration reason'
         )
+      ).toBeVisible()
+
+      await page.getByTestId('close-dialog').click()
+    })
+
+    await test.step('Documents tab shows the document added during edit', async () => {
+      await switchEventTab(page, 'Documents')
+      await expect(
+        page.locator('#listTable-documents').getByText('Proof of birth')
       ).toBeVisible()
     })
   })

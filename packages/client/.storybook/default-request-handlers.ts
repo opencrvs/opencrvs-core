@@ -24,13 +24,15 @@ import {
   generateWorkqueues,
   TENNIS_CLUB_MEMBERSHIP,
   UUID,
-  tennisClubMembershipEvent,
-  footballClubMembershipEvent,
-  libraryMembershipEvent,
   TestUserRole,
   AuditLogEntry,
+  AdministrativeArea,
+  Location,
   V2_DEFAULT_MOCK_ADMINISTRATIVE_AREAS,
-  V2_DEFAULT_MOCK_LOCATIONS
+  V2_DEFAULT_MOCK_LOCATIONS,
+  versionedTennisClubMembershipEvent,
+  versionedFootballClubMembershipEvent,
+  versionedLibraryMembershipEvent
 } from '@opencrvs/commons/client'
 import { testDataGenerator } from '@client/tests/test-data-generators'
 
@@ -56,6 +58,36 @@ export const tRPCMsw = createTRPCMsw<AppRouter>({
   ],
   transformer: { input: superjson, output: superjson }
 })
+
+/**
+ * Mocks of the location and administrative area lists for a story.
+ *
+ * The client fetches the lists with `sync`. When the client has no cache, it
+ * sends no `since`, and the mock returns the whole list. When the client
+ * already has a cache, it sends `since`, and the mock returns no rows, because
+ * the mock lists never change. `list` returns the whole list, for code that
+ * calls it directly.
+ */
+export function locationListHandlers({
+  locations,
+  administrativeAreas
+}: {
+  locations: Location[]
+  administrativeAreas: AdministrativeArea[]
+}) {
+  return [
+    tRPCMsw.locations.list.query(() => locations),
+    tRPCMsw.administrativeAreas.list.query(() => administrativeAreas),
+    tRPCMsw.locations.sync.query(({ since }) => ({
+      syncedAt: new Date().toISOString(),
+      locations: since ? [] : locations
+    })),
+    tRPCMsw.administrativeAreas.sync.query(({ since }) => ({
+      syncedAt: new Date().toISOString(),
+      administrativeAreas: since ? [] : administrativeAreas
+    }))
+  ]
+}
 
 export const handlers = {
   ping: [
@@ -87,20 +119,16 @@ export const handlers = {
   events: [
     tRPCMsw.event.config.get.query(() => {
       return [
-        tennisClubMembershipEvent,
-        footballClubMembershipEvent,
-        libraryMembershipEvent
+        versionedTennisClubMembershipEvent,
+        versionedFootballClubMembershipEvent,
+        versionedLibraryMembershipEvent
       ]
     })
   ],
-  eventLocations: [
-    tRPCMsw.locations.list.query(() => {
-      return V2_DEFAULT_MOCK_LOCATIONS
-    }),
-    tRPCMsw.administrativeAreas.list.query(() => {
-      return V2_DEFAULT_MOCK_ADMINISTRATIVE_AREAS
-    })
-  ],
+  eventLocations: locationListHandlers({
+    locations: V2_DEFAULT_MOCK_LOCATIONS,
+    administrativeAreas: V2_DEFAULT_MOCK_ADMINISTRATIVE_AREAS
+  }),
   getUserRoles: [
     graphql.query('getUserRoles', () => {
       return HttpResponse.json({
@@ -355,11 +383,6 @@ export const handlers = {
     })
   ],
   files: [
-    http.get('/api/presigned-url/:filePath*', async (req) => {
-      return HttpResponse.json({
-        presignedURL: `http://localhost:3535/ocrvs/tree.svg`
-      })
-    }),
     http.post('/api/upload', async (req) => {
       const formData = await req.request.formData()
 
@@ -2218,6 +2241,21 @@ export const handlers = {
             messages: {}
           }
         ]
+      })
+    })
+  ],
+  countryLogo: [
+    http.get('/api/countryconfig/content/country-logo', () => {
+      // The country config serves the logo as an image, not as a data URL
+      const [header, base64] =
+        mockOfflineData.config.COUNTRY_LOGO.file.split(',')
+      const mimeType = header.match(/^data:(.+);base64$/)?.[1] ?? 'image/png'
+      const bytes = Uint8Array.from(atob(base64), (char) => char.charCodeAt(0))
+
+      return new HttpResponse(bytes, {
+        headers: {
+          'Content-Type': mimeType
+        }
       })
     })
   ],

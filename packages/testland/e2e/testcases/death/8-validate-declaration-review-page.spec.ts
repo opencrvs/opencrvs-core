@@ -374,7 +374,6 @@ test('8. Validate declaration review page', async ({ page }) => {
     await test.step('8.1.2 Click any "Change" link', async () => {
       await test.step("8.1.2.1 Change deceased's name", async () => {
         await page.getByTestId('change-button-deceased.name').click()
-        await page.getByRole('button', { name: 'Continue' }).click()
 
         declaration.deceased.name.firstname = faker.person.firstName('male')
         declaration.deceased.name.surname = faker.person.lastName('male')
@@ -396,7 +395,6 @@ test('8. Validate declaration review page', async ({ page }) => {
 
       await test.step("8.1.2.2 Change deceased's gender", async () => {
         await page.getByTestId('change-button-deceased.gender').click()
-        await page.getByRole('button', { name: 'Continue' }).click()
 
         declaration.deceased.gender = 'Female'
 
@@ -416,7 +414,6 @@ test('8. Validate declaration review page', async ({ page }) => {
 
       await test.step("8.1.2.3 Change deceased's birthday", async () => {
         await page.getByTestId('change-button-deceased.dob').click()
-        await page.getByRole('button', { name: 'Continue' }).click()
 
         declaration.deceased.dob = getRandomDate(5, 200)
         await page.getByPlaceholder('dd').fill(declaration.deceased.dob.dd)
@@ -435,7 +432,6 @@ test('8. Validate declaration review page', async ({ page }) => {
 
       await test.step("8.1.2.4 Change deceased's ID type", async () => {
         await page.getByTestId('change-button-deceased.idType').click()
-        await page.getByRole('button', { name: 'Continue' }).click()
 
         declaration.deceased.idType = 'Passport'
 
@@ -455,7 +451,6 @@ test('8. Validate declaration review page', async ({ page }) => {
       })
       await test.step("8.1.2.5 Change deceased's ID", async () => {
         await page.getByTestId('change-button-deceased.passport').click()
-        await page.getByRole('button', { name: 'Continue' }).click()
 
         declaration.deceased.passport = faker.string.numeric(10)
 
@@ -474,7 +469,6 @@ test('8. Validate declaration review page', async ({ page }) => {
 
       await test.step('8.1.2.7 Change informant type', async () => {
         await page.getByTestId('change-button-informant.relation').click()
-        await page.getByRole('button', { name: 'Continue' }).click()
 
         declaration.informant.relation = 'Father'
 
@@ -496,7 +490,6 @@ test('8. Validate declaration review page', async ({ page }) => {
 
       await test.step('8.1.2.8 Change registration email', async () => {
         await page.getByTestId('change-button-informant.email').click()
-        await page.getByRole('button', { name: 'Continue' }).click()
         declaration.informant.email = faker.internet.email()
         await page
           .locator('#informant____email')
@@ -512,7 +505,6 @@ test('8. Validate declaration review page', async ({ page }) => {
 
       await test.step("8.1.2.9 Change spouse's name", async () => {
         await page.getByTestId('change-button-spouse.name').click()
-        await page.getByRole('button', { name: 'Continue' }).click()
         declaration.spouse.name.firstname = faker.person.firstName('female')
         declaration.spouse.name.surname = faker.person.lastName('female')
         await page.locator('#firstname').fill(declaration.spouse.name.firstname)
@@ -529,7 +521,6 @@ test('8. Validate declaration review page', async ({ page }) => {
       })
       await test.step("8.1.2.10 Change spouse's birthday", async () => {
         await page.getByTestId('change-button-spouse.dob').click()
-        await page.getByRole('button', { name: 'Continue' }).click()
         declaration.spouse.dob = getRandomDate(19, 200)
         await page.getByPlaceholder('dd').fill(declaration.spouse.dob.dd)
         await page.getByPlaceholder('mm').fill(declaration.spouse.dob.mm)
@@ -545,7 +536,6 @@ test('8. Validate declaration review page', async ({ page }) => {
       })
       await test.step("8.1.2.11 Change spouse's nationality", async () => {
         await page.getByTestId('change-button-spouse.nationality').click()
-        await page.getByRole('button', { name: 'Continue' }).click()
         declaration.spouse.nationality = 'Holy See'
         await page.locator('#spouse____nationality').click()
         await page
@@ -563,7 +553,6 @@ test('8. Validate declaration review page', async ({ page }) => {
       })
       await test.step("8.1.2.12 Change spouse's ID type", async () => {
         await page.getByTestId('change-button-spouse.idType').click()
-        await page.getByRole('button', { name: 'Continue' }).click()
         declaration.spouse.idType = 'Passport'
         await page.locator('#spouse____idType').click()
         await page
@@ -581,7 +570,6 @@ test('8. Validate declaration review page', async ({ page }) => {
       })
       await test.step("8.1.2.13 Change spouse's ID", async () => {
         await page.getByTestId('change-button-spouse.passport').click()
-        await page.getByRole('button', { name: 'Continue' }).click()
         declaration.spouse.passport = faker.string.numeric(10)
         await page
           .locator('#spouse____passport')
@@ -602,8 +590,6 @@ test('8. Validate declaration review page', async ({ page }) => {
           .locator('#Accordion_documents-accordion')
           .getByRole('button', { name: 'Change all', exact: true })
           .click()
-
-        await page.getByRole('button', { name: 'Continue' }).click()
       })
 
       await test.step('8.1.3.1 Upload proof for deceased', async () => {

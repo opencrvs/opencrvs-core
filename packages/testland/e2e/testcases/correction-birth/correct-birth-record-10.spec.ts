@@ -565,10 +565,17 @@ test.describe('10. Correct record', () => {
           page.locator('#listTable-corrections-table-child')
         ).toContainText(`Weight at birth-${updatedChildDetails.weightAtBirth}`)
 
+        const correctionResponse = page.waitForResponse(
+          (res) =>
+            res.url().includes('event.actions.correction.request') && res.ok()
+        )
+
         await page
           .getByRole('button', { name: 'Submit correction request' })
           .click()
         await page.getByRole('button', { name: 'Confirm' }).click()
+
+        await correctionResponse
 
         await expectInUrl(page, `/workqueue/pending-certification`)
 
@@ -688,7 +695,6 @@ test.describe('10. Correct record', () => {
         })
 
         await test.step('10.1.6.4.2 Validate correction approved modal', async () => {
-          await page.getByRole('button', { name: 'Next page' }).click()
           await page
             .getByRole('button', { name: 'Correction approved', exact: true })
             .click()

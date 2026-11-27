@@ -10,7 +10,7 @@
  */
 import fetch from 'node-fetch'
 import { getUUID, logger, TokenWithBearer, UUID } from '@opencrvs/commons'
-import { EventConfig, EventDocument } from '@opencrvs/commons/events'
+import { EventDocument, VersionedEventConfig } from '@opencrvs/commons/events'
 import { env } from '@events/environment'
 
 import {
@@ -18,14 +18,14 @@ import {
   streamEventDocuments
 } from '@events/storage/postgres/events/events'
 import { getClient } from '@events/storage/postgres/events'
-import { getTemporaryIndexName } from '@events/storage/elasticsearch'
-import { getInMemoryEventConfigurations } from '../config/config'
-import { indexEventsInBulk } from '../indexing/indexing'
+import { getTemporaryVersionIndexName } from '@events/storage/elasticsearch'
+import { getInMemoryVersionedEventConfigurations } from '../config/config'
+import { getConfigForRecord, indexEventsInBulk } from '../indexing/indexing'
 import {
   cleanupOrphanedIndices,
   cleanupTemporaryIndex,
-  finaliseReindexIndex,
-  prepareTemporaryIndex
+  finaliseReindexIndices,
+  prepareTemporaryIndices
 } from './indexing'
 import {
   completeReindexingStatus,
@@ -117,16 +117,12 @@ async function fetchReadableEvents(
 async function reindexSearch(
   timestamp: number,
   token: TokenWithBearer,
-  configurations: EventConfig[],
+  configurations: VersionedEventConfig[],
   onBatchProcessed?: (count: number) => Promise<void>,
   onEventsSkipped?: (skipped: SkippedEvent[]) => void
 ) {
-  const indexNameOverrides = new Map(
-    configurations.map((config) => [
-      config.id,
-      getTemporaryIndexName(config.id, timestamp)
-    ])
-  )
+  const getTemporaryIndexOf = (event: EventDocument) =>
+    getTemporaryVersionIndexName(event.type, event.configVersionId, timestamp)
 
   const inFlight = new Set<Promise<void>>()
   let failure: Error | undefined
@@ -160,13 +156,19 @@ async function reindexSearch(
   }
 
   async function writeBatch(batch: EventDocument[]) {
+    // A record stamped with a version that is no longer configured fails the reindex
+    // rather than drop out of search. Checked before writing, as retrying cannot fix it.
+    for (const event of batch) {
+      getConfigForRecord(configurations, event)
+    }
+
     const start = new Date()
     const batchId = batch[0]?.id ?? 'unknown'
     logger.info(`Batch ${batchId}: ${batch.length} events to index`)
 
     await Promise.all([
       withRetry(async () =>
-        indexEventsInBulk(batch, configurations, indexNameOverrides)
+        indexEventsInBulk(batch, configurations, getTemporaryIndexOf)
       ),
       withRetry(async () => reindexBatchToCountryConfig(token, batch))
     ])
@@ -222,28 +224,30 @@ export async function runReindex(token: TokenWithBearer) {
 
   await createReindexingStatusEntry(runId, startTimestamp)
 
-  const configurations = await getInMemoryEventConfigurations(token)
+  const versionedConfigurations =
+    await getInMemoryVersionedEventConfigurations()
 
   // Best-effort: leftover orphans are retried on the next run.
-  await cleanupOrphanedIndices(configurations).catch((err) =>
+  await cleanupOrphanedIndices(versionedConfigurations).catch((err) =>
     logger.error('Failed to clean up orphaned indices', err)
   )
 
   /*
-   * Create temporary indices for all event types
+   * Create temporary indices for every version of all event types
    */
-  const temporaryIndices = await Promise.all(
-    configurations.map(async (configuration) => {
-      const indexNameWithTimestamp = await prepareTemporaryIndex(
+  const temporaryIndicesByEvent = await Promise.all(
+    versionedConfigurations.map(async (configuration) => {
+      const indexNamesWithTimestamp = await prepareTemporaryIndices(
         configuration,
         timestamp
       )
       logger.info(
-        `Prepared temporary index ${indexNameWithTimestamp} for event type ${configuration.id}`
+        `Prepared temporary indices ${indexNamesWithTimestamp.join(', ')} for event type ${configuration.id}`
       )
-      return indexNameWithTimestamp
+      return indexNamesWithTimestamp
     })
   )
+  const temporaryIndices = temporaryIndicesByEvent.flat()
   const startSecond = Math.floor(Date.now() / 1000)
   const processedCounts: number[] = []
   let totalProcessed = 0
@@ -266,7 +270,7 @@ export async function runReindex(token: TokenWithBearer) {
     await reindexSearch(
       timestamp,
       token,
-      configurations,
+      versionedConfigurations,
       async (batchSize) => {
         const currentSecond = Math.floor(Date.now() / 1000) - startSecond
         const processedThisSecond = processedCounts[currentSecond] || 0
@@ -316,11 +320,8 @@ export async function runReindex(token: TokenWithBearer) {
   }
 
   await Promise.all(
-    configurations.map(async (config) =>
-      finaliseReindexIndex(
-        config.id,
-        getTemporaryIndexName(config.id, timestamp)
-      )
+    versionedConfigurations.map(async (config) =>
+      finaliseReindexIndices(config, timestamp)
     )
   )
 

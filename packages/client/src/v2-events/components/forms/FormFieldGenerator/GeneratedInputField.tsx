@@ -67,13 +67,11 @@ import {
   isFieldGroupFieldType,
   FieldType,
   EventConfig,
-  isFieldVisible,
   IndexMap,
   FormState,
   flattenFieldReference,
   flattenFormState,
   ConditionalType,
-  isConditionMet,
   SelectOption,
   isCustomFieldType,
   isHiddenFieldType,
@@ -129,6 +127,7 @@ import { Hidden } from '@client/v2-events/features/events/registered-fields/Hidd
 import { TextArea } from '@client/v2-events/features/events/registered-fields/TextArea'
 import { Autocomplete } from '@client/v2-events/features/events/registered-fields/Autocomplete'
 import { liveAnchorDate } from '@client/v2-events/utils'
+import { isConditionMet, isFieldVisible } from '@client/v2-events/conditionals'
 import {
   makeFormFieldIdFormikCompatible,
   makeFormikFieldIdOpenCRVSCompatible
@@ -510,10 +509,12 @@ export const GeneratedInputField = <T extends FieldConfig>(
   }
 
   if (isDateRangeFieldType(field)) {
-    const parsed = DateRangeFieldValue.safeParse(field.value)
+    const parsed = DateRangeFieldValue.validate(field.value)
+      ? field.value
+      : undefined
     return (
       <InputField {...field.inputFieldProps}>
-        <DateRangeField.Input {...inputProps} value={parsed.data} />
+        <DateRangeField.Input {...inputProps} value={parsed} />
       </InputField>
     )
   }

@@ -56,7 +56,7 @@ done
 # List of directories
 dirs=(
   "data/elasticsearch"
-  "data/minio"
+  "data/rustfs"
   "data/backups"
   "data/postgres"
   # mosip-api keeps its record-only tokens in SQLite. Its dev default path
@@ -79,6 +79,11 @@ if [ ! -d "$PROJECT_ROOT/.secrets" ]; then
   echo "Creating $PROJECT_ROOT/.secrets"
   mkdir -p "$PROJECT_ROOT/.secrets"
   pnpm dev:secrets:gen
+fi
+
+# Added after the JWT keys, so existing checkouts get it without new JWT keys.
+if [ ! -f "$PROJECT_ROOT/.secrets/core-request-signing-key.pem" ]; then
+  pnpm dev:secrets:gen:request-signing
 fi
 
 if $dependencies; then
@@ -121,7 +126,7 @@ fi
 
 
 echo
-openCRVSPorts=( 3447 9200 6379 4444 3040 5050 2020 7070 1050 3030 3000 3020 2525 2021 3535 3536 9050 2024 20240 20260)
+source "$(dirname "${BASH_SOURCE[0]}")/ports.sh"
 for x in "${openCRVSPorts[@]}"
 do
    :

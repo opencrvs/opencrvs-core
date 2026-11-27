@@ -12,6 +12,7 @@ import { Client } from 'pg'
 import { inject, vi } from 'vitest'
 import {
   getDeclarationFields,
+  INITIAL_EVENT_CONFIG_VERSION_ID,
   TENNIS_CLUB_MEMBERSHIP
 } from '@opencrvs/commons/events'
 import { tennisClubMembershipEvent } from '@opencrvs/commons/fixtures'
@@ -20,19 +21,14 @@ import {
   resetServer as resetEventsPostgresServer
 } from '@events/storage/postgres/events'
 
-import { createIndex } from '@events/service/indexing/indexing'
+import { createVersionIndex } from '@events/service/indexing/indexing'
 import {
   getReindexingStatusIndexName,
-  getTemporaryIndexName
+  getTemporaryVersionIndexName
 } from '@events/storage/__mocks__/elasticsearch'
 import { getOrCreateClient } from '@events/storage/elasticsearch'
 import { mswServer } from './msw'
-import {
-  createDatabase,
-  dropDatabase,
-  initializeSchemaAccess,
-  migrate
-} from './postgres'
+import { createDatabase, dropDatabase, TEMPLATE_DATABASE } from './postgres'
 
 vi.mock('@events/storage/elasticsearch')
 
@@ -41,19 +37,23 @@ vi.mock('@events/storage/elasticsearch')
 let previousId: string | null = null
 
 async function resetESServer() {
-  const { getEventIndexName, getEventAliasName } = await import(
-    // @ts-expect-error - "Cannot find module '@events/storage/elasticsearch' or its corresponding type declarations."
-    '@events/storage/elasticsearch'
-  )
+  const { getEventIndexName, getEventVersionIndexName, getEventAliasName } =
+    await import(
+      // @ts-expect-error - "Cannot find module '@events/storage/elasticsearch' or its corresponding type declarations."
+      '@events/storage/elasticsearch'
+    )
   const id = Date.now() + Math.random()
 
   getEventIndexName.mockImplementation((type: string) => type + '_' + id)
+  getEventVersionIndexName.mockImplementation(
+    (type: string, versionId: string) =>
+      `${getEventIndexName(type)}_${versionId}`
+  )
   getEventAliasName.mockReturnValue('events_' + id)
   getReindexingStatusIndexName.mockReturnValue('reindexing_status_' + id)
-  getTemporaryIndexName.mockImplementation(
-    (eventType: string, timestamp: number) => {
-      return `${getEventIndexName(eventType)}_${timestamp}`
-    }
+  getTemporaryVersionIndexName.mockImplementation(
+    (eventType: string, versionId: string, timestamp: number) =>
+      `${getEventVersionIndexName(eventType, versionId)}_${timestamp}`
   )
 
   const client = getOrCreateClient()
@@ -80,8 +80,9 @@ async function resetESServer() {
   })
 
   // Create concrete indices
-  await createIndex(
-    getEventIndexName(TENNIS_CLUB_MEMBERSHIP),
+  await createVersionIndex(
+    TENNIS_CLUB_MEMBERSHIP,
+    INITIAL_EVENT_CONFIG_VERSION_ID,
     getDeclarationFields(tennisClubMembershipEvent)
   )
 }
@@ -90,6 +91,9 @@ async function resetESServer() {
 // dropped afterwards — every test creates its own database, and without the
 // drop a full run leaves behind ~8MB per test, filling up the CI runner.
 let currentDb: string | null = null
+
+// Postgres error code for a connection terminated by an administrator command
+const ADMIN_SHUTDOWN = '57P01'
 
 function getClusterClient() {
   return new Client({
@@ -120,21 +124,18 @@ async function resetPostgresServer() {
 
   const clusterInitializer = getClusterClient()
   await clusterInitializer.connect()
-  await createDatabase(clusterInitializer, targetDb)
-  // Set before migrating so a failed migration still leaves a droppable name.
+  await createDatabase(clusterInitializer, targetDb, TEMPLATE_DATABASE)
   currentDb = targetDb
   await clusterInitializer.end()
 
-  const databaseInitializer = new Client({
-    connectionString: `postgres://postgres:postgres@${inject('POSTGRES_URI')}/${targetDb}`
-  })
-  await databaseInitializer.connect()
-  await migrate(databaseInitializer)
-  await initializeSchemaAccess(databaseInitializer)
-  await databaseInitializer.end()
-
   await resetEventsPostgresServer()
-  getPool(EVENTS_APP_POSTGRES_URI)
+  // DROP DATABASE ... WITH (FORCE) terminates connections a test left open.
+  // Without a listener the pool re-throws that as an uncaught error.
+  getPool(EVENTS_APP_POSTGRES_URI).on('error', (error) => {
+    if ((error as { code?: string }).code !== ADMIN_SHUTDOWN) {
+      throw error
+    }
+  })
 }
 
 beforeEach(async () => Promise.all([resetPostgresServer(), resetESServer()]))

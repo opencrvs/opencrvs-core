@@ -26,7 +26,10 @@ import {
   generateTranslationConfig,
   tennisClubMembershipEvent,
   ActionStatus,
-  eventAttachmentPath
+  eventAttachmentPath,
+  withDeclaration,
+  getDeclaration,
+  INITIAL_EVENT_CONFIG_VERSION_ID
 } from '@opencrvs/commons/client'
 import type { EventDocument, UUID } from '@opencrvs/commons/client'
 
@@ -788,21 +791,18 @@ const nixConditionalFields = [
 
 // EventConfig with nixConditionalFields in declaration so omitHiddenPaginatedFields
 // can correctly evaluate form.nid / form.verified visibility.
-const nixEventConfig: EventConfig = {
-  ...tennisClubMembershipEvent,
-  declaration: {
-    ...tennisClubMembershipEvent.declaration,
-    pages: [
-      {
-        id: 'nid-test-page',
-        title: generateTranslationConfig('NID page'),
-        fields: nixConditionalFields,
-        requireCompletionToContinue: false,
-        type: 'FORM' as const
-      }
-    ]
-  }
-}
+const nixEventConfig: EventConfig = withDeclaration(tennisClubMembershipEvent, {
+  ...getDeclaration(tennisClubMembershipEvent),
+  pages: [
+    {
+      id: 'nid-test-page',
+      title: generateTranslationConfig('NID page'),
+      fields: nixConditionalFields,
+      requireCompletionToContinue: false,
+      type: 'FORM' as const
+    }
+  ]
+})
 
 const BASE_DECL_EVENT_ID = 'a1b2c3d4-e5f6-7890-abcd-ef0123456789' as UUID
 
@@ -810,6 +810,7 @@ const mockEventWithNid: EventDocument = {
   type: tennisClubMembershipEvent.id,
   id: BASE_DECL_EVENT_ID,
   trackingId: 'NIDTEST',
+  configVersionId: INITIAL_EVENT_CONFIG_VERSION_ID,
   createdAt: '2025-01-01T00:00:00.000Z',
   updatedAt: '2025-01-01T00:00:01.000Z',
   actions: [
@@ -1056,10 +1057,10 @@ const mosipLikeFields = [
   }
 ] satisfies FieldConfig[]
 
-const mosipEventConfig: EventConfig = {
-  ...tennisClubMembershipEvent,
-  declaration: {
-    ...tennisClubMembershipEvent.declaration,
+const mosipEventConfig: EventConfig = withDeclaration(
+  tennisClubMembershipEvent,
+  {
+    ...getDeclaration(tennisClubMembershipEvent),
     pages: [
       {
         id: 'mosip-test-page',
@@ -1070,7 +1071,7 @@ const mosipEventConfig: EventConfig = {
       }
     ]
   }
-}
+)
 
 /**
  * Regression test for issue #12638 (MOSIP case): changing informant type after

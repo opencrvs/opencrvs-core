@@ -62,7 +62,8 @@ function dateClauseToElasticQuery(
 
 /**
  * Generates an Elasticsearch query to search within `document.declaration`
- * using the provided search payload.
+ * using the provided search payload. Each field is read from the first of
+ * `eventConfigs` that has it, so pass the versions of an event in lookup order.
  */
 function generateQuery(
   event: QueryInputType,
@@ -207,6 +208,13 @@ function buildClause(clause: QueryExpression, eventConfigs: EventConfig[]) {
         const value = clause[key]
         if (value.type === 'anyOf') {
           must.push({ terms: { status: value.terms } })
+        } else if (value.type === 'noneOf') {
+          must.push({
+            bool: {
+              must_not: { terms: { status: value.terms } },
+              should: undefined
+            }
+          })
         } else {
           must.push({ term: { status: value.term } })
         }
@@ -235,7 +243,8 @@ function buildClause(clause: QueryExpression, eventConfigs: EventConfig[]) {
       case 'createdAtLocation':
       case 'updatedAtLocation':
       case 'legalStatuses.DECLARED.createdAtLocation':
-      case 'legalStatuses.REGISTERED.createdAtLocation': {
+      case 'legalStatuses.REGISTERED.createdAtLocation':
+      case 'legalStatuses.REVOKED.createdAtLocation': {
         if (clause[key].type === 'exact') {
           must.push({ term: { [key]: clause[key].term } })
         } else {

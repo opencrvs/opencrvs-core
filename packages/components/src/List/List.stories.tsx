@@ -178,6 +178,13 @@ export const TeamMembers = () => {
       menu: true
     },
     {
+      id: 'kalusha',
+      name: 'Kalusha Bwalya',
+      role: 'Hospital Clerk',
+      status: 'Deactivated',
+      menu: true
+    },
+    {
       id: 'emmanuel',
       name: 'Emmanuel Mayuka',
       role: 'Administrator',
@@ -193,7 +200,11 @@ export const TeamMembers = () => {
           key={member.id}
           actions={
             <>
-              <Pill label="Active" type="active" />
+              {member.status === 'Deactivated' ? (
+                <Pill label="Deactivated" type="inactive" />
+              ) : (
+                <Pill label="Active" type="active" />
+              )}
               {member.menu && (
                 <ToggleMenu
                   id={`menu-${member.id}`}

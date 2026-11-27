@@ -16,11 +16,10 @@ import {
   errorMessages,
   EventConfig,
   EventState,
-  EventValidatorContext,
+  EventDocument,
   getDeclarationFields,
-  ValidatorContext,
-  StrictValidatorContext,
-  UserValidatorContext
+  ActionFormConditionalContext,
+  UserConditionalContext
 } from '@opencrvs/commons/events'
 import {
   getOrThrow,
@@ -28,7 +27,6 @@ import {
   FieldConfig,
   getActionAnnotationFields,
   ActionType,
-  getActionFormFields,
   getActionConfig,
   findRecordActionPages,
   isVerificationPage,
@@ -107,67 +105,33 @@ export function getInvalidUpdateKeys<T>({
     }))
 }
 
-/**
- * @deprecated getValidatorContext does not require context, but allows optionality.
- * @see getStrictValidatorContext
- */
-export async function getValidatorContext({
-  token,
-  event
-}: {
+export function getUserConditionalContext(
   token: string
-  event?: EventValidatorContext
-}): Promise<ValidatorContext> {
-  const leafAdminStructureLocationIds =
-    await getLeafLevelAdministrativeAreaIds()
-
-  const user = getOrThrow(getTokenPayload(token), 'Token is missing.')
-
-  return { leafAdminStructureLocationIds, user, event }
-}
-
-/**
- *
- * @returns ValidatorContext with event enforced and types cleaned up.
- */
-export async function getStrictValidatorContext({
-  token,
-  user,
-  event
-}:
-  | {
-      user?: never
-      token: string
-      event: EventValidatorContext
-    }
-  | {
-      token?: never
-      user: UserValidatorContext
-      event: EventValidatorContext
-    }): Promise<StrictValidatorContext> {
-  const leafAdminStructureLocationIds =
-    await getLeafLevelAdministrativeAreaIds()
-
-  if (token) {
-    const tokenPayload = getOrThrow(getTokenPayload(token), 'Token is missing.')
-
-    return {
-      leafAdminStructureLocationIds,
-      event,
-      user: {
-        sub: tokenPayload.sub,
-        scope: tokenPayload.scope,
-        userType: tokenPayload.userType,
-        role: tokenPayload.role
-      }
-    }
-  }
+): UserConditionalContext {
+  const tokenPayload = getOrThrow(getTokenPayload(token), 'Token is missing.')
 
   return {
-    leafAdminStructureLocationIds,
-    event,
-    // types prevent calling without user but inference won't work in this scenario.
-    user: getOrThrow(user, 'User is missing.')
+    sub: tokenPayload.sub,
+    scope: tokenPayload.scope,
+    userType: tokenPayload.userType,
+    role: tokenPayload.role
+  }
+}
+
+export async function getActionFormConditionalContext({
+  token,
+  eventDocument,
+  eventConfig
+}: {
+  token: string
+  eventDocument: EventDocument
+  eventConfig: EventConfig
+}): Promise<ActionFormConditionalContext> {
+  return {
+    eventDocument,
+    eventConfig,
+    user: getUserConditionalContext(token),
+    leafAdminStructureLocationIds: await getLeafLevelAdministrativeAreaIds()
   }
 }
 
@@ -224,16 +188,12 @@ export function validateActionPayloadStructure({
       input.type === ActionType.CUSTOM ? input.customActionType : undefined
   })
 
-  const annotationFields = [
-    ...(actionConfig ? getActionAnnotationFields(actionConfig) : []),
-    ...(input.type === ActionType.NOTIFY
-      ? getActionFormFields(eventConfig, ActionType.NOTIFY)
-      : [])
-  ]
+  const annotationFields = actionConfig
+    ? getActionAnnotationFields(actionConfig)
+    : []
 
   // Clean up annotation for actions that do not have one.
-  const annotation =
-    actionConfig || annotationFields.length > 0 ? (input.annotation ?? {}) : {}
+  const annotation = actionConfig ? (input.annotation ?? {}) : {}
 
   const pages = findRecordActionPages(eventConfig, input.type)
 
