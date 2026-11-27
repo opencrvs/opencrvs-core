@@ -153,8 +153,6 @@ test.describe('International addresses render the required street levels', () =>
   test('Street levels survive on both death certificate templates', async ({
     page
   }) => {
-    test.setTimeout(240_000)
-
     let declaration: Declaration
 
     await test.step('Seed a registered death record with international addresses (via API)', async () => {
@@ -191,8 +189,6 @@ test.describe('International addresses render the required street levels', () =>
   test('Street levels survive on the death certified copy', async ({
     page
   }) => {
-    test.setTimeout(240_000)
-
     let declaration: Declaration
 
     await test.step('Seed a registered death record with international addresses (via API)', async () => {

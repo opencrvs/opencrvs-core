@@ -8,7 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { expect, test, type Page } from '@playwright/test'
+import { expect, test } from '@playwright/test'
 
 import { login, getToken } from '@e2e/support/helpers'
 import { CREDENTIALS } from '@e2e/support/constants'
@@ -24,31 +24,21 @@ import {
 } from '@e2e/support/print-certificate/birth/helpers'
 import { expectInUrl } from '@e2e/support/utils'
 
-test.describe.serial('Navigating in and out of action', () => {
-  let page: Page
-  let declaration: Declaration
-  let eventId: string
-  test.beforeAll(async ({ browser }) => {
-    const token = await getToken(CREDENTIALS.REGISTRAR)
-    const res = await createDeclaration(token)
-    declaration = res.declaration
-    eventId = res.eventId
-    page = await browser.newPage()
-  })
+test('Navigating in and out of action', async ({ page }) => {
+  const token = await getToken(CREDENTIALS.REGISTRAR)
+  const res = await createDeclaration(token)
+  const declaration = res.declaration
+  const eventId = res.eventId
 
-  test.afterAll(async () => {
-    await page.close()
-  })
-
-  test('Login', async () => {
+  await test.step('Login', async () => {
     await login(page)
   })
 
-  test('Navigate to "Pending certification" -workqueue', async () => {
+  await test.step('Navigate to "Pending certification" -workqueue', async () => {
     await page.getByRole('button', { name: 'Pending certification' }).click()
   })
 
-  test('Navigate successfully through the print certificate action flow', async () => {
+  await test.step('Navigate successfully through the print certificate action flow', async () => {
     await navigateToCertificatePrintAction(
       page,
       declaration,
@@ -66,7 +56,7 @@ test.describe.serial('Navigating in and out of action', () => {
     )
   })
 
-  test('Browser back and forward actions work correctly inside the action flow', async () => {
+  await test.step('Browser back and forward actions work correctly inside the action flow', async () => {
     await page.goBack()
     await page.goBack()
     await page.goForward()
@@ -84,7 +74,7 @@ test.describe.serial('Navigating in and out of action', () => {
     )
   })
 
-  test('After finishing action flow, user should be redirected to the event overview page', async () => {
+  await test.step('After finishing action flow, user should be redirected to the event overview page', async () => {
     await page.getByRole('button', { name: 'Yes, print certificate' }).click()
     await page.getByRole('button', { name: 'Print', exact: true }).click()
 
@@ -93,14 +83,14 @@ test.describe.serial('Navigating in and out of action', () => {
     await expectInUrl(page, `/workqueue/pending-certification`)
   })
 
-  test('Browser back button should take user to the front page instead of action flow', async () => {
+  await test.step('Browser back button should take user to the front page instead of action flow', async () => {
     await page.goBack()
     await expect(page.locator('#content-name')).toContainText(
       'Pending certification'
     )
   })
 
-  test('Browser forward button should take user back to the event overview page', async () => {
+  await test.step('Browser forward button should take user back to the event overview page', async () => {
     await page.goForward()
     await expectInUrl(
       page,

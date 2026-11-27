@@ -33,23 +33,14 @@ const loginAndBeginBirthDeclaration = async ({ page }: { page: Page }) => {
   await expect(page.getByText("Child's details")).toBeVisible()
 }
 
-test.describe.serial("2. Validate the child's details page", () => {
-  let page: Page
-
+test.describe("2. Validate the child's details page", () => {
   trackAndDeleteCreatedEvents()
 
-  test.describe('2.1 Validate "First Name(s)" text field', async () => {
-    test.beforeAll(async ({ browser }) => {
-      page = await browser.newPage()
-      await loginAndBeginBirthDeclaration({ page })
-    })
+  test('2.1 Validate "First Name(s)" text field', async ({ page }) => {
+    await loginAndBeginBirthDeclaration({ page })
 
-    test.afterAll(async () => {
-      await page.close()
-    })
-
-    test.describe('2.1.1 Enter Non-English characters', async () => {
-      test('Using name: Richard the 3rd', async () => {
+    await test.step('2.1.1 Enter Non-English characters', async () => {
+      await test.step('Using name: Richard the 3rd', async () => {
         await type(page, '#firstname', 'Richard the 3rd')
         /*
          * Expected result: should accept the input and not throw any error
@@ -57,7 +48,7 @@ test.describe.serial("2. Validate the child's details page", () => {
         await expect(page.locator('#firstname_error')).toBeHidden()
       })
 
-      test('Using name: John_Peter', async () => {
+      await test.step('Using name: John_Peter', async () => {
         await type(page, '#firstname', 'John_Peter')
         /*
          * Expected result: should throw error:
@@ -67,7 +58,7 @@ test.describe.serial("2. Validate the child's details page", () => {
         await expect(page.locator('#firstname_error')).toBeVisible()
       })
 
-      test('Using name: John-Peter', async () => {
+      await test.step('Using name: John-Peter', async () => {
         await type(page, '#firstname', 'John-Peter')
         /*
          * Expected result: should accept the input and not throw any error
@@ -75,7 +66,7 @@ test.describe.serial("2. Validate the child's details page", () => {
         await expect(page.locator('#firstname_error')).toBeHidden()
       })
 
-      test("Using name: O'Neill", async () => {
+      await test.step("Using name: O'Neill", async () => {
         await type(page, '#firstname', "O'Neill")
         /*
          * Expected result: should accept the input and not throw any error
@@ -83,7 +74,7 @@ test.describe.serial("2. Validate the child's details page", () => {
         await expect(page.locator('#firstname_error')).toBeHidden()
       })
 
-      test('Using name: &er$on', async () => {
+      await test.step('Using name: &er$on', async () => {
         await type(page, '#firstname', '&er$on')
         /*
          * Expected result: should throw error:
@@ -96,13 +87,13 @@ test.describe.serial("2. Validate the child's details page", () => {
        * `isValidEnglishName` accepts this today -- Æ is Script=Latin,
        * so the rule has nothing to complain about.
        */
-      test('Using name: X Æ A-Xii', async () => {
+      await test.step('Using name: X Æ A-Xii', async () => {
         await type(page, '#firstname', 'X Æ A-Xii')
         await expect(page.locator('#firstname_error')).toBeHidden()
       })
     })
 
-    test('2.1.2 Enter less than 33 English characters', async () => {
+    await test.step('2.1.2 Enter less than 33 English characters', async () => {
       await type(page, '#firstname', 'Rakibul Islam')
       /*
        * Expected result: should accept the input and not throw any error
@@ -110,7 +101,7 @@ test.describe.serial("2. Validate the child's details page", () => {
       await expect(page.locator('#firstname_error')).toBeHidden()
     })
 
-    test('2.1.4 Enter more than 32 English characters', async () => {
+    await test.step('2.1.4 Enter more than 32 English characters', async () => {
       const LONG_NAME = 'Ovuvuevuevue Enyetuenwuevue Ugbemugbem Osas'
       await type(page, '#firstname', LONG_NAME)
       /*
@@ -121,7 +112,7 @@ test.describe.serial("2. Validate the child's details page", () => {
       )
     })
 
-    test('2.1.3 Enter Field as NULL', async () => {
+    await test.step('2.1.3 Enter Field as NULL', async () => {
       await goToSection(page, 'review')
 
       /*
@@ -188,7 +179,7 @@ test.describe.serial("2. Validate the child's details page", () => {
     })
 
     // @TODO: This validation is not implemented in Events V2 yet
-    test.skip('2.4.2 Enter invalid date', async () => {
+    test.skip('2.4.2 Enter invalid date', async ({ page }) => {
       await page.getByPlaceholder('dd').fill('0')
       await page.getByPlaceholder('mm').fill('0')
       await page.getByPlaceholder('yyyy').fill('0')
@@ -202,7 +193,7 @@ test.describe.serial("2. Validate the child's details page", () => {
     })
 
     // @TODO: This validation is not implemented in Events V2 yet
-    test.skip('2.4.3 Enter future date', async () => {
+    test.skip('2.4.3 Enter future date', async ({ page }) => {
       const futureDate = new Date()
       futureDate.setDate(new Date().getDate() + 5)
       const [yyyy, mm, dd] = futureDate.toISOString().split('T')[0].split('-')
@@ -235,17 +226,10 @@ test.describe.serial("2. Validate the child's details page", () => {
     })
   })
 
-  test.describe('2.5 Validate delayed registration', async () => {
-    test.beforeAll(async ({ browser }) => {
-      page = await browser.newPage()
-      await loginAndBeginBirthDeclaration({ page })
-    })
+  test('2.5 Validate delayed registration', async ({ page }) => {
+    await loginAndBeginBirthDeclaration({ page })
 
-    test.afterAll(async () => {
-      await page.close()
-    })
-
-    test.beforeEach(async () => {
+    async function fillDelayedDate() {
       const delayedDate = new Date()
       delayedDate.setDate(new Date().getDate() - 365 - 5)
       const [yyyy, mm, dd] = delayedDate.toISOString().split('T')[0].split('-')
@@ -253,9 +237,11 @@ test.describe.serial("2. Validate the child's details page", () => {
       await page.getByPlaceholder('dd').fill(dd)
       await page.getByPlaceholder('mm').fill(mm)
       await page.getByPlaceholder('yyyy').fill(yyyy)
-    })
+    }
 
-    test('2.5.1 Enter date after delayed registration time period', async () => {
+    await test.step('2.5.1 Enter date after delayed registration time period', async () => {
+      await fillDelayedDate()
+
       const lateDate = new Date()
       lateDate.setDate(new Date().getDate() - 365 + 5)
       const [yyyy, mm, dd] = lateDate.toISOString().split('T')[0].split('-')
@@ -272,7 +258,9 @@ test.describe.serial("2. Validate the child's details page", () => {
       ).toBeHidden()
     })
 
-    test('2.5.2 Enter date before delayed registration time period', async () => {
+    await test.step('2.5.2 Enter date before delayed registration time period', async () => {
+      await fillDelayedDate()
+
       /*
        * Expected result: should show field:
        * - Reason for delayed registration
@@ -282,7 +270,9 @@ test.describe.serial("2. Validate the child's details page", () => {
       ).toBeVisible()
     })
 
-    test('2.5.3 Enter "Reason for late registration"', async () => {
+    await test.step('2.5.3 Enter "Reason for late registration"', async () => {
+      await fillDelayedDate()
+
       await page.locator('#child____reason').fill('Lack of awareness')
 
       /*
@@ -291,7 +281,9 @@ test.describe.serial("2. Validate the child's details page", () => {
       await expect(page.locator('#child____reason_error')).toBeHidden()
     })
 
-    test('2.5.4 Set the field as null', async () => {
+    await test.step('2.5.4 Set the field as null', async () => {
+      await fillDelayedDate()
+
       await page.locator('#child____reason').fill('')
       await goToSection(page, 'review')
 
@@ -308,73 +300,68 @@ test.describe.serial("2. Validate the child's details page", () => {
   })
 
   test.describe('2.6 Validate place of delivery field', async () => {
-    test.beforeAll(async ({ browser }) => {
-      page = await browser.newPage()
+    test('2.6.2 Select place of delivery', async ({ page }) => {
       await loginAndBeginBirthDeclaration({ page })
-    })
 
-    test.afterAll(async () => {
-      await page.close()
-    })
+      await test.step('2.6.2.a Validate Health Institution', async () => {
+        await test.step('Select Health Institution', async () => {
+          await page.locator('#child____placeOfBirth').click()
+          await page.getByText('Health Institution', { exact: true }).click()
+          /*
+           * Expected result: should show input field for:
+           * - Health institution
+           */
+          await expect(page.locator('#child____birthLocation')).toBeVisible()
+        })
+        await test.step('Enter any health institution', async () => {
+          await page
+            .locator('#searchable-select-child____birthLocation input')
+            .fill('ib')
+          await page.getByText('Ibombo District Hospital').click()
 
-    test('2.6.2.a Validate Health Institution', async () => {
-      await test.step('Select Health Institution', async () => {
-        await page.locator('#child____placeOfBirth').click()
-        await page.getByText('Health Institution', { exact: true }).click()
-        /*
-         * Expected result: should show input field for:
-         * - Health institution
-         */
-        await expect(page.locator('#child____birthLocation')).toBeVisible()
+          await expect(
+            page.locator(
+              '#searchable-select-child____birthLocation .react-select__single-value'
+            )
+          ).toHaveText('Ibombo District Hospital')
+        })
       })
-      await test.step('Enter any health institution', async () => {
-        await page
-          .locator('#searchable-select-child____birthLocation input')
-          .fill('ib')
-        await page.getByText('Ibombo District Hospital').click()
+
+      await test.step('2.6.2.b Select Residential address', async () => {
+        await page.locator('#child____placeOfBirth').click()
+        await page.getByText('Residential address', { exact: true }).click()
+
+        /*
+         * Expected result:
+         * - should select "Residential address" as place of birth
+         * - Should show input field for address
+         */
+        await expect(page.locator('#child____placeOfBirth')).toContainText(
+          'Residential address'
+        )
 
         await expect(
-          page.locator(
-            '#searchable-select-child____birthLocation .react-select__single-value'
-          )
-        ).toHaveText('Ibombo District Hospital')
+          page.locator('#child____birthLocation____privateHome-form-input')
+        ).toBeVisible()
       })
-    })
 
-    test('2.6.2.b Select Residential address', async () => {
-      await page.locator('#child____placeOfBirth').click()
-      await page.getByText('Residential address', { exact: true }).click()
+      await test.step('2.6.2.c Select Other', async () => {
+        await page.locator('#child____placeOfBirth').click()
+        await page.getByText('Other', { exact: true }).click()
 
-      /*
-       * Expected result:
-       * - should select "Residential address" as place of birth
-       * - Should show input field for address
-       */
-      await expect(page.locator('#child____placeOfBirth')).toContainText(
-        'Residential address'
-      )
-
-      await expect(
-        page.locator('#child____birthLocation____privateHome-form-input')
-      ).toBeVisible()
-    })
-
-    test('2.6.2.c Select Other', async () => {
-      await page.locator('#child____placeOfBirth').click()
-      await page.getByText('Other', { exact: true }).click()
-
-      /*
+        /*
        * Expected result:
        should select "Other" as place of birth
        * - Should show input field for address
        */
-      await expect(page.locator('#child____placeOfBirth')).toContainText(
-        'Other'
-      )
+        await expect(page.locator('#child____placeOfBirth')).toContainText(
+          'Other'
+        )
 
-      await expect(
-        page.locator('#child____birthLocation____other-form-input')
-      ).toBeVisible()
+        await expect(
+          page.locator('#child____birthLocation____other-form-input')
+        ).toBeVisible()
+      })
     })
 
     test('2.6.1 Keep field as null', async ({ page }) => {

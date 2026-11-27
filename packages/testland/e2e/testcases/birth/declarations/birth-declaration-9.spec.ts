@@ -8,7 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { test, expect, type Page } from '@playwright/test'
+import { test, expect } from '@playwright/test'
 import {
   continueForm,
   drawSignature,
@@ -27,8 +27,7 @@ import {
 import { ensureAssignedToUser } from '@e2e/support/utils'
 import { openRecordByTitle } from '@e2e/support/print-certificate/birth/helpers'
 
-test.describe.serial('9. Birth declaration case - 9', () => {
-  let page: Page
+test('9. Birth declaration case - 9', async ({ page }) => {
   const declaration = {
     child: {
       name: {
@@ -44,31 +43,22 @@ test.describe.serial('9. Birth declaration case - 9', () => {
       detailsDontExist: true
     }
   }
-  test.beforeAll(async ({ browser }) => {
-    page = await browser.newPage()
-  })
 
-  test.afterAll(async () => {
-    await page.close()
-  })
+  await test.step('9.1 Declaration started by HO', async () => {
+    await login(page, CREDENTIALS.HOSPITAL_OFFICIAL)
+    await page.click('#header-new-event')
+    await page.getByLabel('Birth').click()
+    await page.getByRole('button', { name: 'Continue' }).click()
+    await page.getByRole('button', { name: 'Continue' }).click()
 
-  test.describe('9.1 Declaration started by HO', async () => {
-    test.beforeAll(async () => {
-      await login(page, CREDENTIALS.HOSPITAL_OFFICIAL)
-      await page.click('#header-new-event')
-      await page.getByLabel('Birth').click()
-      await page.getByRole('button', { name: 'Continue' }).click()
-      await page.getByRole('button', { name: 'Continue' }).click()
-    })
-
-    test('9.1.1 Fill child details', async () => {
+    await test.step('9.1.1 Fill child details', async () => {
       await page.locator('#firstname').fill(declaration.child.name.firstNames)
       await page.locator('#surname').fill(declaration.child.name.familyName)
 
       await continueForm(page)
     })
 
-    test('9.1.2 Fill informant details', async () => {
+    await test.step('9.1.2 Fill informant details', async () => {
       await page.locator('#informant____relation').click()
       await page
         .getByText(declaration.informantType, {
@@ -79,20 +69,20 @@ test.describe.serial('9. Birth declaration case - 9', () => {
       await continueForm(page)
     })
 
-    test("9.1.3 Fill mother's details", async () => {
+    await test.step("9.1.3 Fill mother's details", async () => {
       await continueForm(page)
     })
 
-    test("9.1.4 Fill father's details", async () => {
+    await test.step("9.1.4 Fill father's details", async () => {
       await page.getByLabel("Father's details are not available").check()
       await continueForm(page)
     })
 
-    test('9.1.5 Go to preview', async () => {
+    await test.step('9.1.5 Go to preview', async () => {
       await goToSection(page, 'review')
     })
 
-    test('9.1.6 Verify information on preview page', async () => {
+    await test.step('9.1.6 Verify information on preview page', async () => {
       /*
        * Expected result: should include
        * - Child's Family Name
@@ -178,7 +168,7 @@ test.describe.serial('9. Birth declaration case - 9', () => {
       )
     })
 
-    test('9.1.7 Fill up informant signature', async () => {
+    await test.step('9.1.7 Fill up informant signature', async () => {
       await page.locator('#review____comment').fill(faker.lorem.sentence())
       await page.getByRole('button', { name: 'Sign', exact: true }).click()
       await drawSignature(page, 'review____signature_canvas_element', false)
@@ -190,7 +180,7 @@ test.describe.serial('9. Birth declaration case - 9', () => {
       await expect(page.getByRole('dialog')).not.toBeVisible()
     })
 
-    test('9.1.8 Notify', async () => {
+    await test.step('9.1.8 Notify', async () => {
       await triggerDeclarationAction(page, 'Notify')
 
       await assertRecordInWorkqueue({
@@ -206,12 +196,12 @@ test.describe.serial('9. Birth declaration case - 9', () => {
     })
   })
 
-  test.describe('9.2 Declaration Review by RO', async () => {
-    test('9.2.0 Login', async () => {
+  await test.step('9.2 Declaration Review by RO', async () => {
+    await test.step('9.2.0 Login', async () => {
       await login(page, CREDENTIALS.REGISTRATION_OFFICER)
     })
 
-    test('9.2.1 Navigate to the declaration review page', async () => {
+    await test.step('9.2.1 Navigate to the declaration review page', async () => {
       await page.getByRole('button', { name: 'Notifications' }).click()
       await openRecordByTitle(page, formatName(declaration.child.name))
 
@@ -219,7 +209,7 @@ test.describe.serial('9. Birth declaration case - 9', () => {
       await switchEventTab(page, 'Record')
     })
 
-    test('9.2.2 Verify information on preview page', async () => {
+    await test.step('9.2.2 Verify information on preview page', async () => {
       /*
        * Expected result: should include
        * - Child's Family Name

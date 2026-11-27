@@ -8,7 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { expect, Page, test } from '@playwright/test'
+import { expect, test } from '@playwright/test'
 import { v4 as uuidv4 } from 'uuid'
 import { faker } from '@faker-js/faker'
 import {
@@ -21,25 +21,14 @@ import { login } from '@e2e/support/helpers'
 import { createClient } from '@opencrvs/toolkit/api'
 import { selectAction, type } from '@e2e/support/utils'
 
-test.describe
-  .serial('POST /api/events/events/{eventId}/correction/request', () => {
-  let clientToken: string
-  let registrarToken: string
-  let healthFacilityId: string
-  let clientName: string
-  let eventId: string
-  let page: Page
+test('POST /api/events/events/{eventId}/correction/request', async ({
+  page
+}) => {
+  const { clientToken, registrarToken, healthFacilityId, clientName } =
+    await createIntegrationContext()
+  const eventId = await createRegisteredEvent(registrarToken)
 
-  test.beforeAll(async () => {
-    const context = await createIntegrationContext()
-    clientToken = context.clientToken
-    registrarToken = context.registrarToken
-    healthFacilityId = context.healthFacilityId
-    clientName = context.clientName
-  })
-
-  test('HTTP 200 for correction request', async () => {
-    eventId = await createRegisteredEvent(registrarToken)
+  await test.step('HTTP 200 for correction request', async () => {
     console.log('Event ID:', eventId)
 
     const response = await fetchClientAPI(
@@ -69,10 +58,7 @@ test.describe
     expect(requestAction).toBeDefined()
   })
 
-  test('Correction review has submitter name as system client', async ({
-    browser
-  }) => {
-    page = await browser.newPage()
+  await test.step('Correction review has submitter name as system client', async () => {
     await login(page, CREDENTIALS.REGISTRAR)
 
     const client = createClient(

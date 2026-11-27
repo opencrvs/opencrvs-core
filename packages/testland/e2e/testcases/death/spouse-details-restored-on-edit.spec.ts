@@ -32,8 +32,6 @@ import { ActionType } from '@opencrvs/toolkit/events'
 test('Spouse details restored on a later edit are reflected in review and audit (#13701)', async ({
   browser
 }) => {
-  test.setTimeout(180_000)
-
   const page = await browser.newPage()
 
   // Informant we switch to during the first edit. Any non-spouse relation makes

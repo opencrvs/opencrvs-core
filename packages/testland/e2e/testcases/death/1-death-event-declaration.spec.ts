@@ -8,7 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { expect, test, type Page } from '@playwright/test'
+import { expect, test } from '@playwright/test'
 import { login, triggerDeclarationAction } from '@e2e/support/helpers'
 import { faker } from '@faker-js/faker'
 import { expectInUrl, type } from '@e2e/support/utils'
@@ -19,17 +19,8 @@ const deceased = {
 }
 
 test.describe('1. Death event declaration', () => {
-  test.describe.serial('Fill all form sections. Save & Exit', () => {
-    let page: Page
-    test.beforeAll(async ({ browser }) => {
-      page = await browser.newPage()
-    })
-
-    test.afterAll(async () => {
-      await page.close()
-    })
-
-    test('1.1. Navigate to the death event declaration page', async () => {
+  test('Fill all form sections. Save & Exit', async ({ page }) => {
+    await test.step('1.1. Navigate to the death event declaration page', async () => {
       await login(page)
 
       await page.click('#header-new-event')
@@ -39,8 +30,8 @@ test.describe('1. Death event declaration', () => {
       ).toBeVisible()
     })
 
-    test.describe('1.2. Validate event selection page', async () => {
-      test('1.2.1 Validate the contents of the event type page', async () => {
+    await test.step('1.2. Validate event selection page', async () => {
+      await test.step('1.2.1 Validate the contents of the event type page', async () => {
         /*
          * Expected result: should show
          * - Radio buttons of the events
@@ -56,7 +47,7 @@ test.describe('1. Death event declaration', () => {
         await expect(page.getByRole('button', { name: 'Exit' })).toBeVisible()
       })
 
-      test('1.2.2 Click the "Continue" button without selecting any event', async () => {
+      await test.step('1.2.2 Click the "Continue" button without selecting any event', async () => {
         await page.getByRole('button', { name: 'Continue' }).click()
         /*
          * Expected result: should throw an error as below:
@@ -67,7 +58,7 @@ test.describe('1. Death event declaration', () => {
         ).toBeVisible()
       })
 
-      test('1.2.3 Select the "Death" event and click "Continue" button', async () => {
+      await test.step('1.2.3 Select the "Death" event and click "Continue" button', async () => {
         await page.getByLabel('Death').click()
         await page.getByRole('button', { name: 'Continue' }).click()
 
@@ -77,8 +68,8 @@ test.describe('1. Death event declaration', () => {
       })
     })
 
-    test.describe('1.3 Validate "Introduction" page', async () => {
-      test('1.3.1 Validate the contents of introduction page', async () => {
+    await test.step('1.3 Validate "Introduction" page', async () => {
+      await test.step('1.3.1 Validate the contents of introduction page', async () => {
         /*
          * Expected result: should show
          * - verbiage of death event introduction
@@ -112,7 +103,7 @@ test.describe('1. Death event declaration', () => {
         ).toBeVisible()
       })
 
-      test('1.3.2 Verify the verbiage of introduction page of death event', async () => {
+      await test.step('1.3.2 Verify the verbiage of introduction page of death event', async () => {
         /*
          * Expected result: should show
          * - I am going to help you make a declaration of death.
@@ -142,7 +133,7 @@ test.describe('1. Death event declaration', () => {
         ).toBeVisible()
       })
 
-      test('1.3.3 Click the "continue" button', async () => {
+      await test.step('1.3.3 Click the "continue" button', async () => {
         await page.getByRole('button', { name: 'Continue' }).click()
         /*
          * Expected result: should navigate to the "Deceased details" page
@@ -151,8 +142,8 @@ test.describe('1. Death event declaration', () => {
       })
     })
 
-    test.describe('1.4 Validate "Deceased Details" page', async () => {
-      test('1.4.1 Validate the contents of Deceased details page', async () => {
+    await test.step('1.4 Validate "Deceased Details" page', async () => {
+      await test.step('1.4.1 Validate the contents of Deceased details page', async () => {
         /*
          * Expected result: should see
          * - Deceased details block
@@ -180,11 +171,11 @@ test.describe('1. Death event declaration', () => {
         ).toBeVisible()
       })
 
-      test('1.4.2 Validate Deceased details block', async () => {
+      await test.step('1.4.2 Validate Deceased details block', async () => {
         await page.locator('#firstname').fill(deceased.name.firstname)
       })
 
-      test('1.4.3 Click "continue"', async () => {
+      await test.step('1.4.3 Click "continue"', async () => {
         await page.getByRole('button', { name: 'Continue' }).click()
 
         /*
@@ -194,8 +185,8 @@ test.describe('1. Death event declaration', () => {
       })
     })
 
-    test.describe('1.5 Validate "Event Details" page', async () => {
-      test('1.5.1 Validate the contents of Event details page', async () => {
+    await test.step('1.5 Validate "Event Details" page', async () => {
+      await test.step('1.5.1 Validate the contents of Event details page', async () => {
         /*
          * Expected result: should see
          * - Event details block
@@ -223,9 +214,9 @@ test.describe('1. Death event declaration', () => {
         ).toBeVisible()
       })
 
-      test.skip('1.5.2 Validate Event details block', async () => {})
+      await test.step.skip('1.5.2 Validate Event details block', async () => {})
 
-      test('1.5.3 Click "continue"', async () => {
+      await test.step('1.5.3 Click "continue"', async () => {
         await page.getByRole('button', { name: 'Continue' }).click()
 
         /*
@@ -235,8 +226,8 @@ test.describe('1. Death event declaration', () => {
       })
     })
 
-    test.describe('1.6 Validate "Informant details" page', async () => {
-      test('1.6.1 Validate the contents of informant details page', async () => {
+    await test.step('1.6 Validate "Informant details" page', async () => {
+      await test.step('1.6.1 Validate the contents of informant details page', async () => {
         /*
          * Expected result: should see
          * - Relationship to deceased dropdown
@@ -268,9 +259,12 @@ test.describe('1. Death event declaration', () => {
         ).toBeVisible()
       })
 
-      test.skip('1.6.2 Click the "continue" button without selecting any relationship to deceased', async () => {})
+      await test.step.skip(
+        '1.6.2 Click the "continue" button without selecting any relationship to deceased',
+        async () => {}
+      )
 
-      test('misc: shows validation error for phone number', async () => {
+      await test.step('misc: shows validation error for phone number', async () => {
         await type(page, '#informant____phoneNo', '123')
         await expect(page.locator('#informant____phoneNo_error')).toHaveText(
           'Must be a valid 10 digit number that starts with 0(7|9)'
@@ -278,7 +272,7 @@ test.describe('1. Death event declaration', () => {
         await type(page, '#informant____phoneNo', '')
       })
 
-      test('1.6.3 Select eny option in relatinship to deceased and click the "continue" button', async () => {
+      await test.step('1.6.3 Select eny option in relatinship to deceased and click the "continue" button', async () => {
         await page.getByText('Select').click()
         await page.getByText('Son', { exact: true }).click()
         await page.getByRole('button', { name: 'Continue' }).click()
@@ -292,8 +286,8 @@ test.describe('1. Death event declaration', () => {
       })
     })
 
-    test.describe('1.7 Validate "Spouse Details" page', async () => {
-      test('1.7.1 validate the contents of spouse details page', async () => {
+    await test.step('1.7 Validate "Spouse Details" page', async () => {
+      await test.step('1.7.1 validate the contents of spouse details page', async () => {
         /*
          * Expected result: should see
          * - Spouse details block
@@ -324,9 +318,12 @@ test.describe('1. Death event declaration', () => {
         ).toBeVisible()
       })
 
-      test.skip('1.7.2 Validate Spouse details block', async () => {})
+      await test.step.skip(
+        '1.7.2 Validate Spouse details block',
+        async () => {}
+      )
 
-      test('1.7.3 click continue', async () => {
+      await test.step('1.7.3 click continue', async () => {
         await page.getByRole('button', { name: 'Continue' }).click()
 
         /*
@@ -338,8 +335,8 @@ test.describe('1. Death event declaration', () => {
       })
     })
 
-    test.describe('1.8 Validate "Supporting Document" page', async () => {
-      test('1.8.1 validate the contents of Supporting Document page', async () => {
+    await test.step('1.8 Validate "Supporting Document" page', async () => {
+      await test.step('1.8.1 validate the contents of Supporting Document page', async () => {
         /*
          * Expected result: should see
          * - Supporting Document block
@@ -370,16 +367,19 @@ test.describe('1. Death event declaration', () => {
         ).toBeVisible()
       })
 
-      test.skip('1.8.2 Validate Supporting Document block', async () => {})
+      await test.step.skip(
+        '1.8.2 Validate Supporting Document block',
+        async () => {}
+      )
 
-      test('1.8.3 click continue', async () => {
+      await test.step('1.8.3 click continue', async () => {
         await page.getByRole('button', { name: 'Continue' }).click()
         await expectInUrl(page, `/review`)
       })
     })
 
-    test.describe('1.9 Validate "Save & Exit" Button  ', async () => {
-      test('1.9.1 Click the "Save & Exit" button from any page', async () => {
+    await test.step('1.9 Validate "Save & Exit" Button  ', async () => {
+      await test.step('1.9.1 Click the "Save & Exit" button from any page', async () => {
         await page.getByRole('button', { name: 'Action', exact: true }).click()
         await page.getByText('Save & Exit', { exact: true }).click()
 
@@ -405,7 +405,7 @@ test.describe('1. Death event declaration', () => {
         ).toBeVisible()
       })
 
-      test('1.9.2 Click Cancel', async () => {
+      await test.step('1.9.2 Click Cancel', async () => {
         await page.getByRole('button', { name: 'Cancel' }).click()
 
         /*
@@ -416,7 +416,7 @@ test.describe('1. Death event declaration', () => {
         ).toBeHidden()
       })
 
-      test('1.9.3 Click Confirm', async () => {
+      await test.step('1.9.3 Click Confirm', async () => {
         await triggerDeclarationAction(page, 'Save & Exit')
 
         /*

@@ -8,13 +8,8 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { expect, test, type Page } from '@playwright/test'
-import {
-  auditRecord,
-  getToken,
-  goBackToReview,
-  login
-} from '@e2e/support/helpers'
+import { expect, test } from '@playwright/test'
+import { getToken, login } from '@e2e/support/helpers'
 import { faker } from '@faker-js/faker'
 import {
   createDeclaration as createDeclarationV2,
@@ -30,24 +25,20 @@ import {
   type
 } from '@e2e/support/utils'
 import { openRecordByTitle } from '@e2e/support/print-certificate/birth/helpers'
+import { requestCorrectionViaApi } from '@e2e/support/test-data/api-actions'
 
-test.describe.serial('Request and accept correction (offline)', () => {
+test('Request and accept correction (offline)', async ({ page }) => {
   let declaration: DeclarationV2
   let trackingId = ''
   let eventId: string
-  let page: Page
 
   const updatedChildDetails = {
     firstname: faker.person.firstName(),
     surname: faker.person.lastName()
   }
 
-  test.beforeAll(async ({ browser }) => {
-    page = await browser.newPage()
-  })
-
-  test('Shortcut declaration', async () => {
-    let token = await getToken(CREDENTIALS.REGISTRAR)
+  await test.step('Shortcut declaration', async () => {
+    const token = await getToken(CREDENTIALS.REGISTRAR)
 
     const res = await createDeclarationV2(
       token,
@@ -100,99 +91,29 @@ test.describe.serial('Request and accept correction (offline)', () => {
     )
     trackingId = res.trackingId!
     eventId = res.eventId
-    token = await getToken(CREDENTIALS.REGISTRAR)
     declaration = res.declaration
   })
 
-  test.describe('Request correction as RO', () => {
-    test('Login as RO', async () => {
-      await login(page, CREDENTIALS.REGISTRATION_OFFICER)
-    })
-
-    test('Navigate to record correction', async () => {
-      await auditRecord({
-        page,
-        name: formatV2ChildName(declaration),
-        trackingId
-      })
-      await ensureAssignedToUser(page, CREDENTIALS.REGISTRATION_OFFICER)
-
-      await selectAction(page, 'Correct')
-    })
-
-    test('Add correction requester', async () => {
-      await page.locator('#requester____type').click()
-      await page.getByText('Legal Guardian', { exact: true }).click()
-      await page.locator('#reason____option').click()
-      await page
-        .getByText(
-          'Informant provided incorrect information (Material error)',
-          {
-            exact: true
-          }
-        )
-        .click()
-      await page.getByRole('button', { name: 'Continue' }).click()
-    })
-
-    test('Verify identity', async () => {
-      await page.getByRole('button', { name: 'Verified' }).click()
-    })
-
-    test('Skip uploading documents', async () => {
-      await page.getByRole('button', { name: 'Continue' }).click()
-    })
-
-    test('Add correction fee', async () => {
-      await page
-        .locator('#fees____amount')
-        .fill(faker.number.int({ min: 1, max: 1000 }).toString())
-
-      await page.getByRole('button', { name: 'Continue' }).click()
-    })
-
-    test('Change child name', async () => {
-      await page.getByTestId('change-button-child.name').click()
-
-      await page
-        .getByTestId('text__firstname')
-        .fill(updatedChildDetails.firstname)
-
-      await page.getByTestId('text__surname').fill(updatedChildDetails.surname)
-
-      await goBackToReview(page)
-      await page.getByRole('button', { name: 'Continue' }).click()
-    })
-
-    test('Request correction', async () => {
-      const correctionResponse = page.waitForResponse(
-        (res) =>
-          res.url().includes('event.actions.correction.request') && res.ok()
-      )
-
-      await page
-        .getByRole('button', { name: 'Submit correction request' })
-        .click()
-      await page.getByRole('button', { name: 'Confirm' }).click()
-
-      await correctionResponse
-
-      await expectInUrl(page, `events/${eventId}`)
-
-      await expect(
-        page.locator('#content-name', {
-          hasText: formatV2ChildName(declaration)
-        })
-      ).toBeVisible()
+  await test.step('Request correction as RO via API', async () => {
+    await requestCorrectionViaApi({
+      token: await getToken(CREDENTIALS.REGISTRATION_OFFICER),
+      eventId,
+      declaration: { 'child.name': updatedChildDetails },
+      annotation: {
+        'requester.type': 'LEGAL_GUARDIAN',
+        'reason.option': 'MATERIAL_ERROR',
+        'requester.identity.verify': true,
+        'fees.amount': faker.number.int({ min: 1, max: 1000 })
+      }
     })
   })
 
-  test.describe('Accept correction as Registrar (offline)', () => {
-    test('Login as Registrar', async () => {
+  await test.step('Accept correction as Registrar (offline)', async () => {
+    await test.step('Login as Registrar', async () => {
       await login(page, CREDENTIALS.REGISTRAR)
     })
 
-    test('Navigate to correction review', async () => {
+    await test.step('Navigate to correction review', async () => {
       await type(page, '#searchText', trackingId)
       await page.locator('#searchIconButton').click()
 
@@ -202,7 +123,7 @@ test.describe.serial('Request and accept correction (offline)', () => {
       await selectAction(page, 'Review correction request')
     })
 
-    test('Accept correction offline', async () => {
+    await test.step('Accept correction offline', async () => {
       // Go offline
       await page.context().setOffline(true)
 
@@ -224,7 +145,7 @@ test.describe.serial('Request and accept correction (offline)', () => {
       await expect(page.getByText('Offline')).toBeVisible()
     })
 
-    test('Go back online', async () => {
+    await test.step('Go back online', async () => {
       // Go back online
 
       const acceptResponse = page.waitForResponse(
