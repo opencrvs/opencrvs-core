@@ -116,6 +116,22 @@ const handlers = [
   http.delete(`${env.DOCUMENTS_URL}/files/:filePath*`, () => {
     return HttpResponse.json({ ok: true })
   }),
+  http.post(
+    `${env.DOCUMENTS_URL}/presigned-upload-url`,
+    async ({ request }) => {
+      const { filePath, contentType } = (await request.json()) as {
+        filePath: string
+        contentType: string
+      }
+      return HttpResponse.json({
+        url: `http://localhost:9000/ocrvs/${filePath}?X-Amz-Signature=test`,
+        headers: {
+          'Content-Type': contentType,
+          'x-amz-meta-created-by': 'test'
+        }
+      })
+    }
+  ),
   http.get(`${env.DOCUMENTS_URL}/list-files/:prefix*`, () => {
     return HttpResponse.json([])
   }),

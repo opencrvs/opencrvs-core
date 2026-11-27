@@ -22,6 +22,7 @@ import {
   getFilePathsFromEvent,
   getFilePathsFromValues,
   joinUrlPaths,
+  MAX_UPLOAD_SIZE_BYTES,
   parseDocumentPath,
   logger,
   EventDocument,
@@ -299,4 +300,66 @@ export async function uploadFile(
   }
 
   return res.text()
+}
+
+export const PresignUploadFields = z.object({
+  transactionId: UUID,
+  extension: z.string().regex(/^[A-Za-z0-9_-]{1,32}$/),
+  contentType: z.string().min(1),
+  contentLength: z.number().int().positive().max(MAX_UPLOAD_SIZE_BYTES)
+})
+
+const PresignedUpload = z.object({
+  url: z.string(),
+  headers: z.record(z.string(), z.string())
+})
+
+/**
+ * The key that an upload with `fields` gets under `prefix`. The client
+ * derives the same key before the upload, so that it can cache the file.
+ */
+export function getUploadKey(
+  prefix: AttachmentPath,
+  fields: Pick<
+    z.infer<typeof PresignUploadFields>,
+    'transactionId' | 'extension'
+  >
+) {
+  return DocumentPath.parse(
+    `${prefix}${fields.transactionId}.${fields.extension}`
+  )
+}
+
+/**
+ * Asks documents-service for a URL that the browser uses to upload one file
+ * to `path`. The caller must authorize the upload first, because
+ * documents-service signs any path under `events/` or `users/`.
+ */
+export async function presignUpload(
+  path: DocumentPath,
+  {
+    contentType,
+    contentLength
+  }: Pick<z.infer<typeof PresignUploadFields>, 'contentType' | 'contentLength'>,
+  token: string
+) {
+  const res = await fetch(new URL('/presigned-upload-url', env.DOCUMENTS_URL), {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: token
+    },
+    body: JSON.stringify({ filePath: path, contentType, contentLength })
+  })
+
+  // A different user uploaded the file at this path
+  if (res.status === 403) {
+    throw new TRPCError({ code: 'FORBIDDEN' })
+  }
+
+  if (!res.ok) {
+    throw new Error(`Failed to presign upload: ${res.status} ${res.statusText}`)
+  }
+
+  return PresignedUpload.parse(await res.json())
 }
