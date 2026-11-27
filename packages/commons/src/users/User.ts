@@ -20,13 +20,11 @@ import {
   NameFieldValue
 } from '../events'
 
-export const REINDEX_USER_ID = '00000000-0000-0000-0000-000000000000' as UUID
-
 /**
  * Subject of the short-lived bootstrap token countryconfig uses to register
  * integrations on startup. Must be a well-formed UUID so it can be resolved as
- * a `SystemContext` by services verifying the token — hence the v4 version and
- * variant nibbles rather than an all-zero sentinel like `REINDEX_USER_ID`.
+ * a `SystemContext` by services verifying the token. Hence the v4 version and
+ * variant nibbles.
  */
 export const INTEGRATION_CREATOR_USER_ID =
   '00000000-0000-4000-8000-000000000001' as UUID

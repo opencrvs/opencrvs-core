@@ -117,7 +117,6 @@ const roles: Roles = [
         { type: 'user.read' },
         { type: 'user.search' },
         { type: 'performance.read' },
-        { type: 'record.reindex' },
         { type: 'integration.create' },
         { type: 'performance.read-dashboards' },
         {

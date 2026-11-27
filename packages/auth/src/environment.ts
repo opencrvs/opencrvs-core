@@ -41,6 +41,5 @@ export const env = cleanEnv(process.env, {
   CONFIG_REFRESH_TOKEN_GRACE_SECONDS: num({ default: 60 }), // grace window for prev RT replay
   CONFIG_SMS_CODE_EXPIRY_SECONDS: num({ default: 600 }), // 10 minutes
   CONFIG_SYSTEM_TOKEN_EXPIRY_SECONDS: num({ default: 600 }), // 10 minutes
-  CONFIG_REINDEX_TOKEN_EXPIRY_SECONDS: num({ default: 3600 }), // 1 hour
   CONFIG_RECOVERY_LINK_EXPIRY_SECONDS: num({ default: 3600 }) // 1 hour (account recovery link)
 })

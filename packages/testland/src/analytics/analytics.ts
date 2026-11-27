@@ -238,13 +238,6 @@ async function upsertAnalyticsEventActions(
   return
 }
 
-export async function importEvents(events: EventDocument[], trx: Kysely<any>) {
-  if (events.length === 0) {
-    return
-  }
-  await upsertAnalyticsEventActions(events, trx)
-}
-
 export async function importEvent(event: EventDocument, trx: Kysely<any>) {
   const eventConfig = findEventConfig(event)
   if (!eventConfig) {

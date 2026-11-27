@@ -19,7 +19,7 @@ describe('allowedWithAnyOfScopes()', () => {
   test('should throw TRPCError with code "FORBIDDEN" if none of the required scopes are present on the token', async () => {
     const middleware = allowedWithAnyOfScopes([
       'record.notify',
-      'record.reindex'
+      'record.import'
     ])
 
     // missing all of the required scopes
@@ -44,7 +44,7 @@ describe('allowedWithAnyOfScopes()', () => {
   test('should call next if any of the required scopes are present on the token', async () => {
     const middleware = allowedWithAnyOfScopes([
       'record.notify',
-      'record.reindex'
+      'record.import'
     ])
 
     // has one of the required scopes
@@ -52,7 +52,7 @@ describe('allowedWithAnyOfScopes()', () => {
       ctx: {
         token: createTestToken({
           userId: TEST_SYSTEM_ID,
-          scopes: [encodeScope({ type: 'record.reindex' })],
+          scopes: [encodeScope({ type: 'record.import' })],
           role: TestUserRole.enum.REGISTRATION_AGENT
         })
       },

@@ -120,7 +120,7 @@ export async function getEventByIdInTrx(id: UUID, trx: Kysely<Schema>) {
  * crash the process while the one before it is still being yielded. It is
  * rethrown once the chunk is awaited.
  */
-function fetchChunk(
+async function fetchChunk(
   ids: UUID[],
   fetchEvents: (eventIds: UUID[]) => Promise<EventDocument[]>
 ): Promise<EventDocument[]> {

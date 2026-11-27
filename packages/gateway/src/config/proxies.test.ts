@@ -127,7 +127,6 @@ describe('auth proxy', () => {
       '/ping',
       '/.well-known',
       '/internal/service-token',
-      '/internal/reindexing-token',
       '/internal/integration-creator-token',
       '/verifyToken',
       ...allowedAuthPaths.map((path) => path.slice('/auth'.length))
@@ -183,11 +182,9 @@ describe('auth proxy', () => {
   // reachable from inside the cluster, never through the gateway.
   const blockedAttempts = [
     '/auth/internal/integration-creator-token',
-    '/auth/internal/reindexing-token',
     '/auth/internal/service-token',
     '/auth/internal%2Fintegration-creator-token',
     '/auth/internal%2fintegration-creator-token',
-    '/auth/internal%2Freindexing-token',
     '/auth/internal%2Fservice-token',
     '/auth/%2Finternal%2Fintegration-creator-token',
     '/auth/%2E%2E%2Finternal%2Fintegration-creator-token',

@@ -10,19 +10,19 @@ metadata:
   name: elasticsearch-reindex
   namespace: {{ .Release.Namespace }}
 spec:
+  # A second run fails on the reindex lock, so a retry cannot help. Fail the hook at once.
+  backoffLimit: 0
   template:
     metadata:
       labels:
         app: deployment-jobs
     spec:
-      {{- include "elasticsearch-reindex.imagePullSecrets" . | nindent 6 }}
+      {{- include "opencrvs.imagePullSecrets" (dict "root" . "service" .Values.events) | nindent 6 }}
       {{- include "pod-service-account-values-helper" (dict "service_name" "deployment-jobs" "Values" .Values) | nindent 6 }}
-      initContainers:
-      {{- include "elasticsearch-reindex.initContainerSpec" . | nindent 8 }}
       containers:
-      {{- include "elasticsearch-reindex.containerSpec" . | nindent 8 }}
-      restartPolicy: "OnFailure"
+        {{- include "elasticsearch-reindex.containerSpec" . | nindent 8 }}
+      restartPolicy: Never
       volumes:
-      {{- include "elasticsearch-reindex.volumes" . | nindent 8 }}
+        {{- include "events.volumes" . | nindent 8 }}
 
 {{- end }}

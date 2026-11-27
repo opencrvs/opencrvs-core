@@ -9,63 +9,31 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { TRPCError } from '@trpc/server'
-import { http, HttpResponse, HttpResponseInit } from 'msw'
+import { http, HttpResponse } from 'msw'
 import {
   ActionStatus,
   ActionType,
   generateEventDocument,
-  getUUID,
-  TokenUserType,
-  encodeScope
+  getUUID
 } from '@opencrvs/commons'
 import {
   tennisClubMembershipEvent,
   versionedTennisClubMembershipEvent
 } from '@opencrvs/commons/fixtures'
-import {
-  createSystemTestClient,
-  createTestToken,
-  REINDEX_SYSTEM_ID,
-  setupTestCase
-} from '@events/tests/utils'
+import { setupTestCase } from '@events/tests/utils'
 import { mswServer } from '@events/tests/msw'
 import { env } from '@events/environment'
 import { runReindex } from '@events/service/reindex'
-
-// Mock the fire-and-forget wrapper only — runReindex stays real
-vi.mock('@events/service/reindex', async (importOriginal) => {
-  const actual =
-    await importOriginal<typeof import('@events/service/reindex')>()
-  return {
-    ...actual,
-    reindex: vi.fn()
-  }
-})
-
-const silentPostHandler = http.post(`${env.COUNTRY_CONFIG_URL}/reindex`, () =>
-  HttpResponse.json({})
-)
-
-const failingPostHandler = http.post(
-  `${env.COUNTRY_CONFIG_URL}/reindex`,
-  () => new HttpResponse(null, { status: 500 } as HttpResponseInit)
-)
+import { getClient } from '@events/storage/postgres/events'
+import { getReindexingStatusHistory } from './status'
 
 const singleEventConfigHandler = http.get(
   `${env.COUNTRY_CONFIG_URL}/config/events`,
   () => HttpResponse.json([versionedTennisClubMembershipEvent])
 )
 
-const reindexToken = createTestToken({
-  userId: REINDEX_SYSTEM_ID,
-  scopes: [encodeScope({ type: 'record.reindex' })],
-  role: 'TEST_SYSTEM_ROLE',
-  userType: TokenUserType.enum.system
-})
-
 beforeEach(async () => {
-  mswServer.use(singleEventConfigHandler, silentPostHandler)
+  mswServer.use(singleEventConfigHandler)
 
   const { user, eventsDb } = await setupTestCase()
 
@@ -124,45 +92,29 @@ beforeEach(async () => {
 })
 
 test('returns empty array when no reindex has run', async () => {
-  const client = createSystemTestClient(REINDEX_SYSTEM_ID, [
-    encodeScope({ type: 'record.reindex' })
-  ])
-  const result = await client.event.reindex.status()
+  const result = await getReindexingStatusHistory()
   expect(result).toEqual([])
 })
 
-test('returns 403 without record.reindex scope', async () => {
-  const client = createSystemTestClient(REINDEX_SYSTEM_ID, [])
-  await expect(client.event.reindex.status()).rejects.toMatchObject(
-    new TRPCError({ code: 'FORBIDDEN' })
-  )
-})
-
 test('returns completed status after successful reindex', async () => {
-  await runReindex(reindexToken)
+  await runReindex()
 
-  const client = createSystemTestClient(REINDEX_SYSTEM_ID, [
-    encodeScope({ type: 'record.reindex' })
-  ])
-  const result = await client.event.reindex.status()
+  const result = await getReindexingStatusHistory()
 
   expect(result).toHaveLength(1)
   expect(result[0].status).toBe('completed')
   expect(result[0].error_message).toBeNull()
   expect(result[0].completed_at).not.toBeNull()
+  expect(result[0].progress.processed).toBe(1)
 })
 
 test('returns failed status after failed reindex', async () => {
-  mswServer.use(failingPostHandler)
+  // A record stamped with a version that is not configured fails the reindex
+  await getClient().updateTable('events').set({ configVersionId: 'v9' }).execute()
 
-  await runReindex(reindexToken).catch(() => {
-    // Swallow — we only want to inspect the persisted status
-  })
+  await expect(runReindex()).rejects.toThrow()
 
-  const client = createSystemTestClient(REINDEX_SYSTEM_ID, [
-    encodeScope({ type: 'record.reindex' })
-  ])
-  const result = await client.event.reindex.status()
+  const result = await getReindexingStatusHistory()
 
   expect(result).toHaveLength(1)
   expect(result[0].status).toBe('failed')
@@ -171,46 +123,36 @@ test('returns failed status after failed reindex', async () => {
 })
 
 test('returns results ordered newest-first', async () => {
-  await runReindex(reindexToken)
-  await runReindex(reindexToken)
+  await runReindex()
+  await runReindex()
 
-  const client = createSystemTestClient(REINDEX_SYSTEM_ID, [
-    encodeScope({ type: 'record.reindex' })
-  ])
-  const result = await client.event.reindex.status()
+  const result = await getReindexingStatusHistory()
 
   expect(result).toHaveLength(2)
   expect(result[0].timestamp >= result[1].timestamp).toBe(true)
 })
 
 test('limit parameter is respected', async () => {
-  await runReindex(reindexToken)
-  await runReindex(reindexToken)
-  await runReindex(reindexToken)
+  await runReindex()
+  await runReindex()
+  await runReindex()
 
-  const client = createSystemTestClient(REINDEX_SYSTEM_ID, [
-    encodeScope({ type: 'record.reindex' })
-  ])
-  const result = await client.event.reindex.status({ limit: 2 })
+  const result = await getReindexingStatusHistory(2)
 
   expect(result).toHaveLength(2)
 })
 
 test('running reindex appears with running status', async () => {
-  const client = createSystemTestClient(REINDEX_SYSTEM_ID, [
-    encodeScope({ type: 'record.reindex' })
-  ])
-
   // Start reindex without awaiting it to observe the intermediate state
-  const reindexPromise = runReindex(reindexToken)
+  const reindexPromise = runReindex()
 
   // Poll until we see at least one entry.
   // The index may briefly have unavailable shards right after creation,
   // so we swallow transient Elasticsearch errors and keep retrying.
-  let history: Awaited<ReturnType<typeof client.event.reindex.status>> = []
+  let history: Awaited<ReturnType<typeof getReindexingStatusHistory>> = []
   for (let i = 0; i < 20; i++) {
     try {
-      history = await client.event.reindex.status()
+      history = await getReindexingStatusHistory()
       if (history.length > 0) {
         break
       }
@@ -227,6 +169,6 @@ test('running reindex appears with running status', async () => {
   // We should have seen at least one entry (possibly already completed)
   expect(history.length).toBeGreaterThanOrEqual(1)
 
-  const finalHistory = await client.event.reindex.status()
+  const finalHistory = await getReindexingStatusHistory()
   expect(finalHistory[0].status).toBe('completed')
 })

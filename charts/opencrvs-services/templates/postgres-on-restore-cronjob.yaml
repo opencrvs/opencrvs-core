@@ -21,16 +21,14 @@ spec:
             app: deployment-jobs
             job-type: restore
         spec:
-          {{- include "elasticsearch-reindex.imagePullSecrets" . | nindent 10 }}
+          {{- include "opencrvs.imagePullSecrets" (dict "root" . "service" .Values.events) | nindent 10 }}
           {{- include "pod-service-account-values-helper" (dict "service_name" "deployment-jobs" "Values" .Values) | nindent 10 }}
           restartPolicy: OnFailure
-          initContainers:
-          {{- include "elasticsearch-reindex.initContainerSpec" . | nindent 12 }}
           containers:
             {{- include "postgres-on-deploy.containerSpec" . | nindent 12 }}
             {{- include "elasticsearch-reindex.containerSpec" . | nindent 12 }}
           volumes:
             {{- include "postgres-on-deploy.volumes" . | nindent 10 }}
-            {{- include "elasticsearch-reindex.volumes" . | nindent 10 }}
+            {{- include "events.volumes" . | nindent 10 }}
 
 {{- end }}

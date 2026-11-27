@@ -17,7 +17,6 @@ import { TRPCError } from '@trpc/server'
 import * as jwt from 'jsonwebtoken'
 import {
   logger,
-  REINDEX_USER_ID,
   TokenUserType,
   TokenWithBearer,
   SystemContext,
@@ -140,14 +139,6 @@ async function resolveUserDetails(
   }
 
   try {
-    if (userId === REINDEX_USER_ID) {
-      return SystemContext.parse({
-        type: TokenUserType.enum.system,
-        id: userId,
-        primaryOfficeId: undefined
-      })
-    }
-
     if (userType === TokenUserType.enum.system) {
       return SystemContext.parse({
         type: userType,

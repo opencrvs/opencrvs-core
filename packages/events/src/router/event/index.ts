@@ -15,7 +15,6 @@ import {
   getUUID,
   isActionDocument
 } from '@opencrvs/commons'
-import { logger } from '@opencrvs/commons'
 import {
   ActionStatus,
   ActionType,
@@ -65,11 +64,6 @@ import {
 import * as draftsRepo from '@events/storage/postgres/events/drafts'
 import { bulkImportEvents } from '@events/service/events/import'
 import { findRecordsByQuery } from '@events/service/indexing/indexing'
-import { reindex } from '@events/service/reindex'
-import {
-  getReindexingStatusHistory,
-  ReindexingStatusSchema
-} from '@events/service/reindex/status'
 import { markAsDuplicate } from '@events/service/events/actions/mark-as-duplicate'
 import { markNotDuplicate } from '@events/service/events/actions/mark-not-duplicate'
 import {
@@ -88,56 +82,6 @@ import { createAndNotifyProcedure } from './actions/createAndNotify'
 import { filesRouter } from './files'
 
 export const eventRouter = router({
-  /*
-   * This must be defined before event.get or otherwise the rest route /events/:eventId will catch the request before it reaches this route. This is because "reindex" can be mistaken as an eventId in the get route.
-   */
-  reindex: router({
-    trigger: userAndSystemProcedure
-      .input(
-        z
-          .object({
-            waitForCompletion: z.boolean().default(true)
-          })
-          .optional()
-      )
-      .use(middleware.allowedWithAnyOfScopes(['record.reindex']))
-      .output(z.void())
-      .meta({
-        openapi: {
-          summary:
-            'Triggers reindexing of search, workqueues and notifies country config',
-          method: 'POST',
-          path: '/events/reindex',
-          tags: ['Events']
-        }
-      })
-      .mutation(async ({ ctx, input }) => {
-        if (input?.waitForCompletion === false) {
-          void reindex(ctx.token).catch((err) => {
-            logger.error(`Reindex failed ${err.message}`)
-          })
-          return Promise.resolve()
-        }
-        return reindex(ctx.token)
-      }),
-    status: userAndSystemProcedure
-      .meta({
-        openapi: {
-          summary: 'Returns the status of current and past reindexing calls',
-          method: 'GET',
-          path: '/events/reindex',
-          tags: ['Events']
-        }
-      })
-      .use(middleware.allowedWithAnyOfScopes(['record.reindex']))
-      .input(
-        z
-          .object({ limit: z.number().int().min(1).max(100).optional() })
-          .optional()
-      )
-      .output(z.array(ReindexingStatusSchema))
-      .query(async ({ input }) => getReindexingStatusHistory(input?.limit))
-  }),
   config: router({
     /**
      * Event configurations are intentionally available to all user types.

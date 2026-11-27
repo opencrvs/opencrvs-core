@@ -142,6 +142,30 @@ Users will see two kinds of revoked record: ones revoked before the move show as
 
 ### Breaking changes
 
+#### The Elasticsearch reindex runs as a job in the events image
+
+The reindex now runs in its own process with the same environment and secrets as the events service. It needs no token, and it does not send requests to country config, except to get the event configurations [#14242](https://github.com/opencrvs/opencrvs-core/issues/14242):
+
+- **Kubernetes:** the `elasticsearch-reindex` Helm hook and the `on-db-restore-cronjob` run `pnpm reindex:prod` in the `ocrvs-events` image. They do not use the `ocrvs-utilities` image or `assets/elasticsearch/reindex.sh` any more. The hook runs when `elasticsearch.reindex_enabled` is `true`. If the reindex fails, the hook fails.
+- **Docker Swarm:** run the same command as a replicated job, with the network, secrets and environment of the events service:
+
+  ```bash
+  docker service create --name reindex --mode replicated-job --restart-condition none \
+    --network opencrvs_overlay_net <secrets and env of the events service> \
+    ghcr.io/opencrvs/ocrvs-events:<version> pnpm reindex:prod
+  ```
+
+- **Local development:** `pnpm reindex` runs the reindex in-process.
+- Only one reindex can run at a time. A second reindex exits with an error and does not change the indices.
+- If a record cannot be indexed, the reindex fails with a non-zero exit code. Before, it skipped the record.
+
+These items are removed:
+
+- `GET /internal/reindexing-token` on auth, and `POST /events/reindex` and `GET /events/reindex` on events. They return 404.
+- The `record.reindex` scope. **Remove `record.reindex` from the roles in `src/api/roles/roles.ts`.** If a role holds it, the events service does not start.
+- Core no longer sends records to `POST /reindex` on country config. If your country config uses this route to fill an analytics database, move to the analytics API ([#14270](https://github.com/opencrvs/opencrvs-core/issues/14270)).
+- If you changed `assets/elasticsearch/reindex.sh` or `.github/workflows/reindex.yml`, move your changes to the new job.
+
 #### `POST /auth/token` no longer accepts parameters in the query string
 
 The query-string fallback deprecated in [#13626](https://github.com/opencrvs/opencrvs-core/pull/13626) has been removed. Sending `client_secret` in the URL leaks it into access logs and Sentry breadcrumbs (CWE-598). Parameters are now read only from the request body (form-encoded or JSON), and the gateway no longer forwards the query string. Requests that still use the URL fail with `unsupported_grant_type`.

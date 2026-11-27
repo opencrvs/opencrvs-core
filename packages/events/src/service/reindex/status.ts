@@ -9,35 +9,23 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { z } from 'zod'
 import {
   getOrCreateClient,
   getReindexingStatusIndexName
 } from '@events/storage/elasticsearch'
 
-// ---------------------------------------------------------------------------
-// Zod schemas
-// ---------------------------------------------------------------------------
+export type ReindexingProgress = {
+  processed: number
+}
 
-const ReindexingProgressSchema = z.object({
-  processed: z.number().int(),
-  // Runs recorded before skipping was introduced have neither field
-  skipped: z.number().int().default(0),
-  errors: z.array(z.string()).default([])
-})
-
-export type ReindexingProgress = z.infer<typeof ReindexingProgressSchema>
-
-export const ReindexingStatusSchema = z.object({
-  id: z.string().uuid(),
-  timestamp: z.string().datetime(),
-  status: z.enum(['running', 'completed', 'failed']),
-  progress: ReindexingProgressSchema,
-  error_message: z.string().nullable(),
-  completed_at: z.string().datetime().nullable()
-})
-
-type ReindexingStatus = z.infer<typeof ReindexingStatusSchema>
+type ReindexingStatus = {
+  id: string
+  timestamp: string
+  status: 'running' | 'completed' | 'failed'
+  progress: ReindexingProgress
+  error_message: string | null
+  completed_at: string | null
+}
 
 // ---------------------------------------------------------------------------
 // Internal helpers
@@ -61,9 +49,7 @@ async function ensureReindexingStatusIndexExists(): Promise<void> {
             progress: {
               type: 'object',
               properties: {
-                processed: { type: 'integer' },
-                skipped: { type: 'integer' },
-                errors: { type: 'text' }
+                processed: { type: 'integer' }
               }
             },
             error_message: { type: 'text' },
@@ -98,7 +84,7 @@ export async function createReindexingStatusEntry(
       id,
       timestamp,
       status: 'running',
-      progress: { processed: 0, skipped: 0, errors: [] },
+      progress: { processed: 0 },
       error_message: null,
       completed_at: null
     },

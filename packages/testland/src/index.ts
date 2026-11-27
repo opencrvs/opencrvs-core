@@ -92,16 +92,11 @@ import { workqueueconfigHandler } from './api/workqueue/handler'
 import getUserNotificationRoutes from './config/routes/userNotificationRoutes'
 import getVerifiableCredentialRoutes from './verifiable-credentials/routes'
 import {
-  importAdministrativeAreas,
   importEvent,
-  importEvents,
   syncLocationLevels,
-  syncLocationStatistics,
-  importLocations
+  syncLocationStatistics
 } from './analytics/analytics'
 import { getClient } from './analytics/postgres'
-import { createClient } from '@opencrvs/toolkit/api'
-import { getBearerToken } from '@countryconfig/utils'
 import { getLocationsQaRoutes } from './qa-tools/locations.routes'
 import { getAdministrativeAreasQaRoutes } from './qa-tools/administrative-areas.routes'
 import { Event } from './events/utils/types'
@@ -539,45 +534,6 @@ export async function createServer() {
   })
 
   server.route({
-    method: 'POST',
-    path: '/reindex',
-    options: {
-      /*
-       * In deployed environments, the reindex path is blocked by Traefik.
-       * See docker-compose.deploy.yml for more details.
-       */
-      auth: false
-    },
-    handler: async (req, h) => {
-      if (!env.ANALYTICS_DATABASE_URL) {
-        logger.warn(
-          'Skipping reindex, no ANALYTICS_DATABASE_URL environment variable set.'
-        )
-        return h.response().code(200)
-      }
-
-      const batch = req.payload as EventDocument[]
-      const client = getClient()
-
-      try {
-        await client.transaction().execute(async (trx) => {
-          await importEvents(batch, trx)
-        })
-
-        await syncLocations(req)
-
-        logger.info(`Reindexed batch of ${batch.length} events into analytics.`)
-
-        return h.response().code(200)
-      } catch (e) {
-        logger.error(e)
-
-        return h.response({ error: 'Unexpected error' }).code(500)
-      }
-    }
-  })
-
-  server.route({
     method: 'GET',
     path: '/config/events',
     handler: getEventsHandler,
@@ -732,7 +688,7 @@ export async function createServer() {
   server.ext('onPostHandler', async (request, h) => {
     if (!env.ANALYTICS_DATABASE_URL) {
       logger.warn(
-        'Skipping reindex, no ANALYTICS_DATABASE_URL environment variable set.'
+        'Skipping analytics import, no ANALYTICS_DATABASE_URL environment variable set.'
       )
       return h.continue
     }
@@ -833,33 +789,6 @@ export async function createServer() {
     }
     return h.continue
   })
-
-  let lastLocationSyncAt = 0
-  const ONE_HOUR_MS = 60 * 60 * 1000
-
-  async function syncLocations(req: Hapi.Request<Hapi.ReqRefDefaults>) {
-    const now = Date.now()
-    // Sync locations at most once per hour rather than every call
-    if (now - lastLocationSyncAt > ONE_HOUR_MS) {
-      let token: string
-      try {
-        token = await getCoreApiToken()
-      } catch (error) {
-        logger.warn(`Reindex: locations not synced. ${String(error)}`)
-        return
-      }
-      const url = new URL('events', GATEWAY_URL).toString()
-      const apiClient = createClient(url, `Bearer ${token}`)
-      const locations = await apiClient.locations.list.query()
-      const administrativeAreas =
-        await apiClient.administrativeAreas.list.query()
-
-      await importAdministrativeAreas(administrativeAreas)
-      await importLocations(locations)
-      lastLocationSyncAt = now
-      logger.info('Reindex: locations synced into analytics.')
-    }
-  }
 
   async function stop() {
     await server.stop()

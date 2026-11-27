@@ -63,9 +63,6 @@ import { logger } from '@opencrvs/commons'
 import { getPublicKey } from '@auth/features/authenticate/service'
 import serviceTokenHandler from './features/serviceToken/handler'
 import { jwksHandler } from '@auth/features/wellKnown/handler'
-import reindexingTokenHandler, {
-  responseSchema as reindexResponseSchema
-} from './features/reindexToken/handler'
 import integrationCreatorTokenHandler, {
   responseSchema as integrationCreatorResponseSchema
 } from './features/integrationCreatorToken/handler'
@@ -153,21 +150,6 @@ export async function createServer() {
     }
   })
 
-  // curl -H 'Content-Type: application/json' http://localhost:4040/reindexing-token
-  server.route({
-    method: 'GET',
-    path: '/internal/reindexing-token',
-    handler: reindexingTokenHandler,
-    options: {
-      tags: ['api'],
-      description: 'Create a token for migrations to call reindexing endpoints',
-      notes:
-        'Returns a token to be used for reindexing endpoints. This endpoint should never be called directly by clients.',
-      response: {
-        schema: reindexResponseSchema
-      }
-    }
-  })
   server.route({
     method: 'POST',
     path: '/internal/integration-creator-token',

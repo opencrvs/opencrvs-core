@@ -32,7 +32,7 @@
     "cov:login": "cd packages/login && pnpm open:cov",
     "e2e-dev": "cd packages/testland && pnpm e2e-dev",
     "db:clear:all": "bash development-environment/clear-all-data.sh",
-    "reindex": "bash development-environment/reindex.sh",
+    "reindex": "pnpm --filter @opencrvs/events reindex",
     "build": "lerna run build --stream && lerna run build-storybook",
     "build:image": "export VERSION=`git log -1 --pretty=format:%h` && docker build --build-arg VERSION=${VERSION} -t opencrvs-build . && unset VERSION",
     "build:clean": "lerna run build:clean",

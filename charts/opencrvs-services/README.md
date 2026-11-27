@@ -85,9 +85,9 @@ helm upgrade --install opencrvs oci://ghcr.io/opencrvs/opencrvs-services \
             <td>Elasticsearch port.</td>
         </tr>
         <tr>
-            <td>elasticsearch.reindex.enabled</td>
+            <td>elasticsearch.reindex_enabled</td>
             <td>true</td>
-            <td>Enable elasticsearch reindex post-deploy hook</td>
+            <td>Enable the Elasticsearch reindex post-deploy hook. The hook runs <code>pnpm reindex:prod</code> in the events image, with the same environment and secrets as the events service. If the reindex fails, the hook fails.</td>
         </tr>
         <tr>
             <td>elasticsearch.cronjob.enabled</td>
@@ -1095,4 +1095,4 @@ Helm chart has following post-install/upgrade hooks:
 - data-migration: apply data migrations to postgres
 - data-migration-analytics: apply data migrations to postgres, this hook use Countryconfig assets docker image, see documentation on how to create own analytics dashboards.
 - data-seed: initial data seed, runs only on post-install
-- elasticsearch-reindex: reindex data after deployment
+- elasticsearch-reindex: rebuild the Elasticsearch search indices from Postgres after deployment. Runs in the events image.
