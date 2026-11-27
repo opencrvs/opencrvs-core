@@ -80,7 +80,7 @@ spec:
             - sh
             - -c
             - >
-              cp -R /assets/metabase/* /data-assets/ && \
+              cp -R /assets/metabase/* /data-assets/ &&
               chmod +x /data-assets/*.sh || true
           volumeMounts:
             - name: assets

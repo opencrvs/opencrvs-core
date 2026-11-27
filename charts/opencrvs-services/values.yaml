@@ -62,6 +62,8 @@ minio:
   users_secret: minio-opencrvs-users
   # Image used as client to run OpenCRVS configuration scripts
   image:
+    # Mirrored copy of the upstream image, which MinIO removed from quay.io.
+    # Ref source code: https://github.com/opencrvs/minio-mc/tree/RELEASE.2025-05-21T01-59-54Z
     repository: ghcr.io/opencrvs/minio-mc
     tag: 'release.2025-05-21t01-59-54z'
 
