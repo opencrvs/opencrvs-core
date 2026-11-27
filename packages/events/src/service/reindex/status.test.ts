@@ -110,7 +110,10 @@ test('returns completed status after successful reindex', async () => {
 
 test('returns failed status after failed reindex', async () => {
   // A record stamped with a version that is not configured fails the reindex
-  await getClient().updateTable('events').set({ configVersionId: 'v9' }).execute()
+  await getClient()
+    .updateTable('events')
+    .set({ configVersionId: 'v9' })
+    .execute()
 
   await expect(runReindex()).rejects.toThrow()
 
@@ -120,6 +123,22 @@ test('returns failed status after failed reindex', async () => {
   expect(result[0].status).toBe('failed')
   expect(result[0].error_message).toBeTruthy()
   expect(result[0].completed_at).not.toBeNull()
+})
+
+test('returns failed status when the event configurations cannot be read', async () => {
+  mswServer.use(
+    http.get(`${env.COUNTRY_CONFIG_URL}/config/events`, () =>
+      HttpResponse.json({ error: 'unavailable' }, { status: 500 })
+    )
+  )
+
+  await expect(runReindex()).rejects.toThrow()
+
+  const result = await getReindexingStatusHistory()
+
+  expect(result).toHaveLength(1)
+  expect(result[0].status).toBe('failed')
+  expect(result[0].error_message).toBeTruthy()
 })
 
 test('returns results ordered newest-first', async () => {

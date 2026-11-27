@@ -131,17 +131,11 @@ async function reindexSearch(
   }
 }
 
-export async function runReindex() {
-  const start = new Date()
-  const timestamp = start.valueOf()
-  const runId = getUUID()
-  const startTimestamp = start.toISOString()
-
-  await createReindexingStatusEntry(runId, startTimestamp)
-
-  const versionedConfigurations =
-    await getInMemoryVersionedEventConfigurations()
-
+async function buildTemporaryIndices(
+  runId: UUID,
+  timestamp: number,
+  versionedConfigurations: VersionedEventConfig[]
+) {
   // Best-effort: leftover orphans are retried on the next run.
   await cleanupOrphanedIndices(versionedConfigurations).catch((err) =>
     logger.error('Failed to clean up orphaned indices', err)
@@ -150,7 +144,7 @@ export async function runReindex() {
   /*
    * Create temporary indices for every version of all event types
    */
-  const temporaryIndicesByEvent = await Promise.all(
+  await Promise.all(
     versionedConfigurations.map(async (configuration) => {
       const indexNamesWithTimestamp = await prepareTemporaryIndices(
         configuration,
@@ -159,68 +153,97 @@ export async function runReindex() {
       logger.info(
         `Prepared temporary indices ${indexNamesWithTimestamp.join(', ')} for event type ${configuration.id}`
       )
-      return indexNamesWithTimestamp
     })
   )
-  const temporaryIndices = temporaryIndicesByEvent.flat()
   const startSecond = Math.floor(Date.now() / 1000)
   const processedCounts: number[] = []
   let totalProcessed = 0
   let lastProgressWriteAt = 0
 
-  try {
-    await reindexSearch(
-      timestamp,
-      versionedConfigurations,
-      async (batchSize) => {
-        const currentSecond = Math.floor(Date.now() / 1000) - startSecond
-        const processedThisSecond = processedCounts[currentSecond] || 0
-        processedCounts[currentSecond] = processedThisSecond + batchSize
-        totalProcessed += batchSize
-        const perSecond =
-          processedCounts.slice(-6, -1).reduce((m, x) => m + x, 0) / 5
-        logger.info(
-          `Reindex total records processed: ${totalProcessed}. Per second: ${Math.round(perSecond)}`
-        )
-
-        /*
-         * Batches complete concurrently, and the status document is a single
-         * document, so writing it per batch makes Elasticsearch reject the
-         * interleaved updates with a version conflict. Claiming the window before
-         * the await lets exactly one caller through, and the final count is
-         * written once every batch has been processed.
-         */
-        const now = Date.now()
-        if (now - lastProgressWriteAt < PROGRESS_WRITE_INTERVAL_MS) {
-          return
-        }
-        lastProgressWriteAt = now
-        await updateReindexingProgress(runId, { processed: totalProcessed })
-      }
+  await reindexSearch(timestamp, versionedConfigurations, async (batchSize) => {
+    const currentSecond = Math.floor(Date.now() / 1000) - startSecond
+    const processedThisSecond = processedCounts[currentSecond] || 0
+    processedCounts[currentSecond] = processedThisSecond + batchSize
+    totalProcessed += batchSize
+    const perSecond =
+      processedCounts.slice(-6, -1).reduce((m, x) => m + x, 0) / 5
+    logger.info(
+      `Reindex total records processed: ${totalProcessed}. Per second: ${Math.round(perSecond)}`
     )
+
+    /*
+     * Batches complete concurrently, and the status document is a single
+     * document, so writing it per batch makes Elasticsearch reject the
+     * interleaved updates with a version conflict. Claiming the window before
+     * the await lets exactly one caller through, and the final count is
+     * written once every batch has been processed.
+     */
+    const now = Date.now()
+    if (now - lastProgressWriteAt < PROGRESS_WRITE_INTERVAL_MS) {
+      return
+    }
+    lastProgressWriteAt = now
+    await updateReindexingProgress(runId, { processed: totalProcessed })
+  })
+  await updateReindexingProgress(runId, { processed: totalProcessed })
+
+  return totalProcessed
+}
+
+async function cleanupTemporaryIndices(
+  timestamp: number,
+  versionedConfigurations: VersionedEventConfig[]
+) {
+  const temporaryIndices = versionedConfigurations.flatMap((configuration) =>
+    configuration.versions.map(({ id }) =>
+      getTemporaryVersionIndexName(configuration.id, id, timestamp)
+    )
+  )
+  for (const tempIndexName of temporaryIndices) {
+    await cleanupTemporaryIndex(tempIndexName).catch((cleanupErr) => {
+      logger.error(
+        `Failed to clean up temporary index ${tempIndexName}`,
+        cleanupErr
+      )
+    })
+  }
+}
+
+export async function runReindex() {
+  const start = new Date()
+  const timestamp = start.valueOf()
+  const runId = getUUID()
+
+  await createReindexingStatusEntry(runId, start.toISOString())
+
+  let versionedConfigurations: VersionedEventConfig[] = []
+  // The temporary indices are only safe to delete before an alias moves to them.
+  let aliasesMoved = false
+  try {
+    versionedConfigurations = await getInMemoryVersionedEventConfigurations()
+    const totalProcessed = await buildTemporaryIndices(
+      runId,
+      timestamp,
+      versionedConfigurations
+    )
+
+    aliasesMoved = true
+    await Promise.all(
+      versionedConfigurations.map(async (config) =>
+        finaliseReindexIndices(config, timestamp)
+      )
+    )
+
+    await completeReindexingStatus(runId, new Date().toISOString())
+    logger.info(`Reindex completed. Total records indexed: ${totalProcessed}`)
   } catch (err) {
-    logger.error('Reindex failed, cleaning up temporary indexes', err)
+    logger.error('Reindex failed', err)
     const errorMessage = err instanceof Error ? err.message : String(err)
     await failReindexingStatus(runId, errorMessage, new Date().toISOString())
-    for (const tempIndexName of temporaryIndices) {
-      await cleanupTemporaryIndex(tempIndexName).catch((cleanupErr) => {
-        logger.error(
-          `Failed to clean up temporary index ${tempIndexName}`,
-          cleanupErr
-        )
-      })
+    if (!aliasesMoved) {
+      await cleanupTemporaryIndices(timestamp, versionedConfigurations)
     }
     throw err
   }
-  await updateReindexingProgress(runId, { processed: totalProcessed })
-
-  await Promise.all(
-    versionedConfigurations.map(async (config) =>
-      finaliseReindexIndices(config, timestamp)
-    )
-  )
-
-  await completeReindexingStatus(runId, new Date().toISOString())
   await pruneOldReindexingStatusEntries()
-  logger.info(`Reindex completed. Total records indexed: ${totalProcessed}`)
 }
