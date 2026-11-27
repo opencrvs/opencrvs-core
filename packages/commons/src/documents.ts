@@ -85,6 +85,9 @@ export function userAttachmentPath(userId: UUID): UserAttachmentPath {
   return `users/${userId}/`
 }
 
+/** The largest file that a user can upload, the same as the request body limit of the services. */
+export const MAX_UPLOAD_SIZE_BYTES = 50 * 1024 * 1024
+
 const ATTACHMENT_PATH = /^(events|users)\/[^/]+\/$/
 
 export function isAttachmentPath(value: string): value is AttachmentPath {

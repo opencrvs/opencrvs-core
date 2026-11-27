@@ -32,5 +32,6 @@ AWS S3 and Google Cloud Storage have not been tried. The table does not say that
 When you move to another store, or upgrade the one you have, check these yourself:
 
 - **The capabilities in the ADR.** Upload a large file, delete a prefix that holds more than 1000 files through the service, and open an attachment in the client.
-- **CORS.** Browsers fetch presigned URLs, so the store must allow cross-origin reads from the client's origin.
+- **CORS.** Browsers fetch presigned URLs and upload files with presigned `PUT` URLs. The store must allow cross-origin `GET` and `PUT` requests from the client's origin, with the request headers `content-type` and `x-amz-meta-created-by`.
+- **Signed headers on presigned uploads.** An upload URL signs the content type, the content length and the `created-by` metadata. The store must refuse a `PUT` that sends other values. `src/features/presignUpload/handler.test.ts` checks this.
 - **Backups.** The backup, restore and data-cleanup jobs in `charts` are written for RustFS.
