@@ -20,7 +20,6 @@ import {
   FieldConfig,
   generateTransactionId,
   getDeclarationFields,
-  isFieldVisible,
   getCurrentEventState,
   ActionType
 } from '@opencrvs/commons/client'
@@ -46,6 +45,7 @@ import { useActionAnnotation } from '@client/v2-events/features/events/useAction
 import { useUserAllowedActions } from '@client/v2-events/features/workqueues/Actions/useUserAllowedActions'
 import { useValidatorContext } from '@client/v2-events/hooks/useValidatorContext'
 import { getChangedDeclarationDiff } from '@client/v2-events/features/events/useEvents/procedures/actions/declarationDiff'
+import { isFieldVisible } from '@client/v2-events/conditionals'
 import { CorrectionDetails } from './CorrectionDetails'
 
 const messages = defineMessages({

@@ -21,8 +21,6 @@ import {
   EventDocument,
   EventState,
   getCurrentEventState,
-  isFieldVisible,
-  isPageVisible,
   PageConfig,
   PageTypes,
   RequestedCorrectionAction,
@@ -43,6 +41,7 @@ import { ROUTES } from '@client/v2-events/routes'
 import { useUserDetails } from '@client/v2-events/hooks/useUserDetails'
 import { useLocations } from '@client/v2-events/hooks/useLocations'
 import { recordAnchorDate, resolveLocationName } from '@client/v2-events/utils'
+import { isFieldVisible, isPageVisible } from '@client/v2-events/conditionals'
 import { DeclarationComparisonTable } from './DeclarationComparisonTable'
 
 const messages = defineMessages({

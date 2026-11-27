@@ -215,7 +215,13 @@ async function markNotDuplicateAndRegister(page: Page, pair: MixedPair) {
       'review.comment': 'Not a duplicate',
       // Version 'initial' of the birth form does not ask for the signature of the informant.
       ...(pair.flagged.version === BirthVersion.V2
-        ? { 'review.signature': await uploadFile(getSignatureFile(), token) }
+        ? {
+            'review.signature': await uploadFile(
+              getSignatureFile(),
+              token,
+              pair.flagged.eventId
+            )
+          }
         : {})
     }
   })

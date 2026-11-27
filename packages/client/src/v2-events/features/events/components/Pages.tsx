@@ -15,14 +15,11 @@ import { omit } from 'lodash'
 import {
   EventState,
   EventConfig,
-  isPageVisible,
   isNonInteractiveFieldType,
   PageTypes,
   PageConfig,
   AttachmentPath,
-  ValidatorContext,
-  isNameFieldType,
-  FieldConfig
+  ValidatorContext
 } from '@opencrvs/commons/client'
 import { MAIN_CONTENT_ANCHOR_ID, Button } from '@opencrvs/components'
 import {
@@ -31,6 +28,7 @@ import {
 } from '@client/v2-events/components/forms/FormFieldGenerator'
 import { useClearFormModal } from '@client/v2-events/components/ClearFormModal'
 import { useDefaultValue } from '@client/v2-events/hooks/useDefaultValue'
+import { isPageVisible } from '@client/v2-events/conditionals'
 import { useEventFormData } from '../useEventFormData'
 import { VerificationWizard } from './VerificationWizard'
 import { FormWizard } from './FormWizard'
@@ -143,34 +141,11 @@ export function Pages({
       return
     }
 
-    /**
-     * A cleared field falls back to its configured default value. Fields with no
-     * default clear to `null`, except NAME fields: those hold an object, and
-     * `null` leaves the sub-inputs rendering the values that were just cleared,
-     * so they need an explicitly empty name instead.
-     */
-    function getClearedValue(field: FieldConfig) {
-      const defaultValue = getDefaultValue(field, {})
-
-      if (defaultValue !== undefined) {
-        return defaultValue
-      }
-
-      const candidate = { config: field, value: formData[field.id] }
-
-      if (!isNameFieldType(candidate)) {
-        return null
-      }
-
-      return candidate.config.configuration?.name?.middlename
-        ? { firstname: '', middlename: '', surname: '' }
-        : { firstname: '', surname: '' }
-    }
-
     const clearedPageValues = Object.fromEntries(
       page.fields
         .filter((field) => !isNonInteractiveFieldType(field))
-        .map((field) => [field.id, getClearedValue(field)])
+        // A cleared field falls back to its configured default value
+        .map((field) => [field.id, getDefaultValue(field, {}) ?? null])
     )
 
     setFormData({ ...formData, ...clearedPageValues })

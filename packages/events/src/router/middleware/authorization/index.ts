@@ -51,6 +51,7 @@ import { ServiceTrpcContext, TrpcContext } from '@events/context'
 import { getUserById } from '@events/storage/postgres/events/users'
 import { getSystemInitialisation } from '@events/service/auth'
 import { getLocationHierarchy } from '@events/service/locations/locations'
+import { assertCanReadOtherUser } from '@events/service/users/access'
 import { findUserOrSystem, getUser } from '../../../service/users/api'
 import {
   getEventConfigurationForRecord,
@@ -60,15 +61,6 @@ import {
   getEventIndexWithAdministrativeHierarchy,
   hasLocationJurisdictionFilter
 } from '../../../service/indexing/utils'
-
-/**
- * Depending on how the API is called, there might or might not be Bearer keyword in the header.
- * To allow for usage with both direct HTTP calls and TRPC, ensure it's present to be able to use shared scope auth functions.
- */
-export function setBearerForToken(token: string) {
-  const bearer = 'Bearer'
-  return token.startsWith(bearer) ? token : `${bearer} ${token}`
-}
 
 /**
  * Middleware to check if the user has any of the specified allowed scopes.
@@ -297,8 +289,7 @@ function canAccessEventWithInputScopes(
 
     const event = await getEventById(input.eventId)
     const eventConfig = await getEventConfigurationForRecord({
-      event,
-      token: ctx.token
+      event
     })
 
     const eventIndex = getCurrentEventState(event, eventConfig)
@@ -506,7 +497,7 @@ export const userCanCreateEvent: MiddlewareFunction<
   TrpcContext,
   unknown
 > = async ({ next, ctx, getRawInput }) => {
-  const eventConfigs = await getInMemoryEventConfigurations(ctx.token)
+  const eventConfigs = await getInMemoryEventConfigurations()
 
   if (!hasScope(ctx.token, 'record.create')) {
     throw new TRPCError({ code: 'FORBIDDEN' })
@@ -657,48 +648,7 @@ export const userCanReadOtherUser: MiddlewareFunction<
   TrpcContext & UUID,
   UUID
 > = async ({ next, ctx, input }) => {
-  const { token, user: userReading } = ctx
-
-  const acceptedScopes = getAcceptedScopesFromToken(token, ['user.read'])
-
-  const isRequestingOwnUser = userReading.id === input
-
-  if (acceptedScopes.length === 0 && !isRequestingOwnUser) {
-    throw new TRPCError({ code: 'FORBIDDEN' })
-  }
-
-  const otherUser = await getUser(input)
-
-  if (isRequestingOwnUser) {
-    return next()
-  }
-
-  if (acceptedScopes.length === 0) {
-    throw new TRPCError({ code: 'NOT_FOUND' })
-  }
-
-  if (!otherUser.primaryOfficeId) {
-    throw new TRPCError({ code: 'NOT_FOUND' })
-  }
-
-  const userLocationHierarchy = await getLocationHierarchy(
-    otherUser.primaryOfficeId
-  )
-
-  const hasAccess = canAccessOtherUserWithScopes({
-    scopes: acceptedScopes,
-    userToAccess: {
-      role: otherUser.role,
-      administrativeHierarchy: userLocationHierarchy,
-      primaryOfficeId: otherUser.primaryOfficeId
-    },
-    user: userReading
-  })
-
-  if (!hasAccess) {
-    throw new TRPCError({ code: 'NOT_FOUND' })
-  }
-
+  await assertCanReadOtherUser(ctx, input)
   return next()
 }
 

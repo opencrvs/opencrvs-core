@@ -25,7 +25,6 @@ import {
   AdministrativeAreas,
   alwaysTrue,
   AddressType,
-  isFieldDisplayedOnReview,
   AddressField,
   AdministrativeAreaField,
   TextField,
@@ -46,6 +45,7 @@ import { AdminStructureItem } from '@client/utils/referenceApi'
 import { getAdminLevelHierarchy } from '@client/v2-events/utils'
 import { useValidatorContext } from '@client/v2-events/hooks/useValidatorContext'
 import { withSuspense } from '@client/v2-events/components/withSuspense'
+import { isFieldDisplayedOnReview } from '@client/v2-events/conditionals'
 
 /* eslint-disable max-lines */
 

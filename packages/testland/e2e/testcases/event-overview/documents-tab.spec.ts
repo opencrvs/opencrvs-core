@@ -11,14 +11,15 @@
 import { test, expect, Page } from '@playwright/test'
 import { format, subDays } from 'date-fns'
 import { getToken, login, switchEventTab } from '@e2e/support/helpers'
-import { CLIENT_URL, CREDENTIALS } from '@e2e/support/constants'
+import { v4 as uuidv4 } from 'uuid'
+import { createClient } from '@opencrvs/toolkit/api'
+import { CLIENT_URL, CREDENTIALS, GATEWAY_HOST } from '@e2e/support/constants'
 import {
   mockNetworkConditions,
   restoreNetworkConditions
 } from '@e2e/support/mock-network-conditions'
 import { ensureAssignedToUser } from '@e2e/support/utils'
 import {
-  createDeclaration,
   Declaration,
   getDeclaration
 } from '@e2e/support/test-data/birth-declaration'
@@ -38,19 +39,45 @@ async function declareWithProofOfBirth(): Promise<{
   declaration: Declaration
 }> {
   const token = await getToken(CREDENTIALS.REGISTRAR)
-  const proofOfBirth = await uploadFile(getSignatureFile(), token)
+  const client = createClient(GATEWAY_HOST + '/events', `Bearer ${token}`)
+
+  // Uploads are stored under the record, so the record is created first.
+  const { id: eventId } = await client.event.create.mutate({
+    type: 'birth',
+    transactionId: uuidv4()
+  })
+  const proofOfBirth = await uploadFile(getSignatureFile(), token, eventId)
+  const signature = await uploadFile(getSignatureFile(), token, eventId)
   const declarationRequest = await getDeclaration({
     token,
     partialDeclaration: {
       'documents.proofOfBirth': proofOfBirth
     }
   })
-  const res = await createDeclaration(
-    token,
-    declarationRequest,
-    ActionType.DECLARE
+
+  const declareRes = await client.event.actions.declare.request.mutate({
+    eventId,
+    transactionId: uuidv4(),
+    declaration: declarationRequest,
+    annotation: {
+      'review.comment': 'My comment',
+      'review.signature': signature
+    },
+    keepAssignment: false
+  })
+
+  const declareAction = declareRes.actions.find(
+    (action) => action.type === ActionType.DECLARE
   )
-  return { eventId: res.eventId, declaration: res.declaration }
+
+  if (!declareAction || !('declaration' in declareAction)) {
+    throw new Error('Declaration info not found in action')
+  }
+
+  return {
+    eventId,
+    declaration: declareAction.declaration as Declaration
+  }
 }
 
 async function openEventOverview(
@@ -76,7 +103,11 @@ test('Documents tab lists both the original and the replacement of an edited doc
     const token = await getToken(CREDENTIALS.REGISTRAR)
     // A single FILE field holds one value, so uploading another file replaces it.
     await editAndDeclareViaApi(token, eventId, {
-      'documents.proofOfBirth': await uploadFile(getSignatureFile(), token)
+      'documents.proofOfBirth': await uploadFile(
+        getSignatureFile(),
+        token,
+        eventId
+      )
     })
   })
 

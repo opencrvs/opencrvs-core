@@ -22,11 +22,13 @@ import {
   getDeclaration,
   getDeclarationFields,
   getNotificationForm,
-  isFieldVisible,
-  omitHiddenFields,
-  omitHiddenPaginatedFields,
   ValidatorContext
 } from '@opencrvs/commons/client'
+import {
+  isFieldVisible,
+  omitHiddenFields,
+  omitHiddenPaginatedFields
+} from '@client/v2-events/conditionals'
 import type { CustomMutationKeys } from './customAction'
 
 /**

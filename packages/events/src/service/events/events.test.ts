@@ -33,7 +33,8 @@ import {
   TEST_USER_DEFAULT_SCOPES
 } from '@events/tests/utils'
 import { payloadGenerator } from '@events/tests/generators'
-import { processAction } from '@events/service/events/events'
+import { buildAction, processAction } from '@events/service/events/events'
+import * as eventsRepo from '@events/storage/postgres/events/events'
 import { TrpcUserContext } from '@events/context'
 import {
   getEventIndexName,
@@ -420,6 +421,78 @@ describe('processAction', () => {
     })
   })
 
+  describe('file binding', () => {
+    function declareWithImage(path: string) {
+      return buildDeclareInput(eventId, generator, {
+        keepAssignment: true,
+        declaration: {
+          ...generator.event.actions.declare(eventId).declaration,
+          'applicant.image': {
+            type: 'image/png',
+            originalFilename: 'image.png',
+            path: path as DocumentPath
+          }
+        }
+      })
+    }
+
+    async function submit(input: ActionInputWithType) {
+      return processAction(input, {
+        eventId,
+        user: trpcUser,
+        token,
+        status: ActionStatus.Accepted,
+        configuration: tennisClubMembershipEvent
+      })
+    }
+
+    test("accepts a file under the record's own prefix", async () => {
+      const path = `events/${eventId}/${getUUID()}.png`
+      const updatedEvent = await submit(declareWithImage(path))
+
+      expect(updatedEvent.actions).toEqual(
+        expect.arrayContaining([
+          expect.objectContaining({
+            declaration: expect.objectContaining({
+              'applicant.image': expect.objectContaining({ path })
+            })
+          })
+        ])
+      )
+    })
+
+    test.each([
+      ["another record's prefix", () => `events/${getUUID()}/${getUUID()}.png`],
+      ["a user's prefix", () => `users/${getUUID()}/${getUUID()}.png`],
+      ['a bare key the record does not name', () => `${getUUID()}.png`]
+    ])('rejects a file under %s', async (_, makePath) => {
+      const path = makePath()
+
+      await expect(submit(declareWithImage(path))).rejects.toMatchObject(
+        new TRPCError({
+          code: 'BAD_REQUEST',
+          message: `File does not belong to this record: ${path}`
+        })
+      )
+    })
+
+    test('accepts a bare key the record already names', async () => {
+      const legacyPath = `${getUUID()}.png`
+      // Stored before attachment prefixes existed
+      await eventsRepo.createAction(
+        buildAction(
+          { ...declareWithImage(legacyPath), type: ActionType.NOTIFY },
+          ActionStatus.Accepted,
+          trpcUser
+        )
+      )
+
+      await expect(submit(declareWithImage(legacyPath))).resolves.toMatchObject(
+        { id: eventId }
+      )
+    })
+  })
+
   describe('file validation', () => {
     test('throws BAD_REQUEST when a referenced file does not exist', async () => {
       mswServer.use(
@@ -436,7 +509,7 @@ describe('processAction', () => {
           'applicant.image': {
             type: 'image/png',
             originalFilename: 'missing.png',
-            path: 'missing-file.png' as DocumentPath
+            path: `events/${eventId}/missing-file.png` as DocumentPath
           }
         }
       })
@@ -452,7 +525,7 @@ describe('processAction', () => {
       ).rejects.toMatchObject(
         new TRPCError({
           code: 'BAD_REQUEST',
-          message: 'File not found: missing-file.png'
+          message: `File not found: events/${eventId}/missing-file.png`
         })
       )
     })

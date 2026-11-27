@@ -18,6 +18,7 @@ import {
   TokenUserType
 } from '@opencrvs/commons'
 import { tennisClubMembershipEvent } from '@opencrvs/commons/fixtures'
+import { CoreRequestVerification } from '@opencrvs/commons/request-signing'
 import { setupTestCase, seedEvent } from '@events/tests/utils'
 import { mswServer } from '@events/tests/msw'
 import { env } from '@events/environment'
@@ -28,6 +29,7 @@ import {
   runDailyTelemetry,
   startOfUtcDay
 } from '@events/service/telemetry'
+import { verifySignedByCore } from '@events/tests/request-signing'
 
 const TELEMETRY_TRIGGER_URL = `${env.COUNTRY_CONFIG_URL}/trigger/telemetry`
 
@@ -100,12 +102,14 @@ describe('startOfUtcDay', () => {
 })
 
 describe('sendTelemetryReport', () => {
-  it('posts the report to countryconfig with a bearer token and maps a 2xx to sent', async () => {
+  it('posts the report to countryconfig signed as core and maps a 2xx to sent', async () => {
     let capturedBody: unknown = null
     let capturedAuth: string | null = null
+    let verification: CoreRequestVerification | null = null
 
     mswServer.use(
       http.post(TELEMETRY_TRIGGER_URL, async ({ request }) => {
+        verification = await verifySignedByCore(request)
         capturedBody = await request.json()
         capturedAuth = request.headers.get('authorization')
         return HttpResponse.json({ status: 'forwarded' }, {
@@ -118,10 +122,11 @@ describe('sendTelemetryReport', () => {
       { 'events.total': 3, 'users.active': 5 },
       '2026-08-13T00:00:00.000Z'
     )
-    const result = await sendTelemetryReport(report, 'Bearer test-token')
+    const result = await sendTelemetryReport(report)
 
     expect(result).toEqual({ status: 'sent' })
-    expect(capturedAuth).toBe('Bearer test-token')
+    expect(verification).toMatchObject({ valid: true })
+    expect(capturedAuth).toBeNull()
     // core sends only the window, its own version, and the metrics — no
     // country code / domain / environment (countryconfig stamps those).
     expect(capturedBody).toEqual({
@@ -144,7 +149,7 @@ describe('sendTelemetryReport', () => {
       { 'events.total': 3 },
       '2026-08-13T00:00:00.000Z'
     )
-    const result = await sendTelemetryReport(report, 'Bearer test-token')
+    const result = await sendTelemetryReport(report)
     expect(result.status).toBe('error')
     if (result.status === 'error') {
       expect(result.httpStatus).toBe(502)
@@ -159,11 +164,11 @@ describe('runDailyTelemetry', () => {
     let receivedBody:
       | { reported_at: string; metrics: Record<string, unknown> }
       | undefined
-    let receivedAuth: string | null = null
+    let verification: CoreRequestVerification | null = null
     mswServer.use(
       http.post(TELEMETRY_TRIGGER_URL, async ({ request }) => {
+        verification = await verifySignedByCore(request)
         receivedBody = (await request.json()) as typeof receivedBody
-        receivedAuth = request.headers.get('authorization')
         return HttpResponse.json({ status: 'forwarded' }, {
           status: 202
         } as HttpResponseInit)
@@ -176,7 +181,6 @@ describe('runDailyTelemetry', () => {
     expect(result.status).toBe('sent')
     expect(receivedBody?.reported_at).toBe(reportedAt)
     expect(receivedBody?.metrics['events.total']).toBeDefined()
-    // the worker fetched a service token (msw handler) and sent it as bearer
-    expect(receivedAuth).toBe('Bearer service-token')
+    expect(verification).toMatchObject({ valid: true })
   })
 })

@@ -10,13 +10,10 @@
  */
 
 import * as z from 'zod/v4'
-import { TRPCError } from '@trpc/server'
 import {
-  DocumentPath,
   EventDocumentOnlyLastAction,
   getUUID,
-  isActionDocument,
-  maybeUuid
+  isActionDocument
 } from '@opencrvs/commons'
 import { logger } from '@opencrvs/commons'
 import {
@@ -39,7 +36,6 @@ import {
 import { UserContext } from '@opencrvs/commons'
 import * as middleware from '@events/router/middleware'
 import { EventIdParam } from '@events/router/middleware'
-import { MiddlewareOptions } from '@events/router/middleware/utils'
 import {
   userOnlyProcedure,
   router,
@@ -76,7 +72,10 @@ import {
 } from '@events/service/reindex/status'
 import { markAsDuplicate } from '@events/service/events/actions/mark-as-duplicate'
 import { markNotDuplicate } from '@events/service/events/actions/mark-not-duplicate'
-import { presignFile, sweepUnreferencedFiles } from '@events/service/files'
+import {
+  assertFilesBelongToEvent,
+  sweepUnreferencedFiles
+} from '@events/service/files'
 import { writeAuditLog } from '@events/storage/postgres/events/auditLog'
 import {
   assertCanReviewDuplicatesOf,
@@ -86,6 +85,7 @@ import { declareActionProcedures } from './actions/declare'
 import { getDefaultActionProcedures } from './actions'
 import { customActionProcedures } from './actions/custom'
 import { createAndNotifyProcedure } from './actions/createAndNotify'
+import { filesRouter } from './files'
 
 export const eventRouter = router({
   /*
@@ -156,9 +156,7 @@ export const eventRouter = router({
       .input(z.void())
       .use(middleware.reuseEventConfigResponse)
       .output(z.array(VersionedEventConfig))
-      .query(async (options) =>
-        getInMemoryVersionedEventConfigurations(options.ctx.token)
-      )
+      .query(async () => getInMemoryVersionedEventConfigurations())
   }),
   create: userAndSystemProcedure
     .meta({
@@ -177,8 +175,7 @@ export const eventRouter = router({
     .output(EventDocument)
     .mutation(async ({ input, ctx }) => {
       const config = await getVersionedEventConfigurationById({
-        eventType: input.type,
-        token: ctx.token
+        eventType: input.type
       })
 
       const result = await createEvent({
@@ -187,7 +184,7 @@ export const eventRouter = router({
         user: ctx.user,
         createdAtLocation: input.createdAtLocation,
         config,
-        timeZone: await getCountryTimeZone(ctx.token)
+        timeZone: await getCountryTimeZone()
       })
 
       await writeAuditLog({
@@ -223,8 +220,7 @@ export const eventRouter = router({
     .query(async ({ ctx }) => {
       const { eventId, eventType, configVersionId } = ctx
       const configuration = await getEventConfigurationForRecord({
-        event: { type: eventType, configVersionId },
-        token: ctx.token
+        event: { type: eventType, configVersionId }
       })
 
       const updatedEvent = await processAction(
@@ -314,6 +310,8 @@ export const eventRouter = router({
           ctx.event
         )
 
+        assertFilesBelongToEvent(ctx.event, input)
+
         // Checked against the event loaded before the upsert, like throwConflictIfActionNotAllowed above.
         // An action committed in between leaves a stale draft, which the record's next action deletes.
         throwConflictIfDraftNotAllowed(ctx.event)
@@ -350,51 +348,7 @@ export const eventRouter = router({
         return currentDraft
       })
   }),
-  file: router({
-    getPresignedUrl: userAndSystemProcedure
-      // eventId lives inside events/{eventId}/... paths already — a separate
-      // field would be redundant, and meaningless for users/ or bare-uuid paths
-      .input(z.object({ filePath: DocumentPath }))
-      .output(z.object({ presignedURL: z.string() }))
-      .query(async ({ input, ctx }) => {
-        const { filePath } = input
-        const [firstSegment, secondSegment] = filePath.split('/')
-
-        /*
-         * Record ownership isn't known to documents-service, so it's checked
-         * here instead. `events/{eventId}/...` is record-bound; `users/{userId}/...`
-         * and bare `{uuid}.{ext}` (pre-2.0 legacy) aren't.
-         */
-        if (firstSegment === 'events') {
-          const eventId = maybeUuid(secondSegment)
-
-          if (!eventId) {
-            throw new TRPCError({
-              code: 'BAD_REQUEST',
-              message: `Invalid event id in file path: ${filePath}`
-            })
-          }
-
-          /*
-           * No eventId input exists here for .use() to parse — it comes from
-           * the path above. The middleware is invoked directly instead, with
-           * just the fields it reads: ctx, getRawInput, next.
-           */
-          await middleware.canAccessEventWithScopes(['record.read'])({
-            ctx,
-            getRawInput: () => ({ eventId }),
-            next: (opts: unknown) => opts
-          } as unknown as MiddlewareOptions)
-        } else if (firstSegment !== 'users' && filePath.includes('/')) {
-          throw new TRPCError({
-            code: 'BAD_REQUEST',
-            message: `Unrecognized file path: ${filePath}`
-          })
-        }
-
-        return presignFile(filePath, ctx.token)
-      })
-  }),
+  files: filesRouter,
   actions: router({
     notify: router(getDefaultActionProcedures(ActionType.NOTIFY)),
     createAndNotify: router(createAndNotifyProcedure()),
@@ -488,7 +442,7 @@ export const eventRouter = router({
             options.input,
             user,
             token,
-            await getEventConfigurationForRecord({ event, token })
+            await getEventConfigurationForRecord({ event })
           )
           await writeAuditLog({
             clientId: user.id,
@@ -520,7 +474,7 @@ export const eventRouter = router({
             options.input,
             user,
             token,
-            await getEventConfigurationForRecord({ event, token })
+            await getEventConfigurationForRecord({ event })
           )
           await writeAuditLog({
             clientId: user.id,
@@ -557,8 +511,8 @@ export const eventRouter = router({
     )
     .query(async ({ input, ctx }) => {
       const [eventConfigs, versionedEventConfigs] = await Promise.all([
-        getInMemoryEventConfigurationsInLookupOrder(ctx.token),
-        getInMemoryVersionedEventConfigurations(ctx.token)
+        getInMemoryEventConfigurationsInLookupOrder(),
+        getInMemoryVersionedEventConfigurations()
       ])
 
       const result = await findRecordsByQuery({
@@ -566,8 +520,7 @@ export const eventRouter = router({
         eventConfigs,
         versionedEventConfigs,
         user: ctx.user,
-        acceptedScopes: ctx.acceptedScopes,
-        token: ctx.token
+        acceptedScopes: ctx.acceptedScopes
       })
 
       if (ctx.user.type === 'system') {
@@ -593,5 +546,5 @@ export const eventRouter = router({
     .use(middleware.allowedWithAnyOfScopes(['record.import']))
     .input(z.array(EventDocument))
     .output(z.any())
-    .mutation(async ({ input, ctx }) => bulkImportEvents(input, ctx.token))
+    .mutation(async ({ input }) => bulkImportEvents(input))
 })

@@ -48,13 +48,15 @@ import {
   omitHiddenPaginatedFields,
   runFieldValidations,
   runStructuralValidations,
-  ValidatorContext,
   flattenFormState,
   getCustomActionFields,
   EventInput,
   UUID,
   getDeclarationFieldById,
-  StrictValidatorContext
+  ActionFormConditionalContext,
+  AnnotationFormValues,
+  DeclarationFormValues,
+  FormValues
 } from '@opencrvs/commons/events'
 
 import { getEventConfigurationForRecord } from '@events/service/config/config'
@@ -67,17 +69,22 @@ import {
   getVerificationPageErrors,
   throwWhenNotEmpty,
   omitUncorrectableFields,
-  getStrictValidatorContext,
+  getActionFormConditionalContext,
   validateActionPayloadStructure
 } from './utils'
 
-export function getFieldErrors(
+/**
+ * Returns the errors of `fields`. Conditionals read the whole `form`. Only `data` is checked against `fields`.
+ * Use @see getDeclarationFieldErrors or @see getAnnotationFieldErrors, so that the checked values are explicit.
+ */
+function getFieldErrors(
   fields: FieldConfig[],
   data: ActionUpdate,
-  context: ValidatorContext
+  form: FormValues,
+  context: ActionFormConditionalContext
 ) {
   const visibleFields = fields.filter((field) =>
-    isFieldVisible(field, data, context)
+    isFieldVisible(field, form, context)
   )
 
   const visibleFieldIds = visibleFields.map((field) => field.id)
@@ -87,7 +94,7 @@ export function getFieldErrors(
       (field) =>
         // If field is not visible and not in the visible fields list, it is a hidden field
         // We need to check against the visible fields list because there might be fields with same ids, one of which is visible and others are hidden
-        !isFieldVisible(field, data, context) &&
+        !isFieldVisible(field, form, context) &&
         !visibleFieldIds.includes(field.id)
     )
     .map((field) => field.id)
@@ -111,7 +118,7 @@ export function getFieldErrors(
       runFieldValidations({
         field,
         value: data[field.id],
-        form: data,
+        form,
         context
       })
     ).flatMap(([, errors]) => errors)
@@ -126,6 +133,44 @@ export function getFieldErrors(
   return [...hiddenFieldErrors, ...visibleFieldErrors]
 }
 
+/** Checks the declaration values against declaration fields. Annotation values can not affect declaration conditionals. */
+export function getDeclarationFieldErrors(
+  fields: FieldConfig[],
+  form: DeclarationFormValues,
+  context: ActionFormConditionalContext
+) {
+  return getFieldErrors(fields, form.declaration, form, context)
+}
+
+/**
+ * Checks the annotation values against annotation and delcaration fields.
+ */
+export function getAnnotationFieldErrors(
+  fields: FieldConfig[],
+  form: AnnotationFormValues,
+  context: ActionFormConditionalContext
+) {
+  return getFieldErrors(fields, form.annotation, form, context)
+}
+
+/**
+ * Checks the annotation values against annotation fields.
+ * Values of hidden fields are dropped, not reported as errors.
+ */
+function getVisibleAnnotationFieldErrors(
+  fields: FieldConfig[],
+  form: AnnotationFormValues,
+  context: ActionFormConditionalContext
+) {
+  const visibleForm = omitHiddenFields(fields, form, context)
+  return getFieldErrors(
+    fields,
+    visibleForm.annotation ?? {},
+    visibleForm,
+    context
+  )
+}
+
 function getDeclarationFormErrors<T extends EventState | ActionUpdate>({
   form,
   completeDeclaration,
@@ -135,13 +180,13 @@ function getDeclarationFormErrors<T extends EventState | ActionUpdate>({
   form: DeclarationFormConfig
   completeDeclaration: T
   declarationUpdate: ActionUpdate
-  context: ValidatorContext
+  context: ActionFormConditionalContext
 }) {
   // Strip declaration of hidden fields. Without additional checks, client could send an update with hidden fields that are malformed
   // (e.g. when dob is unknown and user has send the age previously. Now they only send dob, without setting dob unknown to false).
-  const cleanedDeclaration = omitHiddenPaginatedFields(
+  const { declaration: cleanedDeclaration } = omitHiddenPaginatedFields(
     form,
-    completeDeclaration,
+    { declaration: completeDeclaration },
     context
   )
 
@@ -163,13 +208,14 @@ function getDeclarationFormErrors<T extends EventState | ActionUpdate>({
   }
 
   // Validate declaration update against conditional rules, taking into account conditional pages.
+  const cleanedForm = { declaration: cleanedDeclaration }
   const allVisiblePageFields = form.pages
-    .filter((page) => isPageVisible(page, cleanedDeclaration, context))
+    .filter((page) => isPageVisible(page, cleanedForm, context))
     .flatMap((page) => page.fields)
 
-  const fieldErrors = getFieldErrors(
+  const fieldErrors = getDeclarationFieldErrors(
     allVisiblePageFields,
-    cleanedDeclaration,
+    cleanedForm,
     context
   )
 
@@ -187,7 +233,7 @@ function validateDeclarationUpdateAction({
   actionType: DeclarationUpdateActionType
   declarationUpdate: ActionUpdate
   annotation?: ActionUpdate
-  context: StrictValidatorContext
+  context: ActionFormConditionalContext
 }) {
   /*
    * Declaration allows partial updates. Updates are validated against primitive types (zod) and field based custom validators (JSON schema).
@@ -196,7 +242,10 @@ function validateDeclarationUpdateAction({
 
   const declarationConfig = getDeclaration(eventConfig)
   // Merge declaration update with previous declaration to validate based on the right conditional rules
-  const previousDeclaration = context.event.state.declaration
+  const previousDeclaration = getCurrentEventState(
+    context.eventDocument,
+    context.eventConfig
+  ).declaration
 
   // at this stage, there could be a situation where the toggle (.e.g. dob unknown) is applied but payload would still have both age and dob.
   const mergedDeclaration = deepMerge(previousDeclaration, declarationUpdate)
@@ -250,18 +299,13 @@ function validateDeclarationUpdateAction({
       ]
     : []
 
-  const annotationContext = { ...context, baseFormState: cleanedDeclaration }
-
-  const visibleAnnotationFields = omitHiddenFields(
+  const annotationErrors = getVisibleAnnotationFieldErrors(
     reviewFields,
-    deepDropNulls(annotation ?? {}),
-    annotationContext
-  )
-
-  const annotationErrors = getFieldErrors(
-    reviewFields,
-    visibleAnnotationFields,
-    annotationContext
+    {
+      declaration: cleanedDeclaration,
+      annotation: deepDropNulls(annotation ?? {})
+    },
+    context
   )
 
   return [...declarationErrors, ...annotationErrors]
@@ -276,13 +320,21 @@ function validateActionAnnotation({
   eventConfig: EventConfig
   actionType: AnnotationActionType
   annotation?: ActionUpdate
-  context: StrictValidatorContext
+  context: ActionFormConditionalContext
 }) {
+  const form = {
+    declaration: getCurrentEventState(
+      context.eventDocument,
+      context.eventConfig
+    ).declaration,
+    annotation
+  } satisfies AnnotationFormValues
+
   const pages = findRecordActionPages(eventConfig, actionType)
 
   const visibleVerificationPageIds = getVisibleVerificationPageIds(
     pages,
-    annotation,
+    form,
     context
   )
 
@@ -292,10 +344,7 @@ function validateActionAnnotation({
   ]
 
   const errors = [
-    ...getFieldErrors(formFields, annotation, {
-      ...context,
-      baseFormState: context.baseFormState ?? context.event.state.declaration
-    }),
+    ...getAnnotationFieldErrors(formFields, form, context),
     ...getVerificationPageErrors(visibleVerificationPageIds, annotation)
   ]
 
@@ -310,14 +359,21 @@ function validateCustomAction({
 }: {
   eventConfig: EventConfig
   annotation?: ActionUpdate
-  context: ValidatorContext
+  context: ActionFormConditionalContext
   customActionType: string
 }) {
   const customActionFields = getCustomActionFields(
     eventConfig,
     customActionType
   )
-  return getFieldErrors(customActionFields, annotation, context)
+  const form = {
+    declaration: getCurrentEventState(
+      context.eventDocument,
+      context.eventConfig
+    ).declaration,
+    annotation
+  } satisfies AnnotationFormValues
+  return getAnnotationFieldErrors(customActionFields, form, context)
 }
 
 export function validateNotifyAction({
@@ -330,7 +386,7 @@ export function validateNotifyAction({
   eventConfig: EventConfig
   annotation?: ActionUpdate
   declaration: ActionUpdate
-  context: ValidatorContext
+  context: ActionFormConditionalContext
   actionType?: typeof ActionType.NOTIFY | typeof ActionType.EDIT
 }) {
   const notifyConfig = getActionConfig({
@@ -365,13 +421,17 @@ export function validateNotifyAction({
         ]
 
   const mergedDeclaration: EventState = deepMerge(
-    context.event?.state.declaration ?? {},
+    getCurrentEventState(context.eventDocument, context.eventConfig)
+      .declaration,
     declaration
   )
   const completeDeclaration = deepDropNulls(mergedDeclaration)
 
   // Review field conditionals commonly depend on declaration values
-  const annotationContext = { ...context, baseFormState: completeDeclaration }
+  const annotationForm = {
+    declaration: completeDeclaration,
+    annotation
+  } satisfies AnnotationFormValues
 
   const annotationErrors = Object.entries(annotation).flatMap(
     ([key, value]) => {
@@ -387,8 +447,8 @@ export function validateNotifyAction({
 
       const fieldErrors = runStructuralValidations({
         field,
-        values: annotation,
-        context: annotationContext
+        form: annotationForm,
+        context
       })
 
       return fieldErrors.map((error) => ({
@@ -416,7 +476,7 @@ export function validateNotifyAction({
 
       const fieldErrors = runStructuralValidations({
         field: { ...field, required: false },
-        values: declaration,
+        form: { declaration } satisfies DeclarationFormValues,
         context,
         actionType: ActionType.NOTIFY
       })
@@ -445,8 +505,6 @@ export function validateNotifyAction({
     return [...annotationErrors, ...invalidKeys]
   }
 
-  const reviewContext = { ...context, baseFormState: cleanedDeclaration }
-
   // Annotation keys that are not NOTIFY review or dialog fields
   const unexpectedAnnotationErrors = annotationErrors.filter(
     ({ id }) => !notifyAnnotationFields.some((field) => field.id === id)
@@ -454,14 +512,13 @@ export function validateNotifyAction({
 
   // Required, type and custom validation errors of the NOTIFY review and dialog fields.
   // Unlike DECLARE, dialog fields are not relaxed: the NOTIFY dialog is always shown before submitting.
-  const reviewErrors = getFieldErrors(
+  const reviewErrors = getVisibleAnnotationFieldErrors(
     notifyAnnotationFields,
-    omitHiddenFields(
-      notifyAnnotationFields,
-      deepDropNulls(annotation),
-      reviewContext
-    ),
-    reviewContext
+    {
+      declaration: cleanedDeclaration,
+      annotation: deepDropNulls(annotation)
+    },
+    context
   )
 
   return [...unexpectedAnnotationErrors, ...fieldErrors, ...reviewErrors]
@@ -507,7 +564,7 @@ function validateAction({
 }: {
   input: ActionInputWithType
   eventConfig: EventConfig
-  context: StrictValidatorContext
+  context: ActionFormConditionalContext
 }): void {
   if (input.type === ActionType.NOTIFY || input.type === ActionType.EDIT) {
     throwWhenNotEmpty(
@@ -536,7 +593,7 @@ function validateAction({
     input.type === ActionType.APPROVE_CORRECTION ||
     input.type === ActionType.REJECT_CORRECTION
   ) {
-    const correctionRequestAction = context.event.document.actions.find(
+    const correctionRequestAction = context.eventDocument.actions.find(
       (a) =>
         a.id === input.requestId && a.type === ActionType.REQUEST_CORRECTION
     )
@@ -598,15 +655,13 @@ export const validateRequestAction: MiddlewareFunction<
 > = async ({ input, next, ctx }) => {
   const event = await getEventById(input.eventId)
   const eventConfig = await getEventConfigurationForRecord({
-    event: event,
-    token: ctx.token
+    event: event
   })
 
-  const eventState = getCurrentEventState(event, eventConfig)
-
-  const context = await getStrictValidatorContext({
+  const context = await getActionFormConditionalContext({
     token: ctx.token,
-    event: { document: event, state: eventState }
+    eventDocument: event,
+    eventConfig
   })
 
   validateAction({
@@ -630,11 +685,10 @@ export const validateAcceptAction: MiddlewareFunction<
   unknown,
   unknown,
   ActionInputWithType
-> = async ({ input, next, ctx }) => {
+> = async ({ input, next }) => {
   const event = await getEventById(input.eventId)
   const eventConfig = await getEventConfigurationForRecord({
-    event: event,
-    token: ctx.token
+    event: event
   })
 
   validateActionPayloadStructure({

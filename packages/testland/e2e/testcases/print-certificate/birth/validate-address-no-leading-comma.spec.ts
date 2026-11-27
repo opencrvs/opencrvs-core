@@ -74,7 +74,11 @@ test('Registration location renders without leading comma for province-level reg
     assignedTo: userId
   })
 
-  const signature = await uploadFile(getSignatureFile(), provincialToken)
+  const signature = await uploadFile(
+    getSignatureFile(),
+    provincialToken,
+    eventId
+  )
 
   const registerRes = await client.event.actions.register.request.mutate({
     eventId,

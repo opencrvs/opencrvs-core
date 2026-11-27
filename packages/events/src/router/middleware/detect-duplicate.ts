@@ -64,8 +64,7 @@ export const detectDuplicate: MiddlewareFunction<
   const { user, token } = ctx
   const storedEvent = ctx.event
   const config = await getEventConfigurationForRecord({
-    event: storedEvent,
-    token
+    event: storedEvent
   })
 
   const dedupConfig = config.actions.find(
@@ -136,10 +135,9 @@ export const detectDuplicate: MiddlewareFunction<
     eventIndex: futureEventState,
     deduplication: dedupConfig,
     versionedConfig: await getVersionedEventConfigurationById({
-      eventType: storedEvent.type,
-      token
+      eventType: storedEvent.type
     }),
-    today: await getCountryToday(token)
+    today: await getCountryToday()
   })
 
   if (duplicates.length > 0) {

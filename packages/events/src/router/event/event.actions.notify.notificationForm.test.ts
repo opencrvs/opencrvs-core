@@ -19,6 +19,7 @@ import {
   getAcceptedActions,
   getActionConfig,
   getCurrentEventState,
+  eventAttachmentPath,
   getUUID,
   toVersionedEventConfig
 } from '@opencrvs/commons'
@@ -117,13 +118,21 @@ describe('event.actions.notify with a notification form', () => {
     useEventConfig(tennisClubMembershipEvent)
     const client = createTestClient(user)
     const event = await client.event.create(generator.event.create())
+    // The server accepts only files under the record's own prefix
+    const annotation = {
+      ...reviewAnnotation,
+      'review.signature': {
+        ...reviewAnnotation['review.signature'],
+        path: `${eventAttachmentPath(event.id)}${reviewAnnotation['review.signature'].path}`
+      }
+    } satisfies ActionUpdate
 
     const notifiedEvent = await client.event.actions.notify.request({
       type: ActionType.NOTIFY,
       eventId: event.id,
       transactionId: getUUID(),
       declaration: {},
-      annotation: reviewAnnotation
+      annotation
     })
 
     const notifyAction = getAcceptedActions(notifiedEvent).find(
@@ -131,7 +140,7 @@ describe('event.actions.notify with a notification form', () => {
     )
     expect(notifyAction).toMatchObject({
       status: ActionStatus.Accepted,
-      annotation: reviewAnnotation
+      annotation
     })
   })
 

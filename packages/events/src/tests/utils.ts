@@ -104,10 +104,14 @@ export const UNSTABLE_EVENT_FIELDS = [
  *   createdAt: '2023-10-01T12:00:00Z'
  * }, { fields: ['createdAt'] })
  * // → { name: 'John Doe', createdAt: '[sanitized]' }
+ *
+ * A file path keeps its name but loses the record or user id it is stored
+ * under, since that id is generated per test run.
  */
 export function sanitizeForSnapshot(data: unknown, fields: string[]) {
   const replacement = '[sanitized]'
   const keyMatches = (key: string) => fields.includes(key)
+  const attachmentOwner = /^(events|users)\/[0-9a-f-]{36}\//
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const sanitize = (value: unknown): any => {
@@ -122,6 +126,10 @@ export function sanitizeForSnapshot(data: unknown, fields: string[]) {
           keyMatches(key) ? replacement : sanitize(val)
         ])
       )
+    }
+
+    if (typeof value === 'string') {
+      return value.replace(attachmentOwner, `$1/${replacement}/`)
     }
 
     return value
@@ -310,6 +318,13 @@ export function createSystemTestClient(
   })
 
   return caller
+}
+
+export async function createUnauthenticatedTestClient() {
+  const ctx = await createContext({
+    req: { headers: {} } as unknown as IncomingMessage
+  })
+  return createCallerFactory(appRouter)(ctx)
 }
 
 export async function createServiceTokenTestClient() {

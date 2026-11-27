@@ -23,10 +23,7 @@ import {
   DuplicateDetectedAction,
   ActionUpdate
 } from './ActionDocument'
-import {
-  getEventValidatorContext,
-  ValidatorContext
-} from '../conditionals/validate'
+import { ActionFormConditionalContext } from '../conditionals/validate-v2'
 import {
   ApproveCorrectionActionInput,
   ArchiveActionInput,
@@ -91,18 +88,29 @@ import {
   HttpFieldValue
 } from './CompositeFieldValue'
 import { FieldValue, PlainDate } from './FieldValue'
-import {
-  EncodedScope,
-  encodeScope,
-  ITokenPayload,
-  TokenUserType
-} from '../users/authentication'
+import { TokenUserType } from '../users/authentication'
 import * as z from 'zod/v4'
 import { DocumentPath } from '../documents'
 import { defineConfig } from './defineConfig'
 import { toNotificationForm } from './toNotificationForm'
-import { V2_DEFAULT_MOCK_ADMINISTRATIVE_AREAS_MAP } from './mocks.test.utils'
 
+/**
+ * Placeholder context to generate test data without a stored event or a user.
+ */
+export function generateEmptyTestValidatorContext(
+  configuration: EventConfig
+): ActionFormConditionalContext {
+  return {
+    user: { sub: '', scope: [], userType: TokenUserType.enum.user },
+    leafAdminStructureLocationIds: [],
+    // eslint-disable-next-line @typescript-eslint/no-use-before-define
+    eventDocument: generateEventDocument({
+      configuration,
+      actions: [{ type: ActionType.CREATE }]
+    }),
+    eventConfig: configuration
+  }
+}
 /**
  * IANA timezone used in testing. Used for queries that expect similar results independent of the users location (e.g. when event was registered.)
  * Since we query by range, providing UTC offset will result to different results when DST changes during the range.
@@ -213,6 +221,51 @@ export function locationVersion(
     status: 'active',
     ...overrides
   }
+}
+
+/**
+ * File keys the mock generators put into file fields. The server only accepts
+ * files stored under the record's own prefix, so action and draft payloads
+ * move them there once the record's id is known.
+ */
+const MOCK_FILE_PATHS = [
+  '4f095fc4-4312-4de2-aa38-86dcc0f71044.png',
+  'e56d1dd3-2cd4-452a-b54e-bf3e2d830605.png'
+] as DocumentPath[]
+
+function scopeMockFiles<T>(eventId: string, value: T): T {
+  if (Array.isArray(value)) {
+    return value.map((item) => scopeMockFiles(eventId, item)) as T
+  }
+
+  if (typeof value !== 'object' || value === null) {
+    return value
+  }
+
+  return Object.fromEntries(
+    Object.entries(value).map(([key, item]) => [
+      key,
+      key === 'path' && MOCK_FILE_PATHS.includes(item as DocumentPath)
+        ? `events/${eventId}/${item}`
+        : scopeMockFiles(eventId, item)
+    ])
+  ) as T
+}
+
+/**
+ * Wraps every `(eventId, ...) => payload` builder so its payload's mock files
+ * are stored under that record.
+ */
+function scopeMockFilesToEvent<T extends object>(builders: T): T {
+  return Object.fromEntries(
+    Object.entries(builders).map(([key, builder]) => [
+      key,
+      typeof builder === 'function'
+        ? (eventId: string, ...rest: unknown[]) =>
+            scopeMockFiles(eventId, builder(eventId, ...rest))
+        : scopeMockFilesToEvent(builder)
+    ])
+  ) as T
 }
 
 /**
@@ -332,7 +385,7 @@ function mapFieldTypeToMockValue(
     case FieldType.SIGNATURE:
     case FieldType.FILE:
       return {
-        path: '4f095fc4-4312-4de2-aa38-86dcc0f71044.png' as DocumentPath,
+        path: MOCK_FILE_PATHS[0],
         originalFilename: 'abcd.png',
         type: 'image/png'
       } satisfies FileFieldValue
@@ -415,12 +468,12 @@ export function generateActionDeclarationInput(
     return omitHiddenPaginatedFields(
       declarationConfig,
       {
-        ...declaration,
-        ...overrides
+        declaration: { ...declaration, ...overrides },
+        annotation: {}
       },
-      {}, // Intentionally empty. Allow generating fields with custom conditionals.
+      generateEmptyTestValidatorContext(configuration),
       true
-    )
+    ).declaration
   }
 
   // eslint-disable-next-line no-console
@@ -458,10 +511,14 @@ function generateActionAnnotationInput(
 
   const annotation = fieldConfigsToActionPayload(annotationFields, rng)
 
+  // The annotation is generated without a declaration, as before.
+  const form = { declaration: {}, annotation }
+  const context = generateEmptyTestValidatorContext(configuration)
+
   const visibleVerificationPageIds = getVisibleVerificationPageIds(
     findRecordActionPages(configuration, action),
-    annotation,
-    {}
+    form,
+    context
   )
 
   const visiblePageVerificationMap = visibleVerificationPageIds.reduce(
@@ -474,9 +531,9 @@ function generateActionAnnotationInput(
 
   const fieldBasedPayload = omitHiddenFields(
     annotationFields,
-    annotation,
-    {} // Intentionally empty. Allow generating fields with custom conditionals.
-  )
+    form,
+    context
+  ).annotation
 
   return {
     ...fieldBasedPayload,
@@ -528,7 +585,7 @@ export function eventPayloadGenerator(
             },
             'applicant.dob': '2020-01-02',
             'applicant.image': {
-              path: 'e56d1dd3-2cd4-452a-b54e-bf3e2d830605.png' as DocumentPath,
+              path: MOCK_FILE_PATHS[1],
               originalFilename: 'Screenshot.png',
               type: 'image/png'
             }
@@ -547,9 +604,9 @@ export function eventPayloadGenerator(
       }
 
       base.action.declaration = omit(base.action.declaration, omitFields)
-      return merge(base, input)
+      return scopeMockFiles(eventId, merge(base, input))
     },
-    actions: {
+    actions: scopeMockFilesToEvent({
       declare: (
         eventId: string,
         input: Partial<
@@ -1012,7 +1069,7 @@ export function eventPayloadGenerator(
           keepAssignment: input.keepAssignment
         })
       }
-    }
+    })
   }
 }
 
@@ -1633,55 +1690,6 @@ export function getLeafAdministrativeAreaIds(
   }
 
   return result
-}
-
-/**
- *
- * @returns TokenPayload. Useful for building test setup for ValidatorContext
- */
-function generateUserTokenPayload({
-  role,
-  scope
-}: {
-  role?: TestUserRole
-  scope?: EncodedScope[]
-}): ITokenPayload {
-  return {
-    // @TODO: Validate which fields are necessary https://github.com/opencrvs/opencrvs-core/issues/13530
-    sub: generateUuid(),
-    algorithm: 'RS256',
-    exp: '1787221786',
-    role: role ?? TestUserRole.enum.FIELD_AGENT,
-    scope: scope ?? [
-      encodeScope({
-        type: 'record.read'
-      })
-    ],
-    userType: TokenUserType.enum.user
-  }
-}
-
-export function generateTestValidatorContext(
-  userRole?: TestUserRole,
-  eventWithConfig?: { event: EventDocument; eventConfig: EventConfig }
-): ValidatorContext {
-  const user = generateUserTokenPayload({ role: userRole })
-
-  const leafAdminStructureLocationIds = getLeafAdministrativeAreaIds(
-    V2_DEFAULT_MOCK_ADMINISTRATIVE_AREAS_MAP
-  )
-
-  if (!eventWithConfig) {
-    return { user, leafAdminStructureLocationIds }
-  }
-
-  const { event, eventConfig } = eventWithConfig
-
-  return {
-    user,
-    leafAdminStructureLocationIds,
-    event: getEventValidatorContext(event, eventConfig)
-  }
 }
 
 /**

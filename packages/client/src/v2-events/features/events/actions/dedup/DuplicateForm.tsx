@@ -22,13 +22,15 @@ import {
   ActionType,
   EventIndex,
   getActionConfig,
-  getUUID,
-  isActionEnabled,
-  isActionVisible
+  getUUID
 } from '@opencrvs/commons/client'
 import { useModal } from '@client/v2-events/hooks/useModal'
 import { useValidatorContext } from '@client/v2-events/hooks/useValidatorContext'
 import { ROUTES } from '@client/v2-events/routes/routes'
+import {
+  isActionEnabled,
+  isActionVisible
+} from '@client/v2-events/conditionals'
 import { useEventConfigurationForRecord } from '../../useEventConfiguration'
 import { useEventTitle } from '../../useEvents/useEventTitle'
 import { useEvents } from '../../useEvents/useEvents'

@@ -18,13 +18,13 @@ import {
   getCustomActionFields,
   FieldConfig,
   EventConfig,
-  isFieldVisible,
   PlainDate,
   ValidatorContext
 } from '@opencrvs/commons/client'
 import { useEventConfigurationForRecord } from '@client/v2-events/features/events/useEventConfiguration'
 import { Output } from '@client/v2-events/features/events/components/Output'
 import { recordAnchorDate } from '@client/v2-events/utils'
+import { isFieldVisible } from '@client/v2-events/conditionals'
 
 function prepareContent(
   action: CustomAction,

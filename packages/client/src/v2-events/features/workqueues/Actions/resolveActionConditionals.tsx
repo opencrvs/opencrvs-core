@@ -22,10 +22,12 @@ import {
   getAssignmentStatus,
   getAvailableActionsForEvent,
   getOrThrow,
-  isActionEnabled,
-  isActionVisible,
   ValidatorContext
 } from '@opencrvs/commons/client'
+import {
+  isActionEnabled,
+  isActionVisible
+} from '@client/v2-events/conditionals'
 import { ActionMenuActionType, WorkqueueCtaType } from './utils'
 
 const STATUSES_THAT_CAN_BE_ASSIGNED: EventStatus[] = [

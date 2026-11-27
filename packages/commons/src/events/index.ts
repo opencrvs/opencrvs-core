@@ -57,6 +57,7 @@ export * from './mocks.test.utils'
 // In order to infer types, we need to export the following types along with events
 export * from '../conditionals/conditionals'
 export * from '../conditionals/validate'
+export * from '../conditionals/validate-v2'
 // This is a workaround for the fact that field is not exported from events
 export * from './field'
 export * from './Flag'

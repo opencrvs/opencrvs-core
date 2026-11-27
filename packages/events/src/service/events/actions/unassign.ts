@@ -40,8 +40,7 @@ export async function unassignRecord({
 }) {
   const event = await getEventById(input.eventId)
   const configuration = await getEventConfigurationForRecord({
-    event: event,
-    token
+    event: event
   })
 
   const lastAssignmentAction = findLastAssignmentAction(event.actions)

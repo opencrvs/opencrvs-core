@@ -16,13 +16,13 @@ import {
   EventDocument,
   getCurrentEventState,
   getDeclarationFields,
-  isFieldDisplayedOnReview,
   ValidatorContext
 } from '@opencrvs/commons/client'
 import { ColumnContentAlignment, Table, Text } from '@opencrvs/components'
 import { useEventConfigurationForRecord } from '@client/v2-events/features/events/useEventConfiguration'
 import { Output } from '@client/v2-events/features/events/components/Output'
 import { recordAnchorDate } from '@client/v2-events/utils'
+import { isFieldDisplayedOnReview } from '@client/v2-events/conditionals'
 
 const messages = defineMessages({
   title: {

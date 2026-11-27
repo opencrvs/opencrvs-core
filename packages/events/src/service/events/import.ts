@@ -10,13 +10,9 @@
  */
 import { omit } from 'lodash'
 import { TRPCError } from '@trpc/server'
-import {
-  EventDocument,
-  getUUID,
-  TokenWithBearer,
-  VersionedEventConfig
-} from '@opencrvs/commons'
+import { EventDocument, getUUID, VersionedEventConfig } from '@opencrvs/commons'
 import { upsertEventWithActions } from '@events/storage/postgres/events/import'
+import { assertImportedFilesBelongToEvent } from '@events/service/files'
 import { getInMemoryVersionedEventConfigurations } from '../config/config'
 import {
   ensureVersionIndicesExist,
@@ -74,12 +70,13 @@ function assertEventsConfigured(
 }
 
 export async function bulkImportEvents(
-  events: EventDocument[],
-  token: TokenWithBearer
+  events: EventDocument[]
 ): Promise<BulkResponse> {
   const toIndex = []
 
-  const eventConfigs = await getInMemoryVersionedEventConfigurations(token)
+  events.forEach(assertImportedFilesBelongToEvent)
+
+  const eventConfigs = await getInMemoryVersionedEventConfigurations()
   assertEventsConfigured(events, eventConfigs)
 
   for (const eventDocument of events) {

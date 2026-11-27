@@ -10,10 +10,10 @@
  */
 import {
   EventState,
-  isPageVisible,
   PageConfig,
   ValidatorContext
 } from '@opencrvs/commons/client'
+import { isPageVisible } from '@client/v2-events/conditionals'
 
 /**
  * Derives the form header's Back action from the current pagination state.

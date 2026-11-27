@@ -21,7 +21,6 @@ import {
   ActionType,
   EventDocument,
   getEventConfigForRecord,
-  getEventValidatorContext,
   NotifyActionInput
 } from '@opencrvs/commons/events'
 import { systemOnlyProcedure } from '@events/router/trpc'
@@ -34,7 +33,7 @@ import { locationExists } from '@events/storage/postgres/administrative-hierarch
 import { writeAuditLog } from '@events/storage/postgres/events/auditLog'
 import { validateNotifyAction } from '@events/router/middleware/validate'
 import {
-  getValidatorContext,
+  getActionFormConditionalContext,
   throwWhenNotEmpty
 } from '@events/router/middleware/validate/utils'
 import { defaultRequestHandler } from '@events/router/event/actions'
@@ -109,8 +108,7 @@ export function createAndNotifyProcedure() {
         } = input
 
         // Authorization
-        const eventConfigs =
-          await getInMemoryVersionedEventConfigurations(token)
+        const eventConfigs = await getInMemoryVersionedEventConfigurations()
         const tokenScopes = getScopes(token)
 
         const versionedConfig = eventConfigs.find((c) => c.id === eventType)
@@ -176,7 +174,7 @@ export function createAndNotifyProcedure() {
           transactionId: createTransactionId,
           createdAtLocation,
           config: versionedConfig,
-          timeZone: await getCountryTimeZone(token)
+          timeZone: await getCountryTimeZone()
         })
         const eventConfig = getEventConfigForRecord(versionedConfig, event)
 
@@ -194,15 +192,16 @@ export function createAndNotifyProcedure() {
         }
 
         // Step 3: Validate notify fields against the event configuration.
-        const validatorContext = await getValidatorContext({
+        const context = await getActionFormConditionalContext({
           token,
-          event: getEventValidatorContext(event, eventConfig)
+          eventDocument: event,
+          eventConfig
         })
         const notifyErrors = validateNotifyAction({
           eventConfig,
           declaration: declaration,
           annotation,
-          context: validatorContext
+          context
         })
         throwWhenNotEmpty(notifyErrors)
 

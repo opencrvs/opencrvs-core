@@ -31,6 +31,7 @@ import {
 import { InformantType as DeathInformantType } from '@countryconfig/events/death/forms/pages/informant'
 import { Event } from '@countryconfig/events/utils'
 import { getAdoptionSealingToken } from '@countryconfig/events/adoption/sealing-service'
+import { getCoreApiToken } from '@countryconfig/api/core-api-token'
 
 export type ActionConfirmationRefs = { Payload: EventDocument }
 export type ActionConfirmationRequest = Hapi.Request<ActionConfirmationRefs>
@@ -63,7 +64,7 @@ export async function onRegisterHandler(
   request: ActionConfirmationRequest,
   h: Hapi.ResponseToolkit<ActionConfirmationRefs>
 ) {
-  const token = request.auth.artifacts.token as string
+  const token = await getCoreApiToken()
   const event = request.payload
   const eventId = event.id
   const action = getPendingAction(event.actions)
@@ -156,7 +157,7 @@ export async function onMosipBirthRegisterHandler(
   request: ActionConfirmationRequest,
   h: Hapi.ResponseToolkit<ActionConfirmationRefs>
 ) {
-  const token = request.auth.artifacts.token as string
+  const token = await getCoreApiToken()
   const event = request.payload
   const declaration = aggregateActionDeclarations(event)
 
@@ -224,7 +225,7 @@ export async function onMosipDeathRegisterHandler(
   request: ActionConfirmationRequest,
   h: Hapi.ResponseToolkit<ActionConfirmationRefs>
 ) {
-  const token = request.auth.artifacts.token as string
+  const token = await getCoreApiToken()
   const event = request.payload
   const declaration = aggregateActionDeclarations(event)
 
@@ -310,7 +311,7 @@ export async function onAdoptionRegisterHandler(
   request: ActionConfirmationRequest,
   h: Hapi.ResponseToolkit<ActionConfirmationRefs>
 ) {
-  const token = request.auth.artifacts.token as string
+  const token = await getCoreApiToken()
   const event = request.payload
   const declaration = aggregateActionDeclarations(event)
 
@@ -369,6 +370,49 @@ async function findBirthRecordByBrn(
 
 type SealResult = { success: true } | { success: false; reason: string }
 
+// A 1x1 transparent PNG
+const PLACEHOLDER_PNG = Buffer.from(
+  'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg==',
+  'base64'
+)
+
+/**
+ * The seal requires a court order copy, and a record can only name files
+ * stored under its own prefix. The court order itself stays on the adoption
+ * record, so the birth record's seal gets a placeholder of its own.
+ */
+async function uploadCourtOrderPlaceholder(eventId: string, token: string) {
+  const file = {
+    originalFilename: 'court-order-held-on-adoption-record.png',
+    type: 'image/png'
+  }
+
+  const form = new FormData()
+  form.append(
+    'file',
+    new Blob([PLACEHOLDER_PNG], { type: file.type }),
+    file.originalFilename
+  )
+  form.append('transactionId', uuidv4())
+  form.append('eventId', eventId)
+
+  const response = await fetch(new URL('events/attachments', GATEWAY_URL), {
+    method: 'POST',
+    headers: { Authorization: `Bearer ${token}` },
+    body: form
+  })
+
+  if (!response.ok) {
+    throw new Error(
+      `Failed to upload the court order placeholder: ${response.status}`
+    )
+  }
+
+  const body = (await response.json()) as { result: { data: { json: string } } }
+
+  return { ...file, path: body.result.data.json }
+}
+
 /**
  * Sealing targets the original birth record, not the adoption record.
  * The token core sends carries no scopes, so we use the sealing service's own token.
@@ -410,6 +454,11 @@ async function sealOriginalBirthRecord(
   }
 
   try {
+    const courtOrderCopy = await uploadCourtOrderPlaceholder(
+      birthRecord.id,
+      sealingToken
+    )
+
     await client.event.actions.custom.request.mutate({
       eventId: birthRecord.id,
       transactionId: uuidv4(),
@@ -417,7 +466,7 @@ async function sealOriginalBirthRecord(
       annotation: {
         reason: 'ADOPTION',
         courtOrderReference: declaration['adoptionOrder.reference'],
-        courtOrderCopy: declaration['documents.courtOrderCopy']
+        courtOrderCopy
       }
     })
 

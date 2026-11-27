@@ -12,17 +12,19 @@ import { MessageDescriptor } from 'react-intl'
 import {
   FieldConfig,
   EventState,
-  isPageVisible,
   FormConfig,
-  runStructuralValidations,
   ValidatorContext,
-  runFieldValidations,
-  omitHiddenFields,
-  omitHiddenPaginatedFields,
   FormState,
   flattenFormState,
   IndexMap
 } from '@opencrvs/commons/client'
+import {
+  isPageVisible,
+  omitHiddenFields,
+  omitHiddenPaginatedFields,
+  runFieldValidations,
+  runStructuralValidations
+} from '@client/v2-events/conditionals'
 
 interface ErrorMessage {
   message: MessageDescriptor

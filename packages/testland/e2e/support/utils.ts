@@ -270,11 +270,17 @@ export async function waitForLocalDraftToContain(page: Page, text: string) {
  * entry for the event, and the action page cannot open the record. Call this
  * before `page.reload()` on an action page that has an event ID in its URL.
  * See `throttlePersister` in core.
+ *
+ * A new declaration opens under a temporary `tmp-<uuid>` ID. When
+ * `event.create` succeeds, the client replaces it in the URL with the real ID.
+ * The poll reads the URL again on each try, so it waits for the real ID.
  */
 export async function waitForPersistedEvent(page: Page) {
-  const eventId = getEventIdFromUrl(page)
-
   const isEventPersisted = async () => {
+    if (page.url().includes('/tmp-')) {
+      return false
+    }
+    const eventId = getEventIdFromUrl(page)
     const entries = await readKeyValuePairs(page)
     const queries = entries.flatMap(
       (entry) =>
@@ -300,7 +306,7 @@ export async function waitForPersistedEvent(page: Page) {
     })
   }
 
-  await expect.poll(isEventPersisted).toBe(true)
+  await expect.poll(isEventPersisted, { timeout: 15_000 }).toBe(true)
 }
 
 export const assertTexts = async ({
