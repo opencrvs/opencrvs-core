@@ -12,7 +12,6 @@ import React from 'react'
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import { createTRPCMsw, httpLink } from '@vafanassieff/msw-trpc'
 import { Outlet } from 'react-router-dom'
-import superjson from 'superjson'
 import { expect, waitFor, within, userEvent } from 'storybook/test'
 import {
   ActionType,
@@ -54,8 +53,7 @@ const tRPCMsw = createTRPCMsw<AppRouter>({
     httpLink({
       url: '/api/events'
     })
-  ],
-  transformer: { input: superjson, output: superjson }
+  ]
 })
 
 const RecommenderType = {

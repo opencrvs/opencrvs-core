@@ -11,7 +11,6 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import { expect, fireEvent, userEvent, waitFor, within } from 'storybook/test'
 import { createTRPCMsw, httpLink } from '@vafanassieff/msw-trpc'
-import superjson from 'superjson'
 import { TRPCError } from '@trpc/server'
 import { setNavigatorOnline } from '@client/tests/storybook-utils'
 import { testDataGenerator } from '@client/tests/test-data-generators'
@@ -20,8 +19,7 @@ import { addUserToQueryData } from '@client/v2-events/features/events/useEvents/
 import { ChangeNumberView } from './ChangeNumberView'
 
 const tRPCMsw = createTRPCMsw<AppRouter>({
-  links: [httpLink({ url: '/api/events' })],
-  transformer: { input: superjson, output: superjson }
+  links: [httpLink({ url: '/api/events' })]
 })
 
 const generator = testDataGenerator()

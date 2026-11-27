@@ -12,7 +12,6 @@ import React from 'react'
 import { Meta, StoryObj } from '@storybook/react-vite'
 import { expect, userEvent, within } from 'storybook/test'
 import { createTRPCMsw, httpLink } from '@vafanassieff/msw-trpc'
-import superjson from 'superjson'
 import {
   ActionType,
   AdvancedSearchField,
@@ -99,8 +98,7 @@ export default meta
 type Story = StoryObj<typeof AdvancedSearch>
 
 const tRPCMsw = createTRPCMsw<AppRouter>({
-  links: [httpLink({ url: '/api/events' })],
-  transformer: { input: superjson, output: superjson }
+  links: [httpLink({ url: '/api/events' })]
 })
 
 export const DoesNotPrefillDefaultValues: Story = {

@@ -12,7 +12,6 @@ import { createElement, PropsWithChildren, Suspense } from 'react'
 import { renderHook, waitFor } from '@testing-library/react'
 import { createTRPCMsw, httpLink } from '@vafanassieff/msw-trpc'
 import { setupServer } from 'msw/node'
-import superjson from 'superjson'
 import {
   ClientLocation,
   Location,
@@ -31,8 +30,7 @@ import {
 vi.unmock('@client/v2-events/hooks/useLocations')
 
 const tRPCMsw = createTRPCMsw<AppRouter>({
-  links: [httpLink({ url: '/api/events' })],
-  transformer: { input: superjson, output: superjson }
+  links: [httpLink({ url: '/api/events' })]
 })
 
 const [first, second] = V2_DEFAULT_MOCK_LOCATIONS

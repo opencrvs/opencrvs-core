@@ -10,7 +10,6 @@
  */
 import { http, HttpResponse } from 'msw'
 import { setupServer } from 'msw/node'
-import { serialize } from 'superjson'
 import { QueryObserver } from '@tanstack/react-query'
 import { EventIndex } from '@opencrvs/commons/client'
 import {
@@ -37,7 +36,7 @@ function recordRequests() {
     http.get('/api/events/:proc', ({ params }) => {
       procedures.push(params.proc as string)
       return HttpResponse.json({
-        result: { data: serialize(EMPTY_RESULT), type: 'data' }
+        result: { data: EMPTY_RESULT, type: 'data' }
       })
     })
   )
@@ -147,7 +146,7 @@ describe('a by-id refetch when the last observer unmounts during the fetch', () 
         requestArrived = true
         await responseReleased
         return HttpResponse.json({
-          result: { data: serialize(after), type: 'data' }
+          result: { data: after, type: 'data' }
         })
       })
     )

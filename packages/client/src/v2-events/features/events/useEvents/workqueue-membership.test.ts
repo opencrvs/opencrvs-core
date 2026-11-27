@@ -11,7 +11,6 @@
 import { MutationKey, QueryObserver } from '@tanstack/react-query'
 import { http, HttpResponse } from 'msw'
 import { setupServer } from 'msw/node'
-import { serialize } from 'superjson'
 import {
   ActionType,
   EventDocument,
@@ -55,7 +54,7 @@ const countInput: WorkqueueCountInput = [{ slug: SLUG, query }]
 const server = setupServer()
 
 function respond(data: unknown) {
-  return HttpResponse.json({ result: { data: serialize(data), type: 'data' } })
+  return HttpResponse.json({ result: { data, type: 'data' } })
 }
 
 /**

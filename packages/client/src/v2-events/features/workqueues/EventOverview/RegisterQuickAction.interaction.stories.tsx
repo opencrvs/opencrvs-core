@@ -11,7 +11,6 @@
 import React from 'react'
 import { Meta, StoryObj } from '@storybook/react-vite'
 import { createTRPCMsw, httpLink } from '@vafanassieff/msw-trpc'
-import superjson from 'superjson'
 import { screen, within, userEvent } from 'storybook/test'
 import { toast } from 'react-hot-toast'
 import {
@@ -54,8 +53,7 @@ const tRPCMsw = createTRPCMsw<AppRouter>({
     httpLink({
       url: '/api/events'
     })
-  ],
-  transformer: { input: superjson, output: superjson }
+  ]
 })
 
 const meta: Meta<typeof EventOverviewIndex> = {

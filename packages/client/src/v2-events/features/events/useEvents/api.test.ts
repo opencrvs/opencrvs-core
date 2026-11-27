@@ -11,7 +11,6 @@
 import { QueryObserver } from '@tanstack/react-query'
 import { http, HttpResponse } from 'msw'
 import { setupServer } from 'msw/node'
-import { serialize } from 'superjson'
 import {
   ActionType,
   EventDocument,
@@ -48,7 +47,7 @@ describe('deleteLocalEvent', () => {
       http.get('/api/events/event.search', () =>
         HttpResponse.json({
           result: {
-            data: serialize({ results: [row], total: 1 }),
+            data: { results: [row], total: 1 },
             type: 'data'
           }
         })

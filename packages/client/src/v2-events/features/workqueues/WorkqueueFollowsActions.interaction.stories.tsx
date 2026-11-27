@@ -10,7 +10,6 @@
  */
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import React from 'react'
-import superjson from 'superjson'
 import { createTRPCMsw, httpLink } from '@vafanassieff/msw-trpc'
 import { getWorker } from 'msw-storybook-addon'
 import { userEvent, within, expect, waitFor } from 'storybook/test'
@@ -49,8 +48,7 @@ export default meta
 type Story = StoryObj<typeof WorkqueueIndex>
 
 const tRPCMsw = createTRPCMsw<AppRouter>({
-  links: [httpLink({ url: '/api/events' })],
-  transformer: { input: superjson, output: superjson }
+  links: [httpLink({ url: '/api/events' })]
 })
 
 const declared = generateEventDocument({
