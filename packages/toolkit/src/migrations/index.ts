@@ -17,6 +17,7 @@ import { main as readDeclarationThroughHelper } from './read-declaration-through
 import { main as resolveVersionedEventConfig } from './resolve-versioned-event-config'
 import { main as updateToolkitDependency } from './persistent/update-toolkit-dependency'
 import { main as replaceIncompleteFlag } from './replace-incomplete-flag'
+import { main as removeReindexScope } from './remove-reindex-scope'
 import { main as upgradeTilt } from './upgrade-tilt'
 
 /**
@@ -40,6 +41,7 @@ export async function runUpgrade(toolkitVersion: string) {
   await readDeclarationThroughHelper()
   await addTranslations(`${major}.${minor}`)
   await replaceIncompleteFlag()
+  await removeReindexScope()
   await upgradeTilt()
   await addE2ETests()
   // Last, so a failed upgrade leaves the version it upgrades from in place
