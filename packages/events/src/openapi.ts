@@ -79,12 +79,8 @@ export const openApiDocument = generateOpenApiDocument(appRouter, {
                   type: 'object',
                   properties: {
                     data: {
-                      type: 'object',
-                      properties: {
-                        json: {
-                          type: 'string'
-                        }
-                      }
+                      type: 'string',
+                      description: 'Path of the uploaded file'
                     }
                   }
                 }

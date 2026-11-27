@@ -105,7 +105,7 @@ describe('POST /attachments', () => {
 
     expect(res.status).toBe(200)
     const body = (await res.json()) as string
-    expect(body).toStrictEqual({ result: { data: { json: expectedFileUrl } } })
+    expect(body).toStrictEqual({ result: { data: expectedFileUrl } })
   })
 
   test('returns error when required fields are missing', async () => {

@@ -50,10 +50,6 @@ function trpcHandler(
   }
 
   return (async (options) => {
-    const body = (await options.request.json()) as unknown as {
-      json: EventInput
-    }
-    options.request.json = async () => Promise.resolve(body.json)
     const response = (await fn(options)) as HttpResponse
     return wrapHttpResponseJson(response)
   }) as HttpResponseResolver<never, EventInput, EventDocument>

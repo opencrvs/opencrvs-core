@@ -623,9 +623,7 @@ export const AllFieldsAreIncludedInCreatePayload: StoryObj = {
                 type: 'image/png'
               },
               name: { firstname: 'Test', surname: 'User' },
-              data: {
-                'user.staffId': null
-              }
+              data: {}
             })
           )
         )
@@ -721,9 +719,7 @@ export const AllFieldsAreIncludedInUpdatePayload: StoryObj = {
                 firstname: mockUser.name.firstname,
                 surname: mockUser.name.surname
               },
-              data: {
-                'user.staffId': null
-              }
+              data: {}
             })
           )
         )
