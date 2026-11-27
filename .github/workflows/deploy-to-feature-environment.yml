@@ -49,7 +49,10 @@ jobs:
           # Dots are allowed so that `release/x.y.z` branches validate. The
           # stack name is slugified downstream (`[^\w\s-]` is stripped), so a
           # dot in the branch name never reaches an environment name.
-          pattern: '^[a-z][a-z0-9/.-]{1,44}$'
+          # The stack name is also truncated to 30 characters, so long
+          # branch names such as `factory/item-<uuid>` (49 characters) are
+          # safe. Image tags escape the branch name separately.
+          pattern: '^[a-z][a-z0-9/.-]{1,63}$'
 
       - name: Check for e2e labels
         id: set_skip_flag
@@ -199,8 +202,10 @@ jobs:
             }
             core.setOutput('stack', slugify('${{ env.BRANCH_NAME }}'));
 
+  # Bots do not get e2e runs, with two exceptions. Forward-merge PRs and PRs
+  # from the OpenCRVS Factory App carry code changes that need e2e coverage.
   trigger-build:
-    if: ${{ (github.event_name == 'workflow_dispatch') || ((!contains(github.actor, 'bot') || startsWith(github.head_ref, 'forward-merge/')) && github.event.pull_request.head.repo.fork == false) }}
+    if: ${{ (github.event_name == 'workflow_dispatch') || ((!contains(github.actor, 'bot') || github.actor == 'opencrvs-factory[bot]' || startsWith(github.head_ref, 'forward-merge/')) && github.event.pull_request.head.repo.fork == false) }}
     needs: generate_stack_name_and_branch
     uses: ./.github/workflows/build-images-from-branch.yml
     with:
