@@ -126,7 +126,10 @@ export const advancedSearchBirth = [
       field('mother.name', {
         validations: [],
         conditionals: []
-      }).fuzzy()
+      }).fuzzy(),
+      field('mother.maritalStatus', {
+        searchCriteriaLabelPrefix: motherPrefix
+      }).exact()
     ]
   },
   {

@@ -507,6 +507,22 @@ export function motherPage(version: BirthVersion) {
                   conditional: requireMotherDetails
                 }
               ]
+            },
+            {
+              id: 'mother.marriageCertificateNumber',
+              type: FieldType.ID,
+              required: false,
+              label: {
+                defaultMessage: 'Marriage certificate number',
+                description: 'This is the label for the field',
+                id: 'event.birth.action.declare.form.section.mother.field.marriageCertificateNumber.label'
+              },
+              conditionals: [
+                {
+                  type: ConditionalType.SHOW,
+                  conditional: requireMotherDetails
+                }
+              ]
             }
           ]
         : []),
@@ -547,7 +563,6 @@ export function motherPage(version: BirthVersion) {
       },
       {
         id: 'mother.previousBirths',
-        type: FieldType.NUMBER,
         analytics: true,
         required: false,
         label: {
@@ -561,10 +576,16 @@ export function motherPage(version: BirthVersion) {
             conditional: requireMotherDetails
           }
         ],
-        configuration: {
-          integer: true,
-          min: 0
-        }
+        // The field changes type between versions, so QA can test the index of each version.
+        ...(version === BirthVersion.INITIAL
+          ? { type: FieldType.TEXT }
+          : {
+              type: FieldType.NUMBER,
+              configuration: {
+                integer: true,
+                min: 0
+              }
+            })
       }
     ]
   })

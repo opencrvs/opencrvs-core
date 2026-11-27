@@ -58,7 +58,9 @@ const roles: Roles = [
       { type: 'performance.read-dashboards' },
       {
         type: 'workqueue',
-        options: { ids: ['assigned-to-you', 'recent', 'requires-completion', 'in-external-validation', 'escalated', 'potential-duplicate', 'pending-updates', 'pending-registration', 'pending-approval', 'pending-certification', 'pending-issuance', 'correction-requested'] }
+        options: {
+          ids: ['assigned-to-you', 'recent', 'requires-completion', 'in-external-validation', 'escalated', 'potential-duplicate', 'pending-updates', 'pending-registration', 'pending-approval', 'pending-certification', 'pending-issuance', 'correction-requested', 'home-births']
+        }
       },
       { type: 'record.search', options: { placeOfEvent: 'administrativeArea' } },
       { type: 'record.create', options: { placeOfEvent: 'administrativeArea' } },
