@@ -120,7 +120,10 @@ export async function getEventByIdInTrx(id: UUID, trx: Kysely<Schema>) {
  * crash the process while the one before it is still being yielded. It is
  * rethrown once the chunk is awaited.
  */
-async function fetchChunk(
+// Do not make this function async. An async function returns a new promise
+// that is not marked handled, which brings the crash back.
+// eslint-disable-next-line @typescript-eslint/promise-function-async
+function fetchChunk(
   ids: UUID[],
   fetchEvents: (eventIds: UUID[]) => Promise<EventDocument[]>
 ): Promise<EventDocument[]> {
