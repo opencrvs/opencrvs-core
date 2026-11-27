@@ -20,7 +20,6 @@ import {
   HTTPHeaders,
   httpLink
 } from '@trpc/client'
-import superjson from 'superjson'
 import {
   NotificationEvent,
   generateVerificationCode,
@@ -38,7 +37,7 @@ import {
   isSelectableAtAnchor,
   Location
 } from '@opencrvs/commons'
-import { UserAuditLog } from '@opencrvs/commons/events'
+import { jsonTransformer, UserAuditLog } from '@opencrvs/commons/events'
 import * as F from 'fp-ts'
 import { EncodedScope, TokenUserType } from '@opencrvs/commons/authentication'
 const { chainW, tryCatch } = F.either
@@ -95,7 +94,7 @@ export const internalClient = createTRPCClient<InternalRouter>({
   links: [
     httpLink({
       url: new URL('/internal', env.EVENTS_URL).href,
-      transformer: superjson,
+      transformer: jsonTransformer,
       async headers() {
         const token = await createInternalServiceToken()
         return { authorization: `Bearer ${token}` }
@@ -108,7 +107,7 @@ const eventsClient = createTRPCClient<AppRouter>({
   links: [
     httpBatchLink({
       url: env.EVENTS_URL,
-      transformer: superjson,
+      transformer: jsonTransformer,
       headers({ opList }) {
         const headers = opList[0].context?.headers
         return (headers as HTTPHeaders) ?? {}

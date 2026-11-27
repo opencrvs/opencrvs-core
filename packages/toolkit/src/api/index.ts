@@ -9,9 +9,9 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { CreateTRPCClient, createTRPCClient, httpBatchLink } from '@trpc/client'
-import superjson from 'superjson'
 // @ts-ignore - This is a workaround to allow the import of the AppRouter type from the events package.
 import { AppRouter } from '@opencrvs/events/build/types/router'
+import { jsonTransformer } from '@opencrvs/commons/events/trpcTransformer'
 
 /**
  * Creates a tRPC client with the specified base URL and authorization token.
@@ -28,7 +28,7 @@ export function createClient(
     links: [
       httpBatchLink({
         url: baseUrl,
-        transformer: superjson,
+        transformer: jsonTransformer,
         headers() {
           return {
             Authorization: token

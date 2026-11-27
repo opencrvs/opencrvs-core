@@ -8,12 +8,11 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
+import { jsonTransformer } from '@opencrvs/commons/events'
 import { AppRouter } from './router'
 import { env } from '@gateway/environment'
 
 import { createTRPCClient, httpLink, HTTPHeaders } from '@trpc/client'
-
-import superjson from 'superjson'
 
 export const api = createTRPCClient<AppRouter>({
   links: [
@@ -21,7 +20,7 @@ export const api = createTRPCClient<AppRouter>({
     // and a batch would send all its calls with the headers of the first one.
     httpLink({
       url: env.EVENTS_URL,
-      transformer: superjson,
+      transformer: jsonTransformer,
       headers({ op }) {
         // A call without context, e.g. for public configuration, sends none.
         return (op.context?.headers ?? {}) as HTTPHeaders
