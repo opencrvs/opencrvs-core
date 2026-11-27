@@ -110,7 +110,7 @@ test('Revoke and reinstate record', async ({ browser }) => {
     await page.goto(CLIENT_URL)
     await page.click('#searchType')
     await expect(page).toHaveURL(/.*\/advanced-search/)
-    await page.getByText('Birth').click()
+    await page.getByText('Birth', { exact: true }).click()
 
     await page.getByText('Registration details').click()
     await page.locator('#event____status').click()

@@ -75,7 +75,7 @@ test('Advanced Search - Mobile', async ({ page }) => {
   })
 
   await test.step('Fill search fields', async () => {
-    await page.getByText('Birth').click()
+    await page.getByText('Birth', { exact: true }).click()
     await page.getByText('Event details').click()
 
     await page.locator('#child____placeOfBirth').click()

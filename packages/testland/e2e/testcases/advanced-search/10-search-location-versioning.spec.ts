@@ -43,7 +43,7 @@ test('Advanced search - inactive registration office', async ({ page }) => {
   })
 
   await test.step('1 - Inactive office appears in Place of Registration filter and finds the birth record', async () => {
-    await page.getByText('Birth').click()
+    await page.getByText('Birth', { exact: true }).click()
     await page.getByText('Registration details').click()
 
     await page
@@ -115,7 +115,7 @@ test('Advanced search - inactive health facilities', async ({ page }) => {
   })
 
   await test.step('1 - Inactive health facility appears in Place of Delivery filter and finds the birth record', async () => {
-    await page.getByText('Birth').click()
+    await page.getByText('Birth', { exact: true }).click()
     await page.getByText('Event details').click()
 
     await page.locator('#child____placeOfBirth').click()
@@ -205,7 +205,7 @@ test('Advanced search - inactive admin area excluded from address filter', async
   })
 
   await test.step('1 - Inactive admin area is hidden from the Other address filter', async () => {
-    await page.getByText('Birth').click()
+    await page.getByText('Birth', { exact: true }).click()
     await page.getByText('Event details').click()
 
     await page.locator('#child____placeOfBirth').click()

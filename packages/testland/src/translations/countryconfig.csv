@@ -728,7 +728,7 @@ verify.label,The title for the E-Signet verification button,Authenticate with Na
 workqueues.assignedToYou.title,Title of assigned to you workqueue,Assigned to you,Attribué à vous
 workqueues.correctionRequested.title,Title of correction requested workqueue,Pending corrections,Corrections en attente
 workqueues.escalated.title,Title of escalated workqueue,Escalated,Transmis
-workqueues.homeBirths.title,Title of the workqueue of births at a private home,Home deliveries,Accouchements à domicile
+workqueues.homeBirths.title,Title of the workqueue of births at a private home,Home births,Naissances à domicile
 workqueues.inExternalValidation.title,Title of pending external validation workqueue,Pending external validation,En attente de validation externe
 workqueues.notifications.emptyMessage,Empty message for notifications workqueue,No notifications,Aucune notification
 workqueues.notifications.title,Title of notifications workqueue,Notifications,Notifications

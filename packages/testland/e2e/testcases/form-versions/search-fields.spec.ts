@@ -99,7 +99,7 @@ test.describe("Search fields across birth versions: the father's name", () => {
       await login(page, CREDENTIALS.REGISTRAR)
       await page.click('#searchType')
       await expectInUrl(page, 'advanced-search')
-      await page.getByText('Birth').click()
+      await page.getByText('Birth', { exact: true }).click()
       await page.getByText('Father details').click()
       await type(page, '#father____firstname', father.firstname)
       await type(page, '#father____surname', father.surname)

@@ -47,7 +47,7 @@ test("Advanced Search - Birth Event Declaration - Child's details", async ({
     await page.click('#searchType')
     await expectInUrl(page, 'advanced-search')
 
-    await page.getByText('Birth').click()
+    await page.getByText('Birth', { exact: true }).click()
   })
 
   await test.step("2.5 - Validate search by Child's details", async () => {

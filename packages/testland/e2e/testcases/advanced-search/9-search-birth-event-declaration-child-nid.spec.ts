@@ -517,7 +517,7 @@ test('Advanced Search - Birth Event Declaration - Child NID', async ({
     await login(page)
     await page.click('#searchType')
     await expect(page).toHaveURL(/.*\/advanced-search/)
-    await page.getByText('Birth').click()
+    await page.getByText('Birth', { exact: true }).click()
   })
 
   await test.step('Search by child name and NID and verify search results', async () => {

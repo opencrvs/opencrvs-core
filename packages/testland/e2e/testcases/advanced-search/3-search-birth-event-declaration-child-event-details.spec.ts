@@ -56,7 +56,7 @@ test("Advanced Search - Birth Event Declaration - Child's details", async ({
     await login(page)
     await page.click('#searchType')
     await expect(page).toHaveURL(/.*\/advanced-search/)
-    await page.getByText('Birth').click()
+    await page.getByText('Birth', { exact: true }).click()
   })
 
   await test.step("3 - Validate search by Child's DOB & Gender", async () => {
@@ -196,7 +196,7 @@ test("Advanced Search - Birth Event Declaration - Child's Residential Address", 
     await login(page, CREDENTIALS.REGISTRATION_OFFICER)
     await page.click('#searchType')
     await expect(page).toHaveURL(/.*\/advanced-search/)
-    await page.getByText('Birth').click()
+    await page.getByText('Birth', { exact: true }).click()
   })
 
   await test.step("3 - Validate search by Child's Place of Birth", async () => {

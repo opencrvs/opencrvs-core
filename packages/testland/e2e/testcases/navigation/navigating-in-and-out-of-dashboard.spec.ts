@@ -47,7 +47,7 @@ test('Navigating in and out of dashboard', async ({ page }) => {
     await test.step('2.5.1 - Fill in advanced search form with child details', async () => {
       await page.click('#searchType')
       await expect(page).toHaveURL(/.*\/advanced-search/)
-      await page.getByText('Birth').click()
+      await page.getByText('Birth', { exact: true }).click()
 
       await page.getByText('Child details').click()
 
