@@ -19,7 +19,6 @@
   },
   "dependencies": {
     "@opencrvs/commons": "workspace:*",
-    "superjson": "1.9.0-0",
     "@opencrvs/events": "workspace:*",
     "@trpc/client": "11.4.3",
     "@types/node": "^16.18.39",

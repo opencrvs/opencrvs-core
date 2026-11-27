@@ -33,7 +33,7 @@ export function trackAndDeleteCreatedEvents() {
       ) {
         try {
           const resBody = await response.json()
-          createdEventIds.push(resBody.result.data.json.id)
+          createdEventIds.push(resBody.result.data.id)
         } catch (e) {
           // Do nothing
         }

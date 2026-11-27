@@ -10,10 +10,9 @@
  */
 
 import { initTRPC, TRPCError } from '@trpc/server'
-import superjson from 'superjson'
 import { OpenApiMeta } from 'trpc-to-openapi'
 import { DefaultErrorShape } from '@trpc/server/unstable-core-do-not-import'
-import { logger, TokenUserType } from '@opencrvs/commons'
+import { jsonTransformer, logger, TokenUserType } from '@opencrvs/commons'
 import {
   TrpcContext,
   ServiceTrpcContext,
@@ -22,7 +21,6 @@ import {
 } from '@events/context'
 import { env } from '@events/environment'
 import { canInitialiseSystem } from './middleware'
-import { transformer } from './serialization'
 
 function errorFormatter({
   shape,
@@ -48,15 +46,11 @@ function errorFormatter({
 export const t = initTRPC
   .context<Partial<TrpcContext>>()
   .meta<OpenApiMeta>()
-  .create({
-    transformer,
-    errorFormatter
-  })
+  .create({ transformer: jsonTransformer, errorFormatter })
 
-export const tService = initTRPC.context<ServiceTrpcContext>().create({
-  transformer: superjson,
-  errorFormatter
-})
+export const tService = initTRPC
+  .context<ServiceTrpcContext>()
+  .create({ transformer: jsonTransformer, errorFormatter })
 
 export const router = t.router
 export const serviceRouter = tService.router

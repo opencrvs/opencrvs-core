@@ -408,9 +408,9 @@ async function uploadCourtOrderPlaceholder(eventId: string, token: string) {
     )
   }
 
-  const body = (await response.json()) as { result: { data: { json: string } } }
+  const body = (await response.json()) as { result: { data: string } }
 
-  return { ...file, path: body.result.data.json }
+  return { ...file, path: body.result.data }
 }
 
 /**

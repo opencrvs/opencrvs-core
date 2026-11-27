@@ -13,7 +13,6 @@ import React from 'react'
 import { QueryKey } from '@tanstack/react-query'
 import { TRPCError } from '@trpc/server'
 import { createTRPCMsw, httpLink } from '@vafanassieff/msw-trpc'
-import superjson from 'superjson'
 import { expect, screen, userEvent, within } from 'storybook/test'
 import {
   ActionType,
@@ -61,8 +60,7 @@ import { EventOverviewIndex } from './EventOverview'
 const generator = testDataGenerator()
 
 const tRPCMsw = createTRPCMsw<AppRouter>({
-  links: [httpLink({ url: '/api/events' })],
-  transformer: { input: superjson, output: superjson }
+  links: [httpLink({ url: '/api/events' })]
 })
 
 const IBOMBO_ADMINISTRATIVE_AREA_ID =

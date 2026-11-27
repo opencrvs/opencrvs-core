@@ -19,8 +19,7 @@ describe('events client', () => {
     const fetchSpy = jest
       .spyOn(globalThis, 'fetch')
       .mockImplementation(
-        async () =>
-          new Response(JSON.stringify({ result: { data: { json: [] } } }))
+        async () => new Response(JSON.stringify({ result: { data: [] } }))
       )
 
     await Promise.all([

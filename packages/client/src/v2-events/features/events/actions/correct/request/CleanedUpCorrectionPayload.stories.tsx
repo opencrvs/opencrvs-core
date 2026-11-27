@@ -12,7 +12,6 @@ import React from 'react'
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import { createTRPCMsw, httpLink } from '@vafanassieff/msw-trpc'
 import { Outlet } from 'react-router-dom'
-import superjson from 'superjson'
 import { expect, waitFor, within, userEvent } from 'storybook/test'
 import {
   ActionType,
@@ -53,8 +52,7 @@ type Story = StoryObj<typeof Request.Pages>
 
 // --- MSW setup ---
 const tRPCMsw = createTRPCMsw<AppRouter>({
-  links: [httpLink({ url: '/api/events' })],
-  transformer: { input: superjson, output: superjson }
+  links: [httpLink({ url: '/api/events' })]
 })
 
 // --- Event config overrides ---

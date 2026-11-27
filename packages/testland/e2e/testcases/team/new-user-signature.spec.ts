@@ -21,8 +21,7 @@ const OFFICE = 'Ibombo District Office'
 async function readCreatedUserId(response: Response): Promise<string> {
   const body = await response.json()
   const [first] = Array.isArray(body) ? body : [body]
-  const data = first.result.data
-  return (data.json ?? data).id
+  return first.result.data.id
 }
 
 test('A signature attached while creating a user is shown to other sessions', async ({

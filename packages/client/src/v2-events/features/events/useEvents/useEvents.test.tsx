@@ -16,7 +16,6 @@ import { createTRPCMsw, httpLink } from '@vafanassieff/msw-trpc'
 import { http, HttpResponse, HttpResponseResolver } from 'msw'
 import { setupServer } from 'msw/node'
 import { Provider } from 'react-redux'
-import superjson, { serialize } from 'superjson'
 import { vi } from 'vitest'
 import {
   ActionStatus,
@@ -46,15 +45,11 @@ function trpcHandler(
   async function wrapHttpResponseJson<T extends HttpResponse>(response: T) {
     const jsonBody = await response.json()
     return HttpResponse.json({
-      result: { data: serialize(jsonBody), type: 'data' }
+      result: { data: jsonBody, type: 'data' }
     })
   }
 
   return (async (options) => {
-    const body = (await options.request.json()) as unknown as {
-      json: EventInput
-    }
-    options.request.json = async () => Promise.resolve(body.json)
     const response = (await fn(options)) as HttpResponse
     return wrapHttpResponseJson(response)
   }) as HttpResponseResolver<never, EventInput, EventDocument>
@@ -108,8 +103,7 @@ const tRPCMsw = createTRPCMsw<AppRouter>({
     httpLink({
       url: '/api/events'
     })
-  ],
-  transformer: { input: superjson, output: superjson }
+  ]
 })
 const server = setupServer(
   http.post<never, EventInput, EventDocument>(

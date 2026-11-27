@@ -11,7 +11,6 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import React from 'react'
 import { createTRPCMsw, httpLink } from '@vafanassieff/msw-trpc'
-import superjson from 'superjson'
 import { expect, fn, userEvent, waitFor, within } from 'storybook/test'
 import {
   ActionType,
@@ -84,8 +83,7 @@ export const EventSelectionWithCreateScopeForAllEventTypes: Story = {
 }
 
 const tRPCMsw = createTRPCMsw<AppRouter>({
-  links: [httpLink({ url: '/api/events' })],
-  transformer: { input: superjson, output: superjson }
+  links: [httpLink({ url: '/api/events' })]
 })
 
 const [initialVersion] = toVersionedEventConfig(birthConfig).versions

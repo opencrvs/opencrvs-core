@@ -14,7 +14,6 @@ import { createTRPCMsw, httpLink } from '@vafanassieff/msw-trpc'
 import { setupServer } from 'msw/node'
 import { Provider } from 'react-redux'
 import { IntlProvider } from 'react-intl'
-import superjson from 'superjson'
 import {
   DEFAULT_EFFECTIVE_FROM,
   VersionedEventConfig,
@@ -45,8 +44,7 @@ const config: VersionedEventConfig = {
 }
 
 const tRPCMsw = createTRPCMsw<AppRouter>({
-  links: [httpLink({ url: '/api/events' })],
-  transformer: { input: superjson, output: superjson }
+  links: [httpLink({ url: '/api/events' })]
 })
 
 const server = setupServer(tRPCMsw.event.config.get.query(() => [config]))

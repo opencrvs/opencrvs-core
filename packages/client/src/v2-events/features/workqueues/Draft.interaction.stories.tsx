@@ -11,7 +11,6 @@
 
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import React from 'react'
-import superjson from 'superjson'
 import { createTRPCMsw, httpLink } from '@vafanassieff/msw-trpc'
 import { userEvent, within, expect, waitFor } from 'storybook/test'
 import { TRPCError } from '@trpc/server'
@@ -47,8 +46,7 @@ export default meta
 type Story = StoryObj<typeof WorkqueueIndex>
 
 const tRPCMsw = createTRPCMsw<AppRouter>({
-  links: [httpLink({ url: '/api/events' })],
-  transformer: { input: superjson, output: superjson }
+  links: [httpLink({ url: '/api/events' })]
 })
 
 // applyDraftToEventIndex sets updatedAt = draft.createdAt, so controlling

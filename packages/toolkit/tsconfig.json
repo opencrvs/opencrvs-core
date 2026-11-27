@@ -27,6 +27,9 @@
       "@opencrvs/commons/events/deduplication": [
         "../commons/src/events/deduplication.ts"
       ],
+      "@opencrvs/commons/events/trpcTransformer": [
+        "../commons/src/events/trpcTransformer.ts"
+      ],
       "@opencrvs/commons/notification": [
         "../commons/src/notification/index.ts"
       ],

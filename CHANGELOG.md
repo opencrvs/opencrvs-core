@@ -307,6 +307,18 @@ Check conditionals that rely on the old counting:
 
 [#10876](https://github.com/opencrvs/opencrvs-core/issues/10876)
 
+#### The events tRPC API sends plain JSON
+
+The events service no longer uses `superjson` to encode tRPC requests and responses. It now sends and accepts plain JSON. This makes large responses, such as event configurations and search results, faster to encode.
+
+A tRPC client that still uses `superjson` cannot call the events service. Use the `@opencrvs/toolkit` version that matches your OpenCRVS Core version, and create clients with `createClient` from `@opencrvs/toolkit/api`. If you create your own tRPC client for the events service, replace `transformer: superjson` with `transformer: jsonTransformer`. Import `jsonTransformer` from `@opencrvs/toolkit/events`.
+
+The response of the `POST /attachments` endpoint of the events API also changes. The file path is now in `result.data`, not in `result.data.json`. Update integrations that upload attachments to read `result.data`.
+
+A request no longer sends object keys that have the value `undefined`. Before, `superjson` sent some of these keys as `null`.
+
+[#14228](https://github.com/opencrvs/opencrvs-core/issues/14228)
+
 #### `supportingCopy` is renamed to `dialogCopy`, and each action gives the copy of its own dialog
 
 `dialogCopy` is now the one key for the text at the top of a confirmation dialog:
