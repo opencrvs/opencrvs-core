@@ -33,9 +33,13 @@ import {
   type FormFieldGeneratorHandle
 } from '@client/v2-events/components/forms/FormFieldGenerator'
 import { AppRouter, TRPCProvider } from '@client/v2-events/trpc'
-import { storybookEventId, TestImage } from '@client/v2-events/features/events/fixtures'
+import {
+  storybookEventId,
+  TestImage
+} from '@client/v2-events/features/events/fixtures'
 import { shouldBypassLock } from '@client/utils/lockBypass'
 import { getTestValidatorContext } from '../../../../../../.storybook/decorators'
+import { presignedUploadHandlers } from '../../../../../../.storybook/default-request-handlers'
 import { SignatureField } from './SignatureField'
 
 const meta: Meta<typeof FormFieldGenerator> = {
@@ -157,11 +161,7 @@ export const SignatureFileUpload: StoryObj<typeof StyledFormFieldGenerator> = {
           })
         ],
         files: [
-          http.post('/api/upload', (req) => {
-            return HttpResponse.text(
-              `uploaded-image-${new Date().getTime()}.jpg`
-            )
-          }),
+          ...presignedUploadHandlers,
           http.get('/:id', () => {
             return new HttpResponse(TestImage.Fish, {
               headers: {
@@ -426,11 +426,7 @@ export const SignatureCanvasUpload: StoryObj<typeof StyledFormFieldGenerator> =
             })
           ],
           files: [
-            http.post('/api/upload', () => {
-              return HttpResponse.text(
-                `uploaded-image-${new Date().getTime()}.jpg`
-              )
-            }),
+            ...presignedUploadHandlers,
 
             ...['/:id', '/events/:eventId/:filename'].map((path) =>
               http.get(path, async () => {

@@ -9,31 +9,68 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { renderHook } from '@testing-library/react'
+import { createTRPCMsw, httpLink } from '@vafanassieff/msw-trpc'
 import { http, HttpResponse } from 'msw'
 import { setupServer } from 'msw/node'
 import React, { PropsWithChildren } from 'react'
+import superjson from 'superjson'
 import { vi } from 'vitest'
 import {
   ActionType,
+  DocumentPath,
   generateEventDocument,
+  getUUID,
   tennisClubMembershipEvent,
+  userAttachmentPath,
   versionedTennisClubMembershipEvent
 } from '@opencrvs/commons/client'
 import {
   addLocalEventConfig,
   setEventData
 } from '@client/v2-events/features/events/useEvents/api'
-import { queryClient, TRPCProvider } from '@client/v2-events/trpc'
+import { AppRouter, queryClient, TRPCProvider } from '@client/v2-events/trpc'
 import { createTemporaryId } from '@client/v2-events/utils'
 import { useFileUpload } from './useFileUpload'
 
+const tRPCMsw = createTRPCMsw<AppRouter>({
+  links: [httpLink({ url: '/api/events' })],
+  transformer: { input: superjson, output: superjson }
+})
+
+const PRESIGNED_URL = 'http://localhost/presigned-upload'
+
 const uploadedPaths: string[] = []
+const storedFiles: { headers: Record<string, string>; body: string }[] = []
+
+function presignedUpload(path: string, contentType: string) {
+  return {
+    url: `${PRESIGNED_URL}/${path}`,
+    headers: { 'Content-Type': contentType, 'x-amz-meta-created-by': 'test' },
+    path: DocumentPath.parse(path)
+  }
+}
 
 const server = setupServer(
-  http.post('/api/upload', async ({ request }) => {
-    const formData = await request.formData()
-    uploadedPaths.push(String(formData.get('path')))
-    return HttpResponse.text(String(formData.get('path')))
+  tRPCMsw.attachments.presignEventUpload.mutation(
+    ({ eventId, transactionId, extension, contentType }) => {
+      const path = `events/${eventId}/${transactionId}.${extension}`
+      uploadedPaths.push(path)
+      return presignedUpload(path, contentType)
+    }
+  ),
+  tRPCMsw.attachments.presignUserUpload.mutation(
+    ({ userId, transactionId, extension, contentType }) => {
+      const path = `users/${userId}/${transactionId}.${extension}`
+      uploadedPaths.push(path)
+      return presignedUpload(path, contentType)
+    }
+  ),
+  http.put(`${PRESIGNED_URL}/*`, async ({ request }) => {
+    storedFiles.push({
+      headers: Object.fromEntries(request.headers.entries()),
+      body: await request.text()
+    })
+    return new HttpResponse(null, { status: 200 })
   })
 )
 
@@ -49,6 +86,7 @@ afterEach(() => {
   server.resetHandlers()
   queryClient.clear()
   uploadedPaths.length = 0
+  storedFiles.length = 0
 })
 afterAll(() => server.close())
 
@@ -79,9 +117,10 @@ describe('uploading a file for an event that only has a temporary id', () => {
       { wrapper }
     )
 
-    await result.current.uploadFileAsync(file)
+    const { url } = await result.current.uploadFileAsync(file)
 
-    expect(uploadedPaths).toEqual([`events/${event.id}/`])
+    expect(url).toMatch(new RegExp(`^events/${event.id}/[0-9a-f-]{36}\\.jpg$`))
+    expect(uploadedPaths).toEqual([url])
   })
 
   test('does not upload to the temporary event path while the event is unsynced', async () => {
@@ -101,5 +140,29 @@ describe('uploading a file for an event that only has a temporary id', () => {
     await new Promise((resolve) => setTimeout(resolve, 1000))
 
     expect(uploadedPaths).toEqual([])
+  })
+})
+
+describe('uploading a file for a user', () => {
+  test('sends the file to the presigned URL with the signed headers', async () => {
+    const userId = getUUID()
+
+    const { result } = renderHook(
+      () => useFileUpload(userAttachmentPath(userId), 'signature'),
+      { wrapper }
+    )
+
+    const { url } = await result.current.uploadFileAsync(file)
+
+    expect(url).toMatch(new RegExp(`^users/${userId}/[0-9a-f-]{36}\\.jpg$`))
+    expect(storedFiles).toEqual([
+      {
+        headers: expect.objectContaining({
+          'content-type': 'image/jpeg',
+          'x-amz-meta-created-by': 'test'
+        }),
+        body: 'test'
+      }
+    ])
   })
 })
