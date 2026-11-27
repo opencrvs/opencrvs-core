@@ -22,11 +22,14 @@ on:
 
 jobs:
   review:
+    # Bot PRs are not reviewed, except PRs from the OpenCRVS Factory App. The
+    # action refuses bot actors that are not in `allowed_bots`.
     if: |
       (github.event_name == 'pull_request' &&
         github.event.pull_request.draft == false &&
         github.event.pull_request.head.repo.full_name == github.repository &&
-        github.event.pull_request.user.type != 'Bot') ||
+        (github.event.pull_request.user.type != 'Bot' ||
+          github.event.pull_request.user.login == 'opencrvs-factory[bot]')) ||
       (github.event_name == 'issue_comment' &&
         github.event.issue.pull_request &&
         contains(github.event.comment.body, '@claude review'))
@@ -78,6 +81,7 @@ jobs:
         if: steps.guard.outputs.skip != 'true'
         with:
           claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+          allowed_bots: 'opencrvs-factory[bot]'
           prompt: |
             REPO: ${{ github.repository }}
             PR NUMBER: ${{ env.PR_NUMBER }}
