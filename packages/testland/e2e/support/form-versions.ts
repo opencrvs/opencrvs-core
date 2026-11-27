@@ -45,13 +45,15 @@ export async function startBirthDeclaration(
 /**
  * Builds a birth declaration that fits `version`. Version `initial` requires
  * the mother's marital status, and version `v2` does not have that field.
+ * Version `initial` keeps the father's name in 2 TEXT fields, so `father.name`
+ * is split into them.
  */
 export async function getVersionedDeclaration(
   token: string,
   version: BirthVersion,
   partialDeclaration: Record<string, unknown> = {}
 ) {
-  return getDeclaration({
+  const declaration = await getDeclaration({
     token,
     // Any informant other than the mother needs the informant's own details.
     informantRelation:
@@ -66,6 +68,30 @@ export async function getVersionedDeclaration(
       ...partialDeclaration
     }
   })
+  return withVersionedFatherName(version, declaration)
+}
+
+/**
+ * Version `initial` keeps the father's name in the TEXT fields `father.firstname` and
+ * `father.surname`. For that version, moves `father.name` of `declaration` into them.
+ */
+export function withVersionedFatherName<T extends Record<string, unknown>>(
+  version: BirthVersion,
+  declaration: T
+): T {
+  if (version !== BirthVersion.INITIAL || !declaration['father.name']) {
+    return declaration
+  }
+  const { 'father.name': fatherName, ...rest } = declaration
+  const { firstname, surname } = fatherName as {
+    firstname: string
+    surname: string
+  }
+  return {
+    ...rest,
+    'father.firstname': firstname,
+    'father.surname': surname
+  } as unknown as T
 }
 
 /** Creates a birth record under `version` through the events API. */

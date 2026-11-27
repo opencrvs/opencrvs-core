@@ -15,18 +15,12 @@ const childDobWithin5Days = field('child.dob').dateRangeMatches({ days: 5 })
 const similarNamedMother = field('mother.name').fuzzyMatches()
 const similarAgedMother = or(
   field('mother.dob').dateRangeMatches({
-    days: 365
-  }),
-  field('mother.age').dateRangeMatches({
-    days: 365
-  }),
-  field('mother.dob').dateRangeMatches({
     days: 365,
-    matchAgainst: 'mother.age'
+    matchAgainst: ['mother.dob', 'mother.age']
   }),
   field('mother.age').dateRangeMatches({
     days: 365,
-    matchAgainst: 'mother.dob'
+    matchAgainst: ['mother.age', 'mother.dob']
   })
 )
 
@@ -74,4 +68,24 @@ export const dedupConfig = or(
     similarAgedMother,
     motherIdMatchesIfGiven
   )
+)
+
+/**
+ * The initial version keeps the father's name in 2 TEXT fields, and v2 keeps it in the NAME
+ * field `father.name`. Each part is matched against the TEXT field and the NAME field, so a
+ * record of the initial version finds the records of both versions.
+ */
+const similarNamedFather = and(
+  field('father.firstname').fuzzyMatches({
+    matchAgainst: ['father.firstname', 'father.name']
+  }),
+  field('father.surname').fuzzyMatches({
+    matchAgainst: ['father.surname', 'father.name']
+  })
+)
+
+/** The deduplication of the initial version also finds a record of the same child and father. */
+export const initialVersionDedupConfig = or(
+  dedupConfig,
+  and(similarNamedChild, childDobWithin5Days, similarNamedFather)
 )

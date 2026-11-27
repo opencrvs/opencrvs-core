@@ -41,7 +41,7 @@ test('Mobile: in-app Back on advanced-search results does not loop back into the
     await page.click('#searchType')
     await expectInUrl(page, '/advanced-search')
 
-    await page.getByText('Birth').click()
+    await page.getByText('Birth', { exact: true }).click()
     await page.getByText('Child details').click()
     await type(page, '#firstname', childFirstName)
     await type(page, '#surname', childSurname)

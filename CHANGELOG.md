@@ -404,6 +404,12 @@ The toolkit and the country configuration template work with any container regis
 
 Date rules could only compare with today, so a record declared on time became late when a registrar reviewed or corrected it after the deadline. Date rules can now compare with the date of an action on the record, for example `field('child.dob').isAfter().days(365).beforeAction(event.firstAction(ActionType.NOTIFY, ActionType.DECLARE))`. Use `event.firstAction(...)` or `event.lastAction(...)` with one or more action types, and `.beforeAction(...)` or `.afterAction(...)` after `isAfter().days(n)` or `isBefore().days(n)`. Only accepted actions count. Until one exists, the rule compares with today. To get the same behaviour, replace `.inPast()` with `.beforeAction(...)` in your late registration rules. [#14329](https://github.com/opencrvs/opencrvs-core/issues/14329)
 
+#### Deduplicate against a list of fields
+
+`matchAgainst` in deduplication accepts a list of fields, matched with OR, for example `matchAgainst: ['child.firstname', 'child.name']`. Use this, and `searchFields` in advanced search, to find the records of all versions when a new version replaces fields. An event configuration fails validation when deduplication uses a field that no version has, or when search or deduplication uses a field whose type differs between versions. [#14335](https://github.com/opencrvs/opencrvs-core/issues/14335)
+
+A searched or deduplicated field must keep its type in every version, because search does not convert values between types. For example, if search or deduplication uses `child.weightAtBirth`, do not change it from TEXT in one version to NUMBER in the next. To use a new type, add a new field with a new id. List the old and new ids together only when one search value matches both. For example, the TEXT fields for the parts of a name can be listed with the NAME field that replaces them. A TEXT field matches only its whole value, so search the name parts with one TEXT input each, for example `searchFields: ['child.firstname', 'child.name']`.
+
 ### Improvements
 
 - Review auth_mode secret management for OpenCRVS helm chart [#14234](https://github.com/opencrvs/opencrvs-core/issues/14234)

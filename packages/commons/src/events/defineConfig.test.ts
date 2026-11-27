@@ -8,6 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
+/* eslint-disable max-lines */
 import { defineConfig } from './defineConfig'
 import {
   INITIAL_EVENT_CONFIG_VERSION_ID,
@@ -510,12 +511,7 @@ describe('defineConfig()', () => {
         )
       })
 
-      it('should check a defaultValue against the newest version that has the field', () => {
-        const textInV1 = withDeclarationField(v1, nicknameField(FieldType.TEXT))
-        const numberInV1 = withDeclarationField(
-          v1,
-          nicknameField(FieldType.NUMBER)
-        )
+      it('should check a defaultValue against the field of the version that has it', () => {
         const numberInV2 = withDeclarationField(
           v2,
           nicknameField(FieldType.NUMBER)
@@ -526,7 +522,7 @@ describe('defineConfig()', () => {
             id: eventId,
             label,
             advancedSearch: searchingNickname('Ace'),
-            versions: [numberInV1, v2WithExtraField]
+            versions: [v1, v2WithExtraField]
           })
         ).not.toThrow()
 
@@ -535,9 +531,78 @@ describe('defineConfig()', () => {
             id: eventId,
             label,
             advancedSearch: searchingNickname('Ace'),
-            versions: [textInV1, numberInV2]
+            versions: [v1, numberInV2]
           })
         ).toThrow('which is not a valid NUMBER value.')
+      })
+
+      it('should reject a field whose type differs between versions when search uses it, naming both versions', () => {
+        expect(() =>
+          defineConfig({
+            id: eventId,
+            label,
+            advancedSearch: searchingNickname(),
+            versions: [
+              withDeclarationField(v1, nicknameField(FieldType.TEXT)),
+              withDeclarationField(v2, nicknameField(FieldType.NUMBER))
+            ]
+          })
+        ).toThrow(
+          `Field ${NICKNAME_FIELD_ID} is a TEXT field in version ${v1.id} and a NUMBER field in version ${v2.id}.`
+        )
+      })
+
+      /** Adds a deduplication rule to the DECLARE action of `version` that matches on `fieldId`. */
+      function withDeduplicationOn(version: typeof v1, fieldId: string) {
+        return {
+          ...version,
+          actions: version.actions.map((action) =>
+            action.type === ActionType.DECLARE
+              ? {
+                  ...action,
+                  deduplication: {
+                    id: 'test',
+                    label: {
+                      id: 'deduplication.test',
+                      defaultMessage: 'Test deduplication',
+                      description: 'Deduplication of the test'
+                    },
+                    query: { type: 'strict' as const, fieldId }
+                  }
+                }
+              : action
+          )
+        }
+      }
+
+      it('should reject a field whose type differs between versions when deduplication uses it', () => {
+        expect(() =>
+          defineConfig({
+            id: eventId,
+            label,
+            advancedSearch,
+            versions: [
+              withDeclarationField(v1, nicknameField(FieldType.TEXT)),
+              withDeduplicationOn(
+                withDeclarationField(v2, nicknameField(FieldType.NUMBER)),
+                NICKNAME_FIELD_ID
+              )
+            ]
+          })
+        ).toThrow(
+          `Field ${NICKNAME_FIELD_ID} is a TEXT field in version ${v1.id} and a NUMBER field in version ${v2.id}.`
+        )
+      })
+
+      it('should reject a deduplication field that no version has', () => {
+        expect(() =>
+          defineConfig({
+            id: eventId,
+            label,
+            advancedSearch,
+            versions: [v1, withDeduplicationOn(v2, 'applicant.nicknme')]
+          })
+        ).toThrow('applicant.nicknme')
       })
     })
 

@@ -17,6 +17,8 @@ import {
   event,
   user
 } from '@opencrvs/toolkit/events'
+import { Event } from '@countryconfig/events/utils/types'
+import { PlaceOfBirth } from '@countryconfig/events/birth/forms/pages/child'
 
 // Example of a column that is used in the workqueue config
 
@@ -386,6 +388,23 @@ export const Workqueues = defineWorkqueues([
     query: {
       ...registeredInMyAdminArea,
       status: { type: 'exact', term: EventStatus.enum.REVOKED }
+    },
+    action: { type: ActionType.READ }
+  },
+  {
+    slug: 'home-births',
+    icon: 'FileText',
+    name: {
+      id: 'workqueues.homeBirths.title',
+      defaultMessage: 'Home births',
+      description: 'Title of the workqueue of births at a private home'
+    },
+    query: {
+      ...declaredInMyAdminArea,
+      eventType: Event.Birth,
+      data: {
+        'child.placeOfBirth': { type: 'exact', term: PlaceOfBirth.PRIVATE_HOME }
+      }
     },
     action: { type: ActionType.READ }
   }

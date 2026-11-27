@@ -19,7 +19,10 @@ import {
   restoreNetworkConditions
 } from '@e2e/support/mock-network-conditions'
 import { ensureAssignedToUser } from '@e2e/support/utils'
-import { Declaration, getDeclaration } from '@e2e/support/test-data/birth-declaration'
+import {
+  Declaration,
+  getDeclaration
+} from '@e2e/support/test-data/birth-declaration'
 import { getSignatureFile, uploadFile } from '@e2e/support/test-data/utils'
 import { editAndDeclareViaApi } from '@e2e/support/test-data/api-actions'
 import { ActionType } from '@opencrvs/toolkit/events'

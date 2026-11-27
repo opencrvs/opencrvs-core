@@ -124,31 +124,69 @@ export function fatherPage(version: BirthVersion) {
           }
         ]
       }),
-      connectToMOSIPIdReader(
-        {
-          id: 'father.name',
-          type: FieldType.NAME,
-          required: true,
-          configuration: farajalandNameConfig,
-          hideLabel: true,
-          label: {
-            defaultMessage: "Father's name",
-            description: 'This is the label for the field',
-            id: 'event.birth.action.declare.form.section.father.field.name.label'
-          },
-          conditionals: [
+      // The initial version keeps the name in 2 TEXT fields, so QA can test search across a field split.
+      ...(version === BirthVersion.INITIAL
+        ? [
             {
-              type: ConditionalType.SHOW,
-              conditional: requireFatherDetails
+              id: 'father.firstname',
+              type: FieldType.TEXT,
+              required: true,
+              label: {
+                defaultMessage: "Father's first name",
+                description: 'This is the label for the field',
+                id: 'event.birth.action.declare.form.section.father.field.firstname.label'
+              },
+              conditionals: [
+                {
+                  type: ConditionalType.SHOW,
+                  conditional: requireFatherDetails
+                }
+              ]
+            },
+            {
+              id: 'father.surname',
+              type: FieldType.TEXT,
+              required: true,
+              label: {
+                defaultMessage: "Father's surname",
+                description: 'This is the label for the field',
+                id: 'event.birth.action.declare.form.section.father.field.surname.label'
+              },
+              conditionals: [
+                {
+                  type: ConditionalType.SHOW,
+                  conditional: requireFatherDetails
+                }
+              ]
             }
-          ],
-          validation: [invalidNameValidator('father.name')]
-        },
-        {
-          valuePath: 'data.name',
-          disableIf: ['pending', 'verified', 'authenticated']
-        }
-      ),
+          ]
+        : [
+            connectToMOSIPIdReader(
+              {
+                id: 'father.name',
+                type: FieldType.NAME,
+                required: true,
+                configuration: farajalandNameConfig,
+                hideLabel: true,
+                label: {
+                  defaultMessage: "Father's name",
+                  description: 'This is the label for the field',
+                  id: 'event.birth.action.declare.form.section.father.field.name.label'
+                },
+                conditionals: [
+                  {
+                    type: ConditionalType.SHOW,
+                    conditional: requireFatherDetails
+                  }
+                ],
+                validation: [invalidNameValidator('father.name')]
+              },
+              {
+                valuePath: 'data.name',
+                disableIf: ['pending', 'verified', 'authenticated']
+              }
+            )
+          ]),
       connectToMOSIPIdReader(
         {
           id: 'father.dob',

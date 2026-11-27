@@ -13,6 +13,7 @@ import {
   AdvancedSearchConfig,
   event,
   field,
+  FieldType,
   user,
   SelectOption
 } from '@opencrvs/toolkit/events'
@@ -126,7 +127,10 @@ export const advancedSearchBirth = [
       field('mother.name', {
         validations: [],
         conditionals: []
-      }).fuzzy()
+      }).fuzzy(),
+      field('mother.maritalStatus', {
+        searchCriteriaLabelPrefix: motherPrefix
+      }).exact()
     ]
   },
   {
@@ -142,7 +146,39 @@ export const advancedSearchBirth = [
       field('father.name', {
         validations: [],
         conditionals: []
-      }).fuzzy()
+      }).fuzzy(),
+      // The initial version keeps the father's name in 2 TEXT fields. Each input searches one
+      // of them and the NAME field of v2, so it finds the records of both versions.
+      {
+        fieldId: 'father.firstname',
+        fieldType: 'field',
+        type: FieldType.TEXT,
+        config: {
+          type: 'fuzzy',
+          searchFields: ['father.firstname', 'father.name']
+        },
+        label: {
+          defaultMessage: "Father's first name",
+          description:
+            'Label of the search field for the first name of the father',
+          id: 'advancedSearch.form.fatherFirstname'
+        }
+      },
+      {
+        fieldId: 'father.surname',
+        fieldType: 'field',
+        type: FieldType.TEXT,
+        config: {
+          type: 'fuzzy',
+          searchFields: ['father.surname', 'father.name']
+        },
+        label: {
+          defaultMessage: "Father's surname",
+          description:
+            'Label of the search field for the surname of the father',
+          id: 'advancedSearch.form.fatherSurname'
+        }
+      }
     ]
   },
   {

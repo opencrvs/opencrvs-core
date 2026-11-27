@@ -15,6 +15,7 @@ import { DateTime } from 'luxon'
 import {
   EventIndex,
   DeduplicationConfig,
+  Clause,
   ClauseOutput,
   FieldValue,
   EventConfig,
@@ -124,6 +125,24 @@ export function generateElasticsearchQuery(
     }
   }
 
+  const { matchAgainst: matchAgainstOption } = queryInput.options
+  // A list of fields matches when any one of them matches.
+  if (Array.isArray(matchAgainstOption)) {
+    return generateElasticsearchQuery(
+      eventIndex,
+      {
+        type: 'or',
+        clauses: matchAgainstOption.map((matchAgainst) =>
+          Clause.parse({
+            ...queryInput,
+            options: { ...queryInput.options, matchAgainst }
+          })
+        )
+      },
+      eventConfigs
+    )
+  }
+
   function resolveFieldPath(fieldId: string): string {
     // When several versions have the field, `find` takes it from the first one: the record's own version.
     const fieldConfig = getOrThrow(
@@ -140,7 +159,7 @@ export function generateElasticsearchQuery(
     return encodedFieldId
   }
 
-  const matchAgainst = queryInput.options.matchAgainst ?? queryInput.fieldId
+  const matchAgainst = matchAgainstOption ?? queryInput.fieldId
   const queryKey = declarationReference(resolveFieldPath(matchAgainst))
   const queryValue = get(
     eventIndex.declaration,

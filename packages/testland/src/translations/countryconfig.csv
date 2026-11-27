@@ -173,8 +173,10 @@ event.birth.action.declare.form.section.documents.field.proofOther.label,This is
 event.birth.action.declare.form.section.father.field.address.addressSameAs.label,This is the label for the field,Same as mother's usual place of residence?,Identique au lieu de résidence habituel de la mère?
 event.birth.action.declare.form.section.father.field.age.label,This is the label for the field,Age of father (at the time of event),Âge du père (au moment de l'événement)
 event.birth.action.declare.form.section.father.field.detailsNotAvailable.label,This is the label for the field,Father's details are not available,Les informations sur le père ne sont pas disponibles
+event.birth.action.declare.form.section.father.field.firstname.label,This is the label for the field,Father's first name,Prénom du père
 event.birth.action.declare.form.section.father.field.name.label,This is the label for the field,Father's name,Nom du père
 event.birth.action.declare.form.section.father.field.reason.label,This is the label for the field,Reason,Raison
+event.birth.action.declare.form.section.father.field.surname.label,This is the label for the field,Father's surname,Nom de famille du père
 event.birth.action.declare.form.section.informant.field.age.label,This is the label for the field,Age of informant (at the time of event),Âge de l'informateur (au moment de l'événement)
 event.birth.action.declare.form.section.informant.field.email.label,This is the label for the field,Email,E-mail
 event.birth.action.declare.form.section.informant.field.name.label,This is the label for the field,Informant's name,Nom du déclarant
@@ -184,6 +186,7 @@ event.birth.action.declare.form.section.informant.field.phoneNo.label,This is th
 event.birth.action.declare.form.section.informant.field.relation.label,This is the label for the field,Relationship to child,Relation avec l'enfant
 event.birth.action.declare.form.section.mother.field.age.label,This is the label for the field,Age of mother (at the time of event),Âge de la mère (au moment de l'événement)
 event.birth.action.declare.form.section.mother.field.detailsNotAvailable.label,This is the label for the field,Mother's details are not available,Les informations sur la mère ne sont pas disponibles
+event.birth.action.declare.form.section.mother.field.marriageCertificateNumber.label,This is the label for the field,Marriage certificate number,Numéro du certificat de mariage
 event.birth.action.declare.form.section.mother.field.name.label,This is the label for the field,Mother's name,Nom de la mère
 event.birth.action.declare.form.section.mother.field.previousBirths.label,This is the label for the field,No. of previous births,Nombre de naissances antérieures
 event.birth.action.declare.form.section.mother.field.reason.label,This is the label for the field,Reason,Raison
@@ -725,6 +728,7 @@ verify.label,The title for the E-Signet verification button,Authenticate with Na
 workqueues.assignedToYou.title,Title of assigned to you workqueue,Assigned to you,Attribué à vous
 workqueues.correctionRequested.title,Title of correction requested workqueue,Pending corrections,Corrections en attente
 workqueues.escalated.title,Title of escalated workqueue,Escalated,Transmis
+workqueues.homeBirths.title,Title of the workqueue of births at a private home,Home births,Naissances à domicile
 workqueues.inExternalValidation.title,Title of pending external validation workqueue,Pending external validation,En attente de validation externe
 workqueues.notifications.emptyMessage,Empty message for notifications workqueue,No notifications,Aucune notification
 workqueues.notifications.title,Title of notifications workqueue,Notifications,Notifications

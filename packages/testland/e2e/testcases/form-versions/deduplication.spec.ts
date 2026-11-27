@@ -329,3 +329,47 @@ test.describe('Deduplication across birth versions', () => {
     })
   }
 })
+
+test.describe('Deduplication with a list of fields to match against', () => {
+  test("A 'v2' record with the mother's date of birth matches an 'initial' record with only the mother's age", async () => {
+    const token = await getToken(CREDENTIALS.REGISTRAR)
+    const identity = getSharedIdentity()
+    const motherAge = 30
+    const [childBirthYear, ...childBirthMonthAndDay] =
+      identity['child.dob'].split('-')
+    const motherDob = [
+      Number(childBirthYear) - motherAge,
+      ...childBirthMonthAndDay
+    ].join('-')
+
+    const existing = await createVersionedRecord(
+      token,
+      BirthVersion.INITIAL,
+      ActionType.REGISTER,
+      {
+        ...identity,
+        ...INITIAL_ONLY_FIELDS,
+        'mother.dob': undefined,
+        'mother.dobUnknown': true,
+        'mother.age': { age: motherAge, asOfDateRef: 'child.dob' }
+      }
+    )
+    const flagged = await createVersionedRecord(
+      token,
+      BirthVersion.V2,
+      ActionType.DECLARE,
+      { ...identity, ...V2_ONLY_FIELDS, 'mother.dob': motherDob }
+    )
+
+    const event = await getEvent(flagged.eventId)
+    const duplicates = event.actions.flatMap((action) =>
+      action.type === ActionType.DUPLICATE_DETECTED
+        ? action.content.duplicates
+        : []
+    )
+    expect(duplicates).toContainEqual({
+      id: existing.eventId,
+      trackingId: existing.trackingId
+    })
+  })
+})

@@ -8,6 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
+/* eslint-disable max-lines */
 import * as z from 'zod/v4'
 import { ActionConfig } from './ActionConfig'
 import { SummaryConfig } from './SummaryConfig'
@@ -35,6 +36,10 @@ import {
   validateNotificationForm,
   validateVersionList
 } from './eventConfigValidation'
+import {
+  validateDeduplicationFieldIds,
+  validateSearchedFieldTypes
+} from './searchedFieldTypes'
 
 export const EventFieldReference = z
   .object({ $$event: EventMetadataDateFieldIdInput })
@@ -237,6 +242,7 @@ export const EventConfig: z.ZodType<EventConfig, EventConfigSchemaInput> =
         return
       }
       validateAdvancedSearchFieldIds(event, [event], ctx)
+      validateDeduplicationFieldIds(event, [event], ctx)
       validateAdvancedSearchDefaultValues(event, [event], ctx)
     })
     .meta({
@@ -583,6 +589,8 @@ export const VersionedEventConfig: z.ZodType<
       return
     }
     validateAdvancedSearchFieldIds(config, versionConfigs, ctx)
+    validateSearchedFieldTypes(config, versionConfigs, ctx)
+    validateDeduplicationFieldIds(config, versionConfigs, ctx)
     validateAdvancedSearchDefaultValues(
       config,
       [...config.versions]

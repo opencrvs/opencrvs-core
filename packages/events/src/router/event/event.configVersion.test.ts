@@ -39,6 +39,13 @@ const PAST = '2010-01-01'
 const FUTURE = '2999-01-01'
 const EXTRA_FIELD_ID = 'applicant.extra'
 const NICKNAME_FIELD_ID = 'applicant.nickname'
+const ALIAS_FIELD_ID = 'applicant.alias'
+/** The TEXT field of the older version for each part of the NAME field `applicant.alias`. */
+const ALIAS_TEXT_FIELD_IDS = {
+  firstname: 'applicant.aliasFirstname',
+  middlename: 'applicant.aliasMiddlename',
+  surname: 'applicant.aliasSurname'
+}
 const CUSTOM_ACTION_TYPE = 'VERSIONS_TEST_ACTION'
 const SECURED_FIELD_ID = 'applicant.address'
 
@@ -131,6 +138,49 @@ function versionWithNickname(
       description: 'Field that only one version has'
     }
   })
+}
+
+/** A version that has the alias as one NAME field, with a middle name. */
+function versionWithAlias(
+  id: string,
+  effectiveFrom?: string
+): EventConfigVersion {
+  return withDeclarationField(version(id, effectiveFrom), {
+    id: ALIAS_FIELD_ID,
+    type: FieldType.NAME,
+    configuration: {
+      name: {
+        firstname: { required: true },
+        middlename: { required: false },
+        surname: { required: true }
+      }
+    },
+    label: {
+      id: 'event.tennis-club-membership.action.declare.form.section.who.field.alias.label',
+      defaultMessage: 'Alias',
+      description: 'Name field that only one version has'
+    }
+  })
+}
+
+/** A version that has the alias as 3 TEXT fields, one for each part of the name. */
+function versionWithAliasTextFields(
+  id: string,
+  effectiveFrom?: string
+): EventConfigVersion {
+  return Object.values(ALIAS_TEXT_FIELD_IDS).reduce(
+    (configured, fieldId) =>
+      withDeclarationField(configured, {
+        id: fieldId,
+        type: FieldType.TEXT,
+        label: {
+          id: `event.tennis-club-membership.action.declare.form.section.who.field.${fieldId}.label`,
+          defaultMessage: fieldId,
+          description: 'Text field for one part of the alias'
+        }
+      }),
+    version(id, effectiveFrom)
+  )
 }
 
 /** A version that updates secured field with `secured: false`. */
@@ -442,5 +492,61 @@ describe('the event configuration version of a record', () => {
     ])
 
     expect(counts).toEqual({ recent: 1 })
+  })
+
+  test('search finds records of both versions when 3 TEXT fields are replaced by one NAME field', async () => {
+    const alias = { firstname: 'Ace', middlename: 'Van', surname: 'Smith' }
+    await useVersions(
+      versionWithAliasTextFields('v1'),
+      versionWithAlias('v2', FUTURE)
+    )
+    const { user, generator } = await setupTestCase()
+    const client = createTestClient(user, SEARCH_SCOPES)
+
+    const recordOfV1 = await client.event.create(generator.event.create())
+    const declareV1 = generator.event.actions.declare(recordOfV1.id)
+    await client.event.actions.declare.request({
+      ...declareV1,
+      declaration: {
+        ...declareV1.declaration,
+        [ALIAS_TEXT_FIELD_IDS.firstname]: alias.firstname,
+        [ALIAS_TEXT_FIELD_IDS.middlename]: alias.middlename,
+        [ALIAS_TEXT_FIELD_IDS.surname]: alias.surname
+      }
+    })
+
+    await useVersions(
+      versionWithAliasTextFields('v1'),
+      versionWithAlias('v2', PAST)
+    )
+    const recordOfV2 = await client.event.create(generator.event.create())
+    const declareV2 = generator.event.actions.declare(recordOfV2.id)
+    await client.event.actions.declare.request({
+      ...declareV2,
+      declaration: { ...declareV2.declaration, [ALIAS_FIELD_ID]: alias }
+    })
+
+    // The query that the client builds when all 3 TEXT inputs are filled. The first name input has
+    // `searchFields: ['applicant.aliasFirstname', 'applicant.alias']`, and so on.
+    const { results } = await client.event.search({
+      query: {
+        type: 'and',
+        clauses: (['firstname', 'middlename', 'surname'] as const).map(
+          (part) => ({
+            type: 'or',
+            clauses: [ALIAS_TEXT_FIELD_IDS[part], ALIAS_FIELD_ID].map(
+              (fieldId) => ({
+                eventType: TENNIS_CLUB_MEMBERSHIP,
+                data: { [fieldId]: { type: 'fuzzy', term: alias[part] } }
+              })
+            )
+          })
+        )
+      }
+    })
+
+    expect(results.map(({ id }) => id).sort()).toEqual(
+      [recordOfV1.id, recordOfV2.id].sort()
+    )
   })
 })

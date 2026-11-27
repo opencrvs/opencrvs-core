@@ -13,6 +13,11 @@ import { TranslationConfig } from './TranslationConfig'
 
 const FieldReference = z.string()
 
+/** The field of the other records to match against, or a list of fields matched with OR. */
+const MatchAgainst = z
+  .union([FieldReference, z.array(FieldReference).min(1)])
+  .optional()
+
 const Matcher = z.object({
   /**
    * Reference to the field used in matching.
@@ -24,7 +29,7 @@ const Matcher = z.object({
   options: z
     .object({
       boost: z.number().optional(),
-      matchAgainst: FieldReference.optional()
+      matchAgainst: MatchAgainst
     })
     .optional()
     .default({
@@ -46,7 +51,7 @@ const FuzzyMatcher = Matcher.extend({
         .optional()
         .default('AUTO:4,7'),
       boost: z.number().optional().default(1),
-      matchAgainst: FieldReference.optional()
+      matchAgainst: MatchAgainst
     })
     .optional()
     .default({
@@ -66,7 +71,7 @@ const StrictMatcher = Matcher.extend({
        * The constant value to be present in the field for both records
        */
       value: z.string().optional(),
-      matchAgainst: FieldReference.optional()
+      matchAgainst: MatchAgainst
     })
     .optional()
     .default({
@@ -86,7 +91,7 @@ const DateRangeMatcher = Matcher.extend({
     pivot: z.number().optional(),
     days: z.number(),
     boost: z.number().optional().default(1),
-    matchAgainst: FieldReference.optional()
+    matchAgainst: MatchAgainst
   })
 })
 

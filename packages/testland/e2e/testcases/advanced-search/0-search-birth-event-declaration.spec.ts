@@ -23,7 +23,7 @@ test('Advanced Search - Birth Event Declaration', async ({ page }) => {
   })
 
   await test.step('0.3 - Validate display child details when selecting Birth', async () => {
-    await page.getByText('Birth').click()
+    await page.getByText('Birth', { exact: true }).click()
     await expect(page.getByText('Child details')).toBeVisible()
   })
 

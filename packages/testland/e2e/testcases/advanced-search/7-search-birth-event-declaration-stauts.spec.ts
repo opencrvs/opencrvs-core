@@ -56,7 +56,7 @@ test("Advanced Search - Birth Event Declaration - Informant's details", async ({
   await test.step('7.2 - Navigate to the advanced search page and select Birth event type', async () => {
     await page.click('#searchType')
     await expect(page).toHaveURL(/.*\/advanced-search/)
-    await page.getByText('Birth').click()
+    await page.getByText('Birth', { exact: true }).click()
   })
 
   await test.step('7.3 - Search for birth declaration using child name and status filter', async () => {

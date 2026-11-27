@@ -108,8 +108,7 @@ export function createAndNotifyProcedure() {
         } = input
 
         // Authorization
-        const eventConfigs =
-          await getInMemoryVersionedEventConfigurations()
+        const eventConfigs = await getInMemoryVersionedEventConfigurations()
         const tokenScopes = getScopes(token)
 
         const versionedConfig = eventConfigs.find((c) => c.id === eventType)
