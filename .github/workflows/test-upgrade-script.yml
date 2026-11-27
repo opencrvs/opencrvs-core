@@ -62,7 +62,25 @@ jobs:
       - name: Run upgrade script on farajaland
         run: |
           cd opencrvs-farajaland
-          ./node_modules/@opencrvs/toolkit/dist/cli.js upgrade
+          ./node_modules/@opencrvs/toolkit/dist/cli.js upgrade --remove-infrastructure
+          # Nothing git tracks may be left in infrastructure/
+          if [ -n "$(git ls-files -- infrastructure)" ]; then
+            echo "::error::The upgrade left tracked files in infrastructure/:"
+            git ls-files -- infrastructure
+            exit 1
+          fi
+          # The upgrade pins the version of the toolkit it runs from, which is
+          # this unpublished build: check the pin, then install the build packed
+          # as it would be published. Not link:, which makes yarn install into
+          # packages/toolkit itself
+          TOOLKIT_VERSION=$(jq -r .version ../packages/toolkit/package.json)
+          jq -e --arg v "$TOOLKIT_VERSION" \
+            '.version == $v and .dependencies["@opencrvs/toolkit"] == $v' package.json
+          PACK_DIR=$(mktemp -d)
+          (cd ../packages/toolkit && npm pack --silent --pack-destination "$PACK_DIR" > /dev/null)
+          jq --arg tarball "file:$(ls "$PACK_DIR"/*.tgz)" \
+            '.dependencies["@opencrvs/toolkit"] = $tarball' package.json > package.json.tmp
+          mv package.json.tmp package.json
           # remove unused files
           rm -rf src/api/notification/testData.ts
           yarn --force
