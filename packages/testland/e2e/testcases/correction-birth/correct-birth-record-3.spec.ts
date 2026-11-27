@@ -1089,25 +1089,32 @@ test(' Correct record - 3', async ({ page }) => {
 
     await test.step('3.8.5 Validate history in record audit', async () => {
       await page.getByRole('button', { name: 'Audit' }).click()
-      await page.getByRole('button', { name: 'Next page' }).click()
 
       /*
        * Expected result: should show in task history
        * - Correction requested
        * - Correction approved
+       *
+       * The history shows the oldest action first, 10 rows on each page. The
+       * page that holds a row depends on how many actions come before it, so
+       * go to the next page until the row shows.
        */
-
-      await expect(
-        page
+      const nextPage = page.getByRole('button', { name: 'Next page' })
+      const expectInHistory = async (name: string) => {
+        const row = page
           .locator('#listTable-task-history')
-          .getByRole('button', { name: 'Correction requested' })
-      ).toBeVisible()
+          .getByRole('button', { name })
 
-      await expect(
-        page
-          .locator('#listTable-task-history')
-          .getByRole('button', { name: 'Correction approved' })
-      ).toBeVisible()
+        await expect(async () => {
+          if (!(await row.isVisible())) {
+            await nextPage.click({ timeout: 2_000 })
+          }
+          await expect(row).toBeVisible({ timeout: 2_000 })
+        }).toPass({ timeout: 30_000 })
+      }
+
+      await expectInHistory('Correction requested')
+      await expectInHistory('Correction approved')
     })
   })
 })
