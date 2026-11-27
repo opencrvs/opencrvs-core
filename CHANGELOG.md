@@ -74,28 +74,17 @@ See [Migrate from MinIO](charts/dependencies/README.md#migrate-from-minio) for m
 
 Country config calls core with a system client of its own. `opencrvs environment init` generates its credentials, `COUNTRY_CONFIG_CLIENT_ID` and `COUNTRY_CONFIG_CLIENT_SECRET`, as environment secrets. A new run on an existing environment keeps the values that exist and adds only the missing ones. The generated chart values give both values to countryconfig from the k8s secret `country-config-client`.
 
-An environment that was set up before 2.2 has its own copy of the chart values and the secret mapping. To add the client:
+The usual upgrade steps add the client. Merge the upstream infrastructure repository, which adds the `country-config-client` secret to `.github/TEMPLATES/secret-mapping-opencrvs.yml`. Then run `yarn environment:init` for each environment. It generates the 2 values and writes the secret to `environments/<environment>/opencrvs-services/values.yaml`.
 
-1. Run `opencrvs environment init` again for each environment.
-2. Add the secret to `.github/TEMPLATES/secret-mapping-opencrvs.yml` in your infrastructure repository:
+If `environment:init` does not manage your environment, add the secret to `countryconfig.secrets` in your chart values:
 
-   ```yaml
-   country-config-client:
-     type: Opaque
-     data:
-       - COUNTRY_CONFIG_CLIENT_ID
-       - COUNTRY_CONFIG_CLIENT_SECRET
-   ```
-
-3. Add the secret to `countryconfig.secrets` in `environments/<env>/opencrvs-services/values.yaml`:
-
-   ```yaml
-   countryconfig:
-     secrets:
-       country-config-client:
-         - COUNTRY_CONFIG_CLIENT_ID
-         - COUNTRY_CONFIG_CLIENT_SECRET
-   ```
+```yaml
+countryconfig:
+  secrets:
+    country-config-client:
+      - COUNTRY_CONFIG_CLIENT_ID
+      - COUNTRY_CONFIG_CLIENT_SECRET
+```
 
 #### Outbox: empty it before you deploy
 
