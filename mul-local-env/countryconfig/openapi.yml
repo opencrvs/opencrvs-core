@@ -186,6 +186,11 @@ components:
         trackingId:
           type: string
           description: System-generated tracking identifier used to look up the event.
+        configVersionId:
+          type: string
+          description: Id of the event configuration version the record was created under.
+            Every action on the record uses that version. Records created before
+            versioning have 'initial'.
       required:
         - id
         - type
@@ -193,6 +198,7 @@ components:
         - updatedAt
         - actions
         - trackingId
+        - configVersionId
     ActionDocument:
       oneOf:
         - $ref: "#/components/schemas/CreatedAction"
@@ -2356,8 +2362,16 @@ components:
             properties:
               id:
                 type: string
+                maxLength: 64
+                pattern: ^[a-z0-9_]+$
                 description: Identifier of the version, unique within the event (e.g.
-                  "birth-v2").
+                  "birth_v2"). It can contain only lower-case letters (a-z),
+                  digits (0-9) and underscores (_), and at most 64 characters.
+              label:
+                description: Name of the version, which the UI shows wherever it names the
+                  version. For example, "{event.configVersionLabel}" in the
+                  event summary.
+                $ref: "#/components/schemas/TranslationConfig"
               effectiveFrom:
                 default: 0001-01-01
                 description: Date (YYYY-MM-DD) from which this version is effective. A version
@@ -2587,6 +2601,7 @@ components:
                   $ref: "#/components/schemas/Conditional"
             required:
               - id
+              - label
               - effectiveFrom
               - title
               - summary
@@ -2596,7 +2611,7 @@ components:
             additionalProperties: false
           description: Versions of the event configuration, each effective from its
             `effectiveFrom`. An event configured without versions has a single
-            version, with id 'default' and `effectiveFrom` '0001-01-01'.
+            version, with id 'initial' and `effectiveFrom` '0001-01-01'.
       required:
         - id
         - label
@@ -3598,7 +3613,9 @@ components:
                     description: Field value template supports variables from configuration (e.g.
                       "{informant.phoneNo} {informant.email}") and EventMetadata
                       (e.g. "{event.legalStatuses.REGISTERED.acceptedAt, date,
-                      ::dd MMMM yyyy}").
+                      ::dd MMMM yyyy}"). "{event.configVersionLabel}" gives the
+                      label of the configuration version that the record was
+                      created under.
                     $ref: "#/components/schemas/TranslationConfig"
                   label:
                     $ref: "#/components/schemas/TranslationConfig"
@@ -3708,9 +3725,6 @@ components:
           description: READ is a meta action excluded from flag resolution, so flags
             configured here would never apply.
           not: {}
-        supportingCopy:
-          description: Text displayed on the confirmation dialog
-          $ref: "#/components/schemas/TranslationConfig"
         icon:
           type: string
           description: Icon representing the action
@@ -14774,9 +14788,6 @@ components:
           description: ASSIGN is a meta action excluded from flag resolution, so flags
             configured here would never apply.
           not: {}
-        supportingCopy:
-          description: Text displayed on the confirmation dialog
-          $ref: "#/components/schemas/TranslationConfig"
         icon:
           type: string
           description: Icon representing the action
@@ -14803,9 +14814,6 @@ components:
           description: UNASSIGN is a meta action excluded from flag resolution, so flags
             configured here would never apply.
           not: {}
-        supportingCopy:
-          description: Text displayed on the confirmation dialog
-          $ref: "#/components/schemas/TranslationConfig"
         icon:
           type: string
           description: Icon representing the action
@@ -14834,9 +14842,6 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/ActionFlagConfig"
-        supportingCopy:
-          description: Text displayed on the confirmation dialog
-          $ref: "#/components/schemas/TranslationConfig"
         icon:
           type: string
           description: Icon representing the action
@@ -14897,9 +14902,6 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/ActionFlagConfig"
-        supportingCopy:
-          description: Text displayed on the confirmation dialog
-          $ref: "#/components/schemas/TranslationConfig"
         icon:
           type: string
           description: Icon representing the action
@@ -14939,6 +14941,9 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/FieldConfig"
+        dialogCopy:
+          description: Text shown at the top of the confirmation dialog of the action.
+          $ref: "#/components/schemas/TranslationConfig"
       required:
         - label
         - flags
@@ -14946,9 +14951,8 @@ components:
         - notificationForm
         - review
       additionalProperties: false
-      description: Configuration for the notify action, including the notification
-        form and its review page. When undefined, it is generated using the
-        DeclareActionConfig.
+      description: "Configuration for the notify action: the notification form and its
+        review page. An event without a NOTIFY action cannot be notified."
     DeclarationFormConfig:
       type: object
       properties:
@@ -15013,9 +15017,6 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/ActionFlagConfig"
-        supportingCopy:
-          description: Text displayed on the confirmation dialog
-          $ref: "#/components/schemas/TranslationConfig"
         icon:
           type: string
           description: Icon representing the action
@@ -15055,22 +15056,8 @@ components:
           items:
             $ref: "#/components/schemas/FieldConfig"
         dialogCopy:
-          type: object
-          properties:
-            notify:
-              description: Confirmation text for the notify action
-              $ref: "#/components/schemas/TranslationConfig"
-            declare:
-              description: Confirmation text for the declare action
-              $ref: "#/components/schemas/TranslationConfig"
-            register:
-              description: Confirmation text for the register action
-              $ref: "#/components/schemas/TranslationConfig"
-          required:
-            - notify
-            - declare
-            - register
-          additionalProperties: false
+          description: Text shown at the top of the confirmation dialog of the action.
+          $ref: "#/components/schemas/TranslationConfig"
       required:
         - label
         - flags
@@ -15237,8 +15224,6 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/ActionFlagConfig"
-        supportingCopy:
-          not: {}
         icon:
           description: DUPLICATE_DETECTED is system-generated and never shown as a button,
             so it has no icon.
@@ -15269,9 +15254,6 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/ActionFlagConfig"
-        supportingCopy:
-          description: Text displayed on the confirmation dialog
-          $ref: "#/components/schemas/TranslationConfig"
         icon:
           type: string
           description: Icon representing the action
@@ -15301,9 +15283,6 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/ActionFlagConfig"
-        supportingCopy:
-          description: Text displayed on the confirmation dialog
-          $ref: "#/components/schemas/TranslationConfig"
         icon:
           type: string
           description: Icon representing the action
@@ -15334,9 +15313,6 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/ActionFlagConfig"
-        supportingCopy:
-          description: Text displayed on the confirmation dialog
-          $ref: "#/components/schemas/TranslationConfig"
         icon:
           type: string
           description: Icon representing the action
@@ -15354,6 +15330,9 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/FieldConfig"
+        dialogCopy:
+          description: Text shown at the top of the confirmation dialog of the action.
+          $ref: "#/components/schemas/TranslationConfig"
       required:
         - label
         - flags
@@ -15372,9 +15351,6 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/ActionFlagConfig"
-        supportingCopy:
-          description: Text displayed on the confirmation dialog
-          $ref: "#/components/schemas/TranslationConfig"
         icon:
           type: string
           description: Icon representing the action
@@ -15394,6 +15370,9 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/FieldConfig"
+        dialogCopy:
+          description: Text shown at the top of the confirmation dialog of the action.
+          $ref: "#/components/schemas/TranslationConfig"
       required:
         - label
         - flags
@@ -15412,9 +15391,6 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/ActionFlagConfig"
-        supportingCopy:
-          description: Text displayed on the confirmation dialog
-          $ref: "#/components/schemas/TranslationConfig"
         icon:
           type: string
           description: Icon representing the action
@@ -15579,9 +15555,6 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/ActionFlagConfig"
-        supportingCopy:
-          description: Text displayed on the confirmation dialog
-          $ref: "#/components/schemas/TranslationConfig"
         icon:
           type: string
           description: Icon representing the action
@@ -15628,9 +15601,6 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/ActionFlagConfig"
-        supportingCopy:
-          description: Text displayed on the confirmation dialog
-          $ref: "#/components/schemas/TranslationConfig"
         icon:
           type: string
           description: Icon representing the action
@@ -15660,9 +15630,6 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/ActionFlagConfig"
-        supportingCopy:
-          description: Text displayed on the confirmation dialog
-          $ref: "#/components/schemas/TranslationConfig"
         icon:
           type: string
           description: Icon representing the action
@@ -15692,9 +15659,6 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/ActionFlagConfig"
-        supportingCopy:
-          description: Text displayed on the confirmation dialog
-          $ref: "#/components/schemas/TranslationConfig"
         icon:
           type: string
           description: Icon representing the action
@@ -15710,13 +15674,13 @@ components:
           type: object
           properties:
             notify:
-              description: Confirmation text for the notify with edits action
+              description: Confirmation text for the 'Notify with edits' action
               $ref: "#/components/schemas/TranslationConfig"
             declare:
-              description: Confirmation text for the declare with edits action
+              description: Confirmation text for the 'Declare with edits' action
               $ref: "#/components/schemas/TranslationConfig"
             register:
-              description: Confirmation text for the register with edits action
+              description: Confirmation text for the 'Register with edits' action
               $ref: "#/components/schemas/TranslationConfig"
           required:
             - notify
@@ -15742,9 +15706,6 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/ActionFlagConfig"
-        supportingCopy:
-          description: Text displayed on the confirmation dialog
-          $ref: "#/components/schemas/TranslationConfig"
         icon:
           type: string
           description: Icon representing the action
@@ -15762,6 +15723,9 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/FieldConfig"
+        dialogCopy:
+          description: Text shown at the top of the confirmation dialog of the action.
+          $ref: "#/components/schemas/TranslationConfig"
       required:
         - label
         - flags
@@ -15780,9 +15744,6 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/ActionFlagConfig"
-        supportingCopy:
-          description: Text displayed on the confirmation dialog
-          $ref: "#/components/schemas/TranslationConfig"
         icon:
           type: string
           description: Icon representing the action
@@ -15794,6 +15755,9 @@ components:
         type:
           type: string
           const: UNARCHIVE
+        dialogCopy:
+          description: Text shown at the top of the confirmation dialog of the action.
+          $ref: "#/components/schemas/TranslationConfig"
       required:
         - label
         - flags
@@ -15812,9 +15776,6 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/ActionFlagConfig"
-        supportingCopy:
-          description: Text displayed on the confirmation dialog
-          $ref: "#/components/schemas/TranslationConfig"
         icon:
           type: string
           description: Icon representing the action
@@ -15832,6 +15793,9 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/FieldConfig"
+        dialogCopy:
+          description: Text shown at the top of the confirmation dialog of the action.
+          $ref: "#/components/schemas/TranslationConfig"
       required:
         - label
         - flags
@@ -15850,9 +15814,6 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/ActionFlagConfig"
-        supportingCopy:
-          description: Text displayed on the confirmation dialog
-          $ref: "#/components/schemas/TranslationConfig"
         icon:
           type: string
           description: Icon representing the action
@@ -15870,6 +15831,9 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/FieldConfig"
+        dialogCopy:
+          description: Text shown at the top of the confirmation dialog of the action.
+          $ref: "#/components/schemas/TranslationConfig"
       required:
         - label
         - flags
@@ -15888,9 +15852,6 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/ActionFlagConfig"
-        supportingCopy:
-          description: Text displayed on the confirmation dialog
-          $ref: "#/components/schemas/TranslationConfig"
         icon:
           type: string
           description: Icon representing the action
@@ -15914,6 +15875,9 @@ components:
         auditHistoryLabel:
           description: The label to show in audit history for this action. For example
             "Approved".
+          $ref: "#/components/schemas/TranslationConfig"
+        dialogCopy:
+          description: Text shown at the top of the confirmation dialog of the action.
           $ref: "#/components/schemas/TranslationConfig"
       required:
         - label
@@ -16056,6 +16020,11 @@ components:
         trackingId:
           type: string
           description: System-generated tracking identifier used to look up the event.
+        configVersionId:
+          type: string
+          description: Id of the event configuration version the record was created under.
+            Every action on the record uses that version. Records created before
+            versioning have 'initial'.
       required:
         - id
         - type
@@ -16063,6 +16032,7 @@ components:
         - updatedAt
         - actions
         - trackingId
+        - configVersionId
       additionalProperties: false
     ActionDocumentOutput:
       oneOf:
