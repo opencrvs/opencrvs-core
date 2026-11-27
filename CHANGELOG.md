@@ -408,6 +408,8 @@ Date rules could only compare with today, so a record declared on time became la
 
 `matchAgainst` in deduplication accepts a list of fields, matched with OR, for example `matchAgainst: ['child.firstname', 'child.name']`. Use this, and `searchFields` in advanced search, to find the records of all versions when a new version replaces fields. An event configuration fails validation when deduplication uses a field that no version has, or when search or deduplication uses a field whose type differs between versions. [#14335](https://github.com/opencrvs/opencrvs-core/issues/14335)
 
+A field that advanced search or deduplication uses must have the same type in every version. The records of each version are indexed with the type of their own version, and search does not convert a value from one type to another. To change the type of such a field, give the field of the new type a new id, and list both ids in `searchFields` and `matchAgainst`. A field that no search or deduplication uses can change type in any version. A TEXT field matches only its whole value, so a NAME search input does not find the records that keep the name in separate TEXT fields. For these records, use one TEXT search input for each part of the name, for example `searchFields: ['child.firstname', 'child.name']`.
+
 ### Improvements
 
 - Review auth_mode secret management for OpenCRVS helm chart [#14234](https://github.com/opencrvs/opencrvs-core/issues/14234)

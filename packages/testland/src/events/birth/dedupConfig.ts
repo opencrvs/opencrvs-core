@@ -69,3 +69,23 @@ export const dedupConfig = or(
     motherIdMatchesIfGiven
   )
 )
+
+/**
+ * The initial version keeps the father's name in 2 TEXT fields, and v2 keeps it in the NAME
+ * field `father.name`. Each part is matched against the TEXT field and the NAME field, so a
+ * record of the initial version finds the records of both versions.
+ */
+const similarNamedFather = and(
+  field('father.firstname').fuzzyMatches({
+    matchAgainst: ['father.firstname', 'father.name']
+  }),
+  field('father.surname').fuzzyMatches({
+    matchAgainst: ['father.surname', 'father.name']
+  })
+)
+
+/** The deduplication of the initial version also finds a record of the same child and father. */
+export const initialVersionDedupConfig = or(
+  dedupConfig,
+  and(similarNamedChild, childDobWithin5Days, similarNamedFather)
+)

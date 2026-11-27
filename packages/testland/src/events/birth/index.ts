@@ -38,7 +38,7 @@ import { BIRTH_CERTIFICATE_COLLECTOR_FORM } from './forms/printForm'
 import { PlaceOfBirth, TypeOfBirth } from './forms/pages/child'
 import { birthCorrectionForm } from './forms/correctionForm'
 import { birthNotificationForm } from './forms/notificationForm'
-import { dedupConfig } from './dedupConfig'
+import { dedupConfig, initialVersionDedupConfig } from './dedupConfig'
 import * as verifiableCredentialActions from '@countryconfig/verifiable-credentials/issue-birth-credential-action'
 import {
   Event,
@@ -523,7 +523,8 @@ const birthVersion = ({
             'This is shown as the action name anywhere the user can trigger the action from',
           id: 'event.birth.action.detect-duplicate.label'
         },
-        query: dedupConfig
+        query:
+          id === BirthVersion.INITIAL ? initialVersionDedupConfig : dedupConfig
       },
       flags: [
         {
@@ -1277,7 +1278,8 @@ const birthVersion = ({
             'This is shown as the action name anywhere the user can trigger the action from',
           id: 'event.birth.action.detect-duplicate.label'
         },
-        query: dedupConfig
+        query:
+          id === BirthVersion.INITIAL ? initialVersionDedupConfig : dedupConfig
       }
     },
     {

@@ -18,6 +18,8 @@ advancedSearch.form.childDetails,The title of Child details accordion,Child deta
 advancedSearch.form.deceasedDetails,The title of Deceased details accordion,Deceased details,information du défunt
 advancedSearch.form.eventDetails,The title of event details accordion,Event details,Détails de l'évènement
 advancedSearch.form.fatherDetails,The title of Father details accordion,Father details,Information du père
+advancedSearch.form.fatherFirstname,Label of the search field for the first name of the father,Father's first name,Prénom du père
+advancedSearch.form.fatherSurname,Label of the search field for the surname of the father,Father's surname,Nom de famille du père
 advancedSearch.form.informantDetails,The title informant details form,Informant details,information de l'informateur
 advancedSearch.form.motherDetails,The title of Mother details accordion,Mother details,Information de la mère
 advancedSearch.form.recordStatusAny,Option for form field: status of record,Any status,Tout statut

@@ -396,7 +396,7 @@ export const Workqueues = defineWorkqueues([
     icon: 'FileText',
     name: {
       id: 'workqueues.homeBirths.title',
-      defaultMessage: 'Home births',
+      defaultMessage: 'Home deliveries',
       description: 'Title of the workqueue of births at a private home'
     },
     query: {

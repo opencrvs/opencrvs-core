@@ -33,6 +33,7 @@ import {
   METABASE_URL
 } from '@e2e/support/constants'
 import { BirthVersion } from '@countryconfig/events/birth/versions'
+import { withVersionedFatherName } from '@e2e/support/form-versions'
 
 /*
  * A broken Metabase card renders a warning icon and an error message
@@ -178,7 +179,9 @@ export async function populateDashboardRecords(page: Page) {
         ],
 
         ...fullParentDetails('mother', village),
-        'mother.previousBirths': index,
+        // Version 'initial' keeps the number of previous births in a TEXT field.
+        'mother.previousBirths':
+          version === BirthVersion.INITIAL ? String(index) : index,
 
         'father.detailsNotAvailable': false,
         ...fullParentDetails('father', village),
@@ -200,7 +203,7 @@ export async function populateDashboardRecords(page: Page) {
       records.push(
         await createDeclaration(
           token,
-          declaration,
+          withVersionedFatherName(version, declaration),
           undefined,
           undefined,
           undefined,
