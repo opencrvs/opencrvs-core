@@ -70,6 +70,33 @@ Skip these steps if `environment:init` manages your environment. Otherwise updat
 
 See [Migrate from MinIO](charts/dependencies/README.md#migrate-from-minio) for more detail. [#13348](https://github.com/opencrvs/opencrvs-core/issues/13348)
 
+#### Country config gets its own system client
+
+Country config calls core with a system client of its own. `opencrvs environment init` generates its credentials, `COUNTRY_CONFIG_CLIENT_ID` and `COUNTRY_CONFIG_CLIENT_SECRET`, as environment secrets. A new run on an existing environment keeps the values that exist and adds only the missing ones. The generated chart values give both values to countryconfig from the k8s secret `country-config-client`.
+
+An environment that was set up before 2.2 has its own copy of the chart values and the secret mapping. To add the client:
+
+1. Run `opencrvs environment init` again for each environment.
+2. Add the secret to `.github/TEMPLATES/secret-mapping-opencrvs.yml` in your infrastructure repository:
+
+   ```yaml
+   country-config-client:
+     type: Opaque
+     data:
+       - COUNTRY_CONFIG_CLIENT_ID
+       - COUNTRY_CONFIG_CLIENT_SECRET
+   ```
+
+3. Add the secret to `countryconfig.secrets` in `environments/<env>/opencrvs-services/values.yaml`:
+
+   ```yaml
+   countryconfig:
+     secrets:
+       country-config-client:
+         - COUNTRY_CONFIG_CLIENT_ID
+         - COUNTRY_CONFIG_CLIENT_SECRET
+   ```
+
 #### Outbox: empty it before you deploy
 
 2.2 changes the shape of the event configuration the client keeps offline, so the client clears its local cache the first time it loads after the upgrade. The outbox is part of that cache: **any action still waiting in a user's outbox when 2.2 loads is discarded** and cannot be recovered.

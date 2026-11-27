@@ -70,6 +70,9 @@ countryconfig:
       - SMTP_PORT
       - SMTP_SECURE
       - SMTP_USERNAME
+    country-config-client:
+      - COUNTRY_CONFIG_CLIENT_ID
+      - COUNTRY_CONFIG_CLIENT_SECRET
 
 dashboards:
   use_default_credentials: false
