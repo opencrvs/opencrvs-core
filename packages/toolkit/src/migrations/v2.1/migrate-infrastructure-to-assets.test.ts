@@ -20,9 +20,11 @@ import {
 } from 'fs'
 import { tmpdir } from 'os'
 import path from 'path'
-import { afterEach, beforeEach, describe, expect, it } from 'vitest'
+import { execFileSync } from 'child_process'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import {
   migrateInfrastructureToAssets,
+  removeLeftovers,
   removeMigrated
 } from './migrate-infrastructure-to-assets'
 import { listFiles } from './template-files'
@@ -281,5 +283,107 @@ describe('removeMigrated', () => {
     expect(existsSync(path.join(cwd, 'infrastructure'))).toBe(false)
 
     rmSync(cwd, { recursive: true, force: true })
+  })
+})
+
+describe('removeLeftovers', () => {
+  let cwd: string
+
+  const git = (...args: string[]) =>
+    execFileSync('git', args, { cwd, stdio: 'pipe', encoding: 'utf8' })
+
+  const write = (file: string) => {
+    mkdirSync(path.dirname(path.join(cwd, file)), { recursive: true })
+    writeFileSync(path.join(cwd, file), file)
+  }
+
+  beforeEach(() => {
+    cwd = mkdtempSync(path.join(tmpdir(), 'remove-leftovers-'))
+    git('init', '-q')
+    git('config', 'user.email', 'test@example.com')
+    git('config', 'user.name', 'test')
+    write('infrastructure/docker-compose.deploy.yml')
+    write('infrastructure/server-setup/playbook.yml')
+    write('.gitignore')
+    writeFileSync(path.join(cwd, '.gitignore'), 'infrastructure/.kube/\n')
+    git('add', '-A')
+    git('commit', '-q', '-m', 'init')
+    write('infrastructure/.kube/config')
+    vi.spyOn(console, 'log').mockImplementation(() => undefined)
+    vi.spyOn(console, 'warn').mockImplementation(() => undefined)
+  })
+
+  afterEach(() => {
+    rmSync(cwd, { recursive: true, force: true })
+    vi.restoreAllMocks()
+  })
+
+  it('deletes tracked files with --remove-infrastructure, without asking', async () => {
+    const confirm = vi.fn()
+
+    await removeLeftovers(cwd, true, confirm)
+
+    expect(confirm).not.toHaveBeenCalled()
+    expect(existsSync(path.join(cwd, 'infrastructure/server-setup'))).toBe(
+      false
+    )
+    expect(git('status', '--porcelain')).toBe(
+      'D  infrastructure/docker-compose.deploy.yml\nD  infrastructure/server-setup/playbook.yml\n'
+    )
+  })
+
+  it('never deletes files git does not track', async () => {
+    await removeLeftovers(cwd, true)
+
+    expect(existsSync(path.join(cwd, 'infrastructure/.kube/config'))).toBe(true)
+  })
+
+  it('asks first when there is a terminal, and keeps the files on no', async () => {
+    const isTTY = process.stdin.isTTY
+    process.stdin.isTTY = true
+    const confirm = vi.fn().mockResolvedValue(false)
+
+    try {
+      await removeLeftovers(cwd, false, confirm)
+    } finally {
+      process.stdin.isTTY = isTTY
+    }
+
+    expect(confirm).toHaveBeenCalledWith([
+      'infrastructure/docker-compose.deploy.yml',
+      'infrastructure/server-setup/playbook.yml'
+    ])
+    expect(git('status', '--porcelain')).toBe('')
+  })
+
+  it('keeps the files without a terminal or the flag', async () => {
+    const isTTY = process.stdin.isTTY
+    process.stdin.isTTY = false
+    const confirm = vi.fn()
+
+    try {
+      await removeLeftovers(cwd, false, confirm)
+    } finally {
+      process.stdin.isTTY = isTTY
+    }
+
+    expect(confirm).not.toHaveBeenCalled()
+    expect(git('status', '--porcelain')).toBe('')
+  })
+
+  it('leaves files with uncommitted changes alone', async () => {
+    writeFileSync(
+      path.join(cwd, 'infrastructure/docker-compose.deploy.yml'),
+      'changed'
+    )
+
+    await removeLeftovers(cwd, true)
+
+    expect(
+      readFileSync(
+        path.join(cwd, 'infrastructure/docker-compose.deploy.yml'),
+        'utf8'
+      )
+    ).toBe('changed')
   })
 })

@@ -17,13 +17,17 @@ import { main as removeMetabasePackageInstalls } from './remove-metabase-package
 import { main as removeSentry } from './remove-sentry'
 import { main as removeTypingsFromDockerfile } from './remove-typings-from-dockerfile'
 import { main as renameTriggerPaths } from './rename-trigger-paths'
+import { main as updatePackageJson } from './update-package-json'
 import { main as upgradeTilt } from './upgrade-tilt'
 
 /**
  * Run the upgrade process for the country config in the current working
  * directory.
  */
-export async function runUpgrade(dockerSwarm: boolean) {
+export async function runUpgrade(
+  dockerSwarm: boolean,
+  removeInfrastructure = false
+) {
   await addExplicitCorrectionFlags()
   await renameTriggerPaths()
   await addRecoveryLinkNotifications()
@@ -31,10 +35,12 @@ export async function runUpgrade(dockerSwarm: boolean) {
   await removeSentry()
   await removeMetabasePackageInstalls()
   // After the Metabase fix, so the merge starts from the patched scripts
-  await migrateInfrastructureToAssets(dockerSwarm)
+  await migrateInfrastructureToAssets(dockerSwarm, removeInfrastructure)
   await upgradeTilt()
   // The Tiltfile it installs no longer sends typings/ to the image build
   await removeTypingsFromDockerfile()
+  // After infrastructure/ is migrated, so scripts only lose files that are gone
+  await updatePackageJson()
   // Last, so the prompt comes after all file changes
   await enableTelemetry()
 }

@@ -21,23 +21,22 @@ In opencrvs-core, each release line has one branch, `release/X.Y.x`. All the pat
 1. Verify `CHANGELOG.md` and `package.json` match the release version.
 2. Dispatch [`publish-toolkit-to-npm` workflow](https://github.com/opencrvs/opencrvs-core/actions/workflows/publish-toolkit-to-npm.yml) — `ref: release/X.Y.x`, `version: X.Y.Z`.
 3. Approve the run in the `npm-publish` environment (any `@opencrvs/developers` member).
-4. Verify the toolkit version is visible on npm.
-5. Bump `@opencrvs/toolkit` to `X.Y.Z` in `packages/countryconfig-template/package.json`.
-   > ⚠️ Run `pnpm install` to update lockfile. Relies on the toolkit already being published to npm in section 2.
-6. Merge the version bump into `release/X.Y.x` through a PR.
-7. Tag the release on `release/X.Y.x`:
+4. Wait for the run's `pin-template` job. It commits `chore: pin @opencrvs/toolkit X.Y.Z in countryconfig-template` to `release/X.Y.x`, which sets both `version` and `@opencrvs/toolkit` in `packages/countryconfig-template/package.json` to `X.Y.Z` and updates its lockfile.
+   > If the job fails, use "Re-run failed jobs": it re-runs only the pin, without publishing or asking for approval again.
+5. Tag the commit named in the run summary:
    ```bash
-   git tag vX.Y.Z
+   git fetch origin release/X.Y.x
+   git tag vX.Y.Z <sha from the run summary>
    git push origin tag vX.Y.Z
    ```
-   > ⚠️ Tag as soon as step 6 is merged — from step 2 until this tag exists, `create-countryconfig@X.Y.Z` scaffolds from the previous release tag.
-8. The [`build-images-from-branch` pipeline](https://github.com/opencrvs/opencrvs-core/actions/workflows/build-images-from-branch.yml) triggers automatically. Ensure it succeeds.
-9. Verify the docker images published — compare sizes against the previous release with `compare-image-sizes.sh` (in the repo root) and report unusual increases:
+   > ⚠️ Tag as soon as the pin is committed — from step 2 until this tag exists, `create-countryconfig@X.Y.Z` scaffolds from the previous release tag.
+6. The [`build-images-from-branch` pipeline](https://github.com/opencrvs/opencrvs-core/actions/workflows/build-images-from-branch.yml) triggers automatically. Ensure it succeeds.
+7. Verify the docker images published — compare sizes against the previous release with `compare-image-sizes.sh` (in the repo root) and report unusual increases:
    ```bash
    ./compare-image-sizes.sh v<previous> vX.Y.Z   # e.g. ./compare-image-sizes.sh v2.1.0 v2.2.0
    ```
    Requires `crane` and `jq`.
-10. Publish the draft release on GitHub [here](https://github.com/opencrvs/opencrvs-core/releases). This starts `init-release` for the next patch, X.Y.(Z+1).
+8. Publish the draft release on GitHub [here](https://github.com/opencrvs/opencrvs-core/releases). This starts `init-release` for the next patch, X.Y.(Z+1).
 
 ## 3. infrastructure -repo
 

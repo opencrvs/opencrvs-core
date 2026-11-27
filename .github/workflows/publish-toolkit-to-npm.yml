@@ -27,6 +27,13 @@ on:
         description: Optional npm dist-tag override.
         default: ''
         required: false
+      pin_template:
+        description: >-
+          Also pin countryconfig-template to this release candidate, so
+          template changes that need it can land. A release (X.Y.Z) always
+          pins the template.
+        type: boolean
+        default: false
 
 permissions:
   contents: read
@@ -39,6 +46,7 @@ jobs:
       toolkit-version: ${{ steps.check-version.outputs.toolkit-version }}
       npm-tag: ${{ steps.check-version.outputs.npm-tag }}
       version-exists: ${{ steps.check-version.outputs.version-exists }}
+      is-release: ${{ steps.check-version.outputs.is-release }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v6
@@ -213,6 +221,7 @@ jobs:
             echo "npm-tag=$NPM_TAG"
             echo "toolkit-version=$TOOLKIT_VERSION"
             echo "version-exists=$VERSION_EXISTS"
+            echo "is-release=$([ -z "$VERSION_PRERELEASE" ] && echo true || echo false)"
           } >> "$GITHUB_OUTPUT"
 
   # Gated on the npm-publish environment: a reviewer approves the plan above
@@ -224,6 +233,8 @@ jobs:
     permissions:
       id-token: write
       contents: read
+    outputs:
+      integrity: ${{ steps.pack-toolkit.outputs.integrity }}
     env:
       TOOLKIT_VERSION: ${{ needs.plan.outputs.toolkit-version }}
       NPM_TAG: ${{ needs.plan.outputs.npm-tag }}
@@ -267,8 +278,10 @@ jobs:
         if: needs.plan.outputs.version-exists == 'false'
         id: pack-toolkit
         run: |
-          TARBALL_NAME=$(npm pack --silent)
-          echo "tarball-path=$PWD/$TARBALL_NAME" >> $GITHUB_OUTPUT
+          PACKED=$(npm pack --json)
+          echo "tarball-path=$PWD/$(jq -r '.[0].filename' <<< "$PACKED")" >> $GITHUB_OUTPUT
+          # Lets pin-template wait for exactly this tarball on the registry
+          echo "integrity=$(jq -r '.[0].integrity' <<< "$PACKED")" >> $GITHUB_OUTPUT
         working-directory: packages/toolkit
 
       - name: Smoke test packed toolkit in clean project
@@ -369,3 +382,114 @@ jobs:
         if: steps.check-mosip-version.outputs.version-exists == 'false'
         run: npm publish --provenance --access public --tag "$NPM_TAG"
         working-directory: packages/mosip
+
+  # Pins countryconfig-template to the version just published, so that on a
+  # release its `version` and `@opencrvs/toolkit` match without a manual commit.
+  # Runs after `publish`, so it waits for the npm-publish approval with it.
+  # A failure here leaves npm untouched: "Re-run failed jobs" re-runs only this
+  # job, and the pin is a no-op once applied.
+  pin-template:
+    needs: [plan, publish]
+    if: >-
+      needs.publish.result == 'success' &&
+      (needs.plan.outputs.is-release == 'true' || inputs.pin_template)
+    runs-on: ubuntu-26.04
+    permissions:
+      contents: write
+    env:
+      TOOLKIT_VERSION: ${{ needs.plan.outputs.toolkit-version }}
+      IS_RELEASE: ${{ needs.plan.outputs.is-release }}
+      INTEGRITY: ${{ needs.publish.outputs.integrity }}
+      REF_INPUT: ${{ inputs.ref }}
+    steps:
+      # Only a branch can take the pin commit; a tag or a sha is skipped
+      - name: Resolve the branch to pin on
+        id: branch
+        run: |
+          BRANCH="${REF_INPUT#refs/heads/}"
+          if git ls-remote --exit-code --heads "https://github.com/${{ github.repository }}" "refs/heads/$BRANCH" > /dev/null; then
+            echo "name=$BRANCH" >> "$GITHUB_OUTPUT"
+          else
+            echo "::notice::$REF_INPUT is not a branch, so countryconfig-template was not pinned."
+            echo "name=" >> "$GITHUB_OUTPUT"
+          fi
+
+      # The branch tip, not the published sha: the branch may have moved
+      # while the publish waited for approval
+      - name: Checkout repository
+        if: steps.branch.outputs.name != ''
+        uses: actions/checkout@v6
+        with:
+          ref: ${{ steps.branch.outputs.name }}
+
+      - name: Setup pnpm
+        if: steps.branch.outputs.name != ''
+        uses: pnpm/action-setup@v6
+
+      - name: Set up Node.js
+        if: steps.branch.outputs.name != ''
+        uses: actions/setup-node@v6
+        with:
+          node-version-file: '.nvmrc'
+          package-manager-cache: false
+
+      # The registry can lag behind `npm publish`. Waits for the tarball that
+      # was published; when the version already existed there is none, and
+      # the version being listed is enough.
+      - name: Wait for the version on npm
+        if: steps.branch.outputs.name != ''
+        run: |
+          for attempt in $(seq 1 30); do
+            FOUND="$(npm view "@opencrvs/toolkit@$TOOLKIT_VERSION" dist.integrity 2>/dev/null || true)"
+            if [ -n "$FOUND" ] && { [ -z "$INTEGRITY" ] || [ "$FOUND" = "$INTEGRITY" ]; }; then
+              echo "@opencrvs/toolkit@$TOOLKIT_VERSION is on npm."
+              exit 0
+            fi
+            echo "Not on npm yet (attempt $attempt/30)"
+            sleep 10
+          done
+          echo "::error::@opencrvs/toolkit@$TOOLKIT_VERSION did not appear on npm. Re-run this job once it does."
+          exit 1
+
+      - name: Pin countryconfig-template
+        if: steps.branch.outputs.name != ''
+        working-directory: packages/countryconfig-template
+        run: |
+          # The template's own version moves only on a release; it then
+          # matches the toolkit
+          jq --arg v "$TOOLKIT_VERSION" --argjson release "$IS_RELEASE" '
+            .dependencies["@opencrvs/toolkit"] = $v
+            | if $release then .version = $v else . end
+          ' package.json > package.json.tmp && mv package.json.tmp package.json
+          # Standalone lockfile: resolves only outside the workspace
+          pnpm install --lockfile-only --ignore-scripts --ignore-workspace
+
+      - name: Commit and push the pin
+        if: steps.branch.outputs.name != ''
+        env:
+          BRANCH: ${{ steps.branch.outputs.name }}
+        run: |
+          FILES="packages/countryconfig-template/package.json packages/countryconfig-template/pnpm-lock.yaml"
+          if git diff --quiet -- $FILES; then
+            echo "countryconfig-template already pins $TOOLKIT_VERSION."
+          else
+            git config user.name "github-actions[bot]"
+            git config user.email "github-actions[bot]@users.noreply.github.com"
+            git add -- $FILES
+            git commit -m "chore: pin @opencrvs/toolkit $TOOLKIT_VERSION in countryconfig-template"
+            # One retry when the branch moved in the meantime
+            git push origin "HEAD:$BRANCH" || {
+              git pull --rebase origin "$BRANCH"
+              git push origin "HEAD:$BRANCH"
+            }
+          fi
+
+          {
+            echo "### countryconfig-template pinned"
+            echo
+            echo "\`$BRANCH\` at \`$(git rev-parse HEAD)\` pins @opencrvs/toolkit $TOOLKIT_VERSION."
+            if [ "$IS_RELEASE" = true ]; then
+              echo
+              echo "Tag that commit as \`v$TOOLKIT_VERSION\`."
+            fi
+          } >> "$GITHUB_STEP_SUMMARY"

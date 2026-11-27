@@ -67,12 +67,19 @@ Upgrade the country config in the current working directory to the next
 major version of OpenCRVS.
 
 Options:
-  --docker-swarm   Keep the 'infrastructure/' directory where it is and
-                   only copy what the assets image needs into 'assets/'.
-                   Use this if your country deploys OpenCRVS via Docker
-                   Swarm. When omitted, 'infrastructure/' moves to
-                   'assets/' (default).
-  -h, --help       Show this message.
+  --docker-swarm            Keep the 'infrastructure/' directory where it
+                            is and only copy what the assets image needs
+                            into 'assets/'. Use this if your country
+                            deploys OpenCRVS via Docker Swarm.
+  --remove-infrastructure   Delete what is left in 'infrastructure/' after
+                            the move without asking. Use this when running
+                            without a terminal, e.g. in CI.
+  -h, --help                Show this message.
+
+Without '--docker-swarm', what the assets image needs moves from
+'infrastructure/' to 'assets/'. The rest of 'infrastructure/' is listed and
+deleted once you confirm. Only files git tracks are deleted, so the deletion
+can be reverted.
 `.trim()
 
 function main() {
@@ -162,7 +169,7 @@ async function handleUpgrade() {
     process.exit(0)
   }
 
-  const KNOWN_FLAGS = new Set(['--docker-swarm'])
+  const KNOWN_FLAGS = new Set(['--docker-swarm', '--remove-infrastructure'])
   const unknownFlags = upgradeArgs.filter(
     (arg) => arg.startsWith('-') && !KNOWN_FLAGS.has(arg)
   )
@@ -173,10 +180,19 @@ async function handleUpgrade() {
   }
 
   const dockerSwarm = upgradeArgs.includes('--docker-swarm')
+  const removeInfrastructure = upgradeArgs.includes('--remove-infrastructure')
+
+  if (dockerSwarm && removeInfrastructure) {
+    console.error(
+      "'--docker-swarm' keeps 'infrastructure/', so it cannot be combined with '--remove-infrastructure'.\n"
+    )
+    console.log(UPGRADE_USAGE)
+    process.exit(1)
+  }
 
   console.log('Initiating upgrade...')
   try {
-    await runUpgrade(dockerSwarm)
+    await runUpgrade(dockerSwarm, removeInfrastructure)
     console.log('Upgrade completed successfully!')
   } catch (error) {
     console.error('Upgrade failed:', error)
