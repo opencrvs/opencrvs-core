@@ -18,7 +18,8 @@
     "./request-signing": "./dist/request-signing/index.js",
     "./events/deduplication": "./dist/events/deduplication.js",
     "./conditionals": "./dist/conditionals/index.js",
-    "./notification": "./dist/notification/index.js"
+    "./notification": "./dist/notification/index.js",
+    "./custom-fields": "./dist/custom-fields/index.js"
   },
   "scripts": {
     "build": "./build.sh",

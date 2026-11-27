@@ -9,9 +9,12 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-/*
- * These are exported modules for modules that are dynamically important into the app
- */
+export default function createPreloadField({ React }) {
+  globalThis.preloadFactoryCalls = (globalThis.preloadFactoryCalls ?? 0) + 1
 
-import React from 'react'
-export default React
+  function Output() {
+    return React.createElement('span', null, 'Preloaded field')
+  }
+
+  return { Input: Output, Output }
+}
