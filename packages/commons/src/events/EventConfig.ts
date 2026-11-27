@@ -37,7 +37,7 @@ import {
   validateVersionList
 } from './eventConfigValidation'
 import {
-  validateDeduplicationFieldPaths,
+  validateDeduplicationFieldIds,
   validateSearchedFieldTypes
 } from './searchedFieldTypes'
 
@@ -242,7 +242,7 @@ export const EventConfig: z.ZodType<EventConfig, EventConfigSchemaInput> =
         return
       }
       validateAdvancedSearchFieldIds(event, [event], ctx)
-      validateDeduplicationFieldPaths(event, [event], ctx)
+      validateDeduplicationFieldIds(event, [event], ctx)
       validateAdvancedSearchDefaultValues(event, [event], ctx)
     })
     .meta({
@@ -590,7 +590,7 @@ export const VersionedEventConfig: z.ZodType<
     }
     validateAdvancedSearchFieldIds(config, versionConfigs, ctx)
     validateSearchedFieldTypes(config, versionConfigs, ctx)
-    validateDeduplicationFieldPaths(config, versionConfigs, ctx)
+    validateDeduplicationFieldIds(config, versionConfigs, ctx)
     validateAdvancedSearchDefaultValues(
       config,
       [...config.versions]

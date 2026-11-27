@@ -15,7 +15,6 @@ import {
   FieldType,
   getAllUniqueFields,
   FieldConfig,
-  findFieldOfPath,
   QueryExpression,
   QueryType,
   DateCondition,
@@ -65,7 +64,6 @@ function dateClauseToElasticQuery(
  * Generates an Elasticsearch query to search within `document.declaration`
  * using the provided search payload. Each field is read from the first of
  * `eventConfigs` that has it, so pass the versions of an event in lookup order.
- * A key can also name a part of a field, such as `child.name.firstname`.
  */
 function generateQuery(
   event: QueryInputType,
@@ -80,19 +78,17 @@ function generateQuery(
   )
 
   const must = Object.entries(event).map(([fieldId, search]) => {
-    const { field, part } = getOrThrow(
-      findFieldOfPath(fieldId, allEventFields),
+    const esFieldName = `declaration.${encodeFieldId(fieldId)}`
+    const field = getOrThrow(
+      allEventFields.find((f) => f.id === fieldId),
       `Tried to search with a field id ${fieldId} but it is not found in event configuration`
     )
-    const esFieldName = ['declaration', encodeFieldId(field.id), ...part].join(
-      '.'
-    )
 
-    if (part.length === 0 && field.type === FieldType.ADDRESS) {
+    if (field.type === FieldType.ADDRESS) {
       return generateQueryForAddressField(fieldId, search)
     }
 
-    if (part.length === 0 && field.type === FieldType.NAME) {
+    if (field.type === FieldType.NAME) {
       if (search.type === 'fuzzy') {
         return {
           match: {
@@ -110,7 +106,6 @@ function generateQuery(
       }
     }
 
-    // From here on, a part of a field, such as `child.name.firstname`, is searched like any other value.
     if (search.type === 'exact') {
       return {
         match: {

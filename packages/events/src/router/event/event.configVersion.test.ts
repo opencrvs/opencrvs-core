@@ -526,21 +526,20 @@ describe('the event configuration version of a record', () => {
       declaration: { ...declareV2.declaration, [ALIAS_FIELD_ID]: alias }
     })
 
-    // The query that the client builds when all 3 inputs are filled. The first name input has
-    // `searchFields: ['applicant.aliasFirstname', 'applicant.alias.firstname']`, and so on.
+    // The query that the client builds when all 3 TEXT inputs are filled. The first name input has
+    // `searchFields: ['applicant.aliasFirstname', 'applicant.alias']`, and so on.
     const { results } = await client.event.search({
       query: {
         type: 'and',
         clauses: (['firstname', 'middlename', 'surname'] as const).map(
           (part) => ({
             type: 'or',
-            clauses: [
-              ALIAS_TEXT_FIELD_IDS[part],
-              `${ALIAS_FIELD_ID}.${part}`
-            ].map((fieldId) => ({
-              eventType: TENNIS_CLUB_MEMBERSHIP,
-              data: { [fieldId]: { type: 'fuzzy', term: alias[part] } }
-            }))
+            clauses: [ALIAS_TEXT_FIELD_IDS[part], ALIAS_FIELD_ID].map(
+              (fieldId) => ({
+                eventType: TENNIS_CLUB_MEMBERSHIP,
+                data: { [fieldId]: { type: 'fuzzy', term: alias[part] } }
+              })
+            )
           })
         )
       }

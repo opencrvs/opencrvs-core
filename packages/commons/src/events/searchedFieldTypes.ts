@@ -12,76 +12,60 @@ import * as z from 'zod/v4'
 import { EventConfig, VersionedEventConfig } from './EventConfig'
 import { ClauseOutput } from './DeduplicationConfig'
 import { findAllFields } from './utils'
-import { findFieldOfPath, findFieldPartOfPath } from './fieldPath'
 
 /** The fields that a deduplication query reads or matches against. */
-function getClauseFieldPaths(clause: ClauseOutput): string[] {
+function getClauseFieldIds(clause: ClauseOutput): string[] {
   if (clause.type === 'not') {
-    return getClauseFieldPaths(clause.clause)
+    return getClauseFieldIds(clause.clause)
   }
   if (clause.type === 'and' || clause.type === 'or') {
-    return clause.clauses.flatMap(getClauseFieldPaths)
+    return clause.clauses.flatMap(getClauseFieldIds)
   }
   return [clause.fieldId, ...[clause.options.matchAgainst ?? []].flat()]
 }
 
 /** The fields that the deduplication configs of `versions` use. */
-function getDeduplicationPaths(versions: EventConfig[]) {
+function getDeduplicationFieldIds(versions: EventConfig[]) {
   return versions
     .flatMap((version) => version.actions)
     .flatMap((action) =>
       'deduplication' in action && action.deduplication
-        ? getClauseFieldPaths(action.deduplication.query)
+        ? getClauseFieldIds(action.deduplication.query)
         : []
     )
 }
 
 /** The fields that advanced search and the deduplication configs of `versions` use. */
-function getSearchedFieldPaths(
+function getSearchedFieldIds(
   advancedSearch: VersionedEventConfig['advancedSearch'],
   versions: EventConfig[]
 ) {
-  const searchPaths = advancedSearch
+  const searchFieldIds = advancedSearch
     .flatMap((section) => section.fields)
     .flatMap((field) => [field.fieldId, ...(field.config.searchFields ?? [])])
-  return [...searchPaths, ...getDeduplicationPaths(versions)]
+  return [...searchFieldIds, ...getDeduplicationFieldIds(versions)]
 }
 
 /**
- * Rejects a path in a deduplication config that names no field of any version, or
- * that is both a field id and a part of another field. Each version's deduplication
- * can match the fields of the other versions.
+ * Rejects a field in a deduplication config that no version has. Each version's
+ * deduplication can match the fields of the other versions.
  *
  * @param versions the event config of each version of `event`
  */
-export function validateDeduplicationFieldPaths(
+export function validateDeduplicationFieldIds(
   event: Pick<EventConfig, 'id'>,
   versions: EventConfig[],
   ctx: Pick<z.RefinementCtx<unknown>, 'addIssue'>
 ) {
-  const fields = versions.flatMap(findAllFields)
-  const paths = [...new Set(getDeduplicationPaths(versions))]
+  const fieldIds = new Set(versions.flatMap(findAllFields).map(({ id }) => id))
+  const unknownFieldIds = [
+    ...new Set(getDeduplicationFieldIds(versions))
+  ].filter((fieldId) => !fieldIds.has(fieldId))
 
-  const unknownPaths = paths.filter(
-    (path) => findFieldOfPath(path, fields) === undefined
-  )
-  if (unknownPaths.length > 0) {
+  if (unknownFieldIds.length > 0) {
     ctx.addIssue({
       code: 'custom',
-      message: `Deduplication of event ${event.id} uses paths that name no field of any version: ${unknownPaths.join(', ')}.`,
-      path: ['versions']
-    })
-  }
-
-  const ambiguousPaths = paths.filter(
-    (path) =>
-      fields.some(({ id }) => id === path) &&
-      findFieldPartOfPath(path, fields) !== undefined
-  )
-  if (ambiguousPaths.length > 0) {
-    ctx.addIssue({
-      code: 'custom',
-      message: `Deduplication of event ${event.id} has paths that are both a field id and a part of another field: ${ambiguousPaths.join(', ')}. Change the id of one of these fields.`,
+      message: `Deduplication of event ${event.id} uses fields that no version has: ${unknownFieldIds.join(', ')}.`,
       path: ['versions']
     })
   }
@@ -100,12 +84,8 @@ export function validateSearchedFieldTypes(
   ctx: Pick<z.RefinementCtx<unknown>, 'addIssue'>
 ) {
   const fieldsOfVersions = versionConfigs.map(findAllFields)
-  const allFields = fieldsOfVersions.flat()
-  // A part of a field, such as `child.name.firstname`, uses the field `child.name`.
   const searchedFieldIds = new Set(
-    getSearchedFieldPaths(config.advancedSearch, versionConfigs).flatMap(
-      (path) => findFieldOfPath(path, allFields)?.field.id ?? []
-    )
+    getSearchedFieldIds(config.advancedSearch, versionConfigs)
   )
 
   for (const fieldId of searchedFieldIds) {

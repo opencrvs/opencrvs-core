@@ -724,7 +724,7 @@ describe('deduplication across versions', () => {
     ).toThrow(`Field with id ${OLDER_FIELD_ID} not found in any version`)
   })
 
-  it('finds duplicates of both versions when the first name moved from a TEXT field into a NAME field', async () => {
+  it('finds duplicates of both versions for a record of the older version when the first name moved from a TEXT field into a NAME field', async () => {
     const OLDER_FIRSTNAME_ID = 'child.firstname'
     const {
       versions: [base],
@@ -776,13 +776,12 @@ describe('deduplication across versions', () => {
       eventIndex: eventQueryDataGenerator({
         id: getUUID(),
         type: ChildOnboardingEvent.id,
-        configVersionId: 'v2',
-        declaration: { 'child.name': { firstname: 'John', surname: 'Smith' } }
+        declaration: { [OLDER_FIRSTNAME_ID]: 'John' }
       }),
       deduplication: DeduplicationConfig.parse({
         ...LEGACY_BIRTH_DEDUPLICATION_RULES,
-        query: field('child.name.firstname').fuzzyMatches({
-          matchAgainst: ['child.name.firstname', OLDER_FIRSTNAME_ID]
+        query: field(OLDER_FIRSTNAME_ID).fuzzyMatches({
+          matchAgainst: [OLDER_FIRSTNAME_ID, 'child.name']
         })
       }),
       versionedConfig,

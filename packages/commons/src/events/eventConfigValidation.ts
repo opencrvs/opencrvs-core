@@ -23,7 +23,6 @@ import {
   getDeclarationPages
 } from './utils'
 import { FieldType } from './FieldType'
-import { findFieldOfPath, findFieldPartOfPath } from './fieldPath'
 import { mapFieldTypeToZod } from './FieldTypeMapping'
 import { EventFieldId } from './AdvancedSearchConfig'
 import { isFieldReference } from '../conditionals/conditionals'
@@ -55,8 +54,9 @@ export function validateAdvancedSearchFieldIds(
   versions: EventConfig[],
   ctx: Pick<z.RefinementCtx<unknown>, 'addIssue'>
 ) {
-  const fields = versions.flatMap(findAllFields)
-  const fieldIds = fields.map((field) => field.id)
+  const fieldIds = versions.flatMap((version) =>
+    findAllFields(version).map((field) => field.id)
+  )
 
   const invalidFields = event.advancedSearch.flatMap((section) =>
     // Check if the fieldId is not in the fieldIds array
@@ -68,9 +68,7 @@ export function validateAdvancedSearchFieldIds(
           (EventFieldId.options as string[]).includes(field.fieldId) ||
           (field.config.searchFields &&
             field.config.searchFields.length > 0 &&
-            field.config.searchFields.every(
-              (sf) => findFieldOfPath(sf, fields) !== undefined
-            ))
+            field.config.searchFields.every((sf) => fieldIds.includes(sf)))
         )
     )
   )
@@ -82,25 +80,6 @@ export function validateAdvancedSearchFieldIds(
   Invalid AdvancedSearch field IDs for event ${event.id}: ${invalidFields
     .map((f) => f.fieldId)
     .join(', ')}`,
-      path: ['advancedSearch']
-    })
-  }
-
-  const ambiguousPaths = event.advancedSearch
-    .flatMap((section) => section.fields)
-    .flatMap((field) => field.config.searchFields ?? [])
-    .filter(
-      (path) =>
-        fieldIds.includes(path) &&
-        findFieldPartOfPath(path, fields) !== undefined
-    )
-
-  if (ambiguousPaths.length > 0) {
-    ctx.addIssue({
-      code: 'custom',
-      message: `searchFields of event ${event.id} has paths that are both a field id and a part of another field: ${[
-        ...new Set(ambiguousPaths)
-      ].join(', ')}. Change the id of one of these fields.`,
       path: ['advancedSearch']
     })
   }

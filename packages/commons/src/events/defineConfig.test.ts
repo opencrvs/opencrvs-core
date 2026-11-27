@@ -511,87 +511,6 @@ describe('defineConfig()', () => {
         )
       })
 
-      const ANY_FIRST_NAME_ID = 'applicant.anyFirstName'
-
-      function searchingAnyFirstName(searchFields: string[]) {
-        return [
-          ...advancedSearch,
-          {
-            title: advancedSearch[1].title,
-            fields: [
-              {
-                fieldId: ANY_FIRST_NAME_ID,
-                fieldType: 'field' as const,
-                type: FieldType.TEXT,
-                label: {
-                  id: 'anyFirstName.label',
-                  defaultMessage: 'First name',
-                  description: 'Search field over several fields'
-                },
-                config: { type: 'fuzzy' as const, searchFields }
-              }
-            ]
-          }
-        ]
-      }
-
-      it('should accept a part of a field in searchFields when a version has the field', () => {
-        expect(() =>
-          defineConfig({
-            id: eventId,
-            label,
-            advancedSearch: searchingAnyFirstName([
-              NICKNAME_FIELD_ID,
-              'applicant.name.firstname'
-            ]),
-            versions: [v1, v2WithExtraField]
-          })
-        ).not.toThrow()
-
-        // A field that no version has, a part that a name does not have, and a part of a TEXT field
-        for (const searchField of [
-          'applicant.unknown.firstname',
-          'applicant.name.babablacksheep',
-          `${NICKNAME_FIELD_ID}.firstname`
-        ]) {
-          expect(() =>
-            defineConfig({
-              id: eventId,
-              label,
-              advancedSearch: searchingAnyFirstName([searchField]),
-              versions: [v1, v2WithExtraField]
-            })
-          ).toThrow(
-            `Invalid AdvancedSearch field IDs for event ${eventId}: ${ANY_FIRST_NAME_ID}`
-          )
-        }
-      })
-
-      it('should reject a path in searchFields that is both a field id and a part of another field', () => {
-        const PATH = 'applicant.name.firstname'
-        // v1 has a TEXT field with the id of a part of the NAME field `applicant.name`
-        const v1WithFieldOfPartId = withDeclarationField(v1, {
-          id: PATH,
-          type: FieldType.TEXT,
-          label: {
-            id: 'firstname.label',
-            defaultMessage: 'First name',
-            description: 'Field whose id is a part of another field'
-          }
-        })
-
-        expect(() =>
-          defineConfig({
-            id: eventId,
-            label,
-            advancedSearch: searchingAnyFirstName([PATH]),
-            versions: [v1WithFieldOfPartId, v2]
-          })
-        ).toThrow(
-          `searchFields of event ${eventId} has paths that are both a field id and a part of another field: ${PATH}.`
-        )
-      })
-
       it('should check a defaultValue against the field of the version that has it', () => {
         const numberInV2 = withDeclarationField(
           v2,
@@ -681,34 +600,9 @@ describe('defineConfig()', () => {
             id: eventId,
             label,
             advancedSearch,
-            versions: [v1, withDeduplicationOn(v2, 'applicant.name.fristname')]
+            versions: [v1, withDeduplicationOn(v2, 'applicant.nicknme')]
           })
-        ).toThrow('applicant.name.fristname')
-      })
-
-      it('should reject a deduplication path that is both a field id and a part of another field', () => {
-        const PATH = 'applicant.name.firstname'
-        // v1 has a TEXT field with the id of a part of the NAME field `applicant.name`
-        const v1WithFieldOfPartId = withDeclarationField(v1, {
-          id: PATH,
-          type: FieldType.TEXT,
-          label: {
-            id: 'firstname.label',
-            defaultMessage: 'First name',
-            description: 'Field whose id is a part of another field'
-          }
-        })
-
-        expect(() =>
-          defineConfig({
-            id: eventId,
-            label,
-            advancedSearch,
-            versions: [v1WithFieldOfPartId, withDeduplicationOn(v2, PATH)]
-          })
-        ).toThrow(
-          `Deduplication of event ${eventId} has paths that are both a field id and a part of another field: ${PATH}.`
-        )
+        ).toThrow('applicant.nicknme')
       })
     })
 

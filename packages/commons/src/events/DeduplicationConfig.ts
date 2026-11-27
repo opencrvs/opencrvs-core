@@ -13,10 +13,7 @@ import { TranslationConfig } from './TranslationConfig'
 
 const FieldReference = z.string()
 
-/**
- * The field of the other records to match against, or a list of fields matched with OR.
- * A field can also be a part of a field, such as `child.name.firstname`.
- */
+/** The field of the other records to match against, or a list of fields matched with OR. */
 const MatchAgainst = z
   .union([FieldReference, z.array(FieldReference).min(1)])
   .optional()
