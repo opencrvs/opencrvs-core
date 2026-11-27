@@ -10,7 +10,7 @@
  */
 import { test, type Page, expect } from '@playwright/test'
 import { login, logout } from '@e2e/support/helpers'
-import { CREDENTIALS, LOGIN_URL } from '@e2e/support/constants'
+import { CREDENTIALS, isLoginUrl } from '@e2e/support/constants'
 import { setMobileViewport } from '@e2e/support/mobile-helpers'
 
 test.describe('Desktop', () => {
@@ -29,9 +29,7 @@ test.describe('Desktop', () => {
 
     await logout(page)
 
-    await page.waitForURL((url) => {
-      return url.origin === LOGIN_URL
-    })
+    await page.waitForURL(isLoginUrl)
 
     const url = new URL(page.url())
 
@@ -66,9 +64,7 @@ test.describe('Mobile', () => {
 
     await logout(page)
 
-    await page.waitForURL((url) => {
-      return url.origin === LOGIN_URL
-    })
+    await page.waitForURL(isLoginUrl)
 
     const url = new URL(page.url())
     const redirectTo = url.searchParams.get('redirectTo')

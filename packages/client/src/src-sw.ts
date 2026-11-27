@@ -104,7 +104,9 @@ registerRoute(S3_URL_REGEX, new CacheFirst({ plugins: [documentsOnly] }))
 registerRoute(
   new NavigationRoute(createHandlerBoundToURL('/index.html'), {
     ...(import.meta.env.DEV && { allowlist: [/^\/$/] }),
-    denylist: [/^\/__.*$/, /^\/login/]
+    // /login and /register are other apps: login and its redirect to the client. On a single domain
+    // they share the origin of the client, so the service worker must leave them to the network.
+    denylist: [/^\/__.*$/, /^\/login/, /^\/register/]
   })
 )
 

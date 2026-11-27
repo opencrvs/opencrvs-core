@@ -62,7 +62,11 @@ spec:
           imagePullPolicy: {{ .Values.esignet_mock.image.pullPolicy | default .Values.platform.imagePullPolicy }}
           env:
             - name: CLIENT_APP_URL
+              {{- if eq .Values.routing.mode "path" }}
+              value: https://{{ .Values.hostname }}
+              {{- else }}
               value: https://register.{{ .Values.hostname }}
+              {{- end }}
           {{- include "render-env-vars" (dict "service_name" "esignet_mock" "Values" .Values) }}
           volumeMounts:
             - name: keystore

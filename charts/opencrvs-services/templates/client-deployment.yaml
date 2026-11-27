@@ -12,8 +12,12 @@ spec:
     - web
   {{- end }}
   routes:
-  - match: 'Host(`{{ include "render-external-subdomain" (dict "service_name" "register" "Values" .Values) }}`) || Host(`{{ .Values.hostname }}`)'
+  - match: '{{ include "render-client-rule" . }}'
     kind: Rule
+    {{- if include "is-path-routing" . }}
+    # Lowest priority: the other routes of the same host take their paths first
+    priority: 1
+    {{- end }}
     services:
     - name: client
       namespace: {{ .Release.Namespace }}

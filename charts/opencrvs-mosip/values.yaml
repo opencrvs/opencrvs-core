@@ -2,6 +2,13 @@ hostname: opencrvs.localhost
 ingress:
   ssl_enabled: false
 
+# routing.mode: use the same mode as in the opencrvs-services chart.
+# - subdomain: the OpenCRVS client is at register.<hostname>.
+# - path: the OpenCRVS client is at <hostname>.
+# The MOSIP services keep their own subdomains in both modes.
+routing:
+  mode: subdomain
+
 storage_type: host_path
 
 # Default image configuration for the OpenCRVS/MOSIP platform.

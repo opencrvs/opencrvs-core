@@ -16,7 +16,8 @@ import {
   GATEWAY_HOST,
   LOGIN_URL,
   SAFE_INPUT_CHANGE_TIMEOUT_MS,
-  TEST_USER_PASSWORD
+  TEST_USER_PASSWORD,
+  isLoginUrl
 } from './constants'
 import { format, parseISO } from 'date-fns'
 import { random } from 'lodash'
@@ -50,16 +51,12 @@ export async function waitForAuthenticatedLanding(
   await page.goto(clientLoginUrl)
 
   const redirectedToApp = page.waitForURL(
-    (url) =>
-      url.href !== clientLoginUrl && url.origin !== new URL(LOGIN_URL).origin,
+    (url) => url.href !== clientLoginUrl && !isLoginUrl(url),
     selectorOptions
   )
 
   const redirectedToLogin = page
-    .waitForURL(
-      (url) => url.origin === new URL(LOGIN_URL).origin,
-      selectorOptions
-    )
+    .waitForURL(isLoginUrl, selectorOptions)
     .then(() => {
       throw new Error(
         'Redirected to the login page instead of the client — the refresh token exchange likely failed'
@@ -95,7 +92,7 @@ export async function logout(page: Page) {
     })
     .click()
   await page.context().clearCookies()
-  await page.waitForURL((url) => url.origin === LOGIN_URL)
+  await page.waitForURL(isLoginUrl)
 }
 
 export async function login(

@@ -1,3 +1,6 @@
+{{- if not (has .Values.routing.mode (list "subdomain" "path")) }}
+{{- fail (printf "routing.mode: %v is not supported. Use subdomain or path" .Values.routing.mode) }}
+{{- end }}
 {{/*
 auth_mode was removed from postgres, elasticsearch and redis. The datastores always use credentials from secrets.
 The values auto, use_secret and managed are ignored. Only disabled changes the result, so it stops the installation.

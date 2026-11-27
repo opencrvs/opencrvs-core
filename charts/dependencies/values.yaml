@@ -12,6 +12,16 @@ hostname: opencrvs.localhost
 #            - register-opencrvs.localhost
 subdomain_separator: '.'
 
+# routing: how the services share `hostname`. Use the same mode as in the opencrvs-services chart.
+routing:
+  # mode: subdomain | path
+  # - subdomain: the S3 API is at rustfs<subdomain_separator><hostname>.
+  # - path: the S3 API is at https://<hostname>/<s3_bucket>/, so the browser needs no extra name.
+  #   The RustFS console and Kibana stay on subdomains.
+  mode: subdomain
+  # s3_bucket: bucket in the S3 URL path. Set it to env.S3_BUCKET of the opencrvs-services chart.
+  s3_bucket: ocrvs
+
 # Access to Dependencies like RustFS is done via Traefik IngressRoutes
 ingress:
   # Enable SSL for IngressRoutes.

@@ -6,10 +6,19 @@
 {{- end }}
 {{- end }}
 
+{{/*
+URL that browsers use to reach a service. In path mode a service in the list below has no
+name of its own, it is a path on `hostname`. Other services keep their subdomain.
+*/}}
 {{- define "render-external-url" -}}
 {{- $service_name := .service_name }}
 {{- $http_scheme := include "http-scheme" . }}
+{{- $paths := dict "register" "" "rustfs" "" "login" (include "login-path" .) "countryconfig" "/api/countryconfig" }}
+{{- if and (include "is-path-routing" .) (hasKey $paths $service_name) }}
+{{- printf "%s://%s%s" $http_scheme .Values.hostname (get $paths $service_name) }}
+{{- else }}
 {{- printf "%s://%s%s%s" $http_scheme $service_name ( .Values.subdomain_separator | default ".") .Values.hostname }}
+{{- end }}
 {{- end }}
 
 {{- define "service-helper" -}}

@@ -40,7 +40,12 @@ spec:
     - web
   {{- end }}
   routes:
+  {{- if eq .Values.routing.mode "path" }}
+  {{- /* Presigned URLs are path-style, https://<hostname>/<bucket>/<key>. Traefik must not strip the path, because the signature covers it. */}}
+  - match: 'Host(`{{ .Values.hostname }}`) && PathPrefix(`/{{ .Values.routing.s3_bucket }}/`)'
+  {{- else }}
   - match: 'Host(`{{ include "render-external-subdomain" (dict "service_name" "rustfs" "Values" .Values) }}`)'
+  {{- end }}
     kind: Rule
     services:
     - name: rustfs

@@ -69,7 +69,8 @@ export default defineConfig(({ mode }) => {
             handler: 'NetworkFirst'
           }
         ],
-        navigateFallback: '/index.html',
+        // Relative to the service worker, so it works under any base path
+        navigateFallback: 'index.html',
         navigateFallbackDenylist: [/^\/__.*$/, /^\/register/]
       },
       devOptions: {
@@ -78,6 +79,9 @@ export default defineConfig(({ mode }) => {
     })
   }
   return {
+    // Relative URLs resolve against <base href> in index.html. The image sets that at start,
+    // so one build serves the login app from / and from a path like /login/ (single domain).
+    base: './',
     // This changes the out put dir from dist to build
     build: {
       outDir: 'build',

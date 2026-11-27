@@ -38,6 +38,18 @@ spec:
   ipAllowList:
     sourceRange:
       - 255.255.255.255
+{{- if include "is-path-routing" . }}
+---
+# The login app serves its files from /, so Traefik removes the path of the login app
+apiVersion: traefik.io/v1alpha1
+kind: Middleware
+metadata:
+  name: login-strip-prefix
+spec:
+  stripPrefix:
+    prefixes:
+      - {{ include "login-path" . }}
+{{- end }}
 {{- if .Values.ingress.admin_console_allowlist }}
 ---
 apiVersion: traefik.io/v1alpha1
