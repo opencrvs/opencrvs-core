@@ -35,8 +35,8 @@ export const MAX_SLOT = 5
 export const PORT_STRIDE = 10000
 
 /**
- * Slot reserved for the primary (non-linked) checkout. Holding it back from
- * linked worktrees is what guarantees the primary always gets today's ports.
+ * Slot of the primary (non-linked) checkout. Named environments take it only
+ * when every other slot is full, so the primary usually gets today's ports.
  */
 export const PRIMARY_SLOT = 0
 
@@ -338,18 +338,30 @@ function liveSlotHolders(
 }
 
 function allocateSlot(name: string, input: ResolveEnvironmentInput): number {
-  /*
-   * Slot 0 is the default environment's, and only its: that is what keeps a
-   * plain `pnpm dev` in the primary checkout on today's ports whichever
-   * environment started first. A named environment recorded at slot 0 by an
-   * older registry moves off it the next time it resolves.
-   */
-  if (input.isDefaultEnvironment) {
-    return PRIMARY_SLOT
-  }
-
   const existing = input.registry[name]
   const holders = liveSlotHolders(name, input)
+
+  /*
+   * Slot 0 belongs to the default environment when it runs. A named
+   * environment takes slot 0 only after slots 1-MAX_SLOT are full, so the
+   * default environment usually finds it free. If a named environment holds
+   * slot 0, the default environment cannot start until that one is destroyed.
+   */
+  if (input.isDefaultEnvironment) {
+    const holder = holders.get(PRIMARY_SLOT)
+    if (holder !== undefined) {
+      throw new SlotAllocationError(
+        [
+          `Cannot start the default environment: environment "${holder}" ` +
+            `holds slot ${PRIMARY_SLOT}.`,
+          '',
+          `Free the slot with \`pnpm env:destroy ${holder}\`, or run this ` +
+            'checkout with `--env <name>`.'
+        ].join('\n')
+      )
+    }
+    return PRIMARY_SLOT
+  }
 
   /*
    * Stability, but never at the cost of uniqueness.
@@ -371,11 +383,7 @@ function allocateSlot(name: string, input: ResolveEnvironmentInput): number {
    * and sharing it — would hand the new occupant of the slot our Redis DB,
    * which is exactly the "leftover data" story 17 rules out.
    */
-  if (
-    existing &&
-    existing.slot !== PRIMARY_SLOT &&
-    !holders.has(existing.slot)
-  ) {
+  if (existing && !holders.has(existing.slot)) {
     return existing.slot
   }
 
@@ -383,6 +391,10 @@ function allocateSlot(name: string, input: ResolveEnvironmentInput): number {
     if (!holders.has(slot)) {
       return slot
     }
+  }
+
+  if (!holders.has(PRIMARY_SLOT)) {
+    return PRIMARY_SLOT
   }
 
   throw new SlotAllocationError(slotExhaustedMessage(name, holders))
@@ -401,8 +413,8 @@ function slotExhaustedMessage(
     `Cannot allocate a slot for environment "${name}": every environment ` +
       `slot (0-${MAX_SLOT}) is in use.`,
     '',
-    'Slot 0 is reserved for the default environment; every other',
-    `environment uses slots 1-${MAX_SLOT}. The ceiling exists because the highest`,
+    'A named environment takes slot 0 only when slots 1-' + MAX_SLOT + ' are',
+    'full. The ceiling exists because the highest',
     `base port (documents, ${BASE_PORTS.documents}) overflows the 16-bit port`,
     `range at slot ${MAX_SLOT + 1}.`,
     '',

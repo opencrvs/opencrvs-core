@@ -152,7 +152,7 @@ describe('resolveEnvironment: primary worktree', () => {
     expect(descriptor.ports.gateway).toBe(17070)
   })
 
-  it('never gives slot 0 to a named primary environment, even when slot 0 is free', () => {
+  it('gives a named primary environment slot 1 before slot 0', () => {
     const descriptor = resolveEnvironment({
       name: 'scratch-env',
       worktreePath: '/home/dev/opencrvs-core',
@@ -163,19 +163,18 @@ describe('resolveEnvironment: primary worktree', () => {
     expect(descriptor.slot).toBe(1)
   })
 
-  it('keeps the default environment on slot 0 when a named environment was recorded there first', () => {
-    const descriptor = resolveEnvironment({
-      name: 'opencrvs-core',
-      worktreePath: '/home/dev/opencrvs-core',
-      isDefaultEnvironment: true,
-      registry: { scratch_env: entry(0, '/home/dev/opencrvs-core') }
-    })
-
-    expect(descriptor.slot).toBe(0)
-    expect(descriptor.ports).toEqual(TODAYS_PORTS)
+  it('refuses to start the default environment while a named environment holds slot 0', () => {
+    expect(() =>
+      resolveEnvironment({
+        name: 'opencrvs-core',
+        worktreePath: '/home/dev/opencrvs-core',
+        isDefaultEnvironment: true,
+        registry: { scratch_env: entry(0, '/home/dev/wt/scratch-env') }
+      })
+    ).toThrow(/environment "scratch_env" holds slot 0/)
   })
 
-  it('moves a named environment off a slot 0 an older registry recorded for it', () => {
+  it('keeps a named environment on slot 0 once it has it', () => {
     const descriptor = resolveEnvironment({
       name: 'scratch-env',
       worktreePath: '/home/dev/opencrvs-core',
@@ -183,7 +182,25 @@ describe('resolveEnvironment: primary worktree', () => {
       registry: { scratch_env: entry(0, '/home/dev/opencrvs-core') }
     })
 
-    expect(descriptor.slot).toBe(1)
+    expect(descriptor.slot).toBe(0)
+  })
+
+  it('gives slot 0 to a named environment when slots 1-5 are full', () => {
+    const registry = Object.fromEntries(
+      [1, 2, 3, 4, 5].map((slot) => [
+        `feature_${slot}`,
+        entry(slot, `/home/dev/wt/feature-${slot}`)
+      ])
+    )
+    const descriptor = resolveEnvironment({
+      name: 'feature-new',
+      worktreePath: '/home/dev/wt/feature-new',
+      isDefaultEnvironment: false,
+      registry
+    })
+
+    expect(descriptor.slot).toBe(0)
+    expect(descriptor.dbName).toBe('events_feature_new')
   })
 
   it('does not key legacy identifiers off slot 0 — a linked worktree at slot 0 would still derive', () => {
@@ -238,7 +255,7 @@ describe('resolveEnvironment: linked worktrees', () => {
     }
   })
 
-  it('never hands slot 0 to a linked worktree, so the primary keeps it', () => {
+  it('gives a linked worktree slot 1 before slot 0, so the primary usually keeps it', () => {
     const descriptor = resolveEnvironment({
       name: 'feature-a',
       worktreePath: '/home/dev/wt/feature-a',

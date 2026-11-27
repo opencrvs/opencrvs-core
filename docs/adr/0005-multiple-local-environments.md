@@ -48,6 +48,25 @@ above are unchanged. The gap argument is not left to inspection:
 share a port, none exceeds 65535, and none collides with the dependency
 singleton.
 
+**Correction (local only, for the release line worktrees):** one registry and
+one dependency singleton now serve the `develop` line and the `release/2.1.x`,
+`release/2.0.x` and `release/1.9.x` lines. Each line has its own copy of
+`packages/dev-cli`, and each copy follows these rules:
+
+- All copies read and write the same registry, so a slot is unique across
+  every line.
+- A named environment takes slot 0 only when slots 1-5 are full. The default
+  environment refuses to start while a named environment holds slot 0. Nobody
+  works in the primary checkout, so 6 named environments are possible.
+- Every line defines `postgres`, `redis`, `elasticsearch` and `rustfs` in the
+  same way. A different definition makes `up -d` recreate the container under
+  the other lines. Postgres uses the image with `mongo_fdw`, because
+  `release/2.0.x` needs it. The release lines store documents in RustFS, not
+  MinIO.
+- `release/2.0.x` and `release/1.9.x` add `mongo1` and `influxdb` to the
+  singleton, with one Mongo database and one Influx database for each
+  environment.
+
 ### Per-environment isolation (all injected as env vars by `dev.sh`)
 
 | Dependency    | Isolation knob                      | Value                                                             |

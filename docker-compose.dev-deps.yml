@@ -19,7 +19,10 @@ volumes:
 services:
   # For dependencies, expose ports locally for dev
   postgres:
-    image: postgres:17.6
+    # Postgres 17.6 with the mongo_fdw extension. The release/2.0.x line needs
+    # the extension, and every release line shares this singleton, so every
+    # line uses the same image. See docs/adr/0005-multiple-local-environments.md.
+    image: docker.io/chumaky/postgres_mongo_fdw:17.6_fdw5.5.2
     restart: always
     environment:
       POSTGRES_USER: postgres
