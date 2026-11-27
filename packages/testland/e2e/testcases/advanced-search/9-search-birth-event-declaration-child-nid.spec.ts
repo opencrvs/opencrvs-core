@@ -8,7 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { expect, test, type Page } from '@playwright/test'
+import { expect, test } from '@playwright/test'
 import { createClient } from '@opencrvs/toolkit/api'
 import { aggregateActionDeclarations } from '@opencrvs/toolkit/events'
 import { omit } from 'lodash'
@@ -465,73 +465,62 @@ const AVAILABLE_IDENTITIES = [
   }
 ]
 
-test.describe
-  .serial('Advanced Search - Birth Event Declaration - Child NID', () => {
-  let page: Page
+test('Advanced Search - Birth Event Declaration - Child NID', async ({
+  page
+}) => {
   let childNid: string
-  let declaration: Declaration
-  let eventId: string
+  const token = await getToken(CREDENTIALS.REGISTRAR)
 
-  test.beforeAll(async ({ browser }) => {
-    page = await browser.newPage()
-    const token = await getToken(CREDENTIALS.REGISTRAR)
+  // Having a single identity results to duplicate detected on problem situations. Pick randomly, removing it from the list.
+  const randomIndex = Math.floor(Math.random() * AVAILABLE_IDENTITIES.length)
+  const [MOTHER_IDENTITY] = AVAILABLE_IDENTITIES.splice(randomIndex, 1)
 
-    // Having a single identity results to duplicate detected on problem situations. Pick randomly, removing it from the list.
-    const randomIndex = Math.floor(Math.random() * AVAILABLE_IDENTITIES.length)
-    const [MOTHER_IDENTITY] = AVAILABLE_IDENTITIES.splice(randomIndex, 1)
+  const declData = await getDeclaration({
+    token,
+    partialDeclaration: {
+      'mother.verified': 'authenticated',
+      'mother.name': {
+        firstname: MOTHER_IDENTITY.firstName,
+        surname: MOTHER_IDENTITY.familyName
+      },
+      'mother.dob': MOTHER_IDENTITY.birthDate
+    }
+  })
 
-    const declData = await getDeclaration({
-      token,
-      partialDeclaration: {
-        'mother.verified': 'authenticated',
-        'mother.name': {
-          firstname: MOTHER_IDENTITY.firstName,
-          surname: MOTHER_IDENTITY.familyName
-        },
-        'mother.dob': MOTHER_IDENTITY.birthDate
+  // mother.idType and mother.nid are hidden when mother.verified === 'authenticated'
+  // (eSignet flow) so the backend rejects those fields — same approach as
+  // birth-registration-forwarding.spec.ts
+  const res = await createDeclaration(
+    token,
+    omit(declData, ['mother.idType', 'mother.nid'])
+  )
+  const { declaration, eventId } = res
+
+  const client = createClient(`${GATEWAY_HOST}/events`, `Bearer ${token}`)
+
+  await expect
+    .poll(
+      async () => {
+        const event = await client.event.get.query({ eventId })
+        const aggregated = aggregateActionDeclarations(event)
+        childNid = aggregated['child.nid'] as string
+        return Boolean(childNid)
+      },
+      {
+        timeout: 60_000,
+        intervals: [...Array(5).fill(1_000), ...Array(5).fill(2_000), 5_000]
       }
-    })
-
-    // mother.idType and mother.nid are hidden when mother.verified === 'authenticated'
-    // (eSignet flow) so the backend rejects those fields — same approach as
-    // birth-registration-forwarding.spec.ts
-    const res = await createDeclaration(
-      token,
-      omit(declData, ['mother.idType', 'mother.nid'])
     )
-    declaration = res.declaration
-    eventId = res.eventId
+    .toBe(true)
 
-    const client = createClient(`${GATEWAY_HOST}/events`, `Bearer ${token}`)
-
-    await expect
-      .poll(
-        async () => {
-          const event = await client.event.get.query({ eventId })
-          const aggregated = aggregateActionDeclarations(event)
-          childNid = aggregated['child.nid'] as string
-          return Boolean(childNid)
-        },
-        {
-          timeout: 60_000,
-          intervals: [...Array(5).fill(1_000), ...Array(5).fill(2_000), 5_000]
-        }
-      )
-      .toBe(true)
-  })
-
-  test.afterAll(async () => {
-    await page.close()
-  })
-
-  test('Navigate to advanced search', async () => {
+  await test.step('Navigate to advanced search', async () => {
     await login(page)
     await page.click('#searchType')
     await expect(page).toHaveURL(/.*\/advanced-search/)
     await page.getByText('Birth').click()
   })
 
-  test('Search by child name and NID and verify search results', async () => {
+  await test.step('Search by child name and NID and verify search results', async () => {
     await page.getByText('Child details').click()
 
     await type(page, '#firstname', declaration['child.name'].firstname)
@@ -557,7 +546,7 @@ test.describe
     })
   })
 
-  test('Open record from search results and verify NID is visible in summary', async () => {
+  await test.step('Open record from search results and verify NID is visible in summary', async () => {
     const childName = formatV2ChildName(declaration)
     await openRecordByTitle(page, childName)
 

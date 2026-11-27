@@ -8,32 +8,22 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { test, expect, type Page } from '@playwright/test'
+import { test, expect } from '@playwright/test'
 import { login } from '@e2e/support/helpers'
 
-test.describe.serial('Death form - date validations', () => {
-  let page: Page
-
-  test.beforeAll(async ({ browser }) => {
-    page = await browser.newPage()
-  })
-
-  test.afterAll(async () => {
-    await page.close()
-  })
-
-  test('Log in', async () => {
+test('Death form - date validations', async ({ page }) => {
+  await test.step('Log in', async () => {
     await login(page)
   })
 
-  test('Start death event declaration', async () => {
+  await test.step('Start death event declaration', async () => {
     await page.click('#header-new-event')
     await page.getByLabel('Death').click()
     await page.getByRole('button', { name: 'Continue' }).click()
     await page.getByRole('button', { name: 'Continue' }).click()
   })
 
-  test('Input valid deceased date-of-birth', async () => {
+  await test.step('Input valid deceased date-of-birth', async () => {
     await page.getByPlaceholder('dd').fill('22')
     await page.getByPlaceholder('mm').fill('09')
     await page.getByPlaceholder('yyyy').fill('1993')
@@ -43,11 +33,11 @@ test.describe.serial('Death form - date validations', () => {
     await expect(page.locator('#deceased____dob_error')).not.toBeVisible()
   })
 
-  test('Navigate to event details section', async () => {
+  await test.step('Navigate to event details section', async () => {
     await page.getByRole('button', { name: 'Continue' }).click()
   })
 
-  test('Input date-of-death which is before date-of-birth, expect to see validation error', async () => {
+  await test.step('Input date-of-death which is before date-of-birth, expect to see validation error', async () => {
     await page.getByPlaceholder('dd').fill('09')
     await page.getByPlaceholder('mm').fill('10')
     await page.getByPlaceholder('yyyy').fill('1990')
@@ -59,7 +49,7 @@ test.describe.serial('Death form - date validations', () => {
     ).toBeVisible()
   })
 
-  test('Input date-of-death which is after date-of-birth, expect to see no validation error', async () => {
+  await test.step('Input date-of-death which is after date-of-birth, expect to see no validation error', async () => {
     await page.getByPlaceholder('dd').fill('09')
     await page.getByPlaceholder('mm').fill('10')
     await page.getByPlaceholder('yyyy').fill('1995')
@@ -69,11 +59,11 @@ test.describe.serial('Death form - date validations', () => {
     await expect(page.locator('#eventDetails____date_error')).not.toBeVisible()
   })
 
-  test('Go back to deceased details section', async () => {
+  await test.step('Go back to deceased details section', async () => {
     await page.getByRole('button', { name: 'Back' }).click()
   })
 
-  test('Input invalid deceased date-of-birth, expect to see validation error', async () => {
+  await test.step('Input invalid deceased date-of-birth, expect to see validation error', async () => {
     await page.getByPlaceholder('dd').fill('22')
     await page.getByPlaceholder('mm').fill('09')
     await page.getByPlaceholder('yyyy').fill('1996')
@@ -85,7 +75,7 @@ test.describe.serial('Death form - date validations', () => {
     )
   })
 
-  test('Input valid deceased date-of-birth, expect to see no validation error', async () => {
+  await test.step('Input valid deceased date-of-birth, expect to see no validation error', async () => {
     await page.getByPlaceholder('dd').fill('22')
     await page.getByPlaceholder('mm').fill('10')
     await page.getByPlaceholder('yyyy').fill('1988')

@@ -13,24 +13,15 @@ import { login } from '@e2e/support/helpers'
 import { CREDENTIALS } from '@e2e/support/constants'
 import { verifyMembersClickable } from '@e2e/support/birth/helpers'
 import { navigateToWorkqueue } from '@e2e/support/utils'
-test.describe.serial('1. Organisation Page', () => {
-  let page: Page
-
-  test.beforeAll(async ({ browser }) => {
-    page = await browser.newPage()
-  })
-
-  test.afterAll(async () => {
-    await page.close()
-  })
-  test.describe.serial('1.1 Basic UI check', async () => {
-    test('1.1.0 Verify UI', async () => {
+test('1. Organisation Page', async ({ page }) => {
+  await test.step('1.1 Basic UI check', async () => {
+    await test.step('1.1.0 Verify UI', async () => {
       await login(page, CREDENTIALS.NATIONAL_SYSTEM_ADMIN)
       await page.getByRole('button', { name: 'Organisation' }).click()
       await expect(page.locator('#content-name')).toHaveText('Organisation')
       await expect(page.getByText('Farajaland', { exact: true })).toBeVisible()
     })
-    test('1.1.1 Verify Province -> District -> Health Facility', async () => {
+    await test.step('1.1.1 Verify Province -> District -> Health Facility', async () => {
       await page.getByRole('button', { name: /Central/ }).click()
       await page.getByRole('button', { name: /^Ibombo$/ }).click()
       await page.getByRole('button', { name: /Klow/ }).click()
@@ -45,7 +36,7 @@ test.describe.serial('1. Organisation Page', () => {
 
       await expect(page.getByText('No result')).toBeHidden()
     })
-    test('1.1.2 Verify Province -> District -> Village -> Village Office(No Data)', async () => {
+    await test.step('1.1.2 Verify Province -> District -> Village -> Village Office(No Data)', async () => {
       await navigateToWorkqueue(page, 'Organisation')
       await page.getByRole('button', { name: /Chuminga/ }).click()
       await page.getByRole('button', { name: /Ama/ }).click()
@@ -62,7 +53,7 @@ test.describe.serial('1. Organisation Page', () => {
       await expect(page.getByText('No result')).toBeVisible()
     })
 
-    test('1.1.2 Verify Province -> District -> District Office', async () => {
+    await test.step('1.1.2 Verify Province -> District -> District Office', async () => {
       await navigateToWorkqueue(page, 'Organisation')
 
       await page.getByRole('button', { name: /Sulaka/ }).click()
@@ -76,7 +67,7 @@ test.describe.serial('1. Organisation Page', () => {
         page.getByText('Ilanga, Sulaka', { exact: true })
       ).toBeVisible()
     })
-    test('1.1.3 Verify team page member list', async () => {
+    await test.step('1.1.3 Verify team page member list', async () => {
       const members = ['Chilufya Tayali', 'Kondwani Mwale']
 
       await verifyMembersClickable(page, members, 'Ilanga District Office')

@@ -8,7 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { expect, test, type Page } from '@playwright/test'
+import { expect, test } from '@playwright/test'
 
 import { login, getToken } from '@e2e/support/helpers'
 import { CREDENTIALS } from '@e2e/support/constants'
@@ -19,29 +19,20 @@ import {
 import { expectInUrl, type } from '@e2e/support/utils'
 import { ActionType } from '@opencrvs/toolkit/events'
 
-test.describe.serial('Navigating in and out of dashboard', () => {
-  let page: Page
-  let declaration: Declaration
-  test.beforeAll(async ({ browser }) => {
-    const token = await getToken(CREDENTIALS.REGISTRAR)
-    const res = await createDeclaration(token, undefined, ActionType.DECLARE)
-    declaration = res.declaration
-    page = await browser.newPage()
-  })
+test('Navigating in and out of dashboard', async ({ page }) => {
+  const token = await getToken(CREDENTIALS.REGISTRAR)
+  const res = await createDeclaration(token, undefined, ActionType.DECLARE)
+  const declaration = res.declaration
 
-  test.afterAll(async () => {
-    await page.close()
-  })
-
-  test('Login', async () => {
+  await test.step('Login', async () => {
     await login(page)
   })
 
-  test('Navigate to the "Pending registration" -workqueue', async () => {
+  await test.step('Navigate to the "Pending registration" -workqueue', async () => {
     await page.getByRole('button', { name: 'Pending registration' }).click()
   })
 
-  test("Enter the 'Registration Dashboard' - from workqueue", async () => {
+  await test.step("Enter the 'Registration Dashboard' - from workqueue", async () => {
     await page.getByText('Registrations Dashboard').click()
     await page.waitForURL(`**/performance/dashboard/registrations`)
     await expectInUrl(page, `/performance/dashboard/registrations`)
@@ -52,9 +43,8 @@ test.describe.serial('Navigating in and out of dashboard', () => {
     await expectInUrl(page, '/workqueue/pending-registration')
   })
 
-  test.describe
-    .serial("Enter the 'Registration Dashboard' - from search result", async () => {
-    test('2.5.1 - Fill in advanced search form with child details', async () => {
+  await test.step("Enter the 'Registration Dashboard' - from search result", async () => {
+    await test.step('2.5.1 - Fill in advanced search form with child details', async () => {
       await page.click('#searchType')
       await expect(page).toHaveURL(/.*\/advanced-search/)
       await page.getByText('Birth').click()
@@ -72,7 +62,7 @@ test.describe.serial('Navigating in and out of dashboard', () => {
       await page.click('#search')
     })
 
-    test('2.5.2 - Navigate to Registration Dashboard from search result', async () => {
+    await test.step('2.5.2 - Navigate to Registration Dashboard from search result', async () => {
       await page.getByText('Registrations Dashboard').click()
       await page.waitForURL(`**/performance/dashboard/registrations`)
       await expectInUrl(page, `/performance/dashboard/registrations`)

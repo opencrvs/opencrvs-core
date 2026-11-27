@@ -10,7 +10,7 @@
  */
 import { defineConfig, devices } from '@playwright/test'
 
-const TEST_TIMEOUT = 90000
+const TEST_TIMEOUT = 180_000
 
 const subdomains = ['register'] // TODO: Add more subdomains if needed
 const insecureOrigins = subdomains.map(

@@ -11,6 +11,7 @@
 - `npx @opencrvs/toolkit upgrade` now sets `version` and `@opencrvs/toolkit` in your `package.json` to the toolkit version it runs from, points scripts at `assets/` instead of `infrastructure/`, and removes scripts whose file no longer exists, such as `snapshot`, `port-forward` and `environment:init` [#14382](https://github.com/opencrvs/opencrvs-core/issues/14382)
 - Without `--docker-swarm`, `npx @opencrvs/toolkit upgrade` now deletes what is left in `infrastructure/` once you confirm, as it said it would. Pass `--remove-infrastructure` to delete without asking. Files git does not track are never deleted [#14382](https://github.com/opencrvs/opencrvs-core/issues/14382)
 - `pnpm dev` in opencrvs-core no longer starts the bundled testland country config. Core contributors pass `--testland` to start it; `--no-testland` is gone [#14382](https://github.com/opencrvs/opencrvs-core/issues/14382)
+- A print button in the form of a custom action no longer crashes when the action opens from the action menu of a record. The fix from 2.0.3 was lost when 2.0.x was merged into 2.1.x. [#13821](https://github.com/opencrvs/opencrvs-core/pull/13821)
 
 ## 2.1.3
 

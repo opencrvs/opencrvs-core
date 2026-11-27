@@ -8,14 +8,13 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { expect, test, type Page } from '@playwright/test'
+import { expect, test } from '@playwright/test'
 
 import { formatName, login } from '@e2e/support/helpers'
 import { CREDENTIALS } from '@e2e/support/constants'
 import { faker } from '@faker-js/faker'
 
-test.describe.serial('Validate draft with partial name', () => {
-  let page: Page
+test('Validate draft with partial name', async ({ page }) => {
   const name1 = {
     firstNames: faker.person.firstName('male')
   }
@@ -23,15 +22,7 @@ test.describe.serial('Validate draft with partial name', () => {
     familyName: faker.person.lastName('male')
   }
 
-  test.beforeAll(async ({ browser }) => {
-    page = await browser.newPage()
-  })
-
-  test.afterAll(async () => {
-    await page.close()
-  })
-
-  test('Record does not appear in draft', async () => {
+  await test.step('Record does not appear in draft', async () => {
     await login(page, CREDENTIALS.HOSPITAL_OFFICIAL)
     await page.getByRole('button', { name: 'Drafts' }).click()
 
@@ -43,7 +34,7 @@ test.describe.serial('Validate draft with partial name', () => {
     )
   })
 
-  test('Create a draft with only firstname', async () => {
+  await test.step('Create a draft with only firstname', async () => {
     await page.click('#header-new-event')
     await page.getByLabel('Birth').click()
     await page.getByRole('button', { name: 'Continue' }).click()
@@ -60,7 +51,7 @@ test.describe.serial('Validate draft with partial name', () => {
     await draftResponse
   })
 
-  test('Create a draft with only lastname', async () => {
+  await test.step('Create a draft with only lastname', async () => {
     await page.click('#header-new-event')
     await page.getByLabel('Birth').click()
     await page.getByRole('button', { name: 'Continue' }).click()
@@ -77,7 +68,7 @@ test.describe.serial('Validate draft with partial name', () => {
     await draftResponse
   })
 
-  test('Records appear in draft', async () => {
+  await test.step('Records appear in draft', async () => {
     await page.getByRole('button', { name: 'Drafts' }).click()
 
     // 5s (Playwright's default) wasn't always enough for the drafts
@@ -92,7 +83,7 @@ test.describe.serial('Validate draft with partial name', () => {
     )
   })
 
-  test('Records do not appear in draft for other user: RO', async () => {
+  await test.step('Records do not appear in draft for other user: RO', async () => {
     await login(page, CREDENTIALS.REGISTRATION_OFFICER)
     await page.getByRole('button', { name: 'Drafts' }).click()
 
@@ -104,7 +95,7 @@ test.describe.serial('Validate draft with partial name', () => {
     )
   })
 
-  test('Records do not appear in draft for other user: LR', async () => {
+  await test.step('Records do not appear in draft for other user: LR', async () => {
     await login(page, CREDENTIALS.REGISTRAR)
     await page.getByRole('button', { name: 'Drafts' }).click()
 
