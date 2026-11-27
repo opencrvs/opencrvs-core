@@ -70,13 +70,16 @@ test('Birth declaration made offline with a supporting document syncs after reco
     father: { reason: 'Father is unknown' }
   }
 
-  /* Successful uploads. A request made while offline never gets a response. */
+  /*
+   * Successful uploads to the presigned URLs of the store. A request made while
+   * offline never gets a response.
+   */
   const uploads: Response[] = []
 
   page.on('response', (response) => {
     if (
-      response.request().method() === 'POST' &&
-      response.url().includes('/api/upload') &&
+      response.request().method() === 'PUT' &&
+      new URL(response.url()).pathname.includes('/events/') &&
       response.ok()
     ) {
       uploads.push(response)
@@ -224,9 +227,7 @@ test('Birth declaration made offline with a supporting document syncs after reco
    */
   expect((await declareResponse).status()).toBe(200)
 
-  const storedPaths = await Promise.all(
-    uploads.map(async (upload) => (await upload.text()).trim())
-  )
+  const storedPaths = uploads.map((upload) => new URL(upload.url()).pathname)
 
   expect(storedPaths.length).toBeGreaterThan(0)
   for (const storedPath of storedPaths) {

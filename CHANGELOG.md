@@ -157,6 +157,13 @@ Integrations using the `client_credentials` grant must send `grant_type`, `clien
 
 Existing credentials keep working. Rotate any secret that has been sent in a URL, since it may still be in old logs.
 
+#### The gateway `POST /upload` route is removed
+
+Any user with a valid token could store a file at any path through `POST /upload`, because the route did not check scopes. The client now asks the events service for a presigned upload URL with `attachments.presignEventUpload` or `attachments.presignUserUpload`, and sends the file to the store with `PUT`. The events service checks that the user can act on the record, or can edit the user, before it signs the URL. It writes an audit entry for each request.
+
+- The store must allow cross-origin `PUT` from the client origin, with the headers `content-type` and `x-amz-meta-created-by`. The RustFS defaults in the dependencies chart and in `docker-compose.deps.yml` allow this.
+- Integrations keep `attachments.upload`, which needs the `attachment.upload` scope.
+
 #### Event `declaration` moved onto the `DECLARE` action
 
 An event's declaration form was defined at the top level of `EventConfig`. It now lives on the event's `DECLARE` action, and every event must have exactly one `DECLARE` action:

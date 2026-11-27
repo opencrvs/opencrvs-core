@@ -52,8 +52,6 @@ spec:
               value: {{ include "render-external-url" (dict "service_name" "login" "Values" .Values) }}
             - name: AUTH_URL
               value: http://auth.{{ .Release.Namespace }}.svc.cluster.local:4040
-            - name: DOCUMENTS_URL
-              value: "http://documents.{{ .Release.Namespace }}.svc.cluster.local:9050"
             - name: EVENTS_URL
               value: "http://events.{{ .Release.Namespace }}.svc.cluster.local:5555/"
           {{- include "render-env-vars" (dict "service_name" "gateway" "Values" .Values) }}
