@@ -104,6 +104,20 @@ export const derivedVariables = [
     scope: 'ENVIRONMENT'
   },
   {
+    name: 'COUNTRY_CONFIG_CLIENT_ID',
+    valueLabel: 'COUNTRY_CONFIG_CLIENT_ID',
+    valueType: 'SECRET',
+    type: 'disabled',
+    scope: 'ENVIRONMENT'
+  },
+  {
+    name: 'COUNTRY_CONFIG_CLIENT_SECRET',
+    valueLabel: 'COUNTRY_CONFIG_CLIENT_SECRET',
+    valueType: 'SECRET',
+    type: 'disabled',
+    scope: 'ENVIRONMENT'
+  },
+  {
     name: 'ENCRYPTION_KEY',
     valueLabel: 'ENCRYPTION_KEY',
     valueType: 'SECRET',

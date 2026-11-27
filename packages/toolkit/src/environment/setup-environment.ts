@@ -9,6 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
+import { randomUUID } from 'crypto'
 import { Octokit } from '@octokit/core'
 import kleur from 'kleur'
 import prompts, { PromptObject } from 'prompts'
@@ -1174,6 +1175,47 @@ export async function runSetupEnvironment() {
       ),
       value: findExistingOrDefine(
         'SUPER_USER_PASSWORD',
+        'SECRET',
+        'ENVIRONMENT',
+        generateLongPassword()
+      ),
+      scope: 'ENVIRONMENT' as const
+    },
+    /*
+     * The system client that country config calls core with. Core's requests
+     * to country config are signed and carry no token that country config
+     * could reuse. Country config registers the client on startup with these
+     * values, so no person needs to give them.
+     */
+    {
+      name: 'COUNTRY_CONFIG_CLIENT_ID',
+      type: 'SECRET' as const,
+      didExist: findExistingValue(
+        'COUNTRY_CONFIG_CLIENT_ID',
+        'SECRET',
+        'ENVIRONMENT',
+        existingValues
+      ),
+      value: findExistingOrDefine(
+        'COUNTRY_CONFIG_CLIENT_ID',
+        'SECRET',
+        'ENVIRONMENT',
+        // Events accepts only a UUID as the id of a client.
+        randomUUID()
+      ),
+      scope: 'ENVIRONMENT' as const
+    },
+    {
+      name: 'COUNTRY_CONFIG_CLIENT_SECRET',
+      type: 'SECRET' as const,
+      didExist: findExistingValue(
+        'COUNTRY_CONFIG_CLIENT_SECRET',
+        'SECRET',
+        'ENVIRONMENT',
+        existingValues
+      ),
+      value: findExistingOrDefine(
+        'COUNTRY_CONFIG_CLIENT_SECRET',
         'SECRET',
         'ENVIRONMENT',
         generateLongPassword()
