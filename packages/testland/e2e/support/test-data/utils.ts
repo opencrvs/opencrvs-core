@@ -9,6 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { v4 as uuidv4 } from 'uuid'
+import { createClient } from '@opencrvs/toolkit/api'
 import { GATEWAY_HOST } from '@e2e/support/constants'
 import fs from 'fs'
 import path from 'path'
@@ -24,22 +25,25 @@ export function getSignatureFile() {
 }
 
 /**
- * Uploads under the record's prefix: a record may only reference files
- * stored there.
+ * Uploads under the record's prefix in the same way as the client: the events
+ * service signs an upload URL for the record, and the file goes to the store
+ * with PUT. A record may only reference files stored there.
  */
 export async function uploadFile(file: File, token: string, eventId: string) {
-  const formData = new FormData()
-  const transactionId = uuidv4()
-  formData.append('file', file)
-  formData.append('transactionId', transactionId)
-  formData.append('path', `events/${eventId}/`)
+  const client = createClient(GATEWAY_HOST + '/events', `Bearer ${token}`)
 
-  const res = await fetch(`${GATEWAY_HOST}/upload`, {
-    method: 'POST',
-    headers: {
-      Authorization: `Bearer ${token}`
-    },
-    body: formData
+  const upload = await client.attachments.presignEventUpload.mutate({
+    eventId,
+    transactionId: uuidv4(),
+    extension: file.name.split('.').pop() ?? '',
+    contentType: file.type,
+    contentLength: file.size
+  })
+
+  const res = await fetch(upload.url, {
+    method: 'PUT',
+    headers: upload.headers,
+    body: file
   })
 
   if (!res.ok) {
@@ -47,7 +51,7 @@ export async function uploadFile(file: File, token: string, eventId: string) {
   }
 
   return {
-    path: await res.text(),
+    path: upload.path,
     originalFilename: file.name,
     type: file.type
   }

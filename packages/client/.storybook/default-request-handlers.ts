@@ -23,6 +23,7 @@ import { tennisClubMembershipCertifiedCertificateTemplate } from './tennisClubMe
 import {
   generateWorkqueues,
   TENNIS_CLUB_MEMBERSHIP,
+  DocumentPath,
   UUID,
   TestUserRole,
   AuditLogEntry,
@@ -58,6 +59,38 @@ export const tRPCMsw = createTRPCMsw<AppRouter>({
   ],
   transformer: { input: superjson, output: superjson }
 })
+
+/**
+ * Mocks of a file upload. The client asks the events service for a presigned
+ * upload URL, and then sends the file to that URL with `PUT`.
+ */
+export const presignedUploadHandlers = [
+  tRPCMsw.attachments.presignEventUpload.mutation(
+    ({ eventId, transactionId, extension, contentType }) => {
+      const path = DocumentPath.parse(
+        `events/${eventId}/${transactionId}.${extension}`
+      )
+      return {
+        url: `/presigned-upload/${path}`,
+        headers: { 'Content-Type': contentType },
+        path
+      }
+    }
+  ),
+  tRPCMsw.attachments.presignUserUpload.mutation(
+    ({ userId, transactionId, extension, contentType }) => {
+      const path = DocumentPath.parse(
+        `users/${userId}/${transactionId}.${extension}`
+      )
+      return {
+        url: `/presigned-upload/${path}`,
+        headers: { 'Content-Type': contentType },
+        path
+      }
+    }
+  ),
+  http.put('/presigned-upload/*', () => new HttpResponse(null, { status: 200 }))
+]
 
 /**
  * Mocks of the location and administrative area lists for a story.
@@ -383,11 +416,7 @@ export const handlers = {
     })
   ],
   files: [
-    http.post('/api/upload', async (req) => {
-      const formData = await req.request.formData()
-
-      return HttpResponse.text(`${formData.get('transactionId')}.jpg`)
-    }),
+    ...presignedUploadHandlers,
     http.get('/files/:id', async (request) => {
       const cache = await caches.open(FAKE_CACHE_NAME)
 

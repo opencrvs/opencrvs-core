@@ -72,7 +72,10 @@ const OPERATIONS_TO_HIDE = [
   'administrativeAreas.withdrawVersion',
   // Written each time a record's documents load; kept for investigations only
   'event.files.presign',
-  'event.file.getPresignedUrl'
+  'event.file.getPresignedUrl',
+  // Written for each file that the user uploads; kept for investigations only
+  'attachments.presignEventUpload',
+  'attachments.presignUserUpload'
 ]
 
 const TableDiv = styled.div`

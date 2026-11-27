@@ -8,7 +8,6 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { DOCUMENTS_URL } from '@gateway/constants'
 import {
   configHandler,
   publicConfigHandler
@@ -37,22 +36,6 @@ export const getRoutes = () => {
         auth: false,
         description: 'Checks the health of all services.',
         notes: 'Pass the service as a query param: service'
-      }
-    },
-    {
-      method: 'POST',
-      path: '/upload',
-      handler: async (req, h) => {
-        return h.proxy({
-          uri: `${DOCUMENTS_URL}/files`,
-          passThrough: true
-        })
-      },
-      options: {
-        payload: {
-          output: 'data',
-          parse: false
-        }
       }
     },
     // application config routes (moved from config service)

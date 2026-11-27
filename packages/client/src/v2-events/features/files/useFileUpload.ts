@@ -14,12 +14,13 @@ import { v4 as uuid } from 'uuid'
 import {
   AttachmentPath,
   DocumentPath,
-  joinValues
+  joinValues,
+  parseDocumentPath
 } from '@opencrvs/commons/client'
-import { ensureFreshAccessToken, getToken } from '@client/utils/authUtils'
+import { ensureFreshAccessToken } from '@client/utils/authUtils'
 import { cacheFile } from '@client/v2-events/cache'
 import { resolveTemporaryIdInPath } from '@client/v2-events/features/events/useEvents/temporary-id'
-import { queryClient } from '@client/v2-events/trpc'
+import { queryClient, trpcClient } from '@client/v2-events/trpc'
 
 interface UploadFileParams {
   file: File
@@ -30,35 +31,65 @@ interface UploadFileParams {
   }
 }
 
+function getExtension(file: File) {
+  return file.name.split('.').pop() ?? ''
+}
+
+/**
+ * Asks the events service for a presigned URL and uploads the file directly
+ * to the object store. The events service checks that the user may upload to
+ * `path`, so the URL is requested again on each retry.
+ */
 async function uploadFile({
   file,
   path,
   meta
-}: UploadFileParams): Promise<{ url: string }> {
+}: UploadFileParams): Promise<{ url: DocumentPath }> {
   await ensureFreshAccessToken()
-  const formData = new FormData()
-  formData.append('file', file)
-  formData.append('transactionId', meta.transactionId)
   /*
    * The path is derived from the event id, which is still temporary when the file is
    * attached before the event has synced (e.g. offline). Actions referring to the file
    * are sent with the canonical id, so the file must be stored under it, too.
    */
-  formData.append('path', resolveTemporaryIdInPath(path))
+  const extension = getExtension(file)
+  const key = parseDocumentPath(
+    `${resolveTemporaryIdInPath(path)}${meta.transactionId}.${extension}`
+  )
 
-  const response = await fetch('/api/upload', {
-    method: 'POST',
-    headers: {
-      Authorization: `Bearer ${getToken()}`
-    },
-    body: formData
+  const fields = {
+    transactionId: meta.transactionId,
+    extension,
+    // Browsers send this type in a form upload when they do not know the file type
+    contentType: file.type || 'application/octet-stream',
+    contentLength: file.size
+  }
+
+  let upload
+  if (key?.kind === 'event') {
+    upload = await trpcClient.attachments.presignEventUpload.mutate({
+      ...fields,
+      eventId: key.eventId
+    })
+  } else if (key?.kind === 'user') {
+    upload = await trpcClient.attachments.presignUserUpload.mutate({
+      ...fields,
+      userId: key.userId
+    })
+  } else {
+    throw new Error(`Cannot upload a file to ${path}`)
+  }
+
+  const response = await fetch(upload.url, {
+    method: 'PUT',
+    headers: upload.headers,
+    body: file
   })
 
   if (!response.ok) {
     throw new Error('File upload failed')
   }
 
-  return { url: await response.text() }
+  return { url: upload.path }
 }
 
 const UPLOAD_MUTATION_KEY = 'uploadFile'
@@ -89,8 +120,7 @@ export function useFileUpload(
       uploadFile({ ...variables, meta: { ...variables.meta } }),
     mutationKey: [UPLOAD_MUTATION_KEY, uniqueIdentifier],
     onMutate: async ({ file, meta }: UploadFileParams) => {
-      const extension = file.name.split('.').pop()
-      const temporaryFilename = `${meta.transactionId}.${extension}`
+      const temporaryFilename = `${meta.transactionId}.${getExtension(file)}`
       const filePath = joinValues(
         [path.replace(/\/$/, ''), temporaryFilename],
         '/'

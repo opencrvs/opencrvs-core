@@ -20,6 +20,7 @@ import {
   listFiles
 } from '@documents/features/getDocument/handler'
 import { svgUploadHandler } from '@documents/features/uploadSvg/handler'
+import { presignUploadHandler } from '@documents/features/presignUpload/handler'
 import {
   deleteDocument,
   deletePrefix
@@ -58,6 +59,15 @@ export const getRoutes = () => {
       method: 'POST',
       path: '/presigned-url',
       handler: createPreSignedUrl,
+      options: {
+        tags: ['api']
+      }
+    },
+    // sign a URL that lets the browser upload one file to the object store
+    {
+      method: 'POST',
+      path: '/presigned-upload-url',
+      handler: presignUploadHandler,
       options: {
         tags: ['api']
       }

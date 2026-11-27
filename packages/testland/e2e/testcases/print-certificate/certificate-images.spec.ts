@@ -18,6 +18,7 @@ import { getToken, login } from '@e2e/support/helpers'
 import { CLIENT_URL, CREDENTIALS, GATEWAY_HOST } from '@e2e/support/constants'
 import { ASSETS_DIR } from '@e2e/support/paths'
 import { ensureAssignedToUser } from '@e2e/support/utils'
+import { uploadFile } from '@e2e/support/test-data/utils'
 import {
   selectCertificationType,
   selectRequesterType
@@ -31,30 +32,11 @@ const TEMPLATE = 'Tennis Club Membership Certificate Multipage'
  */
 async function uploadRecordFile(eventId: string, token: string) {
   const image = fs.readFileSync(path.join(ASSETS_DIR, 'sign1.png'))
-
-  const form = new FormData()
-  form.append(
-    'file',
-    new File([new Uint8Array(image)], 'applicant.png', { type: 'image/png' })
-  )
-  form.append('transactionId', uuidv4())
-  form.append('path', `events/${eventId}`)
-
-  const response = await fetch(`${GATEWAY_HOST}/upload`, {
-    method: 'POST',
-    headers: { Authorization: `Bearer ${token}` },
-    body: form
+  const file = new File([new Uint8Array(image)], 'applicant.png', {
+    type: 'image/png'
   })
 
-  if (!response.ok) {
-    throw new Error(`Failed to upload the file: ${response.statusText}`)
-  }
-
-  return {
-    path: await response.text(),
-    originalFilename: 'applicant.png',
-    type: 'image/png'
-  }
+  return uploadFile(file, token, eventId)
 }
 
 /**

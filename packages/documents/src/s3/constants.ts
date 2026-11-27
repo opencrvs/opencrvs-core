@@ -54,3 +54,6 @@ export const env = cleanEnv(process.env, {
 })
 
 export const S3_PRESIGNED_URL_EXPIRY_IN_SECOND = PRODUCTION ? 3600 : 259200
+
+/** A browser uses an upload URL at once, so it expires soon. */
+export const S3_PRESIGNED_UPLOAD_URL_EXPIRY_IN_SECOND = 300

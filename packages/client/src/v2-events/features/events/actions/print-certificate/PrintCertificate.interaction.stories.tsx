@@ -339,8 +339,8 @@ export const UploadedFilePersistsOnBackNavigation: Story = {
   parameters: {
     chromatic: { disableSnapshot: true },
     test: {
-      // The optimistic upload fires a background POST /api/upload that has no
-      // handler here; the value is set optimistically regardless.
+      // The optimistic upload runs in the background and can fail after the
+      // story ends; the value is set optimistically regardless.
       dangerouslyIgnoreUnhandledErrors: true
     },
     offline: {
@@ -355,11 +355,6 @@ export const UploadedFilePersistsOnBackNavigation: Story = {
     },
     msw: {
       handlers: {
-        upload: [
-          http.post('/api/upload', () => {
-            return HttpResponse.text('ok')
-          })
-        ],
         events: [
           tRPCMsw.event.get.query(() => {
             return tennisClubMembershipEventDocument

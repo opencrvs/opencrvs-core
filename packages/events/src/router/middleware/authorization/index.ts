@@ -155,6 +155,56 @@ export const canUpdateUser: MiddlewareFunction<
   return opts.next()
 }
 
+/**
+ * A user may upload their own avatar and signature. A user with `user.edit`
+ * may upload them for a user they can edit. A user with `user.create` may
+ * upload them for a user that does not exist yet: the client generates the id
+ * of a new user before it creates the user.
+ */
+export const canUploadUserAttachment: MiddlewareFunction<
+  TrpcContext,
+  OpenApiMeta,
+  TrpcContext,
+  TrpcContext,
+  { userId: UUID }
+> = async ({ next, ctx, input }) => {
+  if (input.userId === ctx.user.id) {
+    return next()
+  }
+
+  const editScopes = getAcceptedScopesFromToken(ctx.token, ['user.edit'])
+  const canCreate = hasScope(ctx.token, 'user.create')
+
+  if (editScopes.length === 0 && !canCreate) {
+    throw new TRPCError({ code: 'FORBIDDEN' })
+  }
+
+  const existingUser = await getUserById(input.userId)
+
+  if (!existingUser) {
+    if (canCreate) {
+      return next()
+    }
+    throw new TRPCError({ code: 'FORBIDDEN' })
+  }
+
+  const hasAccess = canAccessOtherUserWithScopes({
+    scopes: editScopes,
+    userToAccess: {
+      role: existingUser.role,
+      primaryOfficeId: existingUser.officeId,
+      administrativeHierarchy: await getLocationHierarchy(existingUser.officeId)
+    },
+    user: ctx.user
+  })
+
+  if (!hasAccess) {
+    throw new TRPCError({ code: 'FORBIDDEN' })
+  }
+
+  return next()
+}
+
 export const EventIdParam = z.object({
   eventId: UUID,
   customActionType: z.string().optional()
