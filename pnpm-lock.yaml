@@ -144,9 +144,6 @@ importers:
       redis:
         specifier: ^6.1.0
         version: 6.1.0(@opentelemetry/api@1.9.1)
-      superjson:
-        specifier: 1.9.0-0
-        version: 1.9.0-0
       tsconfig-paths:
         specifier: ^3.13.0
         version: 3.15.0
@@ -394,9 +391,6 @@ importers:
       styled-components:
         specifier: ^5.2.0
         version: 5.3.11(@babel/core@7.29.7)(react-dom@18.3.1(react@18.3.1))(react-is@19.3.1)(react@18.3.1)
-      superjson:
-        specifier: 1.9.0-0
-        version: 1.9.0-0
       uuid:
         specifier: ^9.0.0
         version: 9.0.1
@@ -865,9 +859,6 @@ importers:
       node-fetch:
         specifier: ^2.6.1
         version: 2.7.0(encoding@0.1.13)
-      superjson:
-        specifier: 1.9.0-0
-        version: 1.9.0-0
       zod:
         specifier: ^4.6.5
         version: 4.6.6
@@ -1098,9 +1089,6 @@ importers:
       pino-http:
         specifier: ^7.1.0
         version: 7.1.0
-      superjson:
-        specifier: 1.9.0-0
-        version: 1.9.0-0
       trpc-to-openapi:
         specifier: ^3.2.0
         version: 3.2.0(@trpc/server@11.8.0(typescript@7.0.2))(zod-openapi@5.4.6(zod@4.6.6))(zod@4.6.6)
@@ -1258,9 +1246,6 @@ importers:
       redis:
         specifier: ^6.1.0
         version: 6.1.0(@opentelemetry/api@1.9.1)
-      superjson:
-        specifier: 1.9.0-0
-        version: 1.9.0-0
       tsconfig-paths:
         specifier: ^4.2.0
         version: 4.2.0
@@ -2056,9 +2041,6 @@ importers:
       ssh2:
         specifier: ^1.17.0
         version: 1.17.0
-      superjson:
-        specifier: 1.9.0-0
-        version: 1.9.0-0
       ts-morph:
         specifier: ^27.0.2
         version: 27.0.2
@@ -11574,9 +11556,6 @@ packages:
   lodash.camelcase@4.3.0:
     resolution: {integrity: sha512-TwuEnCnxbc3rAvhf/LbG7tJUDzhqXyFnv3dtzLOPgCG/hODL7WFnsbwktkD7yUV0RrreP/l1PALq/YSg6VvjlA==}
 
-  lodash.clonedeep@4.5.0:
-    resolution: {integrity: sha512-H5ZhCF25riFd9uB5UCkVKo61m3S/xZk1x4wA6yp/L3RFP6Z/eHH1ymQcGLo7J3GMPfm0V/7m1tryHuGVxpqEBQ==}
-
   lodash.debounce@4.0.8:
     resolution: {integrity: sha512-FT1yDzDYEoYWhnSGnpE/4Kj1fLZkDFyqRb7fNt6FdYOSxlUWAtp42Eh6Wb0rGIv/m9Bgo7x4GhQbm5Ys4SG5ow==}
 
@@ -14324,10 +14303,6 @@ packages:
 
   stylis@4.2.0:
     resolution: {integrity: sha512-Orov6g6BB1sDfYgzWfTHDOxamtX1bE/zo104Dh9e6fqJ3PooipYyfJ0pUmrZO2wAvO8YbEyeFrkV91XTsGMSrw==}
-
-  superjson@1.9.0-0:
-    resolution: {integrity: sha512-JZHRiW+yFgzRSqf+iwKtycGqfpLnt9ct6Oa0D6/yqDt0rD+hQZMeMdk648M+oshlyv4VLpW82ZkiMdFlairdHA==}
-    engines: {node: '>=10'}
 
   supports-color@2.0.0:
     resolution: {integrity: sha512-KKNVtd6pCYgPIKU4cp2733HWYCpplQhddZLBUryaAHou723x+FRzQ5Df824Fj+IyyuiQTRoub4SnIFfIcrp70g==}
@@ -27674,8 +27649,6 @@ snapshots:
 
   lodash.camelcase@4.3.0: {}
 
-  lodash.clonedeep@4.5.0: {}
-
   lodash.debounce@4.0.8: {}
 
   lodash.defaults@4.2.0: {}
@@ -31224,13 +31197,6 @@ snapshots:
       - supports-color
 
   stylis@4.2.0: {}
-
-  superjson@1.9.0-0:
-    dependencies:
-      debug: 4.4.3(supports-color@5.5.0)
-      lodash.clonedeep: 4.5.0
-    transitivePeerDependencies:
-      - supports-color
 
   supports-color@2.0.0: {}
 
