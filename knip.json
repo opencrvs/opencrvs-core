@@ -6,5 +6,10 @@
     "packages/client/src/forms/register/mappings/**/*.ts",
     "packages/client/src/utils/validate.ts",
     "packages/events/src/storage/postgres/events/schema/**/*.ts"
-  ]
+  ],
+  "workspaces": {
+    "packages/toolkit": {
+      "entry": ["src/configurator/ui/main.tsx"]
+    }
+  }
 }

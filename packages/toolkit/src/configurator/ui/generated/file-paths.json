@@ -1,0 +1,357 @@
+{
+  "charts-values/dependencies/values.yaml": {
+    "backup_enabled": [
+      {
+        "segments": [
+          "backup",
+          "enabled"
+        ]
+      }
+    ],
+    "backup_host": [
+      {
+        "segments": [
+          "backup",
+          "host"
+        ]
+      }
+    ],
+    "backup_type": [
+      {
+        "segments": [
+          "rustfs",
+          "backup",
+          "type"
+        ]
+      },
+      {
+        "segments": [
+          "postgres",
+          "backup",
+          "type"
+        ]
+      }
+    ],
+    "elasticsearch_enabled": [
+      {
+        "segments": [
+          "elasticsearch",
+          "enabled"
+        ]
+      }
+    ],
+    "elasticsearch_host": [
+      {
+        "segments": [
+          "elasticsearch",
+          "host"
+        ]
+      }
+    ],
+    "env": [
+      {
+        "segments": [
+          "network_policy",
+          "allowed_namespaces",
+          "0"
+        ],
+        "prefix": "opencrvs-"
+      },
+      {
+        "segments": [
+          "backup",
+          "backup_server_dir"
+        ],
+        "prefix": "/home/backup/"
+      }
+    ],
+    "monitoring_enabled": [
+      {
+        "segments": [
+          "monitoring",
+          "enabled"
+        ]
+      }
+    ],
+    "postgres_enabled": [
+      {
+        "segments": [
+          "postgres",
+          "enabled"
+        ]
+      }
+    ],
+    "redis_enabled": [
+      {
+        "segments": [
+          "redis",
+          "enabled"
+        ]
+      }
+    ],
+    "restore_enabled": [
+      {
+        "segments": [
+          "restore",
+          "enabled"
+        ]
+      }
+    ],
+    "restore_environment_name": [
+      {
+        "segments": [
+          "restore",
+          "backup_server_dir"
+        ],
+        "prefix": "/home/backup/"
+      }
+    ],
+    "restore_host": [
+      {
+        "segments": [
+          "restore",
+          "host"
+        ]
+      }
+    ],
+    "restore_type": [
+      {
+        "segments": [
+          "rustfs",
+          "restore",
+          "type"
+        ]
+      },
+      {
+        "segments": [
+          "postgres",
+          "restore",
+          "type"
+        ]
+      }
+    ],
+    "rustfs_enabled": [
+      {
+        "segments": [
+          "rustfs",
+          "enabled"
+        ]
+      }
+    ]
+  },
+  "charts-values/opencrvs-services/values.yaml": {
+    "elasticsearch_host": [
+      {
+        "segments": [
+          "elasticsearch",
+          "host"
+        ]
+      }
+    ],
+    "env": [
+      {
+        "segments": [
+          "network_policy",
+          "allowed_namespaces",
+          "0"
+        ],
+        "prefix": "opencrvs-deps-"
+      },
+      {
+        "segments": [
+          "otel",
+          "deployment_environment"
+        ]
+      }
+    ],
+    "environment_type": [
+      {
+        "segments": [
+          "environment_type"
+        ]
+      }
+    ],
+    "exporter_otlp_endpoint": [
+      {
+        "segments": [
+          "otel",
+          "exporter_otlp_endpoint"
+        ]
+      }
+    ],
+    "opencrvs_environment": [
+      {
+        "segments": [
+          "env",
+          "OPENCRVS_ENVIRONMENT"
+        ]
+      }
+    ],
+    "otel_enabled": [
+      {
+        "segments": [
+          "otel",
+          "enabled"
+        ]
+      }
+    ],
+    "postgres_host": [
+      {
+        "segments": [
+          "postgres",
+          "host"
+        ]
+      }
+    ],
+    "redis_host": [
+      {
+        "segments": [
+          "redis",
+          "host"
+        ]
+      }
+    ],
+    "restore_enabled": [
+      {
+        "segments": [
+          "on_restore_cronjob",
+          "enabled"
+        ]
+      }
+    ],
+    "s3_host": [
+      {
+        "segments": [
+          "s3",
+          "host"
+        ]
+      }
+    ],
+    "two_fa_enabled": [
+      {
+        "segments": [
+          "auth",
+          "env",
+          "TWO_FA_ENABLED"
+        ]
+      },
+      {
+        "segments": [
+          "events",
+          "env",
+          "TWO_FA_ENABLED"
+        ]
+      }
+    ]
+  },
+  "charts-values/traefik/values.yaml": {
+    "env": [
+      {
+        "segments": [
+          "tracing",
+          "resourceAttributes",
+          "deployment.environment.name"
+        ]
+      }
+    ],
+    "otel_collector_endpoint": [
+      {
+        "segments": [
+          "tracing",
+          "otlp",
+          "grpc",
+          "endpoint"
+        ]
+      }
+    ]
+  },
+  "inventory/inventory.template.yml": {
+    "backup_host": [
+      {
+        "segments": [
+          "all",
+          "children",
+          "backup",
+          "hosts",
+          "backup0",
+          "ansible_host"
+        ]
+      }
+    ],
+    "kube_api_host": [
+      {
+        "segments": [
+          "all",
+          "vars",
+          "kube_api_host"
+        ]
+      }
+    ],
+    "kube_worker_nodes": [
+      {
+        "segments": [
+          "all",
+          "children",
+          "workers",
+          "hosts",
+          "*",
+          "ansible_host"
+        ]
+      }
+    ],
+    "single_node": [
+      {
+        "segments": [
+          "all",
+          "vars",
+          "single_node"
+        ]
+      }
+    ],
+    "users.name": [
+      {
+        "segments": [
+          "all",
+          "vars",
+          "users",
+          "*",
+          "name"
+        ]
+      }
+    ],
+    "users.role": [
+      {
+        "segments": [
+          "all",
+          "vars",
+          "users",
+          "*",
+          "role"
+        ]
+      }
+    ],
+    "users.ssh_keys": [
+      {
+        "segments": [
+          "all",
+          "vars",
+          "users",
+          "*",
+          "ssh_keys",
+          "*"
+        ]
+      }
+    ],
+    "users.state": [
+      {
+        "segments": [
+          "all",
+          "vars",
+          "users",
+          "*",
+          "state"
+        ]
+      }
+    ]
+  }
+}
