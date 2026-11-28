@@ -63,7 +63,6 @@ export type RecordScopeTypeV2 = z.infer<typeof RecordScopeTypeV2>
 const PlainScopeType = z.enum([
   // Misc. system scopes
   'bypassratelimit',
-  'record.reindex',
   'user.data-seeding',
   'integration.create',
   // Reading an integration's audit log. Deliberately separate from

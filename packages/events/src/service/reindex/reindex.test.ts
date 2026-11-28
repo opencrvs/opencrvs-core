@@ -10,8 +10,8 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { TRPCError } from '@trpc/server'
-import { http, HttpResponse, HttpResponseInit } from 'msw'
+import { inject } from 'vitest'
+import { http, HttpResponse } from 'msw'
 import {
   ActionStatus,
   ActionType,
@@ -22,21 +22,13 @@ import {
   generateUuid,
   getUUID,
   INITIAL_EVENT_CONFIG_VERSION_ID,
-  TENNIS_CLUB_MEMBERSHIP,
-  TokenUserType,
-  encodeScope
+  TENNIS_CLUB_MEMBERSHIP
 } from '@opencrvs/commons'
 import {
   tennisClubMembershipEvent,
   versionedTennisClubMembershipEvent
 } from '@opencrvs/commons/fixtures'
-import {
-  createSystemTestClient,
-  createTestToken,
-  REINDEX_SYSTEM_ID,
-  setupTestCase,
-  TEST_SYSTEM_ID
-} from '@events/tests/utils'
+import { setupTestCase } from '@events/tests/utils'
 import {
   getEventAliasName,
   getEventIndexName,
@@ -46,42 +38,16 @@ import {
 import { mswServer } from '@events/tests/msw'
 import { env } from '@events/environment'
 import { runReindex } from '@events/service/reindex'
+import {
+  ReindexAlreadyRunningError,
+  withReindexLock
+} from '@events/service/reindex/lock'
+import { getReindexingStatusHistory } from '@events/service/reindex/status'
 import { cleanupOrphanedIndices } from '@events/service/reindex/indexing'
 import { getLocations } from '@events/storage/postgres/administrative-hierarchy/locations'
 import { getClient } from '@events/storage/postgres/events'
 import * as elasticsearchMocks from '@events/storage/__mocks__/elasticsearch'
 import { getEventIndexName as getEventIndexNameMock } from '@events/storage/__mocks__/elasticsearch'
-
-// Mock reindex endpoint so there are no side effects
-vi.mock('@events/service/reindex', async (importOriginal) => {
-  const actual =
-    await importOriginal<typeof import('@events/service/reindex')>()
-  return {
-    ...actual,
-    reindex: vi.fn().mockResolvedValue(undefined)
-  }
-})
-
-const spy = vi.fn()
-
-const postHandler = http.post(
-  `${env.COUNTRY_CONFIG_URL}/reindex`,
-  async (req) => {
-    const body = await req.request.json()
-    spy(body)
-
-    return HttpResponse.json({})
-  }
-)
-
-const silentPostHandler = http.post(`${env.COUNTRY_CONFIG_URL}/reindex`, () =>
-  HttpResponse.json({})
-)
-
-const failingPostHandler = http.post(
-  `${env.COUNTRY_CONFIG_URL}/reindex`,
-  () => new HttpResponse(null, { status: 500 } as HttpResponseInit)
-)
 
 // Mock getEventConfigurations to return a single event config
 const singleEventConfigHandler = http.get(
@@ -89,18 +55,46 @@ const singleEventConfigHandler = http.get(
   () => HttpResponse.json([versionedTennisClubMembershipEvent])
 )
 
-const reindexToken = createTestToken({
-  userId: REINDEX_SYSTEM_ID,
-  scopes: [encodeScope({ type: 'record.reindex' })],
-  role: 'TEST_SYSTEM_ROLE',
-  userType: TokenUserType.enum.system
-})
+async function insertUnreadableEvent(event: EventDocument) {
+  // An event without actions cannot be turned into a document
+  return getClient()
+    .insertInto('events')
+    .values({
+      eventType: event.type,
+      transactionId: getUUID(),
+      trackingId: getUUID(),
+      createdAt: event.createdAt,
+      updatedAt: event.updatedAt,
+      configVersionId: event.configVersionId
+    })
+    .returning('id')
+    .executeTakeFirstOrThrow()
+}
+
+async function getLiveAndTemporaryIndices() {
+  const esClient = getOrCreateClient()
+  const aliasInfo = await esClient.indices.getAlias({
+    name: getEventAliasName()
+  })
+  const [liveIndex] = Object.keys(aliasInfo)
+  const allIndexes = (await esClient.cat.indices({ format: 'json' })) as {
+    index: string
+  }[]
+  const temporaryIndices = allIndexes
+    .map(({ index }) => index)
+    .filter(
+      (index) =>
+        index.startsWith(getEventAliasName()) &&
+        /_\d+$/.test(index) &&
+        index !== liveIndex
+    )
+  return { liveIndex, temporaryIndices }
+}
 
 let event: EventDocument
 let rngNumber = 949
 beforeEach(async () => {
-  mswServer.use(singleEventConfigHandler, silentPostHandler)
-  spy.mockReset()
+  mswServer.use(singleEventConfigHandler)
   const { user, eventsDb, seed } = await setupTestCase()
 
   const rng = createPrng(rngNumber)
@@ -232,25 +226,8 @@ beforeEach(async () => {
     .execute()
 })
 
-test(`prevents forbidden access if missing required scope`, async () => {
-  const client = createSystemTestClient(TEST_SYSTEM_ID, [])
-
-  await expect(client.event.reindex.trigger()).rejects.toMatchObject(
-    new TRPCError({ code: 'FORBIDDEN' })
-  )
-})
-
-test('allows access with reindex scope', async () => {
-  const client = createSystemTestClient(TEST_SYSTEM_ID, [
-    encodeScope({ type: 'record.reindex' })
-  ])
-
-  await expect(client.event.reindex.trigger()).resolves.not.toThrow()
-})
-
 test('reindexing indexes all events into Elasticsearch', async () => {
-  mswServer.use(postHandler)
-  await runReindex(reindexToken)
+  await runReindex()
 
   const esClient = getOrCreateClient()
 
@@ -269,15 +246,14 @@ test('reindexing indexes all events into Elasticsearch', async () => {
     }
   })
 
-  expect(spy.mock.calls[0]).toHaveLength(1)
   // Does not reindex draftDocument - thus only one record is indexed
   expect(body.hits.hits).toHaveLength(1)
 })
 
 test('reindexing twice', async () => {
-  await runReindex(reindexToken)
-  await runReindex(reindexToken)
-  await runReindex(reindexToken)
+  await runReindex()
+  await runReindex()
+  await runReindex()
 
   const esClient = getOrCreateClient()
 
@@ -293,8 +269,6 @@ test('reindexing twice', async () => {
       }
     }
   })
-
-  expect(postHandler.isUsed).toBe(true)
 
   // Does not reindex draftDocument - thus only one record is indexed
   expect(body.hits.hits).toHaveLength(1)
@@ -319,7 +293,7 @@ test('reindex given original concrete index of a version is replaced by a timest
 
   expect(indicesPointingToAlias).toContain(liveIndexName)
 
-  await runReindex(reindexToken)
+  await runReindex()
 
   const indicesPointingToAliasAfter = Object.keys(
     await esClient.indices.getAlias({
@@ -365,7 +339,7 @@ test('reindex given first-reindex and concrete index of a version conflicts with
   expect(isConcreteBefore).toBe(true)
   expect(isAliasBefore).toBe(false)
 
-  await runReindex(reindexToken)
+  await runReindex()
 
   // After reindex the write alias must exist and point to a timestamped index
   const isAliasAfter = await esClient.indices.existsAlias({
@@ -389,7 +363,7 @@ test('reindex given first-reindex and concrete index of a version conflicts with
 test('reindex data is searchable via alias immediately after alias swap', async () => {
   const esClient = getOrCreateClient()
 
-  await runReindex(reindexToken)
+  await runReindex()
 
   await esClient.indices.refresh({ index: getEventAliasName() })
 
@@ -405,50 +379,30 @@ test('reindex data is searchable via alias immediately after alias swap', async 
   )
 })
 
-test('reindex on country config failure, temp index is cleaned up and no orphaned indexes remain', async () => {
-  await runReindex(reindexToken)
+test('runReindex sends no request other than reading the event configurations', async () => {
+  const requests: string[] = []
+  const onRequest = ({ request }: { request: Request }) => {
+    if (!request.url.includes(inject('ELASTICSEARCH_URI'))) {
+      requests.push(`${request.method} ${request.url}`)
+    }
+  }
+  mswServer.events.on('request:start', onRequest)
 
-  const esClient = getOrCreateClient()
+  try {
+    await runReindex()
+  } finally {
+    mswServer.events.removeListener('request:start', onRequest)
+  }
 
-  const aliasInfoBefore = await esClient.indices.getAlias({
-    name: getEventAliasName()
-  })
-  const liveIndexBefore = Object.keys(aliasInfoBefore)[0]
-
-  // Simulate a failure on the next reindex
-  mswServer.use(failingPostHandler)
-
-  await runReindex(reindexToken).catch(() => {
-    // Swallow the error to complete the test
-  })
-
-  // The alias must still point to the same index as before (live index untouched)
-  const aliasInfoAfter = await esClient.indices.getAlias({
-    name: getEventAliasName()
-  })
-  const liveIndexAfter = Object.keys(aliasInfoAfter)[0]
-  expect(liveIndexAfter).toEqual(liveIndexBefore)
-
-  // There must be no orphaned temporary indexes l
-  const aliasPrefix = getEventAliasName()
-  const allIndexes = await esClient.cat.indices({ format: 'json' })
-  const tempIndexes = (allIndexes as { index: string }[]).filter(
-    ({ index }) =>
-      index.startsWith(aliasPrefix) &&
-      /_\d+$/.test(index) &&
-      index !== liveIndexAfter
-  )
-  expect(tempIndexes).toHaveLength(0)
+  for (const request of requests) {
+    expect(request).toBe(`GET ${env.COUNTRY_CONFIG_URL}/config/events`)
+  }
 })
 
 test('runReindex records completed status in reindexing_status index', async () => {
-  mswServer.use(postHandler)
-  await runReindex(reindexToken)
+  await runReindex()
 
-  const client = createSystemTestClient(REINDEX_SYSTEM_ID, [
-    encodeScope({ type: 'record.reindex' })
-  ])
-  const history = await client.event.reindex.status()
+  const history = await getReindexingStatusHistory()
 
   expect(history).toHaveLength(1)
   expect(history[0].status).toBe('completed')
@@ -457,96 +411,70 @@ test('runReindex records completed status in reindexing_status index', async () 
   expect(history[0].progress.processed).toBeGreaterThanOrEqual(0)
 })
 
-test('runReindex skips events that cannot be read and reports them in its status', async () => {
-  mswServer.use(postHandler)
+test('runReindex fails when a record cannot be read, and keeps the live index', async () => {
+  await runReindex()
+  const before = await getLiveAndTemporaryIndices()
 
-  // An event without actions cannot be turned into a document
-  const unreadable = await getClient()
-    .insertInto('events')
-    .values({
-      eventType: event.type,
-      transactionId: getUUID(),
-      trackingId: getUUID(),
-      createdAt: event.createdAt,
-      updatedAt: event.updatedAt,
-      configVersionId: event.configVersionId
-    })
-    .returning('id')
-    .executeTakeFirstOrThrow()
+  await insertUnreadableEvent(event)
 
-  await runReindex(reindexToken)
+  await expect(runReindex()).rejects.toThrow()
 
-  const client = createSystemTestClient(REINDEX_SYSTEM_ID, [
-    encodeScope({ type: 'record.reindex' })
-  ])
-  const history = await client.event.reindex.status()
+  const after = await getLiveAndTemporaryIndices()
+  expect(after.liveIndex).toEqual(before.liveIndex)
+  expect(after.temporaryIndices).toHaveLength(0)
 
-  expect(history[0].status).toBe('completed')
-  // The rest of the chunk is still indexed, the draft is filtered out
-  expect(history[0].progress.processed).toBe(1)
-  expect(history[0].progress.skipped).toBe(1)
-  expect(history[0].progress.errors).toHaveLength(1)
-  expect(history[0].progress.errors[0]).toContain(unreadable.id)
+  const [latest] = await getReindexingStatusHistory()
+  expect(latest.status).toBe('failed')
+  expect(latest.error_message).toBeTruthy()
+  expect(latest.completed_at).not.toBeNull()
 })
 
 test('runReindex fails when an event is stamped with a version that is not configured', async () => {
-  mswServer.use(postHandler)
-
   await getClient()
     .updateTable('events')
     .set({ configVersionId: 'v9' })
     .where('trackingId', '=', event.trackingId)
     .execute()
 
-  await expect(runReindex(reindexToken)).rejects.toThrow(
+  await expect(runReindex()).rejects.toThrow(
     `Event '${TENNIS_CLUB_MEMBERSHIP}' has no version 'v9'`
   )
 
-  const client = createSystemTestClient(REINDEX_SYSTEM_ID, [
-    encodeScope({ type: 'record.reindex' })
-  ])
-  const history = await client.event.reindex.status()
-
-  expect(history[0].status).toBe('failed')
-})
-
-test('runReindex fails when no event in a chunk can be read', async () => {
-  mswServer.use(postHandler)
-
-  await getClient().deleteFrom('eventActions').execute()
-
-  await expect(runReindex(reindexToken)).rejects.toThrow()
-
-  const client = createSystemTestClient(REINDEX_SYSTEM_ID, [
-    encodeScope({ type: 'record.reindex' })
-  ])
-  const history = await client.event.reindex.status()
-
-  expect(history[0].status).toBe('failed')
-})
-
-test('runReindex records failed status when country config returns 500', async () => {
-  mswServer.use(failingPostHandler)
-
-  await runReindex(reindexToken).catch(() => {
-    // Swallow the error — we only want to inspect status
-  })
-
-  const client = createSystemTestClient(REINDEX_SYSTEM_ID, [
-    encodeScope({ type: 'record.reindex' })
-  ])
-  const history = await client.event.reindex.status()
+  const history = await getReindexingStatusHistory()
 
   expect(history).toHaveLength(1)
   expect(history[0].status).toBe('failed')
-  expect(history[0].error_message).toBeTruthy()
-  expect(history[0].completed_at).not.toBeNull()
+})
+
+test('a second reindex that starts while one runs fails and does not change the indices', async () => {
+  await runReindex()
+  const before = await getLiveAndTemporaryIndices()
+  const historyBefore = await getReindexingStatusHistory()
+
+  const second = vi.fn(async () => runReindex())
+  await withReindexLock(async () => {
+    await expect(withReindexLock(second)).rejects.toThrow(
+      ReindexAlreadyRunningError
+    )
+  })
+
+  expect(second).not.toHaveBeenCalled()
+  expect(await getLiveAndTemporaryIndices()).toEqual(before)
+  expect(await getReindexingStatusHistory()).toEqual(historyBefore)
+})
+
+test('the reindex lock is free again after a reindex fails', async () => {
+  await expect(
+    withReindexLock(async () => Promise.reject(new Error('simulated failure')))
+  ).rejects.toThrow('simulated failure')
+
+  await expect(withReindexLock(async () => runReindex())).resolves.not.toThrow()
 })
 
 test('reindex per-version write alias is re-pointed on every subsequent reindex', async () => {
   const esClient = getOrCreateClient()
 
-  await runReindex(reindexToken)
+  await runReindex()
 
   const writeAliasName = getEventVersionIndexName(
     TENNIS_CLUB_MEMBERSHIP,
@@ -558,7 +486,7 @@ test('reindex per-version write alias is re-pointed on every subsequent reindex'
   const indexAfterFirst = Object.keys(aliasAfterFirst)[0]
 
   // Second reindex — the write alias must point to the new index
-  await runReindex(reindexToken)
+  await runReindex()
 
   const aliasAfterSecond = await esClient.indices.getAlias({
     name: writeAliasName
@@ -587,14 +515,14 @@ test('reindex deletes the index of a version that was removed from the config', 
       ])
     )
   )
-  await runReindex(reindexToken)
+  await runReindex()
   const [v2Index] = Object.keys(
     await esClient.indices.getAlias({ name: v2Name })
   )
 
   // v2 never took effect, so no record uses it and it can be removed.
   mswServer.use(singleEventConfigHandler)
-  await runReindex(reindexToken)
+  await runReindex()
 
   expect(await esClient.indices.exists({ index: v2Index })).toBe(false)
 
@@ -618,16 +546,13 @@ test('does not stop runReindex when the cleanup itself fails', async () => {
     .spyOn(esClient.indices, 'getAlias')
     .mockRejectedValueOnce(new Error('simulated getAlias failure'))
 
-  await expect(runReindex(reindexToken)).resolves.not.toThrow()
+  await expect(runReindex()).resolves.not.toThrow()
   expect(getAliasSpy).toHaveBeenCalled()
 
   getAliasSpy.mockRestore()
   clientSpy.mockRestore()
 
-  const client = createSystemTestClient(REINDEX_SYSTEM_ID, [
-    encodeScope({ type: 'record.reindex' })
-  ])
-  const history = await client.event.reindex.status()
+  const history = await getReindexingStatusHistory()
   expect(history[0].status).toBe('completed')
 })
 

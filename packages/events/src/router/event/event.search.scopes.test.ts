@@ -37,6 +37,7 @@ import {
   TEST_USER_DEFAULT_SCOPES
 } from '@events/tests/utils'
 import { mswServer } from '@events/tests/msw'
+import { runReindex } from '@events/service/reindex'
 import {
   payloadGenerator,
   setupHierarchyWithUsers
@@ -875,20 +876,7 @@ test('For users in locations directly under country "administrativeArea" and "al
   expect(events.length).toEqual(sampleSize)
 
   // 3. Index the events to elasticsearch. Tests would timeout when creating >12 registered events
-  const spy = vi.fn()
-  mswServer.use(
-    http.post(`${env.COUNTRY_CONFIG_URL}/reindex`, async (req) => {
-      const body = await req.request.json()
-      spy(body)
-
-      return HttpResponse.json({})
-    })
-  )
-  const reindexClient = createTestClient(users[0], [
-    encodeScope({ type: 'record.reindex' })
-  ])
-
-  await expect(reindexClient.event.reindex.trigger()).resolves.not.toThrow()
+  await expect(runReindex()).resolves.not.toThrow()
 
   const esClient = getOrCreateClient()
 

@@ -365,7 +365,6 @@ export const userScopes = {
     encodeScope({ type: 'performance.read' }),
     encodeScope({ type: 'performance.read-dashboards' }),
     encodeScope({ type: 'performance.vital-statistics-export' }),
-    encodeScope({ type: 'record.reindex' }),
     encodeScope({
       type: 'user.create',
       options: {

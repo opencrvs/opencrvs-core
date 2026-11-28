@@ -8,10 +8,8 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import fetch from 'node-fetch'
-import { getUUID, logger, TokenWithBearer, UUID } from '@opencrvs/commons'
+import { getUUID, logger, UUID } from '@opencrvs/commons'
 import { EventDocument, VersionedEventConfig } from '@opencrvs/commons/events'
-import { env } from '@events/environment'
 
 import {
   getEventsByIdsInTrx,
@@ -39,31 +37,6 @@ const REINDEX_CONCURRENCY = 4
 
 const PROGRESS_WRITE_INTERVAL_MS = 2000
 
-async function reindexBatchToCountryConfig(
-  token: TokenWithBearer,
-  batch: EventDocument[]
-): Promise<void> {
-  const start = new Date()
-
-  const response = await fetch(new URL('/reindex', env.COUNTRY_CONFIG_URL), {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      Authorization: token
-    },
-    body: JSON.stringify(batch)
-  })
-  const batchId = batch[0]?.id ?? 'unknown'
-  logger.info(
-    `Batch ${batchId}: Reindex batch to country config took ${new Date().valueOf() - start.valueOf()} ms`
-  )
-  if (!response.ok) {
-    throw new Error(
-      `Failed to reindex country config batch: ${response.status} ${response.statusText}`
-    )
-  }
-}
-
 async function withRetry<T>(fn: () => Promise<T>): Promise<T> {
   let retries = 0
   const maxRetries = 5
@@ -84,42 +57,10 @@ async function withRetry<T>(fn: () => Promise<T>): Promise<T> {
   throw new Error(`Max retries exceeded. This should never happen`)
 }
 
-interface SkippedEvent {
-  id: UUID
-  error: string
-}
-
-/*
- * Splits a chunk that cannot be read in half until only the records that fail
- * on their own are left, so the rest of the chunk can still be indexed.
- */
-async function fetchReadableEvents(
-  ids: UUID[]
-): Promise<{ events: EventDocument[]; skipped: SkippedEvent[] }> {
-  try {
-    return { events: await getEventsByIdsInTrx(getClient(), ids), skipped: [] }
-  } catch (err) {
-    if (ids.length === 1) {
-      const error = err instanceof Error ? err.message : String(err)
-      return { events: [], skipped: [{ id: ids[0], error }] }
-    }
-
-    const middle = Math.ceil(ids.length / 2)
-    const first = await fetchReadableEvents(ids.slice(0, middle))
-    const second = await fetchReadableEvents(ids.slice(middle))
-    return {
-      events: [...first.events, ...second.events],
-      skipped: [...first.skipped, ...second.skipped]
-    }
-  }
-}
-
 async function reindexSearch(
   timestamp: number,
-  token: TokenWithBearer,
   configurations: VersionedEventConfig[],
-  onBatchProcessed?: (count: number) => Promise<void>,
-  onEventsSkipped?: (skipped: SkippedEvent[]) => void
+  onBatchProcessed?: (count: number) => Promise<void>
 ) {
   const getTemporaryIndexOf = (event: EventDocument) =>
     getTemporaryVersionIndexName(event.type, event.configVersionId, timestamp)
@@ -127,32 +68,9 @@ async function reindexSearch(
   const inFlight = new Set<Promise<void>>()
   let failure: Error | undefined
 
-  /*
-   * Records that still cannot be read after retrying are skipped, so one bad
-   * record does not fail the whole reindex. The skip is reported in the run's
-   * progress, so the records can be fixed and reindexed.
-   */
+  // A record that cannot be read fails the reindex, so search never silently misses it.
   async function fetchEvents(ids: UUID[]): Promise<EventDocument[]> {
-    try {
-      return await withRetry(async () => getEventsByIdsInTrx(getClient(), ids))
-    } catch (err) {
-      const { events, skipped } = await fetchReadableEvents(ids)
-
-      // Every record failing on its own points at the database, not the data
-      if (skipped.length === ids.length) {
-        throw err
-      }
-
-      for (const { id, error } of skipped) {
-        logger.error({
-          message: 'Skipping event that could not be read',
-          eventId: id,
-          error
-        })
-      }
-      onEventsSkipped?.(skipped)
-      return events
-    }
+    return withRetry(async () => getEventsByIdsInTrx(getClient(), ids))
   }
 
   async function writeBatch(batch: EventDocument[]) {
@@ -166,12 +84,9 @@ async function reindexSearch(
     const batchId = batch[0]?.id ?? 'unknown'
     logger.info(`Batch ${batchId}: ${batch.length} events to index`)
 
-    await Promise.all([
-      withRetry(async () =>
-        indexEventsInBulk(batch, configurations, getTemporaryIndexOf)
-      ),
-      withRetry(async () => reindexBatchToCountryConfig(token, batch))
-    ])
+    await withRetry(async () =>
+      indexEventsInBulk(batch, configurations, getTemporaryIndexOf)
+    )
 
     await onBatchProcessed?.(batch.length)
     logger.info(
@@ -181,7 +96,7 @@ async function reindexSearch(
 
   /*
    * Starts each batch without waiting for it, so the next batch can be read from
-   * Postgres while this one is written to Elasticsearch and country config.
+   * Postgres while this one is written to Elasticsearch.
    * Only blocks once REINDEX_CONCURRENCY batches are already in flight.
    */
   try {
@@ -216,17 +131,11 @@ async function reindexSearch(
   }
 }
 
-export async function runReindex(token: TokenWithBearer) {
-  const start = new Date()
-  const timestamp = start.valueOf()
-  const runId = getUUID()
-  const startTimestamp = start.toISOString()
-
-  await createReindexingStatusEntry(runId, startTimestamp)
-
-  const versionedConfigurations =
-    await getInMemoryVersionedEventConfigurations()
-
+async function buildTemporaryIndices(
+  runId: UUID,
+  timestamp: number,
+  versionedConfigurations: VersionedEventConfig[]
+) {
   // Best-effort: leftover orphans are retried on the next run.
   await cleanupOrphanedIndices(versionedConfigurations).catch((err) =>
     logger.error('Failed to clean up orphaned indices', err)
@@ -235,7 +144,7 @@ export async function runReindex(token: TokenWithBearer) {
   /*
    * Create temporary indices for every version of all event types
    */
-  const temporaryIndicesByEvent = await Promise.all(
+  await Promise.all(
     versionedConfigurations.map(async (configuration) => {
       const indexNamesWithTimestamp = await prepareTemporaryIndices(
         configuration,
@@ -244,92 +153,97 @@ export async function runReindex(token: TokenWithBearer) {
       logger.info(
         `Prepared temporary indices ${indexNamesWithTimestamp.join(', ')} for event type ${configuration.id}`
       )
-      return indexNamesWithTimestamp
     })
   )
-  const temporaryIndices = temporaryIndicesByEvent.flat()
   const startSecond = Math.floor(Date.now() / 1000)
   const processedCounts: number[] = []
   let totalProcessed = 0
-  const skippedEvents: SkippedEvent[] = []
   let lastProgressWriteAt = 0
 
-  function getProgress() {
-    return {
-      processed: totalProcessed,
-      skipped: skippedEvents.length,
-      errors: skippedEvents.map(({ id, error }) => `${id}: ${error}`)
-    }
-  }
-
-  function onEventsSkipped(skipped: SkippedEvent[]) {
-    skippedEvents.push(...skipped)
-  }
-
-  try {
-    await reindexSearch(
-      timestamp,
-      token,
-      versionedConfigurations,
-      async (batchSize) => {
-        const currentSecond = Math.floor(Date.now() / 1000) - startSecond
-        const processedThisSecond = processedCounts[currentSecond] || 0
-        processedCounts[currentSecond] = processedThisSecond + batchSize
-        totalProcessed += batchSize
-        const perSecond =
-          processedCounts.slice(-6, -1).reduce((m, x) => m + x, 0) / 5
-        logger.info(
-          `Reindex total records processed: ${totalProcessed}. Per second: ${Math.round(perSecond)}`
-        )
-
-        /*
-         * Batches complete concurrently, and the status document is a single
-         * document, so writing it per batch makes Elasticsearch reject the
-         * interleaved updates with a version conflict. Claiming the window before
-         * the await lets exactly one caller through, and the final count is
-         * written once every batch has been processed.
-         */
-        const now = Date.now()
-        if (now - lastProgressWriteAt < PROGRESS_WRITE_INTERVAL_MS) {
-          return
-        }
-        lastProgressWriteAt = now
-        await updateReindexingProgress(runId, getProgress())
-      },
-      onEventsSkipped
+  await reindexSearch(timestamp, versionedConfigurations, async (batchSize) => {
+    const currentSecond = Math.floor(Date.now() / 1000) - startSecond
+    const processedThisSecond = processedCounts[currentSecond] || 0
+    processedCounts[currentSecond] = processedThisSecond + batchSize
+    totalProcessed += batchSize
+    const perSecond =
+      processedCounts.slice(-6, -1).reduce((m, x) => m + x, 0) / 5
+    logger.info(
+      `Reindex total records processed: ${totalProcessed}. Per second: ${Math.round(perSecond)}`
     )
+
+    /*
+     * Batches complete concurrently, and the status document is a single
+     * document, so writing it per batch makes Elasticsearch reject the
+     * interleaved updates with a version conflict. Claiming the window before
+     * the await lets exactly one caller through, and the final count is
+     * written once every batch has been processed.
+     */
+    const now = Date.now()
+    if (now - lastProgressWriteAt < PROGRESS_WRITE_INTERVAL_MS) {
+      return
+    }
+    lastProgressWriteAt = now
+    await updateReindexingProgress(runId, { processed: totalProcessed })
+  })
+  await updateReindexingProgress(runId, { processed: totalProcessed })
+
+  return totalProcessed
+}
+
+async function cleanupTemporaryIndices(
+  timestamp: number,
+  versionedConfigurations: VersionedEventConfig[]
+) {
+  const temporaryIndices = versionedConfigurations.flatMap((configuration) =>
+    configuration.versions.map(({ id }) =>
+      getTemporaryVersionIndexName(configuration.id, id, timestamp)
+    )
+  )
+  for (const tempIndexName of temporaryIndices) {
+    await cleanupTemporaryIndex(tempIndexName).catch((cleanupErr) => {
+      logger.error(
+        `Failed to clean up temporary index ${tempIndexName}`,
+        cleanupErr
+      )
+    })
+  }
+}
+
+export async function runReindex() {
+  const start = new Date()
+  const timestamp = start.valueOf()
+  const runId = getUUID()
+
+  await createReindexingStatusEntry(runId, start.toISOString())
+
+  let versionedConfigurations: VersionedEventConfig[] = []
+  // The temporary indices are only safe to delete before an alias moves to them.
+  let aliasesMoved = false
+  try {
+    versionedConfigurations = await getInMemoryVersionedEventConfigurations()
+    const totalProcessed = await buildTemporaryIndices(
+      runId,
+      timestamp,
+      versionedConfigurations
+    )
+
+    aliasesMoved = true
+    await Promise.all(
+      versionedConfigurations.map(async (config) =>
+        finaliseReindexIndices(config, timestamp)
+      )
+    )
+
+    await completeReindexingStatus(runId, new Date().toISOString())
+    logger.info(`Reindex completed. Total records indexed: ${totalProcessed}`)
   } catch (err) {
-    logger.error('Reindex failed, cleaning up temporary indexes', err)
+    logger.error('Reindex failed', err)
     const errorMessage = err instanceof Error ? err.message : String(err)
     await failReindexingStatus(runId, errorMessage, new Date().toISOString())
-    for (const tempIndexName of temporaryIndices) {
-      await cleanupTemporaryIndex(tempIndexName).catch((cleanupErr) => {
-        logger.error(
-          `Failed to clean up temporary index ${tempIndexName}`,
-          cleanupErr
-        )
-      })
+    if (!aliasesMoved) {
+      await cleanupTemporaryIndices(timestamp, versionedConfigurations)
     }
     throw err
   }
-  await updateReindexingProgress(runId, getProgress())
-  if (skippedEvents.length > 0) {
-    logger.error(
-      `Reindex skipped ${skippedEvents.length} records that could not be read`
-    )
-  }
-
-  await Promise.all(
-    versionedConfigurations.map(async (config) =>
-      finaliseReindexIndices(config, timestamp)
-    )
-  )
-
-  await completeReindexingStatus(runId, new Date().toISOString())
   await pruneOldReindexingStatusEntries()
-}
-
-export async function reindex(token: TokenWithBearer) {
-  logger.info('Reindex started in background')
-  return runReindex(token)
 }

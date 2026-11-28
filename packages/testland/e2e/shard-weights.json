@@ -117,7 +117,6 @@
   "events-rest-api/events-locations.spec.ts": 19008,
   "events-rest-api/events-notify.spec.ts": 187452,
   "events-rest-api/events-search.spec.ts": 1234,
-  "events-rest-api/reindex.spec.ts": 5712,
   "form-state/esignet-link-button.spec.ts": 21519,
   "form-state/esignet-psut-persistence.spec.ts": 42686,
   "form-state/form-state.spec.ts": 160182,

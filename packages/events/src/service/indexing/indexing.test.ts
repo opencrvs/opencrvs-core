@@ -38,10 +38,8 @@ import {
 import { encodeScope, toVersionedEventConfig } from '@opencrvs/commons'
 import {
   createEvent,
-  createSystemTestClient,
   createTestClient,
   setupTestCase,
-  TEST_SYSTEM_ID,
   TEST_USER_DEFAULT_SCOPES
 } from '@events/tests/utils'
 import {
@@ -49,6 +47,7 @@ import {
   getOrCreateClient
 } from '@events/storage/elasticsearch'
 import { mswServer } from '@events/tests/msw'
+import { runReindex } from '@events/service/reindex'
 import { env } from '@events/environment'
 import {
   buildElasticQueryFromSearchPayload,
@@ -1467,8 +1466,7 @@ describe('placeOfEvent location hierarchy handling', () => {
         options: {
           event: [TENNIS_CLUB_MEMBERSHIP]
         }
-      }),
-      encodeScope({ type: 'record.reindex' })
+      })
     ])
     esClient = getOrCreateClient()
 
@@ -1680,30 +1678,15 @@ describe('placeOfEvent location hierarchy handling', () => {
       expect(hit._source).toMatchObject(expectedLocationHierarchy)
     }
 
-    // Step 3: Set up mock for reindex endpoint
-    const reindexSpy = vi.fn()
-
-    mswServer.use(
-      http.post(`${env.COUNTRY_CONFIG_URL}/reindex`, async (req) => {
-        const body = await req.request.json()
-        reindexSpy(body)
-        return HttpResponse.json({})
-      })
-    )
-
-    // Step 4: Perform reindexing
-    const sysClient = createSystemTestClient(TEST_SYSTEM_ID, [
-      encodeScope({ type: 'record.reindex' })
-    ])
-
-    await sysClient.event.reindex.trigger()
+    // Step 3: Perform reindexing
+    await runReindex()
 
     // Refresh index to make reindexed documents searchable
     await esClient.indices.refresh({
       index: getEventIndexName(TENNIS_CLUB_MEMBERSHIP)
     })
 
-    // Step 5: Verify location hierarchy is preserved AFTER reindexing
+    // Step 4: Verify location hierarchy is preserved AFTER reindexing
     const reindexedSearchResponse = await esClient.search({
       index: getEventIndexName(TENNIS_CLUB_MEMBERSHIP),
       body: { query: { match_all: {} } }

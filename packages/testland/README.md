@@ -124,7 +124,6 @@ OpenCRVS Core calls the following endpoints. You can run `npx @opencrvs/toolkit 
 
 **Other**
 
-- `POST /reindex`: receives events from Core when it reindexes, to populate the analytics database
 - `GET /ping`: health check endpoint used for monitoring
 - `POST /email`: sends an email, used internally e.g. for monitoring alerts and deployment notifications. It is blocked from outside the cluster in deployed environments.
 

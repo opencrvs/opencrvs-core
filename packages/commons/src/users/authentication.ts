@@ -105,7 +105,7 @@ export const getUserIdFromToken = (token: string): string | null => {
  * Core uses it for service-to-service calls where no user is involved.
  *
  * Must be a well-formed UUID so a service verifying the token can resolve it as
- * a `SystemContext` as with `INTEGRATION_CREATOR_USER_ID` / `REINDEX_USER_ID`.
+ * a `SystemContext` as with `INTEGRATION_CREATOR_USER_ID`.
  *
  * See packages/auth/src/features/serviceToken/handler.ts
  */

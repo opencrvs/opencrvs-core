@@ -97,7 +97,6 @@ docker_build("{0}:{1}-assets".format(countryconfig_image_name, countryconfig_ima
                 'assets/metabase',
                 'assets/postgres',
                 'assets/deployment',
-                'assets/elasticsearch',
                 './Dockerfile.assets'
               ]
 )
