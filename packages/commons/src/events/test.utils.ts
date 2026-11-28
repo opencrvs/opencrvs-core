@@ -97,7 +97,7 @@ import { toNotificationForm } from './toNotificationForm'
 /**
  * Placeholder context to generate test data without a stored event or a user.
  */
-export function generateEmptyTestValidatorContext(
+export function generateEmptyTestConditionalContext(
   configuration: EventConfig
 ): ActionFormConditionalContext {
   return {
@@ -471,7 +471,7 @@ export function generateActionDeclarationInput(
         declaration: { ...declaration, ...overrides },
         annotation: {}
       },
-      generateEmptyTestValidatorContext(configuration),
+      generateEmptyTestConditionalContext(configuration),
       true
     ).declaration
   }
@@ -511,9 +511,9 @@ function generateActionAnnotationInput(
 
   const annotation = fieldConfigsToActionPayload(annotationFields, rng)
 
-  // The annotation is generated without a declaration, as before.
+  // The annotation is generated without a declaration.
   const form = { declaration: {}, annotation }
-  const context = generateEmptyTestValidatorContext(configuration)
+  const context = generateEmptyTestConditionalContext(configuration)
 
   const visibleVerificationPageIds = getVisibleVerificationPageIds(
     findRecordActionPages(configuration, action),

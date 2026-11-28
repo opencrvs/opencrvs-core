@@ -15,6 +15,7 @@ import {
   FieldType,
   FormConfig
 } from '@opencrvs/commons/client'
+import { generateTestEventlessConditionalContext } from '@client/tests/conditional-context'
 import { validationErrorsInActionFormExist } from './validation'
 
 const formConfig: FormConfig = {
@@ -50,6 +51,7 @@ const signature = {
   originalFilename: 'abcd.png',
   type: 'image/png'
 }
+const conditionalContext = generateTestEventlessConditionalContext()
 
 describe('validationErrorsInActionFormExist', () => {
   it('accepts a signed review field whose visibility depends on the declaration', () => {
@@ -59,7 +61,7 @@ describe('validationErrorsInActionFormExist', () => {
         form: { 'parents.count': 2 },
         annotation: { 'review.secondParentSignature': signature },
         reviewFields: [secondParentSignature],
-        context: {}
+        conditionalContext
       })
     ).toBe(false)
   })
@@ -71,7 +73,7 @@ describe('validationErrorsInActionFormExist', () => {
         form: { 'parents.count': 2 },
         annotation: {},
         reviewFields: [secondParentSignature],
-        context: {}
+        conditionalContext
       })
     ).toBe(true)
   })
@@ -83,7 +85,7 @@ describe('validationErrorsInActionFormExist', () => {
         form: { 'parents.count': 1 },
         annotation: {},
         reviewFields: [secondParentSignature],
-        context: {}
+        conditionalContext
       })
     ).toBe(false)
   })

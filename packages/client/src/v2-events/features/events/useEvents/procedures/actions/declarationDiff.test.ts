@@ -14,16 +14,16 @@ import {
   ConditionalType,
   EventConfig,
   EventState,
-  eventQueryDataGenerator,
   flag,
   generateEventDocument,
   getDeclarationFields,
   tennisClubMembershipEvent,
-  ValidatorContext,
   withDeclaration,
   getDeclaration,
   getDeclarationPages
 } from '@opencrvs/commons/client'
+import type { ActionFormConditionalContext } from '@opencrvs/commons/client'
+import { generateTestEventlessConditionalContext } from '@client/tests/conditional-context'
 import {
   getChangedDeclarationDiff,
   getCleanedDeclarationDiff,
@@ -33,7 +33,7 @@ import {
 
 const eventConfiguration = tennisClubMembershipEvent
 const fields = getDeclarationFields(tennisClubMembershipEvent)
-const validatorContext: ValidatorContext = {}
+const conditionalContext = generateTestEventlessConditionalContext()
 
 const filledName = { firstname: 'Jane', surname: 'Doe' }
 const emptyName = { firstname: '', surname: '' }
@@ -118,7 +118,7 @@ describe('getChangedDeclarationDiff', () => {
       form,
       previousFormValues,
       eventConfiguration,
-      validatorContext
+      conditionalContext
     )
 
     expect(result).toEqual({ 'applicant.email': null })
@@ -137,7 +137,7 @@ describe('getChangedDeclarationDiff', () => {
       form,
       previousFormValues,
       eventConfiguration,
-      validatorContext
+      conditionalContext
     )
 
     expect(result).toEqual({})
@@ -161,7 +161,7 @@ describe('getChangedDeclarationDiff', () => {
       form,
       previousFormValues,
       eventConfiguration,
-      validatorContext
+      conditionalContext
     )
 
     expect(result).toEqual({
@@ -184,7 +184,7 @@ describe('getChangedDeclarationDiff', () => {
       form,
       previousFormValues,
       eventConfiguration,
-      validatorContext
+      conditionalContext
     )
 
     expect(result).toEqual({ 'recommender.none': true })
@@ -198,7 +198,7 @@ describe('getCleanedDeclarationDiff', () => {
         eventConfiguration,
         originalDeclaration: { 'applicant.email': 'a@b.c' },
         declarationDiff: undefined,
-        validatorContext
+        conditionalContext
       })
 
       expect(result).toBeUndefined()
@@ -209,7 +209,7 @@ describe('getCleanedDeclarationDiff', () => {
         eventConfiguration,
         originalDeclaration: { 'applicant.email': 'a@b.c' },
         declarationDiff: {},
-        validatorContext
+        conditionalContext
       })
 
       expect(result).toEqual({})
@@ -229,7 +229,7 @@ describe('getCleanedDeclarationDiff', () => {
         eventConfiguration,
         originalDeclaration: undefined,
         declarationDiff,
-        validatorContext
+        conditionalContext
       })
 
       expect(result).toEqual({ 'recommender.none': true })
@@ -245,7 +245,7 @@ describe('getCleanedDeclarationDiff', () => {
         eventConfiguration,
         originalDeclaration: {},
         declarationDiff,
-        validatorContext
+        conditionalContext
       })
 
       expect(result).toEqual(declarationDiff)
@@ -273,7 +273,7 @@ describe('getCleanedDeclarationDiff', () => {
         eventConfiguration,
         originalDeclaration,
         declarationDiff,
-        validatorContext
+        conditionalContext
       })
 
       expect(result).toEqual({ 'recommender.none': true })
@@ -296,7 +296,7 @@ describe('getCleanedDeclarationDiff', () => {
         eventConfiguration,
         originalDeclaration,
         declarationDiff,
-        validatorContext
+        conditionalContext
       })
 
       expect(result).toEqual({ 'applicant.dobUnknown': true })
@@ -315,7 +315,7 @@ describe('getCleanedDeclarationDiff', () => {
         eventConfiguration,
         originalDeclaration,
         declarationDiff,
-        validatorContext
+        conditionalContext
       })
 
       expect(result).toEqual({ 'applicant.email': 'jane2@example.com' })
@@ -336,7 +336,7 @@ describe('getCleanedDeclarationDiff', () => {
         eventConfiguration,
         originalDeclaration,
         declarationDiff,
-        validatorContext
+        conditionalContext
       })
 
       expect(result).toEqual({ 'applicant.email': null })
@@ -354,7 +354,7 @@ describe('getCleanedDeclarationDiff', () => {
         eventConfiguration,
         originalDeclaration,
         declarationDiff,
-        validatorContext
+        conditionalContext
       })
 
       expect(result).toEqual({
@@ -378,7 +378,7 @@ describe('getCleanedDeclarationDiff', () => {
         eventConfiguration,
         originalDeclaration,
         declarationDiff,
-        validatorContext
+        conditionalContext
       })
 
       expect(result).toEqual({
@@ -399,7 +399,7 @@ describe('getCleanedDeclarationDiff', () => {
         eventConfiguration,
         originalDeclaration,
         declarationDiff,
-        validatorContext
+        conditionalContext
       })
 
       expect(result).toEqual({ 'applicant.name': null })
@@ -418,7 +418,7 @@ describe('getCleanedDeclarationDiff', () => {
         eventConfiguration,
         originalDeclaration,
         declarationDiff,
-        validatorContext
+        conditionalContext
       })
 
       expect(result).not.toHaveProperty('applicant.email')
@@ -438,7 +438,7 @@ describe('getCleanedDeclarationDiff', () => {
         eventConfiguration,
         originalDeclaration,
         declarationDiff,
-        validatorContext
+        conditionalContext
       })
 
       expect(result).toEqual({ 'recommender.none': true })
@@ -458,7 +458,7 @@ describe('getCleanedDeclarationDiff', () => {
         eventConfiguration,
         originalDeclaration,
         declarationDiff,
-        validatorContext
+        conditionalContext
       })
 
       expect(result).toEqual({ 'recommender.none': false })
@@ -485,19 +485,39 @@ describe('getCleanedDeclarationDiff', () => {
       }))
     })
 
-    const document = generateEventDocument({
-      configuration: eventConfiguration,
-      actions: [{ type: ActionType.CREATE }, { type: ActionType.DECLARE }]
-    })
+    // The DECLARE action of this configuration adds the flag `sealed`.
+    const configWithSealingDeclare = {
+      ...configWithFlaggedField,
+      actions: configWithFlaggedField.actions.map((action) =>
+        action.type === ActionType.DECLARE
+          ? { ...action, flags: [{ id: 'sealed', operation: 'add' as const }] }
+          : action
+      )
+    }
+
+    /**
+     * The flags come from the actions of the event document.
+     * The event has the flag `sealed` only after the DECLARE action.
+     */
+    function contextWithFlags(flags: string[]): ActionFormConditionalContext {
+      return {
+        ...conditionalContext,
+        eventDocument: generateEventDocument({
+          configuration: configWithSealingDeclare,
+          actions: flags.includes('sealed')
+            ? [{ type: ActionType.CREATE }, { type: ActionType.DECLARE }]
+            : [{ type: ActionType.CREATE }]
+        }),
+        eventConfig: configWithSealingDeclare
+      }
+    }
 
     function cleanDiffForFlags(flags: string[]) {
       return getCleanedDeclarationDiff({
         eventConfiguration: configWithFlaggedField,
         originalDeclaration: {},
         declarationDiff: { [flaggedFieldId]: 'jane@example.com' },
-        validatorContext: {
-          event: { document, state: eventQueryDataGenerator({ flags }) }
-        }
+        conditionalContext: contextWithFlags(flags)
       })
     }
 
@@ -519,7 +539,7 @@ describe('getCleanedDeclarationDiff', () => {
           eventConfiguration: configWithFlaggedField,
           originalDeclaration: {},
           declarationDiff: { [flaggedFieldId]: 'jane@example.com' },
-          validatorContext: {}
+          conditionalContext
         })
       ).toEqual({})
     })
@@ -532,7 +552,7 @@ describe('getCleanedDeclarationDiff', () => {
           form: getDeclaration(eventConfiguration),
           originalDeclaration: {},
           declarationDiff: { [flaggedFieldId]: 'jane@example.com' },
-          validatorContext: {}
+          conditionalContext
         })
       ).toEqual({ [flaggedFieldId]: 'jane@example.com' })
     })

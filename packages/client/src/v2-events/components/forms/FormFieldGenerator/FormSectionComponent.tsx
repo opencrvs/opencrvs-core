@@ -11,7 +11,7 @@
 
 import React, { useEffect } from 'react'
 import { FormikProps } from 'formik'
-import { cloneDeep, set, get, omit, unset, isNil } from 'lodash'
+import { cloneDeep, set, get, omit, unset, isNil, pick } from 'lodash'
 import {
   EventState,
   EventConfig,
@@ -26,13 +26,16 @@ import {
   isCodeToEvaluate,
   buildClientFunctionContext,
   runClientFunction,
-  ClientFunctionContext,
-  ValidatorContext,
+  isFieldEnabled,
+  isFieldVisible,
   findAllFields,
   flattenFieldReference,
   getDeclaration,
+  omitHiddenPaginatedFields,
   HiddenFieldTypes,
-  AttachmentPath
+  AttachmentPath,
+  FormConfig,
+  ActionUpdate
 } from '@opencrvs/commons/client'
 import {
   makeFormFieldIdFormikCompatible,
@@ -42,10 +45,13 @@ import { useOnlineStatus } from '@client/utils'
 import { useDefaultValue } from '@client/v2-events/hooks/useDefaultValue'
 import { useEventFormData } from '@client/v2-events/features/events/useEventFormData'
 import {
-  isFieldEnabled,
-  isFieldVisible,
-  omitHiddenPaginatedFields
-} from '@client/v2-events/conditionals'
+  FormConditionalContext,
+  toActionFormConditionalContext
+} from '@client/v2-events/components/forms/formConditionalContext'
+import {
+  formForConditionals,
+  mergeFormValues
+} from '@client/v2-events/components/forms/formValues'
 import {
   makeFormikFieldIdsOpenCRVSCompatible,
   resolveSyncedFieldValue
@@ -55,7 +61,11 @@ import { FormItem, GeneratedInputField } from './GeneratedInputField'
 type AllProps = {
   eventConfig?: EventConfig
   fields: FieldConfig[]
+  /** All the edited values, with the changes on the page. */
   ocrvsFullForm: EventState
+  /** See `formForConditionals`. */
+  annotates: ActionUpdate | null
+  siblingValues?: ActionUpdate
   className?: string
   readonlyMode?: boolean
   searchMode?: boolean
@@ -76,7 +86,7 @@ type AllProps = {
    * If isCorrection is true, fields with configuration option 'uncorrectable' set to true will be disabled.
    */
   isCorrection?: boolean
-  validatorContext: ValidatorContext
+  conditionalContext: FormConditionalContext
 } & UsedFormikProps
 
 /**
@@ -142,6 +152,24 @@ function getParentsOfListenerFields(fields: FieldConfig[]) {
   return fieldsByParentId
 }
 
+/** Returns the edited values without the values of hidden pages and hidden fields. */
+function omitHiddenEditedValues(
+  formConfig: FormConfig,
+  editedValues: EventState,
+  annotates: ActionUpdate | null,
+  siblingValues: ActionUpdate | undefined,
+  conditionalContext: FormConditionalContext
+): EventState {
+  const form = omitHiddenPaginatedFields(
+    formConfig,
+    formForConditionals(editedValues, annotates, siblingValues),
+    toActionFormConditionalContext(conditionalContext)
+  )
+  const editedPart = annotates ? form.annotation : form.declaration
+
+  return pick(editedPart, Object.keys(editedValues)) as EventState
+}
+
 //@todo: this does not work for nested fields, i.e. FIELD_GROUP
 /**
  * Applies visibility transitions to fieldValues in place.
@@ -157,7 +185,9 @@ function applyVisibilityTransitions({
   prevForm,
   currentForm,
   fieldValues,
-  validatorContext,
+  annotates,
+  siblingValues,
+  conditionalContext,
   cacheHiddenFieldValue,
   popHiddenFieldValue,
   resetFieldIds
@@ -166,20 +196,26 @@ function applyVisibilityTransitions({
   prevForm: EventState
   currentForm: EventState
   fieldValues: Record<string, FieldValue>
-  validatorContext: ValidatorContext
+  annotates: ActionUpdate | null
+  siblingValues: ActionUpdate | undefined
+  conditionalContext: FormConditionalContext
   cacheHiddenFieldValue: (key: string, value: FieldValue) => void
   popHiddenFieldValue: (key: string) => FieldValue | undefined
   resetFieldIds: Set<string>
 }): void {
-  const prevCleaned = omitHiddenPaginatedFields(
+  const prevCleaned = omitHiddenEditedValues(
     getDeclaration(eventConfig),
     prevForm,
-    validatorContext
+    annotates,
+    siblingValues,
+    conditionalContext
   )
-  const currentCleaned = omitHiddenPaginatedFields(
+  const currentCleaned = omitHiddenEditedValues(
     getDeclaration(eventConfig),
     currentForm,
-    validatorContext
+    annotates,
+    siblingValues,
+    conditionalContext
   )
 
   const newHiddenKeys = Object.keys(prevCleaned).filter(
@@ -230,8 +266,13 @@ export function FormSectionComponent({
   setTouched,
   attachmentPath,
   isCorrection = false,
-  validatorContext
+  annotates,
+  siblingValues,
+  conditionalContext
 }: AllProps) {
+  const actionFormContext = toActionFormConditionalContext(conditionalContext)
+  const form = formForConditionals(ocrvsFullForm, annotates, siblingValues)
+
   // Conditionals need to be able to react to whether the user is online or not
   useOnlineStatus()
 
@@ -262,27 +303,44 @@ export function FormSectionComponent({
   /** Sets the value for fields that listen to another field via `parent` and `value` properties */
   const setValueForListenerField = (
     [path, listenerField]: [string[], InteractiveFieldType],
-    fieldValues: Record<string, FieldValue>,
-    clientFunctionContext: ClientFunctionContext
+    fieldValues: Record<string, FieldValue>
   ) => {
     // this can be any field. Even though we call this only when parent triggers the change.
     const formikCompatibleListenerFieldPath = path.map(
       makeFormFieldIdFormikCompatible
     )
 
+    // The referenced field can be on another page, or in the declaration that the form annotates.
+    const fieldForm = formForConditionals(
+      {
+        ...ocrvsFullForm,
+        ...makeFormikFieldIdsOpenCRVSCompatible(fieldValues)
+      },
+      annotates,
+      siblingValues
+    )
+    const fullForm = mergeFormValues(fieldForm)
+    const clientFunctionContext = buildClientFunctionContext({
+      form: fullForm,
+      conditionalContext
+    })
+
     const firstNonFalsyValue = resolveSyncedFieldValue(
       listenerField,
       (syncRef) => {
         /*
          * One path for both kinds of reference: a computed one reads the same
-         * value a plain one would, then passes it through its function. Reading
-         * it any other way misses references that name a subfield, or a field
-         * whose id has dots in it.
+         * value a plain one would, then passes it through its function.
+         *
+         * The path is an array, so a field id with dots in it stays one key.
+         * The full form has the field ids as they are. A field group keeps the
+         * values of its subfields under Formik ids, so the subfield ids are
+         * changed to Formik ids.
          */
-        const referenced = get(
-          fieldValues,
-          flattenFieldReference(syncRef).map(makeFormFieldIdFormikCompatible)
-        )
+        const referenced = get(fullForm, [
+          syncRef.$$field,
+          ...syncRef.$$subfield.map(makeFormFieldIdFormikCompatible)
+        ])
 
         return isCodeToEvaluate(syncRef)
           ? (runClientFunction(
@@ -299,29 +357,23 @@ export function FormSectionComponent({
       return
     }
 
-    const formContext = {
-      ...ocrvsFullForm,
-      ...makeFormikFieldIdsOpenCRVSCompatible(fieldValues)
-    }
-
     // Hidden listener fields are cleared to undefined so their stale values
     // don't leak into other fields that read from them (e.g. via `value` refs).
     // We return early to skip applying the defaultValue, which would otherwise
     // pollute the form state for fields that aren't currently relevant.
 
     // Must be undefined, never null:
-    // null has a specific semantic in the declaration payload — it signals an
-    // intentional field removal and is preserved by getCleanedDeclarationDiff
-    // (via omitHiddenPaginatedFields with retainNullValues=true). Sending null
-    // for fields that were never part of the current action (e.g. correction
-    // form fields appearing in a declare payload) corrupts the event state.
-    // undefined is omitted from JSON serialisation and is therefore safe.
-    if (!isFieldVisible(listenerField, formContext, validatorContext)) {
+    // In the declaration payload, null means that the user cleared the field.
+    // getCleanedDeclarationDiff sends null values, also for hidden fields.
+    // A null for a field that is not part of the action (e.g. a correction
+    // field in a declare payload) corrupts the event state.
+    // JSON leaves out undefined values, so undefined is safe.
+    if (!isFieldVisible(listenerField, fieldForm, actionFormContext)) {
       set(fieldValues, formikCompatibleListenerFieldPath, undefined)
       return
     }
 
-    const defaultValue = getDefaultValue(listenerField, fieldValues)
+    const defaultValue = getDefaultValue(listenerField, fullForm)
 
     set(fieldValues, formikCompatibleListenerFieldPath, defaultValue)
 
@@ -345,17 +397,9 @@ export function FormSectionComponent({
     set(updatedFormikPageForm, formikFieldId, value)
 
     const resetFieldIds = new Set<string>()
-    const clientFunctionContext = buildClientFunctionContext({
-      form: updatedFormikPageForm,
-      validatorContext
-    })
     for (const listenerField of interactiveListenerFields) {
       const fieldId = listenerField[0].join('.')
-      setValueForListenerField(
-        listenerField,
-        updatedFormikPageForm,
-        clientFunctionContext
-      )
+      setValueForListenerField(listenerField, updatedFormikPageForm)
       // Evict stale cached value and mark the id so applyVisibilityTransitions
       // skips caching/restoring it — the parent reset invalidated it
       popHiddenFieldValue(fieldId)
@@ -373,7 +417,9 @@ export function FormSectionComponent({
         prevForm: ocrvsFullForm,
         currentForm: updatedFullForm,
         fieldValues: updatedFormikPageForm,
-        validatorContext,
+        annotates,
+        siblingValues,
+        conditionalContext,
         cacheHiddenFieldValue,
         popHiddenFieldValue,
         resetFieldIds
@@ -405,10 +451,6 @@ export function FormSectionComponent({
     const updatedTouched = cloneDeep(touched)
 
     const resetFieldIds = new Set<string>()
-    const clientFunctionContext = buildClientFunctionContext({
-      form: updatedValues,
-      validatorContext
-    })
     for (const { name: formikFieldId, value } of newValues) {
       set(updatedValues, formikFieldId, value)
 
@@ -421,11 +463,7 @@ export function FormSectionComponent({
 
       for (const listenerField of interactiveListenerFields) {
         const fieldId = listenerField[0].join('.')
-        setValueForListenerField(
-          listenerField,
-          updatedValues,
-          clientFunctionContext
-        )
+        setValueForListenerField(listenerField, updatedValues)
         unset(
           updatedTouched,
           listenerField[0].map(makeFormFieldIdFormikCompatible)
@@ -448,7 +486,9 @@ export function FormSectionComponent({
         prevForm: ocrvsFullForm,
         currentForm: updatedFullForm,
         fieldValues: updatedValues,
-        validatorContext,
+        annotates,
+        siblingValues,
+        conditionalContext,
         cacheHiddenFieldValue,
         popHiddenFieldValue,
         resetFieldIds
@@ -507,12 +547,12 @@ export function FormSectionComponent({
   return (
     <section className={className}>
       {pageFields.map((field) => {
-        if (!isFieldVisible(field, ocrvsFullForm, validatorContext)) {
+        if (!isFieldVisible(field, form, actionFormContext)) {
           return null
         }
         const formikFieldId = makeFormFieldIdFormikCompatible(field.id)
         const isDisabled =
-          !isFieldEnabled(field, ocrvsFullForm, validatorContext) ||
+          !isFieldEnabled(field, form, actionFormContext) ||
           (isCorrection && field.uncorrectable)
 
         return (
@@ -524,7 +564,9 @@ export function FormSectionComponent({
           >
             <GeneratedInputField
               allKnownFields={fullFormFields}
+              annotates={annotates}
               attachmentPath={attachmentPath}
+              conditionalContext={conditionalContext}
               disabled={isDisabled}
               eventConfig={eventConfig}
               fieldDefinition={{ ...field, id: formikFieldId }}
@@ -532,7 +574,7 @@ export function FormSectionComponent({
               ocrvsFullForm={ocrvsFullForm}
               readonlyMode={readonlyMode}
               searchMode={searchMode}
-              validatorContext={validatorContext}
+              siblingValues={siblingValues}
               onBatchFieldValueChange={onBatchFieldValueChange}
               onBlur={handleBlur}
               onFieldValueChange={onFieldValueChange}

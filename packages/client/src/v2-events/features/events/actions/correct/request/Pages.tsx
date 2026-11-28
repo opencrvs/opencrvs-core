@@ -29,7 +29,7 @@ import { useEventFormData } from '@client/v2-events/features/events/useEventForm
 import { useEventFormNavigation } from '@client/v2-events/features/events/useEventFormNavigation'
 import { FormLayout } from '@client/v2-events/layouts'
 import { ROUTES } from '@client/v2-events/routes'
-import { useValidatorContext } from '@client/v2-events/hooks/useValidatorContext'
+import { useActionFormConditionalContext } from '@client/v2-events/hooks/useConditionalContext'
 
 // Filter out pages where all fields either have 'uncorrectable' set to true or are non-interactive
 function getCorrectablePages(formPages: PageConfig[]) {
@@ -55,10 +55,13 @@ export function Pages() {
   const { modal } = useEventFormNavigation()
 
   const event = events.getEvent.useGetEventFromCache(eventId)
-  const validatorContext = useValidatorContext(event)
 
   const { eventConfiguration: configuration } =
     useEventConfigurationForRecord(event)
+  const conditionalContext = useActionFormConditionalContext(
+    event,
+    configuration
+  )
 
   const formPages = getDeclarationPages(configuration)
   const correctablePages = getCorrectablePages(formPages)
@@ -96,7 +99,8 @@ export function Pages() {
   const backAction = getFormBackAction({
     formPages: correctablePages,
     formData: form,
-    validatorContext,
+    annotates: null,
+    conditionalContext,
     pageId: currentPageId,
     onNavigateToPage: onPageChange
   })
@@ -108,14 +112,15 @@ export function Pages() {
     >
       {modal}
       <PagesComponent
+        annotates={null}
         attachmentPath={eventAttachmentPath(eventId)}
+        conditionalContext={conditionalContext}
         eventConfig={configuration}
         formData={form}
         formPages={correctablePages}
         isCorrection={true}
         pageId={currentPageId}
         setFormData={(data) => setFormValues(data)}
-        validatorContext={validatorContext}
         onPageChange={onPageChange}
         onSubmit={() =>
           navigate(

@@ -22,8 +22,9 @@ import {
   generateTransactionId,
   getActionConfig,
   getCurrentEventState,
-  RequestedCorrectionAction,
-  ValidatorContext
+  isActionEnabled,
+  isActionVisible,
+  RequestedCorrectionAction
 } from '@opencrvs/commons/client'
 import {
   Dialog,
@@ -43,10 +44,7 @@ import { useActionAnnotation } from '@client/v2-events/features/events/useAction
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
 import { CorrectionDetails } from '@client/v2-events/features/events/actions/correct/request/Summary/CorrectionDetails'
 import { useUserAllowedActions } from '@client/v2-events/features/workqueues/Actions/useUserAllowedActions'
-import {
-  isActionEnabled,
-  isActionVisible
-} from '@client/v2-events/conditionals'
+import { useActionConditionalContext } from '@client/v2-events/hooks/useConditionalContext'
 import { useEventConfigurationForRecord } from '../../../useEventConfiguration'
 
 const reviewCorrectionMessages = defineMessages({
@@ -258,12 +256,10 @@ const StyledContent = styled(Content)`
 
 export function ReviewCorrection({
   form,
-  correctionRequestAction,
-  validatorContext
+  correctionRequestAction
 }: {
   form: EventState
   correctionRequestAction: RequestedCorrectionAction
-  validatorContext: ValidatorContext
 }) {
   const intl = useIntl()
   const { getAnnotation } = useActionAnnotation()
@@ -277,6 +273,13 @@ export function ReviewCorrection({
   const event = events.getEvent.useGetEventFromCache(eventId)
   const { eventConfiguration } = useEventConfigurationForRecord(event)
   const eventIndex = getCurrentEventState(event, eventConfiguration)
+
+  // @TODO: check if we should pass this as prop.
+  const actionContext = useActionConditionalContext({
+    eventDocument: event,
+    eventConfig: eventConfiguration
+  })
+  const actionForm = { declaration: eventIndex.declaration }
   const { isActionAllowed } = useUserAllowedActions(eventIndex)
   const [modal, openModal] = useModal()
   const navigate = useNavigate()
@@ -291,16 +294,16 @@ export function ReviewCorrection({
   })
 
   const approveVisible = approveActionConfig
-    ? isActionVisible(approveActionConfig, eventIndex, validatorContext)
+    ? isActionVisible(approveActionConfig, actionForm, actionContext)
     : true
   const approveEnabled = approveActionConfig
-    ? isActionEnabled(approveActionConfig, eventIndex, validatorContext)
+    ? isActionEnabled(approveActionConfig, actionForm, actionContext)
     : true
   const rejectVisible = rejectActionConfig
-    ? isActionVisible(rejectActionConfig, eventIndex, validatorContext)
+    ? isActionVisible(rejectActionConfig, actionForm, actionContext)
     : true
   const rejectEnabled = rejectActionConfig
-    ? isActionEnabled(rejectActionConfig, eventIndex, validatorContext)
+    ? isActionEnabled(rejectActionConfig, actionForm, actionContext)
     : true
 
   // Configured labels/icons only affect the action menu; this core-owned
@@ -403,7 +406,6 @@ export function ReviewCorrection({
         event={event}
         form={form}
         requesting={!isActionAllowed(ActionType.APPROVE_CORRECTION)}
-        validatorContext={validatorContext}
       />
       <Row background="white" position="left">
         {rejectButton}

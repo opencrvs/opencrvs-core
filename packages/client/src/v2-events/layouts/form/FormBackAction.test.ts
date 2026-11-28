@@ -12,9 +12,9 @@ import { describe, it, expect, vi } from 'vitest'
 import {
   field,
   generateTranslationConfig,
-  PageConfig,
-  ValidatorContext
+  PageConfig
 } from '@opencrvs/commons/client'
+import { generateTestEventlessConditionalContext } from '@client/tests/conditional-context'
 import { getFormBackAction } from './FormBackAction'
 
 const label = generateTranslationConfig('label')
@@ -32,15 +32,15 @@ function formPage(
     ...(conditional ? { conditional } : {})
   } as unknown as PageConfig
 }
-
-const validatorContext = {} as ValidatorContext
+const conditionalContext = generateTestEventlessConditionalContext()
 
 describe('getFormBackAction', () => {
   it('returns undefined on the first page', () => {
     const back = getFormBackAction({
       formPages: [formPage('a'), formPage('b')],
       formData: {},
-      validatorContext,
+      annotates: null,
+      conditionalContext,
       pageId: 'a',
       onNavigateToPage: vi.fn()
     })
@@ -52,7 +52,8 @@ describe('getFormBackAction', () => {
     const back = getFormBackAction({
       formPages: [formPage('a'), formPage('b')],
       formData: {},
-      validatorContext,
+      annotates: null,
+      conditionalContext,
       pageId: 'missing',
       onNavigateToPage: vi.fn()
     })
@@ -65,7 +66,8 @@ describe('getFormBackAction', () => {
     const back = getFormBackAction({
       formPages: [formPage('a'), formPage('b'), formPage('c')],
       formData: {},
-      validatorContext,
+      annotates: null,
+      conditionalContext,
       pageId: 'c',
       onNavigateToPage
     })
@@ -86,7 +88,8 @@ describe('getFormBackAction', () => {
         formPage('c')
       ],
       formData: {},
-      validatorContext,
+      annotates: null,
+      conditionalContext,
       pageId: 'c',
       onNavigateToPage
     })

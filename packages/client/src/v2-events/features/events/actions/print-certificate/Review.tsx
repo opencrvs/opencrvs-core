@@ -59,7 +59,7 @@ import { useEventConfigurationForRecord } from '@client/v2-events/features/event
 import { useOnlineStatus } from '@client/utils'
 import { getUserDetails } from '@client/profile/profileSelectors'
 import { useUserAllowedActions } from '@client/v2-events/features/workqueues/Actions/useUserAllowedActions'
-import { useValidatorContext } from '@client/v2-events/hooks/useValidatorContext'
+import { useActionFormConditionalContext } from '@client/v2-events/hooks/useConditionalContext'
 import { useAdministrativeAreas } from '../../../../hooks/useAdministrativeAreas'
 
 const CertificateContainer = styled.div`
@@ -174,7 +174,10 @@ export function Review() {
   const fullEvent = getEvent.useGetEventFromCache(eventId)
   const { eventConfiguration } = useEventConfigurationForRecord(fullEvent)
   const fullEventIndex = getCurrentEventState(fullEvent, eventConfiguration)
-  const validatorContext = useValidatorContext(fullEvent)
+  const conditionalContext = useActionFormConditionalContext(
+    fullEvent,
+    eventConfiguration
+  )
 
   const userIds = getUserIdsFromActions(getAcceptedActions(fullEvent))
 
@@ -247,7 +250,8 @@ export function Review() {
   const validationErrorExist = validationErrorsInActionFormExist({
     formConfig,
     form: annotation,
-    context: validatorContext
+    annotates: fullEventIndex.declaration,
+    conditionalContext
   })
 
   if (validationErrorExist) {

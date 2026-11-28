@@ -30,7 +30,7 @@ import { ROUTES } from '@client/v2-events/routes'
 import { useEventFormNavigation } from '@client/v2-events/features/events/useEventFormNavigation'
 import { messages as formHeaderMessages } from '@client/v2-events/layouts/form/FormHeader'
 import { useUserAllowedActions } from '@client/v2-events/features/workqueues/Actions/useUserAllowedActions'
-import { useValidatorContext } from '@client/v2-events/hooks/useValidatorContext'
+import { useActionFormConditionalContext } from '@client/v2-events/hooks/useConditionalContext'
 import {
   AcceptActionModalResult,
   Review
@@ -79,7 +79,10 @@ function useReviewPageActions(
     modal: deleteDeclarationModal
   } = useEventFormNavigation()
   const { eventConfiguration } = useEventConfigurationForRecord(event)
-  const validatorContext = useValidatorContext(event)
+  const conditionalContext = useActionFormConditionalContext(
+    event,
+    eventConfiguration
+  )
   const declaration = useEventFormData((state) => state.getFormValues())
   const { getAnnotation } = useActionAnnotation()
   const annotation = getAnnotation()
@@ -108,7 +111,7 @@ function useReviewPageActions(
     formConfig,
     form: declaration,
     annotation,
-    context: validatorContext,
+    conditionalContext,
     reviewFields: reviewConfig.fields
   })
 

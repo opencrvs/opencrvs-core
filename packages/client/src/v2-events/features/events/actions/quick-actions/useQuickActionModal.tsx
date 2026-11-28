@@ -27,9 +27,11 @@ import {
   FieldUpdateValue,
   getActionConfig,
   findActionDialogCopy,
+  runFieldValidations,
   UUID,
   getCurrentEventState,
   EventConfig,
+  omitHiddenFields,
   EventIndex,
   isValidIcon,
   flattenFormState,
@@ -40,12 +42,9 @@ import { buttonMessages } from '@client/i18n/messages'
 import { ROUTES } from '@client/v2-events/routes'
 import { FormFieldGenerator } from '@client/v2-events/components/forms/FormFieldGenerator'
 import { useDialogFormState } from '@client/v2-events/hooks/useDialogFormState'
-import { useValidatorContext } from '@client/v2-events/hooks/useValidatorContext'
+import { useActionFormConditionalContext } from '@client/v2-events/hooks/useConditionalContext'
 import { useUserAllowedActions } from '@client/v2-events/features/workqueues/Actions/useUserAllowedActions'
-import {
-  omitHiddenFields,
-  runFieldValidations
-} from '@client/v2-events/conditionals'
+import { formForConditionals } from '@client/v2-events/components/forms/formValues'
 import { TranslationTextWithFormatModifier } from '../../components/TranslationTextWithFormatModifier'
 import { useModal } from '../../../../hooks/useModal'
 import { actionLabels } from '../../../workqueues/Actions/utils'
@@ -128,25 +127,29 @@ function QuickActionModal({
    * fields evaluate their conditionals against it, and the print button
    * prints it.
    */
-  const validatorContext = useValidatorContext(eventDocument)
+  const conditionalContext = useActionFormConditionalContext(
+    eventDocument,
+    eventConfiguration
+  )
+
+  // The dialog annotates the declaration.
+  const annotationForm = formForConditionals(modalValues, event.declaration)
 
   const errorsOnField = (config.fields ?? []).flatMap((field) =>
     flattenFormState(
       runFieldValidations({
         field,
-        form: modalValues,
+        form: annotationForm,
         value: modalValues[field.id],
-        context: validatorContext
+        context: conditionalContext
       })
     ).flatMap(([, errs]) => errs)
   )
 
   const confirm = () => {
-    const visibleFields = omitHiddenFields(
-      config.fields ?? [],
-      modalValues,
-      validatorContext
-    )
+    const visibleFields =
+      omitHiddenFields(config.fields ?? [], annotationForm, conditionalContext)
+        .annotation ?? {}
 
     close({ result: true, values: visibleFields })
   }
@@ -205,15 +208,12 @@ function QuickActionModal({
         )}
         <FormFieldGenerator
           {...dialogForm}
+          annotates={event.declaration}
           attachmentPath={eventAttachmentPath(eventId)}
+          conditionalContext={conditionalContext}
           eventConfig={eventConfiguration}
           fields={config.fields ?? []}
           id={'quick-action-modal-form'}
-          // Pass in the complete declaration form values so that read-only declaration data is available for Data components or calculations.
-          validatorContext={{
-            ...validatorContext,
-            baseFormState: event.declaration
-          }}
         />
       </Stack>
     </Dialog>

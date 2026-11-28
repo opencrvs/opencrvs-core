@@ -13,20 +13,17 @@ import {
   deepMerge,
   EventDocument,
   getCurrentEventState,
-  RequestedCorrectionAction,
-  ValidatorContext
+  RequestedCorrectionAction
 } from '@opencrvs/commons/client'
 import { useEventConfigurationForRecord } from '@client/v2-events/features/events/useEventConfiguration'
 import { CorrectionDetails } from '@client/v2-events/features/events/actions/correct/request/Summary/CorrectionDetails'
 
 export function RequestCorrection({
   action,
-  fullEvent,
-  validatorContext
+  fullEvent
 }: {
   action: RequestedCorrectionAction
   fullEvent: EventDocument
-  validatorContext: ValidatorContext
 }) {
   const { eventConfiguration } = useEventConfigurationForRecord(fullEvent)
 
@@ -53,7 +50,6 @@ export function RequestCorrection({
       event={eventBeforeCorrectionRequest}
       form={deepMerge(eventIndex.declaration, action.declaration)}
       requesting={!action.annotation.isImmediateCorrection}
-      validatorContext={validatorContext}
     />
   )
 }

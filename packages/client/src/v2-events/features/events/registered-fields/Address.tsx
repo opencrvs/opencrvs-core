@@ -25,27 +25,31 @@ import {
   AdministrativeAreas,
   alwaysTrue,
   AddressType,
+  isFieldDisplayedOnReview,
   AddressField,
   AdministrativeAreaField,
   TextField,
   EventConfig,
-  ValidatorContext,
   IndexMap,
   FormState,
   FieldConfig,
   UUID,
-  PlainDate
+  PlainDate,
+  ActionUpdate
 } from '@opencrvs/commons/client'
 import { FormFieldGenerator } from '@client/v2-events/components/forms/FormFieldGenerator'
+import {
+  FormConditionalContext,
+  toActionFormConditionalContext
+} from '@client/v2-events/components/forms/formConditionalContext'
 import { Output } from '@client/v2-events/features/events/components/Output'
 import { getFormDataStringifier } from '@client/v2-events/hooks/useFormDataStringifier'
 import { getOfflineData } from '@client/offline/selectors'
 import { useAdministrativeAreas } from '@client/v2-events/hooks/useAdministrativeAreas'
 import { AdminStructureItem } from '@client/utils/referenceApi'
 import { getAdminLevelHierarchy } from '@client/v2-events/utils'
-import { useValidatorContext } from '@client/v2-events/hooks/useValidatorContext'
+import { useEventlessFormConditionalContext } from '@client/v2-events/hooks/useConditionalContext'
 import { withSuspense } from '@client/v2-events/components/withSuspense'
-import { isFieldDisplayedOnReview } from '@client/v2-events/conditionals'
 
 /* eslint-disable max-lines */
 
@@ -60,7 +64,11 @@ interface Props {
   value?: AddressFieldValue
   config: AddressField
   disabled?: boolean
-  validatorContext: ValidatorContext
+  /** See `formForConditionals`. */
+  annotates: ActionUpdate | null
+  /** The values around the address field. */
+  siblingValues?: ActionUpdate
+  conditionalContext: FormConditionalContext
   eventConfig?: EventConfig
 }
 
@@ -552,7 +560,9 @@ function AddressInput(props: Props) {
       addressType: AddressType.DOMESTIC,
       country: ''
     },
-    validatorContext,
+    annotates,
+    siblingValues,
+    conditionalContext,
     touched = {},
     ...otherProps
   } = props
@@ -580,22 +590,23 @@ function AddressInput(props: Props) {
 
   const fields = [countryField, ...domesticFields, ...streetAddressFields]
 
+  // @todo: verify
+  // Conditionals refer to addressType, but no field in the inner address form has it
+  const siblingValuesWithAddressType = {
+    ...siblingValues,
+    addressType: value.addressType
+  }
+
   return (
     <FormFieldGenerator
       {...otherProps}
+      annotates={annotates}
       attachmentPath={null}
+      conditionalContext={conditionalContext}
       fields={fields}
       formTouched={nestedTouched}
       formValues={nestedValue}
-      // addressType is passed as context to the nested form due to the value
-      // being referred in conditionals but not having any associated field
-      validatorContext={{
-        ...validatorContext,
-        baseFormState: {
-          ...validatorContext.baseFormState,
-          addressType: value.addressType
-        }
-      }}
+      siblingValues={siblingValuesWithAddressType}
       onFormChange={(nestedVal) =>
         onChange(transformNestedValueToParentValue(nestedVal, adminLevelIds))
       }
@@ -624,7 +635,10 @@ function AddressOutput({
   configuration: AddressField
   anchor: PlainDate
 }) {
-  const validatorContext = useValidatorContext()
+  // The conditionals of the address subfields read only the address value, so they need no event
+  const conditionalContext = toActionFormConditionalContext(
+    useEventlessFormConditionalContext()
+  )
   const { getAdministrativeAreas } = useAdministrativeAreas()
   const administrativeAreas = getAdministrativeAreas.useSuspenseQuery()
   const { config } = useSelector(getOfflineData)
@@ -664,8 +678,8 @@ function AddressOutput({
         field.value &&
         isFieldDisplayedOnReview(
           field.field,
-          addressValueWithHierarchyExpanded,
-          validatorContext
+          { declaration: addressValueWithHierarchyExpanded },
+          conditionalContext
         )
     )
 

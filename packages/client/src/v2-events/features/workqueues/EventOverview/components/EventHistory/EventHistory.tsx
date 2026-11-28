@@ -51,7 +51,6 @@ import {
   findImmediateApproveCorrection
 } from '@client/v2-events/features/events/actions/correct/useActionForHistory'
 import { usePermissions } from '@client/hooks/useAuthorization'
-import { useValidatorContext } from '@client/v2-events/hooks/useValidatorContext'
 import { useEventConfigurationForRecord } from '@client/v2-events/features/events/useEventConfiguration'
 import { useUserDetails } from '@client/v2-events/hooks/useUserDetails'
 import { resolveLocationName } from '@client/v2-events/utils'
@@ -453,7 +452,6 @@ function EventHistorySkeleton() {
 function EventHistory({ fullEvent }: { fullEvent: EventDocument }) {
   const [currentPageNumber, setCurrentPageNumber] = React.useState(1)
 
-  const validatorContext = useValidatorContext(fullEvent)
   const { eventConfiguration } = useEventConfigurationForRecord(fullEvent)
 
   const intl = useIntl()
@@ -494,7 +492,6 @@ function EventHistory({ fullEvent }: { fullEvent: EventDocument }) {
         systemUpdates={systemUpdates}
         title={title}
         userName={userName}
-        validatorContext={validatorContext}
       />
     ))
   }

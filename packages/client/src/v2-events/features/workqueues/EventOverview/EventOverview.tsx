@@ -17,7 +17,8 @@ import {
   dangerouslyGetCurrentEventStateWithDrafts,
   EventIndex,
   applyDraftToEventIndex,
-  deepDropNulls
+  deepDropNulls,
+  dropSecuredDeclarationFields
 } from '@opencrvs/commons/client'
 import { Content, ContentSize } from '@opencrvs/components'
 import { EventIcon } from '@client/v2-events/components/EventIcon'
@@ -27,8 +28,6 @@ import { useUsers } from '@client/v2-events/hooks/useUsers'
 import { withSuspense } from '@client/v2-events/components/withSuspense'
 import { flattenEventIndex, getUsersFullName } from '@client/v2-events/utils'
 import { useEventTitle } from '@client/v2-events/features/events/useEvents/useEventTitle'
-import { useValidatorContext } from '@client/v2-events/hooks/useValidatorContext'
-import { dropSecuredDeclarationFields } from '@client/v2-events/conditionals'
 import { useDrafts } from '../../drafts/useDrafts'
 import { DuplicateWarning } from '../../events/actions/dedup/DuplicateWarning'
 import { DuplicateReviewUnavailable } from '../../events/actions/dedup/DuplicateReviewUnavailable'
@@ -45,7 +44,6 @@ import { useEventOverviewInfo } from './components/useEventOverviewInfo'
  */
 function EventOverviewFull({ event }: { event: EventDocument }) {
   const { eventConfiguration } = useEventConfigurationForRecord(event)
-  const validatorContext = useValidatorContext(event)
   const eventIndex = getCurrentEventState(event, eventConfiguration)
   const { status } = eventIndex
   const { useRemoteDraftByEventId } = useDrafts()
@@ -66,7 +64,8 @@ function EventOverviewFull({ event }: { event: EventDocument }) {
   const eventWithoutSecuredFields = dropSecuredDeclarationFields(
     eventConfiguration,
     eventWithDrafts,
-    validatorContext
+    // @todo: check that this is sensible
+    { eventIndex: eventWithDrafts }
   )
 
   const { getEventTitle } = useEventTitle()

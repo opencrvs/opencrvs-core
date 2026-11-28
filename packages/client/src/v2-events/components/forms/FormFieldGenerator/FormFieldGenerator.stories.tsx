@@ -28,7 +28,7 @@ const meta: Meta<typeof FormFieldGenerator> = {
   title: 'FormFieldGenerator/Helper Text',
   component: FormFieldGenerator,
   argTypes: {
-    validatorContext: { control: false }
+    conditionalContext: { control: false }
   },
   decorators: [
     (Story, context) => (

@@ -27,7 +27,7 @@ import { Review as ReviewComponent } from '@client/v2-events/features/events/com
 import { FormLayout } from '@client/v2-events/layouts'
 import { makeFormFieldIdFormikCompatible } from '@client/v2-events/components/forms/utils'
 import { useIntlFormatMessageWithFlattenedParams } from '@client/v2-events/messages/utils'
-import { useValidatorContext } from '@client/v2-events/hooks/useValidatorContext'
+import { useActionFormConditionalContext } from '@client/v2-events/hooks/useConditionalContext'
 import { recordAnchorDate } from '@client/v2-events/utils'
 import { EditActionMenu } from './EditActionMenu'
 import { EditPageBanner } from './EditPageBanner'
@@ -40,12 +40,12 @@ export function Review() {
   const navigate = useNavigate()
   const { formatMessage } = useIntlFormatMessageWithFlattenedParams()
   const event = events.getEvent.useGetEventFromCache(eventId)
-  const validatorContext = useValidatorContext(event)
   const {
     eventConfiguration: config,
     formConfig,
     reviewConfig
   } = useEditForm(event)
+  const conditionalContext = useActionFormConditionalContext(event, config)
   const currentEventState = getCurrentEventState(event, config)
   const previousFormValues = currentEventState.declaration
   const form = useEventFormData((state) => state.getFormValues())
@@ -84,13 +84,13 @@ export function Review() {
           anchor={recordAnchorDate(currentEventState)}
           annotation={annotation}
           attachmentPath={eventAttachmentPath(eventId)}
+          conditionalContext={conditionalContext}
           form={form}
           formConfig={formConfig}
           previousFormValues={previousFormValues}
           reviewFields={reviewConfig.fields}
           title={formatMessage(reviewConfig.title, form)}
           treatMissingValuesAsCleared={true}
-          validatorContext={validatorContext}
           onAnnotationChange={(values) => setAnnotation(values)}
           onEdit={handleEdit}
         />

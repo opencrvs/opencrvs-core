@@ -12,11 +12,11 @@ import * as _ from 'lodash'
 import {
   FieldConfig,
   EventState,
-  ValidatorContext,
   deepMerge,
   EventConfig,
   ActionDocument
 } from '@opencrvs/commons/client'
+import { FormConditionalContext } from '@client/v2-events/components/forms/formConditionalContext'
 import { hasFieldChanged } from '@client/v2-events/features/events/useEvents/procedures/actions/declarationDiff'
 
 export function aggregateAnnotations(actions: ActionDocument[]) {
@@ -40,7 +40,7 @@ export function getAnnotationComparisonForField(
   field: FieldConfig,
   acceptedActions: ActionDocument[],
   currentActionIndex: number,
-  context: ValidatorContext
+  context: FormConditionalContext
 ) {
   if (currentActionIndex < 0) {
     return {

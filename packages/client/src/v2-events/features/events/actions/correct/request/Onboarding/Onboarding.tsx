@@ -29,7 +29,7 @@ import { useActionAnnotation } from '@client/v2-events/features/events/useAction
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
 import { ROUTES } from '@client/v2-events/routes'
 import { useEventFormNavigation } from '@client/v2-events/features/events/useEventFormNavigation'
-import { useValidatorContext } from '@client/v2-events/hooks/useValidatorContext'
+import { useActionFormConditionalContext } from '@client/v2-events/hooks/useConditionalContext'
 
 const messages = defineMessages({
   title: {
@@ -52,13 +52,16 @@ export function Onboarding() {
   const setAnnotation = useActionAnnotation((state) => state.setAnnotation)
 
   const event = events.getEvent.useGetEventFromCache(eventId)
-  const validatorContext = useValidatorContext(event)
 
   const navigate = useNavigate()
   const intl = useIntl()
   const { closeActionView } = useEventFormNavigation()
   const { eventConfiguration: configuration } =
     useEventConfigurationForRecord(event)
+  const conditionalContext = useActionFormConditionalContext(
+    event,
+    configuration
+  )
 
   const actionConfiguration = configuration.actions.find(
     (action) => action.type === ActionType.REQUEST_CORRECTION
@@ -93,11 +96,6 @@ export function Onboarding() {
     return null
   }
 
-  const pagesValidatorContext = {
-    ...validatorContext,
-    baseFormState: eventIndex.declaration
-  }
-
   const onPageChange = (nextPageId: string) =>
     navigate(
       ROUTES.V2.EVENTS.REQUEST_CORRECTION.ONBOARDING.buildPath(
@@ -116,7 +114,8 @@ export function Onboarding() {
     getFormBackAction({
       formPages,
       formData: annotation,
-      validatorContext: pagesValidatorContext,
+      annotates: eventIndex.declaration,
+      conditionalContext,
       pageId: currentPageId,
       onNavigateToPage: onPageChange
     }) ?? (() => navigate(-1))
@@ -177,14 +176,15 @@ export function Onboarding() {
     >
       <PagesComponent
         hideBackToReview
+        annotates={eventIndex.declaration}
         attachmentPath={eventAttachmentPath(event.id)}
+        conditionalContext={conditionalContext}
         continueButtonText={intl.formatMessage(buttonMessages.continueButton)}
         eventConfig={configuration}
         formData={annotation}
         formPages={formPages}
         pageId={currentPageId}
         setFormData={(data) => setAnnotation(data)}
-        validatorContext={pagesValidatorContext}
         onPageChange={onPageChange}
         onSubmit={() => {
           return navigate(

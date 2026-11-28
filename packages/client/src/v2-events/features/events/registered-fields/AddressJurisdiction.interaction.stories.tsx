@@ -110,12 +110,13 @@ function scopeReferenceStory(
           path: '/event/:eventId',
           element: (
             <StyledFormFieldGenerator
+              annotates={null}
               attachmentPath={null}
+              conditionalContext={getTestValidatorContext(userRole)}
               eventConfig={tennisClubMembershipEvent}
               fields={addressFields()}
               formValues={declaration}
               id="my-form"
-              validatorContext={getTestValidatorContext(userRole)}
             />
           )
         },

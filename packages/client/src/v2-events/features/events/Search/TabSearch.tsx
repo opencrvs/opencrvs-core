@@ -24,16 +24,19 @@ import {
   NameFieldValue,
   isDateRangeFieldType,
   isNameFieldType,
-  ValidatorContext,
+  isFieldVisible,
   flattenFormState
 } from '@opencrvs/commons/client'
 import { FormFieldGenerator } from '@client/v2-events/components/forms/FormFieldGenerator'
 import { filterEmptyValues } from '@client/v2-events/utils'
 import { ROUTES } from '@client/v2-events/routes'
-import { useValidatorContext } from '@client/v2-events/hooks/useValidatorContext'
+import { useEventlessFormConditionalContext } from '@client/v2-events/hooks/useConditionalContext'
+import {
+  FormConditionalContext,
+  toActionFormConditionalContext
+} from '@client/v2-events/components/forms/formConditionalContext'
 import { useDefaultValue } from '@client/v2-events/hooks/useDefaultValue'
 import { useAdminStructure } from '@client/v2-events/hooks/useAdminStructure'
-import { isFieldVisible } from '@client/v2-events/conditionals'
 import { useSearchableFields } from '@client/v2-events/features/events/useEventConfiguration'
 import {
   getAdvancedSearchFieldErrors,
@@ -70,7 +73,7 @@ function SearchSectionForm({
   section,
   handleFieldChange,
   fieldValues,
-  validatorContext,
+  conditionalContext,
   eventConfig
 }: {
   section: {
@@ -80,7 +83,7 @@ function SearchSectionForm({
   }
   handleFieldChange: (fieldId: string, value: FieldValue) => void
   fieldValues?: EventState
-  validatorContext: ValidatorContext
+  conditionalContext: FormConditionalContext
   eventConfig: EventConfig
 }) {
   const intl = useIntl()
@@ -95,13 +98,14 @@ function SearchSectionForm({
       name={section.title.id}
     >
       <FormFieldGenerator
+        annotates={null}
         attachmentPath={null}
+        conditionalContext={conditionalContext}
         eventConfig={eventConfig}
         fields={section.fields}
         formValues={fieldValues}
         id={section.title.id}
         searchMode={true}
-        validatorContext={validatorContext}
         onFormChange={(updatedValues) => {
           Object.entries(updatedValues).forEach(([fieldId, value]) =>
             handleFieldChange(fieldId, value)
@@ -149,7 +153,7 @@ export function TabSearch({
 }) {
   const intl = useIntl()
   const navigate = useNavigate()
-  const validatorContext = useValidatorContext()
+  const conditionalContext = useEventlessFormConditionalContext()
   const getDefaultValues = useDefaultValue()
   const adminStructure = useAdminStructure()
   const getSearchableFields = useSearchableFields()
@@ -179,6 +183,13 @@ export function TabSearch({
     return { ...defaultValues, ...fieldValues }
   })
 
+  const isSearchFieldVisible = (field: FieldConfig) =>
+    isFieldVisible(
+      field,
+      { declaration: formValues },
+      toActionFormConditionalContext(conditionalContext)
+    )
+
   const prevEventId = useRef(currentEvent.id)
 
   useEffect(() => {
@@ -199,7 +210,7 @@ export function TabSearch({
     }))
 
   const errors = flattenFormState(
-    getAdvancedSearchFieldErrors(sections, formValues, validatorContext)
+    getAdvancedSearchFieldErrors(sections, formValues, conditionalContext)
   ).flatMap(([, fieldErrors]) => fieldErrors)
 
   const nonEmptyValues = filterEmptyValues(formValues)
@@ -210,7 +221,7 @@ export function TabSearch({
     const updatedValues = Object.entries(nonEmptyValues).reduce(
       (result, [fieldId, value]) => {
         const field = fields.find((f) => f.id === fieldId)
-        if (!field || !isFieldVisible(field, formValues, validatorContext)) {
+        if (!field || !isSearchFieldVisible(field)) {
           return result
         }
         if (field.type === FieldType.NAME && typeof value === 'object') {
@@ -250,7 +261,7 @@ export function TabSearch({
         if (!field) {
           return count
         }
-        if (!isFieldVisible(field, formValues, validatorContext)) {
+        if (!isSearchFieldVisible(field)) {
           return count
         }
         return count + countFilledFieldsForInputType(field, val)
@@ -267,11 +278,11 @@ export function TabSearch({
       {sections.map((section) => (
         <SearchSectionForm
           key={section.title.id}
+          conditionalContext={conditionalContext}
           eventConfig={currentEvent}
           fieldValues={fieldValues}
           handleFieldChange={handleFieldChange}
           section={section}
-          validatorContext={validatorContext}
         />
       ))}
       <SearchButton

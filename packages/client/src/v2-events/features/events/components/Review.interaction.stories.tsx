@@ -25,7 +25,10 @@ import {
   tennisClubMembershipEvent
 } from '@opencrvs/commons/client'
 import { TRPCProvider } from '@client/v2-events/trpc'
-import { storybookEventId } from '@client/v2-events/features/events/fixtures'
+import {
+  storybookEventId,
+  tennisClubMembershipEventDocument
+} from '@client/v2-events/features/events/fixtures'
 import { withValidatorContext } from '../../../../../.storybook/decorators'
 import { AcceptActionModalResult, Review } from './Review'
 
@@ -289,6 +292,7 @@ export const AcceptModalKeepsDeclarationConditionalValue: Story = {
           onConfirm: generateTranslationConfig('Confirm')
         }}
         declaration={{ 'applicant.dobUnknown': true, 'applicant.age': 30 }}
+        event={tennisClubMembershipEventDocument}
         eventConfiguration={tennisClubMembershipEvent}
         eventType="Tennis club membership"
         fields={[acceptModalAgeEvidenceField]}
@@ -330,6 +334,7 @@ export const AcceptModalHiddenDeclarationValueDoesNotShowField: Story = {
           onConfirm: generateTranslationConfig('Confirm')
         }}
         declaration={{ 'applicant.dobUnknown': false, 'applicant.age': 30 }}
+        event={tennisClubMembershipEventDocument}
         eventConfiguration={tennisClubMembershipEvent}
         eventType="Tennis club membership"
         fields={[acceptModalAgeEvidenceField]}

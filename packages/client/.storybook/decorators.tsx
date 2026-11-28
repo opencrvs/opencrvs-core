@@ -13,21 +13,20 @@ import type { Decorator } from '@storybook/react-vite'
 import {
   EventConfig,
   EventDocument,
-  getEventValidatorContext,
   getOrThrow,
   getTokenPayload,
   TestUserRole,
-  ValidatorContext,
   V2_DEFAULT_MOCK_ADMINISTRATIVE_AREAS_MAP
 } from '@opencrvs/commons/client'
 import { testDataGenerator } from '@client/tests/test-data-generators'
 import { getLeafAdministrativeAreaIds } from '@client/v2-events/hooks/useAdministrativeAreas'
+import { FormConditionalContext } from '@client/v2-events/components/forms/formConditionalContext'
 
 const generator = testDataGenerator(1337)
 
 /**
  *
- * @returns Stroybook decorator that provides a validator context based on the user role specified in the story parameters.
+ * @returns Storybook decorator that provides the context for conditionals in a form, based on the user role in the story parameters.
  *
  * @example Setting up meta for a story:
  *
@@ -48,21 +47,19 @@ export const DataDisplayWithConditionallyHiddenFields: StoryObj<
     }
  */
 export const withValidatorContext: Decorator = (Story, context) => {
-  const validatorContext: ValidatorContext = getTestValidatorContext(
+  const conditionalContext = getTestValidatorContext(
     context.parameters.userRole
   )
 
   return (
     <Story
-      args={{ ...context.args, validatorContext }}
-      validatorContext={validatorContext}
+      args={{ ...context.args, conditionalContext }}
+      conditionalContext={conditionalContext}
     />
   )
 }
-export function getTestValidatorContext(
-  userRole?: TestUserRole,
-  eventWithConfig?: { event: EventDocument; eventConfig: EventConfig }
-): ValidatorContext {
+
+function getTestUser(userRole?: TestUserRole) {
   let token
 
   if (userRole === TestUserRole.enum.FIELD_AGENT) {
@@ -79,24 +76,34 @@ export function getTestValidatorContext(
     token = generator.user.token.localRegistrar
   }
 
-  const user = getOrThrow(
+  return getOrThrow(
     getTokenPayload(token),
     'Token payload missing. User is not logged in'
   )
+}
 
-  const leafAdminStructureLocationIds = getLeafAdministrativeAreaIds(
-    V2_DEFAULT_MOCK_ADMINISTRATIVE_AREAS_MAP
-  )
-
-  if (!eventWithConfig) {
-    return { user, leafAdminStructureLocationIds }
+/**
+ * Returns the context for conditionals in a form, for the given user role and event.
+ * Without an event, the result is the context for a user form.
+ */
+export function getTestValidatorContext(
+  userRole?: TestUserRole,
+  eventWithConfig?: { event: EventDocument; eventConfig: EventConfig }
+): FormConditionalContext {
+  const eventlessContext = {
+    user: getTestUser(userRole),
+    leafAdminStructureLocationIds: getLeafAdministrativeAreaIds(
+      V2_DEFAULT_MOCK_ADMINISTRATIVE_AREAS_MAP
+    )
   }
 
-  const { event, eventConfig } = eventWithConfig
+  if (!eventWithConfig) {
+    return eventlessContext
+  }
 
   return {
-    user,
-    leafAdminStructureLocationIds,
-    event: getEventValidatorContext(event, eventConfig)
+    ...eventlessContext,
+    eventDocument: eventWithConfig.event,
+    eventConfig: eventWithConfig.eventConfig
   }
 }

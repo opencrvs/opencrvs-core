@@ -10,6 +10,7 @@
  */
 import { useSelector } from 'react-redux'
 import {
+  isActionAvailable,
   ActionType,
   TokenUserType,
   getCurrentEventState,
@@ -18,10 +19,9 @@ import {
   UUID
 } from '@opencrvs/commons/client'
 import { getUserDetails } from '@client/profile/profileSelectors'
-import { useValidatorContext } from '@client/v2-events/hooks/useValidatorContext'
+import { useActionConditionalContext } from '@client/v2-events/hooks/useConditionalContext'
 import { useEventFormData } from '@client/v2-events/features/events/useEventFormData'
 import { useActionAnnotation } from '@client/v2-events/features/events/useActionAnnotation'
-import { isActionAvailable } from '@client/v2-events/conditionals'
 import { useEventConfigurationForRecord } from '../useEventConfiguration'
 
 /**
@@ -31,8 +31,11 @@ import { useEventConfigurationForRecord } from '../useEventConfiguration'
  */
 export function useCanDirectlyRegister(event: EventDocument) {
   const userDetails = useSelector(getUserDetails)
-  const validatorContext = useValidatorContext()
   const { eventConfiguration } = useEventConfigurationForRecord(event)
+  const currentEventIndex = getCurrentEventState(event, eventConfiguration)
+  const actionContext = useActionConditionalContext({
+    eventIndex: currentEventIndex
+  })
   const declaration = useEventFormData((state) => state.getFormValues())
   const { getAnnotation } = useActionAnnotation()
   const annotation = getAnnotation()
@@ -41,7 +44,6 @@ export function useCanDirectlyRegister(event: EventDocument) {
     return false
   }
 
-  const currentEventIndex = getCurrentEventState(event, eventConfiguration)
   const declareActionConfig = getActionConfig({
     eventConfiguration,
     actionType: ActionType.DECLARE
@@ -50,7 +52,11 @@ export function useCanDirectlyRegister(event: EventDocument) {
   // If 'Declare' action conditions are not met, we should not allow the direct register
   if (
     !declareActionConfig ||
-    !isActionAvailable(declareActionConfig, currentEventIndex, validatorContext)
+    !isActionAvailable(
+      declareActionConfig,
+      { declaration: currentEventIndex.declaration },
+      actionContext
+    )
   ) {
     return false
   }
@@ -88,9 +94,10 @@ export function useCanDirectlyRegister(event: EventDocument) {
     return false
   }
 
+  // TODO: This index is not from the server. It adds a declare action that has not happened yet. https://github.com/opencrvs/opencrvs-core/issues/14485
   return isActionAvailable(
     registerActionConfig,
-    eventIndexAfterDeclare,
-    validatorContext
+    { declaration: eventIndexAfterDeclare.declaration },
+    { eventIndex: eventIndexAfterDeclare, user: actionContext.user }
   )
 }

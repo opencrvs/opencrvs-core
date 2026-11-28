@@ -22,11 +22,14 @@ import {
   getActionConfig,
   getAcceptedActions,
   getActionFormFields,
+  runFieldValidations,
   flattenFormState,
+  omitHiddenFields,
   FieldConfig,
   FieldUpdateValue,
   EventState,
   EventConfig,
+  isActionEnabled,
   AttachmentPath,
   eventAttachmentPath
 } from '@opencrvs/commons/client'
@@ -38,7 +41,10 @@ import { ROUTES } from '@client/v2-events/routes'
 import { useModal } from '@client/v2-events/hooks/useModal'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
 import { useUserAllowedActions } from '@client/v2-events/features/workqueues/Actions/useUserAllowedActions'
-import { useValidatorContext } from '@client/v2-events/hooks/useValidatorContext'
+import {
+  useActionConditionalContext,
+  useActionFormConditionalContext
+} from '@client/v2-events/hooks/useConditionalContext'
 import { validationErrorsInActionFormExist } from '@client/v2-events/components/forms/validation'
 import { actionIcons } from '@client/v2-events/features/workqueues/Actions/utils'
 import {
@@ -46,11 +52,7 @@ import {
   hasDeclarationFieldChanged,
   hasFieldChanged
 } from '@client/v2-events/features/events/useEvents/procedures/actions/declarationDiff'
-import {
-  isActionEnabled,
-  omitHiddenFields,
-  runFieldValidations
-} from '@client/v2-events/conditionals'
+import { formForConditionals } from '@client/v2-events/components/forms/formValues'
 import { useActionAnnotation } from '../../useActionAnnotation'
 import { useEventFormData } from '../../useEventFormData'
 import { TranslationTextWithFormatModifier } from '../../components/TranslationTextWithFormatModifier'
@@ -110,7 +112,7 @@ function EditActionModal({
 }: {
   attachmentPath: AttachmentPath
   /** Record the action is taken on, for fields that act on it, e.g. a print button. */
-  event?: EventDocument
+  event: EventDocument
   title: MessageDescriptor
   dialogCopy?: MessageDescriptor
   close: (result: EditActionModalResult) => void
@@ -119,17 +121,22 @@ function EditActionModal({
   declaration: EventState
 }) {
   const intl = useIntl()
-  const validatorContext = useValidatorContext(event)
+  const conditionalContext = useActionFormConditionalContext(
+    event,
+    eventConfiguration
+  )
   const dialogForm = useDialogFormState()
   const modalValues = dialogForm.formValues
+  // The dialog annotates the declaration.
+  const annotationForm = formForConditionals(modalValues, declaration)
 
   const errorsOnField = fields.flatMap((field) =>
     flattenFormState(
       runFieldValidations({
         field,
-        form: modalValues,
+        form: annotationForm,
         value: modalValues[field.id],
-        context: validatorContext
+        context: conditionalContext
       })
     ).flatMap(([, errs]) => errs)
   )
@@ -154,7 +161,9 @@ function EditActionModal({
           onClick={() =>
             close({
               confirmed: true,
-              values: omitHiddenFields(fields, modalValues, validatorContext)
+              values:
+                omitHiddenFields(fields, annotationForm, conditionalContext)
+                  .annotation ?? {}
             })
           }
         >
@@ -179,11 +188,12 @@ function EditActionModal({
       {fields.length > 0 && (
         <FormFieldGenerator
           {...dialogForm}
+          annotates={declaration}
           attachmentPath={attachmentPath}
+          conditionalContext={conditionalContext}
           eventConfig={eventConfiguration}
           fields={fields}
           id="edit-action-modal-form"
-          validatorContext={{ ...validatorContext, baseFormState: declaration }}
         />
       )}
     </Dialog>
@@ -202,7 +212,14 @@ function useEditActions(event: EventDocument) {
   const [modal, openModal] = useModal()
   const events = useEvents()
   const declaration = useEventFormData((state) => state.getFormValues())
-  const validatorContext = useValidatorContext(event)
+  const actionContext = useActionConditionalContext({
+    eventDocument: event,
+    eventConfig: eventConfiguration
+  })
+  const conditionalContext = useActionFormConditionalContext(
+    event,
+    eventConfiguration
+  )
 
   const formFields = formConfig.pages.flatMap((page) => page.fields)
   const declarationDiff = getChangedDeclarationDiff(
@@ -210,7 +227,7 @@ function useEditActions(event: EventDocument) {
     declaration,
     eventIndex.declaration,
     eventConfiguration,
-    validatorContext
+    conditionalContext
   )
   const changedFields = formFields.filter((f) =>
     hasDeclarationFieldChanged(
@@ -218,7 +235,7 @@ function useEditActions(event: EventDocument) {
       declaration,
       eventIndex.declaration,
       eventConfiguration,
-      validatorContext,
+      conditionalContext,
       formFields
     )
   )
@@ -229,7 +246,7 @@ function useEditActions(event: EventDocument) {
   const reviewFormFields = getReviewFormFields(eventConfiguration)
 
   const changedAnnotationFields = reviewFormFields.filter((f) =>
-    hasFieldChanged(f, originalAnnotation, annotation, validatorContext)
+    hasFieldChanged(f, originalAnnotation, annotation, conditionalContext)
   )
 
   const anyValuesHaveChanged =
@@ -244,7 +261,11 @@ function useEditActions(event: EventDocument) {
   const isTargetActionEnabled = (actionType: ActionType) => {
     const targetConfig = getActionConfig({ eventConfiguration, actionType })
     return targetConfig
-      ? isActionEnabled(targetConfig, eventIndex, validatorContext)
+      ? isActionEnabled(
+          targetConfig,
+          { declaration: eventIndex.declaration },
+          actionContext
+        )
       : true
   }
 
@@ -252,7 +273,7 @@ function useEditActions(event: EventDocument) {
     formConfig,
     form: declaration,
     annotation,
-    context: validatorContext,
+    conditionalContext,
     reviewFields: reviewConfig.fields
   })
 

@@ -8,13 +8,13 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
+// @TODO: Check whether we should pass context from here.
 import React from 'react'
 import {
   ActionDocument,
   ActionStatus,
   ActionType,
-  EventDocument,
-  ValidatorContext
+  EventDocument
 } from '@opencrvs/commons/client'
 import { RequestCorrection } from './RequestCorrection'
 import { PrintCertificate } from './PrintCertificate'
@@ -25,53 +25,27 @@ import { ActionFormContent } from './ActionFormContent'
 
 export function ActionTypeSpecificContent({
   action,
-  fullEvent,
-  validatorContext
+  fullEvent
 }: {
   action: ActionDocument
   fullEvent: EventDocument
-  validatorContext: ValidatorContext
 }) {
   const { type } = action
 
   if (type === ActionType.REQUEST_CORRECTION) {
-    return (
-      <RequestCorrection
-        action={action}
-        fullEvent={fullEvent}
-        validatorContext={validatorContext}
-      />
-    )
+    return <RequestCorrection action={action} fullEvent={fullEvent} />
   }
 
   if (type === ActionType.PRINT_CERTIFICATE) {
-    return (
-      <PrintCertificate
-        action={action}
-        event={fullEvent}
-        validatorContext={validatorContext}
-      />
-    )
+    return <PrintCertificate action={action} event={fullEvent} />
   }
 
   if (type === ActionType.CUSTOM) {
-    return (
-      <CustomActionContent
-        action={action}
-        event={fullEvent}
-        validatorContext={validatorContext}
-      />
-    )
+    return <CustomActionContent action={action} event={fullEvent} />
   }
 
   if (type === ActionType.EDIT) {
-    return (
-      <Edit
-        action={action}
-        fullEvent={fullEvent}
-        validatorContext={validatorContext}
-      />
-    )
+    return <Edit action={action} fullEvent={fullEvent} />
   }
 
   if (type === ActionType.DUPLICATE_DETECTED) {
@@ -89,13 +63,7 @@ export function ActionTypeSpecificContent({
   ]
 
   if (coreDialogFormActions.includes(type)) {
-    return (
-      <ActionFormContent
-        action={action}
-        event={fullEvent}
-        validatorContext={validatorContext}
-      />
-    )
+    return <ActionFormContent action={action} event={fullEvent} />
   }
 
   return null

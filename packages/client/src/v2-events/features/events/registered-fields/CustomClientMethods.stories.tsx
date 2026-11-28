@@ -28,7 +28,7 @@ const meta: Meta<FormFieldGeneratorPropsWithoutRef> = {
     layout: 'centered'
   },
   argTypes: {
-    validatorContext: { control: false }
+    conditionalContext: { control: false }
   },
   decorators: [
     (Story, context) => (

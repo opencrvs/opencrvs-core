@@ -26,7 +26,7 @@ const meta: Meta<FormFieldGeneratorPropsWithoutRef> = {
   title: 'Inputs/Data',
   component: FormFieldGenerator,
   argTypes: {
-    validatorContext: { control: false }
+    conditionalContext: { control: false }
   },
   decorators: [
     (Story, context) => (

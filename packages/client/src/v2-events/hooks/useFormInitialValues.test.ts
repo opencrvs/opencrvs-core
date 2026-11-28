@@ -15,17 +15,17 @@ import {
   FieldConfig,
   FieldType,
   FieldValue,
-  InteractiveFieldType,
-  ValidatorContext
+  InteractiveFieldType
 } from '@opencrvs/commons/client'
 import { generateTranslationConfig } from '@opencrvs/commons/client'
+import { generateTestEventlessConditionalContext } from '@client/tests/conditional-context'
 import { computeInitialValues } from './useFormInitialValues'
 
 // ---------------------------------------------------------------------------
 // computeInitialValues
 // ---------------------------------------------------------------------------
 
-const emptyValidator = {} as ValidatorContext
+const emptyContext = generateTestEventlessConditionalContext()
 const t = generateTranslationConfig
 
 /** Stub that returns the raw string defaultValue, or undefined. */
@@ -44,7 +44,9 @@ function run(
   return computeInitialValues(
     fields,
     formValues,
-    { ...emptyValidator, baseFormState: { ...form, ...formValues } },
+    null,
+    { ...form, ...formValues },
+    emptyContext,
     stubGetDefaultValue
   )
 }
@@ -117,7 +119,7 @@ describe('computeInitialValues', () => {
   it('intra-page derived default: field B defaultValue applied using field A default resolved in same pass', () => {
     // field A gets its defaultValue first; field B is only visible once A's value
     // is in the accumulated state, and then gets its own defaultValue applied.
-    // This distinguishes intra-page accumulation from cross-page (baseFormState).
+    // This distinguishes intra-page accumulation from cross-page (siblingValues).
     const fieldA: InteractiveFieldType = {
       id: 'a',
       type: FieldType.TEXT,
@@ -140,8 +142,8 @@ describe('computeInitialValues', () => {
       label: t('b')
     }
 
-    // No formValues and empty baseFormState — A and B both start unresolved.
-    // B must see A's resolved default (not baseFormState) to become visible.
+    // No formValues and empty siblingValues — A and B both start unresolved.
+    // B must see A's resolved default (not siblingValues) to become visible.
     const result = run([fieldA, fieldB], {}, {})
 
     expect(result['a']).toBe('a-default')
@@ -163,8 +165,8 @@ describe('computeInitialValues', () => {
     expect(result['a']).toBeNull()
   })
 
-  it('sync reference resolves value from baseFormState (previous page)', () => {
-    // field A lives on a previous page (in baseFormState), not in the current page's fields
+  it('sync reference resolves value from siblingValues (previous page)', () => {
+    // field A lives on a previous page (in siblingValues), not in the current page's fields
     const fieldB: InteractiveFieldType = {
       id: 'b',
       type: FieldType.TEXT,

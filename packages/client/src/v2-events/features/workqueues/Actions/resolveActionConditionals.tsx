@@ -21,13 +21,10 @@ import {
   getActionConfig,
   getAssignmentStatus,
   getAvailableActionsForEvent,
-  getOrThrow,
-  ValidatorContext
-} from '@opencrvs/commons/client'
-import {
   isActionEnabled,
-  isActionVisible
-} from '@client/v2-events/conditionals'
+  isActionVisible,
+  ActionConditionalContext
+} from '@opencrvs/commons/client'
 import { ActionMenuActionType, WorkqueueCtaType } from './utils'
 
 const STATUSES_THAT_CAN_BE_ASSIGNED: EventStatus[] = [
@@ -133,20 +130,17 @@ function resolveInternalActionConditions({
 export function resolveBaseActionConditionals({
   event,
   actionType,
-  validatorContext,
+  actionContext,
   isActionAllowedForUser,
   eventConfiguration
 }: {
   event: EventIndex
   actionType: DisplayableAction
-  validatorContext: ValidatorContext
+  actionContext: ActionConditionalContext
   isActionAllowedForUser: (action: DisplayableAction) => boolean
   eventConfiguration: EventConfig
 }) {
-  const user = getOrThrow(
-    validatorContext.user,
-    'Cannot determine action conditionals without user information'
-  )
+  const { user } = actionContext
 
   // 1. Gather all available actions for the event, including assignment actions
   const allAvailableActions = [
@@ -161,11 +155,12 @@ export function resolveBaseActionConditionals({
   const actionConfig = getActionConfig({ eventConfiguration, actionType })
 
   // 4. Check if the action is enabled/visible based on the configuration conditionals.
+  const form = { declaration: event.declaration }
   const isVisible = actionConfig
-    ? isActionVisible(actionConfig, event, validatorContext)
+    ? isActionVisible(actionConfig, form, actionContext)
     : true
   const isEnabled = actionConfig
-    ? isActionEnabled(actionConfig, event, validatorContext)
+    ? isActionEnabled(actionConfig, form, actionContext)
     : true
 
   return {
@@ -180,7 +175,7 @@ export function resolveBaseActionConditionals({
 export function resolveActionConditionals({
   event,
   actionType,
-  validatorContext,
+  actionContext,
   isActionAllowedForUser,
   eventConfiguration,
   isOnline,
@@ -193,7 +188,7 @@ export function resolveActionConditionals({
     WorkqueueCtaType | ActionMenuActionType,
     typeof ClientSpecificAction.CONTINUE_DRAFT
   >
-  validatorContext: ValidatorContext
+  actionContext: ActionConditionalContext
   isActionAllowedForUser: (action: DisplayableAction) => boolean
   eventConfiguration: EventConfig
   isOnline: boolean
@@ -204,16 +199,13 @@ export function resolveActionConditionals({
   enabled: boolean
   visible: boolean
 } {
-  const user = getOrThrow(
-    validatorContext.user,
-    'Cannot determine action conditionals without user information'
-  )
+  const { user } = actionContext
 
   // 1-5. The base result.
   const base = resolveBaseActionConditionals({
     event,
     actionType,
-    validatorContext,
+    actionContext,
     isActionAllowedForUser,
     eventConfiguration
   })

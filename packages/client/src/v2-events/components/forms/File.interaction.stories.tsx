@@ -71,7 +71,11 @@ export const FileInputWithOptionTest: Story = {
         path: '/event/:eventId',
         element: (
           <StyledFormFieldGenerator
+            annotates={null}
             attachmentPath={eventAttachmentPath(storybookEventId)}
+            conditionalContext={getTestValidatorContext(
+              TestUserRole.enum.LOCAL_REGISTRAR
+            )}
             fields={[
               {
                 id: 'storybook.file',
@@ -130,9 +134,6 @@ export const FileInputWithOptionTest: Story = {
               }
             ]}
             id="my-form"
-            validatorContext={getTestValidatorContext(
-              TestUserRole.enum.LOCAL_REGISTRAR
-            )}
           />
         )
       },
@@ -232,7 +233,11 @@ export const FileInputButton: Story = {
         path: '/event/:eventId',
         element: (
           <StyledFormFieldGenerator
+            annotates={null}
             attachmentPath={eventAttachmentPath(storybookEventId)}
+            conditionalContext={getTestValidatorContext(
+              TestUserRole.enum.LOCAL_REGISTRAR
+            )}
             fields={[
               {
                 id: 'storybook.file',
@@ -254,9 +259,6 @@ export const FileInputButton: Story = {
               }
             ]}
             id="my-form"
-            validatorContext={getTestValidatorContext(
-              TestUserRole.enum.LOCAL_REGISTRAR
-            )}
           />
         )
       },
@@ -350,7 +352,11 @@ export const FileInputPdfWithPreview: Story = {
         path: '/event/:eventId',
         element: (
           <StyledFormFieldGenerator
+            annotates={null}
             attachmentPath={eventAttachmentPath(storybookEventId)}
+            conditionalContext={getTestValidatorContext(
+              TestUserRole.enum.LOCAL_REGISTRAR
+            )}
             fields={[
               {
                 id: 'storybook.file',
@@ -372,9 +378,6 @@ export const FileInputPdfWithPreview: Story = {
               }
             ]}
             id="my-form"
-            validatorContext={getTestValidatorContext(
-              TestUserRole.enum.LOCAL_REGISTRAR
-            )}
           />
         )
       },
@@ -465,7 +468,11 @@ function maxImageSizeParameters(targetSize: { width: number; height: number }) {
         path: '/event/:eventId',
         element: (
           <StyledFormFieldGenerator
+            annotates={null}
             attachmentPath={eventAttachmentPath(storybookEventId)}
+            conditionalContext={getTestValidatorContext(
+              TestUserRole.enum.LOCAL_REGISTRAR
+            )}
             fields={[
               {
                 id: 'storybook.file',
@@ -488,9 +495,6 @@ function maxImageSizeParameters(targetSize: { width: number; height: number }) {
               }
             ]}
             id="my-form"
-            validatorContext={getTestValidatorContext(
-              TestUserRole.enum.LOCAL_REGISTRAR
-            )}
           />
         )
       },

@@ -44,7 +44,9 @@ export const FileInputWithOption: StoryObj<typeof FormFieldGenerator> = {
         path: '/event/:eventId',
         element: (
           <StyledFormFieldGenerator
+            annotates={null}
             attachmentPath={eventAttachmentPath(storybookEventId)}
+            conditionalContext={getTestValidatorContext()}
             fields={[
               {
                 id: 'storybook.file',
@@ -103,7 +105,6 @@ export const FileInputWithOption: StoryObj<typeof FormFieldGenerator> = {
               }
             ]}
             id="my-form"
-            validatorContext={getTestValidatorContext()}
           />
         )
       },
@@ -122,7 +123,9 @@ export const FileInputWithoutOption: StoryObj<typeof StyledFormFieldGenerator> =
           path: '/event/:eventId',
           element: (
             <StyledFormFieldGenerator
+              annotates={null}
               attachmentPath={eventAttachmentPath(storybookEventId)}
+              conditionalContext={getTestValidatorContext()}
               fields={[
                 {
                   id: 'storybook.file2',
@@ -143,7 +146,6 @@ export const FileInputWithoutOption: StoryObj<typeof StyledFormFieldGenerator> =
                 }
               ]}
               id="my-form"
-              validatorContext={getTestValidatorContext()}
             />
           )
         },

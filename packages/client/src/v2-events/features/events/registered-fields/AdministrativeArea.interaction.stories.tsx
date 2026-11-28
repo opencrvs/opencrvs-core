@@ -91,13 +91,14 @@ export const AdministrativeAreaWithCommunityLeader: StoryObj<
         path: '/event/:eventId',
         element: (
           <StyledFormFieldGenerator
+            annotates={null}
             attachmentPath={null}
+            conditionalContext={getTestValidatorContext(
+              TestUserRole.enum.COMMUNITY_LEADER
+            )}
             fields={fields}
             formValues={declaration}
             id="my-form"
-            validatorContext={getTestValidatorContext(
-              TestUserRole.enum.COMMUNITY_LEADER
-            )}
           />
         )
       },
@@ -153,13 +154,14 @@ export const AdministrativeAreaWithLocalRegistrar: StoryObj<
         path: '/event/:eventId',
         element: (
           <StyledFormFieldGenerator
+            annotates={null}
             attachmentPath={null}
+            conditionalContext={getTestValidatorContext(
+              TestUserRole.enum.LOCAL_REGISTRAR
+            )}
             fields={fields}
             formValues={declaration}
             id="my-form"
-            validatorContext={getTestValidatorContext(
-              TestUserRole.enum.LOCAL_REGISTRAR
-            )}
           />
         )
       },
@@ -217,13 +219,14 @@ export const AdministrativeAreaWithProvincialRegistrar: StoryObj<
         path: '/event/:eventId',
         element: (
           <StyledFormFieldGenerator
+            annotates={null}
             attachmentPath={null}
+            conditionalContext={getTestValidatorContext(
+              TestUserRole.enum.PROVINCIAL_REGISTRAR
+            )}
             fields={fields}
             formValues={declaration}
             id="my-form"
-            validatorContext={getTestValidatorContext(
-              TestUserRole.enum.PROVINCIAL_REGISTRAR
-            )}
           />
         )
       },

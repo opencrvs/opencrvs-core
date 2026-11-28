@@ -33,7 +33,7 @@ import { recordAnchorDate } from '@client/v2-events/utils'
 import { ROUTES } from '@client/v2-events/routes'
 import { makeFormFieldIdFormikCompatible } from '@client/v2-events/components/forms/utils'
 import { validationErrorsInActionFormExist } from '@client/v2-events/components/forms/validation'
-import { useValidatorContext } from '@client/v2-events/hooks/useValidatorContext'
+import { useActionFormConditionalContext } from '@client/v2-events/hooks/useConditionalContext'
 import { hasDeclarationFieldChanged } from '@client/v2-events/features/events/useEvents/procedures/actions/declarationDiff'
 
 export function Review() {
@@ -46,10 +46,13 @@ export function Review() {
   const events = useEvents()
 
   const event = events.getEvent.useGetEventFromCache(eventId)
-  const validatorContext = useValidatorContext(event)
 
   const { eventConfiguration: configuration } =
     useEventConfigurationForRecord(event)
+  const conditionalContext = useActionFormConditionalContext(
+    event,
+    configuration
+  )
   const eventIndex = getCurrentEventState(event, configuration)
 
   const formConfig = getDeclaration(configuration)
@@ -66,7 +69,7 @@ export function Review() {
       form,
       previousFormValues,
       configuration,
-      validatorContext
+      conditionalContext
     )
   )
   const anyValuesHaveChanged = changedFields.length > 0
@@ -86,7 +89,7 @@ export function Review() {
   const incomplete = validationErrorsInActionFormExist({
     formConfig,
     form,
-    context: validatorContext
+    conditionalContext
   })
 
   return (
@@ -94,6 +97,7 @@ export function Review() {
       <ReviewComponent.Body
         anchor={recordAnchorDate(eventIndex)}
         attachmentPath={eventAttachmentPath(eventId)}
+        conditionalContext={conditionalContext}
         form={form}
         formConfig={formConfig}
         isCorrection={true}
@@ -103,7 +107,6 @@ export function Review() {
           previousFormValues
         )}
         treatMissingValuesAsCleared={true}
-        validatorContext={validatorContext}
         onEdit={({ pageId, fieldId }) => {
           navigate(
             ROUTES.V2.EVENTS.REQUEST_CORRECTION.PAGES.buildPath(

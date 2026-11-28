@@ -20,6 +20,7 @@ import {
   FieldConfig,
   generateTransactionId,
   getDeclarationFields,
+  isFieldVisible,
   getCurrentEventState,
   ActionType
 } from '@opencrvs/commons/client'
@@ -43,9 +44,8 @@ import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents
 import { ROUTES } from '@client/v2-events/routes'
 import { useActionAnnotation } from '@client/v2-events/features/events/useActionAnnotation'
 import { useUserAllowedActions } from '@client/v2-events/features/workqueues/Actions/useUserAllowedActions'
-import { useValidatorContext } from '@client/v2-events/hooks/useValidatorContext'
 import { getChangedDeclarationDiff } from '@client/v2-events/features/events/useEvents/procedures/actions/declarationDiff'
-import { isFieldVisible } from '@client/v2-events/conditionals'
+import { useActionFormConditionalContext } from '@client/v2-events/hooks/useConditionalContext'
 import { CorrectionDetails } from './CorrectionDetails'
 
 const messages = defineMessages({
@@ -91,8 +91,11 @@ export function Summary() {
 
   const events = useEvents()
   const event = events.getEvent.useGetEventFromCache(eventId)
-  const validatorContext = useValidatorContext(event)
   const { eventConfiguration } = useEventConfigurationForRecord(event)
+  const conditionalContext = useActionFormConditionalContext(
+    event,
+    eventConfiguration
+  )
   const eventIndex = getCurrentEventState(event, eventConfiguration)
   const togglePrompt = () => setShowPrompt(!showPrompt)
 
@@ -113,16 +116,20 @@ export function Summary() {
       form,
       previousFormValues,
       eventConfiguration,
-      validatorContext
+      conditionalContext
     )
 
     const valuesThatGotHidden = fields.filter((field) => {
       const wasVisible = isFieldVisible(
         field,
-        previousFormValues,
-        validatorContext
+        { declaration: previousFormValues },
+        conditionalContext
       )
-      const isHidden = !isFieldVisible(field, form, validatorContext)
+      const isHidden = !isFieldVisible(
+        field,
+        { declaration: form },
+        conditionalContext
+      )
       return wasVisible && isHidden
     })
 
@@ -143,7 +150,8 @@ export function Summary() {
       transactionId: generateTransactionId(),
       annotation,
       event,
-      context: validatorContext,
+      // @todo: check this. We should never pass, and definitely not trust client provided context.
+      context: conditionalContext,
       fullEvent: event
     }
 
@@ -169,7 +177,7 @@ export function Summary() {
     previousFormValues,
     navigate,
     userMayCorrect,
-    validatorContext,
+    conditionalContext,
     eventConfiguration,
     backTo
   ])
@@ -273,7 +281,6 @@ export function Summary() {
             event={event}
             form={form}
             requesting={!userMayCorrect}
-            validatorContext={validatorContext}
           />
         </Content>
       </Frame>

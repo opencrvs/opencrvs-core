@@ -14,7 +14,8 @@ import {
   ActionType,
   EventIndex,
   CustomActionConfig,
-  getOrThrow,
+  isActionEnabled,
+  isActionVisible,
   getAvailableActionsForEvent,
   isValidIcon,
   getAcceptedScopesByType,
@@ -26,12 +27,8 @@ import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents
 import { useEventConfigurationForRecord } from '@client/v2-events/features/events/useEventConfiguration'
 import { getScope } from '@client/profile/profileSelectors'
 import { useCustomActionModal } from '@client/v2-events/features/events/actions/quick-actions/useQuickActionModal'
-import { useValidatorContext } from '@client/v2-events/hooks/useValidatorContext'
+import { useActionConditionalContext } from '@client/v2-events/hooks/useConditionalContext'
 import { useCanAccessEventWithScopes } from '@client/v2-events/hooks/useCanAccessEventWithScopes'
-import {
-  isActionEnabled,
-  isActionVisible
-} from '@client/v2-events/conditionals'
 import { ActionMenuItem } from './utils'
 
 export function useCustomActionConfigs(event: EventIndex): {
@@ -42,17 +39,17 @@ export function useCustomActionConfigs(event: EventIndex): {
   const { useFindEventFromCache } = useEvents().getEvent
   const cachedEvent = useFindEventFromCache(event.id)
   const isDownloaded = Boolean(cachedEvent.data)
-  const validatorContext = useValidatorContext(cachedEvent.data)
   const { canAccessEventWithScopes } = useCanAccessEventWithScopes(event.id, [
     'record.custom-action'
   ])
 
-  const userId = getOrThrow(
-    validatorContext.user?.sub,
-    'Authentication is not available but is required'
-  )
-
   const { eventConfiguration } = useEventConfigurationForRecord(event)
+  const actionContext = useActionConditionalContext(
+    cachedEvent.data
+      ? { eventDocument: cachedEvent.data, eventConfig: eventConfiguration }
+      : { eventIndex: event }
+  )
+  const userId = actionContext.user.sub
   const { customActionModal, onCustomAction } = useCustomActionModal(
     event.id,
     eventConfiguration
@@ -69,6 +66,8 @@ export function useCustomActionConfigs(event: EventIndex): {
     }).length > 0
 
   const customActionConfigs = useMemo(() => {
+    const form = { declaration: event.declaration }
+
     if (!hasCustomActionScope) {
       return []
     }
@@ -94,9 +93,9 @@ export function useCustomActionConfigs(event: EventIndex): {
         onClick: async (backTo?: string) => onCustomAction(action, backTo),
         disabled: !(
           isDownloadedAndAssignedToUser &&
-          isActionEnabled(action, event, validatorContext)
+          isActionEnabled(action, form, actionContext)
         ),
-        hidden: !isActionVisible(action, event, validatorContext),
+        hidden: !isActionVisible(action, form, actionContext),
         type: ActionType.CUSTOM,
         customActionType: action.customActionType
       }))
@@ -104,7 +103,7 @@ export function useCustomActionConfigs(event: EventIndex): {
     hasCustomActionScope,
     eventConfiguration.actions,
     isDownloadedAndAssignedToUser,
-    validatorContext,
+    actionContext,
     event,
     onCustomAction,
     canAccessEventWithScopes

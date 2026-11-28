@@ -14,7 +14,7 @@ import {
   EventDocument,
   EventState,
   getCurrentEventState,
-  getEventValidatorContext
+  getOrThrow
 } from '@opencrvs/commons/client'
 import * as customApi from '@client/v2-events/custom-api'
 import { useEventConfigurationResolver } from '@client/v2-events/features/events/useEventConfiguration'
@@ -35,7 +35,7 @@ import {
 } from '@client/v2-events/features/events/useEvents/procedures/actions/mutationHandlers'
 import { waitUntilEventIsCreated } from '@client/v2-events/features/events/useEvents/procedures/utils'
 import { queryClient } from '@client/v2-events/trpc'
-import { useValidatorContext } from '@client/v2-events/hooks/useValidatorContext'
+import { useEventlessFormConditionalContext } from '@client/v2-events/hooks/useConditionalContext'
 
 export type CustomMutationKeys = keyof typeof customApi
 
@@ -133,7 +133,7 @@ export function useEventCustomAction<T extends CustomMutationKeys>(
 ) {
   const findEventConfiguration = useEventConfigurationResolver()
 
-  const validatorContext = useValidatorContext()
+  const eventlessContext = useEventlessFormConditionalContext()
   const mutationKey = customMutationKeys[mutationName]
   const mutation = useMutation({
     mutationKey,
@@ -142,10 +142,13 @@ export function useEventCustomAction<T extends CustomMutationKeys>(
 
   return {
     mutate: (params: Omit<CustomMutationTypes[T], 'eventConfiguration'>) => {
-      const localEvent = findLocalEventDocument(params.eventId)
+      // A custom action needs the assignment, and the assignment downloads the event.
+      const localEvent = getOrThrow(
+        findLocalEventDocument(params.eventId),
+        `The event ${params.eventId} must be downloaded before the custom action is sent`
+      )
 
-      const eventConfiguration =
-        localEvent && findEventConfiguration(localEvent)
+      const eventConfiguration = findEventConfiguration(localEvent)
 
       if (!eventConfiguration) {
         throw new Error('Event configuration not found')
@@ -170,7 +173,7 @@ export function useEventCustomAction<T extends CustomMutationKeys>(
           params.event as EventDocument,
           eventConfiguration
         ).declaration
-      } else if (needsOriginalDeclaration && localEvent) {
+      } else if (needsOriginalDeclaration) {
         originalDeclaration = getCurrentEventState(
           localEvent,
           eventConfiguration
@@ -185,11 +188,10 @@ export function useEventCustomAction<T extends CustomMutationKeys>(
           form: getSubmissionForm(eventConfiguration, mutationName),
           originalDeclaration,
           declarationDiff: params.declaration,
-          validatorContext: {
-            ...validatorContext,
-            event:
-              localEvent &&
-              getEventValidatorContext(localEvent, eventConfiguration)
+          conditionalContext: {
+            ...eventlessContext,
+            eventDocument: localEvent,
+            eventConfig: eventConfiguration
           }
         })
       })

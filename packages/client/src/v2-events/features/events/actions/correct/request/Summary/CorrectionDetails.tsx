@@ -21,14 +21,16 @@ import {
   EventDocument,
   EventState,
   getCurrentEventState,
+  isFieldVisible,
+  isPageVisible,
   PageConfig,
   PageTypes,
   RequestedCorrectionAction,
   TranslationConfig,
   UUID,
-  ValidatorContext,
   PlainDate,
-  toPlainDate
+  toPlainDate,
+  ActionFormConditionalContext
 } from '@opencrvs/commons/client'
 import { makeFormFieldIdFormikCompatible } from '@client/v2-events/components/forms/utils'
 import { messages as correctionMessages } from '@client/i18n/messages/views/correction'
@@ -41,7 +43,7 @@ import { ROUTES } from '@client/v2-events/routes'
 import { useUserDetails } from '@client/v2-events/hooks/useUserDetails'
 import { useLocations } from '@client/v2-events/hooks/useLocations'
 import { recordAnchorDate, resolveLocationName } from '@client/v2-events/utils'
-import { isFieldVisible, isPageVisible } from '@client/v2-events/conditionals'
+import { useActionFormConditionalContext } from '@client/v2-events/hooks/useConditionalContext'
 import { DeclarationComparisonTable } from './DeclarationComparisonTable'
 
 const messages = defineMessages({
@@ -120,12 +122,14 @@ function buildCorrectionDetails(
   intl: IntlShape,
   submitterName: string,
   locations: Map<UUID, ClientLocation>,
-  validatorContext: ValidatorContext,
+  conditionalContext: ActionFormConditionalContext,
   anchor: PlainDate,
   correctionRequestAction?: Action
 ): CorrectionDetail[] {
   const details: CorrectionDetail[] = correctionFormPages
-    .filter((page) => isPageVisible(page, annotation, validatorContext))
+    .filter((page) =>
+      isPageVisible(page, { declaration: form, annotation }, conditionalContext)
+    )
     .flatMap((page) => {
       if (page.type === PageTypes.enum.VERIFICATION) {
         const value = !!annotation[page.id]
@@ -144,10 +148,11 @@ function buildCorrectionDetails(
       }
       return page.fields
         .filter((f) =>
-          isFieldVisible(f, annotation, {
-            ...validatorContext,
-            baseFormState: form
-          })
+          isFieldVisible(
+            f,
+            { declaration: form, annotation },
+            conditionalContext
+          )
         )
         .filter((f) => !isEmptyValue(f, { ...form, ...annotation }[f.id]))
         .map((field) => ({
@@ -205,8 +210,7 @@ export function CorrectionDetails({
   annotation,
   requesting,
   editable = false,
-  correctionRequestAction,
-  validatorContext
+  correctionRequestAction
 }: {
   event: EventDocument
   form: EventState
@@ -215,10 +219,14 @@ export function CorrectionDetails({
   correctionRequestAction?: RequestedCorrectionAction
   editable?: boolean
   backTo?: string
-  validatorContext: ValidatorContext
 }) {
   const intl = useIntl()
+  // @TODO: Check if we should keep passing this as prop
   const { eventConfiguration } = useEventConfigurationForRecord(event)
+  const conditionalContext = useActionFormConditionalContext(
+    event,
+    eventConfiguration
+  )
 
   const navigate = useNavigate()
   const { getUserDetails } = useUserDetails()
@@ -251,7 +259,7 @@ export function CorrectionDetails({
     intl,
     submitterName,
     locations,
-    validatorContext,
+    conditionalContext,
     anchor,
     correctionRequestAction
   )
@@ -325,7 +333,6 @@ export function CorrectionDetails({
         form={form}
         fullEvent={event}
         id={'corrections-table'}
-        validatorContext={validatorContext}
       />
     </>
   )

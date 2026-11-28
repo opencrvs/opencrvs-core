@@ -16,14 +16,18 @@ import type {
 } from '@trpc/tanstack-react-query'
 import { TRPCClientError } from '@trpc/client'
 import { useSyncExternalStore } from 'react'
+import { isEmpty } from 'lodash'
 import {
+  ActionFormConditionalContext,
   ActionType,
   EventDocument,
+  getOrThrow,
+  isMetaAction,
   getActionAnnotationFields,
+  omitHiddenFields,
   deepDropNulls,
   deepMerge,
   getCurrentEventState,
-  getEventValidatorContext,
   getActionConfig
 } from '@opencrvs/commons/client'
 import { useEventConfigurationResolver } from '@client/v2-events/features/events/useEventConfiguration'
@@ -50,7 +54,7 @@ import {
   queryClient,
   trpcOptionsProxy
 } from '@client/v2-events/trpc'
-import { useValidatorContext } from '@client/v2-events/hooks/useValidatorContext'
+import { useEventlessFormConditionalContext } from '@client/v2-events/hooks/useConditionalContext'
 
 import {
   deleteLocalEventAndToastOnDuplicate,
@@ -58,7 +62,6 @@ import {
   retryDelay,
   retryUnlessConflict
 } from '@client/v2-events/features/events/useEvents/procedures/actions/mutationHandlers'
-import { omitHiddenFields } from '@client/v2-events/conditionals'
 
 setMutationDefaults(trpcOptionsProxy.event.actions.custom.request, {
   mutationFn: createEventActionMutationFn(
@@ -288,7 +291,7 @@ export function useEventAction<P extends DecorateMutationProcedure<any>>(
 ) {
   const findEventConfiguration = useEventConfigurationResolver()
 
-  const validatorContext = useValidatorContext()
+  const eventlessContext = useEventlessFormConditionalContext()
 
   const allOptions = {
     ...trpcProcedure.mutationOptions(),
@@ -368,35 +371,50 @@ export function useEventAction<P extends DecorateMutationProcedure<any>>(
       ? getActionAnnotationFields(actionConfig)
       : []
 
-    // Action types with no config entry at all (ASSIGN, UNASSIGN, duplicate
-    // and correction actions, ...) get their annotation cleared, as before.
+    /*
+     * Every action that sends a declaration or an annotation needs the assignment.
+     * The assignment downloads the event, so the event is local.
+     */
+    const getConditionalContext = (): ActionFormConditionalContext => ({
+      ...eventlessContext,
+      eventDocument: getOrThrow(
+        localFullEvent,
+        `The event ${eventId} must be downloaded before the ${actionType} action is sent`
+      ),
+      eventConfig: eventConfiguration
+    })
+
+    // Action types with no config entry at all (duplicate and correction actions, ...)
+    // get their annotation cleared. Assign, unassign and read send no annotation,
+    // and the user can send them before the event is downloaded.
     // Types with a config entry keep pass-through semantics even with zero
     // configured fields — EDIT's annotation carries review-page values.
-    const annotation = actionConfig
-      ? deepDropNulls(
-          omitHiddenFields(annotationFields, restParams.annotation ?? {}, {
-            baseFormState: submittedDeclaration
-          })
-        )
-      : {}
-
-    const localEventDocument = findLocalEventDocument(eventId)
+    const annotation =
+      actionConfig && !isMetaAction(actionType)
+        ? deepDropNulls(
+            omitHiddenFields(
+              annotationFields,
+              {
+                declaration: submittedDeclaration,
+                annotation: restParams.annotation ?? {}
+              },
+              getConditionalContext()
+            ).annotation ?? {}
+          )
+        : {}
 
     return {
       ...restParams,
       eventId,
-      declaration: getCleanedDeclarationDiff({
-        eventConfiguration,
-        form: getSubmissionForm(eventConfiguration, actionType),
-        originalDeclaration,
-        declarationDiff: params.declaration,
-        validatorContext: {
-          ...validatorContext,
-          event:
-            localEventDocument &&
-            getEventValidatorContext(localEventDocument, eventConfiguration)
-        }
-      }),
+      declaration: isEmpty(params.declaration)
+        ? params.declaration
+        : getCleanedDeclarationDiff({
+            eventConfiguration,
+            form: getSubmissionForm(eventConfiguration, actionType),
+            originalDeclaration,
+            declarationDiff: params.declaration,
+            conditionalContext: getConditionalContext()
+          }),
       annotation
     }
   }

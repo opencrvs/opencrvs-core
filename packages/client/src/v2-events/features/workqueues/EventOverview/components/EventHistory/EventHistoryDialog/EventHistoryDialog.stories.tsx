@@ -32,7 +32,6 @@ import {
   INITIAL_EVENT_CONFIG_VERSION_ID
 } from '@opencrvs/commons/client'
 import { testDataGenerator } from '@client/tests/test-data-generators'
-import { getTestValidatorContext } from '../../../../../../../../.storybook/decorators'
 import { EventHistoryDialog } from './EventHistoryDialog'
 
 const declaration = {
@@ -105,7 +104,6 @@ const fullEvent = {
 const argbase = {
   userName: 'Jane Doe',
   fullEvent,
-  validatorContext: getTestValidatorContext(),
   action: {
     ...actionBase
   }
@@ -117,7 +115,6 @@ const meta: Meta<typeof EventHistoryDialog> = {
   args: {
     userName: 'Jane Doe',
     fullEvent,
-    validatorContext: getTestValidatorContext(),
     isAwaitingConfirmation: false
   }
 }

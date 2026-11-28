@@ -53,9 +53,9 @@ import {
 import {
   eventQueryDataGenerator,
   generateActionDocument,
-  generateEmptyTestValidatorContext,
   generateTranslationConfig,
-  withDeclaration
+  withDeclaration,
+  generateEmptyTestConditionalContext
 } from './test.utils'
 import { DeclarationFormConfig } from './FormConfig'
 import { toNotificationForm } from './toNotificationForm'
@@ -609,7 +609,7 @@ describe('omitHiddenPaginatedFields', () => {
     const declarationWithoutHiddenFields = omitHiddenPaginatedFields(
       declarationConfig,
       { declaration, annotation: {} },
-      generateEmptyTestValidatorContext(tennisClubMembershipEvent)
+      generateEmptyTestConditionalContext(tennisClubMembershipEvent)
     ).declaration
 
     const missingKeys = difference(
@@ -646,7 +646,7 @@ describe('omitHiddenPaginatedFields', () => {
         },
         annotation: {}
       },
-      generateEmptyTestValidatorContext(tennisClubMembershipEvent),
+      generateEmptyTestConditionalContext(tennisClubMembershipEvent),
       true
     ).declaration
 
@@ -704,7 +704,7 @@ describe('omitHiddenPaginatedFields', () => {
     const result = omitHiddenPaginatedFields(
       formConfig,
       { declaration: values, annotation: {} },
-      generateEmptyTestValidatorContext(tennisClubMembershipEvent)
+      generateEmptyTestConditionalContext(tennisClubMembershipEvent)
     ).declaration
 
     expect(result).toMatchObject({ 'shared.field': 'value' })

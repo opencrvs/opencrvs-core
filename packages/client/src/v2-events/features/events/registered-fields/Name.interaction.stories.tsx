@@ -101,7 +101,7 @@ const meta: Meta<FormFieldGeneratorPropsWithoutRef> = {
     chromatic: { disableSnapshot: true }
   },
   argTypes: {
-    validatorContext: { control: false }
+    conditionalContext: { control: false }
   },
   args: {
     id: 'name-form',

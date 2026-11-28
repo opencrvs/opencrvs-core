@@ -8,6 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
+// @TODO: REREAD
 import { get, pick } from 'lodash'
 import {
   ActionUpdate,
@@ -17,93 +18,159 @@ import {
   buildClientFunctionContext,
   flattenFieldReference,
   isCodeToEvaluate,
+  isFieldVisible,
   runClientFunction,
-  FieldType,
-  ValidatorContext
+  FieldType
 } from '@opencrvs/commons/client'
 import { resolveSyncedFieldValue } from '@client/v2-events/components/forms/FormFieldGenerator/utils'
-import { isFieldVisible } from '@client/v2-events/conditionals'
+import {
+  formForConditionals,
+  mergeFormValues
+} from '@client/v2-events/components/forms/formValues'
+import {
+  FormConditionalContext,
+  toActionFormConditionalContext
+} from '@client/v2-events/components/forms/formConditionalContext'
 import { useDefaultValue } from './useDefaultValue'
 
+type GetDefaultValue = (
+  field: FieldConfig,
+  form: EventState | ActionUpdate
+) => FieldValue | undefined
+
+/**
+ * Returns the value of a visible field: the form value, else the synced value, else the default value.
+ * A form value can be `null`. The function keeps it.
+ *
+ * @param resolvedValues the values of the page that are resolved before this field.
+ * @param annotates see `formForConditionals`.
+ * @param siblingValues the other values of the form, e.g. the other pages.
+ */
+function resolveFieldValue(
+  field: FieldConfig,
+  resolvedValues: EventState,
+  annotates: ActionUpdate | null,
+  siblingValues: ActionUpdate,
+  getDefaultValue: GetDefaultValue
+): FieldValue | undefined {
+  if (resolvedValues[field.id] !== undefined) {
+    return resolvedValues[field.id]
+  }
+
+  const syncedValue = resolveSyncedFieldValue(field, (syncRef) => {
+    const key = flattenFieldReference(syncRef)
+    const referenced =
+      get(resolvedValues, key) ??
+      get(
+        mergeFormValues(formForConditionals({}, annotates, siblingValues)),
+        key
+      )
+
+    // A computed reference stores the result of its function, not the value that it reads.
+    return isCodeToEvaluate(syncRef)
+      ? (runClientFunction(
+          syncRef.$$code,
+          referenced,
+          buildClientFunctionContext({
+            form: mergeFormValues(
+              formForConditionals(resolvedValues, annotates, siblingValues)
+            )
+          })
+        ) as FieldValue | undefined)
+      : referenced
+  })
+
+  return (
+    syncedValue ??
+    getDefaultValue(
+      field,
+      mergeFormValues(
+        formForConditionals(resolvedValues, annotates, siblingValues)
+      )
+    )
+  )
+}
+
+/**
+ * Resolves the values of a page. The function does not change its arguments.
+ *
+ * Each field sees the values that are resolved before it on the page.
+ * A hidden field keeps its value. A field group resolves the values of its subfields in the same way.
+ *
+ * @param values the values of the page, before they are resolved.
+ * @param annotates see `formForConditionals`.
+ * @param siblingValues the other values of the form, e.g. the other pages.
+ */
 export function computeInitialValues(
   fields: FieldConfig[],
   values: EventState,
-  context: ValidatorContext,
-  getDefaultValue: (
-    field: FieldConfig,
-    form: EventState | ActionUpdate
-  ) => FieldValue | undefined
+  annotates: ActionUpdate | null,
+  siblingValues: ActionUpdate,
+  conditionalContext: FormConditionalContext,
+  getDefaultValue: GetDefaultValue
 ): EventState {
-  for (const field of fields) {
+  return fields.reduce((resolvedValues, field) => {
     if (field.type === FieldType.FIELD_GROUP) {
-      // Recurse cumulatively — sub-fields see accumulated top-level state
-      const subValues = computeInitialValues(
+      const groupValues = computeInitialValues(
         field.fields,
-        (values[field.id] as EventState | undefined) ?? {},
-        { ...context, baseFormState: { ...context.baseFormState, ...values } },
+        (resolvedValues[field.id] as EventState | undefined) ?? {},
+        annotates,
+        { ...siblingValues, ...resolvedValues },
+        conditionalContext,
         getDefaultValue
       )
-      values[field.id] = subValues
-      continue
+
+      return { ...resolvedValues, [field.id]: groupValues }
     }
 
-    if (!isFieldVisible(field, values, context)) {
-      continue
+    if (
+      !isFieldVisible(
+        field,
+        formForConditionals(resolvedValues, annotates, siblingValues),
+        toActionFormConditionalContext(conditionalContext)
+      )
+    ) {
+      return resolvedValues
     }
 
-    /*
-    /* Visible simple field: formValue ?? resolveSyncedFieldValue ?? getDefaultValue
-     * where a formValue can be null
-     */
-    const effectiveValue =
-      values[field.id] !== undefined
-        ? values[field.id]
-        : (resolveSyncedFieldValue(field, (syncRef) => {
-            const key = flattenFieldReference(syncRef)
-            const referenced =
-              get(values, key) ?? get(context.baseFormState, key)
-
-            /*
-             * A computed reference names the value it reads from; what it
-             * stores is what it's function makes of that value, not the value
-             * itself.
-             */
-            return isCodeToEvaluate(syncRef)
-              ? (runClientFunction(
-                  syncRef.$$code,
-                  referenced,
-                  buildClientFunctionContext({
-                    form: { ...context.baseFormState, ...values }
-                  })
-                ) as FieldValue | undefined)
-              : referenced
-          }) ?? getDefaultValue(field, values))
-
-    values[field.id] = effectiveValue
-  }
-
-  return values
+    return {
+      ...resolvedValues,
+      [field.id]: resolveFieldValue(
+        field,
+        resolvedValues,
+        annotates,
+        siblingValues,
+        getDefaultValue
+      )
+    }
+  }, values)
 }
 
 export function useFormInitialValues() {
   const getDefaultValue = useDefaultValue()
 
   return {
+    /**
+     * @param editedValues all the values that the form edits. The values of the page are taken from it.
+     * @param annotates see `formForConditionals`.
+     * @param siblingValues see `formForConditionals`.
+     */
     getInitialValues: (
       pageFields: FieldConfig[],
-      fullForm: EventState,
-      context: ValidatorContext
+      editedValues: EventState,
+      annotates: ActionUpdate | null,
+      siblingValues: ActionUpdate | undefined,
+      conditionalContext: FormConditionalContext
     ) =>
       computeInitialValues(
         pageFields,
         pick(
-          fullForm,
+          editedValues,
           pageFields.map((field) => field.id)
         ),
-        {
-          ...context,
-          baseFormState: { ...context.baseFormState, ...fullForm }
-        },
+        annotates,
+        { ...siblingValues, ...editedValues },
+        conditionalContext,
         getDefaultValue
       )
   }

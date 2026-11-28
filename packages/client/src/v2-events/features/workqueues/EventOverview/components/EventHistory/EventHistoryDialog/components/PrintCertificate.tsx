@@ -19,7 +19,7 @@ import {
   PageTypes,
   getPrintCertificatePages,
   getCurrentEventState,
-  ValidatorContext
+  isFieldDisplayedOnReview
 } from '@opencrvs/commons/client'
 import { useEventConfigurationForRecord } from '@client/v2-events/features/events/useEventConfiguration'
 import {
@@ -29,7 +29,7 @@ import {
 import { useCertificateTemplateSelectorFieldConfig } from '@client/v2-events/features/events/useCertificateTemplateSelectorFieldConfig'
 import { useAppConfig } from '@client/v2-events/hooks/useAppConfig'
 import { recordAnchorDate } from '@client/v2-events/utils'
-import { isFieldDisplayedOnReview } from '@client/v2-events/conditionals'
+import { useActionFormConditionalContext } from '@client/v2-events/hooks/useConditionalContext'
 
 const verifiedMessage = {
   id: 'verified',
@@ -39,14 +39,16 @@ const verifiedMessage = {
 
 export function PrintCertificate({
   event,
-  action,
-  validatorContext
+  action
 }: {
   event: EventDocument
   action: PrintCertificateAction
-  validatorContext: ValidatorContext
 }) {
   const { eventConfiguration } = useEventConfigurationForRecord(event)
+  const conditionalContext = useActionFormConditionalContext(
+    event,
+    eventConfiguration
+  )
   const formPages = getPrintCertificatePages(eventConfiguration)
   const intl = useIntl()
 
@@ -55,7 +57,10 @@ export function PrintCertificate({
   // These are form values, so their locations resolve at the record's form
   // anchor (date of event, falling back to creation) — not the action date.
   const anchor = recordAnchorDate(eventIndex)
-  const annotation = deepMerge(eventIndex.declaration, action.annotation ?? {})
+  const declarationWithAnnotation = deepMerge(
+    eventIndex.declaration,
+    action.annotation ?? {}
+  )
   const templateId = action.content?.templateId
   const certTemplateFieldConfig = useCertificateTemplateSelectorFieldConfig(
     event.type,
@@ -74,15 +79,21 @@ export function PrintCertificate({
 
   const content = formPages.flatMap((page) => {
     const fields = page.fields
-      .filter((f) => isFieldDisplayedOnReview(f, annotation, validatorContext))
-      .filter((f) => !isEmptyValue(f, annotation[f.id]))
+      .filter((f) =>
+        isFieldDisplayedOnReview(
+          f,
+          { declaration: declarationWithAnnotation },
+          conditionalContext
+        )
+      )
+      .filter((f) => !isEmptyValue(f, declarationWithAnnotation[f.id]))
       .map((field) => {
         const valueDisplay = (
           <Output
             anchor={anchor}
             eventConfig={eventConfiguration}
             field={field}
-            value={annotation[field.id]}
+            value={declarationWithAnnotation[field.id]}
           />
         )
 
@@ -104,7 +115,7 @@ export function PrintCertificate({
             defaultValue: false,
             required: true
           }}
-          value={annotation[page.id]}
+          value={declarationWithAnnotation[page.id]}
         />
       )
 

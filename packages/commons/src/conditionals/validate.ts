@@ -40,11 +40,7 @@ import {
   AgeValue
 } from '../events/FieldValue'
 import { TranslationConfig } from '../events/TranslationConfig'
-import {
-  EncodedScope,
-  ITokenPayload,
-  TokenUserType
-} from '../users/authentication'
+import { ITokenPayload } from '../users/authentication'
 import { UUID } from '../uuid'
 import {
   ageToDate,
@@ -57,10 +53,8 @@ import { ActionConfig } from '../events/ActionConfig'
 import { ActionType } from '../events/ActionType'
 import { EventConfig } from '../events/EventConfig'
 import { EventDocument } from '../events/EventDocument'
-import { EventIndex } from '../events/EventIndex'
 import { Location } from '../events/locations'
 import { SystemVariables } from '../events/TemplateConfig'
-import { getCurrentEventState } from '../events/state'
 import { isPlainDate } from '../events/PlainDate'
 import {
   ActionConditionalContext,
@@ -68,10 +62,14 @@ import {
   buildActionConditionalParameters,
   buildActionFormConditionalParameters,
   buildCertificateTemplateConditionalParameters,
-  buildSecuredConditionalParameters,
+  buildEventIndexConditionalParameters,
   CertificateTemplateConditionalContext,
+  ClientFunctionConditionalContext,
   FormValues,
-  SecuredConditionalContext
+  hasClientFunctionEvent,
+  resolveEventState,
+  EventIndexConditionalContext,
+  UserConditionalContext
 } from './validate-v2'
 
 const ajv = new Ajv({
@@ -174,12 +172,16 @@ export type ClientFunctionContext = {
   $form: EventState | ActionUpdate
   $now: string
   $online: boolean
-  $user?: UserValidatorContext
+  $user?: UserConditionalContext
   $event?: EventDocument
   $leafAdminStructureLocationIds: Array<{ id: UUID }>
+  /** The profile of the user. Only `$$code` default values get it. */
   user?: SystemVariables['user']
+  /** The location of the browser window. Only `$$code` default values get it. */
   $window?: SystemVariables['$window']
+  /** No caller sets it at the moment, so it is always `undefined`. */
   locations?: Location[]
+  /** The ids of the levels of the administrative structure. Only `$$code` default values get it. */
   adminLevelIds?: string[]
   $flags?: string[]
   $status?: string
@@ -223,7 +225,7 @@ export function isOnline() {
 // about a stable timestamp/online flag should snapshot it themselves.
 export function buildClientFunctionContext(input: {
   form: EventState | ActionUpdate
-  validatorContext?: ValidatorContext
+  conditionalContext?: ClientFunctionConditionalContext
   systemVariables?: SystemVariables
   /**
    * In real use cases, there can be hundreds of thousands of locations.
@@ -234,19 +236,26 @@ export function buildClientFunctionContext(input: {
   locations?: Location[]
   adminLevelIds?: string[]
 }): ClientFunctionContext {
+  // @TODO: Double check and reconcile the changes.
+  const { conditionalContext } = input
+  const event =
+    conditionalContext && hasClientFunctionEvent(conditionalContext)
+      ? conditionalContext
+      : undefined
+  const eventState = event ? resolveEventState(event) : undefined
+
   return {
     $form: input.form,
-    $flags: input.validatorContext?.event?.state.flags ?? [],
+    $flags: eventState?.flags ?? [],
+    $status: eventState?.status,
     $now: todayISO(),
     $online: isOnline(),
-    $user: input.validatorContext?.user,
-    $event: input.validatorContext?.event?.document
-      ? getEventWithCompleteAcceptedActions(
-          input.validatorContext.event.document
-        )
+    $user: input.conditionalContext?.user,
+    $event: event?.eventDocument
+      ? getEventWithCompleteAcceptedActions(event.eventDocument)
       : undefined,
     $leafAdminStructureLocationIds:
-      input.validatorContext?.leafAdminStructureLocationIds ?? [],
+      input.conditionalContext?.leafAdminStructureLocationIds ?? [],
     user: input.systemVariables?.user,
     $window: input.systemVariables?.$window,
     locations: input.locations,
@@ -500,15 +509,16 @@ function getConditionalActionsForField(
     .map((conditional) => conditional.type)
 }
 
+/**
+ * Returns whether all the conditions are met, e.g. for the banners and fields of the event summary.
+ * The event can be an event index, e.g. when the event is not downloaded.
+ */
 export function areConditionsMet(
   conditions: FieldConditional[],
   form: FormValues,
-  context: ActionFormConditionalContext
+  context: ActionConditionalContext
 ) {
-  const clientFunctionContext = buildActionFormConditionalParameters(
-    form,
-    context
-  )
+  const clientFunctionContext = buildActionConditionalParameters(form, context)
 
   return conditions.every((condition) =>
     validate(condition.conditional, clientFunctionContext)
@@ -523,7 +533,7 @@ export function areConditionsMet(
 export function isFieldSecured(
   field: Pick<FieldConfig, 'secured'>,
   form: FormValues,
-  context: SecuredConditionalContext
+  context: EventIndexConditionalContext
 ): boolean {
   if (typeof field.secured !== 'object' || field.secured === null) {
     return Boolean(field.secured)
@@ -531,42 +541,8 @@ export function isFieldSecured(
 
   return validate(
     field.secured as JSONSchema,
-    buildSecuredConditionalParameters(form, context)
+    buildEventIndexConditionalParameters(form, context)
   )
-}
-
-export type EventValidatorContext = {
-  document: EventDocument
-  state: EventIndex
-}
-
-export function getEventValidatorContext(
-  document: EventDocument,
-  config: EventConfig
-): EventValidatorContext {
-  return { document, state: getCurrentEventState(document, config) }
-}
-
-export type UserValidatorContext = {
-  // In system-wide context internal service tokens do not have UUID.
-  sub: string
-  scope: EncodedScope[]
-  role?: string
-  userType: TokenUserType
-}
-/** deprecated */
-export type ValidatorContext = {
-  user?: UserValidatorContext
-  leafAdminStructureLocationIds?: Array<{ id: UUID }>
-  baseFormState?: EventState
-  event?: EventValidatorContext
-}
-
-export type StrictValidatorContext = {
-  user: UserValidatorContext
-  leafAdminStructureLocationIds: Array<{ id: UUID }>
-  baseFormState?: EventState
-  event: EventValidatorContext
 }
 
 function isFieldConditionMet(
@@ -915,15 +891,8 @@ export function runFieldValidations({
     return []
   }
   /**
-   * Built via the shared helper so every site that compiles a serialised
-   * client function (AJV `customClientValidator`, sync-listener evaluator,
-   * default-value evaluator, HTTP field-param resolver) feeds the function
-   * the same {@link ClientFunctionContext} shape.
-   *
-   * Note on locations: `validatorContext.leafAdminStructureLocationIds` must
-   * already be narrowed (e.g. to the user's admin scope) by the caller — there
-   * can be hundreds of thousands of locations in real deployments and
-   * loading them all into memory chokes the app.
+   * The caller must narrow `context.leafAdminStructureLocationIds`, e.g. to the admin scope of the user.
+   * A country can have hundreds of thousands of locations. If all of them are in memory, the app becomes slow.
    */
   const conditionalParameters = buildActionFormConditionalParameters(
     form,

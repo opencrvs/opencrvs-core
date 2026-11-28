@@ -49,7 +49,7 @@ import {
 import {
   ActionFormConditionalContext,
   FormValues,
-  SecuredConditionalContext,
+  EventIndexConditionalContext,
   AnnotationFormValues
 } from '../conditionals/validate-v2'
 import { Draft } from './Draft'
@@ -1192,7 +1192,7 @@ export function aggregateActionAnnotations(event: EventDocument): EventState {
 export function dropSecuredDeclarationFields(
   eventConfig: EventConfig,
   eventIndex: EventIndex,
-  context: SecuredConditionalContext
+  context: EventIndexConditionalContext
 ): EventIndex {
   const declarationFields = getDeclarationFields(eventConfig)
   const form = { declaration: eventIndex.declaration }

@@ -17,6 +17,7 @@ import {
   FieldProps,
   FieldType,
   FieldConfig,
+  isFieldVisible,
   DataFieldValue,
   DataField,
   StaticDataEntry,
@@ -29,10 +30,12 @@ import {
 } from '@opencrvs/commons/client'
 import { List } from '@opencrvs/components'
 import { Output } from '@client/v2-events/features/events/components/Output'
-import { useValidatorContext } from '@client/v2-events/hooks/useValidatorContext'
 import { makeFormikFieldIdOpenCRVSCompatible } from '@client/v2-events/components/forms/utils'
 import { parseFieldReferenceToValue } from '@client/v2-events/components/forms/FormFieldGenerator/utils'
-import { isFieldVisible } from '@client/v2-events/conditionals'
+import {
+  FormConditionalContext,
+  toActionFormConditionalContext
+} from '@client/v2-events/components/forms/formConditionalContext'
 
 function getFieldFromDataEntry({
   intl,
@@ -116,15 +119,18 @@ function DataInput({
   label,
   formData,
   allKnownFields,
+  conditionalContext,
   onChange,
   id
 }: FieldProps<'DATA'> & {
   formData: EventState
   allKnownFields: FieldConfig[]
+  /** The context of the form that the field is in. */
+  conditionalContext: FormConditionalContext
   onChange: (value: DataFieldValue) => void
 }) {
   const intl = useIntl()
-  const validatorContext = useValidatorContext()
+  const actionFormContext = toActionFormConditionalContext(conditionalContext)
   const { subtitle, data } = configuration
   const title = label.defaultMessage ? intl.formatMessage(label) : ''
 
@@ -139,7 +145,7 @@ function DataInput({
           )
         }
         const visibleConfigs = configs.filter((f) =>
-          isFieldVisible(f, formData, validatorContext)
+          isFieldVisible(f, { declaration: formData }, actionFormContext)
         )
 
         // We don't want to display fields that are conditionally hidden in the original form configuration

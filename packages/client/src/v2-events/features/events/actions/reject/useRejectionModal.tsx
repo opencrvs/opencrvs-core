@@ -16,7 +16,8 @@ import {
   findActionDialogCopy,
   getActionFormFields,
   ActionType,
-  eventAttachmentPath
+  eventAttachmentPath,
+  getOrThrow
 } from '@opencrvs/commons/client'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
 import { findLocalEventDocument } from '@client/v2-events/features/events/useEvents/api'
@@ -42,7 +43,10 @@ export function useRejectionModal(event: EventIndex) {
           attachmentPath={eventAttachmentPath(eventId)}
           close={close}
           dialogCopy={dialogCopy}
-          event={findLocalEventDocument(eventId)}
+          event={getOrThrow(
+            findLocalEventDocument(eventId),
+            'The event must be downloaded before it is rejected'
+          )}
           eventConfiguration={eventConfiguration}
           fields={fields}
         />

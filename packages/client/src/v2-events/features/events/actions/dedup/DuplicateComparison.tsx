@@ -23,6 +23,8 @@ import {
   getDeclaration,
   getDeclarationFields,
   getDeclarationPages,
+  isFieldDisplayedOnReview,
+  isPageVisible,
   PlainDate,
   resolveVersion,
   toPlainDate,
@@ -45,13 +47,9 @@ import {
   recordAnchorDate
 } from '@client/v2-events/utils'
 import { useUsers } from '@client/v2-events/hooks/useUsers'
-import { useValidatorContext } from '@client/v2-events/hooks/useValidatorContext'
+import { useActionFormConditionalContext } from '@client/v2-events/hooks/useConditionalContext'
 import { useLocations } from '@client/v2-events/hooks/useLocations'
 import { useAdministrativeAreas } from '@client/v2-events/hooks/useAdministrativeAreas'
-import {
-  isFieldDisplayedOnReview,
-  isPageVisible
-} from '@client/v2-events/conditionals'
 import { Output, ValueOutput } from '../../components/Output'
 import { DocumentViewer } from '../../components/DocumentViewer'
 import { duplicateMessages } from './ReviewDuplicate'
@@ -162,8 +160,12 @@ function useComparisonSide(
   eventState: EventIndex,
   eventConfiguration: EventConfig
 ) {
-  const validatorContext = useValidatorContext(event)
+  const conditionalContext = useActionFormConditionalContext(
+    event,
+    eventConfiguration
+  )
   const declaration = eventState.declaration
+  const form = { declaration }
   const pages = getDeclarationPages(eventConfiguration)
   const fieldsById = new Map(
     getDeclarationFields(eventConfiguration).map((field) => [field.id, field])
@@ -174,13 +176,13 @@ function useComparisonSide(
 
   function isPageShown(pageId: string) {
     const page = pages.find(({ id }) => id === pageId)
-    return page ? isPageVisible(page, declaration, validatorContext) : false
+    return page ? isPageVisible(page, form, conditionalContext) : false
   }
 
   function isFieldShown(fieldId: string) {
     const field = fieldsById.get(fieldId)
     return field
-      ? isFieldDisplayedOnReview(field, declaration, validatorContext)
+      ? isFieldDisplayedOnReview(field, form, conditionalContext)
       : false
   }
 
@@ -194,7 +196,7 @@ function useComparisonSide(
     const candidates = rowFields.flatMap(({ id }) => fieldsById.get(id) ?? [])
     const field =
       candidates.find((candidate) =>
-        isFieldDisplayedOnReview(candidate, declaration, validatorContext)
+        isFieldDisplayedOnReview(candidate, form, conditionalContext)
       ) ?? candidates.at(0)
 
     return field ? (
